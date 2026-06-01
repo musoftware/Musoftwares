@@ -69,23 +69,21 @@ export default function AdminToolsIndex({ tools, categories }: Props) {
 
     return (
         <WorkspaceLayout
-            title="Admin — Tools"
+            title={__('general.admin_tools')}
             workspaceName="Musoftware Admin"
             tenantId="SYS-ADMIN"
             menuItems={menuItems}
         >
-            <Head title="Tools Marketplace — Admin" />
+            <Head title={__('general.tools_marketplace_admin')} />
 
             <div className="space-y-6">
                 <ModulePageHeader
-                    title="Tools Marketplace"
-                    description="Manage downloadable desktop tools, pricing plans, and release versions."
+                    title={__('general.tools_marketplace')}
+                    description={__('general.manage_downloadable_desktop_tools_pricing_plans_and_release_versions')}
                     actions={
                         <Link href={route('admin.tools.create')}>
                             <Button size="sm" className="gap-1.5 text-xs bg-slate-900 hover:bg-slate-800 text-white">
-                                <Plus className="h-3.5 w-3.5" />
-                                New Tool
-                            </Button>
+                                <Plus className="h-3.5 w-3.5" />{__('general.new_tool')}</Button>
                         </Link>
                     }
                 />
@@ -94,8 +92,8 @@ export default function AdminToolsIndex({ tools, categories }: Props) {
                     {tools.data.length === 0 ? (
                         <EmptyState
                             icon={Package}
-                            title="No tools yet"
-                            description="Create your first downloadable tool to populate the marketplace."
+                            title={__('general.no_tools_yet')}
+                            description={__('general.create_your_first_downloadable_tool_to_populate_the_marketplace')}
                             action={route('admin.tools.create')}
                             actionLabel="Create First Tool"
                         />
@@ -109,7 +107,7 @@ export default function AdminToolsIndex({ tools, categories }: Props) {
                                             <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden md:table-cell">Category</th>
                                             <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden lg:table-cell">Version</th>
                                             <th className="text-center px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden sm:table-cell">Subs</th>
-                                            <th className="text-center px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden sm:table-cell">Active Users</th>
+                                            <th className="text-center px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden sm:table-cell">{__('general.active_users')}</th>
                                             <th className="text-center px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Status</th>
                                             <th className="text-right px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
                                         </tr>
@@ -131,10 +129,8 @@ export default function AdminToolsIndex({ tools, categories }: Props) {
                                                             <div className="flex items-center gap-1.5">
                                                                 <p className="font-semibold text-text-primary text-sm leading-tight">{tool.title}</p>
                                                                 {tool.max_subscription_months === 1 && (
-                                                                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-50 border border-amber-200 text-amber-700 rounded text-[10px] font-semibold" title="Monthly subscriptions only">
-                                                                        <Clock className="h-2.5 w-2.5" />
-                                                                        Monthly Only
-                                                                    </span>
+                                                                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-50 border border-amber-200 text-amber-700 rounded text-[10px] font-semibold" title={__('general.monthly_subscriptions_only')}>
+                                                                        <Clock className="h-2.5 w-2.5" />{__('general.monthly_only')}</span>
                                                                 )}
                                                             </div>
                                                             <p className="text-xs text-text-muted mt-0.5">{tool.slug}</p>

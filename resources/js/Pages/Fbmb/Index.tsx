@@ -203,9 +203,9 @@ export default function ISaasIndex() {
 
     return (
         <AuthenticatedLayout
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">iSAAS Database Lookup</h2>}
+            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('general.isaas_database_lookup')}</h2>}
         >
-            <Head title="iSAAS Database Lookup" />
+            <Head title={__('general.isaas_database_lookup')} />
 
             <div className="py-8 md:py-12">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -219,12 +219,8 @@ export default function ISaasIndex() {
                                 <Database className="w-5 h-5 text-white" />
                             </div>
                             <div>
-                                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-                                    iSAAS Database Lookup
-                                </h1>
-                                <p className="text-sm text-slate-500">
-                                    Upload Facebook IDs → Get Mobile Numbers instantly
-                                </p>
+                                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">{__('general.isaas_database_lookup')}</h1>
+                                <p className="text-sm text-slate-500">{__('general.upload_facebook_ids_get_mobile_numbers_instantly')}</p>
                             </div>
                         </div>
                     </div>
@@ -246,8 +242,7 @@ export default function ISaasIndex() {
                             </p>
                             {!hasBalance && (
                                 <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
-                                    <AlertCircle className="w-3 h-3" /> Get points to start lookups
-                                </p>
+                                    <AlertCircle className="w-3 h-3" />{__('general.get_points_to_start_lookups')}</p>
                             )}
                             <div className={cn("absolute -right-2 -bottom-2 w-16 h-16 rounded-full opacity-10", hasBalance ? "bg-emerald-500" : "bg-amber-500")} />
                         </div>
@@ -255,12 +250,12 @@ export default function ISaasIndex() {
                         <div className="relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-4">
                             <div className="flex items-center gap-2 mb-1">
                                 <Zap className="w-4 h-4 text-indigo-500" />
-                                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Cost Per Match</span>
+                                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">{__('general.cost_per_match')}</span>
                             </div>
                             <p className="text-2xl font-bold font-mono tracking-tight text-indigo-700">
                                 1 <span className="text-sm font-normal text-slate-400">Point</span>
                             </p>
-                            <p className="text-xs text-slate-500 mt-1">Only charged for successful matches</p>
+                            <p className="text-xs text-slate-500 mt-1">{__('general.only_charged_for_successful_matches')}</p>
                             <div className="absolute -right-2 -bottom-2 w-16 h-16 rounded-full bg-indigo-500 opacity-10" />
                         </div>
                     </div>
@@ -276,9 +271,7 @@ export default function ISaasIndex() {
                                     : "text-slate-500 hover:text-slate-700"
                             )}
                         >
-                            <UploadCloud className="w-4 h-4" />
-                            New Lookup
-                        </button>
+                            <UploadCloud className="w-4 h-4" />{__('general.new_lookup')}</button>
                         <button
                             onClick={() => setActiveTab('history')}
                             className={cn(
@@ -395,8 +388,7 @@ export default function ISaasIndex() {
                                                                 {isDragging ? 'Drop your file here' : 'Click to upload or drag and drop'}
                                                             </p>
                                                             <p className="text-xs text-slate-500">
-                                                                Supports <span className="font-medium">.txt</span> and <span className="font-medium">.csv</span> files up to 10 MB
-                                                            </p>
+                                                                Supports <span className="font-medium">.txt</span> and <span className="font-medium">.csv</span>{__('general.files_up_to_10_mb')}</p>
                                                         </>
                                                     ) : (
                                                         <div className="flex items-center gap-4 w-full" onClick={(e) => e.stopPropagation()}>
@@ -436,9 +428,7 @@ export default function ISaasIndex() {
                                                                 </p>
                                                                 {estimatedIds > pointsBalance && (
                                                                     <p className="text-amber-600 flex items-center gap-1 font-medium">
-                                                                        <AlertCircle className="w-3 h-3" />
-                                                                        Your points may not cover all matches. Partial results may be available.
-                                                                    </p>
+                                                                        <AlertCircle className="w-3 h-3" />{__('general.your_points_may_not_cover_all_matches_partial_results_may_be_available')}</p>
                                                                 )}
                                                             </div>
                                                         </div>
@@ -456,14 +446,10 @@ export default function ISaasIndex() {
                                                                 : ""
                                                         )}
                                                     >
-                                                        <Sparkles className="w-4 h-4 mr-2" />
-                                                        Start Lookup
-                                                    </Button>
+                                                        <Sparkles className="w-4 h-4 mr-2" />{__('general.start_lookup')}</Button>
                                                     {!hasBalance && (
                                                         <p className="text-xs text-amber-600 flex items-center gap-1">
-                                                            <AlertCircle className="w-3 h-3 shrink-0" />
-                                                            Get points to use this feature
-                                                        </p>
+                                                            <AlertCircle className="w-3 h-3 shrink-0" />{__('general.get_points_to_use_this_feature')}</p>
                                                     )}
                                                 </div>
                                             </form>
@@ -478,7 +464,7 @@ export default function ISaasIndex() {
                                                         <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
                                                     </div>
                                                 </div>
-                                                <h3 className="mt-6 text-lg font-semibold text-slate-800">Processing your file...</h3>
+                                                <h3 className="mt-6 text-lg font-semibold text-slate-800">{__('general.processing_your_file')}</h3>
                                                 <p className="mt-1 text-sm text-slate-500 text-center max-w-xs">
                                                     Searching {estimatedIds > 0 ? `${estimatedIds.toLocaleString()} IDs` : 'your IDs'} across the intelligence database. This may take a moment.
                                                 </p>
@@ -498,14 +484,14 @@ export default function ISaasIndex() {
                                                         <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                                                     </div>
                                                     <div>
-                                                        <h3 className="text-sm font-semibold text-emerald-800">Lookup Complete</h3>
-                                                        <p className="text-xs text-emerald-600">Your results are ready to download. This lookup is also saved in History.</p>
+                                                        <h3 className="text-sm font-semibold text-emerald-800">{__('general.lookup_complete')}</h3>
+                                                        <p className="text-xs text-emerald-600">{__('general.your_results_are_ready_to_download_this_lookup_is_also_saved_in_history')}</p>
                                                     </div>
                                                 </div>
 
                                                 <div className="grid grid-cols-3 gap-3 mb-6">
                                                     <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
-                                                        <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Total IDs</p>
+                                                        <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">{__('general.total_ids')}</p>
                                                         <p className="text-2xl font-bold font-mono text-slate-800">{result.total_ids.toLocaleString()}</p>
                                                     </div>
                                                     <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center">
@@ -513,14 +499,14 @@ export default function ISaasIndex() {
                                                         <p className="text-2xl font-bold font-mono text-emerald-700">{result.found_count.toLocaleString()}</p>
                                                     </div>
                                                     <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-center">
-                                                        <p className="text-xs text-indigo-600 font-medium uppercase tracking-wider mb-1">Points Used</p>
+                                                        <p className="text-xs text-indigo-600 font-medium uppercase tracking-wider mb-1">{__('general.points_used')}</p>
                                                         <p className="text-2xl font-bold font-mono text-indigo-700">{result.credits_used.toLocaleString()}</p>
                                                     </div>
                                                 </div>
 
                                                 <div className="mb-6">
                                                     <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
-                                                        <span>Match Rate</span>
+                                                        <span>{__('general.match_rate')}</span>
                                                         <span className="font-mono font-medium text-slate-700">
                                                             {result.total_ids > 0 ? ((result.found_count / result.total_ids) * 100).toFixed(1) : 0}%
                                                         </span>
@@ -536,8 +522,7 @@ export default function ISaasIndex() {
                                                 <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 mb-6">
                                                     <div className="flex items-center justify-between text-sm">
                                                         <span className="text-slate-500 flex items-center gap-1.5">
-                                                            <Wallet className="w-3.5 h-3.5" /> Remaining Points
-                                                        </span>
+                                                            <Wallet className="w-3.5 h-3.5" />{__('general.remaining_points')}</span>
                                                         <span className="font-mono font-semibold text-slate-800">{result.remaining_balance.toLocaleString()} Pts</span>
                                                     </div>
                                                 </div>
@@ -553,17 +538,13 @@ export default function ISaasIndex() {
                                                         </Button>
                                                     )}
                                                     <Button onClick={startNewLookup} variant="outline" className="h-11 rounded-xl">
-                                                        <ArrowRight className="w-4 h-4 mr-2" />
-                                                        New Lookup
-                                                    </Button>
+                                                        <ArrowRight className="w-4 h-4 mr-2" />{__('general.new_lookup')}</Button>
                                                 </div>
 
                                                 {result.found_count === 0 && (
                                                     <div className="mt-4 p-4 rounded-xl border border-amber-200 bg-amber-50">
                                                         <p className="text-sm text-amber-700 flex items-center gap-2">
-                                                            <AlertCircle className="w-4 h-4 shrink-0" />
-                                                            No matches were found. No points were deducted.
-                                                        </p>
+                                                            <AlertCircle className="w-4 h-4 shrink-0" />{__('general.no_matches_were_found_no_points_were_deducted')}</p>
                                                     </div>
                                                 )}
                                             </div>
@@ -584,17 +565,13 @@ export default function ISaasIndex() {
                                     <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 mb-4">
                                         <History className="w-8 h-8 text-slate-400" />
                                     </div>
-                                    <h3 className="text-base font-semibold text-slate-700 mb-1">No lookups yet</h3>
-                                    <p className="text-sm text-slate-500 max-w-xs">
-                                        Once you run a lookup, it will appear here for 24 hours.
-                                    </p>
+                                    <h3 className="text-base font-semibold text-slate-700 mb-1">{__('general.no_lookups_yet')}</h3>
+                                    <p className="text-sm text-slate-500 max-w-xs">{__('general.once_you_run_a_lookup_it_will_appear_here_for_24_hours')}</p>
                                     <Button
                                         onClick={() => setActiveTab('lookup')}
                                         className="mt-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl h-10 px-5 text-sm font-semibold"
                                     >
-                                        <Sparkles className="w-4 h-4 mr-2" />
-                                        Start your first lookup
-                                    </Button>
+                                        <Sparkles className="w-4 h-4 mr-2" />{__('general.start_your_first_lookup')}</Button>
                                 </div>
                             ) : (
                                 <div className="space-y-3">
@@ -676,7 +653,7 @@ export default function ISaasIndex() {
                                                                         : "bg-slate-100 text-slate-400"
                                                             )}>
                                                                 {record.found_count === 0 ? (
-                                                                    <><AlertCircle className="w-3 h-3" /> No matches</>
+                                                                    <><AlertCircle className="w-3 h-3" />{__('general.no_matches')}</>
                                                                 ) : (
                                                                     <><X className="w-3 h-3" /> Expired</>
                                                                 )}
@@ -688,9 +665,7 @@ export default function ISaasIndex() {
                                         );
                                     })}
 
-                                    <p className="text-center text-xs text-slate-400 pt-2">
-                                        Lookup results are kept for 24 hours, then automatically removed.
-                                    </p>
+                                    <p className="text-center text-xs text-slate-400 pt-2">{__('general.lookup_results_are_kept_for_24_hours_then_automatically_removed')}</p>
                                 </div>
                             )}
                         </div>
@@ -699,9 +674,7 @@ export default function ISaasIndex() {
                     {/* ── Info Footer ── */}
                     {activeTab === 'lookup' && (
                         <div className="mt-6 text-center">
-                            <p className="text-xs text-slate-400">
-                                Results are saved for 24 hours — switch to the History tab to re-download anytime.
-                            </p>
+                            <p className="text-xs text-slate-400">{__('general.results_are_saved_for_24_hours_switch_to_the_history_tab_to_re_download_anytime')}</p>
                         </div>
                     )}
                 </div>

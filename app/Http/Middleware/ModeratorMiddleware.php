@@ -23,7 +23,7 @@ class ModeratorMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->check() || !auth()->user()->hasAnyRole(['admin', 'Admin', 'super_admin', 'superadmin', 'moderator'])) {
-            abort(403, 'Unauthorized access.');
+            abort(403, __('general.unauthorized_access'));
         }
 
         return $next($request);

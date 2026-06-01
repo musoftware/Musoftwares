@@ -109,7 +109,7 @@ export default function RecurringForm({ entry = null, business_currency = 'USD' 
     return (
         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-8">
             <div className="bg-white p-6 shadow sm:rounded-lg">
-                <h3 className="text-lg font-medium text-gray-900 mb-4 border-b pb-2">Section 1 — Basic Info</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4 border-b pb-2">{__('general.section_1_basic_info')}</h3>
                 <div className="space-y-4">
                     <div>
                         <InputLabel value="Type" />
@@ -140,7 +140,7 @@ export default function RecurringForm({ entry = null, business_currency = 'USD' 
                             className="mt-1 block w-full"
                             value={data.title}
                             onChange={(e) => setData('title', e.target.value)}
-                            placeholder="e.g. Monthly Rent, Client Subscription"
+                            placeholder={__('general.e_g_monthly_rent_client_subscription')}
                         />
                         <InputError message={errors.title} className="mt-2" />
                     </div>
@@ -160,7 +160,7 @@ export default function RecurringForm({ entry = null, business_currency = 'USD' 
             </div>
 
             <div className="bg-white p-6 shadow sm:rounded-lg">
-                <h3 className="text-lg font-medium text-gray-900 mb-4 border-b pb-2">Section 2 — Amount</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4 border-b pb-2">{__('general.section_2_amount')}</h3>
                 <div className="grid grid-cols-3 gap-4">
                     <div className="col-span-2">
                         <InputLabel htmlFor="amount" value="Amount" />
@@ -188,13 +188,12 @@ export default function RecurringForm({ entry = null, business_currency = 'USD' 
                 </div>
                 {data.amount && data.amount_currency !== business_currency && (
                     <div className="mt-4 text-sm text-gray-500 flex items-center">
-                        ≈ <span className="mx-1 font-medium"><CurrencyDisplay amount={data.amount} currency={data.amount_currency} /></span> at today's rate
-                    </div>
+                        ≈ <span className="mx-1 font-medium"><CurrencyDisplay amount={data.amount} currency={data.amount_currency} /></span>{__('general.at_today_s_rate')}</div>
                 )}
             </div>
 
             <div className="bg-white p-6 shadow sm:rounded-lg">
-                <h3 className="text-lg font-medium text-gray-900 mb-4 border-b pb-2">Section 3 — Schedule</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4 border-b pb-2">{__('general.section_3_schedule')}</h3>
                 <div className="space-y-6">
                     <div>
                         <InputLabel value="Frequency" />
@@ -301,9 +300,7 @@ export default function RecurringForm({ entry = null, business_currency = 'USD' 
                                         className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 mr-1"
                                         checked={data.no_end_date}
                                         onChange={(e) => setData('no_end_date', e.target.checked)}
-                                    />
-                                    No end date
-                                </label>
+                                    />{__('general.no_end_date')}</label>
                             </div>
                             <TextInput
                                 id="ends_at"
@@ -321,9 +318,7 @@ export default function RecurringForm({ entry = null, business_currency = 'USD' 
 
             <div className="bg-gray-50 p-6 border-2 border-dashed border-gray-300 rounded-lg">
                 <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                    <CalendarIcon className="w-5 h-5 mr-2 text-indigo-500" />
-                    Section 4 — Preview
-                </h3>
+                    <CalendarIcon className="w-5 h-5 mr-2 text-indigo-500" />{__('general.section_4_preview')}</h3>
                 <div className="space-y-2">
                     <p className="text-sm font-medium text-gray-700">Next 3 occurrences:</p>
                     <ul className="space-y-1">

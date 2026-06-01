@@ -97,7 +97,7 @@
                             @endforeach
 
                             <div class="text-center">
-                                <button type="submit" class="btn btn-primary btn-lg px-5" aria-label="Paper Plane">
+                                <button type="submit" class="btn btn-primary btn-lg px-5" aria-label="{{ __('general.paper_plane') }}">
                                     <i class="fas fa-paper-plane me-2"></i>{{ $landingPage->form_config['submit_button_text'] ?? 'Submit' }}
                                 </button>
                             </div>

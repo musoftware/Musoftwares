@@ -5,11 +5,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 export default function Submissions({ service, landingPage, submissions }: any) {
     return (
-        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Landing Page Leads</h2>}>
-            <Head title="Landing Page Leads" />
+        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('general.landing_page_leads')}</h2>}>
+            <Head title={__('general.landing_page_leads')} />
             <div className="py-12 max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <h3 className="text-lg font-medium mb-4">Leads & Submissions</h3>
+                    <h3 className="text-lg font-medium mb-4">{__('general.leads_submissions')}</h3>
                     <div className="border rounded-md">
                         <Table>
                             <TableHeader>
@@ -36,7 +36,7 @@ export default function Submissions({ service, landingPage, submissions }: any) 
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={4} className="text-center py-8 text-gray-500">No submissions found.</TableCell>
+                                        <TableCell colSpan={4} className="text-center py-8 text-gray-500">{__('general.no_submissions_found')}</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>

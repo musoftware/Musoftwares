@@ -21,8 +21,8 @@ export default function SlaAlertsList({ leads = [] }: { leads: StaleLead[] }) {
                 <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mb-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                 </div>
-                <span className="font-medium text-emerald-800">{__('Zero SLA Breaches')}</span>
-                <span className="text-emerald-600/80 mt-1">{__('All leads are being followed up on time.')}</span>
+                <span className="font-medium text-emerald-800">{__('general.zero_sla_breaches')}</span>
+                <span className="text-emerald-600/80 mt-1">{__('general.all_leads_are_being_followed_up_on_time')}</span>
             </div>
         );
     }
@@ -32,9 +32,9 @@ export default function SlaAlertsList({ leads = [] }: { leads: StaleLead[] }) {
         const now = new Date();
         const diffHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
         
-        if (diffHours < 24) return `${diffHours} ${__('hours ago')}`;
+        if (diffHours < 24) return `${diffHours} ${__('general.hours_ago')}`;
         const diffDays = Math.floor(diffHours / 24);
-        return `${diffDays} ${__('days ago')}`;
+        return `${diffDays} ${__('general.days_ago')}`;
     };
 
     return (
@@ -44,11 +44,11 @@ export default function SlaAlertsList({ leads = [] }: { leads: StaleLead[] }) {
                     <div className="flex items-start gap-3">
                         <div className="mt-0.5">
                             {lead.assigned_to_id ? (
-                                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center" title={__('Stale Lead')}>
+                                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center" title={__('general.stale_lead')}>
                                     <Clock className="w-4 h-4 text-red-600" />
                                 </div>
                             ) : (
-                                <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center" title={__('Unassigned Lead')}>
+                                <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center" title={__('general.unassigned_lead')}>
                                     <UserX className="w-4 h-4 text-amber-600" />
                                 </div>
                             )}
@@ -61,7 +61,7 @@ export default function SlaAlertsList({ leads = [] }: { leads: StaleLead[] }) {
                                 </Badge>
                                 <span className="text-xs text-slate-500 flex items-center gap-1">
                                     <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                                    {__('Last touched:')} <span className="font-medium text-red-600">{getTimeAgo(lead.updated_at)}</span>
+                                    {__('general.last_touched')} <span className="font-medium text-red-600">{getTimeAgo(lead.updated_at)}</span>
                                 </span>
                             </div>
                         </div>
@@ -69,7 +69,7 @@ export default function SlaAlertsList({ leads = [] }: { leads: StaleLead[] }) {
                     
                     <Button variant="ghost" size="sm" asChild className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">
                         <Link href={`/crm/leads/${lead.id}`}>
-                            {__('View')}
+                            {__('general.view')}
                             <ArrowRight className="w-4 h-4 ml-1" />
                         </Link>
                     </Button>

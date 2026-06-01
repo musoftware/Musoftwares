@@ -55,24 +55,23 @@ export default function Show({ sequence }) {
                 </div>
                 <div className="flex space-x-3">
                     <Link href={route('crm.sequences.index')}>
-                        <Button variant="outline">Back to Sequences</Button>
+                        <Button variant="outline">{__('general.back_to_sequences')}</Button>
                     </Link>
                     <Dialog open={isAiOpen} onOpenChange={setIsAiOpen}>
                         <DialogTrigger asChild>
                             <Button className="bg-indigo-600 hover:bg-indigo-700">
-                                <Sparkles className="w-4 h-4 mr-2" /> Auto-Generate with AI
-                            </Button>
+                                <Sparkles className="w-4 h-4 mr-2" />{__('general.auto_generate_with_ai')}</Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[600px]">
                             <DialogHeader>
-                                <DialogTitle>AI Sequence Generator</DialogTitle>
+                                <DialogTitle>{__('general.ai_sequence_generator')}</DialogTitle>
                             </DialogHeader>
                             {!generatedSteps ? (
                                 <div className="space-y-4 py-4">
                                     <div className="space-y-2">
-                                        <Label>Campaign Goal / Context</Label>
+                                        <Label>{__('general.campaign_goal_context')}</Label>
                                         <Textarea 
-                                            placeholder="e.g. A welcome series for new freelancers explaining how to get their first job..."
+                                            placeholder={__('general.e_g_a_welcome_series_for_new_freelancers_explaining_how_to_get_their_first_job')}
                                             value={aiForm.context}
                                             onChange={e => setAiForm({...aiForm, context: e.target.value})}
                                             rows={3}
@@ -80,7 +79,7 @@ export default function Show({ sequence }) {
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label>Number of Steps</Label>
+                                            <Label>{__('general.number_of_steps')}</Label>
                                             <Input type="number" min="1" max="5" value={aiForm.num_steps} onChange={e => setAiForm({...aiForm, num_steps: parseInt(e.target.value)})} />
                                         </div>
                                         <div className="space-y-2">
@@ -91,8 +90,8 @@ export default function Show({ sequence }) {
                                                 onChange={e => setAiForm({...aiForm, tone: e.target.value})}
                                             >
                                                 <option value="professional">Professional</option>
-                                                <option value="friendly">Friendly & Welcoming</option>
-                                                <option value="urgent">Urgent / Sales</option>
+                                                <option value="friendly">{__('general.friendly_welcoming')}</option>
+                                                <option value="urgent">{__('general.urgent_sales')}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -111,9 +110,9 @@ export default function Show({ sequence }) {
                                             <div className="font-semibold text-gray-700 mb-2">Step {idx + 1} (Wait {step.delay} {step.unit}s)</div>
                                             {step.send_email && (
                                                 <div className="mb-2">
-                                                    <div className="text-xs text-gray-500 uppercase tracking-wider font-bold">Email Subject</div>
+                                                    <div className="text-xs text-gray-500 uppercase tracking-wider font-bold">{__('general.email_subject')}</div>
                                                     <div className="text-sm font-medium">{step.email_subject_en}</div>
-                                                    <div className="text-xs text-gray-500 uppercase tracking-wider font-bold mt-2">Email Body</div>
+                                                    <div className="text-xs text-gray-500 uppercase tracking-wider font-bold mt-2">{__('general.email_body')}</div>
                                                     <div className="text-sm whitespace-pre-wrap">{step.email_content_en}</div>
                                                 </div>
                                             )}
@@ -121,7 +120,7 @@ export default function Show({ sequence }) {
                                     ))}
                                     <div className="flex justify-end space-x-3 mt-4">
                                         <Button variant="outline" onClick={() => setGeneratedSteps(null)}>Discard</Button>
-                                        <Button onClick={handleApplyAI}>Apply Steps to Sequence</Button>
+                                        <Button onClick={handleApplyAI}>{__('general.apply_steps_to_sequence')}</Button>
                                     </div>
                                 </div>
                             )}
@@ -182,10 +181,9 @@ export default function Show({ sequence }) {
 
                     {sequence.steps.length === 0 && (
                         <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-                            <p className="text-gray-500 mb-4">No steps in this sequence yet.</p>
+                            <p className="text-gray-500 mb-4">{__('general.no_steps_in_this_sequence_yet')}</p>
                             <Button variant="outline" onClick={() => setIsAiOpen(true)}>
-                                <Sparkles className="w-4 h-4 mr-2 text-indigo-600" /> Generate with AI
-                            </Button>
+                                <Sparkles className="w-4 h-4 mr-2 text-indigo-600" />{__('general.generate_with_ai')}</Button>
                         </div>
                     )}
                 </div>

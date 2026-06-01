@@ -427,7 +427,7 @@ class FinancialOperationsController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Ledger entry created successfully.');
+        return redirect()->back()->with('success', __('general.ledger_entry_created_successfully'));
     }
 
     public function update(Request $request, $id)
@@ -496,7 +496,7 @@ class FinancialOperationsController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Ledger entry updated successfully.');
+        return redirect()->back()->with('success', __('general.ledger_entry_updated_successfully'));
     }
 
     public function destroy(Request $request, $id)
@@ -533,7 +533,7 @@ class FinancialOperationsController extends Controller
             }
         }
         
-        return redirect()->back()->with('success', 'Ledger entry deleted successfully.');
+        return redirect()->back()->with('success', __('general.ledger_entry_deleted_successfully'));
     }
 
     public function markAsPaid(Request $request, $id)
@@ -568,6 +568,6 @@ class FinancialOperationsController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Ledger entry marked as paid.');
+        return redirect()->back()->with('success', __('general.ledger_entry_marked_as_paid'));
     }
 }

@@ -37,7 +37,7 @@ export default function Create() {
 
     return (
         <WorkspaceLayout
-            title="Create Event Type"
+            title={__('general.create_event_type')}
             workspaceName="Booking Settings"
             tenantId="SYS-BOOKING"
             menuItems={[
@@ -48,13 +48,13 @@ export default function Create() {
                 { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
-            <Head title="Create Event Type" />
+            <Head title={__('general.create_event_type')} />
             
             <div className="max-w-2xl mx-auto space-y-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">New Event Type</h1>
-                        <p className="text-muted-foreground">Set up a new type of booking event for your clients.</p>
+                        <h1 className="text-2xl font-bold tracking-tight">{__('general.new_event_type')}</h1>
+                        <p className="text-muted-foreground">{__('general.set_up_a_new_type_of_booking_event_for_your_clients')}</p>
                     </div>
                     <div className="mt-4 sm:mt-0">
                         <Link href={route('booking.index')} className="text-sm font-medium text-slate-500 hover:text-slate-900">
@@ -66,24 +66,24 @@ export default function Create() {
                 <form onSubmit={submit} className="mt-6 space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Basic Details</CardTitle>
+                            <CardTitle>{__('general.basic_details')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="title">Event Name</Label>
+                                <Label htmlFor="title">{__('general.event_name')}</Label>
                                 <Input 
                                     id="title" 
                                     value={data.title}
                                     onChange={handleTitleChange}
-                                    placeholder="e.g. 30 Minute Consultation"
+                                    placeholder={__('general.e_g_30_minute_consultation')}
                                     required
                                 />
                                 {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="slug">URL Slug</Label>
+                                <Label htmlFor="slug">{__('general.url_slug')}</Label>
                                 <div className="flex items-center">
                                     <span className="text-muted-foreground bg-slate-50 border border-r-0 border-input rounded-l-md px-3 h-10 flex items-center text-sm">
                                         /book/
@@ -105,7 +105,7 @@ export default function Create() {
                                     id="description" 
                                     value={data.description}
                                     onChange={e => setData('description', e.target.value)}
-                                    placeholder="Tell invitees what this meeting is about..."
+                                    placeholder={__('general.tell_invitees_what_this_meeting_is_about')}
                                     rows={4}
                                 />
                                 {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
@@ -116,7 +116,7 @@ export default function Create() {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Scheduling Settings</CardTitle>
+                            <CardTitle>{__('general.scheduling_settings')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                         <div className="space-y-4">
@@ -140,14 +140,14 @@ export default function Create() {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Payment Options</CardTitle>
+                            <CardTitle>{__('general.payment_options')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between p-4 border rounded-lg bg-slate-50/50">
                                 <div className="space-y-0.5">
-                                    <Label>Require Payment</Label>
-                                    <p className="text-sm text-muted-foreground">Ask for payment when booking.</p>
+                                    <Label>{__('general.require_payment')}</Label>
+                                    <p className="text-sm text-muted-foreground">{__('general.ask_for_payment_when_booking')}</p>
                                 </div>
                                 <Switch 
                                     checked={data.requires_payment}
@@ -194,9 +194,7 @@ export default function Create() {
                         >
                             Cancel
                         </Link>
-                        <LoadingButton loading={processing} type="submit">
-                            Create Event Type
-                        </LoadingButton>
+                        <LoadingButton loading={processing} type="submit">{__('general.create_event_type')}</LoadingButton>
                     </div>
                 </form>
             </div>

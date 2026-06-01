@@ -62,7 +62,7 @@ export default function TikTokBoosterRunner({ tool }: any) {
             <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center font-sans">
                 <div className="text-center space-y-4">
                     <div className="w-10 h-10 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto" />
-                    <p className="text-sm font-semibold text-slate-600">Syncing with Local Runtime Agent...</p>
+                    <p className="text-sm font-semibold text-slate-600">{__('general.syncing_with_local_runtime_agent')}</p>
                 </div>
             </div>
         );
@@ -81,20 +81,20 @@ export default function TikTokBoosterRunner({ tool }: any) {
                         <div className="w-6.5 h-6.5 bg-gradient-to-tr from-pink-500 to-rose-500 rounded-lg flex items-center justify-center shadow-md shadow-pink-500/20">
                             <Activity className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">TikTok Views Booster</span>
+                        <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">{__('general.tiktok_views_booster')}</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-800">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-bold uppercase tracking-wider font-mono">Engine Ready</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider font-mono">{__('general.engine_ready')}</span>
                     </div>
                 </div>
             </header>
 
             <div className="flex-1 overflow-y-auto p-8 max-w-5xl mx-auto w-full space-y-8">
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
-                    <h2 className="text-lg font-bold">New Campaign</h2>
+                    <h2 className="text-lg font-bold">{__('general.new_campaign')}</h2>
                     
                     <div className="flex border border-slate-200 rounded-xl overflow-hidden p-1 gap-1 w-fit bg-slate-50 flex-wrap">
                         {(['views', 'shares', 'favorites', 'hearts'] as const).map(m => (
@@ -114,9 +114,9 @@ export default function TikTokBoosterRunner({ tool }: any) {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">TikTok Video URL</label>
+                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">{__('general.tiktok_video_url')}</label>
                         <Input
-                            placeholder="https://www.tiktok.com/@user/video/1234567890"
+                            placeholder={__('general.https_www_tiktok_com_user_video_1234567890')}
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
                             className="font-mono text-sm h-11 bg-slate-50 w-full"
@@ -135,16 +135,14 @@ export default function TikTokBoosterRunner({ tool }: any) {
 
                 <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                        <h2 className="text-lg font-bold">Active & Past Campaigns</h2>
+                        <h2 className="text-lg font-bold">{__('general.active_past_campaigns')}</h2>
                         <Button variant="ghost" size="sm" onClick={fetchCampaigns}>
                             <RefreshCw className="w-4 h-4 mr-2" /> Refresh
                         </Button>
                     </div>
                     
                     {campaigns.length === 0 ? (
-                        <div className="p-12 text-center text-slate-500">
-                            No campaigns yet.
-                        </div>
+                        <div className="p-12 text-center text-slate-500">{__('general.no_campaigns_yet_1')}</div>
                     ) : (
                         <table className="w-full text-sm text-left">
                             <thead className="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase">

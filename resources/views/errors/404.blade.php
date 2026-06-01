@@ -87,9 +87,9 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         </div>
         <h1>404</h1>
-        <h2>Page Not Found</h2>
-        <p>The page you are looking for does not exist or has been moved.</p>
-        <a href="/" class="btn">Go Home</a>
+        <h2>{{ __('general.page_not_found') }}</h2>
+        <p>{{ __('general.the_page_you_are_looking_for_does_not_exist_or_has_been_moved') }}</p>
+        <a href="/" class="btn">{{ __('general.go_home') }}</a>
     </div>
 </body>
 </html>

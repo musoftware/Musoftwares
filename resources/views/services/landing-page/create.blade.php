@@ -51,8 +51,7 @@
             </div>
             <div class="header-actions">
                 <a href="{{ route('services.show', $service) }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm me-2">
-                    <i class="fas fa-eye"></i> View Service
-                </a>
+                    <i class="fas fa-eye"></i>{{ __('general.view_service') }}</a>
                 <a href="{{ route('services.mine') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="fas fa-arrow-left"></i> Back
                 </a>
@@ -67,8 +66,7 @@
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                             <div>
                                 <i class="ti ti-sparkles me-2"></i>
-                                <strong>AI-Powered Fill:</strong> Click the button below to use AI to generate optimized landing page content from your service information.
-                                <small class="d-block text-muted mt-2">
+                                <strong>AI-Powered Fill:</strong>{{ __('general.click_the_button_below_to_use_ai_to_generate_optimized_landing_page_content_from_your_service_information') }}<small class="d-block text-muted mt-2">
                                     <i class="ti ti-settings me-1"></i>Using: <strong>{{ strtoupper(auth()->user()->default_ai_model ?? 'gemini') }}</strong>
                                     @if(auth()->user()->default_ai_model === 'openai')
                                         (OpenAI GPT-4o-mini)
@@ -78,7 +76,7 @@
                                 </small>
                             </div>
                             <button type="button" id="fill-from-service" class="btn btn-primary">
-                                <i class="ti ti-sparkles me-1"></i> <span id="fill-button-text">Generate with AI</span>
+                                <i class="ti ti-sparkles me-1"></i> <span id="fill-button-text">{{ __('general.generate_with_ai') }}</span>
                                 <span id="fill-button-spinner" class="spinner-border spinner-border-sm d-none ms-1" role="status" aria-hidden="true"></span>
                             </button>
                         </div>
@@ -92,19 +90,18 @@
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="headingBasic">
                                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBasic" aria-expanded="true" aria-controls="collapseBasic">
-                                        <i class="ti ti-settings me-2"></i> Basic Information
-                                    </button>
+                                        <i class="ti ti-settings me-2"></i>{{ __('general.basic_information') }}</button>
                                 </h2>
                                 <div id="collapseBasic" class="accordion-collapse collapse show" aria-labelledby="headingBasic" data-bs-parent="#landingPageAccordion">
                                     <div class="accordion-body">
                                         <div class="form-section">
                                             <div class="mb-3">
-                                                <label for="slug" class="form-label">Landing Page URL Slug</label>
+                                                <label for="slug" class="form-label">{{ __('general.landing_page_url_slug') }}</label>
                                                 <div class="input-group">
                                                     <span class="input-group-text bg-light">{{ url('/lp/') }}/</span>
                                                     <input type="text" id="slug" name="slug" required class="form-control"
                                                            value="{{ old('slug', Str::slug($service->title)) }}"
-                                                           placeholder="my-service-landing-page">
+                                                           placeholder="{{ __('general.my_service_landing_page') }}">
                                                 </div>
                                                 <small class="text-muted d-block mt-1">
                                                     <i class="ti ti-link me-1"></i>URL Preview: {{ url('/lp/') }}/<strong id="slug-preview">{{ old('slug', Str::slug($service->title)) }}</strong>
@@ -115,33 +112,33 @@
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="hero_title" class="form-label">Hero Title</label>
+                                                <label for="hero_title" class="form-label">{{ __('general.hero_title') }}</label>
                                                 <input type="text" id="hero_title" name="hero_title" required class="form-control"
                                                        value="{{ old('hero_title', $service->title) }}"
-                                                       placeholder="Enter hero title">
+                                                       placeholder="{{ __('general.enter_hero_title') }}">
                                                 @error('hero_title')
                                                     <div class="text-danger mt-1"><i class="ti ti-alert-circle me-1"></i>{{ $message }}</div>
                                                 @enderror
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="hero_description" class="form-label">Hero Description</label>
+                                                <label for="hero_description" class="form-label">{{ __('general.hero_description') }}</label>
                                                 <textarea id="hero_description" name="hero_description" class="form-control" rows="3"
-                                                          placeholder="Enter hero description">{{ old('hero_description') }}</textarea>
-                                                <small class="text-muted d-block mt-1">A brief description that appears below the hero title</small>
+                                                          placeholder="{{ __('general.enter_hero_description') }}">{{ old('hero_description') }}</textarea>
+                                                <small class="text-muted d-block mt-1">{{ __('general.a_brief_description_that_appears_below_the_hero_title') }}</small>
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="hero_cta_text" class="form-label">Hero CTA Button Text</label>
+                                                <label for="hero_cta_text" class="form-label">{{ __('general.hero_cta_button_text') }}</label>
                                                 <input type="text" id="hero_cta_text" name="hero_cta_text" class="form-control"
                                                        value="{{ old('hero_cta_text', 'Get Started') }}"
-                                                       placeholder="Get Started">
-                                                <small class="text-muted d-block mt-1">The text displayed on the call-to-action button</small>
+                                                       placeholder="{{ __('general.get_started') }}">
+                                                <small class="text-muted d-block mt-1">{{ __('general.the_text_displayed_on_the_call_to_action_button') }}</small>
                                             </div>
 
                                             <div class="mb-3">
                                                 <label class="form-label d-flex justify-content-between align-items-center">
-                                                    <span>Landing Page Template</span>
+                                                    <span>{{ __('general.landing_page_template') }}</span>
                                                     <span class="badge bg-light text-primary border" id="selected-template-name">Modern</span>
                                                 </label>
                                                 
@@ -182,7 +179,7 @@
                                                                                          class="template-preview-img">
                                                                                     <button type="button" class="btn btn-sm btn-light position-absolute bottom-0 end-0 m-2 opacity-75" 
                                                                                             onclick="event.stopPropagation(); showPreview('{{ $template['id'] }}', '{{ $template['name'] }}')"
-                                                                                            title="Preview Template">
+                                                                                            title="{{ __('general.preview_template') }}">
                                                                                         <i class="ti ti-eye"></i>
                                                                                     </button>
                                                                                 </div>
@@ -201,7 +198,7 @@
                                                         @endforeach
                                                     </div>
                                                 </div>
-                                                <small class="text-muted d-block mt-2">Choose a template style. You can preview larger versions by clicking the eye icon.</small>
+                                                <small class="text-muted d-block mt-2">{{ __('general.choose_a_template_style_you_can_preview_larger_versions_by_clicking_the_eye_icon') }}</small>
                                                 @error('template')
                                                     <div class="text-danger mt-1"><i class="ti ti-alert-circle me-1"></i>{{ $message }}</div>
                                                 @enderror
@@ -222,27 +219,20 @@
                                     <div class="accordion-body">
                                         <div class="form-section">
                                             <div class="mb-3">
-                                                <label for="description" class="form-label">Service Description</label>
+                                                <label for="description" class="form-label">{{ __('general.service_description') }}</label>
                                                 <textarea id="description-editor" name="description" hidden>{{ old('description') }}</textarea>
                                                 <small class="text-muted d-block mb-2">
-                                                    <i class="ti ti-info-circle me-1"></i>Add detailed description about your service using the rich text editor below.
-                                                </small>
+                                                    <i class="ti ti-info-circle me-1"></i>{{ __('general.add_detailed_description_about_your_service_using_the_rich_text_editor_below') }}</small>
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="description_alignment" class="form-label">Description Text Alignment</label>
+                                                <label for="description_alignment" class="form-label">{{ __('general.description_text_alignment') }}</label>
                                                 <select id="description_alignment" name="description_alignment" class="form-select">
-                                                    <option value="left" {{ old('description_alignment', 'left') == 'left' ? 'selected' : '' }}>
-                                                        Left Aligned
-                                                    </option>
-                                                    <option value="center" {{ old('description_alignment') == 'center' ? 'selected' : '' }}>
-                                                        Center Aligned
-                                                    </option>
-                                                    <option value="right" {{ old('description_alignment') == 'right' ? 'selected' : '' }}>
-                                                        Right Aligned
-                                                    </option>
+                                                    <option value="left" {{ old('description_alignment', 'left') == 'left' ? 'selected' : '' }}>{{ __('general.left_aligned') }}</option>
+                                                    <option value="center" {{ old('description_alignment') == 'center' ? 'selected' : '' }}>{{ __('general.center_aligned') }}</option>
+                                                    <option value="right" {{ old('description_alignment') == 'right' ? 'selected' : '' }}>{{ __('general.right_aligned') }}</option>
                                                 </select>
-                                                <small class="text-muted d-block mt-1">Choose how the description text should be aligned. Note: RTL languages will automatically override this setting.</small>
+                                                <small class="text-muted d-block mt-1">{{ __('general.choose_how_the_description_text_should_be_aligned_note_rtl_languages_will_automatically_override_this_setting') }}</small>
                                                 @error('description_alignment')
                                                     <div class="text-danger mt-1"><i class="ti ti-alert-circle me-1"></i>{{ $message }}</div>
                                                 @enderror
@@ -256,50 +246,45 @@
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="headingSEO">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSEO" aria-expanded="false" aria-controls="collapseSEO">
-                                        <i class="ti ti-search me-2"></i> SEO Optimization
-                                    </button>
+                                        <i class="ti ti-search me-2"></i>{{ __('general.seo_optimization') }}</button>
                                 </h2>
                                 <div id="collapseSEO" class="accordion-collapse collapse" aria-labelledby="headingSEO" data-bs-parent="#landingPageAccordion">
                                     <div class="accordion-body">
                                         <div class="form-section">
                                             <h6 class="mb-3 text-primary fw-bold">
-                                                <i class="ti ti-tag me-2"></i>Basic Meta Tags
-                                            </h6>
+                                                <i class="ti ti-tag me-2"></i>{{ __('general.basic_meta_tags') }}</h6>
                                             <div class="mb-3">
-                                                <label for="meta_title" class="form-label">
-                                                    Meta Title <small class="text-muted">(Recommended: 50-60 characters)</small>
+                                                <label for="meta_title" class="form-label">{{ __('general.meta_title') }}<small class="text-muted">(Recommended: 50-60 characters)</small>
                                                 </label>
                                                 <input type="text" id="meta_title" name="meta_title" class="form-control"
                                                        value="{{ old('meta_title') }}"
-                                                       placeholder="Enter meta title for search engines"
+                                                       placeholder="{{ __('general.enter_meta_title_for_search_engines') }}"
                                                        maxlength="60">
-                                                <small class="text-muted d-block mt-1">This appears in search engine results. If left empty, the hero title will be used.</small>
+                                                <small class="text-muted d-block mt-1">{{ __('general.this_appears_in_search_engine_results_if_left_empty_the_hero_title_will_be_used') }}</small>
                                                 <div class="mt-1">
                                                     <small id="meta_title_length" class="text-muted">0 / 60 characters</small>
                                                 </div>
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="meta_description" class="form-label">
-                                                    Meta Description <small class="text-muted">(Recommended: 150-160 characters)</small>
+                                                <label for="meta_description" class="form-label">{{ __('general.meta_description') }}<small class="text-muted">(Recommended: 150-160 characters)</small>
                                                 </label>
                                                 <textarea id="meta_description" name="meta_description" class="form-control" rows="3"
-                                                          placeholder="Enter meta description for search engines"
+                                                          placeholder="{{ __('general.enter_meta_description_for_search_engines') }}"
                                                           maxlength="160">{{ old('meta_description') }}</textarea>
-                                                <small class="text-muted d-block mt-1">This appears in search engine results. If left empty, the hero description will be used.</small>
+                                                <small class="text-muted d-block mt-1">{{ __('general.this_appears_in_search_engine_results_if_left_empty_the_hero_description_will_be_used') }}</small>
                                                 <div class="mt-1">
                                                     <small id="meta_description_length" class="text-muted">0 / 160 characters</small>
                                                 </div>
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="meta_keywords" class="form-label">
-                                                    Meta Keywords <small class="text-muted">(Comma-separated)</small>
+                                                <label for="meta_keywords" class="form-label">{{ __('general.meta_keywords') }}<small class="text-muted">(Comma-separated)</small>
                                                 </label>
                                                 <input type="text" id="meta_keywords" name="meta_keywords" class="form-control"
                                                        value="{{ old('meta_keywords') }}"
-                                                       placeholder="keyword1, keyword2, keyword3">
-                                                <small class="text-muted d-block mt-1">Enter relevant keywords separated by commas. This is less important for modern SEO but still used by some search engines.</small>
+                                                       placeholder="{{ __('general.keyword1_keyword2_keyword3') }}">
+                                                <small class="text-muted d-block mt-1">{{ __('general.enter_relevant_keywords_separated_by_commas_this_is_less_important_for_modern_seo_but_still_used_by_some_search_engines') }}</small>
                                             </div>
 
                                             <hr class="my-4">
@@ -308,85 +293,83 @@
                                                 <i class="ti ti-brand-facebook me-2"></i>Open Graph Tags (Facebook, LinkedIn, etc.)
                                             </h6>
                                             <div class="mb-3">
-                                                <label for="og_title" class="form-label">OG Title</label>
+                                                <label for="og_title" class="form-label">{{ __('general.og_title') }}</label>
                                                 <input type="text" id="og_title" name="og_title" class="form-control"
                                                        value="{{ old('og_title') }}"
-                                                       placeholder="Enter Open Graph title">
-                                                <small class="text-muted d-block mt-1">If left empty, meta title or hero title will be used.</small>
+                                                       placeholder="{{ __('general.enter_open_graph_title') }}">
+                                                <small class="text-muted d-block mt-1">{{ __('general.if_left_empty_meta_title_or_hero_title_will_be_used') }}</small>
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="og_description" class="form-label">OG Description</label>
+                                                <label for="og_description" class="form-label">{{ __('general.og_description') }}</label>
                                                 <textarea id="og_description" name="og_description" class="form-control" rows="2"
-                                                          placeholder="Enter Open Graph description">{{ old('og_description') }}</textarea>
-                                                <small class="text-muted d-block mt-1">If left empty, meta description or hero description will be used.</small>
+                                                          placeholder="{{ __('general.enter_open_graph_description') }}">{{ old('og_description') }}</textarea>
+                                                <small class="text-muted d-block mt-1">{{ __('general.if_left_empty_meta_description_or_hero_description_will_be_used') }}</small>
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="og_image" class="form-label">OG Image URL</label>
+                                                <label for="og_image" class="form-label">{{ __('general.og_image_url') }}</label>
                                                 <input type="url" id="og_image" name="og_image" class="form-control"
                                                        value="{{ old('og_image') }}"
-                                                       placeholder="https://example.com/image.jpg">
-                                                <small class="text-muted d-block mt-1">Full URL to the image that will appear when sharing on social media. Recommended size: 1200x630px.</small>
+                                                       placeholder="{{ __('general.https_example_com_image_jpg') }}">
+                                                <small class="text-muted d-block mt-1">{{ __('general.full_url_to_the_image_that_will_appear_when_sharing_on_social_media_recommended_size_1200x630px') }}</small>
                                             </div>
 
                                             <hr class="my-4">
 
                                             <h6 class="mb-3 text-primary fw-bold">
-                                                <i class="ti ti-brand-twitter me-2"></i>Twitter Card Tags
-                                            </h6>
+                                                <i class="ti ti-brand-twitter me-2"></i>{{ __('general.twitter_card_tags') }}</h6>
                                             <div class="mb-3">
-                                                <label for="twitter_card_type" class="form-label">Twitter Card Type</label>
+                                                <label for="twitter_card_type" class="form-label">{{ __('general.twitter_card_type') }}</label>
                                                 <select id="twitter_card_type" name="twitter_card_type" class="form-select">
                                                     <option value="summary" {{ old('twitter_card_type', 'summary_large_image') == 'summary' ? 'selected' : '' }}>Summary</option>
-                                                    <option value="summary_large_image" {{ old('twitter_card_type', 'summary_large_image') == 'summary_large_image' ? 'selected' : '' }}>Summary Large Image</option>
+                                                    <option value="summary_large_image" {{ old('twitter_card_type', 'summary_large_image') == 'summary_large_image' ? 'selected' : '' }}>{{ __('general.summary_large_image') }}</option>
                                                     <option value="app" {{ old('twitter_card_type') == 'app' ? 'selected' : '' }}>App</option>
                                                     <option value="player" {{ old('twitter_card_type') == 'player' ? 'selected' : '' }}>Player</option>
                                                 </select>
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="twitter_title" class="form-label">Twitter Title</label>
+                                                <label for="twitter_title" class="form-label">{{ __('general.twitter_title') }}</label>
                                                 <input type="text" id="twitter_title" name="twitter_title" class="form-control"
                                                        value="{{ old('twitter_title') }}"
-                                                       placeholder="Enter Twitter card title">
-                                                <small class="text-muted d-block mt-1">If left empty, OG title or meta title will be used.</small>
+                                                       placeholder="{{ __('general.enter_twitter_card_title') }}">
+                                                <small class="text-muted d-block mt-1">{{ __('general.if_left_empty_og_title_or_meta_title_will_be_used') }}</small>
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="twitter_description" class="form-label">Twitter Description</label>
+                                                <label for="twitter_description" class="form-label">{{ __('general.twitter_description') }}</label>
                                                 <textarea id="twitter_description" name="twitter_description" class="form-control" rows="2"
-                                                          placeholder="Enter Twitter card description">{{ old('twitter_description') }}</textarea>
-                                                <small class="text-muted d-block mt-1">If left empty, OG description or meta description will be used.</small>
+                                                          placeholder="{{ __('general.enter_twitter_card_description') }}">{{ old('twitter_description') }}</textarea>
+                                                <small class="text-muted d-block mt-1">{{ __('general.if_left_empty_og_description_or_meta_description_will_be_used') }}</small>
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="twitter_image" class="form-label">Twitter Image URL</label>
+                                                <label for="twitter_image" class="form-label">{{ __('general.twitter_image_url') }}</label>
                                                 <input type="url" id="twitter_image" name="twitter_image" class="form-control"
                                                        value="{{ old('twitter_image') }}"
-                                                       placeholder="https://example.com/image.jpg">
-                                                <small class="text-muted d-block mt-1">If left empty, OG image will be used. Recommended size: 1200x675px for large image cards.</small>
+                                                       placeholder="{{ __('general.https_example_com_image_jpg') }}">
+                                                <small class="text-muted d-block mt-1">{{ __('general.if_left_empty_og_image_will_be_used_recommended_size_1200x675px_for_large_image_cards') }}</small>
                                             </div>
 
                                             <hr class="my-4">
 
                                             <h6 class="mb-3 text-primary fw-bold">
-                                                <i class="ti ti-settings me-2"></i>Additional SEO Settings
-                                            </h6>
+                                                <i class="ti ti-settings me-2"></i>{{ __('general.additional_seo_settings') }}</h6>
                                             <div class="mb-3">
-                                                <label for="canonical_url" class="form-label">Canonical URL</label>
+                                                <label for="canonical_url" class="form-label">{{ __('general.canonical_url') }}</label>
                                                 <input type="url" id="canonical_url" name="canonical_url" class="form-control"
                                                        value="{{ old('canonical_url') }}"
-                                                       placeholder="https://example.com/canonical-page">
-                                                <small class="text-muted d-block mt-1">Optional. Use this if you want to specify a canonical URL different from the landing page URL.</small>
+                                                       placeholder="{{ __('general.https_example_com_canonical_page') }}">
+                                                <small class="text-muted d-block mt-1">{{ __('general.optional_use_this_if_you_want_to_specify_a_canonical_url_different_from_the_landing_page_url') }}</small>
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="robots" class="form-label">Robots Meta Tag</label>
+                                                <label for="robots" class="form-label">{{ __('general.robots_meta_tag') }}</label>
                                                 <input type="text" id="robots" name="robots" class="form-control"
                                                        value="{{ old('robots', 'index, follow') }}"
-                                                       placeholder="index, follow">
-                                                <small class="text-muted d-block mt-1">Control how search engines index this page. Common values: "index, follow", "noindex, nofollow", "index, nofollow", "noindex, follow".</small>
+                                                       placeholder="{{ __('general.index_follow') }}">
+                                                <small class="text-muted d-block mt-1">{{ __('general.control_how_search_engines_index_this_page_common_values_index_follow_noindex_nofollow_index_nofollow_noindex_follow') }}</small>
                                             </div>
                                         </div>
                                     </div>
@@ -397,16 +380,14 @@
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="headingTracking">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTracking" aria-expanded="false" aria-controls="collapseTracking">
-                                        <i class="ti ti-chart-line me-2"></i> Tracking & Analytics
-                                    </button>
+                                        <i class="ti ti-chart-line me-2"></i>{{ __('general.tracking_analytics') }}</button>
                                 </h2>
                                 <div id="collapseTracking" class="accordion-collapse collapse" aria-labelledby="headingTracking" data-bs-parent="#landingPageAccordion">
                                     <div class="accordion-body">
                                         <div class="form-section">
                                             <div class="alert alert-info border-0 mb-4">
                                                 <i class="ti ti-info-circle me-2"></i>
-                                                <strong>Tip:</strong> Add social media and analytics platform IDs to track your page's performance and accurately measure conversion rates. Your page will automatically send visitor and sales data to these platforms.
-                                                <br><small class="d-block mt-2">All these fields are optional - you can add what you need only or leave them empty and come back to edit them later.</small>
+                                                <strong>Tip:</strong>{{ __('general.add_social_media_and_analytics_platform_ids_to_track_your_page_s_performance_and_accurately_measure_conversion_rates_your_page_will_automatically_send_visitor_and_sales_data_to_these_platforms') }}<br><small class="d-block mt-2">{{ __('general.all_these_fields_are_optional_you_can_add_what_you_need_only_or_leave_them_empty_and_come_back_to_edit_them_later') }}</small>
                                             </div>
 
                                             <div class="mb-3">
@@ -415,9 +396,9 @@
                                                 </label>
                                                 <input type="text" id="facebook_pixel_id" name="facebook_pixel_id" class="form-control"
                                                        value="{{ old('facebook_pixel_id') }}"
-                                                       placeholder="Enter Facebook Pixel ID"
+                                                       placeholder="{{ __('general.enter_facebook_pixel_id') }}"
                                                        maxlength="100">
-                                                <small class="text-muted d-block mt-1">Enter your Facebook Pixel ID to track conversions and optimize your Facebook ads.</small>
+                                                <small class="text-muted d-block mt-1">{{ __('general.enter_your_facebook_pixel_id_to_track_conversions_and_optimize_your_facebook_ads') }}</small>
                                                 <div class="mt-1">
                                                     <small id="facebook_pixel_length" class="text-muted">0 / 100 characters</small>
                                                 </div>
@@ -429,9 +410,9 @@
                                                 </label>
                                                 <input type="text" id="tiktok_pixel_id" name="tiktok_pixel_id" class="form-control"
                                                        value="{{ old('tiktok_pixel_id') }}"
-                                                       placeholder="Enter TikTok Pixel ID"
+                                                       placeholder="{{ __('general.enter_tiktok_pixel_id') }}"
                                                        maxlength="100">
-                                                <small class="text-muted d-block mt-1">Enter your TikTok Pixel ID to track conversions and optimize your TikTok ads.</small>
+                                                <small class="text-muted d-block mt-1">{{ __('general.enter_your_tiktok_pixel_id_to_track_conversions_and_optimize_your_tiktok_ads') }}</small>
                                                 <div class="mt-1">
                                                     <small id="tiktok_pixel_length" class="text-muted">0 / 100 characters</small>
                                                 </div>
@@ -443,9 +424,9 @@
                                                 </label>
                                                 <input type="text" id="snapchat_pixel_id" name="snapchat_pixel_id" class="form-control"
                                                        value="{{ old('snapchat_pixel_id') }}"
-                                                       placeholder="Enter Snapchat Pixel ID"
+                                                       placeholder="{{ __('general.enter_snapchat_pixel_id') }}"
                                                        maxlength="100">
-                                                <small class="text-muted d-block mt-1">Enter your Snapchat Pixel ID to track conversions and optimize your Snapchat ads.</small>
+                                                <small class="text-muted d-block mt-1">{{ __('general.enter_your_snapchat_pixel_id_to_track_conversions_and_optimize_your_snapchat_ads') }}</small>
                                                 <div class="mt-1">
                                                     <small id="snapchat_pixel_length" class="text-muted">0 / 100 characters</small>
                                                 </div>
@@ -457,9 +438,9 @@
                                                 </label>
                                                 <input type="text" id="google_analytics_id" name="google_analytics_id" class="form-control"
                                                        value="{{ old('google_analytics_id') }}"
-                                                       placeholder="Enter Google Analytics ID (e.g. GA_MEASUREMENT_ID)"
+                                                       placeholder="{{ __('general.enter_google_analytics_id_e_g_ga_measurement_id') }}"
                                                        maxlength="100">
-                                                <small class="text-muted d-block mt-1">Enter your Google Analytics Measurement ID (e.g., G-XXXXXXXXXX) to track page views and user behavior.</small>
+                                                <small class="text-muted d-block mt-1">{{ __('general.enter_your_google_analytics_measurement_id_e_g_g_xxxxxxxxxx_to_track_page_views_and_user_behavior') }}</small>
                                                 <div class="mt-1">
                                                     <small id="google_analytics_length" class="text-muted">0 / 100 characters</small>
                                                 </div>
@@ -473,23 +454,21 @@
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="headingABTesting">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseABTesting" aria-expanded="false" aria-controls="collapseABTesting">
-                                        <i class="ti ti-chart-bar me-2"></i> A/B Testing
-                                    </button>
+                                        <i class="ti ti-chart-bar me-2"></i>{{ __('general.a_b_testing') }}</button>
                                 </h2>
                                 <div id="collapseABTesting" class="accordion-collapse collapse" aria-labelledby="headingABTesting" data-bs-parent="#landingPageAccordion">
                                     <div class="accordion-body">
                                         <div class="form-section">
                                             <div class="alert alert-info border-0 mb-4">
                                                 <i class="ti ti-info-circle me-2"></i>
-                                                <strong>A/B Testing:</strong> Test different versions of your landing page to see which performs better. You can create variants after creating the main page.
-                                            </div>
+                                                <strong>A/B Testing:</strong>{{ __('general.test_different_versions_of_your_landing_page_to_see_which_performs_better_you_can_create_variants_after_creating_the_main_page') }}</div>
 
                                             <div class="mb-3">
                                                 <div class="form-check form-switch">
                                                     <input type="checkbox" id="ab_testing_enabled" name="ab_testing_enabled" value="1" class="form-check-input" {{ old('ab_testing_enabled') ? 'checked' : '' }}>
-                                                    <label for="ab_testing_enabled" class="form-check-label fw-bold">Enable A/B Testing</label>
+                                                    <label for="ab_testing_enabled" class="form-check-label fw-bold">{{ __('general.enable_a_b_testing') }}</label>
                                                 </div>
-                                                <small class="text-muted d-block mt-1">Enable this to create variants of this landing page for testing.</small>
+                                                <small class="text-muted d-block mt-1">{{ __('general.enable_this_to_create_variants_of_this_landing_page_for_testing') }}</small>
                                             </div>
 
                                             <div id="ab-testing-settings" style="display: {{ old('ab_testing_enabled') ? 'block' : 'none' }};">
@@ -497,8 +476,8 @@
                                                     <label for="auto_winner_visits" class="form-label">Auto-Select Winner After (Visits)</label>
                                                     <input type="number" id="auto_winner_visits" name="auto_winner_visits" class="form-control"
                                                            value="{{ old('auto_winner_visits') }}"
-                                                           placeholder="e.g., 1000" min="0">
-                                                    <small class="text-muted d-block mt-1">Automatically select the winning variant after this many visits. Leave empty to manually select.</small>
+                                                           placeholder="{{ __('general.e_g_1000_1') }}" min="0">
+                                                    <small class="text-muted d-block mt-1">{{ __('general.automatically_select_the_winning_variant_after_this_many_visits_leave_empty_to_manually_select') }}</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -510,19 +489,17 @@
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="headingCTAVariants">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCTAVariants" aria-expanded="false" aria-controls="collapseCTAVariants">
-                                        <i class="ti ti-click me-2"></i> Smart CTA Variants
-                                    </button>
+                                        <i class="ti ti-click me-2"></i>{{ __('general.smart_cta_variants') }}</button>
                                 </h2>
                                 <div id="collapseCTAVariants" class="accordion-collapse collapse" aria-labelledby="headingCTAVariants" data-bs-parent="#landingPageAccordion">
                                     <div class="accordion-body">
                                         <div class="form-section">
                                             <div class="alert alert-info border-0 mb-4">
                                                 <i class="ti ti-info-circle me-2"></i>
-                                                <strong>Smart CTAs:</strong> Create multiple call-to-action buttons with conditional display rules based on visitor behavior, device, location, or language.
-                                            </div>
+                                                <strong>Smart CTAs:</strong>{{ __('general.create_multiple_call_to_action_buttons_with_conditional_display_rules_based_on_visitor_behavior_device_location_or_language') }}</div>
 
                                             <div id="cta-variants-container">
-                                                <p class="text-muted text-center py-3">CTA variants can be added after creating the landing page.</p>
+                                                <p class="text-muted text-center py-3">{{ __('general.cta_variants_can_be_added_after_creating_the_landing_page') }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -533,8 +510,7 @@
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="headingStickyExit">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStickyExit" aria-expanded="false" aria-controls="collapseStickyExit">
-                                        <i class="ti ti-device-mobile me-2"></i> Sticky CTA & Exit Intent
-                                    </button>
+                                        <i class="ti ti-device-mobile me-2"></i>{{ __('general.sticky_cta_exit_intent') }}</button>
                                 </h2>
                                 <div id="collapseStickyExit" class="accordion-collapse collapse" aria-labelledby="headingStickyExit" data-bs-parent="#landingPageAccordion">
                                     <div class="accordion-body">
@@ -545,17 +521,17 @@
                                             <div class="mb-3">
                                                 <div class="form-check form-switch">
                                                     <input type="checkbox" id="sticky_cta_enabled" name="sticky_cta_enabled" value="1" class="form-check-input" {{ old('sticky_cta_enabled') ? 'checked' : '' }}>
-                                                    <label for="sticky_cta_enabled" class="form-check-label fw-bold">Enable Sticky CTA</label>
+                                                    <label for="sticky_cta_enabled" class="form-check-label fw-bold">{{ __('general.enable_sticky_cta') }}</label>
                                                 </div>
-                                                <small class="text-muted d-block mt-1">Show a sticky call-to-action button that stays visible while scrolling.</small>
+                                                <small class="text-muted d-block mt-1">{{ __('general.show_a_sticky_call_to_action_button_that_stays_visible_while_scrolling') }}</small>
                                             </div>
 
                                             <div id="sticky-cta-settings" style="display: {{ old('sticky_cta_enabled') ? 'block' : 'none' }};">
                                                 <div class="mb-3">
-                                                    <label for="sticky_cta_text" class="form-label">Sticky CTA Button Text</label>
+                                                    <label for="sticky_cta_text" class="form-label">{{ __('general.sticky_cta_button_text') }}</label>
                                                     <input type="text" id="sticky_cta_text" name="sticky_cta_text" class="form-control"
                                                            value="{{ old('sticky_cta_text', 'Get Started') }}"
-                                                           placeholder="Get Started">
+                                                           placeholder="{{ __('general.get_started') }}">
                                                 </div>
 
                                                 <div class="mb-3">
@@ -569,9 +545,9 @@
                                                 <div class="mb-3">
                                                     <div class="form-check form-switch">
                                                         <input type="checkbox" id="sticky_cta_mobile_only" name="sticky_cta_mobile_only" value="1" class="form-check-input" {{ old('sticky_cta_mobile_only', true) ? 'checked' : '' }}>
-                                                        <label for="sticky_cta_mobile_only" class="form-check-label">Mobile Only</label>
+                                                        <label for="sticky_cta_mobile_only" class="form-check-label">{{ __('general.mobile_only') }}</label>
                                                     </div>
-                                                    <small class="text-muted d-block mt-1">Show sticky CTA only on mobile devices.</small>
+                                                    <small class="text-muted d-block mt-1">{{ __('general.show_sticky_cta_only_on_mobile_devices') }}</small>
                                                 </div>
                                             </div>
 
@@ -583,52 +559,51 @@
                                             <div class="mb-3">
                                                 <div class="form-check form-switch">
                                                     <input type="checkbox" id="exit_intent_enabled" name="exit_intent_enabled" value="1" class="form-check-input" {{ old('exit_intent_enabled') ? 'checked' : '' }}>
-                                                    <label for="exit_intent_enabled" class="form-check-label fw-bold">Enable Exit Intent Popup</label>
+                                                    <label for="exit_intent_enabled" class="form-check-label fw-bold">{{ __('general.enable_exit_intent_popup') }}</label>
                                                 </div>
-                                                <small class="text-muted d-block mt-1">Show a popup when visitors are about to leave the page (desktop only).</small>
+                                                <small class="text-muted d-block mt-1">{{ __('general.show_a_popup_when_visitors_are_about_to_leave_the_page_desktop_only') }}</small>
                                             </div>
 
                                             <div id="exit-intent-settings" style="display: {{ old('exit_intent_enabled') ? 'block' : 'none' }};">
                                                 <div class="mb-3">
-                                                    <label for="exit_intent_title" class="form-label">Popup Title</label>
+                                                    <label for="exit_intent_title" class="form-label">{{ __('general.popup_title') }}</label>
                                                     <input type="text" id="exit_intent_title" name="exit_intent_title" class="form-control"
                                                            value="{{ old('exit_intent_title') }}"
-                                                           placeholder="Wait! Don't miss out">
+                                                           placeholder="{{ __('general.wait_don') }}"t miss out">
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label for="exit_intent_message" class="form-label">Popup Message</label>
+                                                    <label for="exit_intent_message" class="form-label">{{ __('general.popup_message') }}</label>
                                                     <textarea id="exit_intent_message" name="exit_intent_message" class="form-control" rows="3"
-                                                              placeholder="Get started today and save 20%!">{{ old('exit_intent_message') }}</textarea>
+                                                              placeholder="{{ __('general.get_started_today_and_save_20') }}">{{ old('exit_intent_message') }}</textarea>
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label for="exit_intent_cta_text" class="form-label">CTA Button Text</label>
+                                                    <label for="exit_intent_cta_text" class="form-label">{{ __('general.cta_button_text') }}</label>
                                                     <input type="text" id="exit_intent_cta_text" name="exit_intent_cta_text" class="form-control"
                                                            value="{{ old('exit_intent_cta_text', 'Get Started') }}"
-                                                           placeholder="Get Started">
+                                                           placeholder="{{ __('general.get_started') }}">
                                                 </div>
 
                                                 <div class="mb-3">
                                                     <div class="form-check form-switch">
                                                         <input type="checkbox" id="exit_intent_desktop_only" name="exit_intent_desktop_only" value="1" class="form-check-input" {{ old('exit_intent_desktop_only', true) ? 'checked' : '' }}>
-                                                        <label for="exit_intent_desktop_only" class="form-check-label">Desktop Only</label>
+                                                        <label for="exit_intent_desktop_only" class="form-check-label">{{ __('general.desktop_only') }}</label>
                                                     </div>
-                                                    <small class="text-muted d-block mt-1">Show exit intent popup only on desktop devices.</small>
+                                                    <small class="text-muted d-block mt-1">{{ __('general.show_exit_intent_popup_only_on_desktop_devices') }}</small>
                                                 </div>
                                             </div>
 
                                             <hr class="my-4">
 
                                             <h6 class="mb-3 text-primary fw-bold">
-                                                <i class="ti ti-clock me-2"></i>Time-Based Popup
-                                            </h6>
+                                                <i class="ti ti-clock me-2"></i>{{ __('general.time_based_popup') }}</h6>
                                             <div class="mb-3">
                                                 <div class="form-check form-switch">
                                                     <input type="checkbox" id="time_based_popup_enabled" name="time_based_popup_enabled" value="1" class="form-check-input" {{ old('time_based_popup_enabled') ? 'checked' : '' }}>
-                                                    <label for="time_based_popup_enabled" class="form-check-label fw-bold">Enable Time-Based Popup</label>
+                                                    <label for="time_based_popup_enabled" class="form-check-label fw-bold">{{ __('general.enable_time_based_popup') }}</label>
                                                 </div>
-                                                <small class="text-muted d-block mt-1">Show a popup after visitors spend a certain amount of time on the page.</small>
+                                                <small class="text-muted d-block mt-1">{{ __('general.show_a_popup_after_visitors_spend_a_certain_amount_of_time_on_the_page') }}</small>
                                             </div>
 
                                             <div id="time-based-popup-settings" style="display: {{ old('time_based_popup_enabled') ? 'block' : 'none' }};">
@@ -637,27 +612,27 @@
                                                     <input type="number" id="time_based_popup_delay" name="time_based_popup_delay" class="form-control"
                                                            value="{{ old('time_based_popup_delay', 30) }}"
                                                            placeholder="30" min="1">
-                                                    <small class="text-muted d-block mt-1">Number of seconds before showing the popup.</small>
+                                                    <small class="text-muted d-block mt-1">{{ __('general.number_of_seconds_before_showing_the_popup') }}</small>
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label for="time_based_popup_title" class="form-label">Popup Title</label>
+                                                    <label for="time_based_popup_title" class="form-label">{{ __('general.popup_title') }}</label>
                                                     <input type="text" id="time_based_popup_title" name="time_based_popup_title" class="form-control"
                                                            value="{{ old('time_based_popup_title') }}"
-                                                           placeholder="Special Offer!">
+                                                           placeholder="{{ __('general.special_offer') }}">
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label for="time_based_popup_message" class="form-label">Popup Message</label>
+                                                    <label for="time_based_popup_message" class="form-label">{{ __('general.popup_message') }}</label>
                                                     <textarea id="time_based_popup_message" name="time_based_popup_message" class="form-control" rows="3"
-                                                              placeholder="Get 20% off your first order!">{{ old('time_based_popup_message') }}</textarea>
+                                                              placeholder="{{ __('general.get_20_off_your_first_order') }}">{{ old('time_based_popup_message') }}</textarea>
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label for="time_based_popup_cta_text" class="form-label">CTA Button Text</label>
+                                                    <label for="time_based_popup_cta_text" class="form-label">{{ __('general.cta_button_text') }}</label>
                                                     <input type="text" id="time_based_popup_cta_text" name="time_based_popup_cta_text" class="form-control"
                                                            value="{{ old('time_based_popup_cta_text', 'Get Started') }}"
-                                                           placeholder="Get Started">
+                                                           placeholder="{{ __('general.get_started') }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -668,8 +643,7 @@
 
                          <div class="mt-4 d-flex gap-2">
                             <button type="submit" class="btn-create">
-                                <i class="fas fa-check"></i> Create Landing Page
-                            </button>
+                                <i class="fas fa-check"></i>{{ __('general.create_landing_page') }}</button>
                             <a href="{{ route('services.mine') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
@@ -694,15 +668,13 @@
                 <div class="modal-body p-0 position-relative" style="height: 70vh; min-height: 500px;">
                     <div id="modal-preview-spinner" class="position-absolute top-50 start-50 translate-middle text-center">
                         <div class="spinner-border text-primary mb-2" role="status"></div>
-                        <div class="text-muted small">Loading Template...</div>
+                        <div class="text-muted small">{{ __('general.loading_template') }}</div>
                     </div>
                     <iframe src="about:blank" id="modal-preview-iframe" class="w-100 h-100 border-0 position-relative" style="z-index: 10; opacity: 0; transition: opacity 0.3s ease;" title="{{ __('Template preview') }}"></iframe>
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
-                    <button type="button" class="btn btn-primary" id="modal-select-btn">
-                        Select This Template
-                    </button>
+                    <button type="button" class="btn btn-primary" id="modal-select-btn">{{ __('general.select_this_template') }}</button>
                 </div>
             </div>
         </div>
@@ -722,7 +694,7 @@
             buttonSpinner.classList.remove('d-none');
             alert.classList.remove('alert-info', 'alert-success', 'alert-danger');
             alert.classList.add('alert-warning');
-            alert.innerHTML = '<i class="ti ti-loader me-2"></i><strong>AI is working...</strong> Generating optimized landing page content. This may take a few moments.';
+            alert.innerHTML = '<i class="ti ti-loader me-2"></i><strong>{{ __('general.ai_is_working') }}</strong> Generating optimized landing page content. This may take a few moments.';
 
             try {
                 const response = await fetch('{{ route("services.landing-page.generate-content", $service) }}', {
@@ -836,7 +808,7 @@
                 // Show success message
                 alert.classList.remove('alert-warning');
                 alert.classList.add('alert-success');
-                alert.innerHTML = '<i class="ti ti-check-circle me-2"></i><strong>Success!</strong> ' + (result.message || 'AI has generated optimized landing page content. Review and adjust as needed.');
+                alert.innerHTML = '<i class="ti ti-check-circle me-2"></i><strong>{{ __('general.success') }}</strong> ' + (result.message || 'AI has generated optimized landing page content. Review and adjust as needed.');
 
             } catch (error) {
                 console.error('Error generating content:', error);

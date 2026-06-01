@@ -292,7 +292,7 @@ export default function Index({ members, payslips, filters, auth }: any) {
                                 min="0" 
                                 value={baseSalary} 
                                 onChange={(e) => setBaseSalary(e.target.value)} 
-                                placeholder="e.g. 5000"
+                                placeholder={__('general.e_g_5000')}
                             />
                         </div>
                     </div>

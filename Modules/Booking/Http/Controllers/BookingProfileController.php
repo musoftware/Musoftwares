@@ -34,7 +34,7 @@ class BookingProfileController extends Controller
         }
 
         if (!$config) {
-            abort(404, "Booking profile not found.");
+            abort(404, __('general.booking_profile_not_found'));
         }
 
         // Fetch public data for the tenant

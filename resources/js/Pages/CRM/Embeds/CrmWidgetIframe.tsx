@@ -38,7 +38,7 @@ export default function CrmWidgetIframe({ widget, token, flash }: { widget: any,
                     <CheckCircle2 className="w-8 h-8" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{flash?.success || 'Thank you!'}</h3>
-                <p className="text-slate-500">Your information has been received successfully.</p>
+                <p className="text-slate-500">{__('general.your_information_has_been_received_successfully')}</p>
             </div>
         );
     }

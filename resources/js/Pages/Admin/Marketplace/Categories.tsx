@@ -27,12 +27,12 @@ export default function Categories({ categories }: any) {
     };
 
     return (
-        <AdminSidebarLayout title="Marketplace Categories" header="Marketplace Categories">
-            <Head title="Marketplace Categories" />
+        <AdminSidebarLayout title={__('general.marketplace_categories')} header="Marketplace Categories">
+            <Head title={__('general.marketplace_categories')} />
             <div className="py-12">
                 <div className="mx-auto flex max-w-7xl gap-6 sm:px-6 lg:px-8">
                     <div className="h-fit w-1/3 bg-white p-6 shadow-sm sm:rounded-lg">
-                        <h3 className="mb-4 text-lg font-bold">Add Category</h3>
+                        <h3 className="mb-4 text-lg font-bold">{__('general.add_category')}</h3>
                         <form onSubmit={handleCreate}>
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700">
@@ -68,9 +68,7 @@ export default function Categories({ categories }: any) {
                     </div>
 
                     <div className="w-2/3 bg-white p-6 shadow-sm sm:rounded-lg">
-                        <h3 className="mb-4 text-lg font-bold">
-                            Categories List
-                        </h3>
+                        <h3 className="mb-4 text-lg font-bold">{__('general.categories_list')}</h3>
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead>
                                 <tr>
@@ -111,9 +109,7 @@ export default function Categories({ categories }: any) {
                                         <td
                                             colSpan={3}
                                             className="px-6 py-4 text-center text-gray-500"
-                                        >
-                                            No categories found.
-                                        </td>
+                                        >{__('general.no_categories_found')}</td>
                                     </tr>
                                 )}
                             </tbody>

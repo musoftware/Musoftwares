@@ -45,7 +45,7 @@ export default function ActivityIndex({ activities, filters }: Props) {
 
     return (
         <AuthenticatedLayout header={undefined}>
-            <Head title="Activity Log" />
+            <Head title={__('general.activity_log')} />
 
             <div className="min-h-screen bg-slate-50/50">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
@@ -57,7 +57,7 @@ export default function ActivityIndex({ activities, filters }: Props) {
                                 <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
                                     <Activity className="w-4 h-4 text-white" />
                                 </div>
-                                <h1 className="text-2xl font-bold text-slate-900">Activity Log</h1>
+                                <h1 className="text-2xl font-bold text-slate-900">{__('general.activity_log')}</h1>
                             </div>
                             <p className="text-sm text-slate-500 ml-10">
                                 {activities.total} events across the platform

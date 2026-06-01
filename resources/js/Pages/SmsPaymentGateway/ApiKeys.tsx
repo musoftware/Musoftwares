@@ -176,7 +176,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                 {__('API Keys')}
                             </h1>
                             <p className="text-slate-500 mt-1">
-                                {__('Manage your publishable and secret keys for API integration.')}
+                                {__('general.manage_your_publishable_and_secret_keys_for_api_integration')}
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -192,7 +192,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                     <DialogHeader>
                                         <DialogTitle>{__('Create API Key')}</DialogTitle>
                                         <DialogDescription>
-                                            {__('Generate a new pair of publishable and secret keys for your integration.')}
+                                            {__('general.generate_a_new_pair_of_publishable_and_secret_keys_for_your_integration')}
                                         </DialogDescription>
                                     </DialogHeader>
                                     <form onSubmit={handleCreateSubmit} className="space-y-5">
@@ -201,7 +201,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                             <Input
                                                 id="key-name"
                                                 type="text"
-                                                placeholder={__('e.g. Production Server, Mobile App')}
+                                                placeholder={__('general.e_g_production_server_mobile_app')}
                                                 value={createForm.data.name}
                                                 onChange={e => createForm.setData('name', e.target.value)}
                                                 required
@@ -216,8 +216,8 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                 <Label className="text-base">{__('Test Mode')}</Label>
                                                 <p className="text-sm text-slate-500">
                                                     {createForm.data.is_test
-                                                        ? __('This key will only work in test/sandbox environment.')
-                                                        : __('This key will process real payments in production.')
+                                                        ? __('general.this_key_will_only_work_in_test_sandbox_environment')
+                                                        : __('general.this_key_will_process_real_payments_in_production')
                                                     }
                                                 </p>
                                             </div>
@@ -261,7 +261,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                     {__('Your API Keys')}
                                 </DialogTitle>
                                 <DialogDescription>
-                                    {__('Copy your keys now. The secret key will only be shown once.')}
+                                    {__('general.copy_your_keys_now_the_secret_key_will_only_be_shown_once')}
                                 </DialogDescription>
                             </DialogHeader>
 
@@ -271,7 +271,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                     <AlertTriangle className="w-5 h-5 mt-0.5 shrink-0" />
                                     <div className="text-sm">
                                         <p className="font-semibold">{__('Important')}</p>
-                                        <p>{__('The secret key will only be shown once. Save it securely. You will not be able to see it again.')}</p>
+                                        <p>{__('general.the_secret_key_will_only_be_shown_once_save_it_securely_you_will_not_be_able_to_see_it_again')}</p>
                                     </div>
                                 </div>
 
@@ -350,7 +350,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                         {__('No API keys yet')}
                                     </h3>
                                     <p className="text-sm text-slate-500 max-w-sm">
-                                        {__('Create your first API key to start integrating the payment gateway into your application.')}
+                                        {__('general.create_your_first_api_key_to_start_integrating_the_payment_gateway_into_your_application')}
                                     </p>
                                 </div>
                             ) : (
@@ -591,13 +591,13 @@ export default function ApiKeys({ apiKeys }: Props) {
                             {__('Roll Secret Key')}
                         </DialogTitle>
                         <DialogDescription>
-                            {__('This will generate a new secret key and immediately invalidate the old one. Any integrations using the current secret key will stop working.')}
+                            {__('general.this_will_generate_a_new_secret_key_and_immediately_invalidate_the_old_one_any_integrations_using_the_current_secret_key_will_stop_working')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800">
                         <AlertTriangle className="w-5 h-5 mt-0.5 shrink-0" />
                         <p className="text-sm">
-                            {__('This action cannot be undone. Make sure to update your server configuration with the new key.')}
+                            {__('general.this_action_cannot_be_undone_make_sure_to_update_your_server_configuration_with_the_new_key')}
                         </p>
                     </div>
                     <DialogFooter>
@@ -633,7 +633,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                             {__('Delete API Key')}
                         </DialogTitle>
                         <DialogDescription>
-                            {__('Are you sure you want to permanently delete this API key? All integrations using these keys will immediately stop working.')}
+                            {__('general.are_you_sure_you_want_to_permanently_delete_this_api_key_all_integrations_using_these_keys_will_immediately_stop_working')}
                         </DialogDescription>
                     </DialogHeader>
                     {actionKey && (

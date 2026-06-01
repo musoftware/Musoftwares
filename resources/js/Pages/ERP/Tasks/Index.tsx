@@ -169,7 +169,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
             case 'review':
                 return <span className={`${classes} bg-indigo-50 text-indigo-700 border-indigo-200`}>Review</span>;
             case 'in_progress':
-                return <span className={`${classes} bg-blue-50 text-blue-700 border-blue-200`}>In Progress</span>;
+                return <span className={`${classes} bg-blue-50 text-blue-700 border-blue-200`}>{__('general.in_progress')}</span>;
             case 'archived':
                 return <span className={`${classes} bg-zinc-100 text-zinc-700 border-zinc-300`}>Archived</span>;
             default:
@@ -179,7 +179,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('tasks');
 
     return (
-        <ERPLayout title="ERP Client Task Boards" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__('general.erp_client_task_boards')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-6 font-sans text-sm">
                 
@@ -187,21 +187,15 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="space-y-1">
                         <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                            <FolderKanban className="h-6 w-6 text-primary" />
-                            Client Tasks & Todos
-                        </h1>
-                        <p className="text-muted-foreground text-xs leading-normal">
-                            Create, track, and manage interactive task boards and todo items shared with your clients.
-                        </p>
+                            <FolderKanban className="h-6 w-6 text-primary" />{__('general.client_tasks_todos')}</h1>
+                        <p className="text-muted-foreground text-xs leading-normal">{__('general.create_track_and_manage_interactive_task_boards_and_todo_items_shared_with_your_clients')}</p>
                     </div>
                     
                     <Button 
                         onClick={() => setIsCreateOpen(true)}
                         className="shadow-none flex items-center gap-2 h-10 px-5"
                     >
-                        <Plus className="h-4 w-4" />
-                        Create Task Board
-                    </Button>
+                        <Plus className="h-4 w-4" />{__('general.create_task_board')}</Button>
                 </div>
 
                 {/* Filters Section */}
@@ -220,10 +214,10 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                     onValueChange={(val) => handleFilterChange('client_id', val)}
                                 >
                                     <SelectTrigger className="h-9 shadow-none text-xs">
-                                        <SelectValue placeholder="All Clients" />
+                                        <SelectValue placeholder={__('general.all_clients')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">All Clients</SelectItem>
+                                        <SelectItem value="all">{__('general.all_clients')}</SelectItem>
                                         {clients.map((c) => (
                                             <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
                                         ))}
@@ -238,12 +232,12 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                     onValueChange={(val) => handleFilterChange('status', val)}
                                 >
                                     <SelectTrigger className="h-9 shadow-none text-xs">
-                                        <SelectValue placeholder="All Statuses" />
+                                        <SelectValue placeholder={__('general.all_statuses')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">All Statuses</SelectItem>
+                                        <SelectItem value="all">{__('general.all_statuses')}</SelectItem>
                                         <SelectItem value="open">Open</SelectItem>
-                                        <SelectItem value="in_progress">In Progress</SelectItem>
+                                        <SelectItem value="in_progress">{__('general.in_progress')}</SelectItem>
                                         <SelectItem value="review">Review</SelectItem>
                                         <SelectItem value="completed">Completed</SelectItem>
                                     </SelectContent>
@@ -259,9 +253,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                     checked={filterForm.data.show_archived}
                                     onChange={(e) => handleFilterChange('show_archived', e.target.checked)}
                                     className="rounded border-input text-primary shadow-none focus:ring-primary h-3.5 w-3.5"
-                                />
-                                Show Archived Boards
-                            </label>
+                                />{__('general.show_archived_boards')}</label>
                         </div>
                     </CardContent>
                 </Card>
@@ -274,7 +266,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                 <FolderKanban className="h-6 w-6" />
                             </div>
                             <div className="space-y-1 max-w-sm mx-auto">
-                                <h3 className="font-semibold text-foreground text-sm">No Task Boards Found</h3>
+                                <h3 className="font-semibold text-foreground text-sm">{__('general.no_task_boards_found')}</h3>
                                 <p className="text-muted-foreground text-xs leading-normal">
                                     {filterForm.data.client_id !== 'all' || filterForm.data.status !== 'all'
                                         ? "No boards match your current filters. Try resetting them."
@@ -286,8 +278,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                 variant="outline"
                                 className="shadow-none text-xs gap-2"
                             >
-                                <Plus className="h-3.5 w-3.5" /> Create Board
-                            </Button>
+                                <Plus className="h-3.5 w-3.5" />{__('general.create_board')}</Button>
                         </CardContent>
                     </Card>
                 ) : (
@@ -334,7 +325,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                         {task.total_todos > 0 ? (
                                             <div className="space-y-1.5">
                                                 <div className="flex justify-between items-center text-[11px] font-medium">
-                                                    <span className="text-muted-foreground">Todos Progress</span>
+                                                    <span className="text-muted-foreground">{__('general.todos_progress')}</span>
                                                     <span className="text-foreground">{task.progress}% ({task.completed_todos}/{task.total_todos})</span>
                                                 </div>
                                                 <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
@@ -346,8 +337,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                             </div>
                                         ) : (
                                             <div className="text-muted-foreground text-xs italic flex items-center gap-1">
-                                                <Clock className="h-3.5 w-3.5" /> No items added yet
-                                            </div>
+                                                <Clock className="h-3.5 w-3.5" />{__('general.no_items_added_yet')}</div>
                                         )}
 
                                         {/* Badges & Meta */}
@@ -371,9 +361,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                         <Link 
                                             href={route('erp.tasks.show', task.id)}
                                             className="text-primary hover:underline flex items-center gap-0.5"
-                                        >
-                                            Manage Board
-                                            <ChevronRight className="h-3.5 w-3.5" />
+                                        >{__('general.manage_board')}<ChevronRight className="h-3.5 w-3.5" />
                                         </Link>
 
                                         <div className="flex items-center gap-2">
@@ -383,7 +371,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                                     variant="ghost" 
                                                     size="icon" 
                                                     className="h-7 w-7 text-zinc-500 hover:text-zinc-700"
-                                                    title="Restore Board"
+                                                    title={__('general.restore_board')}
                                                 >
                                                     <Archive className="h-3.5 w-3.5 rotate-180" />
                                                 </Button>
@@ -393,7 +381,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                                     variant="ghost" 
                                                     size="icon" 
                                                     className="h-7 w-7 text-zinc-500 hover:text-zinc-700"
-                                                    title="Archive Board"
+                                                    title={__('general.archive_board')}
                                                 >
                                                     <Archive className="h-3.5 w-3.5" />
                                                 </Button>
@@ -403,7 +391,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                                 variant="ghost" 
                                                 size="icon" 
                                                 className="h-7 w-7 text-rose-500 hover:text-rose-700 hover:bg-rose-50"
-                                                title="Delete Board"
+                                                title={__('general.delete_board')}
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />
                                             </Button>
@@ -421,23 +409,19 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                 <DialogContent className="sm:max-w-[480px]">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
-                            <Plus className="h-5 w-5 text-primary" />
-                            Create Task Board
-                        </DialogTitle>
-                        <DialogDescription className="text-xs">
-                            Set up a shared, dedicated board where you can add, organize, and check off todo list items with your client.
-                        </DialogDescription>
+                            <Plus className="h-5 w-5 text-primary" />{__('general.create_task_board')}</DialogTitle>
+                        <DialogDescription className="text-xs">{__('general.set_up_a_shared_dedicated_board_where_you_can_add_organize_and_check_off_todo_list_items_with_your_client')}</DialogDescription>
                     </DialogHeader>
 
                     <form onSubmit={handleCreateSubmit} className="space-y-4 py-2 text-xs">
                         {/* Name */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="task_name" className="text-xs font-semibold text-foreground">Task Board Title</Label>
+                            <Label htmlFor="task_name" className="text-xs font-semibold text-foreground">{__('general.task_board_title')}</Label>
                             <Input 
                                 id="task_name"
                                 value={data.task_name}
                                 onChange={(e) => setData('task_name', e.target.value)}
-                                placeholder="e.g. Phase 1 — UI Design & Prototypes"
+                                placeholder={__('general.e_g_phase_1_ui_design_prototypes')}
                                 className="shadow-none h-9 text-xs"
                                 required
                             />
@@ -446,12 +430,12 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
 
                         {/* Description */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="task_description" className="text-xs font-semibold text-foreground">Brief Description</Label>
+                            <Label htmlFor="task_description" className="text-xs font-semibold text-foreground">{__('general.brief_description')}</Label>
                             <Textarea 
                                 id="task_description"
                                 value={data.task_description}
                                 onChange={(e) => setData('task_description', e.target.value)}
-                                placeholder="Detail what this board represents for your client..."
+                                placeholder={__('general.detail_what_this_board_represents_for_your_client')}
                                 className="shadow-none text-xs min-h-[80px] resize-none"
                             />
                             {errors.task_description && <p className="text-rose-500 text-[11px] font-medium">{errors.task_description}</p>}
@@ -460,7 +444,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                         <div className="grid grid-cols-2 gap-4">
                             {/* Client ID */}
                             <div className="space-y-1.5">
-                                <Label htmlFor="client_id" className="text-xs font-semibold text-foreground">Select Client</Label>
+                                <Label htmlFor="client_id" className="text-xs font-semibold text-foreground">{__('general.select_client')}</Label>
                                 <select
                                     id="client_id"
                                     value={data.client_id}
@@ -474,7 +458,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                     className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
                                     required
                                 >
-                                    <option value="" disabled>Choose a client...</option>
+                                    <option value="" disabled>{__('general.choose_a_client')}</option>
                                     {clients.map((c) => (
                                         <option key={c.id} value={c.id}>{c.name}</option>
                                     ))}
@@ -484,7 +468,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
 
                             {/* Project ID */}
                             <div className="space-y-1.5">
-                                <Label htmlFor="project_id" className="text-xs font-semibold text-foreground">Select Project</Label>
+                                <Label htmlFor="project_id" className="text-xs font-semibold text-foreground">{__('general.select_project')}</Label>
                                 <select
                                     id="project_id"
                                     value={data.project_id}
@@ -506,7 +490,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                         <div className="grid grid-cols-2 gap-4">
                             {/* Priority */}
                             <div className="space-y-1.5">
-                                <Label htmlFor="priority" className="text-xs font-semibold text-foreground">Priority Level</Label>
+                                <Label htmlFor="priority" className="text-xs font-semibold text-foreground">{__('general.priority_level')}</Label>
                                 <select
                                     id="priority"
                                     value={data.priority}
@@ -523,7 +507,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
 
                             {/* Status */}
                             <div className="space-y-1.5">
-                                <Label htmlFor="status" className="text-xs font-semibold text-foreground">Initial Status</Label>
+                                <Label htmlFor="status" className="text-xs font-semibold text-foreground">{__('general.initial_status')}</Label>
                                 <select
                                     id="status"
                                     value={data.status}
@@ -531,7 +515,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                     className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
                                 >
                                     <option value="open">Open</option>
-                                    <option value="in_progress">In Progress</option>
+                                    <option value="in_progress">{__('general.in_progress')}</option>
                                     <option value="review">Review</option>
                                     <option value="completed">Completed</option>
                                 </select>
@@ -541,7 +525,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
 
                         {/* Due Date */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="due_date" className="text-xs font-semibold text-foreground">Target Due Date</Label>
+                            <Label htmlFor="due_date" className="text-xs font-semibold text-foreground">{__('general.target_due_date')}</Label>
                             <Input 
                                 id="due_date"
                                 type="date"

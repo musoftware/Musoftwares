@@ -25,12 +25,12 @@ export default function Show({ widget }: { widget: any }) {
     const handleCopy = () => {
         navigator.clipboard.writeText(embedCode);
         setCopied(true);
-        toast.success(__('Embed code copied to clipboard!'));
+        toast.success(__('general.embed_code_copied_to_clipboard'));
         setTimeout(() => setCopied(false), 2000);
     };
 
     return (
-        <CrmLayout title={__('Form Embed Code')} activeMenu="widgets">
+        <CrmLayout title={__('general.form_embed_code')} activeMenu="widgets">
             <div className="max-w-4xl mx-auto space-y-6 pb-12">
                 <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
@@ -44,7 +44,7 @@ export default function Show({ widget }: { widget: any }) {
                                 {widget.name}
                             </h1>
                             <p className="text-sm text-slate-500">
-                                {__('Get your embed code or preview the form.')}
+                                {__('general.get_your_embed_code_or_preview_the_form')}
                             </p>
                         </div>
                     </div>
@@ -57,7 +57,7 @@ export default function Show({ widget }: { widget: any }) {
                         <Button asChild className="gap-2">
                             <a href={iframeUrl} target="_blank" rel="noopener noreferrer">
                                 <ExternalLink className="w-4 h-4" />
-                                {__('Live Preview')}
+                                {__('general.live_preview')}
                             </a>
                         </Button>
                     </div>
@@ -69,10 +69,10 @@ export default function Show({ widget }: { widget: any }) {
                             <CardHeader>
                                 <CardTitle className="text-lg flex items-center gap-2">
                                     <Code className="w-5 h-5 text-indigo-500" />
-                                    {__('Embed Code')}
+                                    {__('general.embed_code')}
                                 </CardTitle>
                                 <CardDescription>
-                                    {__('Copy and paste this HTML code into your website (WordPress, Shopify, custom site) where you want the form to appear.')}
+                                    {__('general.copy_and_paste_this_html_code_into_your_website_wordpress_shopify_custom_site_where_you_want_the_form_to_appear')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -87,12 +87,12 @@ export default function Show({ widget }: { widget: any }) {
                                         onClick={handleCopy}
                                     >
                                         {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                                        {copied ? __('Copied!') : __('Copy Code')}
+                                        {copied ? __('general.copied') : __('general.copy_code')}
                                     </Button>
                                 </div>
                                 <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
                                     <strong>{__('Note')}: </strong>
-                                    {__('If you specified Allowed Domains in the settings, this form will ONLY load when embedded on those specific websites. If it appears blank on your site, verify your domain settings.')}
+                                    {__('general.if_you_specified_allowed_domains_in_the_settings_this_form_will_only_load_when_embedded_on_those_specific_websites_if_it_appears_blank_on_your_site_verify_your_domain_settings')}
                                 </div>
                             </CardContent>
                         </Card>
@@ -101,7 +101,7 @@ export default function Show({ widget }: { widget: any }) {
                     <div className="md:col-span-1 space-y-6">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-lg">{__('Quick Stats')}</CardTitle>
+                                <CardTitle className="text-lg">{__('general.quick_stats')}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex justify-between items-center py-2 border-b border-slate-100">
@@ -111,11 +111,11 @@ export default function Show({ widget }: { widget: any }) {
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                                    <span className="text-slate-500">{__('Leads Captured')}</span>
+                                    <span className="text-slate-500">{__('general.leads_captured')}</span>
                                     <span className="font-semibold text-slate-900">{widget.leads_count || 0}</span>
                                 </div>
                                 <div className="flex justify-between items-center py-2">
-                                    <span className="text-slate-500">{__('Created On')}</span>
+                                    <span className="text-slate-500">{__('general.created_on')}</span>
                                     <span className="text-slate-900 text-sm">
                                         {new Date(widget.created_at).toLocaleDateString()}
                                     </span>

@@ -20,16 +20,16 @@ class ServiceReviewController extends Controller
     {
         // Auth checks
         if ($order->buyer_id !== auth()->id()) {
-            abort(403, 'Only the buyer can leave a review.');
+            abort(403, __('general.only_the_buyer_can_leave_a_review'));
         }
 
         if ($order->status !== ServiceOrderStatus::COMPLETED) {
-            return back()->with('error', 'You can only review completed orders.');
+            return back()->with('error', __('general.you_can_only_review_completed_orders'));
         }
 
         // Prevent duplicate
         if (ServiceReview::where('order_id', $order->id)->where('reviewer_id', auth()->id())->exists()) {
-            return back()->with('error', 'You have already reviewed this order.');
+            return back()->with('error', __('general.you_have_already_reviewed_this_order'));
         }
 
         $data = $request->validate([
@@ -50,7 +50,7 @@ class ServiceReviewController extends Controller
         // Update aggregate rating on the service
         ServiceReview::syncServiceRating($order->package->service_id ?? 0);
 
-        return back()->with('success', 'Thank you for your review!');
+        return back()->with('success', __('general.thank_you_for_your_review'));
     }
 
     /**
@@ -66,6 +66,6 @@ class ServiceReviewController extends Controller
         $review->delete();
         ServiceReview::syncServiceRating($serviceId);
 
-        return back()->with('success', 'Review removed.');
+        return back()->with('success', __('general.review_removed'));
     }
 }

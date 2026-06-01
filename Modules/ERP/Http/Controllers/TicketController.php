@@ -24,7 +24,7 @@ class TicketController extends Controller
     {
         $user = Auth::user();
         if (!$user->hasModuleSubscription('erp-tickets')) {
-            abort(403, 'Upgrade to enable Support Tickets.');
+            abort(403, __('general.upgrade_to_enable_support_tickets'));
         }
 
         $tenant = $this->getTenant();
@@ -39,7 +39,7 @@ class TicketController extends Controller
     {
         $user = Auth::user();
         if (!$user->hasModuleSubscription('erp-tickets')) {
-            abort(403, 'Upgrade to enable Support Tickets.');
+            abort(403, __('general.upgrade_to_enable_support_tickets'));
         }
 
         $tenant = $this->getTenant();
@@ -65,7 +65,7 @@ class TicketController extends Controller
         ]);
 
         return redirect()->route('erp.dashboard', ['section' => 'overview'])
-            ->with('success', 'Ticket created successfully.');
+            ->with('success', __('general.ticket_created_successfully'));
     }
 
     public function resolve(SupportTicket $ticket)
@@ -76,7 +76,7 @@ class TicketController extends Controller
         }
 
         $ticket->update(['status' => 'resolved']);
-        return back()->with('success', 'Ticket resolved.');
+        return back()->with('success', __('general.ticket_resolved'));
     }
 
     public function close(SupportTicket $ticket)
@@ -87,7 +87,7 @@ class TicketController extends Controller
         }
 
         $ticket->update(['status' => 'closed']);
-        return back()->with('success', 'Ticket closed.');
+        return back()->with('success', __('general.ticket_closed'));
     }
 
     public function destroy(SupportTicket $ticket)
@@ -98,6 +98,6 @@ class TicketController extends Controller
         }
 
         $ticket->delete();
-        return back()->with('success', 'Ticket deleted.');
+        return back()->with('success', __('general.ticket_deleted'));
     }
 }

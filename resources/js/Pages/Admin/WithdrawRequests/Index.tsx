@@ -134,7 +134,7 @@ export default function Index({ requests, filters }: Props) {
             render: (row: WithdrawRequest) => (
                 <DropdownMenu>
                     <DropdownMenuTrigger className="inline-flex h-8 w-8 items-center justify-center rounded-md p-0 text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus:outline-none">
-                        <span className="sr-only">Open menu</span>
+                        <span className="sr-only">{__('general.open_menu')}</span>
                         <MoreHorizontal className="h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40">
@@ -156,7 +156,7 @@ export default function Index({ requests, filters }: Props) {
             value={filters.status || ''}
             onChange={(e) => handleFilter(e.target.value)}
         >
-            <option value="">All Statuses</option>
+            <option value="">{__('general.all_statuses')}</option>
             <option value="pending">Pending</option>
             <option value="reviewing">Reviewing</option>
             <option value="approved">Approved</option>
@@ -165,8 +165,8 @@ export default function Index({ requests, filters }: Props) {
     );
 
     return (
-        <AdminSidebarLayout title="Withdraw Requests" header="Withdraw Requests">
-            <Head title="Withdraw Requests" />
+        <AdminSidebarLayout title={__('general.withdraw_requests')} header="Withdraw Requests">
+            <Head title={__('general.withdraw_requests')} />
             <DataTable
                 columns={columns}
                 data={requests.data}

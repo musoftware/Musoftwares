@@ -49,7 +49,7 @@ export default function OrderShow({ order }: any) {
                 <div className="flex items-center gap-3">
                     <Select onValueChange={(val) => handleStatusUpdate(val)}>
                         <SelectTrigger className="w-[180px] bg-white">
-                            <SelectValue placeholder="Update Status..." />
+                            <SelectValue placeholder={__('general.update_status_1')} />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="preparing">Preparing</SelectItem>
@@ -68,7 +68,7 @@ export default function OrderShow({ order }: any) {
                         <div className="absolute top-5 left-16 right-16 h-0.5 bg-gray-100 z-0"></div>
                         <div className="absolute top-5 left-16 right-16 h-0.5 bg-blue-600 z-0 transition-all duration-500" style={{ width: order.status === 'new' ? '0%' : order.status === 'preparing' ? '33%' : order.status === 'shipping' ? '66%' : '100%' }}></div>
                         
-                        <div className="relative z-10"><TimelineStep title="New Order" active={true} /></div>
+                        <div className="relative z-10"><TimelineStep title={__('general.new_order')} active={true} /></div>
                         <div className="relative z-10"><TimelineStep title="Preparing" active={['preparing', 'shipping', 'delivered'].includes(order.status)} /></div>
                         <div className="relative z-10"><TimelineStep title="Shipping" active={['shipping', 'delivered'].includes(order.status)} /></div>
                         <div className="relative z-10"><TimelineStep title="Delivered" active={order.status === 'delivered'} isLast={true} /></div>
@@ -81,8 +81,7 @@ export default function OrderShow({ order }: any) {
                 <Card className="shadow-sm border-gray-200 col-span-1">
                     <CardHeader className="bg-gray-50/50 border-b p-4">
                         <CardTitle className="text-lg flex items-center gap-2">
-                            <User className="w-5 h-5 text-gray-500" /> Customer Details
-                        </CardTitle>
+                            <User className="w-5 h-5 text-gray-500" />{__('general.customer_details')}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-5 space-y-4">
                         <div>
@@ -95,8 +94,7 @@ export default function OrderShow({ order }: any) {
                         </div>
                         <div>
                             <div className="text-sm text-gray-500 flex items-center gap-1 mt-4">
-                                <MapPin className="w-4 h-4" /> Shipping Address
-                            </div>
+                                <MapPin className="w-4 h-4" />{__('general.shipping_address')}</div>
                             <div className="font-medium text-gray-900 mt-1">{order.customer_governorate}</div>
                             <div className="text-sm text-gray-600 mt-1 bg-gray-50 p-2 rounded-lg border border-gray-100">
                                 {order.customer_address}
@@ -109,12 +107,9 @@ export default function OrderShow({ order }: any) {
                 <Card className="shadow-sm border-gray-200 col-span-1 md:col-span-2">
                     <CardHeader className="bg-gray-50/50 border-b p-4 flex flex-row items-center justify-between">
                         <CardTitle className="text-lg flex items-center gap-2">
-                            <Package className="w-5 h-5 text-gray-500" /> Order Items
-                        </CardTitle>
+                            <Package className="w-5 h-5 text-gray-500" />{__('general.order_items')}</CardTitle>
                         <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => handleItemAction('returning')} className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-200">
-                                Partial Return
-                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => handleItemAction('returning')} className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-200">{__('general.partial_return')}</Button>
                             <Button variant="outline" size="sm" onClick={() => handleItemAction('replacing')} className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200">
                                 <RefreshCw className="w-3.5 h-3.5 mr-1.5" /> Replace
                             </Button>
@@ -156,11 +151,11 @@ export default function OrderShow({ order }: any) {
                                     <TableCell className="text-right font-bold text-gray-900">{order.subtotal.toLocaleString()} EGP</TableCell>
                                 </TableRow>
                                 <TableRow className="bg-gray-50/50">
-                                    <TableCell colSpan={4} className="text-right font-medium text-gray-500">Shipping Fees</TableCell>
+                                    <TableCell colSpan={4} className="text-right font-medium text-gray-500">{__('general.shipping_fees')}</TableCell>
                                     <TableCell className="text-right font-bold text-gray-900">{order.shipping_fees.toLocaleString()} EGP</TableCell>
                                 </TableRow>
                                 <TableRow className="bg-blue-50/30">
-                                    <TableCell colSpan={4} className="text-right font-semibold text-blue-900">Grand Total</TableCell>
+                                    <TableCell colSpan={4} className="text-right font-semibold text-blue-900">{__('general.grand_total')}</TableCell>
                                     <TableCell className="text-right font-bold text-blue-700 text-lg">{order.total.toLocaleString()} EGP</TableCell>
                                 </TableRow>
                             </TableBody>

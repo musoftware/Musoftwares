@@ -82,10 +82,10 @@ export default function ScorecardWorkspace({ t, campaignResult }: any) {
                     </div>
 
                     <div className="border-t border-slate-800/80 pt-4 mt-6 flex justify-between items-center text-[10px] font-bold text-slate-500">
-                        <span>Campaign OS v3 Safeguards</span>
+                        <span>{__('general.campaign_os_v3_safeguards')}</span>
                         <div className="flex items-center gap-1 bg-teal-500/10 text-teal-400 border border-teal-500/20 px-2 py-1 rounded-full uppercase">
                             <Sparkles className="w-3 h-3" />
-                            <span>AI Warming Active</span>
+                            <span>{__('general.ai_warming_active')}</span>
                         </div>
                     </div>
                 </div>

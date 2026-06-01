@@ -24,7 +24,7 @@ class SubscriptionMiddleware
     {
         if (!auth()->check() && !auth('erp_team')->check()) {
             if ($request->expectsJson() || $request->is('api/*')) {
-                abort(401, 'Unauthorized access.');
+                abort(401, __('general.unauthorized_access'));
             }
             return redirect()->route('login');
         }
@@ -36,7 +36,7 @@ class SubscriptionMiddleware
         }
 
         if (!$user) {
-            abort(401, 'Unauthorized access.');
+            abort(401, __('general.unauthorized_access'));
         }
 
         // Bypass subscription check for freelance and marketplace modules

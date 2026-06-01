@@ -44,7 +44,7 @@ export default function UpgradePreview() {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('overview');
 
     return (
-        <ERPLayout title="ERP Workspace Premium Upgrade" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__('general.erp_workspace_premium_upgrade')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-[1000px] mx-auto px-4 py-8 space-y-8 font-sans text-sm">
                 
@@ -56,16 +56,10 @@ export default function UpgradePreview() {
 
                     <CardContent className="p-8 md:p-10 relative z-10 max-w-2xl space-y-6">
                         <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 font-semibold gap-1.5 px-3 py-1">
-                            <Sparkles className="h-3.5 w-3.5" />
-                            Premium ERP Extension Module
-                        </Badge>
+                            <Sparkles className="h-3.5 w-3.5" />{__('general.premium_erp_extension_module')}</Badge>
                         <div className="space-y-2">
-                            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground leading-tight">
-                                Consolidate Invoicing, Estimations, & Profit Ledger Into One Operational Workspace
-                            </h1>
-                            <p className="text-muted-foreground leading-relaxed">
-                                Upgrade your client account to unlock professional estimates, automated recurring business invoices, employee expense reporting, and active ledger profit distribution charts.
-                            </p>
+                            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground leading-tight">{__('general.consolidate_invoicing_estimations_profit_ledger_into_one_operational_workspace')}</h1>
+                            <p className="text-muted-foreground leading-relaxed">{__('general.upgrade_your_client_account_to_unlock_professional_estimates_automated_recurring_business_invoices_employee_expense_reporting_and_active_ledger_profit_distribution_charts')}</p>
                         </div>
                         
                         <div className="pt-2">
@@ -90,11 +84,8 @@ export default function UpgradePreview() {
                                 <Lock className="h-5 w-5" />
                             </div>
                             <CardTitle className="text-base flex items-center gap-2">
-                                <Calculator className="h-4 w-4 text-primary" /> Dynamic Estimations Engine
-                            </CardTitle>
-                            <CardDescription className="text-xs leading-normal pt-1">
-                                Build interactive itemized estimates and automatically convert them into billing invoices upon client signature approval.
-                            </CardDescription>
+                                <Calculator className="h-4 w-4 text-primary" />{__('general.dynamic_estimations_engine')}</CardTitle>
+                            <CardDescription className="text-xs leading-normal pt-1">{__('general.build_interactive_itemized_estimates_and_automatically_convert_them_into_billing_invoices_upon_client_signature_approval')}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {/* Blurred Mockup Visual */}
@@ -104,8 +95,8 @@ export default function UpgradePreview() {
                                     <span className="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-medium">Draft</span>
                                 </div>
                                 <div className="space-y-1.5 text-muted-foreground">
-                                    <div className="flex justify-between"><span>Core Refactoring</span><span>{formatMoney(1200, 'USD')}</span></div>
-                                    <div className="flex justify-between"><span>Database Migration</span><span>{formatMoney(650, 'USD')}</span></div>
+                                    <div className="flex justify-between"><span>{__('general.core_refactoring')}</span><span>{formatMoney(1200, 'USD')}</span></div>
+                                    <div className="flex justify-between"><span>{__('general.database_migration')}</span><span>{formatMoney(650, 'USD')}</span></div>
                                 </div>
                                 <div className="text-right font-bold pt-2 border-t border-border text-foreground">Total: {formatMoney(1850, 'USD')}</div>
                             </div>
@@ -119,17 +110,14 @@ export default function UpgradePreview() {
                                 <Lock className="h-5 w-5" />
                             </div>
                             <CardTitle className="text-base flex items-center gap-2">
-                                <PieChart className="h-4 w-4 text-primary" /> Automated Expense Tracker
-                            </CardTitle>
-                            <CardDescription className="text-xs leading-normal pt-1">
-                                Log operational costs, vendor receipts, server costs, and compile automatic Profit & Loss charts for annual tax schedules.
-                            </CardDescription>
+                                <PieChart className="h-4 w-4 text-primary" />{__('general.automated_expense_tracker')}</CardTitle>
+                            <CardDescription className="text-xs leading-normal pt-1">{__('general.log_operational_costs_vendor_receipts_server_costs_and_compile_automatic_profit_loss_charts_for_annual_tax_schedules')}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {/* Blurred chart visual */}
                             <div className="rounded-lg border border-border bg-muted/30 p-4 select-none filter blur-[1.5px] opacity-70 pointer-events-none font-mono text-[10px] space-y-3">
                                 <div className="flex justify-between items-center">
-                                    <span className="font-semibold text-foreground">Profit & Loss Ledger</span>
+                                    <span className="font-semibold text-foreground">{__('general.profit_loss_ledger')}</span>
                                     <span className="text-emerald-600 font-bold flex items-center"><TrendingUp className="h-3 w-3 mr-1" /> +14.5%</span>
                                 </div>
                                 <div className="flex justify-between text-muted-foreground">
@@ -148,9 +136,7 @@ export default function UpgradePreview() {
                 {/* Feature Comparison Capability Table */}
                 <Card className="shadow-none overflow-hidden">
                     <CardHeader className="bg-muted/30 border-b pb-4">
-                        <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                            Capability Mapping Comparison
-                        </CardTitle>
+                        <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{__('general.capability_mapping_comparison')}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
@@ -158,33 +144,33 @@ export default function UpgradePreview() {
                                 <TableHeader>
                                     <TableRow className="bg-muted/10">
                                         <TableHead className="pl-6 w-[40%]">Feature</TableHead>
-                                        <TableHead className="text-center w-[30%]">Standard Client Account</TableHead>
-                                        <TableHead className="text-center w-[30%] bg-primary/5 text-primary font-semibold">Premium ERP Workspace</TableHead>
+                                        <TableHead className="text-center w-[30%]">{__('general.standard_client_account')}</TableHead>
+                                        <TableHead className="text-center w-[30%] bg-primary/5 text-primary font-semibold">{__('general.premium_erp_workspace')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell className="pl-6 font-medium">Receive Invoices & Pay</TableCell>
+                                        <TableCell className="pl-6 font-medium">{__('general.receive_invoices_pay')}</TableCell>
                                         <TableCell className="text-center"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
                                         <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell className="pl-6 font-medium">Estimates Creation & Signatures</TableCell>
+                                        <TableCell className="pl-6 font-medium">{__('general.estimates_creation_signatures')}</TableCell>
                                         <TableCell className="text-center text-muted-foreground"><Lock className="h-4 w-4 mx-auto opacity-50" /></TableCell>
                                         <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell className="pl-6 font-medium">Client Expense Ledger Tracking</TableCell>
+                                        <TableCell className="pl-6 font-medium">{__('general.client_expense_ledger_tracking')}</TableCell>
                                         <TableCell className="text-center text-muted-foreground"><Lock className="h-4 w-4 mx-auto opacity-50" /></TableCell>
                                         <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell className="pl-6 font-medium">Annual Profit & Loss Reports</TableCell>
+                                        <TableCell className="pl-6 font-medium">{__('general.annual_profit_loss_reports')}</TableCell>
                                         <TableCell className="text-center text-muted-foreground"><Lock className="h-4 w-4 mx-auto opacity-50" /></TableCell>
                                         <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell className="pl-6 font-medium">Recurring Auto-Invoicing Automation</TableCell>
+                                        <TableCell className="pl-6 font-medium">{__('general.recurring_auto_invoicing_automation')}</TableCell>
                                         <TableCell className="text-center text-muted-foreground"><Lock className="h-4 w-4 mx-auto opacity-50" /></TableCell>
                                         <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
                                     </TableRow>
@@ -198,17 +184,15 @@ export default function UpgradePreview() {
                 <Card className="shadow-none border-primary/20 bg-primary/5">
                     <CardContent className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="space-y-1">
-                            <span className="font-semibold text-foreground block">Ready to unlock fully unified operations?</span>
-                            <p className="text-xs text-muted-foreground leading-snug">
-                                Activate your Premium ERP workspace license today. Simulates check clearance instantly in sandbox mode.
-                            </p>
+                            <span className="font-semibold text-foreground block">{__('general.ready_to_unlock_fully_unified_operations')}</span>
+                            <p className="text-xs text-muted-foreground leading-snug">{__('general.activate_your_premium_erp_workspace_license_today_simulates_check_clearance_instantly_in_sandbox_mode')}</p>
                         </div>
                         <Button 
                             onClick={handleUpgradeSimulate}
                             disabled={isUpgrading}
                             className="shadow-none whitespace-nowrap"
                         >
-                            {isUpgrading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Checking...</> : "Upgrade Now"}
+                            {isUpgrading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{__('general.checking')}</> : "Upgrade Now"}
                         </Button>
                     </CardContent>
                 </Card>
@@ -233,10 +217,8 @@ export default function UpgradePreview() {
                                 <Loader2 className="h-6 w-6" />
                             </div>
                             <div className="space-y-1">
-                                <h3 className="font-semibold text-card-foreground text-base">Processing License Setup</h3>
-                                <p className="text-muted-foreground text-xs leading-normal">
-                                    Provisioning estimates tables, recurring models, and dashboard metrics trackers...
-                                </p>
+                                <h3 className="font-semibold text-card-foreground text-base">{__('general.processing_license_setup')}</h3>
+                                <p className="text-muted-foreground text-xs leading-normal">{__('general.provisioning_estimates_tables_recurring_models_and_dashboard_metrics_trackers')}</p>
                             </div>
                         </motion.div>
                     </motion.div>

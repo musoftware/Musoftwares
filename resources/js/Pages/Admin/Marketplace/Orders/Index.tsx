@@ -10,7 +10,7 @@ export default function Index({ orders }) {
     const getStatusBadge = (status) => {
         switch (status) {
             case 'completed': return <Badge variant="success" className="bg-green-100 text-green-800">Completed</Badge>;
-            case 'in_progress': return <Badge variant="secondary" className="bg-blue-100 text-blue-800">In Progress</Badge>;
+            case 'in_progress': return <Badge variant="secondary" className="bg-blue-100 text-blue-800">{__('general.in_progress')}</Badge>;
             case 'disputed': return <Badge variant="destructive" className="bg-red-100 text-red-800">Disputed</Badge>;
             case 'cancelled': return <Badge variant="outline" className="text-gray-500 border-gray-300">Cancelled</Badge>;
             default: return <Badge variant="outline" className="text-gray-600">{status}</Badge>;
@@ -18,7 +18,7 @@ export default function Index({ orders }) {
     };
 
     return (
-        <AdminSidebarLayout title="Marketplace Orders" header="Marketplace Orders">
+        <AdminSidebarLayout title={__('general.marketplace_orders')} header="Marketplace Orders">
             <div className="overflow-hidden rounded-lg bg-white shadow">
                 <table className="w-full text-left">
                     <thead className="border-b bg-gray-50">
@@ -59,9 +59,7 @@ export default function Index({ orders }) {
                         ))}
                         {orders.data.length === 0 && (
                             <tr>
-                                <td colSpan="7" className="p-8 text-center text-gray-500">
-                                    No marketplace orders found.
-                                </td>
+                                <td colSpan="7" className="p-8 text-center text-gray-500">{__('general.no_marketplace_orders_found')}</td>
                             </tr>
                         )}
                     </tbody>

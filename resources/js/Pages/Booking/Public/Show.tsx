@@ -86,7 +86,7 @@ export default function Show({ host, eventType }: any) {
             {/* Step 1: Provider / Doctor selection if they exist */}
             {eventType.providers && eventType.providers.length > 0 && (
                 <div className="space-y-3">
-                    <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Select a Provider</h3>
+                    <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">{__('general.select_a_provider')}</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {/* Any Available Option */}
                         <Card 
@@ -102,8 +102,8 @@ export default function Show({ host, eventType }: any) {
                                     <Users className="h-5 w-5" />
                                 </div>
                                 <div className="min-w-0">
-                                    <h4 className="font-semibold text-slate-800 text-sm">Any Provider</h4>
-                                    <p className="text-xs text-slate-500 truncate">First available timeslot</p>
+                                    <h4 className="font-semibold text-slate-800 text-sm">{__('general.any_provider')}</h4>
+                                    <p className="text-xs text-slate-500 truncate">{__('general.first_available_timeslot')}</p>
                                 </div>
                             </div>
                         </Card>
@@ -143,7 +143,7 @@ export default function Show({ host, eventType }: any) {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
                 {/* Date Grid */}
                 <div className="lg:col-span-7 space-y-4">
-                    <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Select a Date</h3>
+                    <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">{__('general.select_a_date')}</h3>
                     <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100">
                         <div className="flex items-center justify-between mb-4">
                             <span className="font-semibold text-slate-800">{format(today, 'MMMM yyyy')}</span>
@@ -193,7 +193,7 @@ export default function Show({ host, eventType }: any) {
 
                 {/* Slots List */}
                 <div className="lg:col-span-5 space-y-4">
-                    <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Available Times</h3>
+                    <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">{__('general.available_times')}</h3>
                     
                     {selectedDate ? (
                         <div className="space-y-4 animate-in fade-in duration-300">
@@ -210,8 +210,8 @@ export default function Show({ host, eventType }: any) {
                             ) : availableSlots.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-12 border border-dashed border-slate-200 rounded-xl bg-slate-50 p-4 text-center">
                                     <AlertCircle className="w-8 h-8 text-slate-400 mb-2" />
-                                    <span className="text-xs text-slate-500 font-medium">No available slots on this day.</span>
-                                    <span className="text-[10px] text-slate-400 mt-1">Please select another date.</span>
+                                    <span className="text-xs text-slate-500 font-medium">{__('general.no_available_slots_on_this_day')}</span>
+                                    <span className="text-[10px] text-slate-400 mt-1">{__('general.please_select_another_date')}</span>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 gap-2 max-h-[320px] overflow-y-auto pr-1.5 custom-scrollbar">
@@ -253,8 +253,8 @@ export default function Show({ host, eventType }: any) {
                     ) : (
                         <div className="h-56 flex flex-col items-center justify-center border-2 border-dashed border-slate-100 rounded-2xl p-6 text-center bg-slate-50/20">
                             <CalendarIcon className="w-8 h-8 text-slate-300 mb-2 animate-bounce" />
-                            <span className="text-slate-400 text-xs font-semibold">Select a calendar date</span>
-                            <span className="text-[10px] text-slate-400 mt-0.5">Slots dynamically calculated</span>
+                            <span className="text-slate-400 text-xs font-semibold">{__('general.select_a_calendar_date')}</span>
+                            <span className="text-[10px] text-slate-400 mt-0.5">{__('general.slots_dynamically_calculated')}</span>
                         </div>
                     )}
                 </div>
@@ -266,13 +266,12 @@ export default function Show({ host, eventType }: any) {
         <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
             <div className="flex items-center text-slate-600 mb-6">
                 <Button variant="ghost" size="sm" onClick={() => setStep(1)} className="mr-2 -ml-3 text-slate-500 hover:text-slate-900 rounded-lg">
-                    <ChevronLeft className="h-4 w-4 mr-1" /> Back to calendar
-                </Button>
+                    <ChevronLeft className="h-4 w-4 mr-1" />{__('general.back_to_calendar')}</Button>
             </div>
 
             <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs">
                 <div>
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Appointment Schedule</h4>
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{__('general.appointment_schedule')}</h4>
                     <span className="text-sm font-semibold text-slate-800 block">
                         {selectedDate && format(selectedDate, 'EEEE, MMMM d, yyyy')}
                     </span>
@@ -297,7 +296,7 @@ export default function Show({ host, eventType }: any) {
                 )}
             </div>
 
-            <h3 className="text-lg font-semibold text-slate-900">Enter Booking Details</h3>
+            <h3 className="text-lg font-semibold text-slate-900">{__('general.enter_booking_details')}</h3>
             
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -307,7 +306,7 @@ export default function Show({ host, eventType }: any) {
                             id="guest_name" 
                             value={data.guest_name}
                             onChange={e => setData('guest_name', e.target.value)}
-                            placeholder="John Doe"
+                            placeholder={__('general.john_doe')}
                             required
                             className="rounded-xl border-slate-200/80 bg-white py-5"
                         />
@@ -333,7 +332,7 @@ export default function Show({ host, eventType }: any) {
                         type="email"
                         value={data.guest_email}
                         onChange={e => setData('guest_email', e.target.value)}
-                        placeholder="john@example.com"
+                        placeholder={__('general.john_example_com')}
                         required
                         className="rounded-xl border-slate-200/80 bg-white py-5"
                     />
@@ -346,7 +345,7 @@ export default function Show({ host, eventType }: any) {
                         id="notes" 
                         value={data.notes}
                         onChange={e => setData('notes', e.target.value)}
-                        placeholder="Please share anything helpful to prepare for this consultation..."
+                        placeholder={__('general.please_share_anything_helpful_to_prepare_for_this_consultation')}
                         rows={3}
                         className="rounded-xl border-slate-200/80 bg-white resize-none"
                     />
@@ -367,16 +366,12 @@ export default function Show({ host, eventType }: any) {
                             </>
                         ) : (
                             <>
-                                <CheckCircle2 className="w-5 h-5" />
-                                Confirm Appointment
-                            </>
+                                <CheckCircle2 className="w-5 h-5" />{__('general.confirm_appointment')}</>
                         )}
                     </Button>
                 </div>
                 
-                <p className="text-center text-xs text-slate-400 mt-4">
-                    Secured by Musoftwares. By confirming, you agree to our Terms and Policies.
-                </p>
+                <p className="text-center text-xs text-slate-400 mt-4">{__('general.secured_by_musoftwares_by_confirming_you_agree_to_our_terms_and_policies')}</p>
             </form>
         </div>
     );
@@ -396,7 +391,7 @@ export default function Show({ host, eventType }: any) {
                             <div className="h-14 w-14 bg-gradient-to-tr from-slate-800 to-slate-900 border border-slate-700/10 rounded-2xl flex items-center justify-center shadow-xs mb-4 overflow-hidden text-white font-bold text-lg">
                                 {host.name.charAt(0).toUpperCase()}
                             </div>
-                            <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-1">Host Profile</p>
+                            <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-1">{__('general.host_profile')}</p>
                             <span className="text-slate-800 font-semibold text-sm block mb-4">{host.name}</span>
                             <h1 className="text-xl font-extrabold text-slate-900 tracking-tight leading-tight">{eventType.title}</h1>
                         </div>
@@ -426,9 +421,7 @@ export default function Show({ host, eventType }: any) {
                     </div>
 
                     <div className="mt-8 pt-6 border-t border-slate-200/50 text-[10px] text-slate-400 flex items-center gap-1 font-medium">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        Verified Scheduling Page
-                    </div>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />{__('general.verified_scheduling_page')}</div>
                 </div>
                 
                 {/* Right Column - Step Booking Flow */}

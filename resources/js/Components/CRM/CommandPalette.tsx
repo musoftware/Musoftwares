@@ -42,7 +42,7 @@ export function CommandPalette() {
                         <Search className="h-5 w-5 text-slate-400 mr-2 shrink-0" />
                         <Command.Input 
                             autoFocus
-                            placeholder="Search leads, campaigns, or actions..." 
+                            placeholder={__('general.search_leads_campaigns_or_actions')} 
                             className="flex-1 h-14 bg-transparent outline-none placeholder:text-slate-400 text-slate-800"
                         />
                         <div className="flex items-center gap-1">
@@ -51,42 +51,35 @@ export function CommandPalette() {
                     </div>
 
                     <Command.List className="max-h-[300px] overflow-y-auto p-2">
-                        <Command.Empty className="py-6 text-center text-sm text-slate-500">No results found.</Command.Empty>
+                        <Command.Empty className="py-6 text-center text-sm text-slate-500">{__('general.no_results_found')}</Command.Empty>
 
                         <Command.Group heading="Quick Actions" className="text-xs font-medium text-slate-500 p-2">
                             <Command.Item 
                                 onSelect={() => runCommand(() => console.log('New Lead'))}
                                 className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 rounded-md cursor-pointer hover:bg-slate-100 aria-selected:bg-slate-100"
                             >
-                                <User className="h-4 w-4 text-slate-400" /> Create New Lead
-                            </Command.Item>
+                                <User className="h-4 w-4 text-slate-400" />{__('general.create_new_lead')}</Command.Item>
                             <Command.Item 
                                 onSelect={() => runCommand(() => console.log('New Task'))}
                                 className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 rounded-md cursor-pointer hover:bg-slate-100 aria-selected:bg-slate-100"
                             >
-                                <CheckSquare className="h-4 w-4 text-slate-400" /> Create New Task
-                            </Command.Item>
+                                <CheckSquare className="h-4 w-4 text-slate-400" />{__('general.create_new_task')}</Command.Item>
                             <Command.Item 
                                 onSelect={() => runCommand(() => console.log('New Campaign'))}
                                 className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 rounded-md cursor-pointer hover:bg-slate-100 aria-selected:bg-slate-100"
                             >
-                                <Send className="h-4 w-4 text-slate-400" /> Start Campaign
-                            </Command.Item>
+                                <Send className="h-4 w-4 text-slate-400" />{__('general.start_campaign')}</Command.Item>
                         </Command.Group>
 
                         <Command.Group heading="Navigation" className="text-xs font-medium text-slate-500 p-2">
                             <Command.Item 
                                 onSelect={() => runCommand(() => router.visit(route('crm.leads.index')))}
                                 className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 rounded-md cursor-pointer hover:bg-slate-100 aria-selected:bg-slate-100"
-                            >
-                                Go to Leads
-                            </Command.Item>
+                            >{__('general.go_to_leads')}</Command.Item>
                             <Command.Item 
                                 onSelect={() => runCommand(() => router.visit(route('crm.dashboard')))}
                                 className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 rounded-md cursor-pointer hover:bg-slate-100 aria-selected:bg-slate-100"
-                            >
-                                Go to Dashboard
-                            </Command.Item>
+                            >{__('general.go_to_dashboard')}</Command.Item>
                         </Command.Group>
 
                     </Command.List>

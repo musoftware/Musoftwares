@@ -57,14 +57,14 @@ export default function Settings({ settings, devices }: Props) {
             <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">{__('Payment Gateway Settings')}</h1>
-                    <p className="mt-2 text-sm text-gray-600">{__('Configure transfer number and available payment methods for your customers.')}</p>
+                    <p className="mt-2 text-sm text-gray-600">{__('general.configure_transfer_number_and_available_payment_methods_for_your_customers')}</p>
                 </div>
 
                 <form onSubmit={submit}>
                     <Card className="shadow-sm">
                         <CardHeader>
                             <CardTitle>{__('Transfer Details')}</CardTitle>
-                            <CardDescription>{__('This is the number that will appear to the buyer to transfer the amount to.')}</CardDescription>
+                            <CardDescription>{__('general.this_is_the_number_that_will_appear_to_the_buyer_to_transfer_the_amount_to')}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             
@@ -79,7 +79,7 @@ export default function Settings({ settings, devices }: Props) {
                                     onChange={(e) => setData('wallet_phone_number', e.target.value)}
                                     placeholder={__('Example: 01012345678')}
                                 />
-                                <p className="text-xs text-gray-500 max-w-md">{__('This number is used by default if a specific number is not set for each payment method.')}</p>
+                                <p className="text-xs text-gray-500 max-w-md">{__('general.this_number_is_used_by_default_if_a_specific_number_is_not_set_for_each_payment_method')}</p>
                                 {errors.wallet_phone_number && <p className="text-sm text-red-600">{errors.wallet_phone_number}</p>}
                             </div>
 
@@ -92,7 +92,7 @@ export default function Settings({ settings, devices }: Props) {
                                     <div className="flex items-center justify-between max-w-md p-4 border rounded-lg bg-gray-50/50">
                                         <div className="space-y-0.5">
                                             <Label className="text-base">{__('Instapay')}</Label>
-                                            <p className="text-sm text-gray-500">{__('Allow buyer to select Instapay as transfer method.')}</p>
+                                            <p className="text-sm text-gray-500">{__('general.allow_buyer_to_select_instapay_as_transfer_method')}</p>
                                         </div>
                                         <Switch
                                             checked={data.is_instapay_enabled}
@@ -114,14 +114,14 @@ export default function Settings({ settings, devices }: Props) {
                                             {errors.instapay_phone_number && <p className="text-sm text-red-600 mt-1">{errors.instapay_phone_number}</p>}
                                             
                                             <div className="mt-4 pt-4 border-t border-indigo-100">
-                                                <Label htmlFor="instapay_device_id">{__('Dedicated Device for Validation (Internal)')}</Label>
+                                                <Label htmlFor="instapay_device_id">{__('general.dedicated_device_for_validation_internal')}</Label>
                                                 <select
                                                     id="instapay_device_id"
                                                     className="w-full mt-2 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                                     value={data.instapay_device_id}
                                                     onChange={(e) => setData('instapay_device_id', e.target.value)}
                                                 >
-                                                    <option value="">{__('Any Device')}</option>
+                                                    <option value="">{__('general.any_device')}</option>
                                                     {devices?.map(device => (
                                                         <option key={device.id} value={device.id}>{device.device_name}</option>
                                                     ))}
@@ -129,7 +129,7 @@ export default function Settings({ settings, devices }: Props) {
                                             </div>
 
                                             <div className="mt-4">
-                                                <Label htmlFor="instapay_allowed_sender">{__('Dedicated Allowed Sender (Internal)')}</Label>
+                                                <Label htmlFor="instapay_allowed_sender">{__('general.dedicated_allowed_sender_internal')}</Label>
                                                 <Input
                                                     id="instapay_allowed_sender"
                                                     type="text"
@@ -137,9 +137,9 @@ export default function Settings({ settings, devices }: Props) {
                                                     className="text-left font-mono mt-2"
                                                     value={data.instapay_allowed_sender}
                                                     onChange={(e) => setData('instapay_allowed_sender', e.target.value)}
-                                                    placeholder={__('Example: InstaPay')}
+                                                    placeholder={__('general.example_instapay')}
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">{__('Only match transactions from this specific sender.')}</p>
+                                                <p className="text-xs text-gray-500 mt-1">{__('general.only_match_transactions_from_this_specific_sender')}</p>
                                             </div>
                                         </div>
                                     )}
@@ -149,7 +149,7 @@ export default function Settings({ settings, devices }: Props) {
                                     <div className="flex items-center justify-between max-w-md p-4 border rounded-lg bg-gray-50/50">
                                         <div className="space-y-0.5">
                                             <Label className="text-base">{__('Vodafone Cash / Wallets')}</Label>
-                                            <p className="text-sm text-gray-500">{__('Allow selecting electronic wallets.')}</p>
+                                            <p className="text-sm text-gray-500">{__('general.allow_selecting_electronic_wallets')}</p>
                                         </div>
                                         <Switch
                                             checked={data.is_vodafone_cash_enabled}
@@ -171,14 +171,14 @@ export default function Settings({ settings, devices }: Props) {
                                             {errors.vodafone_cash_phone_number && <p className="text-sm text-red-600 mt-1">{errors.vodafone_cash_phone_number}</p>}
                                             
                                             <div className="mt-4 pt-4 border-t border-indigo-100">
-                                                <Label htmlFor="vodafone_cash_device_id">{__('Dedicated Device for Validation (Internal)')}</Label>
+                                                <Label htmlFor="vodafone_cash_device_id">{__('general.dedicated_device_for_validation_internal')}</Label>
                                                 <select
                                                     id="vodafone_cash_device_id"
                                                     className="w-full mt-2 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                                     value={data.vodafone_cash_device_id}
                                                     onChange={(e) => setData('vodafone_cash_device_id', e.target.value)}
                                                 >
-                                                    <option value="">{__('Any Device')}</option>
+                                                    <option value="">{__('general.any_device')}</option>
                                                     {devices?.map(device => (
                                                         <option key={device.id} value={device.id}>{device.device_name}</option>
                                                     ))}
@@ -186,7 +186,7 @@ export default function Settings({ settings, devices }: Props) {
                                             </div>
 
                                             <div className="mt-4">
-                                                <Label htmlFor="vodafone_cash_allowed_sender">{__('Dedicated Allowed Sender (Internal)')}</Label>
+                                                <Label htmlFor="vodafone_cash_allowed_sender">{__('general.dedicated_allowed_sender_internal')}</Label>
                                                 <Input
                                                     id="vodafone_cash_allowed_sender"
                                                     type="text"
@@ -194,9 +194,9 @@ export default function Settings({ settings, devices }: Props) {
                                                     className="text-left font-mono mt-2"
                                                     value={data.vodafone_cash_allowed_sender}
                                                     onChange={(e) => setData('vodafone_cash_allowed_sender', e.target.value)}
-                                                    placeholder={__('Example: Vodafone Cash')}
+                                                    placeholder={__('general.example_vodafone_cash')}
                                                 />
-                                                <p className="text-xs text-gray-500 mt-1">{__('Only match transactions from this specific sender.')}</p>
+                                                <p className="text-xs text-gray-500 mt-1">{__('general.only_match_transactions_from_this_specific_sender')}</p>
                                             </div>
                                         </div>
                                     )}
@@ -215,9 +215,9 @@ export default function Settings({ settings, devices }: Props) {
                                         dir="ltr"
                                         value={data.whitelist_senders}
                                         onChange={(e) => setData('whitelist_senders', e.target.value)}
-                                        placeholder="e& money, VF-Cash, CIB"
+                                        placeholder={__('general.e_money_vf_cash_cib')}
                                     />
-                                    <p className="text-xs text-gray-500 max-w-md">{__('Enter the names of the senders you want to allow to process incoming messages from, separated by commas. If left empty, all default senders will be allowed.')}</p>
+                                    <p className="text-xs text-gray-500 max-w-md">{__('general.enter_the_names_of_the_senders_you_want_to_allow_to_process_incoming_messages_from_separated_by_commas_if_left_empty_all_default_senders_will_be_allowed')}</p>
                                     {errors.whitelist_senders && <p className="text-sm text-red-600">{errors.whitelist_senders}</p>}
                                 </div>
                             </div>

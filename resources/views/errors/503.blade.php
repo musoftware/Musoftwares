@@ -87,9 +87,9 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
         </div>
         <h1>503</h1>
-        <h2>Under Maintenance</h2>
-        <p>We are currently undergoing scheduled maintenance. Please check back shortly.</p>
-        <a href="/" class="btn">Go Home</a>
+        <h2>{{ __('general.under_maintenance') }}</h2>
+        <p>{{ __('general.we_are_currently_undergoing_scheduled_maintenance_please_check_back_shortly') }}</p>
+        <a href="/" class="btn">{{ __('general.go_home') }}</a>
     </div>
 </body>
 </html>

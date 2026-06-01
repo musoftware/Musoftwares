@@ -42,14 +42,14 @@ export default function SearchIndex() {
 
     if (!hasSalesStaff) {
         return (
-            <CrmLayout title={__('Universal Search')} activeMenu="search">
+            <CrmLayout title={__('general.universal_search')} activeMenu="search">
                 <div className="p-8">
                     <UpgradeOverlay 
-                        title={__('Sales Staff Add-on Required')}
-                        description={__('To use Universal Search across leads, contacts, and campaigns, you need the Sales Staff Operations add-on.')}
+                        title={__('general.sales_staff_add_on_required')}
+                        description={__('general.to_use_universal_search_across_leads_contacts_and_campaigns_you_need_the_sales_staff_operations_add_on')}
                         icon={SearchIcon}
                         module="crm-sales-staff"
-                        priceText={__('Subscribe to Sales Staff')}
+                        priceText={__('general.subscribe_to_sales_staff')}
                     />
                 </div>
             </CrmLayout>
@@ -57,7 +57,7 @@ export default function SearchIndex() {
     }
 
     return (
-        <CrmLayout title={__('Universal Search')} activeMenu="search">
+        <CrmLayout title={__('general.universal_search')} activeMenu="search">
             <div className="flex flex-col h-full items-center p-8 pt-16">
                 
                 <div className="w-full max-w-3xl space-y-8">
@@ -66,8 +66,8 @@ export default function SearchIndex() {
                         <div className="mx-auto w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
                             <SearchIcon size={32} strokeWidth={2.5} />
                         </div>
-                        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">{__('What are you looking for?')}</h1>
-                        <p className="text-lg text-slate-500">{__('Search across all your leads, contacts, and campaigns instantly.')}</p>
+                        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">{__('general.what_are_you_looking_for')}</h1>
+                        <p className="text-lg text-slate-500">{__('general.search_across_all_your_leads_contacts_and_campaigns_instantly')}</p>
                     </div>
 
                     {/* Search Input */}
@@ -82,7 +82,7 @@ export default function SearchIndex() {
                         <Input
                             type="text"
                             className="block w-full pl-12 pr-4 py-6 text-lg border-slate-200 bg-white rounded-2xl shadow-sm focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-                            placeholder={__('Type a name, email, or phone number...')}
+                            placeholder={__('general.type_a_name_email_or_phone_number')}
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                             autoFocus
@@ -93,7 +93,7 @@ export default function SearchIndex() {
                     {query.length >= 2 && (
                         <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                             <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">
-                                {__('Search Results')}
+                                {__('general.search_results')}
                             </h3>
                             
                             {results.length > 0 ? (
@@ -119,8 +119,8 @@ export default function SearchIndex() {
                                 </div>
                             ) : !loading && hasSearched && (
                                 <div className="text-center py-12 bg-slate-50 rounded-2xl border border-slate-100 border-dashed">
-                                    <p className="text-slate-500 font-medium">{__('No results found for')} "{query}"</p>
-                                    <p className="text-sm text-slate-400 mt-1">{__('Try adjusting your search terms.')}</p>
+                                    <p className="text-slate-500 font-medium">{__('general.no_results_found_for')} "{query}"</p>
+                                    <p className="text-sm text-slate-400 mt-1">{__('general.try_adjusting_your_search_terms')}</p>
                                 </div>
                             )}
                         </div>

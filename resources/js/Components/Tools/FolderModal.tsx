@@ -53,7 +53,7 @@ export function FolderModal({ isOpen, onClose, folderName, onRename, children }:
                             <h2 
                                 className="text-white text-xl font-semibold cursor-pointer hover:bg-white/10 px-4 py-1 rounded-lg transition-colors drop-shadow-md text-center"
                                 onClick={() => setIsEditing(true)}
-                                title="Click to rename"
+                                title={__('general.click_to_rename')}
                             >
                                 {folderName}
                             </h2>

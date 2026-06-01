@@ -38,7 +38,7 @@ class AdminCouponController extends Controller
     {
         $this->promotionService->createCoupon($request->validated());
 
-        return redirect()->back()->with('success', 'Coupon created successfully');
+        return redirect()->back()->with('success', __('general.coupon_created_successfully'));
     }
 
     public function show(Coupon $coupon)
@@ -60,13 +60,13 @@ class AdminCouponController extends Controller
     {
         $this->promotionService->updateCoupon($coupon, $request->validated());
 
-        return redirect()->back()->with('success', 'Coupon updated successfully');
+        return redirect()->back()->with('success', __('general.coupon_updated_successfully'));
     }
 
     public function destroy(Coupon $coupon)
     {
         $coupon->delete();
 
-        return redirect()->route('admin.coupons.index')->with('success', 'Coupon deleted successfully');
+        return redirect()->route('admin.coupons.index')->with('success', __('general.coupon_deleted_successfully'));
     }
 }

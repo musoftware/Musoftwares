@@ -34,27 +34,24 @@ export default function CreateExpense() {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('expenses');
 
     return (
-        <ERPLayout title="Log Expense" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
-            <Head title="Log Expense" />
+        <ERPLayout title={__('general.log_expense')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+            <Head title={__('general.log_expense')} />
             <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">
                     <Link href={route('erp.dashboard', { section: 'expenses' })} className="text-slate-400 hover:text-slate-900 transition-colors">
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Log Expense</h1>
-                        <p className="text-slate-500 text-sm mt-0.5">Record a new business expense.</p>
+                        <h1 className="text-2xl font-bold text-slate-900">{__('general.log_expense')}</h1>
+                        <p className="text-slate-500 text-sm mt-0.5">{__('general.record_a_new_business_expense')}</p>
                     </div>
                 </div>
 
                 <Card className="bg-white border border-slate-200 shadow-sm">
                     <CardHeader>
                         <CardTitle className="text-slate-900 flex items-center gap-2">
-                            <DollarSign className="w-5 h-5 text-indigo-600" /> Expense Details
-                        </CardTitle>
-                        <CardDescription className="text-slate-500">
-                            Enter the details of the expense you want to log.
-                        </CardDescription>
+                            <DollarSign className="w-5 h-5 text-indigo-600" />{__('general.expense_details')}</CardTitle>
+                        <CardDescription className="text-slate-500">{__('general.enter_the_details_of_the_expense_you_want_to_log')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -65,7 +62,7 @@ export default function CreateExpense() {
                                         required 
                                         value={form.title} 
                                         onChange={e => setForm({...form, title: e.target.value})} 
-                                        placeholder="Figma Enterprise seats" 
+                                        placeholder={__('general.figma_enterprise_seats')} 
                                         className="bg-white border-slate-200 text-slate-900"
                                     />
                                     {errors.title && <p className="text-xs text-red-500">{errors.title}</p>}
@@ -100,7 +97,7 @@ export default function CreateExpense() {
                                     <Input 
                                         value={form.category} 
                                         onChange={e => setForm({...form, category: e.target.value})} 
-                                        placeholder="Software Subscriptions" 
+                                        placeholder={__('general.software_subscriptions')} 
                                         className="bg-white border-slate-200 text-slate-900"
                                     />
                                     {errors.category && <p className="text-xs text-red-500">{errors.category}</p>}
@@ -110,7 +107,7 @@ export default function CreateExpense() {
                                     <Textarea 
                                         value={form.description} 
                                         onChange={e => setForm({...form, description: e.target.value})} 
-                                        placeholder="Optional description/notes about the expense..." 
+                                        placeholder={__('general.optional_description_notes_about_the_expense')} 
                                         className="bg-white border-slate-200 text-slate-900 min-h-[100px]"
                                     />
                                     {errors.description && <p className="text-xs text-red-500">{errors.description}</p>}

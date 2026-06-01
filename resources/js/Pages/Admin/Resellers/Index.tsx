@@ -50,16 +50,15 @@ export default function ResellersIndex({ resellers, meta }: any) {
 
     return (
         <WorkspaceLayout title="Resellers" workspaceName="Musoftware Admin" tenantId="SYS-ADMIN" menuItems={menuItems}>
-            <Head title="Tool Resellers" />
+            <Head title={__('general.tool_resellers')} />
             <div className="space-y-6">
                 <ModulePageHeader
-                    title="Tool Resellers"
-                    description="Manage B2B reseller accounts — balance, sub-users, and anti-sharing protection."
+                    title={__('general.tool_resellers')}
+                    description={__('general.manage_b2b_reseller_accounts_balance_sub_users_and_anti_sharing_protection')}
                     actions={
                         <Link href="/admin/resellers/create">
                             <Button size="sm" className="gap-1.5">
-                                <Plus className="w-3.5 h-3.5" /> New Reseller
-                            </Button>
+                                <Plus className="w-3.5 h-3.5" />{__('general.new_reseller')}</Button>
                         </Link>
                     }
                 />
@@ -71,7 +70,7 @@ export default function ResellersIndex({ resellers, meta }: any) {
                             <Store className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider">Total Resellers</p>
+                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider">{__('general.total_resellers')}</p>
                             <p className="text-2xl font-bold text-text-primary">{filtered.length}</p>
                         </div>
                     </OperationalCard>
@@ -80,7 +79,7 @@ export default function ResellersIndex({ resellers, meta }: any) {
                             <Users className="w-5 h-5 text-emerald-500" />
                         </div>
                         <div>
-                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider">Active Sub-Users</p>
+                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider">{__('general.active_sub_users')}</p>
                             <p className="text-2xl font-bold text-text-primary">{totalUsers}</p>
                         </div>
                     </OperationalCard>
@@ -89,7 +88,7 @@ export default function ResellersIndex({ resellers, meta }: any) {
                             <ShieldAlert className={`w-5 h-5 ${flaggedCount > 0 ? 'text-red-500' : 'text-slate-400'}`} />
                         </div>
                         <div>
-                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider">Sharing Flags</p>
+                            <p className="text-xs text-text-muted font-medium uppercase tracking-wider">{__('general.sharing_flags')}</p>
                             <p className={`text-2xl font-bold ${flaggedCount > 0 ? 'text-red-500' : 'text-text-primary'}`}>{flaggedCount}</p>
                         </div>
                     </OperationalCard>
@@ -99,7 +98,7 @@ export default function ResellersIndex({ resellers, meta }: any) {
                 <div className="relative max-w-sm">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                     <Input
-                        placeholder="Search resellers..."
+                        placeholder={__('general.search_resellers')}
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         className="pl-9"
@@ -109,7 +108,7 @@ export default function ResellersIndex({ resellers, meta }: any) {
                 {/* Table */}
                 <OperationalCard noPadding>
                     {filtered.length === 0 ? (
-                        <EmptyState icon={Store} title="No resellers yet" description="Create your first reseller account to get started." action="/admin/resellers/create" actionLabel="New Reseller" />
+                        <EmptyState icon={Store} title={__('general.no_resellers_yet')} description={__('general.create_your_first_reseller_account_to_get_started')} action="/admin/resellers/create" actionLabel="New Reseller" />
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
@@ -117,8 +116,8 @@ export default function ResellersIndex({ resellers, meta }: any) {
                                     <tr className="border-b border-border/60">
                                         <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Reseller</th>
                                         <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Balance</th>
-                                        <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Sub-Users</th>
-                                        <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Sharing Flags</th>
+                                        <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.sub_users')}</th>
+                                        <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.sharing_flags')}</th>
                                         <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Status</th>
                                         <th className="text-right px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
                                     </tr>

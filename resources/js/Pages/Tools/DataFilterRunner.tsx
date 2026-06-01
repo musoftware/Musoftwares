@@ -185,8 +185,8 @@ export default function DataFilterRunner({ tool }: any) {
             <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center font-sans">
                 <div className="text-center space-y-4">
                     <div className="w-10 h-10 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto" />
-                    <p className="text-sm font-semibold text-slate-600">Syncing with Local Runtime Agent...</p>
-                    <p className="text-xs text-slate-400">Make sure your Musoftware Runtime is running on your machine.</p>
+                    <p className="text-sm font-semibold text-slate-600">{__('general.syncing_with_local_runtime_agent')}</p>
+                    <p className="text-xs text-slate-400">{__('general.make_sure_your_musoftware_runtime_is_running_on_your_machine')}</p>
                 </div>
             </div>
         );
@@ -206,7 +206,7 @@ export default function DataFilterRunner({ tool }: any) {
                         <div className="w-6.5 h-6.5 bg-gradient-to-tr from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center shadow-md shadow-blue-500/20">
                             <Database className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">CSV Data Filter</span>
+                        <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">{__('general.csv_data_filter')}</span>
                     </div>
                     
                     <div className="h-5 w-px bg-slate-200" />
@@ -216,23 +216,19 @@ export default function DataFilterRunner({ tool }: any) {
                             variant={activeTab === 'engine' ? 'default' : 'ghost'}
                             size="sm"
                             onClick={() => setActiveTab('engine')}
-                        >
-                            Processing Engine
-                        </Button>
+                        >{__('general.processing_engine')}</Button>
                         <Button 
                             variant={activeTab === 'history' ? 'default' : 'ghost'}
                             size="sm"
                             onClick={() => setActiveTab('history')}
-                        >
-                            Job History
-                        </Button>
+                        >{__('general.job_history')}</Button>
                     </nav>
                 </div>
 
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-800">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-bold uppercase tracking-wider font-mono">Stream Engine Ready</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider font-mono">{__('general.stream_engine_ready')}</span>
                     </div>
                 </div>
             </header>
@@ -244,14 +240,14 @@ export default function DataFilterRunner({ tool }: any) {
                     <div className="p-5 flex-1 flex flex-col min-h-0">
                         <div className="flex items-center gap-2 mb-4">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping" />
-                            <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">Live Engine Feed</h3>
+                            <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">{__('general.live_engine_feed')}</h3>
                         </div>
                         <div className="flex-1 overflow-y-auto space-y-3 pr-1 font-sans scrollbar-thin">
                             {realtimeLogs.length === 0 ? (
                                 <div className="text-center py-20 text-slate-400 text-xs flex flex-col items-center gap-2">
                                     <Layers className="w-6 h-6 text-slate-300" />
-                                    <span>Engine is idle</span>
-                                    <span>Launch a job to see streaming logs</span>
+                                    <span>{__('general.engine_is_idle')}</span>
+                                    <span>{__('general.launch_a_job_to_see_streaming_logs')}</span>
                                 </div>
                             ) : (
                                 realtimeLogs.map(log => (
@@ -287,8 +283,8 @@ export default function DataFilterRunner({ tool }: any) {
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div>
-                                    <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-800 bg-clip-text text-transparent">Stream Processing Engine</h1>
-                                    <p className="text-xs text-slate-500 mt-1">Configure your files and run lightning-fast local deduplication and filtering operations.</p>
+                                    <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-800 bg-clip-text text-transparent">{__('general.stream_processing_engine')}</h1>
+                                    <p className="text-xs text-slate-500 mt-1">{__('general.configure_your_files_and_run_lightning_fast_local_deduplication_and_filtering_operations')}</p>
                                 </div>
                             </div>
 
@@ -344,7 +340,7 @@ export default function DataFilterRunner({ tool }: any) {
 
                                     {mode === 'distinct_column' && (
                                         <div className="space-y-2 max-w-xs">
-                                            <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Target Column Index</label>
+                                            <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">{__('general.target_column_index')}</label>
                                             <Input
                                                 type="number"
                                                 placeholder="0 for first column"
@@ -360,7 +356,7 @@ export default function DataFilterRunner({ tool }: any) {
                                     {mode === 'split_file' && (
                                         <div className="space-y-4 max-w-xs">
                                             <div className="space-y-2">
-                                                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Lines Per File</label>
+                                                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">{__('general.lines_per_file')}</label>
                                                 <Input
                                                     type="number"
                                                     placeholder="100000"
@@ -369,7 +365,7 @@ export default function DataFilterRunner({ tool }: any) {
                                                     className="font-mono text-sm h-11 bg-slate-50"
                                                     min={1}
                                                 />
-                                                <p className="text-[10px] text-slate-500">The engine will create a new file every time this many lines are written.</p>
+                                                <p className="text-[10px] text-slate-500">{__('general.the_engine_will_create_a_new_file_every_time_this_many_lines_are_written')}</p>
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <input 
@@ -379,14 +375,14 @@ export default function DataFilterRunner({ tool }: any) {
                                                     onChange={(e) => setPreserveHeader(e.target.checked)}
                                                     className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                                                 />
-                                                <label htmlFor="preserveHeader" className="text-xs font-bold text-slate-700">Preserve First Line Header</label>
+                                                <label htmlFor="preserveHeader" className="text-xs font-bold text-slate-700">{__('general.preserve_first_line_header')}</label>
                                             </div>
                                         </div>
                                     )}
 
                                     {mode === 'extract_columns' && (
                                         <div className="space-y-2 max-w-xs">
-                                            <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Columns to Keep</label>
+                                            <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">{__('general.columns_to_keep')}</label>
                                             <Input
                                                 type="text"
                                                 placeholder="0, 2, 4"
@@ -394,14 +390,14 @@ export default function DataFilterRunner({ tool }: any) {
                                                 onChange={(e) => setExtractIndices(e.target.value)}
                                                 className="font-mono text-sm h-11 bg-slate-50"
                                             />
-                                            <p className="text-[10px] text-slate-500">Comma-separated list of 0-based column indices. e.g., 0, 1, 5.</p>
+                                            <p className="text-[10px] text-slate-500">{__('general.comma_separated_list_of_0_based_column_indices_e_g_0_1_5')}</p>
                                         </div>
                                     )}
 
                                     {mode === 'filter_keyword' && (
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-2 max-w-xs">
-                                                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Target Column Index</label>
+                                                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">{__('general.target_column_index')}</label>
                                                 <Input
                                                     type="number"
                                                     placeholder="0 for first column"
@@ -412,15 +408,15 @@ export default function DataFilterRunner({ tool }: any) {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Keyword to Match</label>
+                                                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">{__('general.keyword_to_match')}</label>
                                                 <Input
                                                     type="text"
-                                                    placeholder="e.g. Gmail"
+                                                    placeholder={__('general.e_g_gmail')}
                                                     value={keyword}
                                                     onChange={(e) => setKeyword(e.target.value)}
                                                     className="font-mono text-sm h-11 bg-slate-50"
                                                 />
-                                                <p className="text-[10px] text-slate-500">Case-insensitive. Only rows containing this keyword in the target column will be kept.</p>
+                                                <p className="text-[10px] text-slate-500">{__('general.case_insensitive_only_rows_containing_this_keyword_in_the_target_column_will_be_kept')}</p>
                                             </div>
                                         </div>
                                     )}
@@ -441,7 +437,7 @@ export default function DataFilterRunner({ tool }: any) {
                                     <div className="flex items-start gap-2.5 bg-rose-50 border border-rose-200 rounded-xl p-4 animate-in fade-in">
                                         <AlertCircle className="w-4 h-4 text-rose-500 mt-0.5 shrink-0" />
                                         <div>
-                                            <p className="text-sm text-rose-800 font-bold">Engine Error</p>
+                                            <p className="text-sm text-rose-800 font-bold">{__('general.engine_error')}</p>
                                             <p className="text-xs text-rose-600 mt-1">{errorMsg}</p>
                                         </div>
                                     </div>
@@ -453,11 +449,11 @@ export default function DataFilterRunner({ tool }: any) {
                                 <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-2">
                                     <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative overflow-hidden">
                                         {status === 'running' && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-cyan-400 animate-pulse" />}
-                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Rows Read From Input</p>
+                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{__('general.rows_read_from_input')}</p>
                                         <p className="text-3xl font-black text-slate-800">{totalRows.toLocaleString()}</p>
                                     </div>
                                     <div className="bg-white border border-emerald-200 rounded-2xl p-6 shadow-sm bg-emerald-50/30">
-                                        <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Distinct Rows Written</p>
+                                        <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">{__('general.distinct_rows_written')}</p>
                                         <p className="text-3xl font-black text-emerald-700">{writtenRows.toLocaleString()}</p>
                                     </div>
                                 </div>
@@ -467,7 +463,7 @@ export default function DataFilterRunner({ tool }: any) {
                                 <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm flex items-start gap-3 animate-in fade-in">
                                     <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                                     <div>
-                                        <p className="font-bold">Execution Completed Successfully</p>
+                                        <p className="font-bold">{__('general.execution_completed_successfully')}</p>
                                         <p className="text-xs opacity-90 mt-1">Output has been saved to: <span className="font-mono bg-emerald-100/50 px-1 rounded">{mode === 'split_file' ? targetFolder : targetPath}</span></p>
                                     </div>
                                 </div>
@@ -480,12 +476,10 @@ export default function DataFilterRunner({ tool }: any) {
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-800 bg-clip-text text-transparent">Job History</h1>
-                                    <p className="text-xs text-slate-500 mt-1">Review previously executed datasets and exports.</p>
+                                    <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-800 bg-clip-text text-transparent">{__('general.job_history')}</h1>
+                                    <p className="text-xs text-slate-500 mt-1">{__('general.review_previously_executed_datasets_and_exports')}</p>
                                 </div>
-                                <Button variant="outline" size="sm" onClick={clearHistory} className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200">
-                                    Clear History
-                                </Button>
+                                <Button variant="outline" size="sm" onClick={clearHistory} className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200">{__('general.clear_history')}</Button>
                             </div>
                             
                             {loadingHistory ? (
@@ -493,8 +487,8 @@ export default function DataFilterRunner({ tool }: any) {
                             ) : jobHistory.length === 0 ? (
                                 <div className="bg-white border border-slate-200 rounded-2xl p-12 shadow-sm text-center">
                                     <FileText className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                                    <h3 className="font-bold text-slate-700">History Vault is Empty</h3>
-                                    <p className="text-xs text-slate-400 mt-1">Run your first data filter job to see it here.</p>
+                                    <h3 className="font-bold text-slate-700">{__('general.history_vault_is_empty')}</h3>
+                                    <p className="text-xs text-slate-400 mt-1">{__('general.run_your_first_data_filter_job_to_see_it_here')}</p>
                                 </div>
                             ) : (
                                 <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
@@ -503,8 +497,8 @@ export default function DataFilterRunner({ tool }: any) {
                                             <tr>
                                                 <th className="px-6 py-4 tracking-wider">Date</th>
                                                 <th className="px-6 py-4 tracking-wider">Mode</th>
-                                                <th className="px-6 py-4 tracking-wider">Rows Read</th>
-                                                <th className="px-6 py-4 tracking-wider">Rows Written</th>
+                                                <th className="px-6 py-4 tracking-wider">{__('general.rows_read')}</th>
+                                                <th className="px-6 py-4 tracking-wider">{__('general.rows_written')}</th>
                                                 <th className="px-6 py-4 tracking-wider">Status</th>
                                             </tr>
                                         </thead>

@@ -129,7 +129,7 @@ class OnboardingController extends Controller
             return redirect()->intended(route('dashboard', absolute: false));
         }
 
-        return back()->with('status', 'Progress saved');
+        return back()->with('status', __('general.progress_saved'));
     }
 
     public function updateTourStatus(Request $request)

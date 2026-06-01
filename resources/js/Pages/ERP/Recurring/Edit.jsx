@@ -14,7 +14,7 @@ export default function Edit({ entry, business_currency }) {
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <PageHeader
                         title={`Edit: ${entry.title}`}
-                        subtitle="Update your recurring entry details or schedule"
+                        subtitle={__('general.update_your_recurring_entry_details_or_schedule')}
                     />
 
                     <RecurringForm entry={entry} business_currency={business_currency} />

@@ -43,7 +43,7 @@ export default function EditProject({ project, clients = [] }: { project: any, c
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Edit Project</h1>
+                        <h1 className="text-2xl font-bold text-slate-900">{__('general.edit_project')}</h1>
                         <p className="text-slate-500 text-sm mt-0.5">Update scope and details for {project.name}.</p>
                     </div>
                 </div>
@@ -51,22 +51,19 @@ export default function EditProject({ project, clients = [] }: { project: any, c
                 <Card className="bg-white border border-slate-200 shadow-sm">
                     <CardHeader>
                         <CardTitle className="text-slate-900 flex items-center gap-2">
-                            <Edit2 className="w-5 h-5" /> Project Details
-                        </CardTitle>
-                        <CardDescription className="text-slate-500">
-                            Modify the existing project scope below.
-                        </CardDescription>
+                            <Edit2 className="w-5 h-5" />{__('general.project_details')}</CardTitle>
+                        <CardDescription className="text-slate-500">{__('general.modify_the_existing_project_scope_below')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Project Name <span className="text-red-500">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.project_name')}<span className="text-red-500">*</span></label>
                                     <Input 
                                         required 
                                         value={form.name} 
                                         onChange={e => setForm({...form, name: e.target.value})} 
-                                        placeholder="Website Redesign" 
+                                        placeholder={__('general.website_redesign')} 
                                         className="bg-white border-slate-200 text-slate-900"
                                     />
                                     {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
@@ -85,12 +82,12 @@ export default function EditProject({ project, clients = [] }: { project: any, c
                                     <label className="text-sm font-medium text-slate-700">Status</label>
                                     <Select value={form.status} onValueChange={(val) => setForm({...form, status: val})}>
                                         <SelectTrigger className="bg-white border-slate-200 text-slate-900">
-                                            <SelectValue placeholder="Select status" />
+                                            <SelectValue placeholder={__('general.select_status_1')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white border-slate-200 text-slate-900">
                                             <SelectItem value="Planning">Planning</SelectItem>
                                             <SelectItem value="Active">Active</SelectItem>
-                                            <SelectItem value="On Hold">On Hold</SelectItem>
+                                            <SelectItem value="On Hold">{__('general.on_hold')}</SelectItem>
                                             <SelectItem value="Completed">Completed</SelectItem>
                                             <SelectItem value="Cancelled">Cancelled</SelectItem>
                                         </SelectContent>
@@ -98,7 +95,7 @@ export default function EditProject({ project, clients = [] }: { project: any, c
                                     {errors.status && <p className="text-xs text-red-500">{errors.status}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Due Date</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.due_date')}</label>
                                     <Input 
                                         type="date"
                                         value={form.due_date} 

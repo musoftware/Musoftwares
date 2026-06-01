@@ -17,24 +17,23 @@ export default function SmartRules({ rules }: { rules: Rule[] }) {
         <div className="p-6 max-w-7xl mx-auto space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Smart Rules Engine</h1>
-                    <p className="text-muted-foreground mt-2">Configure rules for gap reduction and load balancing.</p>
+                    <h1 className="text-3xl font-bold tracking-tight">{__('general.smart_rules_engine')}</h1>
+                    <p className="text-muted-foreground mt-2">{__('general.configure_rules_for_gap_reduction_and_load_balancing')}</p>
                 </div>
                 <Button>
-                    <Plus className="mr-2 h-4 w-4" /> Add Rule
-                </Button>
+                    <Plus className="mr-2 h-4 w-4" />{__('general.add_rule')}</Button>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Active Optimization Rules</CardTitle>
+                    <CardTitle>{__('general.active_optimization_rules')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Rule Name</TableHead>
-                                <TableHead>Target Metric</TableHead>
+                                <TableHead>{__('general.rule_name')}</TableHead>
+                                <TableHead>{__('general.target_metric')}</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>

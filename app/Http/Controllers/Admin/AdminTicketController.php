@@ -110,7 +110,7 @@ class AdminTicketController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Reply sent successfully.');
+        return redirect()->back()->with('success', __('general.reply_sent_successfully'));
     }
 
     public function assign(Request $request, Ticket $ticket)
@@ -123,7 +123,7 @@ class AdminTicketController extends Controller
             'assigned_employee_id' => $request->assigned_employee_id,
         ]);
 
-        return redirect()->back()->with('success', 'Ticket assigned successfully.');
+        return redirect()->back()->with('success', __('general.ticket_assigned_successfully'));
     }
 
     public function addCannedResponse(Request $request)
@@ -139,6 +139,6 @@ class AdminTicketController extends Controller
             'body' => $request->body,
         ]);
 
-        return redirect()->back()->with('success', 'Canned response added successfully.');
+        return redirect()->back()->with('success', __('general.canned_response_added_successfully'));
     }
 }

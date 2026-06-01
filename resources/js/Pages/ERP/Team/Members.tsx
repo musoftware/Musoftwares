@@ -136,7 +136,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
 
     return (
         <ERPLayout 
-            title="Team Members"
+            title={__('general.team_members')}
             workspaceName={workspaceName}
             tenantId={tenantId}
             menuItems={mappedMenuItems}
@@ -145,8 +145,8 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
             <div className="space-y-6">
                 {!hasFeature ? (
                     <UpgradeOverlay 
-                        title="Collaborate with Your Team in Real-Time"
-                        description="Unlock Team Members to invite managers and staff to your workspace. Assign roles, control access to finances and tasks, and track activity — all from one place."
+                        title={__('general.collaborate_with_your_team_in_real_time')}
+                        description={__('general.unlock_team_members_to_invite_managers_and_staff_to_your_workspace_assign_roles_control_access_to_finances_and_tasks_and_track_activity_all_from_one_place')}
                         icon={Users}
                         module="erp-team-members"
                         priceText="Unlock Team Members for 500 EGP/Yr"
@@ -160,10 +160,8 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                     <>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Team Members</h2>
-                        <p className="text-sm text-slate-500 mt-1">
-                            Invite team members and assign specific CRM roles and access levels.
-                        </p>
+                        <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">{__('general.team_members')}</h2>
+                        <p className="text-sm text-slate-500 mt-1">{__('general.invite_team_members_and_assign_specific_crm_roles_and_access_levels')}</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="text-[13px] font-semibold text-slate-600 bg-white border border-slate-200 px-3 py-1.5 rounded-full shadow-sm flex items-center gap-2">
@@ -177,16 +175,14 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                         </div>
                         {activeMembersCount >= capacityLimit ? (
                             <Button size="sm" variant="outline" className="shadow-sm border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 flex items-center gap-1.5 cursor-not-allowed">
-                                <Lock className="h-3 w-3" /> Upgrade Capacity
-                            </Button>
+                                <Lock className="h-3 w-3" />{__('general.upgrade_capacity')}</Button>
                         ) : (
                             <Button 
                                 size="sm" 
                                 onClick={() => setShowInviteModal(true)} 
                                 className="shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white font-semibold flex items-center gap-1.5"
                             >
-                                <UserPlus className="h-4 w-4" /> Invite Member
-                            </Button>
+                                <UserPlus className="h-4 w-4" />{__('general.invite_member')}</Button>
                         )}
                     </div>
                 </div>
@@ -207,7 +203,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                     <th className="px-6 py-3.5">Role</th>
                                     <th className="px-6 py-3.5">Status</th>
                                     <th className="px-6 py-3.5">Joined</th>
-                                    <th className="px-6 py-3.5">Last Login</th>
+                                    <th className="px-6 py-3.5">{__('general.last_login')}</th>
                                     <th className="px-6 py-3.5 text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -217,10 +213,8 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                         <td colSpan={7} className="p-0">
                                             <div className="flex flex-col items-center justify-center p-12 text-center">
                                                 <Users className="h-12 w-12 text-slate-300 mb-4" />
-                                                <h3 className="font-semibold text-slate-800 text-sm">No Team Members yet</h3>
-                                                <p className="text-xs text-slate-500 max-w-xs mt-1">
-                                                    Invite managers or members to grant secure role-based access.
-                                                </p>
+                                                <h3 className="font-semibold text-slate-800 text-sm">{__('general.no_team_members_yet')}</h3>
+                                                <p className="text-xs text-slate-500 max-w-xs mt-1">{__('general.invite_managers_or_members_to_grant_secure_role_based_access')}</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -260,14 +254,14 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                                     <button 
                                                         onClick={() => handleEditClick(member)}
                                                         className="p-1.5 hover:bg-slate-100 rounded text-slate-500 transition-colors"
-                                                        title="Edit Role or Status"
+                                                        title={__('general.edit_role_or_status')}
                                                     >
                                                         <Edit2 className="h-4 w-4" />
                                                     </button>
                                                     <button 
                                                         onClick={() => handleDeleteClick(member)}
                                                         className="p-1.5 hover:bg-rose-50 rounded text-rose-500 transition-colors"
-                                                        title="Delete Member"
+                                                        title={__('general.delete_member')}
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
@@ -286,17 +280,17 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                 <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
                     <OperationalCard className="w-full max-w-md shadow-2xl animate-scale-up">
                         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                            <h3 className="font-semibold text-slate-800 text-[14px]">Invite Team Member</h3>
+                            <h3 className="font-semibold text-slate-800 text-[14px]">{__('general.invite_team_member')}</h3>
                             <button onClick={() => setShowInviteModal(false)} className="p-1 hover:bg-slate-100 rounded text-slate-400">
                                 <X className="h-4 w-4" />
                             </button>
                         </div>
                         <form onSubmit={handleInviteSubmit} className="p-6 space-y-4">
                             <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Full Name</label>
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{__('general.full_name')}</label>
                                 <Input 
                                     required 
-                                    placeholder="John Doe" 
+                                    placeholder={__('general.john_doe')} 
                                     value={inviteForm.data.name} 
                                     onChange={e => inviteForm.setData('name', e.target.value)} 
                                     className="shadow-none" 
@@ -305,11 +299,11 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                             </div>
                             
                             <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Email Address</label>
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{__('general.email_address')}</label>
                                 <Input 
                                     required 
                                     type="email" 
-                                    placeholder="john@example.com" 
+                                    placeholder={__('general.john_example_com')} 
                                     value={inviteForm.data.email} 
                                     onChange={e => inviteForm.setData('email', e.target.value)} 
                                     className="shadow-none" 
@@ -318,7 +312,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                             </div>
 
                             <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Temporary Password</label>
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{__('general.temporary_password')}</label>
                                 <Input 
                                     required 
                                     type="password" 
@@ -337,7 +331,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                     value={inviteForm.data.role}
                                     onChange={e => inviteForm.setData('role', e.target.value)}
                                 >
-                                    <optgroup label="Basic Roles">
+                                    <optgroup label={__('general.basic_roles')}>
                                         {Object.entries(basicRoles).map(([key, label]) => (
                                             <option key={key} value={key}>{label}</option>
                                         ))}
@@ -354,8 +348,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                 
                                 {!hasAdvancedRolesAddon && (
                                     <p className="text-[11px] text-amber-600 mt-1 flex items-center gap-1">
-                                        <Lock className="w-3 h-3" /> Get the <strong>Advanced Roles</strong> addon to unlock Manager titles.
-                                    </p>
+                                        <Lock className="w-3 h-3" />{__('general.get_the')}<strong>{__('general.advanced_roles')}</strong>{__('general.addon_to_unlock_manager_titles')}</p>
                                 )}
                             </div>
 
@@ -389,7 +382,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                 <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
                     <OperationalCard className="w-full max-w-md shadow-2xl animate-scale-up">
                         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                            <h3 className="font-semibold text-slate-800 text-[14px]">Update Team Member Details</h3>
+                            <h3 className="font-semibold text-slate-800 text-[14px]">{__('general.update_team_member_details')}</h3>
                             <button onClick={() => { setShowEditModal(false); setSelectedMember(null); }} className="p-1 hover:bg-slate-100 rounded text-slate-400">
                                 <X className="h-4 w-4" />
                             </button>
@@ -407,7 +400,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                     value={editForm.data.role}
                                     onChange={e => editForm.setData('role', e.target.value)}
                                 >
-                                    <optgroup label="Basic Roles">
+                                    <optgroup label={__('general.basic_roles')}>
                                         {Object.entries(basicRoles).map(([key, label]) => (
                                             <option key={key} value={key}>{label}</option>
                                         ))}
@@ -424,13 +417,12 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
 
                                 {!hasAdvancedRolesAddon && (
                                     <p className="text-[11px] text-amber-600 mt-1 flex items-center gap-1">
-                                        <Lock className="w-3 h-3" /> Get the <strong>Advanced Roles</strong> addon to unlock Manager titles.
-                                    </p>
+                                        <Lock className="w-3 h-3" />{__('general.get_the')}<strong>{__('general.advanced_roles')}</strong>{__('general.addon_to_unlock_manager_titles')}</p>
                                 )}
                             </div>
 
                             <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Account Status</label>
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{__('general.account_status')}</label>
                                 <select 
                                     className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
                                     value={editForm.data.status}
@@ -477,7 +469,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
             {/* CONFIRM DELETE MODAL */}
             <ConfirmModal 
                 isOpen={deleteConfirm.open}
-                title="Remove Team Member"
+                title={__('general.remove_team_member')}
                 description={`Are you sure you want to remove ${deleteConfirm.member?.name}? This will permanently revoke their access credentials. This cannot be undone.`}
                 confirmLabel="Remove Member"
                 variant="danger"

@@ -166,7 +166,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
             <div className="min-h-screen bg-[#FDFDFD] flex items-center justify-center font-sans">
                 <div className="text-center space-y-4">
                     <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto" />
-                    <p className="text-sm font-medium text-slate-500">Connecting to Runtime Engine...</p>
+                    <p className="text-sm font-medium text-slate-500">{__('general.connecting_to_runtime_engine')}</p>
                 </div>
             </div>
         );
@@ -213,9 +213,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                     variant="ghost"
                                     onClick={() => setActiveTab('activity')}
                                     className={`h-8 px-3 text-sm font-medium transition-colors ${activeTab === 'activity' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
-                                >
-                                    Activity Feed
-                                </Button>
+                                >{__('general.activity_feed')}</Button>
                             </>
                         )}
                     </div>
@@ -224,7 +222,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Engine Linked</span>
+                        <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">{__('general.engine_linked')}</span>
                     </div>
                 </div>
             </div>
@@ -236,18 +234,17 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                         <div className="flex items-center justify-between">
                             <div>
                                 <h1 className="text-2xl font-bold tracking-tight">Workspaces</h1>
-                                <p className="text-sm text-slate-500 mt-1">Select a project to view and annotate screenshots.</p>
+                                <p className="text-sm text-slate-500 mt-1">{__('general.select_a_project_to_view_and_annotate_screenshots')}</p>
                             </div>
                             <Button onClick={handleCreateProject} className="gap-1.5 h-9 bg-black text-white hover:bg-slate-800 shadow-sm">
-                                <Plus className="w-4 h-4" /> New Project
-                            </Button>
+                                <Plus className="w-4 h-4" />{__('general.new_project')}</Button>
                         </div>
 
                         {projects.length === 0 ? (
                             <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                 <LayoutDashboard className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                <h3 className="text-sm font-semibold text-slate-900">No projects yet</h3>
-                                <p className="text-sm text-slate-500 mt-1">Create a project to start organizing feedback.</p>
+                                <h3 className="text-sm font-semibold text-slate-900">{__('general.no_projects_yet')}</h3>
+                                <p className="text-sm text-slate-500 mt-1">{__('general.create_a_project_to_start_organizing_feedback')}</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -302,8 +299,8 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                         {screenshots.length === 0 ? (
                             <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                 <ImageIcon className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                <h3 className="text-sm font-semibold text-slate-900">No screenshots</h3>
-                                <p className="text-sm text-slate-500 mt-1">Upload a design or UI to begin reviewing.</p>
+                                <h3 className="text-sm font-semibold text-slate-900">{__('general.no_screenshots')}</h3>
+                                <p className="text-sm text-slate-500 mt-1">{__('general.upload_a_design_or_ui_to_begin_reviewing')}</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -379,7 +376,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                             <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                                 <div>
                                     <h1 className="text-xl font-bold tracking-tight">{currentScreenshot?.filename}</h1>
-                                    <p className="text-xs text-slate-400 mt-0.5">Click anywhere on the screenshot to drop a feedback pin.</p>
+                                    <p className="text-xs text-slate-400 mt-0.5">{__('general.click_anywhere_on_the_screenshot_to_drop_a_feedback_pin')}</p>
                                 </div>
                                 <Button 
                                     variant="outline"
@@ -467,7 +464,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
 
                                                     <form onSubmit={handleSavePin} className="space-y-3 relative z-10">
                                                         <div className="flex items-center justify-between">
-                                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Add Comment</span>
+                                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{__('general.add_comment')}</span>
                                                             <Button 
                                                                 variant="ghost"
                                                                 size="icon"
@@ -483,7 +480,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                                             rows={3}
                                                             value={newPinComment}
                                                             onChange={(e) => setNewPinComment(e.target.value)}
-                                                            placeholder="What needs feedback at this exact spot?"
+                                                            placeholder={__('general.what_needs_feedback_at_this_exact_spot')}
                                                             className="text-xs bg-slate-50 resize-none font-sans"
                                                         />
                                                         <div className="flex justify-end gap-2 text-xs">
@@ -501,9 +498,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                                                 type="submit"
                                                                 disabled={!newPinComment.trim()}
                                                                 className="h-7 text-xs bg-black text-white hover:bg-slate-800 shadow-sm"
-                                                            >
-                                                                Save Pin
-                                                            </Button>
+                                                            >{__('general.save_pin')}</Button>
                                                         </div>
                                                     </form>
                                                 </div>
@@ -590,7 +585,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                                                     size="icon"
                                                                     onClick={() => handleResolvePin(pin.id)}
                                                                     className="opacity-0 group-hover/card:opacity-100 h-6 w-6 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 transition-all border border-transparent hover:border-emerald-100"
-                                                                    title="Mark resolved"
+                                                                    title={__('general.mark_resolved')}
                                                                 >
                                                                     <CheckCircle2 className="w-3.5 h-3.5" />
                                                                 </Button>
@@ -618,7 +613,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                         }).length === 0 && (
                                             <div className="py-12 text-center text-slate-400">
                                                 <MessageSquareText className="w-6 h-6 text-slate-200 mx-auto mb-2" />
-                                                <p className="text-xs">No annotations in this category</p>
+                                                <p className="text-xs">{__('general.no_annotations_in_this_category')}</p>
                                             </div>
                                         )}
                                     </div>

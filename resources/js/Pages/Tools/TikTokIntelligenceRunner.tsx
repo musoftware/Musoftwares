@@ -144,7 +144,7 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
         <div className="min-h-screen bg-slate-950 flex items-center justify-center">
             <div className="text-center space-y-3">
                 <div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm font-semibold text-slate-500">Connecting to Runtime...</p>
+                <p className="text-sm font-semibold text-slate-500">{__('general.connecting_to_runtime')}</p>
             </div>
         </div>
     );
@@ -157,12 +157,12 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-pink-500 to-rose-600 rounded-lg flex items-center justify-center shadow-lg shadow-pink-500/30">
                         <Flame className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm">TikTok Analytics</span>
+                    <span className="font-bold text-sm">{__('general.tiktok_analytics')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <Tab active={tab === 'discover'} onClick={() => setTab('discover')}><Search className="w-3 h-3 inline mr-1" />Discover</Tab>
                     <Tab active={tab === 'monitor'} onClick={() => setTab('monitor')}><Eye className="w-3 h-3 inline mr-1" />Monitor</Tab>
-                    <Tab active={tab === 'vault'} onClick={() => setTab('vault')}><Bookmark className="w-3 h-3 inline mr-1" />UGC Vault</Tab>
+                    <Tab active={tab === 'vault'} onClick={() => setTab('vault')}><Bookmark className="w-3 h-3 inline mr-1" />{__('general.ugc_vault')}</Tab>
                 </div>
                 <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-pink-500/10 border-pink-500/30 text-pink-400' : status === 'done' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-slate-800 border-slate-700 text-slate-500'}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-pink-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-600'}`} />
@@ -176,16 +176,16 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                     <>
                         {/* Search config */}
                         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                            <h1 className="text-lg font-bold mb-1">Creator Discovery Engine</h1>
-                            <p className="text-xs text-slate-400 mb-5">Find viral creators by keyword and niche. Extract engagement data, follower counts, and contact info.</p>
+                            <h1 className="text-lg font-bold mb-1">{__('general.creator_discovery_engine')}</h1>
+                            <p className="text-xs text-slate-400 mb-5">{__('general.find_viral_creators_by_keyword_and_niche_extract_engagement_data_follower_counts_and_contact_info')}</p>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                 <div className="md:col-span-1">
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Search Keyword</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.search_keyword')}</label>
                                     <div className="relative">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
                                         <Input type="text" value={keyword} onChange={e => setKeyword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleDiscover()}
-                                            placeholder="muscle building, meal prep..."
+                                            placeholder={__('general.muscle_building_meal_prep')}
                                             className="pl-9 h-11 text-sm bg-slate-800 border-slate-700 focus-visible:ring-pink-500 text-white placeholder:text-slate-600" />
                                     </div>
                                 </div>
@@ -204,8 +204,7 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                                             </Button>
                                         ) : (
                                             <Button onClick={handleDiscover} disabled={!keyword.trim()} className="flex-1 gap-2 h-11 bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg shadow-pink-500/20 hover:opacity-90">
-                                                <Zap className="w-4 h-4" /> Discover Creators
-                                            </Button>
+                                                <Zap className="w-4 h-4" />{__('general.discover_creators')}</Button>
                                         )}
                                         {creators.length > 0 && (
                                             <Button variant="outline" size="icon" onClick={exportCSV} className="h-11 w-12 bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-slate-200">
@@ -251,7 +250,7 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                         {/* Creator grid */}
                         {creators.length > 0 && (
                             <div className="space-y-3">
-                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-500">Discovered Creators</h3>
+                                <h3 className="text-xs font-black uppercase tracking-wider text-slate-500">{__('general.discovered_creators')}</h3>
                                 {creators.map((c, i) => <CreatorCard key={i} creator={c} idx={i} />)}
                             </div>
                         )}
@@ -259,8 +258,8 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                         {status === 'idle' && creators.length === 0 && (
                             <div className="py-24 text-center border border-dashed border-slate-800 rounded-2xl">
                                 <Flame className="w-10 h-10 text-slate-700 mx-auto mb-4" />
-                                <h3 className="text-sm font-bold text-slate-400">Find viral creators by niche</h3>
-                                <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">Enter a keyword and select a niche to start discovering high-engagement TikTok creators in your market.</p>
+                                <h3 className="text-sm font-bold text-slate-400">{__('general.find_viral_creators_by_niche')}</h3>
+                                <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">{__('general.enter_a_keyword_and_select_a_niche_to_start_discovering_high_engagement_tiktok_creators_in_your_market')}</p>
                             </div>
                         )}
                     </>
@@ -269,8 +268,8 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                 {tab === 'monitor' && (
                     <div className="py-24 text-center border border-dashed border-slate-800 rounded-2xl">
                         <Eye className="w-10 h-10 text-slate-700 mx-auto mb-4" />
-                        <h3 className="text-sm font-bold text-slate-400">Competitor Monitoring Jobs</h3>
-                        <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">Add competitors and hashtags to track. The intelligence engine will monitor them daily and alert you to viral content and trend changes.</p>
+                        <h3 className="text-sm font-bold text-slate-400">{__('general.competitor_monitoring_jobs')}</h3>
+                        <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">{__('general.add_competitors_and_hashtags_to_track_the_intelligence_engine_will_monitor_them_daily_and_alert_you_to_viral_content_and_trend_changes')}</p>
                         <Button variant="outline" className="mt-6 h-10 bg-pink-500/10 border-pink-500/30 text-pink-400 hover:bg-pink-500/20 hover:text-pink-400">
                             + Add Monitoring Job
                         </Button>
@@ -280,11 +279,9 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                 {tab === 'vault' && (
                     <div className="py-24 text-center border border-dashed border-slate-800 rounded-2xl">
                         <Bookmark className="w-10 h-10 text-slate-700 mx-auto mb-4" />
-                        <h3 className="text-sm font-bold text-slate-400">UGC Content Vault</h3>
-                        <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">Discovered viral content is automatically saved here. Browse, filter, and extract format blueprints from the best-performing videos in your niche.</p>
-                        <Button variant="outline" className="mt-6 h-10 bg-pink-500/10 border-pink-500/30 text-pink-400 hover:bg-pink-500/20 hover:text-pink-400">
-                            Sync Vault Now
-                        </Button>
+                        <h3 className="text-sm font-bold text-slate-400">{__('general.ugc_content_vault')}</h3>
+                        <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">{__('general.discovered_viral_content_is_automatically_saved_here_browse_filter_and_extract_format_blueprints_from_the_best_performing_videos_in_your_niche')}</p>
+                        <Button variant="outline" className="mt-6 h-10 bg-pink-500/10 border-pink-500/30 text-pink-400 hover:bg-pink-500/20 hover:text-pink-400">{__('general.sync_vault_now')}</Button>
                     </div>
                 )}
             </div>

@@ -69,8 +69,8 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
                             <Upload className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                            <h2 className="font-semibold text-sm">Auto Publisher</h2>
-                            <p className="text-xs text-muted-foreground">Background Engine</p>
+                            <h2 className="font-semibold text-sm">{__('general.auto_publisher')}</h2>
+                            <p className="text-xs text-muted-foreground">{__('general.background_engine')}</p>
                         </div>
                     </div>
 
@@ -80,25 +80,19 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
                             className="w-full justify-start"
                             onClick={() => setActiveTab('queue')}
                         >
-                            <List className="mr-2 h-4 w-4" />
-                            Publishing Queue
-                        </Button>
+                            <List className="mr-2 h-4 w-4" />{__('general.publishing_queue')}</Button>
                         <Button 
                             variant={activeTab === 'accounts' ? 'secondary' : 'ghost'} 
                             className="w-full justify-start"
                             onClick={() => setActiveTab('accounts')}
                         >
-                            <User className="mr-2 h-4 w-4" />
-                            Accounts & Pages
-                        </Button>
+                            <User className="mr-2 h-4 w-4" />{__('general.accounts_pages')}</Button>
                         <Button 
                             variant={activeTab === 'media' ? 'secondary' : 'ghost'} 
                             className="w-full justify-start"
                             onClick={() => setActiveTab('media')}
                         >
-                            <HardDrive className="mr-2 h-4 w-4" />
-                            Local Media Library
-                        </Button>
+                            <HardDrive className="mr-2 h-4 w-4" />{__('general.local_media_library')}</Button>
                     </div>
 
                     <div className="mt-8 pt-8 border-t">
@@ -122,13 +116,11 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
                             <div className="space-y-6">
                                 <div className="flex justify-between items-center">
                                     <div>
-                                        <h1 className="text-2xl font-bold tracking-tight">Publishing Queue</h1>
-                                        <p className="text-muted-foreground">Monitor and manage background automation jobs.</p>
+                                        <h1 className="text-2xl font-bold tracking-tight">{__('general.publishing_queue')}</h1>
+                                        <p className="text-muted-foreground">{__('general.monitor_and_manage_background_automation_jobs')}</p>
                                     </div>
                                     <Button onClick={handleAddJob} disabled={!isConnected}>
-                                        <Plus className="mr-2 h-4 w-4" />
-                                        Queue New Post
-                                    </Button>
+                                        <Plus className="mr-2 h-4 w-4" />{__('general.queue_new_post')}</Button>
                                 </div>
 
                                 <Card>
@@ -138,7 +130,7 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
                                                 <thead>
                                                     <tr className="border-b bg-muted/50 text-left">
                                                         <th className="font-medium p-4">ID</th>
-                                                        <th className="font-medium p-4">Page ID</th>
+                                                        <th className="font-medium p-4">{__('general.page_id')}</th>
                                                         <th className="font-medium p-4">Type</th>
                                                         <th className="font-medium p-4">File</th>
                                                         <th className="font-medium p-4">Status</th>
@@ -147,9 +139,7 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
                                                 <tbody>
                                                     {queues.length === 0 ? (
                                                         <tr>
-                                                            <td colSpan={5} className="p-8 text-center text-muted-foreground">
-                                                                No publishing jobs in queue.
-                                                            </td>
+                                                            <td colSpan={5} className="p-8 text-center text-muted-foreground">{__('general.no_publishing_jobs_in_queue')}</td>
                                                         </tr>
                                                     ) : (
                                                         queues.map(q => (
@@ -185,20 +175,16 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
                             <div className="space-y-6">
                                 <div className="flex justify-between items-center">
                                     <div>
-                                        <h1 className="text-2xl font-bold tracking-tight">Facebook Accounts</h1>
-                                        <p className="text-muted-foreground">Manage connected profiles and isolated browser sessions.</p>
+                                        <h1 className="text-2xl font-bold tracking-tight">{__('general.facebook_accounts')}</h1>
+                                        <p className="text-muted-foreground">{__('general.manage_connected_profiles_and_isolated_browser_sessions')}</p>
                                     </div>
                                     <Button onClick={handleAddAccount} disabled={!isConnected}>
-                                        <Plus className="mr-2 h-4 w-4" />
-                                        Add Account
-                                    </Button>
+                                        <Plus className="mr-2 h-4 w-4" />{__('general.add_account')}</Button>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {accounts.length === 0 ? (
-                                        <div className="col-span-full p-8 text-center border rounded-lg bg-muted/10 text-muted-foreground">
-                                            No accounts configured yet.
-                                        </div>
+                                        <div className="col-span-full p-8 text-center border rounded-lg bg-muted/10 text-muted-foreground">{__('general.no_accounts_configured_yet')}</div>
                                     ) : (
                                         accounts.map(acc => (
                                             <Card key={acc.id}>
@@ -210,9 +196,7 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
                                                     <div className="text-xs text-muted-foreground mb-4">
                                                         Profile: {acc.profile_path}
                                                     </div>
-                                                    <Button variant="outline" size="sm" className="w-full">
-                                                        Manage Pages
-                                                    </Button>
+                                                    <Button variant="outline" size="sm" className="w-full">{__('general.manage_pages')}</Button>
                                                 </CardContent>
                                             </Card>
                                         ))
@@ -224,13 +208,13 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
                         {activeTab === 'media' && (
                             <div className="space-y-6">
                                 <div>
-                                    <h1 className="text-2xl font-bold tracking-tight">Local Media Library</h1>
-                                    <p className="text-muted-foreground">Manage files that the local engine will use to publish.</p>
+                                    <h1 className="text-2xl font-bold tracking-tight">{__('general.local_media_library')}</h1>
+                                    <p className="text-muted-foreground">{__('general.manage_files_that_the_local_engine_will_use_to_publish')}</p>
                                 </div>
                                 <div className="border border-dashed rounded-lg p-12 text-center text-muted-foreground">
                                     <HardDrive className="h-10 w-10 mx-auto mb-4 opacity-50" />
-                                    <p>Media Library integration coming soon.</p>
-                                    <p className="text-sm mt-1">For now, provide absolute paths when queueing posts.</p>
+                                    <p>{__('general.media_library_integration_coming_soon')}</p>
+                                    <p className="text-sm mt-1">{__('general.for_now_provide_absolute_paths_when_queueing_posts')}</p>
                                 </div>
                             </div>
                         )}

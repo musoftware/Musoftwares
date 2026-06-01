@@ -15,14 +15,14 @@ export function B2BProspectorSidebar({ realtimeLogs, linkedInSession, inboxes, r
             <div className="p-5 flex-1 flex flex-col min-h-0">
                 <div className="flex items-center gap-2 mb-4">
                     <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-ping" />
-                    <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">Live Activity Feed</h3>
+                    <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">{__('general.live_activity_feed')}</h3>
                 </div>
                 <div className="flex-1 overflow-y-auto space-y-3 pr-1 font-sans scrollbar-thin">
                     {realtimeLogs.length === 0 ? (
                         <div className="text-center py-20 text-slate-400 text-xs flex flex-col items-center gap-2">
                             <HelpCircle className="w-6 h-6 text-slate-300" />
-                            <span>Activity feed is clear</span>
-                            <span>Launch a search to harvest leads</span>
+                            <span>{__('general.activity_feed_is_clear')}</span>
+                            <span>{__('general.launch_a_search_to_harvest_leads')}</span>
                         </div>
                     ) : (
                         realtimeLogs.map(log => (

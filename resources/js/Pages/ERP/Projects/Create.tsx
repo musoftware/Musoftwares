@@ -35,7 +35,7 @@ export default function CreateProject({ clients = [] }: { clients?: any[] }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('projects');
 
     return (
-        <ERPLayout title="Create Project" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__('general.create_project')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="w-full px-4 sm:px-6 lg:px-8 py-8 space-y-6">
                 <div className="flex items-center gap-4">
@@ -43,30 +43,27 @@ export default function CreateProject({ clients = [] }: { clients?: any[] }) {
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Create New Project</h1>
-                        <p className="text-slate-500 text-sm mt-0.5">Establish a new project under a client.</p>
+                        <h1 className="text-2xl font-bold text-slate-900">{__('general.create_new_project')}</h1>
+                        <p className="text-slate-500 text-sm mt-0.5">{__('general.establish_a_new_project_under_a_client')}</p>
                     </div>
                 </div>
 
                 <Card className="bg-white border border-slate-200 shadow-sm">
                     <CardHeader>
                         <CardTitle className="text-slate-900 flex items-center gap-2">
-                            <Briefcase className="w-5 h-5" /> Project Details
-                        </CardTitle>
-                        <CardDescription className="text-slate-500">
-                            Provide the necessary information to setup the project scope.
-                        </CardDescription>
+                            <Briefcase className="w-5 h-5" />{__('general.project_details')}</CardTitle>
+                        <CardDescription className="text-slate-500">{__('general.provide_the_necessary_information_to_setup_the_project_scope')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Project Name <span className="text-red-500">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.project_name')}<span className="text-red-500">*</span></label>
                                     <Input 
                                         required 
                                         value={form.name} 
                                         onChange={e => setForm({...form, name: e.target.value})} 
-                                        placeholder="Website Redesign" 
+                                        placeholder={__('general.website_redesign')} 
                                         className="bg-white border-slate-200 text-slate-900"
                                     />
                                     {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
@@ -84,12 +81,12 @@ export default function CreateProject({ clients = [] }: { clients?: any[] }) {
                                     <label className="text-sm font-medium text-slate-700">Status</label>
                                     <Select value={form.status} onValueChange={(val) => setForm({...form, status: val})}>
                                         <SelectTrigger className="bg-white border-slate-200 text-slate-900">
-                                            <SelectValue placeholder="Select status" />
+                                            <SelectValue placeholder={__('general.select_status_1')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white border-slate-200 text-slate-900">
                                             <SelectItem value="Planning">Planning</SelectItem>
                                             <SelectItem value="Active">Active</SelectItem>
-                                            <SelectItem value="On Hold">On Hold</SelectItem>
+                                            <SelectItem value="On Hold">{__('general.on_hold')}</SelectItem>
                                             <SelectItem value="Completed">Completed</SelectItem>
                                             <SelectItem value="Cancelled">Cancelled</SelectItem>
                                         </SelectContent>
@@ -97,7 +94,7 @@ export default function CreateProject({ clients = [] }: { clients?: any[] }) {
                                     {errors.status && <p className="text-xs text-red-500">{errors.status}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Due Date</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.due_date')}</label>
                                     <Input 
                                         type="date"
                                         value={form.due_date} 

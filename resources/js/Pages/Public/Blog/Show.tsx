@@ -91,9 +91,7 @@ export default function Show({ article }: ShowProps) {
                     <div className="mb-8">
                         <Link href="/admin/blog-articles">
                             <Button variant="ghost" className="gap-2 text-slate-500 hover:text-slate-900 transition-colors">
-                                <ArrowLeft className="h-4 w-4" />
-                                Back to Manager
-                            </Button>
+                                <ArrowLeft className="h-4 w-4" />{__('general.back_to_manager')}</Button>
                         </Link>
                     </div>
 
@@ -133,7 +131,7 @@ export default function Show({ article }: ShowProps) {
                                         <span className="block text-sm font-semibold text-slate-800">
                                             {article.service?.seller?.name || 'System Writer'}
                                         </span>
-                                        <span className="block text-xs text-slate-400">Published Content Creator</span>
+                                        <span className="block text-xs text-slate-400">{__('general.published_content_creator')}</span>
                                     </div>
                                 </div>
 

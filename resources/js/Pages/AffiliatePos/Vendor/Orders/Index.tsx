@@ -17,12 +17,12 @@ export default function VendorOrdersIndex({ orders, filters }: any) {
 
     return (
         <div className="p-6 max-w-[1600px] mx-auto space-y-6">
-            <Head title="Vendor Orders" />
+            <Head title={__('general.vendor_orders')} />
 
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Sales Orders</h1>
-                    <p className="text-sm text-gray-500 mt-1">Track orders containing your products.</p>
+                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">{__('general.sales_orders')}</h1>
+                    <p className="text-sm text-gray-500 mt-1">{__('general.track_orders_containing_your_products')}</p>
                 </div>
             </div>
 
@@ -31,10 +31,10 @@ export default function VendorOrdersIndex({ orders, filters }: any) {
                     <div className="flex gap-4">
                         <Select value={status} onValueChange={(val) => { setStatus(val); handleSearch(); }}>
                             <SelectTrigger className="w-[200px] bg-white">
-                                <SelectValue placeholder="Filter by status" />
+                                <SelectValue placeholder={__('general.filter_by_status')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">All Orders</SelectItem>
+                                <SelectItem value="all">{__('general.all_orders')}</SelectItem>
                                 <SelectItem value="new">New</SelectItem>
                                 <SelectItem value="preparing">Preparing</SelectItem>
                                 <SelectItem value="shipping">Shipping</SelectItem>
@@ -47,7 +47,7 @@ export default function VendorOrdersIndex({ orders, filters }: any) {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-gray-50/80">
-                                <TableHead className="font-semibold text-gray-600">Order ID</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.order_id')}</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Customer</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Location</TableHead>
                                 <TableHead className="font-semibold text-gray-600 text-right">Items</TableHead>
@@ -59,7 +59,7 @@ export default function VendorOrdersIndex({ orders, filters }: any) {
                         <TableBody>
                             {orders.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="h-32 text-center text-gray-500">No orders found.</TableCell>
+                                    <TableCell colSpan={7} className="h-32 text-center text-gray-500">{__('general.no_orders_found')}</TableCell>
                                 </TableRow>
                             ) : (
                                 orders.data.map((order: any) => (

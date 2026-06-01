@@ -120,23 +120,23 @@ export default function OlxB2CFinderRunner({ auth, tool }: any) {
             <div className="max-w-7xl mx-auto space-y-6">
                 <Tabs defaultValue="search" className="w-full">
                         <TabsList className="mb-4">
-                            <TabsTrigger value="search">Search & Extract</TabsTrigger>
+                            <TabsTrigger value="search">{__('general.search_extract')}</TabsTrigger>
                             <TabsTrigger value="results">Live Results ({results.length})</TabsTrigger>
                         </TabsList>
                         
                         <TabsContent value="search">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Search Configuration</CardTitle>
-                                    <CardDescription>Configure your lead extraction targets</CardDescription>
+                                    <CardTitle>{__('general.search_configuration')}</CardTitle>
+                                    <CardDescription>{__('general.configure_your_lead_extraction_targets')}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">Target Country / Platform</label>
+                                            <label className="text-sm font-medium">{__('general.target_country_platform')}</label>
                                             <Select value={selectedCountry} onValueChange={setSelectedCountry} disabled={isRunning}>
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="Select platform..." />
+                                                    <SelectValue placeholder={__('general.select_platform')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {countries.map(c => (
@@ -146,9 +146,9 @@ export default function OlxB2CFinderRunner({ auth, tool }: any) {
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">Search Keyword</label>
+                                            <label className="text-sm font-medium">{__('general.search_keyword')}</label>
                                             <Input 
-                                                placeholder="e.g. iPhone 14 Pro" 
+                                                placeholder={__('general.e_g_iphone_14_pro')} 
                                                 value={keyword}
                                                 onChange={e => setKeyword(e.target.value)}
                                                 disabled={isRunning}
@@ -161,16 +161,12 @@ export default function OlxB2CFinderRunner({ auth, tool }: any) {
                                                 onClick={startSearch} 
                                                 disabled={!selectedCountry || !keyword}
                                                 className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
-                                            >
-                                                Start Extraction Engine
-                                            </Button>
+                                            >{__('general.start_extraction_engine')}</Button>
                                         ) : (
                                             <Button 
                                                 onClick={stopSearch} 
                                                 className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white"
-                                            >
-                                                Stop Extraction Engine
-                                            </Button>
+                                            >{__('general.stop_extraction_engine')}</Button>
                                         )}
                                     </div>
                                 </CardContent>
@@ -180,14 +176,12 @@ export default function OlxB2CFinderRunner({ auth, tool }: any) {
                         <TabsContent value="results">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Extracted Leads</CardTitle>
-                                    <CardDescription>Real-time results from the extraction engine</CardDescription>
+                                    <CardTitle>{__('general.extracted_leads')}</CardTitle>
+                                    <CardDescription>{__('general.real_time_results_from_the_extraction_engine')}</CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     {results.length === 0 ? (
-                                        <div className="text-center text-gray-500 py-8">
-                                            No results yet. Start an extraction to see data here.
-                                        </div>
+                                        <div className="text-center text-gray-500 py-8">{__('general.no_results_yet_start_an_extraction_to_see_data_here')}</div>
                                     ) : (
                                         <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
                                             {results.map((r, i) => (

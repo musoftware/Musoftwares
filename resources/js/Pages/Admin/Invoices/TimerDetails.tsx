@@ -145,7 +145,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
     const handleDelete = (index: number) => {
         const timerToDelete = timers[index];
         if (!timerToDelete.isNew) {
-            if (confirm(__('Are you sure you want to delete this session?'))) {
+            if (confirm(__('general.are_you_sure_you_want_to_delete_this_session'))) {
                 router.delete(route('admin.invoices.timer-details.destroy', [item.id, timerToDelete.id]), {
                     onSuccess: () => {
                         const newTimers = [...timers];
@@ -196,14 +196,14 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
 
     return (
         <AdminSidebarLayout>
-            <Head title={`${__('Timer Details')} — ${item.item_title}`} />
+            <Head title={`${__('general.timer_details')} — ${item.item_title}`} />
 
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-4">
                     <Link href={route('admin.invoices.show', item.invoice_id)}>
                         <Button variant="outline" size="sm">
-                            <ArrowLeft className="w-4 h-4 mr-2" /> {__('Back to Invoice')}
+                            <ArrowLeft className="w-4 h-4 mr-2" /> {__('general.back_to_invoice')}
                         </Button>
                     </Link>
                     <div>
@@ -217,11 +217,11 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                 <div className="flex items-center gap-2">
                     {hasUnsavedChanges && (
                         <div className="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-200">
-                            {__('Unsaved Sessions')}
+                            {__('general.unsaved_sessions')}
                         </div>
                     )}
                     <Button onClick={handleSave} disabled={!hasUnsavedChanges || isSaving} className="bg-blue-600 hover:bg-blue-700">
-                        <Save className="w-4 h-4 mr-2" /> {__('Save Sessions')}
+                        <Save className="w-4 h-4 mr-2" /> {__('general.save_sessions')}
                     </Button>
                 </div>
             </div>
@@ -235,11 +235,11 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                         <div className="flex items-center gap-4">
                             {!isRunning ? (
                                 <Button size="lg" onClick={handleStart} className="bg-green-600 hover:bg-green-700 h-14 px-8 shadow-sm">
-                                    <Play className="w-5 h-5 mr-2" /> {__('Start Timer')}
+                                    <Play className="w-5 h-5 mr-2" /> {__('general.start_timer')}
                                 </Button>
                             ) : (
                                 <Button size="lg" onClick={handleStop} variant="destructive" className="h-14 px-8 shadow-sm animate-pulse">
-                                    <Pause className="w-5 h-5 mr-2" /> {__('Pause Timer')}
+                                    <Pause className="w-5 h-5 mr-2" /> {__('general.pause_timer')}
                                 </Button>
                             )}
 
@@ -247,7 +247,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                 <div className="flex flex-col">
                                     <span className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center">
                                         <span className="w-2 h-2 rounded-full bg-red-500 mr-2 animate-ping"></span>
-                                        {__('Running Session')}
+                                        {__('general.running_session')}
                                     </span>
                                     <span className="text-2xl font-black text-gray-900 tabular-nums">
                                         {formatDuration(liveSeconds)}
@@ -269,7 +269,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">{__('Hours')}</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">{__('general.hours')}</label>
                                 <Input
                                     type="number"
                                     min="0"
@@ -280,7 +280,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">{__('Mins')}</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">{__('general.mins')}</label>
                                 <Input
                                     type="number"
                                     min="0"
@@ -292,7 +292,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                 />
                             </div>
                             <Button onClick={handleAddManual} variant="outline" className="bg-white border-dashed">
-                                <Plus className="w-4 h-4 mr-2 text-blue-500" /> {__('Add Duration')}
+                                <Plus className="w-4 h-4 mr-2 text-blue-500" /> {__('general.add_duration')}
                             </Button>
                         </div>
                     </div>
@@ -307,7 +307,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                             <Clock className="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('Total Tracked Time')}</p>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.total_tracked_time')}</p>
                             <p className="text-2xl font-black text-gray-900 tabular-nums">{formatDuration(currentTotalSeconds)}</p>
                         </div>
                     </CardContent>
@@ -319,7 +319,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                             <History className="w-6 h-6 text-indigo-600" />
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('Total Period (First to Last)')}</p>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.total_period_first_to_last')}</p>
                             <p className="text-2xl font-black text-gray-900 tabular-nums">{formatDuration(currentSpanSeconds)}</p>
                         </div>
                     </CardContent>
@@ -331,7 +331,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                             <DollarSign className="w-6 h-6 text-green-600" />
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('Total Billable')}</p>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.total_billable')}</p>
                             <p className="text-2xl font-black text-green-700">{formatCurrency(currentTotalBillable, invoice_currency?.code)}</p>
                         </div>
                     </CardContent>
@@ -343,7 +343,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                             <Calendar className="w-6 h-6 text-purple-600" />
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('Total Sessions')}</p>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.total_sessions')}</p>
                             <p className="text-2xl font-black text-gray-900">{timers.length}</p>
                         </div>
                     </CardContent>
@@ -355,7 +355,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                 <CardHeader className="bg-gray-50 border-b py-3 flex flex-row items-center justify-between">
                     <CardTitle className="text-base font-bold text-gray-900 flex items-center">
                         <Clock className="w-4 h-4 mr-2 text-primary" />
-                        {__('Logged Sessions')} ({timers.length})
+                        {__('general.logged_sessions')} ({timers.length})
                     </CardTitle>
                     <span className="badge bg-white text-gray-600 border rounded-full px-3 py-1 text-xs flex items-center shadow-sm">
                         <History className="w-3 h-3 mr-1" /> {__('History')}
@@ -367,10 +367,10 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                             <thead className="bg-gray-50 border-b">
                                 <tr>
                                     <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">#</th>
-                                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{__('Start Session')}</th>
-                                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{__('End Session')}</th>
+                                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.start_session')}</th>
+                                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.end_session')}</th>
                                     <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">{__('Duration')}</th>
-                                    <th className="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">{__('Earnings')}</th>
+                                    <th className="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.earnings')}</th>
                                     <th className="px-4 py-3 w-10"></th>
                                 </tr>
                             </thead>
@@ -383,7 +383,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                         <tr key={timer.id} className={`transition-colors ${timer.isNew ? 'bg-amber-50/50 hover:bg-amber-50' : 'hover:bg-gray-50'}`}>
                                             <td className="px-4 py-3 text-gray-500 font-mono text-xs">
                                                 {index + 1}
-                                                {timer.isNew && <span className="ml-2 inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">{__('NEW')}</span>}
+                                                {timer.isNew && <span className="ml-2 inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">{__('general.new')}</span>}
                                             </td>
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center">
@@ -434,7 +434,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                             {(timers.length > 0 || isRunning) && (
                                 <tfoot className="bg-gray-50 border-t">
                                     <tr>
-                                        <td colSpan={3} className="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase">{__('Totals')}</td>
+                                        <td colSpan={3} className="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase">{__('general.totals')}</td>
                                         <td className="px-4 py-3 text-center">
                                             <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800 tabular-nums">
                                                 {formatHumanDuration(currentTotalSeconds)}

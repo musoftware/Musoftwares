@@ -141,7 +141,7 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-border/50 p-4 bg-sidebar">
         <Link href="/" className="flex items-center gap-2 px-2">
             <ApplicationLogo className="w-6 h-6 text-indigo-600 fill-current" />
-            <span className="font-semibold text-lg tracking-tight">Admin Panel</span>
+            <span className="font-semibold text-lg tracking-tight">{__('general.admin_panel')}</span>
         </Link>
       </SidebarHeader>
       <SidebarContent className="p-2">

@@ -45,12 +45,11 @@ export default function ToolsPublicLayout({
             {!isAuthed && (
                 <div className="bg-slate-900 text-slate-300 text-center py-2 px-4 text-xs font-medium flex items-center justify-center gap-2">
                     <span className="text-slate-400">🚀</span>
-                    <span>Professional desktop tools for power users.</span>
+                    <span>{__('general.professional_desktop_tools_for_power_users')}</span>
                     <Link
                         href={route('register')}
                         className="inline-flex items-center gap-0.5 text-white font-semibold hover:opacity-80 transition-opacity ml-1"
-                    >
-                        Get started free <ArrowUpRight className="h-3 w-3" />
+                    >{__('general.get_started_free')}<ArrowUpRight className="h-3 w-3" />
                     </Link>
                 </div>
             )}
@@ -113,7 +112,7 @@ export default function ToolsPublicLayout({
                                             className="gap-1.5 text-[13px] text-slate-500 h-8 hover:text-slate-800"
                                         >
                                             <LogIn className="h-3.5 w-3.5" />
-                                            <span className="hidden sm:inline">Sign in</span>
+                                            <span className="hidden sm:inline">{__('general.sign_in')}</span>
                                         </Button>
                                     </Link>
                                     <Link href={route('register')}>
@@ -145,7 +144,7 @@ export default function ToolsPublicLayout({
                             <div className="w-5 h-5 rounded-md bg-slate-900 flex items-center justify-center">
                                 <ApplicationLogo className="w-3 h-3 text-white fill-current" />
                             </div>
-                            <span className="text-sm font-medium text-slate-700">musoftware Tools</span>
+                            <span className="text-sm font-medium text-slate-700">{__('general.musoftware_tools')}</span>
                         </div>
                         <div className="flex items-center gap-6 text-xs text-slate-400">
                             <span>© {new Date().getFullYear()} musoftware</span>

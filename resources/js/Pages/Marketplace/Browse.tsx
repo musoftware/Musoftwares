@@ -62,13 +62,11 @@ export default function Browse({ services, categories, filters }: any) {
 
     return (
         <MarketplaceLayout>
-            <Head title="Find the perfect service" />
+            <Head title={__('general.find_the_perfect_service')} />
 
             {/* Hero Banner */}
             <div className="bg-indigo-900 px-6 py-20 text-center text-white sm:px-12">
-                <h1 className="mb-6 text-4xl font-bold md:text-5xl">
-                    Find the perfect service
-                </h1>
+                <h1 className="mb-6 text-4xl font-bold md:text-5xl">{__('general.find_the_perfect_service')}</h1>
                 <div className="relative mx-auto max-w-3xl">
                     <form
                         onSubmit={handleSearch}
@@ -78,7 +76,7 @@ export default function Browse({ services, categories, filters }: any) {
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="What service are you looking for today?"
+                            placeholder={__('general.what_service_are_you_looking_for_today')}
                             className="w-full rounded-full py-4 pr-32 pl-6 text-lg text-gray-900 shadow-lg focus:ring-4 focus:ring-indigo-300 focus:outline-none"
                         />
                         <button
@@ -109,9 +107,7 @@ export default function Browse({ services, categories, filters }: any) {
                         <button
                             onClick={() => selectCategory('')}
                             className={`rounded-full border px-4 py-2 whitespace-nowrap transition ${categoryId === '' ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-300 bg-white text-gray-700 hover:border-gray-900'}`}
-                        >
-                            All Categories
-                        </button>
+                        >{__('general.all_categories')}</button>
                         {categories.map((cat: any) => (
                             <button
                                 key={cat.id}
@@ -245,9 +241,7 @@ export default function Browse({ services, categories, filters }: any) {
                                                 </svg>
                                             </div>
                                             <div className="text-right">
-                                                <span className="text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                    Starting at
-                                                </span>
+                                                <span className="text-xs font-medium tracking-wider text-gray-500 uppercase">{__('general.starting_at')}</span>
                                                 <span className="block text-lg font-bold text-gray-900">
                                                     ${startingPrice || 25}
                                                 </span>
@@ -274,12 +268,8 @@ export default function Browse({ services, categories, filters }: any) {
                                     d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                                 ></path>
                             </svg>
-                            <h3 className="text-lg font-medium text-gray-900">
-                                No services found
-                            </h3>
-                            <p className="mt-1 text-sm text-gray-500">
-                                Try adjusting your search or category filters.
-                            </p>
+                            <h3 className="text-lg font-medium text-gray-900">{__('general.no_services_found')}</h3>
+                            <p className="mt-1 text-sm text-gray-500">{__('general.try_adjusting_your_search_or_category_filters')}</p>
                             <button
                                 onClick={() => {
                                     setSearch('');
@@ -287,9 +277,7 @@ export default function Browse({ services, categories, filters }: any) {
                                     handleSearch();
                                 }}
                                 className="mt-4 font-medium text-indigo-600 hover:text-indigo-500"
-                            >
-                                Clear all filters
-                            </button>
+                            >{__('general.clear_all_filters')}</button>
                         </div>
                     )}
 

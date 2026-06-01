@@ -37,8 +37,8 @@ export default function Backup({ auth, flash }) {
     };
 
     return (
-        <AuthenticatedLayout user={auth.user} header={<h2 className="font-semibold text-xl text-slate-800 leading-tight">Data Management</h2>}>
-            <Head title="Backup & Restore" />
+        <AuthenticatedLayout user={auth.user} header={<h2 className="font-semibold text-xl text-slate-800 leading-tight">{__('general.data_management')}</h2>}>
+            <Head title={__('general.backup_restore')} />
 
             <div className="py-12 max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-8">
                 
@@ -63,18 +63,13 @@ export default function Backup({ auth, flash }) {
                             <Download className="w-5 h-5 text-indigo-600" />
                             <CardTitle>Export Data (Backup)</CardTitle>
                         </div>
-                        <CardDescription>
-                            Download a complete JSON backup of all your ERP (Clients, Invoices, Tasks) and CRM (Leads, Campaigns) records.
-                        </CardDescription>
+                        <CardDescription>{__('general.download_a_complete_json_backup_of_all_your_erp_clients_invoices_tasks_and_crm_leads_campaigns_records')}</CardDescription>
                     </CardHeader>
                     <CardContent className="pt-6">
-                        <p className="text-sm text-slate-600 mb-4">
-                            Keep this file safe. It contains sensitive business data and can be used to restore your account if needed.
-                        </p>
+                        <p className="text-sm text-slate-600 mb-4">{__('general.keep_this_file_safe_it_contains_sensitive_business_data_and_can_be_used_to_restore_your_account_if_needed')}</p>
                         <a href={route('settings.backup.export')} target="_blank" rel="noopener noreferrer">
                             <Button className="bg-indigo-600 hover:bg-indigo-700">
-                                <Download className="w-4 h-4 mr-2" /> Download JSON Backup
-                            </Button>
+                                <Download className="w-4 h-4 mr-2" />{__('general.download_json_backup')}</Button>
                         </a>
                     </CardContent>
                 </Card>
@@ -86,25 +81,20 @@ export default function Backup({ auth, flash }) {
                             <Upload className="w-5 h-5 text-red-600" />
                             <CardTitle className="text-red-900">Restore Data (Import)</CardTitle>
                         </div>
-                        <CardDescription className="text-red-700/80">
-                            Upload a previously downloaded JSON backup file to restore your account.
-                        </CardDescription>
+                        <CardDescription className="text-red-700/80">{__('general.upload_a_previously_downloaded_json_backup_file_to_restore_your_account')}</CardDescription>
                     </CardHeader>
                     <CardContent className="pt-6">
                         <Alert variant="destructive" className="mb-6 bg-white">
                             <AlertTriangle className="h-4 w-4" />
-                            <AlertTitle>Danger Zone</AlertTitle>
-                            <AlertDescription>
-                                Restoring from a backup will <strong>permanently delete</strong> your current CRM and ERP data and replace it entirely with the data from the backup file. This action cannot be undone.
-                            </AlertDescription>
+                            <AlertTitle>{__('general.danger_zone')}</AlertTitle>
+                            <AlertDescription>{__('general.restoring_from_a_backup_will')}<strong>{__('general.permanently_delete')}</strong>{__('general.your_current_crm_and_erp_data_and_replace_it_entirely_with_the_data_from_the_backup_file_this_action_cannot_be_undone')}</AlertDescription>
                         </Alert>
 
                         <form onSubmit={handleImport} className="space-y-4">
                             <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:bg-slate-50 transition-colors">
                                 <FileJson className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                                 <label className="block text-sm font-medium text-slate-700 cursor-pointer">
-                                    <span className="text-indigo-600 hover:text-indigo-500">Upload a file</span> or drag and drop
-                                    <input 
+                                    <span className="text-indigo-600 hover:text-indigo-500">{__('general.upload_a_file')}</span>{__('general.or_drag_and_drop')}<input 
                                         type="file" 
                                         className="hidden" 
                                         accept=".json" 
@@ -112,7 +102,7 @@ export default function Backup({ auth, flash }) {
                                         onChange={handleFileChange}
                                     />
                                 </label>
-                                <p className="text-xs text-slate-500 mt-1">JSON backup files only up to 10MB</p>
+                                <p className="text-xs text-slate-500 mt-1">{__('general.json_backup_files_only_up_to_10mb')}</p>
                             </div>
 
                             {selectedFile && (

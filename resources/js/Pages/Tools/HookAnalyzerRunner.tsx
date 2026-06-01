@@ -37,7 +37,7 @@ function HookScoreBar({ score }: { score: number }) {
     return (
         <div className="space-y-1">
             <div className="flex justify-between text-xs font-bold text-slate-500">
-                <span>Hook Score</span><span>{score}/100</span>
+                <span>{__('general.hook_score')}</span><span>{score}/100</span>
             </div>
             <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
                 <div
@@ -92,12 +92,12 @@ function AnalysisCard({ a, idx }: { a: any; idx: number }) {
                     {/* Pattern + retention */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="bg-slate-50 border border-slate-100 rounded-xl p-3">
-                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Hook Pattern</p>
+                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">{__('general.hook_pattern')}</p>
                             <p className="text-xs font-bold text-slate-700">{a.hook_pattern?.label}</p>
                             <p className="text-[10px] text-slate-400 mt-0.5">Power: {a.hook_pattern?.power}/10</p>
                         </div>
                         <div className="bg-slate-50 border border-slate-100 rounded-xl p-3">
-                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Retention Estimate</p>
+                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">{__('general.retention_estimate')}</p>
                             <p className="text-xs font-bold text-slate-700">{a.retention_estimate}</p>
                         </div>
                     </div>
@@ -134,7 +134,7 @@ function AnalysisCard({ a, idx }: { a: any; idx: number }) {
                     {/* Alternative hooks */}
                     {a.alternative_hooks?.length > 0 && (
                         <div className="space-y-2">
-                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">Try These Instead</p>
+                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">{__('general.try_these_instead')}</p>
                             {a.alternative_hooks.map((h: string, i: number) => (
                                 <div key={i} className="flex items-start gap-2 bg-violet-50 border border-violet-100 rounded-xl px-3 py-2.5">
                                     <Sparkles className="w-3.5 h-3.5 text-violet-500 mt-0.5 shrink-0" />
@@ -236,7 +236,7 @@ export default function HookAnalyzerRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-violet-600 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
                         <Target className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 tracking-tight">Video Hooks Analytics</span>
+                    <span className="font-bold text-sm text-slate-800 tracking-tight">{__('general.video_hooks_analytics')}</span>
                 </div>
                 <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-amber-50 border-amber-200 text-amber-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-amber-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
@@ -249,8 +249,8 @@ export default function HookAnalyzerRunner({ tool }: any) {
                 {/* Input card */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5">
                     <div>
-                        <h1 className="text-xl font-bold tracking-tight text-slate-900">Score your hook</h1>
-                        <p className="text-sm text-slate-400 mt-1">Get a Hook Score, grade, pattern detection, and specific improvements.</p>
+                        <h1 className="text-xl font-bold tracking-tight text-slate-900">{__('general.score_your_hook')}</h1>
+                        <p className="text-sm text-slate-400 mt-1">{__('general.get_a_hook_score_grade_pattern_detection_and_specific_improvements')}</p>
                     </div>
 
                     {/* Mode toggle */}
@@ -276,7 +276,7 @@ export default function HookAnalyzerRunner({ tool }: any) {
                                 value={singleUrl}
                                 onChange={e => setSingleUrl(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleAnalyze()}
-                                placeholder="https://www.tiktok.com/@user/video/..."
+                                placeholder={__('general.https_www_tiktok_com_user_video')}
                                 className="pl-9 h-11 text-sm bg-slate-50 font-mono"
                             />
                         </div>
@@ -293,7 +293,7 @@ export default function HookAnalyzerRunner({ tool }: any) {
                                             type="url"
                                             value={u}
                                             onChange={e => updateUrl(i, e.target.value)}
-                                            placeholder="https://www.tiktok.com/@user/video/..."
+                                            placeholder={__('general.https_www_tiktok_com_user_video')}
                                             className="pl-8 h-11 text-sm bg-slate-50 font-mono"
                                         />
                                     </div>
@@ -306,8 +306,7 @@ export default function HookAnalyzerRunner({ tool }: any) {
                             ))}
                             {batchUrls.length < 10 && (
                                 <Button variant="ghost" onClick={addUrl} className="gap-1.5 h-8 text-xs font-bold text-violet-600 hover:text-violet-700 hover:bg-violet-50 transition-colors">
-                                    <Plus className="w-3.5 h-3.5" /> Add another URL
-                                </Button>
+                                    <Plus className="w-3.5 h-3.5" />{__('general.add_another_url')}</Button>
                             )}
                         </div>
                     )}
@@ -354,11 +353,11 @@ export default function HookAnalyzerRunner({ tool }: any) {
                         {analyses.length > 1 && avg != null && (
                             <div className="bg-gradient-to-tr from-violet-900 to-purple-900 border border-violet-700 rounded-2xl p-5 text-white flex items-center justify-between shadow-lg">
                                 <div>
-                                    <p className="text-xs font-bold text-violet-300 uppercase tracking-wider">Average Hook Score</p>
+                                    <p className="text-xs font-bold text-violet-300 uppercase tracking-wider">{__('general.average_hook_score')}</p>
                                     <p className="text-4xl font-black mt-1">{avg}<span className="text-lg font-bold text-violet-400">/100</span></p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-xs font-bold text-violet-300 uppercase tracking-wider">Videos Analyzed</p>
+                                    <p className="text-xs font-bold text-violet-300 uppercase tracking-wider">{__('general.videos_analyzed')}</p>
                                     <p className="text-4xl font-black mt-1">{analyses.length}</p>
                                 </div>
                             </div>

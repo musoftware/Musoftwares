@@ -15,12 +15,12 @@ export default function AffiliateOrdersIndex({ orders, filters }: any) {
 
     return (
         <div className="p-6 max-w-[1600px] mx-auto space-y-6">
-            <Head title="My Conversions" />
+            <Head title={__('general.my_conversions')} />
 
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">My Conversions</h1>
-                    <p className="text-sm text-gray-500 mt-1">Track your affiliate sales and commissions.</p>
+                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">{__('general.my_conversions')}</h1>
+                    <p className="text-sm text-gray-500 mt-1">{__('general.track_your_affiliate_sales_and_commissions')}</p>
                 </div>
             </div>
 
@@ -28,10 +28,10 @@ export default function AffiliateOrdersIndex({ orders, filters }: any) {
                 <CardHeader className="bg-gray-50/50 border-b p-4">
                     <Select value={status} onValueChange={(val) => { setStatus(val); handleSearch(); }}>
                         <SelectTrigger className="w-[200px] bg-white">
-                            <SelectValue placeholder="Filter by status" />
+                            <SelectValue placeholder={__('general.filter_by_status')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Orders</SelectItem>
+                            <SelectItem value="all">{__('general.all_orders')}</SelectItem>
                             <SelectItem value="new">New</SelectItem>
                             <SelectItem value="delivered">Delivered</SelectItem>
                             <SelectItem value="returned">Returned</SelectItem>
@@ -42,7 +42,7 @@ export default function AffiliateOrdersIndex({ orders, filters }: any) {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-gray-50/80">
-                                <TableHead className="font-semibold text-gray-600">Order ID</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.order_id')}</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Customer</TableHead>
                                 <TableHead className="font-semibold text-gray-600 text-right">Commission (EGP)</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Status</TableHead>
@@ -52,7 +52,7 @@ export default function AffiliateOrdersIndex({ orders, filters }: any) {
                         <TableBody>
                             {orders.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="h-32 text-center text-gray-500">No conversions found.</TableCell>
+                                    <TableCell colSpan={5} className="h-32 text-center text-gray-500">{__('general.no_conversions_found')}</TableCell>
                                 </TableRow>
                             ) : (
                                 orders.data.map((order: any) => (

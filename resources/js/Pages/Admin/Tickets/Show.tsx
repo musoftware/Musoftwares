@@ -256,9 +256,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                     href="/admin/tickets"
                     className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors"
                 >
-                    <ArrowLeft className="h-4 w-4" />
-                    All Tickets
-                </Link>
+                    <ArrowLeft className="h-4 w-4" />{__('general.all_tickets')}</Link>
                 <div className="flex items-center gap-2">
                     <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${statusMeta.badge}`}>
                         <span className={`h-1.5 w-1.5 rounded-full ${statusMeta.dot}`} />
@@ -267,8 +265,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                     {!isClosed ? (
                         <Button size="sm" variant="outline" onClick={() => setCloseModalOpen(true)}
                             className="border-emerald-200 text-emerald-700 hover:bg-emerald-50">
-                            <CheckCircle className="mr-1.5 h-4 w-4" /> Close Ticket
-                        </Button>
+                            <CheckCircle className="mr-1.5 h-4 w-4" />{__('general.close_ticket')}</Button>
                     ) : (
                         <Button size="sm" variant="outline" onClick={handleReopen}
                             className="border-amber-200 text-amber-700 hover:bg-amber-50">
@@ -282,13 +279,13 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
             {ticket.is_urgent && !isClosed && (
                 <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     <Zap className="h-4 w-4 flex-shrink-0 text-red-500" />
-                    <span><strong>Urgent ticket</strong> — High priority and still open. Please respond ASAP.</span>
+                    <span><strong>{__('general.urgent_ticket')}</strong> — High priority and still open. Please respond ASAP.</span>
                 </div>
             )}
             {ticket.needs_attention && !ticket.is_urgent && !isClosed && (
                 <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
                     <AlertTriangle className="h-4 w-4 flex-shrink-0 text-amber-500" />
-                    <span>This ticket needs attention — the client is waiting for a reply.</span>
+                    <span>{__('general.this_ticket_needs_attention_the_client_is_waiting_for_a_reply')}</span>
                 </div>
             )}
 
@@ -340,7 +337,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                     {messages.length === 0 && !isClosed && (
                         <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 py-10 text-center">
                             <MessageSquare className="mx-auto h-8 w-8 text-slate-300 mb-2" />
-                            <p className="text-sm text-slate-400">No replies yet — be the first to respond.</p>
+                            <p className="text-sm text-slate-400">{__('general.no_replies_yet_be_the_first_to_respond')}</p>
                         </div>
                     )}
 
@@ -376,14 +373,11 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                                 {msg.sender?.name ?? 'Unknown'}
                                             </span>
                                             {isAdminMsg && (
-                                                <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold text-indigo-600">
-                                                    Support Agent
-                                                </span>
+                                                <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold text-indigo-600">{__('general.support_agent')}</span>
                                             )}
                                             {isInternal && (
                                                 <span className="flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
-                                                    <Lock className="h-3 w-3" /> Private Note
-                                                </span>
+                                                    <Lock className="h-3 w-3" />{__('general.private_note')}</span>
                                             )}
                                             <span className="text-[10px] text-slate-400" title={fullDate(msg.created_at)}>
                                                 {relativeTime(msg.created_at)}
@@ -416,9 +410,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                             checked={isInternal}
                                             onChange={(e) => setIsInternal(e.target.checked)}
                                             className="rounded text-amber-500 border-slate-300 focus:ring-amber-500 h-3.5 w-3.5"
-                                        />
-                                        Internal Note
-                                    </label>
+                                        />{__('general.internal_note')}</label>
                                 </div>
                             </div>
                             <form onSubmit={handleReply} className="p-4 space-y-3">
@@ -431,7 +423,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                             onChange={insertCannedResponse}
                                             defaultValue=""
                                         >
-                                            <option value="" disabled>Insert Quick Reply...</option>
+                                            <option value="" disabled>{__('general.insert_quick_reply')}</option>
                                             {cannedResponses.map(cr => (
                                                 <option key={cr.id} value={cr.body}>{cr.title}</option>
                                             ))}
@@ -474,9 +466,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                             onClick={() => fileInputRef.current?.click()}
                                             className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-colors"
                                         >
-                                            <Paperclip className="h-3.5 w-3.5" />
-                                            Attach Files
-                                        </button>
+                                            <Paperclip className="h-3.5 w-3.5" />{__('general.attach_files')}</button>
                                         <input
                                             ref={fileInputRef}
                                             type="file"
@@ -517,16 +507,14 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 flex items-center gap-3">
                             <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0" />
                             <div>
-                                <p className="text-sm font-semibold text-emerald-800">This ticket has been resolved</p>
+                                <p className="text-sm font-semibold text-emerald-800">{__('general.this_ticket_has_been_resolved')}</p>
                                 {ticket.closed_at && (
                                     <p className="text-xs text-emerald-600 mt-0.5">Closed on {fullDate(ticket.closed_at)}</p>
                                 )}
                                 <button
                                     onClick={handleReopen}
                                     className="mt-1 text-xs text-emerald-700 underline underline-offset-2 hover:text-emerald-900"
-                                >
-                                    Reopen ticket
-                                </button>
+                                >{__('general.reopen_ticket')}</button>
                             </div>
                         </div>
                     )}
@@ -538,7 +526,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                     {/* Ticket Details */}
                     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                         <div className="border-b border-slate-100 px-5 py-3">
-                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Ticket Details</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">{__('general.ticket_details')}</h3>
                         </div>
                         <dl className="divide-y divide-slate-100">
                             <div className="flex items-center justify-between px-5 py-3">
@@ -590,9 +578,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                         href={`/admin/users/${ticket.user.id}`}
                                         className="mt-2 inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
                                     >
-                                        <User className="h-3.5 w-3.5" />
-                                        View profile
-                                        <ExternalLink className="h-3 w-3" />
+                                        <User className="h-3.5 w-3.5" />{__('general.view_profile')}<ExternalLink className="h-3 w-3" />
                                     </Link>
                                 )}
                             </div>
@@ -622,7 +608,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                     {/* Quick actions */}
                     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                         <div className="border-b border-slate-100 px-5 py-3">
-                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Quick Actions</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">{__('general.quick_actions')}</h3>
                         </div>
                         <div className="p-4 space-y-2">
                             {!isClosed ? (
@@ -630,22 +616,19 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                     onClick={() => setCloseModalOpen(true)}
                                     className="w-full flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors border border-emerald-200"
                                 >
-                                    <CheckCircle className="h-4 w-4" /> Mark as Resolved
-                                </button>
+                                    <CheckCircle className="h-4 w-4" />{__('general.mark_as_resolved')}</button>
                             ) : (
                                 <button
                                     onClick={handleReopen}
                                     className="w-full flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 transition-colors border border-amber-200"
                                 >
-                                    <RotateCcw className="h-4 w-4" /> Reopen Ticket
-                                </button>
+                                    <RotateCcw className="h-4 w-4" />{__('general.reopen_ticket_1')}</button>
                             )}
                             <Link
                                 href="/admin/tickets"
                                 className="w-full flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-200"
                             >
-                                <ArrowLeft className="h-4 w-4" /> Back to All Tickets
-                            </Link>
+                                <ArrowLeft className="h-4 w-4" />{__('general.back_to_all_tickets')}</Link>
                         </div>
                     </div>
 
@@ -657,16 +640,14 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
             <Dialog open={closeModalOpen} onOpenChange={setCloseModalOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Close Ticket</DialogTitle>
+                        <DialogTitle>{__('general.close_ticket')}</DialogTitle>
                     </DialogHeader>
                     <div className="py-4">
-                        <p className="text-sm text-slate-600 mb-4">
-                            You are about to mark this ticket as resolved. You can optionally send a final comment to the user before closing it.
-                        </p>
+                        <p className="text-sm text-slate-600 mb-4">{__('general.you_are_about_to_mark_this_ticket_as_resolved_you_can_optionally_send_a_final_comment_to_the_user_before_closing_it')}</p>
                         <textarea
                             className="w-full rounded-lg border-slate-200 text-sm focus:ring-emerald-200 focus:border-emerald-400 placeholder-slate-400"
                             rows={4}
-                            placeholder="Optional final comment..."
+                            placeholder={__('general.optional_final_comment')}
                             value={closeComment}
                             onChange={(e) => setCloseComment(e.target.value)}
                         />
@@ -676,9 +657,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                         <Button 
                             onClick={handleCloseConfirm}
                             className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                        >
-                            Close Ticket
-                        </Button>
+                        >{__('general.close_ticket')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

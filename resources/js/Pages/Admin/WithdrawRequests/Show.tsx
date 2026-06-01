@@ -51,7 +51,7 @@ export default function Show({ withdrawRequest }: Props) {
     const badge = statusStyles[withdrawRequest.status] ?? { cls: 'bg-slate-100 text-slate-700', label: withdrawRequest.status };
 
     return (
-        <AdminSidebarLayout title="Withdraw Request" header="Withdraw Request Detail">
+        <AdminSidebarLayout title={__('general.withdraw_request')} header="Withdraw Request Detail">
             <Head title={`Withdraw Request #${withdrawRequest.id}`} />
 
             {/* Back link */}
@@ -60,9 +60,7 @@ export default function Show({ withdrawRequest }: Props) {
                     href="/admin/withdraw-requests"
                     className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors"
                 >
-                    <ArrowLeft className="h-4 w-4" />
-                    Back to Withdraw Requests
-                </Link>
+                    <ArrowLeft className="h-4 w-4" />{__('general.back_to_withdraw_requests')}</Link>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -92,8 +90,7 @@ export default function Show({ withdrawRequest }: Props) {
 
                             <div>
                                 <dt className="text-slate-500 flex items-center gap-1.5 mb-1">
-                                    <FileText className="h-3.5 w-3.5" /> Payment Method
-                                </dt>
+                                    <FileText className="h-3.5 w-3.5" />{__('general.payment_method')}</dt>
                                 <dd className="font-medium text-slate-800">
                                     {withdrawRequest.method?.name ?? '—'}
                                 </dd>
@@ -101,8 +98,7 @@ export default function Show({ withdrawRequest }: Props) {
 
                             <div>
                                 <dt className="text-slate-500 flex items-center gap-1.5 mb-1">
-                                    <Calendar className="h-3.5 w-3.5" /> Requested At
-                                </dt>
+                                    <Calendar className="h-3.5 w-3.5" />{__('general.requested_at')}</dt>
                                 <dd className="text-slate-700">
                                     {new Date(withdrawRequest.created_at).toLocaleString()}
                                 </dd>
@@ -110,8 +106,7 @@ export default function Show({ withdrawRequest }: Props) {
 
                             <div>
                                 <dt className="text-slate-500 flex items-center gap-1.5 mb-1">
-                                    <Clock className="h-3.5 w-3.5" /> Last Updated
-                                </dt>
+                                    <Clock className="h-3.5 w-3.5" />{__('general.last_updated')}</dt>
                                 <dd className="text-slate-700">
                                     {new Date(withdrawRequest.updated_at).toLocaleString()}
                                 </dd>
@@ -188,8 +183,7 @@ export default function Show({ withdrawRequest }: Props) {
                                         disabled={loading}
                                         onClick={() => updateStatus('reviewing')}
                                     >
-                                        <Clock className="h-4 w-4" /> Mark as Reviewing
-                                    </Button>
+                                        <Clock className="h-4 w-4" />{__('general.mark_as_reviewing')}</Button>
                                 )}
                             </div>
                         </div>
@@ -206,8 +200,7 @@ export default function Show({ withdrawRequest }: Props) {
                                 disabled={loading}
                                 onClick={() => updateStatus('reviewing')}
                             >
-                                <Clock className="h-4 w-4" /> Reopen as Reviewing
-                            </Button>
+                                <Clock className="h-4 w-4" />{__('general.reopen_as_reviewing')}</Button>
                         </div>
                     )}
                 </div>

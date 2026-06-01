@@ -30,7 +30,7 @@ class ResolveTenantDomain
             ->first();
 
         if (!$tenantDomain) {
-            abort(404, "Custom domain not registered or not verified.");
+            abort(404, __('general.custom_domain_not_registered_or_not_verified'));
         }
 
         // Bind the tenant ID to the request attributes so controllers know 

@@ -74,7 +74,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
         router.post(`/admin/users/${client.id}/update-role`, { role: selectedRole }, {
             onSuccess: () => {
                 setIsChangeRoleOpen(false);
-                alert(__("User role updated successfully!"));
+                alert(__("general.user_role_updated_successfully"));
             }
         });
     };
@@ -176,17 +176,16 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
     return (
         <AdminSidebarLayout title={`User Profile: ${client.name}`} header="User Details">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold font-sora">User Profile</h1>
+                <h1 className="text-3xl font-bold font-sora">{__('general.user_profile')}</h1>
                 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                    <div role="button" className="inline-flex cursor-pointer items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-[8px] hover:bg-slate-800 transition shadow-sm text-sm font-semibold select-none">
-                        Quick Actions <ChevronDown size={16} />
+                    <div role="button" className="inline-flex cursor-pointer items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-[8px] hover:bg-slate-800 transition shadow-sm text-sm font-semibold select-none">{__('general.quick_actions')}<ChevronDown size={16} />
                     </div>
                 </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
                         <DropdownMenuGroup>
-                            <DropdownMenuLabel>Account & Tools</DropdownMenuLabel>
+                            <DropdownMenuLabel>{__('general.account_tools')}</DropdownMenuLabel>
                             <DropdownMenuItem onClick={handleLoginAsUser} disabled={isLoginAsLoading}>
                                 <Briefcase className="mr-2 h-4 w-4" />
                                 <span>{isLoginAsLoading ? 'Logging in...' : 'Login As'}</span>
@@ -194,20 +193,20 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/users/${client.id}/edit`} className="w-full cursor-pointer flex items-center">
                                     <Edit className="mr-2 h-4 w-4" />
-                                    <span>Edit Profile</span>
+                                    <span>{__('general.edit_profile')}</span>
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => { setIsResetPassOpen(true); setNewPassword(''); }}>
                                 <Key className="mr-2 h-4 w-4" />
-                                <span>Reset Password</span>
+                                <span>{__('general.reset_password')}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => { setSelectedRole(client.role || 'client'); setIsChangeRoleOpen(true); }}>
                                 <ShieldCheck className="mr-2 h-4 w-4" />
-                                <span>Change Role</span>
+                                <span>{__('general.change_role')}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => setIsAssignTaskOpen(true)}>
                                 <Briefcase className="mr-2 h-4 w-4" />
-                                <span>Assign Task</span>
+                                <span>{__('general.assign_task')}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/users/${client.id}/files`} className="w-full cursor-pointer flex items-center">
@@ -224,12 +223,12 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/users/${client.id}/referrals`} className="w-full cursor-pointer flex items-center">
                                     <MessageCircle className="mr-2 h-4 w-4" />
-                                    <span>Manage Referrals</span>
+                                    <span>{__('general.manage_referrals')}</span>
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => setIsActivateMembershipOpen(true)}>
                                 <Briefcase className="mr-2 h-4 w-4" />
-                                <span>Activate Membership</span>
+                                <span>{__('general.activate_membership')}</span>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
@@ -238,7 +237,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/invoices/create?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
                                     <FileText className="mr-2 h-4 w-4" />
-                                    <span>New Invoice</span>
+                                    <span>{__('general.new_invoice')}</span>
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
@@ -250,7 +249,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/finance?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
                                     <Wallet className="mr-2 h-4 w-4" />
-                                    <span>All Transactions</span>
+                                    <span>{__('general.all_transactions')}</span>
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -259,51 +258,51 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                 setIsWalletModalOpen(true);
                             }}>
                                 <Wallet className="mr-2 h-4 w-4" />
-                                <span>Receive Money</span>
+                                <span>{__('general.receive_money')}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => {
                                 setWalletTxForm({ ...walletTxForm, type: 'send-money' });
                                 setIsWalletModalOpen(true);
                             }}>
                                 <Wallet className="mr-2 h-4 w-4" />
-                                <span>Send Money</span>
+                                <span>{__('general.send_money')}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => {
                                 setWalletTxForm({ ...walletTxForm, type: 'earn' });
                                 setIsWalletModalOpen(true);
                             }}>
                                 <Wallet className="mr-2 h-4 w-4" />
-                                <span>Earned Money</span>
+                                <span>{__('general.earned_money')}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => {
                                 setWalletTxForm({ ...walletTxForm, type: 'charge' });
                                 setIsWalletModalOpen(true);
                             }}>
                                 <Wallet className="mr-2 h-4 w-4" />
-                                <span>Charge Account</span>
+                                <span>{__('general.charge_account')}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => {
                                 setWalletTxForm({ ...walletTxForm, type: 'refund' });
                                 setIsWalletModalOpen(true);
                             }}>
                                 <Wallet className="mr-2 h-4 w-4" />
-                                <span>Refund Money</span>
+                                <span>{__('general.refund_money')}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => setIsSwapBudgetOpen(true)}>
                                 <Wallet className="mr-2 h-4 w-4" />
-                                <span>Swap Budgets</span>
+                                <span>{__('general.swap_budgets')}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <a href={`/admin/users/${client.id}/balance-sheet`} target="_blank" rel="noopener noreferrer" className="w-full cursor-pointer flex items-center">
                                     <FileText className="mr-2 h-4 w-4" />
-                                    <span>Due Balance Sheet</span>
+                                    <span>{__('general.due_balance_sheet')}</span>
                                 </a>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-600">
                             <Trash2 className="mr-2 h-4 w-4" />
-                            <span>Delete User</span>
+                            <span>{__('general.delete_user')}</span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -314,17 +313,15 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                 <DialogContent>
                     <form onSubmit={submitAssignTask}>
                         <DialogHeader>
-                            <DialogTitle>Assign Task</DialogTitle>
-                            <DialogDescription>
-                                Create an ERP Task for this client.
-                            </DialogDescription>
+                            <DialogTitle>{__('general.assign_task')}</DialogTitle>
+                            <DialogDescription>{__('general.create_an_erp_task_for_this_client')}</DialogDescription>
                         </DialogHeader>
                         <div className="py-4">
-                            <p className="text-sm text-gray-500">This will create a new task named <strong>{client.name}'s Task</strong> and link it to their ERP account.</p>
+                            <p className="text-sm text-gray-500">{__('general.this_will_create_a_new_task_named')}<strong>{client.name}'s Task</strong>{__('general.and_link_it_to_their_erp_account')}</p>
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsAssignTaskOpen(false)}>Cancel</Button>
-                            <Button type="submit">Create Task</Button>
+                            <Button type="submit">{__('general.create_task')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -334,21 +331,19 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                 <DialogContent>
                     <form onSubmit={submitSwapBudget}>
                         <DialogHeader>
-                            <DialogTitle>Swap Budgets</DialogTitle>
-                            <DialogDescription>
-                                Transfer funds from this user's wallet to another user's wallet.
-                            </DialogDescription>
+                            <DialogTitle>{__('general.swap_budgets')}</DialogTitle>
+                            <DialogDescription>{__('general.transfer_funds_from_this_user_s_wallet_to_another_user_s_wallet')}</DialogDescription>
                         </DialogHeader>
                         <div className="py-4">
-                            <p className="text-sm text-gray-500 mb-2">Select destination wallet and amount.</p>
+                            <p className="text-sm text-gray-500 mb-2">{__('general.select_destination_wallet_and_amount')}</p>
                             <div className="space-y-4">
-                                <Input type="number" placeholder="Amount to transfer" />
-                                <Input placeholder="Target user email or ID" />
+                                <Input type="number" placeholder={__('general.amount_to_transfer')} />
+                                <Input placeholder={__('general.target_user_email_or_id')} />
                             </div>
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsSwapBudgetOpen(false)}>Cancel</Button>
-                            <Button type="submit">Transfer Funds</Button>
+                            <Button type="submit">{__('general.transfer_funds')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -358,14 +353,12 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                 <DialogContent>
                     <form onSubmit={submitActivateMembership}>
                         <DialogHeader>
-                            <DialogTitle>Activate Membership</DialogTitle>
-                            <DialogDescription>
-                                Manually assign a subscription plan to this user.
-                            </DialogDescription>
+                            <DialogTitle>{__('general.activate_membership')}</DialogTitle>
+                            <DialogDescription>{__('general.manually_assign_a_subscription_plan_to_this_user')}</DialogDescription>
                         </DialogHeader>
                         <div className="py-4 space-y-4">
                             <div>
-                                <Label>Select Plan</Label>
+                                <Label>{__('general.select_plan')}</Label>
                                 <select 
                                     className="border-gray-300 rounded-md w-full mt-1"
                                     value={membershipForm.plan_id}
@@ -387,12 +380,12 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                     required 
                                     className="mt-1"
                                 />
-                                <p className="text-xs text-gray-500 mt-1">E.g., enter 1 for a 1-day test.</p>
+                                <p className="text-xs text-gray-500 mt-1">{__('general.e_g_enter_1_for_a_1_day_test')}</p>
                             </div>
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsActivateMembershipOpen(false)}>Cancel</Button>
-                            <Button type="submit">Activate Plan</Button>
+                            <Button type="submit">{__('general.activate_plan')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -402,14 +395,14 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                 <DialogContent>
                     <form onSubmit={submitChangeRole}>
                         <DialogHeader>
-                            <DialogTitle>{__("Change User Role")}</DialogTitle>
+                            <DialogTitle>{__("general.change_user_role")}</DialogTitle>
                             <DialogDescription>
-                                {__("Change direct permissions and role access level for this user.")}
+                                {__("general.change_direct_permissions_and_role_access_level_for_this_user")}
                             </DialogDescription>
                         </DialogHeader>
                         <div className="py-4 space-y-4">
                             <div>
-                                <Label>{__("Select Role")}</Label>
+                                <Label>{__("general.select_role")}</Label>
                                 <select 
                                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 mt-2"
                                     value={selectedRole}
@@ -419,15 +412,15 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                     <option value="client">{__("Client")}</option>
                                     <option value="user">{__("User")}</option>
                                     <option value="admin">{__("Admin")}</option>
-                                    <option value="manager">{__("Manager")}</option>
+                                    <option value="manager">{__("general.manager")}</option>
                                     <option value="employee">{__("Employee")}</option>
-                                    <option value="moderator">{__("Moderator")}</option>
+                                    <option value="moderator">{__("general.moderator")}</option>
                                 </select>
                             </div>
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsChangeRoleOpen(false)}>{__("Cancel")}</Button>
-                            <Button type="submit">{__("Update Role")}</Button>
+                            <Button type="submit">{__("general.update_role")}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -436,10 +429,8 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
             <Dialog open={isResetPassOpen} onOpenChange={setIsResetPassOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Reset Password</DialogTitle>
-                        <DialogDescription>
-                            Are you sure you want to reset this user's password? A new secure password will be generated.
-                        </DialogDescription>
+                        <DialogTitle>{__('general.reset_password')}</DialogTitle>
+                        <DialogDescription>{__('general.are_you_sure_you_want_to_reset_this_user_s_password_a_new_secure_password_will_be_generated')}</DialogDescription>
                     </DialogHeader>
                     {newPassword ? (
                         <div className="p-4 bg-green-50 border border-green-200 rounded-md">
@@ -452,7 +443,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                     ) : (
                         <DialogFooter>
                             <Button variant="outline" onClick={() => setIsResetPassOpen(false)}>Cancel</Button>
-                            <Button variant="destructive" onClick={handleResetPassword}>Reset Password</Button>
+                            <Button variant="destructive" onClick={handleResetPassword}>{__('general.reset_password')}</Button>
                         </DialogFooter>
                     )}
                 </DialogContent>
@@ -465,13 +456,11 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                             <DialogTitle>
                                 {walletTxForm.type === 'credit' ? 'Receive Money' : 'Send Money'}
                             </DialogTitle>
-                            <DialogDescription>
-                                Add or remove funds directly from the user's platform wallet.
-                            </DialogDescription>
+                            <DialogDescription>{__('general.add_or_remove_funds_directly_from_the_user_s_platform_wallet')}</DialogDescription>
                         </DialogHeader>
                         <div className="py-4 space-y-4">
                             <div>
-                                <Label>Select Wallet</Label>
+                                <Label>{__('general.select_wallet')}</Label>
                                 <select 
                                     className="w-full mt-1 rounded-md border-gray-300"
                                     value={walletTxForm.wallet_id}
@@ -515,24 +504,24 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                                 onChange={(e) => setWalletTxForm({ ...walletTxForm, is_used: e.target.checked })}
                                                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                             />
-                                            <Label htmlFor="is_used" className="font-normal cursor-pointer text-gray-700">Mark as Used</Label>
+                                            <Label htmlFor="is_used" className="font-normal cursor-pointer text-gray-700">{__('general.mark_as_used')}</Label>
                                         </div>
                                     )}
                                 </div>
                             )}
 
                             <div>
-                                <Label>Description / Reason</Label>
+                                <Label>{__('general.description_reason')}</Label>
                                 <Input 
                                     value={walletTxForm.description}
                                     onChange={(e) => setWalletTxForm({ ...walletTxForm, description: e.target.value })}
-                                    placeholder="Optional note"
+                                    placeholder={__('general.optional_note')}
                                 />
                             </div>
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsWalletModalOpen(false)}>Cancel</Button>
-                            <Button type="submit">Confirm Transaction</Button>
+                            <Button type="submit">{__('general.confirm_transaction')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -543,10 +532,8 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                 <DialogContent>
                     <form onSubmit={submitEditMembership}>
                         <DialogHeader>
-                            <DialogTitle>Edit Membership</DialogTitle>
-                            <DialogDescription>
-                                Modify the subscription status and expiration date.
-                            </DialogDescription>
+                            <DialogTitle>{__('general.edit_membership')}</DialogTitle>
+                            <DialogDescription>{__('general.modify_the_subscription_status_and_expiration_date')}</DialogDescription>
                         </DialogHeader>
                         <div className="py-4 space-y-4">
                             <div>
@@ -564,7 +551,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                 </select>
                             </div>
                             <div>
-                                <Label>Expires At</Label>
+                                <Label>{__('general.expires_at')}</Label>
                                 <Input 
                                     type="date" 
                                     value={editMembershipForm.expires_at}
@@ -576,7 +563,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsEditMembershipOpen(false)}>Cancel</Button>
-                            <Button type="submit">Save Changes</Button>
+                            <Button type="submit">{__('general.save_changes')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -598,9 +585,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                             Role: {client.role || 'client'}
                         </span>
                         {client.kyc_verified ? (
-                            <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold uppercase tracking-wide border border-green-200">
-                                KYC Verified
-                            </span>
+                            <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold uppercase tracking-wide border border-green-200">{__('general.kyc_verified')}</span>
                         ) : (
                             <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold uppercase tracking-wide border border-amber-200">
                                 Unverified
@@ -642,37 +627,36 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                 <div className="col-span-1 space-y-6">
                     <div className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200">
                         <h2 className="text-lg font-bold font-sora text-slate-900 mb-4 border-b pb-2 flex items-center gap-2">
-                            <Briefcase size={18} className="text-slate-400" /> Personal Information
-                        </h2>
+                            <Briefcase size={18} className="text-slate-400" />{__('general.personal_information')}</h2>
                         <div className="space-y-4 text-sm">
                             <div className="grid grid-cols-2 gap-2">
                                 <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Currency</span><span className="font-medium text-slate-900 break-words">{client.currency || <span className="text-slate-400 italic">Default</span>}</span></div>
                                 <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Hour Rate (USD)</span><span className="font-medium text-slate-900 break-words">{client.hour_rate || "0.00"}</span></div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Phone</span><span className="font-medium text-slate-900 break-words">{client.phone || <span className="text-slate-400 italic">Not provided</span>}</span></div>
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">WhatsApp</span><span className="font-medium text-slate-900 break-words">{client.whatsapp_number || <span className="text-slate-400 italic">Not provided</span>}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Phone</span><span className="font-medium text-slate-900 break-words">{client.phone || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">WhatsApp</span><span className="font-medium text-slate-900 break-words">{client.whatsapp_number || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Skype</span><span className="font-medium text-slate-900 break-words">{client.skype || <span className="text-slate-400 italic">Not provided</span>}</span></div>
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Facebook</span><span className="font-medium text-slate-900 break-words">{client.facebook || <span className="text-slate-400 italic">Not provided</span>}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Skype</span><span className="font-medium text-slate-900 break-words">{client.skype || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Facebook</span><span className="font-medium text-slate-900 break-words">{client.facebook || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Job</span><span className="font-medium text-slate-900 break-words">{client.job || <span className="text-slate-400 italic">Not provided</span>}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Job</span><span className="font-medium text-slate-900 break-words">{client.job || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
                                 <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Joined</span><span className="font-medium text-slate-900">{client.created_at ? new Date(client.created_at).toLocaleDateString() : "N/A"}</span></div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Start Date</span><span className="font-medium text-slate-900">{client.date_start ? new Date(client.date_start).toLocaleDateString() : <span className="text-slate-400 italic">Not provided</span>}</span></div>
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">End Date</span><span className="font-medium text-slate-900">{client.date_end ? new Date(client.date_end).toLocaleDateString() : <span className="text-slate-400 italic">Not provided</span>}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.start_date')}</span><span className="font-medium text-slate-900">{client.date_start ? new Date(client.date_start).toLocaleDateString() : <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.end_date')}</span><span className="font-medium text-slate-900">{client.date_end ? new Date(client.date_end).toLocaleDateString() : <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
                             </div>
                             <div>
                                 <span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Address</span>
-                                <span className="font-medium text-slate-900 break-words">{client.address || <span className="text-slate-400 italic">Not provided</span>}</span>
+                                <span className="font-medium text-slate-900 break-words">{client.address || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span>
                             </div>
                             <div className="pt-4 border-t border-slate-100">
                                 <div className="grid grid-cols-2 gap-2">
                                     <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Taxable</span><span className="font-medium text-slate-900">{client.client_taxable ? "Yes" : "No"}</span></div>
-                                    <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Invoice Taxable</span><span className="font-medium text-slate-900">{client.invoice_taxable ? "Yes" : "No"}</span></div>
+                                    <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.invoice_taxable')}</span><span className="font-medium text-slate-900">{client.invoice_taxable ? "Yes" : "No"}</span></div>
                                 </div>
                             </div>
                         </div>
@@ -680,8 +664,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
 
                     <div className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200">
                         <h2 className="text-lg font-bold font-sora text-slate-900 mb-4 border-b pb-2 flex items-center gap-2">
-                            <MessageCircle size={18} className="text-slate-400" /> Referral Program
-                        </h2>
+                            <MessageCircle size={18} className="text-slate-400" />{__('general.referral_program')}</h2>
                         <div className="space-y-4">
                             <div>
                                 <span className="text-sm text-slate-500 block mb-1">Referral Code:</span>
@@ -731,22 +714,21 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                     {/* Financial Summary */}
                     <div className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200">
                         <h2 className="text-lg font-bold font-sora text-slate-900 mb-4 border-b pb-2 flex items-center gap-2">
-                            <Wallet size={18} className="text-slate-400" /> Financial Summary
-                        </h2>
+                            <Wallet size={18} className="text-slate-400" />{__('general.financial_summary')}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                                <span className="text-slate-500 text-sm">Available Balance</span>
+                                <span className="text-slate-500 text-sm">{__('general.available_balance')}</span>
                                 <span className="font-bold text-slate-900 font-jetbrains">{formatCurrency(client.available_balance || 0, client.currency)}</span>
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                                <span className="text-slate-500 text-sm">Unpaid Invoices</span>
+                                <span className="text-slate-500 text-sm">{__('general.unpaid_invoices')}</span>
                                 <span className="font-bold text-red-600 font-jetbrains">{formatCurrency(stats.invoices_unpaid_sum || 0, client.currency)}</span>
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                                <span className="text-slate-500 text-sm">Total Spend</span>
+                                <span className="text-slate-500 text-sm">{__('general.total_spend')}</span>
                                 <HiddenAmount 
                                     amount={formatCurrency((client.total_paid || 0) - (client.total_cost || 0), client.currency)}
-                                    hiddenText={__("Hidden")}
+                                    hiddenText={__("general.hidden")}
                                 />
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
@@ -754,19 +736,19 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                 <span className="font-bold text-green-600 font-jetbrains">{formatCurrency((client.available_balance || 0) - (stats.invoices_unpaid_sum || 0), client.currency)}</span>
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                                <span className="text-slate-500 text-sm">Pending Comm.</span>
+                                <span className="text-slate-500 text-sm">{__('general.pending_comm')}</span>
                                 <span className="font-bold text-amber-600 font-jetbrains">{formatCurrency(client.pending_commission || 0, client.currency)}</span>
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                                <span className="text-slate-500 text-sm">Work Time</span>
+                                <span className="text-slate-500 text-sm">{__('general.work_time')}</span>
                                 <span className="font-bold text-slate-900">0h 0m</span>
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                                <span className="text-slate-500 text-sm">Invoiced Days</span>
+                                <span className="text-slate-500 text-sm">{__('general.invoiced_days')}</span>
                                 <span className="font-bold text-slate-900">0 days</span>
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                                <span className="text-slate-500 text-sm">Reward Points</span>
+                                <span className="text-slate-500 text-sm">{__('general.reward_points')}</span>
                                 <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-bold text-xs">0</span>
                             </div>
                         </div>
@@ -775,8 +757,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                     {/* Mail Sequence */}
                     <div className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200 mb-6">
                         <h2 className="text-lg font-bold font-sora text-slate-900 mb-4 border-b pb-2 flex items-center gap-2">
-                            <Mail size={18} className="text-slate-400" /> Mail Sequence
-                        </h2>
+                            <Mail size={18} className="text-slate-400" />{__('general.mail_sequence')}</h2>
                         {client.active_mail_sequence ? (
                             <div>
                                 <div className="p-3 bg-green-50 border border-green-200 rounded-[8px] flex items-center gap-3 mb-4">
@@ -788,9 +769,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                         <div className="text-xs text-green-700">Current Step: {client.active_mail_sequence.step || 1}</div>
                                     </div>
                                 </div>
-                                <Button variant="outline" className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => alert("Opt out functionality not implemented.")}>
-                                    Opt-Out User
-                                </Button>
+                                <Button variant="outline" className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => alert("Opt out functionality not implemented.")}>{__('general.opt_out_user')}</Button>
                             </div>
                         ) : (
                             <div>
@@ -798,11 +777,9 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                     <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
                                         <Mail size={16} />
                                     </div>
-                                    <div className="text-sm font-medium">No active mail sequence</div>
+                                    <div className="text-sm font-medium">{__('general.no_active_mail_sequence')}</div>
                                 </div>
-                                <Button className="w-full bg-slate-900 text-white hover:bg-slate-800" onClick={() => alert("Enroll functionality not implemented.")}>
-                                    Opt-In Default Sequence
-                                </Button>
+                                <Button className="w-full bg-slate-900 text-white hover:bg-slate-800" onClick={() => alert("Enroll functionality not implemented.")}>{__('general.opt_in_default_sequence')}</Button>
                             </div>
                         )}
                     </div>
@@ -811,8 +788,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                     {client.subscription_date && (
                     <div className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200">
                         <h2 className="text-lg font-bold font-sora text-slate-900 mb-4 border-b pb-2 flex items-center gap-2">
-                            <Briefcase size={18} className="text-slate-400" /> Active Subscription
-                        </h2>
+                            <Briefcase size={18} className="text-slate-400" />{__('general.active_subscription')}</h2>
                         <div className="flex justify-between items-center">
                             {new Date(client.subscription_date) > new Date() ? (() => {
                                 const daysRemaining = Math.max(0, Math.ceil((new Date(client.subscription_date) - new Date()) / (1000 * 60 * 60 * 24)));
@@ -846,7 +822,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                         <Trash2 size={24} />
                                     </div>
                                     <h5 className="text-red-600 font-bold text-lg mb-1">Expired</h5>
-                                    <p className="text-sm text-slate-500">Subscription has ended</p>
+                                    <p className="text-sm text-slate-500">{__('general.subscription_has_ended')}</p>
                                 </div>
                             )}
                         </div>
@@ -856,8 +832,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                     {/* User Subscriptions List */}
                     <div className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200">
                         <h2 className="text-lg font-bold font-sora text-slate-900 mb-4 border-b pb-2 flex items-center gap-2">
-                            <Briefcase size={18} className="text-slate-400" /> User Subscriptions
-                        </h2>
+                            <Briefcase size={18} className="text-slate-400" />{__('general.user_subscriptions')}</h2>
                         {subscriptions && subscriptions.length > 0 ? (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left text-sm">
@@ -865,7 +840,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                         <tr>
                                             <th className="p-3 font-bold text-slate-600">Module</th>
                                             <th className="p-3 font-bold text-slate-600">Status</th>
-                                            <th className="p-3 font-bold text-slate-600">Expires At</th>
+                                            <th className="p-3 font-bold text-slate-600">{__('general.expires_at')}</th>
                                             <th className="p-3 text-right font-bold text-slate-600">Actions</th>
                                         </tr>
                                     </thead>
@@ -901,9 +876,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                 </table>
                             </div>
                         ) : (
-                            <p className="text-sm text-slate-500 italic p-4 bg-slate-50 rounded-md">
-                                No module subscriptions found.
-                            </p>
+                            <p className="text-sm text-slate-500 italic p-4 bg-slate-50 rounded-md">{__('general.no_module_subscriptions_found')}</p>
                         )}
                     </div>
 
@@ -919,9 +892,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                 </span>
                             </div>
 
-                            <h3 className="mb-3 text-sm font-bold tracking-wider text-slate-500 uppercase">
-                                Transaction History
-                            </h3>
+                            <h3 className="mb-3 text-sm font-bold tracking-wider text-slate-500 uppercase">{__('general.transaction_history')}</h3>
                             {wallet.transactions && wallet.transactions.length > 0 ? (
                                 <div className="overflow-x-auto">
                                 <table className="w-full text-left text-sm">
@@ -946,9 +917,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                 </table>
                                 </div>
                             ) : (
-                                <p className="text-sm text-slate-500 italic p-4 bg-slate-50 rounded-md">
-                                    No transactions found in this wallet.
-                                </p>
+                                <p className="text-sm text-slate-500 italic p-4 bg-slate-50 rounded-md">{__('general.no_transactions_found_in_this_wallet')}</p>
                             )}
                         </div>
                     ))}
@@ -960,16 +929,12 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                     <ShieldCheck size={24} />
                 </div>
                 <div className="text-center">
-                    <h3 className="text-lg font-bold text-slate-900 font-sora mb-1">Secure Notes</h3>
-                    <p className="text-sm text-slate-500 mb-4 max-w-md mx-auto">
-                        View and manage end-to-end encrypted notes, passwords, and sensitive information for this user.
-                    </p>
+                    <h3 className="text-lg font-bold text-slate-900 font-sora mb-1">{__('general.secure_notes')}</h3>
+                    <p className="text-sm text-slate-500 mb-4 max-w-md mx-auto">{__('general.view_and_manage_end_to_end_encrypted_notes_passwords_and_sensitive_information_for_this_user')}</p>
                     <Link 
                         href={`/admin/users/${client.id}/notes`}
                         className="inline-flex items-center justify-center px-4 py-2 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition"
-                    >
-                        Open Secure Notes
-                    </Link>
+                    >{__('general.open_secure_notes')}</Link>
                 </div>
             </div>
         </AdminSidebarLayout>

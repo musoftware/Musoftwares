@@ -94,12 +94,12 @@ export default function Index({ vouchers }) {
         <div className="space-y-4 max-h-[65vh] overflow-y-auto p-1 pr-2">
             {/* Name */}
             <div>
-                <Label htmlFor="name">Voucher Name</Label>
+                <Label htmlFor="name">{__('general.voucher_name')}</Label>
                 <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => set('name', e.target.value)}
-                    placeholder="e.g. Summer Bonus"
+                    placeholder={__('general.e_g_summer_bonus')}
                     required
                 />
             </div>
@@ -113,13 +113,13 @@ export default function Index({ vouchers }) {
                     rows={2}
                     value={formData.description}
                     onChange={(e) => set('description', e.target.value)}
-                    placeholder="Optional description..."
+                    placeholder={__('general.optional_description')}
                 />
             </div>
 
             {/* Type */}
             <div>
-                <Label htmlFor="type">Reward Type</Label>
+                <Label htmlFor="type">{__('general.reward_type')}</Label>
                 <select
                     id="type"
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black"
@@ -127,7 +127,7 @@ export default function Index({ vouchers }) {
                     onChange={(e) => set('type', e.target.value)}
                     required
                 >
-                    <option value="fixed">Fixed Amount</option>
+                    <option value="fixed">{__('general.fixed_amount')}</option>
                     <option value="percentage">Percentage</option>
                 </select>
             </div>
@@ -135,7 +135,7 @@ export default function Index({ vouchers }) {
             {/* Spend */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <Label htmlFor="spend_amount">Spend Amount</Label>
+                    <Label htmlFor="spend_amount">{__('general.spend_amount')}</Label>
                     <Input
                         id="spend_amount"
                         type="number"
@@ -147,14 +147,14 @@ export default function Index({ vouchers }) {
                     />
                 </div>
                 <div>
-                    <Label htmlFor="spend_currency">Spend Currency ID</Label>
+                    <Label htmlFor="spend_currency">{__('general.spend_currency_id')}</Label>
                     <Input
                         id="spend_currency"
                         type="number"
                         min="1"
                         value={formData.spend_currency}
                         onChange={(e) => set('spend_currency', e.target.value)}
-                        placeholder="Currency ID"
+                        placeholder={__('general.currency_id')}
                         required
                     />
                 </div>
@@ -163,7 +163,7 @@ export default function Index({ vouchers }) {
             {/* Reward */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <Label htmlFor="reward_amount">Reward Amount</Label>
+                    <Label htmlFor="reward_amount">{__('general.reward_amount')}</Label>
                     <Input
                         id="reward_amount"
                         type="number"
@@ -175,14 +175,14 @@ export default function Index({ vouchers }) {
                     />
                 </div>
                 <div>
-                    <Label htmlFor="reward_currency">Reward Currency ID</Label>
+                    <Label htmlFor="reward_currency">{__('general.reward_currency_id')}</Label>
                     <Input
                         id="reward_currency"
                         type="number"
                         min="1"
                         value={formData.reward_currency}
                         onChange={(e) => set('reward_currency', e.target.value)}
-                        placeholder="Currency ID"
+                        placeholder={__('general.currency_id')}
                         required
                     />
                 </div>
@@ -200,7 +200,7 @@ export default function Index({ vouchers }) {
                         max="100"
                         value={formData.reward_percentage}
                         onChange={(e) => set('reward_percentage', e.target.value)}
-                        placeholder="e.g. 10"
+                        placeholder={__('general.e_g_10')}
                     />
                 </div>
             )}
@@ -208,7 +208,7 @@ export default function Index({ vouchers }) {
             {/* Usage Limits */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <Label htmlFor="max_uses_per_user">Max Uses / User</Label>
+                    <Label htmlFor="max_uses_per_user">{__('general.max_uses_user')}</Label>
                     <Input
                         id="max_uses_per_user"
                         type="number"
@@ -219,7 +219,7 @@ export default function Index({ vouchers }) {
                     />
                 </div>
                 <div>
-                    <Label htmlFor="max_total_uses">Max Total Uses</Label>
+                    <Label htmlFor="max_total_uses">{__('general.max_total_uses')}</Label>
                     <Input
                         id="max_total_uses"
                         type="number"
@@ -234,7 +234,7 @@ export default function Index({ vouchers }) {
             {/* Dates */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <Label htmlFor="starts_at">Starts At</Label>
+                    <Label htmlFor="starts_at">{__('general.starts_at')}</Label>
                     <Input
                         id="starts_at"
                         type="datetime-local"
@@ -243,7 +243,7 @@ export default function Index({ vouchers }) {
                     />
                 </div>
                 <div>
-                    <Label htmlFor="expires_at">Expires At</Label>
+                    <Label htmlFor="expires_at">{__('general.expires_at')}</Label>
                     <Input
                         id="expires_at"
                         type="datetime-local"
@@ -255,14 +255,14 @@ export default function Index({ vouchers }) {
 
             {/* Admin Notes */}
             <div>
-                <Label htmlFor="admin_notes">Admin Notes</Label>
+                <Label htmlFor="admin_notes">{__('general.admin_notes')}</Label>
                 <textarea
                     id="admin_notes"
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black"
                     rows={2}
                     value={formData.admin_notes}
                     onChange={(e) => set('admin_notes', e.target.value)}
-                    placeholder="Internal notes..."
+                    placeholder={__('general.internal_notes')}
                 />
             </div>
 
@@ -275,7 +275,7 @@ export default function Index({ vouchers }) {
                     onChange={(e) => set('is_active', e.target.checked)}
                     className="rounded border-gray-300 text-black focus:ring-black"
                 />
-                <Label htmlFor="is_active">Voucher is Active</Label>
+                <Label htmlFor="is_active">{__('general.voucher_is_active')}</Label>
             </div>
         </div>
     );
@@ -284,7 +284,7 @@ export default function Index({ vouchers }) {
 
     return (
         <AdminSidebarLayout title="Vouchers" header="Vouchers Manager">
-            <Head title="Admin — Vouchers" />
+            <Head title={__('general.admin_vouchers')} />
 
             {/* Header bar */}
             <div className="mb-6 flex items-center justify-between">
@@ -294,10 +294,10 @@ export default function Index({ vouchers }) {
                 </div>
 
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                    <DialogTrigger render={<Button><Plus className="mr-2 h-4 w-4" />Create Voucher</Button>} />
+                    <DialogTrigger render={<Button><Plus className="mr-2 h-4 w-4" />{__('general.create_voucher')}</Button>} />
                     <DialogContent className="max-w-lg">
                         <DialogHeader>
-                            <DialogTitle>Create New Voucher</DialogTitle>
+                            <DialogTitle>{__('general.create_new_voucher')}</DialogTitle>
                         </DialogHeader>
                         <form onSubmit={handleCreateSubmit}>
                             {renderFormFields()}
@@ -305,7 +305,7 @@ export default function Index({ vouchers }) {
                                 <Button type="button" variant="outline" onClick={() => { setIsCreateOpen(false); resetForm(); }}>
                                     Cancel
                                 </Button>
-                                <Button type="submit">Save Voucher</Button>
+                                <Button type="submit">{__('general.save_voucher')}</Button>
                             </DialogFooter>
                         </form>
                     </DialogContent>
@@ -319,7 +319,7 @@ export default function Index({ vouchers }) {
                         <tr>
                             <th className="p-4 font-medium text-gray-600">Name</th>
                             <th className="p-4 font-medium text-gray-600">Type</th>
-                            <th className="p-4 font-medium text-gray-600">Spend → Reward</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.spend_reward')}</th>
                             <th className="p-4 font-medium text-gray-600">Uses</th>
                             <th className="p-4 font-medium text-gray-600">Expires</th>
                             <th className="p-4 font-medium text-gray-600">Status</th>
@@ -388,9 +388,7 @@ export default function Index({ vouchers }) {
                         {items.length === 0 && (
                             <tr>
                                 <td colSpan={7} className="p-8 text-center text-gray-400">
-                                    <Ticket className="mx-auto mb-2 h-8 w-8 opacity-30" />
-                                    No vouchers found.
-                                </td>
+                                    <Ticket className="mx-auto mb-2 h-8 w-8 opacity-30" />{__('general.no_vouchers_found')}</td>
                             </tr>
                         )}
                     </tbody>
@@ -420,7 +418,7 @@ export default function Index({ vouchers }) {
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
-                        <DialogTitle>Edit Voucher</DialogTitle>
+                        <DialogTitle>{__('general.edit_voucher')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleEditSubmit}>
                         {renderFormFields()}
@@ -428,7 +426,7 @@ export default function Index({ vouchers }) {
                             <Button type="button" variant="outline" onClick={() => { setIsEditOpen(false); resetForm(); }}>
                                 Cancel
                             </Button>
-                            <Button type="submit">Save Changes</Button>
+                            <Button type="submit">{__('general.save_changes')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

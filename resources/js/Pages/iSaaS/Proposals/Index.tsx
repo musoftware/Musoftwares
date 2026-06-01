@@ -30,19 +30,17 @@ export default function Index({ proposals, auth }: Props) {
 
     return (
         <AuthenticatedLayout>
-            <Head title="My Proposals" />
+            <Head title={__('general.my_proposals')} />
 
             <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Project Proposals</h1>
-                        <p className="text-gray-500 mt-1">Manage your AI-generated project estimates and proposals.</p>
+                        <h1 className="text-3xl font-bold tracking-tight text-gray-900">{__('general.project_proposals')}</h1>
+                        <p className="text-gray-500 mt-1">{__('general.manage_your_ai_generated_project_estimates_and_proposals')}</p>
                     </div>
                     <Link href={route('isaas.proposals.create')}>
                         <Button>
-                            <Plus className="mr-2 h-4 w-4" />
-                            New Estimate
-                        </Button>
+                            <Plus className="mr-2 h-4 w-4" />{__('general.new_estimate')}</Button>
                     </Link>
                 </div>
 
@@ -52,12 +50,10 @@ export default function Index({ proposals, auth }: Props) {
                             <div className="mx-auto w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                                 <FileText className="h-6 w-6 text-gray-400" />
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">No proposals yet</h3>
-                            <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-                                Create your first AI-generated proposal in seconds to impress your clients.
-                            </p>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">{__('general.no_proposals_yet')}</h3>
+                            <p className="text-gray-500 mb-6 max-w-sm mx-auto">{__('general.create_your_first_ai_generated_proposal_in_seconds_to_impress_your_clients')}</p>
                             <Link href={route('isaas.proposals.create')}>
-                                <Button variant="outline">Create Proposal</Button>
+                                <Button variant="outline">{__('general.create_proposal')}</Button>
                             </Link>
                         </CardContent>
                     </Card>
@@ -80,16 +76,14 @@ export default function Index({ proposals, auth }: Props) {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="flex justify-between items-center mt-2">
-                                        <span className="text-sm text-gray-500">Total Estimate</span>
+                                        <span className="text-sm text-gray-500">{__('general.total_estimate')}</span>
                                         <span className="font-semibold text-gray-900">
                                             {formatMoney(proposal.total_amount, proposal.currency || businessCurrency)}
                                         </span>
                                     </div>
                                     <div className="mt-6">
                                         <Link href={route('isaas.proposals.show', proposal.id)}>
-                                            <Button variant="secondary" className="w-full">
-                                                View Details
-                                            </Button>
+                                            <Button variant="secondary" className="w-full">{__('general.view_details')}</Button>
                                         </Link>
                                     </div>
                                 </CardContent>

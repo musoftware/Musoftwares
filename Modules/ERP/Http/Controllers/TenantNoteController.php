@@ -24,7 +24,7 @@ class TenantNoteController extends Controller
     private function authorizeNote(TenantNote $note, Tenant $tenant): void
     {
         if ($note->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to note.');
+            abort(403, __('general.unauthorized_access_to_note'));
         }
     }
 
@@ -52,7 +52,7 @@ class TenantNoteController extends Controller
             'pinned'     => false,
         ]);
 
-        return back()->with('success', 'Note created.');
+        return back()->with('success', __('general.note_created'));
     }
 
     // ── Update (Save) ────────────────────────────────────────────────
@@ -73,7 +73,7 @@ class TenantNoteController extends Controller
 
         $note->update($validated);
 
-        return back()->with('success', 'Note saved.');
+        return back()->with('success', __('general.note_saved'));
     }
 
     // ── Toggle Pin ───────────────────────────────────────────────────
@@ -103,6 +103,6 @@ class TenantNoteController extends Controller
 
         $note->delete();
 
-        return back()->with('success', 'Note deleted.');
+        return back()->with('success', __('general.note_deleted'));
     }
 }

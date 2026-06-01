@@ -81,24 +81,18 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
     
     return (
         <AuthenticatedLayout header={undefined}>
-            <Head title="Build Your Workspace" />
+            <Head title={__('general.build_your_workspace')} />
 
             {/* ── Hero ── */}
             <div className="max-w-7xl mx-auto px-4 pt-10 pb-6">
                 <Link href={route('subscriptions.manage')} className="inline-flex items-center text-sm text-slate-500 hover:text-slate-800 mb-6 transition-colors">
-                    <ArrowLeft className="w-4 h-4 mr-1.5" /> Back to My Subscriptions
-                </Link>
+                    <ArrowLeft className="w-4 h-4 mr-1.5" />{__('general.back_to_my_subscriptions')}</Link>
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
                         <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full mb-3">
-                            <Crown className="h-3.5 w-3.5" /> Fully Genius System
-                        </div>
-                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
-                            Build Your Workspace
-                        </h1>
-                        <p className="mt-2 text-lg text-slate-500 font-light">
-                            Select exactly what you need. No more, no less.
-                        </p>
+                            <Crown className="h-3.5 w-3.5" />{__('general.fully_genius_system')}</div>
+                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">{__('general.build_your_workspace')}</h1>
+                        <p className="mt-2 text-lg text-slate-500 font-light">{__('general.select_exactly_what_you_need_no_more_no_less')}</p>
                     </div>
                 </div>
             </div>
@@ -166,9 +160,7 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
                                             : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                                     )}
                                 >
-                                    <Sparkles className="h-4 w-4" />
-                                    Start 14-Day Free Trial
-                                </Button>
+                                    <Sparkles className="h-4 w-4" />{__('general.start_14_day_free_trial')}</Button>
                             );
                         }
 
@@ -194,16 +186,13 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
                                     variant="outline"
                                     className="w-full h-12 rounded-xl text-sm font-medium gap-2 border-slate-200 hover:bg-slate-50 text-slate-700"
                                 >
-                                    <CreditCard className="h-4 w-4 text-slate-400" />
-                                    Pay by Card
-                                </Button>
+                                    <CreditCard className="h-4 w-4 text-slate-400" />{__('general.pay_by_card')}</Button>
 
                                 {!canAfford && selectedItems.length > 0 && (
                                     <Link
                                         href={route('financial.add-balance')}
                                         className="flex items-center justify-center gap-1 text-xs text-slate-500 hover:text-slate-700 pt-2"
-                                    >
-                                        Add funds to wallet <ArrowRight className="h-3 w-3" />
+                                    >{__('general.add_funds_to_wallet')}<ArrowRight className="h-3 w-3" />
                                     </Link>
                                 )}
                             </>

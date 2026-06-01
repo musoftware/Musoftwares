@@ -258,7 +258,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                 <div className="md:col-span-2 space-y-6">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
-                            <CardTitle>Contract Details</CardTitle>
+                            <CardTitle>{__('general.contract_details')}</CardTitle>
                             <Button 
                                 type="button" 
                                 variant="outline" 
@@ -273,7 +273,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                         <CardContent className="space-y-4">
                             
                             <div>
-                                <Label htmlFor="project_name">Project Name <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="project_name">{__('general.project_name')}<span className="text-red-500">*</span></Label>
                                 <Input id="project_name" value={data.project_name} onChange={e => setData('project_name', e.target.value)} />
                                 {errors.project_name && <p className="text-sm text-red-500 mt-1">{errors.project_name}</p>}
                             </div>
@@ -293,7 +293,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                     </Select>
                                 </div>
                                 <div>
-                                    <Label htmlFor="total_amount">Total Amount</Label>
+                                    <Label htmlFor="total_amount">{__('general.total_amount')}</Label>
                                     <div className="flex">
                                         <Input type="number" step="0.01" id="total_amount" value={data.total_amount} onChange={e => setData('total_amount', parseFloat(e.target.value))} className="rounded-r-none" />
                                         <Button type="button" variant="outline" className="rounded-l-none" onClick={() => recalculateTotal()}>
@@ -303,14 +303,14 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                     {errors.total_amount && <p className="text-sm text-red-500 mt-1">{errors.total_amount}</p>}
                                 </div>
                                 <div>
-                                    <Label htmlFor="deposit_amount">Deposit Amount</Label>
+                                    <Label htmlFor="deposit_amount">{__('general.deposit_amount')}</Label>
                                     <Input type="number" step="0.01" id="deposit_amount" value={data.deposit_amount} onChange={e => setData('deposit_amount', parseFloat(e.target.value))} />
                                 </div>
                             </div>
 
                             <div className="flex items-center space-x-2 pt-2">
                                 <Switch id="deposit_paid" checked={data.deposit_paid} onCheckedChange={c => setData('deposit_paid', c)} />
-                                <Label htmlFor="deposit_paid">Deposit Paid</Label>
+                                <Label htmlFor="deposit_paid">{__('general.deposit_paid')}</Label>
                             </div>
 
                             <div className="pt-4 border-t">
@@ -320,18 +320,18 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                     {data.items.map((item, index) => (
                                         <div key={index} className="flex flex-col md:flex-row gap-2 items-start border p-3 rounded-md bg-gray-50">
                                             <div className="flex-1 space-y-2">
-                                                <Input placeholder="Item Name (e.g., UI Design)" value={item.item} onChange={e => updateItem(index, 'item', e.target.value)} />
-                                                <Input placeholder="Short Description" value={item.description} onChange={e => updateItem(index, 'description', e.target.value)} />
+                                                <Input placeholder={__('general.item_name_e_g_ui_design')} value={item.item} onChange={e => updateItem(index, 'item', e.target.value)} />
+                                                <Input placeholder={__('general.short_description')} value={item.description} onChange={e => updateItem(index, 'description', e.target.value)} />
                                             </div>
                                             <div className="w-24">
                                                 <Input type="number" placeholder="Hours" value={item.hours} onChange={e => updateItem(index, 'hours', parseFloat(e.target.value))} />
                                             </div>
                                             <div className="w-32 space-y-2">
-                                                <Input type="number" placeholder="Rate/Fixed" value={item.hourly_rate_egp} onChange={e => updateItem(index, 'hourly_rate_egp', parseFloat(e.target.value))} />
+                                                <Input type="number" placeholder={__('general.rate_fixed')} value={item.hourly_rate_egp} onChange={e => updateItem(index, 'hourly_rate_egp', parseFloat(e.target.value))} />
                                                 <Select value={item.frequency} onValueChange={v => updateItem(index, 'frequency', v)}>
                                                     <SelectTrigger><SelectValue/></SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="One-time">One-time</SelectItem>
+                                                        <SelectItem value="One-time">{__('general.one_time')}</SelectItem>
                                                         <SelectItem value="Monthly">Monthly</SelectItem>
                                                         <SelectItem value="Yearly">Yearly</SelectItem>
                                                     </SelectContent>
@@ -347,12 +347,11 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                     ))}
                                 </div>
                                 <Button type="button" variant="outline" size="sm" className="mt-3" onClick={addItem}>
-                                    <Plus className="w-4 h-4 mr-2" /> Add Item
-                                </Button>
+                                    <Plus className="w-4 h-4 mr-2" />{__('general.add_item')}</Button>
                             </div>
 
                             <div className="pt-4 border-t">
-                                <h3 className="text-sm font-medium mb-3">Key Features <span className="text-gray-400 font-normal">(Quotation Bullet Points)</span></h3>
+                                <h3 className="text-sm font-medium mb-3">{__('general.key_features')}<span className="text-gray-400 font-normal">(Quotation Bullet Points)</span></h3>
                                 <div className="space-y-2">
                                     {data.features.map((feature, index) => (
                                         <div key={index} className="flex gap-2">
@@ -364,29 +363,28 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                     ))}
                                 </div>
                                 <Button type="button" variant="outline" size="sm" className="mt-3" onClick={addFeature}>
-                                    <Plus className="w-4 h-4 mr-2" /> Add Feature
-                                </Button>
+                                    <Plus className="w-4 h-4 mr-2" />{__('general.add_feature')}</Button>
                             </div>
 
                             <div className="pt-4 border-t">
-                                <Label htmlFor="payment_terms">Payment Terms</Label>
+                                <Label htmlFor="payment_terms">{__('general.payment_terms')}</Label>
                                 <Textarea id="payment_terms" rows={3} value={data.payment_terms} onChange={e => setData('payment_terms', e.target.value)} className="mt-1" />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
                                 <div>
-                                    <Label htmlFor="start_date">Start Date</Label>
+                                    <Label htmlFor="start_date">{__('general.start_date')}</Label>
                                     <Input type="date" id="start_date" value={data.start_date} onChange={e => setData('start_date', e.target.value)} />
                                 </div>
                                 <div>
-                                    <Label htmlFor="end_date">Estimated Completion Date</Label>
+                                    <Label htmlFor="end_date">{__('general.estimated_completion_date')}</Label>
                                     <Input type="date" id="end_date" value={data.end_date} onChange={e => setData('end_date', e.target.value)} />
                                 </div>
                             </div>
 
                             <div className="pt-4 border-t">
                                 <div className="flex justify-between items-center mb-2">
-                                    <Label htmlFor="description">Contract Description / Content</Label>
+                                    <Label htmlFor="description">{__('general.contract_description_content')}</Label>
                                     <Button type="button" variant="secondary" size="sm" onClick={handleAiReview} disabled={isReviewing}>
                                         <Wand2 className="w-4 h-4 mr-2" />
                                         {isReviewing ? 'Reviewing...' : 'AI Review & Fix'}
@@ -404,7 +402,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                 <div className="space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Client & Status</CardTitle>
+                            <CardTitle>{__('general.client_status')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div>
@@ -413,7 +411,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                     <SelectTrigger className="mt-1"><SelectValue/></SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="draft">Draft</SelectItem>
-                                        <SelectItem value="sent">Sent to Client</SelectItem>
+                                        <SelectItem value="sent">{__('general.sent_to_client')}</SelectItem>
                                         <SelectItem value="signed">Signed</SelectItem>
                                         <SelectItem value="active">Active</SelectItem>
                                         <SelectItem value="completed">Completed</SelectItem>
@@ -422,7 +420,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                             </div>
 
                             <div>
-                                <Label>Contract Language</Label>
+                                <Label>{__('general.contract_language')}</Label>
                                 <Select value={data.lang} onValueChange={v => setData('lang', v)}>
                                     <SelectTrigger className="mt-1"><SelectValue/></SelectTrigger>
                                     <SelectContent>
@@ -438,7 +436,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                             </div>
 
                             <div className="pt-4 border-t">
-                                <Label className="mb-2 block">Assigned Client</Label>
+                                <Label className="mb-2 block">{__('general.assigned_client')}</Label>
                                 
                                 {data.user_id ? (
                                     <div className="flex items-center justify-between p-3 border rounded-md bg-gray-50">
@@ -450,15 +448,15 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                 ) : (
                                     <div className="space-y-3">
                                         <div>
-                                            <Label className="text-xs text-gray-500">Manual Client Name</Label>
-                                            <Input value={data.client_name} onChange={e => setData('client_name', e.target.value)} placeholder="Enter guest name" className="mt-1" />
+                                            <Label className="text-xs text-gray-500">{__('general.manual_client_name')}</Label>
+                                            <Input value={data.client_name} onChange={e => setData('client_name', e.target.value)} placeholder={__('general.enter_guest_name')} className="mt-1" />
                                         </div>
                                         
                                         <div className="relative">
                                             <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
                                             <Input 
                                                 className="pl-9" 
-                                                placeholder="Search system users..." 
+                                                placeholder={__('general.search_system_users')} 
                                                 value={clientSearch}
                                                 onChange={e => setClientSearch(e.target.value)}
                                             />
@@ -486,25 +484,25 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Quotation Info</CardTitle>
+                            <CardTitle>{__('general.quotation_info')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div>
-                                <Label>Quotation Reference</Label>
+                                <Label>{__('general.quotation_reference')}</Label>
                                 <Input value={data.reference} onChange={e => setData('reference', e.target.value)} className="mt-1" />
                             </div>
                             <div>
-                                <Label>Prepared By</Label>
+                                <Label>{__('general.prepared_by')}</Label>
                                 <Input value={data.prepared_by} onChange={e => setData('prepared_by', e.target.value)} className="mt-1" />
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <Label>Valid Until</Label>
+                                    <Label>{__('general.valid_until')}</Label>
                                     <Input type="date" value={data.valid_until} onChange={e => setData('valid_until', e.target.value)} className="mt-1" />
                                 </div>
                                 <div>
                                     <Label>Duration</Label>
-                                    <Input placeholder="e.g. 15 Days" value={data.duration} onChange={e => setData('duration', e.target.value)} className="mt-1" />
+                                    <Input placeholder={__('general.e_g_15_days')} value={data.duration} onChange={e => setData('duration', e.target.value)} className="mt-1" />
                                 </div>
                             </div>
                             
@@ -516,28 +514,28 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                             <div className="space-y-3 pt-3 border-t">
                                 <div className="flex items-center space-x-2">
                                     <Switch id="includes_hosting" checked={data.includes_hosting} onCheckedChange={c => setData('includes_hosting', c)} />
-                                    <Label htmlFor="includes_hosting">Includes Hosting</Label>
+                                    <Label htmlFor="includes_hosting">{__('general.includes_hosting')}</Label>
                                 </div>
                                 {data.includes_hosting && (
-                                    <Input placeholder="Hosting Duration (e.g. 1 Year)" value={data.hosting_duration} onChange={e => setData('hosting_duration', e.target.value)} />
+                                    <Input placeholder={__('general.hosting_duration_e_g_1_year')} value={data.hosting_duration} onChange={e => setData('hosting_duration', e.target.value)} />
                                 )}
 
                                 <div className="flex items-center space-x-2">
                                     <Switch id="includes_support" checked={data.includes_support} onCheckedChange={c => setData('includes_support', c)} />
-                                    <Label htmlFor="includes_support">Includes Support</Label>
+                                    <Label htmlFor="includes_support">{__('general.includes_support')}</Label>
                                 </div>
                                 {data.includes_support && (
-                                    <Input placeholder="Support Duration (e.g. 3 Months)" value={data.support_duration} onChange={e => setData('support_duration', e.target.value)} />
+                                    <Input placeholder={__('general.support_duration_e_g_3_months')} value={data.support_duration} onChange={e => setData('support_duration', e.target.value)} />
                                 )}
                             </div>
 
                             <div className="space-y-3 pt-3 border-t">
                                 <div>
-                                    <Label>Extra Notes</Label>
+                                    <Label>{__('general.extra_notes')}</Label>
                                     <Textarea rows={2} value={data.notes} onChange={e => setData('notes', e.target.value)} className="mt-1" />
                                 </div>
                                 <div>
-                                    <Label>Special Terms</Label>
+                                    <Label>{__('general.special_terms')}</Label>
                                     <Textarea rows={2} value={data.terms} onChange={e => setData('terms', e.target.value)} className="mt-1" />
                                 </div>
                             </div>

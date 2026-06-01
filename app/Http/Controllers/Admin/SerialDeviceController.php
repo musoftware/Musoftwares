@@ -114,14 +114,14 @@ class SerialDeviceController extends Controller
     {
         $this->serialDeviceService->updateStatus($serialDevice, $request->validated('status'));
 
-        return back()->with('success', __('Device status updated.'));
+        return back()->with('success', __('general.device_status_updated'));
     }
 
     public function destroy(SerialDevice $serialDevice): RedirectResponse
     {
         $this->serialDeviceService->deleteDevice($serialDevice);
 
-        return back()->with('success', __('Device deleted.'));
+        return back()->with('success', __('general.device_deleted'));
     }
 
     public function export(Request $request): StreamedResponse

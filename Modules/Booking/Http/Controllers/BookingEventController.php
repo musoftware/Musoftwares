@@ -42,7 +42,7 @@ class BookingEventController extends Controller
             'is_active' => true,
         ]);
 
-        return redirect()->route('booking.events.index')->with('success', 'Booking event created successfully.');
+        return redirect()->route('booking.events.index')->with('success', __('general.booking_event_created_successfully'));
     }
 
     public function edit($slug)
@@ -69,6 +69,6 @@ class BookingEventController extends Controller
 
         $event->update($validated);
 
-        return redirect()->route('booking.events.index')->with('success', 'Booking event updated.');
+        return redirect()->route('booking.events.index')->with('success', __('general.booking_event_updated'));
     }
 }

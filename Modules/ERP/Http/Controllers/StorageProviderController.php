@@ -57,6 +57,6 @@ class StorageProviderController extends Controller
             null
         );
 
-        return redirect()->route('erp.dashboard', ['section' => 'system'])->with('success', 'Storage provider configured successfully.');
+        return redirect()->route('erp.dashboard', ['section' => 'system'])->with('success', __('general.storage_provider_configured_successfully'));
     }
 }

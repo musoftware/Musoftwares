@@ -25,7 +25,7 @@ export default function Login({ status }: { status?: string }) {
 
     return (
         <GuestLayout>
-            <Head title="ERP Team Login" />
+            <Head title={__('general.erp_team_login')} />
 
             <div className="space-y-6">
                 <div className="flex items-center space-x-3 mb-2">
@@ -33,12 +33,8 @@ export default function Login({ status }: { status?: string }) {
                         <Users className="w-6 h-6" />
                     </div>
                     <div className="space-y-0.5">
-                        <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-                            ERP Team Portal
-                        </h1>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">
-                            Sign in to join your team's workspace
-                        </p>
+                        <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">{__('general.erp_team_portal')}</h1>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">{__('general.sign_in_to_join_your_team_s_workspace')}</p>
                     </div>
                 </div>
 
@@ -51,13 +47,11 @@ export default function Login({ status }: { status?: string }) {
 
                 <form onSubmit={submit} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="email" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                            Team Email
-                        </Label>
+                        <Label htmlFor="email" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{__('general.team_email')}</Label>
                         <Input
                             id="email"
                             type="email"
-                            placeholder="name@workspace.com"
+                            placeholder={__('general.name_workspace_com')}
                             value={data.email}
                             autoComplete="username"
                             autoFocus
@@ -110,9 +104,7 @@ export default function Login({ status }: { status?: string }) {
                         <Label
                             htmlFor="remember"
                             className="text-xs font-normal text-zinc-600 dark:text-zinc-400 cursor-pointer select-none"
-                        >
-                            Remember this device
-                        </Label>
+                        >{__('general.remember_this_device')}</Label>
                     </div>
 
                     <div className="pt-2">
@@ -124,10 +116,10 @@ export default function Login({ status }: { status?: string }) {
                             {processing ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin text-white/50" />
-                                    <span>Entering workspace...</span>
+                                    <span>{__('general.entering_workspace')}</span>
                                 </>
                             ) : (
-                                <span>Sign In as Team Member</span>
+                                <span>{__('general.sign_in_as_team_member')}</span>
                             )}
                         </Button>
                     </div>

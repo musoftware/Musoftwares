@@ -170,7 +170,7 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                                                 onValueChange={value => setEditWalletData({...editWalletData, goal_type: value})}
                                             >
                                                 <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder={__('Select Goal Type')} />
+                                                    <SelectValue placeholder={__('general.select_goal_type')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="Investment">{__('Investment')}</SelectItem>
@@ -266,7 +266,7 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                                                 onValueChange={(value: 'buy' | 'sell') => setNewTx({...newTx, type: value})}
                                             >
                                                 <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder={__('Select Type')} />
+                                                    <SelectValue placeholder={__('general.select_type')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="buy">{__('Buy')}</SelectItem>
@@ -289,7 +289,7 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                                                 onValueChange={value => setNewTx({...newTx, karat: value})}
                                             >
                                                 <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder={__('Select Karat')} />
+                                                    <SelectValue placeholder={__('general.select_karat')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="18">18k</SelectItem>
@@ -388,7 +388,7 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                                                         <Dialog>
                                                             <DialogTrigger asChild>
                                                                 <Button variant="ghost" className="h-8 w-8 p-0">
-                                                                    <span className="sr-only">Open menu</span>
+                                                                    <span className="sr-only">{__('general.open_menu')}</span>
                                                                     <MoreHorizontal className="h-4 w-4" />
                                                                 </Button>
                                                             </DialogTrigger>
@@ -444,7 +444,7 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                                             onValueChange={(value: 'buy' | 'sell') => setEditingTx({...editingTx, type: value})}
                                         >
                                             <SelectTrigger className="w-full">
-                                                <SelectValue placeholder={__('Select Type')} />
+                                                <SelectValue placeholder={__('general.select_type')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="buy">{__('Buy')}</SelectItem>
@@ -467,7 +467,7 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                                             onValueChange={value => setEditingTx({...editingTx, karat: parseInt(value)})}
                                         >
                                             <SelectTrigger className="w-full">
-                                                <SelectValue placeholder={__('Select Karat')} />
+                                                <SelectValue placeholder={__('general.select_karat')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="18">18k</SelectItem>

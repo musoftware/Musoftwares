@@ -12,29 +12,25 @@ interface VerificationProps {
 
 export default function Verification({ token }: VerificationProps) {
     return (
-        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">API Verification</h2>}>
-            <Head title="API Authentication - Payment Gateway" />
+        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('general.api_verification')}</h2>}>
+            <Head title={__('general.api_authentication_payment_gateway')} />
 
             <div className="py-8 md:py-12">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                                <KeySquare className="w-6 h-6 text-indigo-600" />
-                                API Authentication
-                            </h1>
-                            <p className="text-slate-500 mt-1">Manage Personal Access Tokens used to authenticate API requests.</p>
+                                <KeySquare className="w-6 h-6 text-indigo-600" />{__('general.api_authentication')}</h1>
+                            <p className="text-slate-500 mt-1">{__('general.manage_personal_access_tokens_used_to_authenticate_api_requests')}</p>
                         </div>
                         <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
-                            <ArrowLeft className="w-4 h-4 mr-2" />
-                            Back to Dashboard
-                        </Button>
+                            <ArrowLeft className="w-4 h-4 mr-2" />{__('general.back_to_dashboard')}</Button>
                     </div>
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Active Access Token</CardTitle>
-                            <CardDescription>Your API requests to the Payment Gateway must be authenticated with a Bearer token.</CardDescription>
+                            <CardTitle>{__('general.active_access_token')}</CardTitle>
+                            <CardDescription>{__('general.your_api_requests_to_the_payment_gateway_must_be_authenticated_with_a_bearer_token')}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {token ? (
@@ -60,7 +56,7 @@ export default function Verification({ token }: VerificationProps) {
                             )}
 
                             <div className="mt-8 pt-6 border-t">
-                                <h4 className="font-semibold text-slate-800 mb-4">Authentication Usage</h4>
+                                <h4 className="font-semibold text-slate-800 mb-4">{__('general.authentication_usage')}</h4>
                                 <pre className="bg-slate-900 text-slate-300 p-4 rounded-xl text-sm overflow-x-auto">
 {`// Example API Request
 curl -X POST https://musoftwares.com/api/sms-payment-gateway/connect \\

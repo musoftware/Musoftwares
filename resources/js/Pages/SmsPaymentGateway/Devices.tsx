@@ -43,7 +43,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
             } else {
                 toast({
                     title: __('Error'),
-                    description: __('Failed to generate connection code.'),
+                    description: __('general.failed_to_generate_connection_code'),
                     variant: 'destructive',
                 });
                 setIsAddModalOpen(false);
@@ -51,7 +51,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
         } catch (error: any) {
             toast({
                 title: __('Error'),
-                description: error.response?.data?.message || __('Failed to generate QR code.'),
+                description: error.response?.data?.message || __('general.failed_to_generate_qr_code'),
                 variant: 'destructive',
             });
             setIsAddModalOpen(false);
@@ -72,7 +72,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                                 <Smartphone className="w-6 h-6 text-indigo-600" />
                                 {__('Android Devices')}
                             </h1>
-                            <p className="text-slate-500 mt-1">{__('Manage all Android phones connected to your Payment Gateway to read SMS receipts.')}</p>
+                            <p className="text-slate-500 mt-1">{__('general.manage_all_android_phones_connected_to_your_payment_gateway_to_read_sms_receipts')}</p>
                         </div>
                         <div className="flex gap-2">
                             <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
@@ -95,7 +95,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                                 </div>
                                 <div className="min-w-0">
                                     <p className="font-semibold text-slate-800 text-sm">{__('Need the Android app?')}</p>
-                                    <p className="text-xs text-slate-500 truncate">{__('Download and install the companion app to connect your phone.')}</p>
+                                    <p className="text-xs text-slate-500 truncate">{__('general.download_and_install_the_companion_app_to_connect_your_phone')}</p>
                                 </div>
                             </div>
                             <a
@@ -119,7 +119,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                             {devices.length === 0 ? (
                                 <div className="text-center py-8">
                                     <Smartphone className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                                    <p className="text-slate-500 mb-4">{__('No Android devices connected.')}</p>
+                                    <p className="text-slate-500 mb-4">{__('general.no_android_devices_connected')}</p>
                                     <Button onClick={handleAddDevice}>
                                         <Plus className="w-4 h-4 mr-2" />
                                         {__('Connect New Device')}
@@ -134,8 +134,8 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                                                 <div>
                                                     <h3 className="font-bold text-lg text-slate-800">{device.device_name || __('Generic Android')}</h3>
                                                     <div className="mt-1 space-y-1">
-                                                        <p className="text-sm font-medium text-slate-700">SIM 1: <span className="font-mono text-slate-500">{device.sim1_number || __('Not set')}</span></p>
-                                                        <p className="text-sm font-medium text-slate-700">SIM 2: <span className="font-mono text-slate-500">{device.sim2_number || __('Not set')}</span></p>
+                                                        <p className="text-sm font-medium text-slate-700">SIM 1: <span className="font-mono text-slate-500">{device.sim1_number || __('general.not_set')}</span></p>
+                                                        <p className="text-sm font-medium text-slate-700">SIM 2: <span className="font-mono text-slate-500">{device.sim2_number || __('general.not_set')}</span></p>
                                                     </div>
                                                     <p className="text-xs text-slate-400 mt-2">{__('Added')}: {new Date(device.created_at).toLocaleDateString()}</p>
                                                 </div>
@@ -165,7 +165,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                             <QrCode className="w-5 h-5 text-indigo-600" /> {__('Connect New Device')}
                         </DialogTitle>
                         <DialogDescription>
-                            {__('Scan this QR code from the Musoftware Payment Gateway Android App to link your device.')}
+                            {__('general.scan_this_qr_code_from_the_musoftware_payment_gateway_android_app_to_link_your_device')}
                         </DialogDescription>
                     </DialogHeader>
                     
@@ -173,7 +173,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                         {isGenerating ? (
                             <div className="flex flex-col items-center">
                                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
-                                <p className="text-slate-500">{__('Generating secure connection code...')}</p>
+                                <p className="text-slate-500">{__('general.generating_secure_connection_code')}</p>
                             </div>
                         ) : qrData ? (
                             <div className="flex flex-col items-center space-y-6 w-full">

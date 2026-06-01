@@ -69,9 +69,7 @@ export default function Show({ tool, userSubscription }: Props) {
                         {/* About */}
                         {tool.description && (
                             <section>
-                                <h2 className="text-base font-semibold text-slate-900 mb-3 pb-2 border-b border-slate-100">
-                                    About this tool
-                                </h2>
+                                <h2 className="text-base font-semibold text-slate-900 mb-3 pb-2 border-b border-slate-100">{__('general.about_this_tool')}</h2>
                                 <div className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">
                                     {tool.description}
                                 </div>
@@ -91,9 +89,7 @@ export default function Show({ tool, userSubscription }: Props) {
                         {/* Release Notes */}
                         {(tool.versions ?? []).length > 0 && (
                             <section>
-                                <h2 className="text-base font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100">
-                                    Release Notes
-                                </h2>
+                                <h2 className="text-base font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100">{__('general.release_notes')}</h2>
                                 <ReleaseNotes
                                     versions={tool.versions}
                                     defaultExpanded={tool.versions[0]?.version ?? null}
@@ -105,9 +101,7 @@ export default function Show({ tool, userSubscription }: Props) {
                         {safeRequirements.length > 0 && (
                             <section>
                                 <h2 className="text-base font-semibold text-slate-900 mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">
-                                    <Cpu className="h-4 w-4 text-slate-400" />
-                                    System Requirements
-                                </h2>
+                                    <Cpu className="h-4 w-4 text-slate-400" />{__('general.system_requirements')}</h2>
                                 <ul className="space-y-2">
                                     {safeRequirements.map((req: string, i: number) => (
                                         <li key={i} className="flex items-start gap-2.5 text-sm text-slate-600">

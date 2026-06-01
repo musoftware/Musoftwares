@@ -22,8 +22,7 @@ export default function Logs({ entry, logs }) {
                             href={route('erp.recurring.index')}
                             className="text-sm text-indigo-600 hover:text-indigo-900 flex items-center"
                         >
-                            <ArrowLeft className="w-4 h-4 mr-1" /> Back to Recurring Entries
-                        </Link>
+                            <ArrowLeft className="w-4 h-4 mr-1" />{__('general.back_to_recurring_entries')}</Link>
                     </div>
 
                     <PageHeader
@@ -37,8 +36,8 @@ export default function Logs({ entry, logs }) {
                                 <tr>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Business Amount</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exchange Rate</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.business_amount')}</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.exchange_rate')}</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Note</th>
                                 </tr>
@@ -77,9 +76,7 @@ export default function Logs({ entry, logs }) {
                                 ))}
                                 {logs.data.length === 0 && (
                                     <tr>
-                                        <td colSpan="6" className="px-6 py-12 text-center text-sm text-gray-500">
-                                            No execution history found for this entry.
-                                        </td>
+                                        <td colSpan="6" className="px-6 py-12 text-center text-sm text-gray-500">{__('general.no_execution_history_found_for_this_entry')}</td>
                                     </tr>
                                 )}
                             </tbody>

@@ -30,15 +30,15 @@ export default function MyLicenses({ licenses }: Props) {
     };
 
     return (
-        <ToolsPublicLayout title="My Licenses" activeNav="licenses">
-            <Head title="My Licenses" />
+        <ToolsPublicLayout title={__('general.my_licenses')} activeNav="licenses">
+            <Head title={__('general.my_licenses')} />
 
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
 
                 {/* Page header */}
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">My Licenses</h1>
-                    <p className="text-sm text-slate-500 mt-1">Your license keys — used by the runtime to verify your subscriptions locally.</p>
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{__('general.my_licenses')}</h1>
+                    <p className="text-sm text-slate-500 mt-1">{__('general.your_license_keys_used_by_the_runtime_to_verify_your_subscriptions_locally')}</p>
                 </div>
 
                 {licenses.length === 0 ? (
@@ -46,13 +46,12 @@ export default function MyLicenses({ licenses }: Props) {
                         <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3">
                             <Key className="h-6 w-6 text-muted-foreground" />
                         </div>
-                        <p className="text-sm font-semibold">No licenses yet</p>
-                        <p className="text-xs text-muted-foreground mt-1 mb-4">Subscribe to a tool to receive your license key.</p>
+                        <p className="text-sm font-semibold">{__('general.no_licenses_yet')}</p>
+                        <p className="text-xs text-muted-foreground mt-1 mb-4">{__('general.subscribe_to_a_tool_to_receive_your_license_key')}</p>
                         
                         <Link href={route('tools.marketplace.index')}>
                             <Button className="gap-2 h-9 text-xs">
-                                <ShoppingBag className="h-4 w-4" /> Browse Tools
-                            </Button>
+                                <ShoppingBag className="h-4 w-4" />{__('general.browse_tools')}</Button>
                         </Link>
                     </Card>
                 ) : (
@@ -87,9 +86,7 @@ export default function MyLicenses({ licenses }: Props) {
                                                     size="sm"
                                                     className="w-full gap-2 text-xs border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950 h-8"
                                                 >
-                                                    <ExternalLink className="h-3.5 w-3.5" />
-                                                    Open Tool
-                                                </Button>
+                                                    <ExternalLink className="h-3.5 w-3.5" />{__('general.open_tool')}</Button>
                                             </Link>
                                         </div>
                                     </div>

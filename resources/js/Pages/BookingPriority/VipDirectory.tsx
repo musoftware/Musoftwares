@@ -10,17 +10,16 @@ export default function VipDirectory({ vipCustomers }) {
         <div className="p-6 max-w-7xl mx-auto space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">VIP Directory</h1>
-                    <p className="text-muted-foreground mt-2">Manage premium customer tiers and priority tagging.</p>
+                    <h1 className="text-3xl font-bold tracking-tight">{__('general.vip_directory')}</h1>
+                    <p className="text-muted-foreground mt-2">{__('general.manage_premium_customer_tiers_and_priority_tagging')}</p>
                 </div>
                 <Button>
-                    <Plus className="mr-2 h-4 w-4" /> Add VIP
-                </Button>
+                    <Plus className="mr-2 h-4 w-4" />{__('general.add_vip')}</Button>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Premium Customers</CardTitle>
+                    <CardTitle>{__('general.premium_customers')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -28,7 +27,7 @@ export default function VipDirectory({ vipCustomers }) {
                             <TableRow>
                                 <TableHead>Customer</TableHead>
                                 <TableHead>Tier</TableHead>
-                                <TableHead>Assigned Date</TableHead>
+                                <TableHead>{__('general.assigned_date')}</TableHead>
                                 <TableHead>Reason</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>

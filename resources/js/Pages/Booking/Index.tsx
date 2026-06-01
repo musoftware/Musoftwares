@@ -28,7 +28,7 @@ export default function Index({ events }: { events: EventType[] }) {
 
     return (
         <WorkspaceLayout
-            title="Booking Events"
+            title={__('general.booking_events')}
             workspaceName="Booking Settings"
             tenantId="SYS-BOOKING"
             menuItems={[
@@ -39,22 +39,20 @@ export default function Index({ events }: { events: EventType[] }) {
                 { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
-            <Head title="Booking Events" />
+            <Head title={__('general.booking_events')} />
             
             <div className="space-y-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">Event Types</h1>
-                        <p className="text-muted-foreground">Create and manage your booking event types.</p>
+                        <h1 className="text-2xl font-bold tracking-tight">{__('general.event_types')}</h1>
+                        <p className="text-muted-foreground">{__('general.create_and_manage_your_booking_event_types')}</p>
                     </div>
                     <div className="mt-4 sm:mt-0">
                         <Link 
                             href={route('booking.events.create')} 
                             className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors shadow-sm"
                         >
-                            <Plus className="w-4 h-4 mr-2" />
-                            New Event Type
-                        </Link>
+                            <Plus className="w-4 h-4 mr-2" />{__('general.new_event_type')}</Link>
                     </div>
                 </div>
 
@@ -62,8 +60,8 @@ export default function Index({ events }: { events: EventType[] }) {
                 {events.length === 0 ? (
                     <EmptyState
                         icon={Calendar}
-                        title="No event types yet"
-                        description="Create an event type to start accepting bookings."
+                        title={__('general.no_event_types_yet')}
+                        description={__('general.create_an_event_type_to_start_accepting_bookings')}
                         action={{
                             label: "Create Event Type",
                             href: route('booking.events.create')
@@ -84,9 +82,7 @@ export default function Index({ events }: { events: EventType[] }) {
                                                 <DropdownMenuItem className="cursor-pointer" onClick={() => window.location.href = route('booking.events.edit', event.slug)}>
                                                     Edit
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem className="cursor-pointer" onClick={() => copyLink(event.slug)}>
-                                                    Copy Link
-                                                </DropdownMenuItem>
+                                                <DropdownMenuItem className="cursor-pointer" onClick={() => copyLink(event.slug)}>{__('general.copy_link')}</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>
@@ -113,9 +109,7 @@ export default function Index({ events }: { events: EventType[] }) {
                                     </Badge>
                                     
                                     <button onClick={() => copyLink(event.slug)} className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 h-8 px-3 text-slate-500 hover:text-slate-900">
-                                        <Copy className="w-4 h-4 mr-2" />
-                                        Copy link
-                                    </button>
+                                        <Copy className="w-4 h-4 mr-2" />{__('general.copy_link_1')}</button>
                                 </CardFooter>
                             </Card>
                         ))}

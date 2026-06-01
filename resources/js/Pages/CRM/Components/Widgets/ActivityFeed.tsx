@@ -25,7 +25,7 @@ export default function ActivityFeed({ feed }: { feed?: FeedItem[] }) {
     return (
         <div className="bg-white rounded-xl border border-slate-200 flex flex-col h-full shadow-sm">
             <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-                <h3 className="font-semibold text-slate-800">Live Activity Feed</h3>
+                <h3 className="font-semibold text-slate-800">{__('general.live_activity_feed')}</h3>
                 <span className="flex h-2 w-2 relative">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
@@ -34,7 +34,7 @@ export default function ActivityFeed({ feed }: { feed?: FeedItem[] }) {
             
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {displayFeed.length === 0 ? (
-                    <div className="text-sm text-slate-500 text-center py-4">{__('No recent activities.')}</div>
+                    <div className="text-sm text-slate-500 text-center py-4">{__('general.no_recent_activities')}</div>
                 ) : (
                     displayFeed.map((item) => (
                     <div key={item.id} className="flex gap-3 text-sm">

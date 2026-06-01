@@ -33,7 +33,7 @@ export default function CreateContract({ clients = [] }: { clients?: any[] }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('overview');
 
     return (
-        <ERPLayout title="Draft Contract" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__('general.draft_contract')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">
@@ -41,30 +41,27 @@ export default function CreateContract({ clients = [] }: { clients?: any[] }) {
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Draft New Contract</h1>
-                        <p className="text-slate-500 text-sm mt-0.5">Create a new agreement or contract sheet.</p>
+                        <h1 className="text-2xl font-bold text-slate-900">{__('general.draft_new_contract')}</h1>
+                        <p className="text-slate-500 text-sm mt-0.5">{__('general.create_a_new_agreement_or_contract_sheet')}</p>
                     </div>
                 </div>
 
                 <Card className="bg-white border border-slate-200 shadow-sm">
                     <CardHeader>
                         <CardTitle className="text-slate-900 flex items-center gap-2">
-                            <FileSignature className="w-5 h-5" /> Contract Details
-                        </CardTitle>
-                        <CardDescription className="text-slate-500">
-                            Enter the details of the contract agreement.
-                        </CardDescription>
+                            <FileSignature className="w-5 h-5" />{__('general.contract_details')}</CardTitle>
+                        <CardDescription className="text-slate-500">{__('general.enter_the_details_of_the_contract_agreement')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2 md:col-span-2">
-                                    <label className="text-sm font-medium text-slate-700">Agreement Sheet Title <span className="text-red-500">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.agreement_sheet_title')}<span className="text-red-500">*</span></label>
                                     <Input 
                                         required 
                                         value={form.title} 
                                         onChange={e => setForm({...form, title: e.target.value})} 
-                                        placeholder="Mutual Non-Disclosure Agreement" 
+                                        placeholder={__('general.mutual_non_disclosure_agreement')} 
                                         className="bg-white border-slate-200 text-slate-900"
                                     />
                                     {errors.title && <p className="text-xs text-red-500">{errors.title}</p>}
@@ -73,7 +70,7 @@ export default function CreateContract({ clients = [] }: { clients?: any[] }) {
                                     <label className="text-sm font-medium text-slate-700">Client <span className="text-red-500">*</span></label>
                                     <Select value={form.client} onValueChange={(val) => setForm({...form, client: val})}>
                                         <SelectTrigger className="bg-white border-slate-200 text-slate-900">
-                                            <SelectValue placeholder="Select Client" />
+                                            <SelectValue placeholder={__('general.select_client')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white border-slate-200 text-slate-900">
                                             {clients.map(c => (

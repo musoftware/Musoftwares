@@ -129,15 +129,15 @@ export default function Create({ user, wallet }) {
 
     return (
         <AuthenticatedLayout header="Send Wallet Funds">
-            <Head title="Send Transfer" />
+            <Head title={__('general.send_transfer')} />
 
             <div className="max-w-[700px] mx-auto px-4 py-8 space-y-8">
                 
                 {/* Header with back link */}
                 <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                        <h1 className="text-2xl font-semibold tracking-tight">Peer-to-Peer Transfer</h1>
-                        <p className="text-sm text-muted-foreground">Send funds instantly to another platform user's wallet.</p>
+                        <h1 className="text-2xl font-semibold tracking-tight">{__('general.peer_to_peer_transfer')}</h1>
+                        <p className="text-sm text-muted-foreground">{__('general.send_funds_instantly_to_another_platform_user_s_wallet')}</p>
                     </div>
                     <Button variant="outline" size="sm" asChild className="shadow-none">
                         <Link href={route('financial.transfer.history')}>History</Link>
@@ -153,7 +153,7 @@ export default function Create({ user, wallet }) {
                                     <Wallet className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <CardTitle className="text-sm font-medium">Your Platform Balance</CardTitle>
+                                    <CardTitle className="text-sm font-medium">{__('general.your_platform_balance')}</CardTitle>
                                     <div className="text-lg font-bold text-foreground">
                                         {Number(wallet.balance).toFixed(2)} <span className="text-xs font-normal text-muted-foreground">{wallet.currency}</span>
                                     </div>
@@ -178,14 +178,14 @@ export default function Create({ user, wallet }) {
                             {step === 1 && (
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="receiver_search">Search Recipient</Label>
+                                        <Label htmlFor="receiver_search">{__('general.search_recipient')}</Label>
                                         <div className="relative">
                                             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                                             <Input
                                                 id="receiver_search"
                                                 type="text"
                                                 className="pl-9 shadow-none"
-                                                placeholder="Enter recipient's name or email (min 5 chars)..."
+                                                placeholder={__('general.enter_recipient_s_name_or_email')}
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
                                             />
@@ -194,9 +194,7 @@ export default function Create({ user, wallet }) {
 
                                     {/* Auto-complete Search Results dropdown panel */}
                                     {searching ? (
-                                        <div className="p-4 border rounded-md text-center text-sm text-muted-foreground">
-                                            Searching for matching accounts...
-                                        </div>
+                                        <div className="p-4 border rounded-md text-center text-sm text-muted-foreground">{__('general.searching_for_matching_accounts')}</div>
                                     ) : searchResults.length > 0 ? (
                                         <div className="border rounded-lg divide-y bg-background shadow-sm max-h-[300px] overflow-y-auto">
                                             {searchResults.map((userMatch) => (
@@ -220,9 +218,7 @@ export default function Create({ user, wallet }) {
                                         </div>
                                     ) : (
                                         <div className="p-4 border border-dashed rounded-lg text-center text-xs text-muted-foreground bg-muted/5 flex flex-col items-center gap-2">
-                                            <Info className="w-4 h-4 text-muted-foreground/60" />
-                                            Start typing a recipient's email address or full name to lookup.
-                                        </div>
+                                            <Info className="w-4 h-4 text-muted-foreground/60" />{__('general.start_typing_a_recipient_s_email_address_or_full_name_to_lookup')}</div>
                                     )}
                                     
                                     {errors.receiver_email && (
@@ -242,7 +238,7 @@ export default function Create({ user, wallet }) {
                                                 {selectedRecipient.name.charAt(0).toUpperCase()}
                                             </div>
                                             <div>
-                                                <span className="text-xs font-semibold text-primary uppercase tracking-wider">Recipient Selected</span>
+                                                <span className="text-xs font-semibold text-primary uppercase tracking-wider">{__('general.recipient_selected')}</span>
                                                 <h4 className="font-semibold text-sm text-foreground">{selectedRecipient.name}</h4>
                                                 <p className="text-xs text-muted-foreground">{selectedRecipient.email}</p>
                                             </div>
@@ -281,7 +277,7 @@ export default function Create({ user, wallet }) {
                                                 id="reason"
                                                 type="text"
                                                 className="shadow-none"
-                                                placeholder="e.g. Project bonus, Freelance help..."
+                                                placeholder={__('general.e_g_project_bonus_freelance_help')}
                                                 value={data.reason}
                                                 onChange={(e) => setData('reason', e.target.value)}
                                             />
@@ -293,27 +289,24 @@ export default function Create({ user, wallet }) {
 
                                     {/* Live Preview Panel */}
                                     {previewLoading ? (
-                                        <div className="p-6 border rounded-lg text-center text-sm text-muted-foreground bg-muted/5 animate-pulse">
-                                            Calculating fees and exchange conversions...
-                                        </div>
+                                        <div className="p-6 border rounded-lg text-center text-sm text-muted-foreground bg-muted/5 animate-pulse">{__('general.calculating_fees_and_exchange_conversions')}</div>
                                     ) : previewError ? (
                                         <Alert variant="destructive" className="shadow-none">
                                             <AlertCircle className="h-4 w-4" />
-                                            <AlertTitle>Validation Blocked</AlertTitle>
+                                            <AlertTitle>{__('general.validation_blocked')}</AlertTitle>
                                             <AlertDescription>{previewError}</AlertDescription>
                                         </Alert>
                                     ) : previewData ? (
                                         <div className="border rounded-lg divide-y bg-muted/5">
                                             <div className="p-4 flex items-center justify-between text-sm">
-                                                <span className="text-muted-foreground">Principal Transfer Amount</span>
+                                                <span className="text-muted-foreground">{__('general.principal_transfer_amount')}</span>
                                                 <span className="font-semibold text-foreground">
                                                     {Number(previewData.amount).toFixed(2)} {previewData.currency}
                                                 </span>
                                             </div>
 
                                             <div className="p-4 flex items-center justify-between text-sm">
-                                                <span className="text-muted-foreground flex items-center gap-1.5">
-                                                    Transfer Fee <span className="text-xs text-muted-foreground/60">(1% capped)</span>
+                                                <span className="text-muted-foreground flex items-center gap-1.5">{__('general.transfer_fee')}<span className="text-xs text-muted-foreground/60">(1% capped)</span>
                                                 </span>
                                                 <span className="font-semibold text-foreground">
                                                     +{Number(previewData.fee).toFixed(2)} {previewData.currency}
@@ -324,27 +317,24 @@ export default function Create({ user, wallet }) {
                                                 <div className="p-4 bg-primary/5 space-y-2">
                                                     <div className="flex items-center justify-between text-sm">
                                                         <span className="text-primary font-medium flex items-center gap-1">
-                                                            <Sparkles className="w-3.5 h-3.5" /> Exchange Rate applied
-                                                        </span>
+                                                            <Sparkles className="w-3.5 h-3.5" />{__('general.exchange_rate_applied')}</span>
                                                         <span className="font-semibold text-primary">
                                                             1 {previewData.currency} = {Number(previewData.exchange_rate).toFixed(4)} {previewData.converted_currency}
                                                         </span>
                                                     </div>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        Includes a standard 1.5% security exchange margin to protect platform liquidity.
-                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">{__('general.includes_a_standard_1_5_security_exchange_margin_to_protect_platform_liquidity')}</p>
                                                 </div>
                                             )}
 
                                             <div className="p-4 flex items-center justify-between text-sm bg-primary/10">
-                                                <span className="font-bold text-foreground">Total Debited Balance</span>
+                                                <span className="font-bold text-foreground">{__('general.total_debited_balance')}</span>
                                                 <span className="font-bold text-lg text-primary">
                                                     {Number(parseFloat(previewData.amount) + parseFloat(previewData.fee)).toFixed(2)} {previewData.currency}
                                                 </span>
                                             </div>
 
                                             <div className="p-4 flex items-center justify-between text-sm">
-                                                <span className="text-muted-foreground">Recipient Will Receive</span>
+                                                <span className="text-muted-foreground">{__('general.recipient_will_receive')}</span>
                                                 <span className="font-bold text-emerald-600 text-lg">
                                                     {Number(previewData.converted_amount).toFixed(2)} {previewData.converted_currency}
                                                 </span>
@@ -367,8 +357,7 @@ export default function Create({ user, wallet }) {
                                             className="shadow-none"
                                             disabled={!previewData || !!previewError}
                                             onClick={() => setStep(3)}
-                                        >
-                                            Next Step <ArrowRight className="w-4 h-4 ml-2" />
+                                        >{__('general.next_step')}<ArrowRight className="w-4 h-4 ml-2" />
                                         </Button>
                                     </div>
                                 </div>
@@ -379,15 +368,13 @@ export default function Create({ user, wallet }) {
                                 <div className="space-y-6">
                                     <Alert className="shadow-none bg-amber-50 border-amber-200 text-amber-900">
                                         <AlertCircle className="h-4 w-4 text-amber-700" />
-                                        <AlertTitle className="font-semibold">Irreversible Transaction</AlertTitle>
-                                        <AlertDescription className="text-xs">
-                                            Peer-to-peer wallet transfers are direct, absolute, and cannot be refunded or cancelled once processed. Please verify the recipient email carefully before proceeding.
-                                        </AlertDescription>
+                                        <AlertTitle className="font-semibold">{__('general.irreversible_transaction')}</AlertTitle>
+                                        <AlertDescription className="text-xs">{__('general.peer_to_peer_wallet_transfers_are_direct_absolute_and_cannot_be_refunded_or_cancelled_once_processed_please_verify_the_recipient_email_carefully_before_proceeding')}</AlertDescription>
                                     </Alert>
 
                                     {/* Summary Invoice Receipt Mock */}
                                     <div className="p-6 border border-dashed rounded-lg bg-muted/10 space-y-4">
-                                        <h3 className="font-bold text-center text-sm tracking-wide uppercase text-muted-foreground">Transfer Confirmation</h3>
+                                        <h3 className="font-bold text-center text-sm tracking-wide uppercase text-muted-foreground">{__('general.transfer_confirmation')}</h3>
                                         <div className="space-y-2 text-sm">
                                             <div className="flex justify-between">
                                                 <span className="text-muted-foreground">Sender User:</span>
@@ -429,9 +416,7 @@ export default function Create({ user, wallet }) {
                                             <Label htmlFor="confirm_transfer" className="font-medium text-sm text-foreground">
                                                 I authorize this transfer of {Number(previewData.amount).toFixed(2)} {previewData.currency} to {selectedRecipient.name}.
                                             </Label>
-                                            <p className="text-xs text-muted-foreground">
-                                                I confirm the recipient details are correct and accept that this transaction is immediate and final.
-                                            </p>
+                                            <p className="text-xs text-muted-foreground">{__('general.i_confirm_the_recipient_details_are_correct_and_accept_that_this_transaction_is_immediate_and_final')}</p>
                                         </div>
                                     </div>
                                     {errors.confirm_transfer && (
@@ -449,8 +434,7 @@ export default function Create({ user, wallet }) {
                                             disabled={processing || !data.confirm_transfer}
                                         >
                                             {processing ? 'Processing Transfer...' : (
-                                                <>
-                                                    Execute Transfer <Send className="w-4 h-4 ml-2" />
+                                                <>{__('general.execute_transfer')}<Send className="w-4 h-4 ml-2" />
                                                 </>
                                             )}
                                         </Button>

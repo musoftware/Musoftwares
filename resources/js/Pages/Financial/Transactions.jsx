@@ -17,27 +17,27 @@ export default function Transactions({ transactions, wallet }) {
                 {/* Header */}
                 <div className="space-y-2">
                     <h1 className="text-2xl font-semibold tracking-tight">Transactions</h1>
-                    <p className="text-sm text-muted-foreground">View your wallet transaction history and ledgers.</p>
+                    <p className="text-sm text-muted-foreground">{__('general.view_your_wallet_transaction_history_and_ledgers')}</p>
                 </div>
 
                 {/* Balance Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Card className="shadow-none border-primary/20 bg-muted/10">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
+                            <CardTitle className="text-sm font-medium">{__('general.total_balance')}</CardTitle>
                             <Wallet className="h-4 w-4 text-primary" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
                                 {Number(wallet?.balance || 0).toFixed(2)} <span className="text-sm font-normal text-muted-foreground">{wallet?.currency || 'USD'}</span>
                             </div>
-                            <p className="mt-1 text-xs text-muted-foreground">Available across all platform workspaces</p>
+                            <p className="mt-1 text-xs text-muted-foreground">{__('general.available_across_all_platform_workspaces')}</p>
                         </CardContent>
                     </Card>
 
                     <Card className="shadow-none">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Earned Balance</CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">{__('general.earned_balance')}</CardTitle>
                             <ArrowDownLeft className="h-4 w-4 text-emerald-600" />
                         </CardHeader>
                         <CardContent>
@@ -45,14 +45,13 @@ export default function Transactions({ transactions, wallet }) {
                                 {Number(wallet?.earned_balance || 0).toFixed(2)} <span className="text-sm font-normal text-muted-foreground">{wallet?.currency || 'USD'}</span>
                             </div>
                             <p className="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-1">
-                                <CheckCircle2 className="w-3 h-3" /> Eligible for withdrawal
-                            </p>
+                                <CheckCircle2 className="w-3 h-3" />{__('general.eligible_for_withdrawal')}</p>
                         </CardContent>
                     </Card>
 
                     <Card className="shadow-none">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Locked / Pending</CardTitle>
+                            <CardTitle className="text-sm font-medium text-muted-foreground">{__('general.locked_pending')}</CardTitle>
                             <Clock className="h-4 w-4 text-amber-600" />
                         </CardHeader>
                         <CardContent>
@@ -60,8 +59,7 @@ export default function Transactions({ transactions, wallet }) {
                                 {Number(wallet?.locked_balance || 0).toFixed(2)} <span className="text-sm font-normal text-muted-foreground">{wallet?.currency || 'USD'}</span>
                             </div>
                             <p className="text-xs text-amber-600 font-medium flex items-center gap-1 mt-1">
-                                <AlertCircle className="w-3 h-3" /> Pending in active contracts
-                            </p>
+                                <AlertCircle className="w-3 h-3" />{__('general.pending_in_active_contracts')}</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -70,8 +68,8 @@ export default function Transactions({ transactions, wallet }) {
                 <Card className="shadow-none">
                     <CardHeader className="flex flex-row items-center justify-between">
                         <div className="space-y-1">
-                            <CardTitle className="text-base font-semibold">Transaction History</CardTitle>
-                            <CardDescription>A list of your recent transactions.</CardDescription>
+                            <CardTitle className="text-base font-semibold">{__('general.transaction_history')}</CardTitle>
+                            <CardDescription>{__('general.a_list_of_your_recent_transactions')}</CardDescription>
                         </div>
                         <Badge variant="secondary" className="font-normal">{transactions?.total || 0} Records</Badge>
                     </CardHeader>
@@ -82,17 +80,15 @@ export default function Transactions({ transactions, wallet }) {
                                     <TableHead className="pl-6">Type</TableHead>
                                     <TableHead>Description</TableHead>
                                     <TableHead>Amount</TableHead>
-                                    <TableHead>Balance Before</TableHead>
-                                    <TableHead>Balance After</TableHead>
+                                    <TableHead>{__('general.balance_before')}</TableHead>
+                                    <TableHead>{__('general.balance_after')}</TableHead>
                                     <TableHead className="pr-6 text-right">Date</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {(!transactions?.data || transactions.data.length === 0) ? (
                                     <TableRow>
-                                        <TableCell colSpan={6} className="py-12 text-center text-muted-foreground">
-                                            No transactions found.
-                                        </TableCell>
+                                        <TableCell colSpan={6} className="py-12 text-center text-muted-foreground">{__('general.no_transactions_found')}</TableCell>
                                     </TableRow>
                                 ) : (
                                     transactions.data.map((tx) => (

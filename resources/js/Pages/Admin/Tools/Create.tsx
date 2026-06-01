@@ -77,17 +77,17 @@ export default function AdminToolCreate({ categories }: Props) {
 
     return (
         <WorkspaceLayout
-            title="Admin — Create Tool"
+            title={__('general.admin_create_tool')}
             workspaceName="Musoftware Admin"
             tenantId="SYS-ADMIN"
             menuItems={menuItems}
         >
-            <Head title="Create Tool — Admin" />
+            <Head title={__('general.create_tool_admin')} />
 
             <div className="space-y-6 max-w-3xl">
                 <ModulePageHeader
-                    title="Create New Tool"
-                    description="Add a new downloadable desktop tool to the marketplace."
+                    title={__('general.create_new_tool')}
+                    description={__('general.add_a_new_downloadable_desktop_tool_to_the_marketplace')}
                     actions={
                         <Button
                             variant="outline"
@@ -102,7 +102,7 @@ export default function AdminToolCreate({ categories }: Props) {
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     {/* Basic Info */}
-                    <OperationalCard title="Basic Information">
+                    <OperationalCard title={__('general.basic_information')}>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                                 <Label htmlFor="title" className="text-xs font-semibold">Title *</Label>
@@ -110,7 +110,7 @@ export default function AdminToolCreate({ categories }: Props) {
                                     id="title"
                                     value={data.title}
                                     onChange={handleTitleChange}
-                                    placeholder="TikTok Scraper Pro"
+                                    placeholder={__('general.tiktok_scraper_pro')}
                                     className="h-9 text-sm"
                                 />
                                 {errors.title && <p className="text-xs text-red-500">{errors.title}</p>}
@@ -122,19 +122,19 @@ export default function AdminToolCreate({ categories }: Props) {
                                     id="slug"
                                     value={data.slug}
                                     onChange={e => setData('slug', e.target.value)}
-                                    placeholder="tiktok-scraper-pro"
+                                    placeholder={__('general.tiktok_scraper_pro_1')}
                                     className="h-9 text-sm font-mono"
                                 />
                                 {errors.slug && <p className="text-xs text-red-500">{errors.slug}</p>}
                             </div>
 
                             <div className="space-y-1.5 sm:col-span-2">
-                                <Label htmlFor="short_description" className="text-xs font-semibold">Short Description</Label>
+                                <Label htmlFor="short_description" className="text-xs font-semibold">{__('general.short_description')}</Label>
                                 <Input
                                     id="short_description"
                                     value={data.short_description}
                                     onChange={e => setData('short_description', e.target.value)}
-                                    placeholder="One-line description shown on card listings..."
+                                    placeholder={__('general.one_line_description_shown_on_card_listings')}
                                     className="h-9 text-sm"
                                     maxLength={250}
                                 />
@@ -142,12 +142,12 @@ export default function AdminToolCreate({ categories }: Props) {
                             </div>
 
                             <div className="space-y-1.5 sm:col-span-2">
-                                <Label htmlFor="description" className="text-xs font-semibold">Full Description</Label>
+                                <Label htmlFor="description" className="text-xs font-semibold">{__('general.full_description')}</Label>
                                 <textarea
                                     id="description"
                                     value={data.description}
                                     onChange={e => setData('description', e.target.value)}
-                                    placeholder="Detailed markdown-supported description for the tool detail page..."
+                                    placeholder={__('general.detailed_markdown_supported_description_for_the_tool_detail_page')}
                                     rows={5}
                                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
                                 />
@@ -156,7 +156,7 @@ export default function AdminToolCreate({ categories }: Props) {
                     </OperationalCard>
 
                     {/* Classification */}
-                    <OperationalCard title="Classification &amp; Availability">
+                    <OperationalCard title={__('general.classification_amp_availability')}>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                                 <Label className="text-xs font-semibold">Category *</Label>
@@ -233,7 +233,7 @@ export default function AdminToolCreate({ categories }: Props) {
                                     value={newFeature}
                                     onChange={e => setNewFeature(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addItem('features', newFeature, () => setNewFeature('')))}
-                                    placeholder="e.g. Proxy rotation built-in"
+                                    placeholder={__('general.e_g_proxy_rotation_built_in')}
                                     className="h-9 text-sm flex-1"
                                 />
                                 <Button
@@ -256,21 +256,21 @@ export default function AdminToolCreate({ categories }: Props) {
                                     </span>
                                 ))}
                                 {data.features.length === 0 && (
-                                    <p className="text-xs text-text-muted italic">No features added yet. Press Enter or click Add.</p>
+                                    <p className="text-xs text-text-muted italic">{__('general.no_features_added_yet_press_enter_or_click_add')}</p>
                                 )}
                             </div>
                         </div>
                     </OperationalCard>
 
                     {/* Requirements */}
-                    <OperationalCard title="System Requirements">
+                    <OperationalCard title={__('general.system_requirements')}>
                         <div className="space-y-3">
                             <div className="flex gap-2">
                                 <Input
                                     value={newRequirement}
                                     onChange={e => setNewRequirement(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addItem('requirements', newRequirement, () => setNewRequirement('')))}
-                                    placeholder="e.g. Windows 10 / macOS 12+"
+                                    placeholder={__('general.e_g_windows_10_macos_12')}
                                     className="h-9 text-sm flex-1"
                                 />
                                 <Button
@@ -293,7 +293,7 @@ export default function AdminToolCreate({ categories }: Props) {
                                     </span>
                                 ))}
                                 {data.requirements.length === 0 && (
-                                    <p className="text-xs text-text-muted italic">No requirements added yet.</p>
+                                    <p className="text-xs text-text-muted italic">{__('general.no_requirements_added_yet')}</p>
                                 )}
                             </div>
                         </div>

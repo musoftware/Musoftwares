@@ -45,6 +45,6 @@ class AffiliatePayoutController extends Controller
             $request->amount
         );
 
-        return back()->with('success', 'Payout requested successfully');
+        return back()->with('success', __('general.payout_requested_successfully'));
     }
 }

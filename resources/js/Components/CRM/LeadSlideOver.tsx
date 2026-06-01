@@ -113,7 +113,7 @@ export function LeadSlideOver({ leadId, isOpen, onClose }: LeadSlideOverProps) {
                         <div className="bg-white border-b border-slate-200 p-4">
                             <div className="space-y-3">
                                 <Textarea 
-                                    placeholder="Add a note to this lead..." 
+                                    placeholder={__('general.add_a_note_to_this_lead')} 
                                     className="min-h-[80px] resize-none border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 transition-all"
                                     value={newNote}
                                     onChange={(e) => setNewNote(e.target.value)}
@@ -138,9 +138,7 @@ export function LeadSlideOver({ leadId, isOpen, onClose }: LeadSlideOverProps) {
                         {/* Timeline Area */}
                         <ScrollArea className="flex-1 p-6">
                             <h3 className="text-sm font-semibold text-slate-900 mb-6 flex items-center gap-2">
-                                <Activity className="h-4 w-4 text-indigo-500" />
-                                Activity Timeline
-                            </h3>
+                                <Activity className="h-4 w-4 text-indigo-500" />{__('general.activity_timeline')}</h3>
                             
                             <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
                                 {timeline.map((event, idx) => (
@@ -180,9 +178,7 @@ export function LeadSlideOver({ leadId, isOpen, onClose }: LeadSlideOverProps) {
                                 ))}
                                 
                                 {timeline.length === 0 && (
-                                    <div className="text-center text-slate-500 py-10 bg-white rounded-xl border border-slate-200 border-dashed">
-                                        No activity recorded yet.
-                                    </div>
+                                    <div className="text-center text-slate-500 py-10 bg-white rounded-xl border border-slate-200 border-dashed">{__('general.no_activity_recorded_yet')}</div>
                                 )}
                             </div>
                         </ScrollArea>

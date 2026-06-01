@@ -33,13 +33,11 @@ export default function Create({ services }) {
     };
 
     return (
-        <AdminSidebarLayout title="Create Article" header="Add New Blog Article">
+        <AdminSidebarLayout title={__('general.create_article')} header="Add New Blog Article">
             <div className="mb-6 flex items-center">
                 <Link href={route('admin.blog-articles.index')}>
                     <Button variant="ghost" className="gap-2">
-                        <ArrowLeft className="h-4 w-4" />
-                        Back to Articles
-                    </Button>
+                        <ArrowLeft className="h-4 w-4" />{__('general.back_to_articles')}</Button>
                 </Link>
             </div>
 
@@ -52,7 +50,7 @@ export default function Create({ services }) {
                                 id="title"
                                 value={data.title}
                                 onChange={(e) => setData('title', e.target.value)}
-                                placeholder="Article title"
+                                placeholder={__('general.article_title')}
                                 required
                             />
                             {errors.title && <p className="text-sm text-red-600">{errors.title}</p>}
@@ -64,7 +62,7 @@ export default function Create({ services }) {
                                 id="slug"
                                 value={data.slug}
                                 onChange={(e) => setData('slug', e.target.value)}
-                                placeholder="leave-blank-to-auto-generate"
+                                placeholder={__('general.leave_blank_to_auto_generate')}
                             />
                             {errors.slug && <p className="text-sm text-red-600">{errors.slug}</p>}
                         </div>
@@ -76,7 +74,7 @@ export default function Create({ services }) {
                             id="content"
                             value={data.content}
                             onChange={(e) => setData('content', e.target.value)}
-                            placeholder="Article content goes here..."
+                            placeholder={__('general.article_content_goes_here')}
                             className="min-h-[200px]"
                             required
                         />
@@ -89,7 +87,7 @@ export default function Create({ services }) {
                             id="excerpt"
                             value={data.excerpt}
                             onChange={(e) => setData('excerpt', e.target.value)}
-                            placeholder="Short summary of the article..."
+                            placeholder={__('general.short_summary_of_the_article')}
                             className="min-h-[80px]"
                         />
                         {errors.excerpt && <p className="text-sm text-red-600">{errors.excerpt}</p>}
@@ -100,7 +98,7 @@ export default function Create({ services }) {
                             <Label htmlFor="language">Language *</Label>
                             <Select value={data.language} onValueChange={(val) => setData('language', val)}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select language" />
+                                    <SelectValue placeholder={__('general.select_language')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="en">English</SelectItem>
@@ -111,10 +109,10 @@ export default function Create({ services }) {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="service_id">Related Service</Label>
+                            <Label htmlFor="service_id">{__('general.related_service')}</Label>
                             <Select value={data.service_id?.toString() || "none"} onValueChange={(val) => setData('service_id', val)}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select a service (optional)" />
+                                    <SelectValue placeholder={__('general.select_a_service_optional')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">-- No Service --</SelectItem>
@@ -131,7 +129,7 @@ export default function Create({ services }) {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <Label htmlFor="meta_title">Meta Title</Label>
+                            <Label htmlFor="meta_title">{__('general.meta_title')}</Label>
                             <Input
                                 id="meta_title"
                                 value={data.meta_title}
@@ -140,7 +138,7 @@ export default function Create({ services }) {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="meta_description">Meta Description</Label>
+                            <Label htmlFor="meta_description">{__('general.meta_description')}</Label>
                             <Input
                                 id="meta_description"
                                 value={data.meta_description}
@@ -155,7 +153,7 @@ export default function Create({ services }) {
                             checked={data.is_published}
                             onCheckedChange={(checked) => setData('is_published', checked)}
                         />
-                        <Label htmlFor="is_published">Publish immediately</Label>
+                        <Label htmlFor="is_published">{__('general.publish_immediately')}</Label>
                     </div>
 
                     <div className="flex justify-end pt-4 border-t">

@@ -70,13 +70,13 @@ class AdminBusyTimesController extends Controller
     {
         $busyTime->update(['is_active' => ! $busyTime->is_active]);
 
-        return redirect()->back()->with('success', 'Busy time status updated.');
+        return redirect()->back()->with('success', __('general.busy_time_status_updated'));
     }
 
     public function destroy(RecurringBusyTime $busyTime)
     {
         $busyTime->delete();
 
-        return redirect()->route('admin.busy-times.index')->with('success', 'Busy time deleted.');
+        return redirect()->route('admin.busy-times.index')->with('success', __('general.busy_time_deleted'));
     }
 }

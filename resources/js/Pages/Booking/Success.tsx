@@ -10,7 +10,7 @@ export default function Success({ booking }: any) {
 
     return (
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 py-12 selection:bg-slate-200">
-            <Head title="Booking Confirmed" />
+            <Head title={__('general.booking_confirmed')} />
             
             <div className="max-w-md w-full">
                 <Card className="border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl overflow-hidden text-center relative z-10">
@@ -21,10 +21,8 @@ export default function Success({ booking }: any) {
                             <CheckCircle2 className="h-10 w-10 text-slate-900" />
                         </div>
                         
-                        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-2">Booking Confirmed</h1>
-                        <p className="text-slate-500 mb-8">
-                            A calendar invitation has been sent to your email address.
-                        </p>
+                        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-2">{__('general.booking_confirmed')}</h1>
+                        <p className="text-slate-500 mb-8">{__('general.a_calendar_invitation_has_been_sent_to_your_email_address')}</p>
                         
                         <div className="bg-slate-50 rounded-2xl p-6 mb-8 space-y-4 text-left">
                             <div>
@@ -54,9 +52,7 @@ export default function Success({ booking }: any) {
                         <a 
                             href="/"
                             className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-base font-medium text-white hover:bg-slate-800 transition-colors h-12 w-full shadow-sm"
-                        >
-                            Return Home
-                        </a>
+                        >{__('general.return_home')}</a>
                     </CardContent>
                 </Card>
             </div>

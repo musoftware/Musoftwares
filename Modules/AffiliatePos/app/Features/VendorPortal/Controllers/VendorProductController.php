@@ -77,14 +77,14 @@ class VendorProductController extends Controller
                 'reference_id' => $product->id
             ]);
 
-            return back()->with('success', 'Simple product created successfully');
+            return back()->with('success', __('general.simple_product_created_successfully'));
         });
     }
 
     public function updateStock(Request $request, Product $product)
     {
         if ($product->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized access to product.');
+            abort(403, __('general.unauthorized_access_to_product'));
         }
 
         $request->validate([

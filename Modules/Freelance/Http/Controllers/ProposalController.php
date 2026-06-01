@@ -69,7 +69,7 @@ class ProposalController extends Controller
             return back()->withErrors(['proposal' => $e->getMessage()]);
         }
 
-        return back()->with('success', 'Proposal submitted successfully.');
+        return back()->with('success', __('general.proposal_submitted_successfully'));
     }
 
     public function accept(Request $request, Proposal $proposal)
@@ -84,7 +84,7 @@ class ProposalController extends Controller
 
         event(new ProposalAccepted($proposal));
 
-        return back()->with('success', 'Proposal accepted and contract created.');
+        return back()->with('success', __('general.proposal_accepted_and_contract_created'));
     }
 
     public function reject(Request $request, Proposal $proposal)
@@ -109,7 +109,7 @@ class ProposalController extends Controller
             }
         });
 
-        return back()->with('success', 'Proposal rejected.');
+        return back()->with('success', __('general.proposal_rejected'));
     }
 
     public function withdraw(Request $request, Proposal $proposal)
@@ -132,6 +132,6 @@ class ProposalController extends Controller
             $proposal->delete();
         });
 
-        return back()->with('success', 'Proposal withdrawn.');
+        return back()->with('success', __('general.proposal_withdrawn'));
     }
 }

@@ -290,7 +290,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                                             <Dialog>
                                                                 <DialogTrigger asChild>
                                                                     <Button variant="ghost" className="h-8 w-8 p-0">
-                                                                        <span className="sr-only">Open menu</span>
+                                                                        <span className="sr-only">{__('general.open_menu')}</span>
                                                                         <MoreHorizontal className="h-4 w-4" />
                                                                     </Button>
                                                                 </DialogTrigger>
@@ -394,7 +394,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                             <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{t.full_name}</label>
                                             <Input
                                                 required
-                                                placeholder="Ahmed Mohamed"
+                                                placeholder={__('general.ahmed_mohamed')}
                                                 value={inviteForm.data.name}
                                                 onChange={e => inviteForm.setData('name', e.target.value)}
                                                 className="shadow-none"
@@ -407,7 +407,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                             <Input
                                                 required
                                                 type="email"
-                                                placeholder="ahmed@example.com"
+                                                placeholder={__('general.ahmed_example_com')}
                                                 value={inviteForm.data.email}
                                                 onChange={e => inviteForm.setData('email', e.target.value)}
                                                 className="shadow-none"

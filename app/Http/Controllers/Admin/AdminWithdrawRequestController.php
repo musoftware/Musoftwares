@@ -51,6 +51,6 @@ class AdminWithdrawRequestController extends Controller
 
         $withdrawRequest->changeStatus($request->status);
 
-        return redirect()->route('admin.withdraw-requests.index')->with('success', 'Status updated successfully.');
+        return redirect()->route('admin.withdraw-requests.index')->with('success', __('general.status_updated_successfully'));
     }
 }

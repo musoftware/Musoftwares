@@ -69,29 +69,25 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                                     onClick={onClose}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
                                 >
-                                    <FilePlus className="h-4 w-4 mr-3 text-slate-500" /> New Invoice
-                                </Link>
+                                    <FilePlus className="h-4 w-4 mr-3 text-slate-500" />{__('general.new_invoice')}</Link>
                                 <Link 
                                     href={`/admin/transactions/create?user=${client.id}&type=receive`} 
                                     onClick={onClose}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
                                 >
-                                    <Wallet className="h-4 w-4 mr-3 text-slate-500" /> Receive Money
-                                </Link>
+                                    <Wallet className="h-4 w-4 mr-3 text-slate-500" />{__('general.receive_money')}</Link>
                                 <Link 
                                     href={`/admin/transactions/create?user=${client.id}&type=send-money`} 
                                     onClick={onClose}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
                                 >
-                                    <Banknote className="h-4 w-4 mr-3 text-slate-500" /> Send Money
-                                </Link>
+                                    <Banknote className="h-4 w-4 mr-3 text-slate-500" />{__('general.send_money')}</Link>
                                 <Link 
                                     href={`/admin/transactions/create?user=${client.id}&type=refund`} 
                                     onClick={onClose}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
                                 >
-                                    <RotateCcw className="h-4 w-4 mr-3 text-slate-500" /> Refund Money
-                                </Link>
+                                    <RotateCcw className="h-4 w-4 mr-3 text-slate-500" />{__('general.refund_money')}</Link>
                                 <Link 
                                     href={`/admin/invoices?client_id=${client.id}`} 
                                     onClick={onClose}
@@ -105,28 +101,25 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                                     onClick={onClose}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
                                 >
-                                    <Receipt className="h-4 w-4 mr-3 text-slate-500" /> All Transactions
-                                </Link>
+                                    <Receipt className="h-4 w-4 mr-3 text-slate-500" />{__('general.all_transactions')}</Link>
                                 <button 
                                     onClick={() => { onClose(); onResetPassword(client.id); }}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium w-full text-left"
                                 >
-                                    <Key className="h-4 w-4 mr-3 text-slate-500" /> {__("Reset Password")}
+                                    <Key className="h-4 w-4 mr-3 text-slate-500" /> {__("general.reset_password")}
                                 </button>
                                 <button 
                                     onClick={() => { onClose(); onChangeRole(client); }}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium w-full text-left"
                                 >
-                                    <ShieldCheck className="h-4 w-4 mr-3 text-slate-500" /> {__("Change Role")}
+                                    <ShieldCheck className="h-4 w-4 mr-3 text-slate-500" /> {__("general.change_role")}
                                 </button>
                             </div>
                         </div>
 
                         {/* Account & Tools Column */}
                         <div>
-                            <h6 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-3">
-                                Account & Tools
-                            </h6>
+                            <h6 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-3">{__('general.account_tools')}</h6>
                             <div className="flex flex-col space-y-0.5">
                                 <Link 
                                     href={`/admin/projects?user_id=${client.id}`} 
@@ -140,8 +133,7 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                                     onClick={onClose}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
                                 >
-                                    <ListTodo className="h-4 w-4 mr-3 text-slate-500" /> Assign Task
-                                </Link>
+                                    <ListTodo className="h-4 w-4 mr-3 text-slate-500" />{__('general.assign_task')}</Link>
                                 <Link 
                                     href={`/admin/users/${client.id}/notes`} 
                                     onClick={onClose}
@@ -161,21 +153,18 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                                     onClick={onClose}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
                                 >
-                                    <User className="h-4 w-4 mr-3 text-slate-500" /> View Profile
-                                </Link>
+                                    <User className="h-4 w-4 mr-3 text-slate-500" />{__('general.view_profile_1')}</Link>
                                 <Link 
                                     href={`/admin/users/${client.id}/edit`} 
                                     onClick={onClose}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
                                 >
-                                    <ClipboardEdit className="h-4 w-4 mr-3 text-slate-500" /> Edit Profile
-                                </Link>
+                                    <ClipboardEdit className="h-4 w-4 mr-3 text-slate-500" />{__('general.edit_profile')}</Link>
                                 <button 
                                     onClick={() => { onClose(); onLoginAs(client.id); }}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium w-full text-left"
                                 >
-                                    <LogIn className="h-4 w-4 mr-3 text-slate-500" /> Login As
-                                </button>
+                                    <LogIn className="h-4 w-4 mr-3 text-slate-500" />{__('general.login_as')}</button>
                             </div>
                         </div>
                     </div>

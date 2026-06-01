@@ -100,13 +100,13 @@ export default function Index({ clients, filters, stats }) {
                 setSelectedRoleUser(null);
                 toast({
                     title: __("Success"),
-                    description: __("Role updated successfully."),
+                    description: __("general.role_updated_successfully"),
                 });
             },
             onError: () => {
                 toast({
                     title: __("Error"),
-                    description: __("Failed to update role."),
+                    description: __("general.failed_to_update_role"),
                     variant: "destructive"
                 });
             }
@@ -192,7 +192,7 @@ export default function Index({ clients, filters, stats }) {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
+                            <span className="sr-only">{__('general.open_menu')}</span>
                             <MoreHorizontal className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
@@ -201,13 +201,11 @@ export default function Index({ clients, filters, stats }) {
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/users/${client.id}`}>
-                                    <Eye className="mr-2 h-4 w-4" /> View Profile
-                                </Link>
+                                    <Eye className="mr-2 h-4 w-4" />{__('general.view_profile_1')}</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/users/${client.id}/edit`}>
-                                    <Edit className="mr-2 h-4 w-4" /> Edit Client
-                                </Link>
+                                    <Edit className="mr-2 h-4 w-4" />{__('general.edit_client')}</Link>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         
@@ -215,14 +213,11 @@ export default function Index({ clients, filters, stats }) {
                         
                         <DropdownMenuGroup>
                             <DropdownMenuItem onClick={() => handleLoginAs(client.id)}>
-                                <LogIn className="mr-2 h-4 w-4" /> Login As
-                            </DropdownMenuItem>
+                                <LogIn className="mr-2 h-4 w-4" />{__('general.login_as')}</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleResetPassword(client.id)}>
-                                <Key className="mr-2 h-4 w-4" /> Reset Password
-                            </DropdownMenuItem>
+                                <Key className="mr-2 h-4 w-4" />{__('general.reset_password')}</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => { setSelectedRoleUser(client); setSelectedRole(client.role || 'client'); setIsChangeRoleOpen(true); }}>
-                                <ShieldCheck className="mr-2 h-4 w-4" /> Change Role
-                            </DropdownMenuItem>
+                                <ShieldCheck className="mr-2 h-4 w-4" />{__('general.change_role')}</DropdownMenuItem>
                         </DropdownMenuGroup>
 
                         <DropdownMenuSeparator />
@@ -257,7 +252,7 @@ export default function Index({ clients, filters, stats }) {
                 value={filters.role || ''}
                 onChange={(e) => handleFilter('role', e.target.value)}
             >
-                <option value="">All Roles</option>
+                <option value="">{__('general.all_roles')}</option>
                 <option value="client">Clients</option>
                 <option value="admin">Admins</option>
                 <option value="employee">Employees</option>
@@ -267,7 +262,7 @@ export default function Index({ clients, filters, stats }) {
                 value={filters.status || ''}
                 onChange={(e) => handleFilter('status', e.target.value)}
             >
-                <option value="">All Statuses</option>
+                <option value="">{__('general.all_statuses')}</option>
                 <option value="active">Active</option>
                 <option value="blocked">Blocked</option>
             </select>
@@ -276,7 +271,7 @@ export default function Index({ clients, filters, stats }) {
                 value={filters.kyc || ''}
                 onChange={(e) => handleFilter('kyc', e.target.value)}
             >
-                <option value="">All KYC</option>
+                <option value="">{__('general.all_kyc')}</option>
                 <option value="verified">Verified</option>
                 <option value="unverified">Unverified</option>
             </select>
@@ -289,7 +284,7 @@ export default function Index({ clients, filters, stats }) {
                 <div className="mb-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
                         <span className="text-2xl font-semibold text-slate-800">{stats.total}</span>
-                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Total Users</span>
+                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.total_users')}</span>
                     </div>
                     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
                         <span className="text-2xl font-semibold text-green-600">{stats.active}</span>
@@ -301,15 +296,15 @@ export default function Index({ clients, filters, stats }) {
                     </div>
                     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
                         <span className="text-2xl font-semibold text-indigo-600">{stats.kyc_verified}</span>
-                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">KYC Verified</span>
+                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.kyc_verified')}</span>
                     </div>
                     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
                         <span className="text-2xl font-semibold text-blue-600">{stats.new_this_week}</span>
-                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">New This Week</span>
+                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.new_this_week')}</span>
                     </div>
                     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
                         <span className="text-2xl font-semibold text-purple-600">{stats.new_this_month}</span>
-                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">New This Month</span>
+                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.new_this_month')}</span>
                     </div>
                 </div>
             )}
@@ -350,18 +345,18 @@ export default function Index({ clients, filters, stats }) {
                 <DialogContent>
                     <form onSubmit={handleUpdateRoleSubmit}>
                         <DialogHeader>
-                            <DialogTitle>{__("Change User Role")}</DialogTitle>
+                            <DialogTitle>{__("general.change_user_role")}</DialogTitle>
                             <DialogDescription>
-                                {__("Change direct permissions and role access level for this user.")}
+                                {__("general.change_direct_permissions_and_role_access_level_for_this_user")}
                             </DialogDescription>
                         </DialogHeader>
                         {selectedRoleUser && (
                             <div className="py-4 space-y-4">
                                 <p className="text-sm text-slate-600">
-                                    {__("Changing role for:")} <strong className="text-slate-900">{selectedRoleUser.name}</strong>
+                                    {__("general.changing_role_for")} <strong className="text-slate-900">{selectedRoleUser.name}</strong>
                                 </p>
                                 <div>
-                                    <Label>{__("Select Role")}</Label>
+                                    <Label>{__("general.select_role")}</Label>
                                     <select 
                                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 mt-2"
                                         value={selectedRole}
@@ -370,16 +365,16 @@ export default function Index({ clients, filters, stats }) {
                                     >
                                         <option value="client">{__("Client")}</option>
                                         <option value="admin">{__("Admin")}</option>
-                                        <option value="manager">{__("Manager")}</option>
+                                        <option value="manager">{__("general.manager")}</option>
                                         <option value="employee">{__("Employee")}</option>
-                                        <option value="moderator">{__("Moderator")}</option>
+                                        <option value="moderator">{__("general.moderator")}</option>
                                     </select>
                                 </div>
                             </div>
                         )}
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsChangeRoleOpen(false)}>{__("Cancel")}</Button>
-                            <Button type="submit">{__("Update Role")}</Button>
+                            <Button type="submit">{__("general.update_role")}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

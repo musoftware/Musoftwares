@@ -85,7 +85,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
     const { auth } = usePage().props as any;
 
     return (
-        <AdminSidebarLayout title="New Transaction" header="New Transaction" user={auth?.user}>
+        <AdminSidebarLayout title={__('general.new_transaction')} header="New Transaction" user={auth?.user}>
             <Head title={`Adjust Wallet: ${user.name}`} />
 
             <div className="w-full max-w-6xl mx-auto py-6 space-y-6">
@@ -97,7 +97,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                     </div>
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
-                            <h1 className="text-3xl font-bold tracking-tight">Wallet Adjustments</h1>
+                            <h1 className="text-3xl font-bold tracking-tight">{__('general.wallet_adjustments')}</h1>
                             <p className="text-muted-foreground mt-1">
                                 {user.name} {selectedProject ? `(Project: ${selectedProject.project_name})` : ''}
                             </p>
@@ -119,7 +119,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                                     <Coins className="h-5 w-5" />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">User Balance</p>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{__('general.user_balance')}</p>
                                     <p className="font-bold text-sm truncate">
                                         <CurrencyDisplay amount={user.user_balance || 0} currency={currencies.find(c => c.id === (user.currency_id || businessCurrency.id))} />
                                     </p>
@@ -132,7 +132,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                                     <TrendingUp className="h-5 w-5" />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Pending Earns</p>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{__('general.pending_earns')}</p>
                                     <p className="font-bold text-sm truncate">
                                         <CurrencyDisplay amount={user.pending_commission || 0} currency={currencies.find(c => c.id === (user.currency_id || businessCurrency.id))} />
                                     </p>
@@ -145,7 +145,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                                     <Receipt className="h-5 w-5" />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Cleared Earns</p>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{__('general.cleared_earns')}</p>
                                     <p className="font-bold text-sm truncate">
                                         <CurrencyDisplay amount={user.available_commission || 0} currency={currencies.find(c => c.id === (user.currency_id || businessCurrency.id))} />
                                     </p>
@@ -190,7 +190,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                         </TabsTrigger>
                         <TabsTrigger value="earned" className="flex items-center gap-2">
                             <Coins className="h-4 w-4 text-purple-500" />
-                            <span className="hidden sm:inline">Add Earn</span>
+                            <span className="hidden sm:inline">{__('general.add_earn')}</span>
                         </TabsTrigger>
                     </TabsList>
 
@@ -212,8 +212,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                     <div className="flex items-center gap-4">
                         <Button variant="secondary" asChild className="rounded-full">
                             <a href={route('admin.users.notes.index', user.id)} target="_blank" rel="noopener noreferrer">
-                                <StickyNote className="h-4 w-4 mr-2" /> User Notes
-                            </a>
+                                <StickyNote className="h-4 w-4 mr-2" />{__('general.user_notes')}</a>
                         </Button>
                         <Button variant="secondary" asChild className="rounded-full">
                             <a href={route('admin.finance.index', { user_id: user.id })} target="_blank" rel="noopener noreferrer">

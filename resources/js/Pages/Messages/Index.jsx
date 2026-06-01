@@ -105,8 +105,7 @@ export default function MessagesIndex({ conversations, users }) {
                     </div>
 
                     <PrimaryButton onClick={() => setIsNewModalOpen(true)} className="self-start md:self-auto shadow-md">
-                        <Plus className="w-4 h-4 mr-2" /> New Direct Chat
-                    </PrimaryButton>
+                        <Plus className="w-4 h-4 mr-2" />{__('general.new_direct_chat')}</PrimaryButton>
                 </div>
 
                 {/* Main Chat Layout */}
@@ -118,7 +117,7 @@ export default function MessagesIndex({ conversations, users }) {
                                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input
                                     type="text"
-                                    placeholder="Search conversations..."
+                                    placeholder={__('general.search_conversations')}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-indigo-500 focus:ring-indigo-500 transition-all"
@@ -128,9 +127,7 @@ export default function MessagesIndex({ conversations, users }) {
 
                         <div className="flex-1 overflow-y-auto divide-y divide-slate-50 p-2">
                             {filteredConversations.length === 0 ? (
-                                <div className="p-8 text-center text-slate-400 font-light text-sm">
-                                    No conversations found in this tab.
-                                </div>
+                                <div className="p-8 text-center text-slate-400 font-light text-sm">{__('general.no_conversations_found_in_this_tab')}</div>
                             ) : (
                                 filteredConversations.map((conv) => {
                                     const isSelected = activeConv?.id === conv.id;
@@ -185,8 +182,8 @@ export default function MessagesIndex({ conversations, users }) {
                                 <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mb-4">
                                     <MessageSquare className="w-8 h-8" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-slate-800 mb-1">No Active Chat Selected</h3>
-                                <p className="text-sm text-slate-500 max-w-md">Select a conversation from the sidebar or initiate a new direct message to start chatting.</p>
+                                <h3 className="text-lg font-semibold text-slate-800 mb-1">{__('general.no_active_chat_selected')}</h3>
+                                <p className="text-sm text-slate-500 max-w-md">{__('general.select_a_conversation_from_the_sidebar_or_initiate_a_new_direct_message_to_start_chatting')}</p>
                             </div>
                         ) : (
                             <div className="flex-1 h-full shadow-sm rounded-2xl overflow-hidden border border-slate-200 bg-white">
@@ -204,12 +201,11 @@ export default function MessagesIndex({ conversations, users }) {
                 <Modal show={isNewModalOpen} onClose={() => setIsNewModalOpen(false)}>
                     <div className="p-6">
                         <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                            <Send className="w-5 h-5 text-indigo-600" /> New Direct Chat
-                        </h2>
+                            <Send className="w-5 h-5 text-indigo-600" />{__('general.new_direct_chat')}</h2>
                         <form onSubmit={startDirectMessage} className="space-y-6">
                             <div>
                                 <InputLabel htmlFor="recipient" value="Contact Support Team" />
-                                <p className="text-xs text-slate-400 mb-1">Direct chats can only be initiated with support or admin staff.</p>
+                                <p className="text-xs text-slate-400 mb-1">{__('general.direct_chats_can_only_be_initiated_with_support_or_admin_staff')}</p>
                                 <select
                                     id="recipient"
                                     value={data.recipient_id}
@@ -234,7 +230,7 @@ export default function MessagesIndex({ conversations, users }) {
                                     rows="4"
                                     value={data.message}
                                     onChange={(e) => setData('message', e.target.value)}
-                                    placeholder="Type your first message..."
+                                    placeholder={__('general.type_your_first_message')}
                                     className="mt-1 block w-full rounded-xl border-slate-200 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     required
                                 />
@@ -243,9 +239,7 @@ export default function MessagesIndex({ conversations, users }) {
 
                             <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                                 <SecondaryButton onClick={() => setIsNewModalOpen(false)}>Cancel</SecondaryButton>
-                                <PrimaryButton type="submit" disabled={processing}>
-                                    Start Chat
-                                </PrimaryButton>
+                                <PrimaryButton type="submit" disabled={processing}>{__('general.start_chat')}</PrimaryButton>
                             </div>
                         </form>
                     </div>

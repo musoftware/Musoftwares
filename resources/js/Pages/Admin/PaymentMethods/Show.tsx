@@ -115,7 +115,7 @@ export default function Show({ paymentMethod }: Props) {
     const isInstapay    = paymentMethod.type?.toLowerCase() === 'instapay';
 
     return (
-        <AdminSidebarLayout title="Payment Method Detail" header="Payment Method Detail">
+        <AdminSidebarLayout title={__('general.payment_method_detail')} header="Payment Method Detail">
             <Head title={`Payment Method #${paymentMethod.id}`} />
 
             {/* Back */}
@@ -124,9 +124,7 @@ export default function Show({ paymentMethod }: Props) {
                     href={route('admin.payment-methods.index')}
                     className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors"
                 >
-                    <ArrowLeft className="h-4 w-4" />
-                    Back to Payment Methods
-                </Link>
+                    <ArrowLeft className="h-4 w-4" />{__('general.back_to_payment_methods')}</Link>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -159,36 +157,36 @@ export default function Show({ paymentMethod }: Props) {
                     <div className="pt-2">
                         {isBank && (
                             <>
-                                <DetailRow icon={Building2} label="Bank Name"       value={paymentMethod.bank_name} />
-                                <DetailRow icon={Hash}      label="Account Number"  value={paymentMethod.bank_number} />
-                                <DetailRow icon={UserIcon}  label="Account Holder"  value={paymentMethod.bank} />
+                                <DetailRow icon={Building2} label={__('general.bank_name')}       value={paymentMethod.bank_name} />
+                                <DetailRow icon={Hash}      label={__('general.account_number')}  value={paymentMethod.bank_number} />
+                                <DetailRow icon={UserIcon}  label={__('general.account_holder')}  value={paymentMethod.bank} />
                                 <DetailRow icon={GitBranch} label="Branch"          value={paymentMethod.bank_branch} />
-                                <DetailRow icon={Mail}      label="Payee Email"     value={paymentMethod.payee_email} />
-                                <DetailRow icon={Hash}      label="ID Number"       value={paymentMethod.id_number} />
+                                <DetailRow icon={Mail}      label={__('general.payee_email')}     value={paymentMethod.payee_email} />
+                                <DetailRow icon={Hash}      label={__('general.id_number')}       value={paymentMethod.id_number} />
                             </>
                         )}
 
                         {isMobile && (
                             <>
-                                <DetailRow icon={Phone}    label="Mobile Number"   value={paymentMethod.mobile} />
-                                <DetailRow icon={UserIcon} label="Account Name"    value={paymentMethod.name} />
-                                <DetailRow icon={Hash}     label="ID Number"       value={paymentMethod.id_number} />
+                                <DetailRow icon={Phone}    label={__('general.mobile_number')}   value={paymentMethod.mobile} />
+                                <DetailRow icon={UserIcon} label={__('general.account_name')}    value={paymentMethod.name} />
+                                <DetailRow icon={Hash}     label={__('general.id_number')}       value={paymentMethod.id_number} />
                             </>
                         )}
 
                         {isPaypal && (
                             <>
-                                <DetailRow icon={Mail}     label="PayPal Email"    value={paymentMethod.payee_email} />
-                                <DetailRow icon={UserIcon} label="Account Name"    value={paymentMethod.name} />
+                                <DetailRow icon={Mail}     label={__('general.paypal_email')}    value={paymentMethod.payee_email} />
+                                <DetailRow icon={UserIcon} label={__('general.account_name')}    value={paymentMethod.name} />
                             </>
                         )}
 
                         {isInstapay && (
                             <>
-                                <DetailRow icon={Wallet}   label="Wallet Provider" value={paymentMethod.ewallet_provider} />
-                                <DetailRow icon={Mail}     label="Payee Email"     value={paymentMethod.payee_email} />
+                                <DetailRow icon={Wallet}   label={__('general.wallet_provider')} value={paymentMethod.ewallet_provider} />
+                                <DetailRow icon={Mail}     label={__('general.payee_email')}     value={paymentMethod.payee_email} />
                                 <DetailRow icon={Phone}    label="Mobile"          value={paymentMethod.mobile} />
-                                <DetailRow icon={Hash}     label="ID Number"       value={paymentMethod.id_number} />
+                                <DetailRow icon={Hash}     label={__('general.id_number')}       value={paymentMethod.id_number} />
                             </>
                         )}
 
@@ -221,7 +219,7 @@ export default function Show({ paymentMethod }: Props) {
 
                     {/* User card */}
                     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-                        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Submitted By</h3>
+                        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">{__('general.submitted_by')}</h3>
                         {paymentMethod.user ? (
                             <>
                                 <div className="flex items-center gap-3">
@@ -241,7 +239,7 @@ export default function Show({ paymentMethod }: Props) {
                                 </Link>
                             </>
                         ) : (
-                            <p className="text-sm text-slate-400 italic">User account deleted.</p>
+                            <p className="text-sm text-slate-400 italic">{__('general.user_account_deleted')}</p>
                         )}
                     </div>
 
@@ -254,9 +252,7 @@ export default function Show({ paymentMethod }: Props) {
                                 className="w-full justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
                                 onClick={() => handleUpdate('active')}
                             >
-                                <CheckCircle className="h-4 w-4" />
-                                Approve Method
-                            </Button>
+                                <CheckCircle className="h-4 w-4" />{__('general.approve_method')}</Button>
                         )}
 
                         {paymentMethod.status !== 'declined' && (
@@ -265,9 +261,7 @@ export default function Show({ paymentMethod }: Props) {
                                 className="w-full justify-center gap-2"
                                 onClick={() => handleUpdate('declined')}
                             >
-                                <XCircle className="h-4 w-4" />
-                                Decline Method
-                            </Button>
+                                <XCircle className="h-4 w-4" />{__('general.decline_method')}</Button>
                         )}
 
                         {paymentMethod.status !== 'pending' && (
@@ -276,9 +270,7 @@ export default function Show({ paymentMethod }: Props) {
                                 className="w-full justify-center gap-2"
                                 onClick={() => handleUpdate('pending')}
                             >
-                                <Clock className="h-4 w-4" />
-                                Reset to Pending
-                            </Button>
+                                <Clock className="h-4 w-4" />{__('general.reset_to_pending')}</Button>
                         )}
                     </div>
                 </div>

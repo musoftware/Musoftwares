@@ -95,25 +95,25 @@ class MarketplaceServiceController extends Controller
     public function approve(Service $service)
     {
         $service->update(['status' => 'active']);
-        return back()->with('success', __('Service approved successfully.'));
+        return back()->with('success', __('general.service_approved_successfully'));
     }
 
     public function reject(Service $service)
     {
         $service->update(['status' => 'rejected']);
-        return back()->with('success', __('Service rejected successfully.'));
+        return back()->with('success', __('general.service_rejected_successfully'));
     }
 
     public function suspend(Service $service)
     {
         $service->update(['status' => 'suspended']);
-        return back()->with('success', __('Service suspended successfully.'));
+        return back()->with('success', __('general.service_suspended_successfully'));
     }
 
     public function feature(Service $service)
     {
         $service->update(['is_featured' => !$service->is_featured]);
-        return back()->with('success', __('Service featured status updated.'));
+        return back()->with('success', __('general.service_featured_status_updated'));
     }
 
     public function edit(Service $service)
@@ -151,12 +151,12 @@ class MarketplaceServiceController extends Controller
         $service->packages()->delete();
         $service->packages()->createMany($validated['packages']);
 
-        return redirect()->route('admin.marketplace.services.all')->with('success', __('Service updated successfully.'));
+        return redirect()->route('admin.marketplace.services.all')->with('success', __('general.service_updated_successfully'));
     }
 
     public function destroy(Service $service)
     {
         $service->delete();
-        return back()->with('success', __('Service deleted successfully.'));
+        return back()->with('success', __('general.service_deleted_successfully'));
     }
 }

@@ -124,7 +124,7 @@ class MessagesController extends Controller
                 return $conv;
             });
 
-            return back()->with('success', 'Message sent successfully.');
+            return back()->with('success', __('general.message_sent_successfully'));
         } catch (\Exception $e) {
             return back()->withErrors(['message' => 'Failed to send message: ' . $e->getMessage()]);
         }

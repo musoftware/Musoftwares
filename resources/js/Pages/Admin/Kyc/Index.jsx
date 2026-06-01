@@ -46,18 +46,18 @@ export default function AdminKycIndex({ auth, users }) {
     };
 
     return (
-        <AdminSidebarLayout user={auth?.user} title="KYC Applications" header="KYC Applications">
+        <AdminSidebarLayout user={auth?.user} title={__('general.kyc_applications')} header="KYC Applications">
             <div className="space-y-6 pb-20 p-6">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold font-sora tracking-tight">KYC Applications</h1>
-                        <p className="text-sm text-muted-foreground mt-1">Review and approve identity verification requests.</p>
+                        <h1 className="text-3xl font-bold font-sora tracking-tight">{__('general.kyc_applications')}</h1>
+                        <p className="text-sm text-muted-foreground mt-1">{__('general.review_and_approve_identity_verification_requests')}</p>
                     </div>
                 </div>
 
                 <Card>
                     <CardHeader className="bg-slate-50/50 border-b border-slate-100">
-                        <CardTitle className="text-lg">Pending Reviews</CardTitle>
+                        <CardTitle className="text-lg">{__('general.pending_reviews')}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
                         <Table>
@@ -88,7 +88,7 @@ export default function AdminKycIndex({ auth, users }) {
                                         </TableCell>
                                         <TableCell>
                                             {user.kyc_status === 'pending_review' ? (
-                                                <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100">Review Required</Badge>
+                                                <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100">{__('general.review_required')}</Badge>
                                             ) : user.kyc_status === 'verified' ? (
                                                 <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Verified</Badge>
                                             ) : (
@@ -103,7 +103,7 @@ export default function AdminKycIndex({ auth, users }) {
                                                         {doc.type}
                                                     </Badge>
                                                 ))}
-                                                {user.documents.length === 0 && <span className="text-xs text-slate-400">No docs</span>}
+                                                {user.documents.length === 0 && <span className="text-xs text-slate-400">{__('general.no_docs')}</span>}
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-sm text-slate-500">
@@ -119,9 +119,7 @@ export default function AdminKycIndex({ auth, users }) {
                                 {users.data.length === 0 && (
                                     <TableRow>
                                         <TableCell colSpan={5} className="text-center py-8 text-slate-500">
-                                            <ShieldCheck className="w-8 h-8 mx-auto mb-3 text-slate-300" />
-                                            No pending KYC applications.
-                                        </TableCell>
+                                            <ShieldCheck className="w-8 h-8 mx-auto mb-3 text-slate-300" />{__('general.no_pending_kyc_applications')}</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -137,7 +135,7 @@ export default function AdminKycIndex({ auth, users }) {
                                 <DialogTitle className="flex items-center gap-2">
                                     <User className="w-5 h-5 text-indigo-600" /> Review Application: {selectedUser.name}
                                 </DialogTitle>
-                                <DialogDescription>Review the documents below to verify this user's identity.</DialogDescription>
+                                <DialogDescription>{__('general.review_the_documents_below_to_verify_this_user_s_identity')}</DialogDescription>
                             </DialogHeader>
 
                             <div className="grid grid-cols-2 gap-4 my-4">
@@ -160,9 +158,7 @@ export default function AdminKycIndex({ auth, users }) {
                                     </div>
                                 ))}
                                 {selectedUser.documents.length === 0 && (
-                                    <div className="col-span-2 text-center py-4 text-slate-500 border border-dashed rounded-xl">
-                                        No documents uploaded
-                                    </div>
+                                    <div className="col-span-2 text-center py-4 text-slate-500 border border-dashed rounded-xl">{__('general.no_documents_uploaded')}</div>
                                 )}
                             </div>
 
@@ -173,8 +169,7 @@ export default function AdminKycIndex({ auth, users }) {
                                         <X className="w-4 h-4 mr-1" /> Reject
                                     </Button>
                                     <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleApprove(selectedUser.id)}>
-                                        <Check className="w-4 h-4 mr-1" /> Approve Verification
-                                    </Button>
+                                        <Check className="w-4 h-4 mr-1" />{__('general.approve_verification')}</Button>
                                 </div>
                             </DialogFooter>
                         </DialogContent>
@@ -185,13 +180,13 @@ export default function AdminKycIndex({ auth, users }) {
                 <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle className="text-rose-600">Reject Application</DialogTitle>
-                            <DialogDescription>Please provide a reason for rejecting this KYC application. The user will see this message.</DialogDescription>
+                            <DialogTitle className="text-rose-600">{__('general.reject_application')}</DialogTitle>
+                            <DialogDescription>{__('general.please_provide_a_reason_for_rejecting_this_kyc_application_the_user_will_see_this_message')}</DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleReject} className="space-y-4">
                             <div className="space-y-2">
                                 <Input 
-                                    placeholder="e.g. ID photo is blurry, Please upload a valid passport."
+                                    placeholder={__('general.e_g_id_photo_is_blurry_please_upload_a_valid_passport')}
                                     value={data.reason}
                                     onChange={e => setData('reason', e.target.value)}
                                     required
@@ -200,7 +195,7 @@ export default function AdminKycIndex({ auth, users }) {
                             </div>
                             <DialogFooter>
                                 <Button type="button" variant="outline" onClick={() => setIsRejectDialogOpen(false)}>Cancel</Button>
-                                <Button type="submit" variant="destructive" disabled={processing}>Confirm Rejection</Button>
+                                <Button type="submit" variant="destructive" disabled={processing}>{__('general.confirm_rejection')}</Button>
                             </DialogFooter>
                         </form>
                     </DialogContent>

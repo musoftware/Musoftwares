@@ -25,13 +25,13 @@ class WidgetController extends Controller
         $order = \App\Models\PaymentOrder::where('uuid', $uuid)->first();
 
         if (!$order) {
-            abort(404, 'Invalid checkout session.');
+            abort(404, __('general.invalid_checkout_session'));
         }
 
         $user = User::find($order->user_id);
 
         if (!$user) {
-            abort(404, 'Merchant not found.');
+            abort(404, __('general.merchant_not_found'));
         }
 
         $settings = SmsPaymentGatewaySetting::where('user_id', $user->id)->first();

@@ -53,9 +53,9 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
 
     return (
         <AuthenticatedLayout
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Integration Tester</h2>}
+            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('general.integration_tester')}</h2>}
         >
-            <Head title="Integration Tester - Text Payment Gateway" />
+            <Head title={__('general.integration_tester_text_payment_gateway')} />
 
             <div className="py-8 md:py-12">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -63,15 +63,11 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                                <TestTube className="w-6 h-6 text-indigo-600" />
-                                Integration Sandbox
-                            </h1>
-                            <p className="text-slate-500 mt-1">Simulate API calls to verify your application's handling of Text Payment Gateway payloads.</p>
+                                <TestTube className="w-6 h-6 text-indigo-600" />{__('general.integration_sandbox')}</h1>
+                            <p className="text-slate-500 mt-1">{__('general.simulate_api_calls_to_verify_your_application_s_handling_of_text_payment_gateway_payloads')}</p>
                         </div>
                         <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
-                            <ArrowLeft className="w-4 h-4 mr-2" />
-                            Back to Dashboard
-                        </Button>
+                            <ArrowLeft className="w-4 h-4 mr-2" />{__('general.back_to_dashboard')}</Button>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -79,32 +75,30 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
                             <form onSubmit={handleRunTest}>
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
-                                        <Server className="w-5 h-5 text-indigo-500" />
-                                        Target Configuration
-                                    </CardTitle>
-                                    <CardDescription>Setup the destination and credentials for the simulated request.</CardDescription>
+                                        <Server className="w-5 h-5 text-indigo-500" />{__('general.target_configuration')}</CardTitle>
+                                    <CardDescription>{__('general.setup_the_destination_and_credentials_for_the_simulated_request')}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="endpoint">Endpoint URL</Label>
+                                        <Label htmlFor="endpoint">{__('general.endpoint_url')}</Label>
                                         <Input
                                             id="endpoint"
                                             type="url"
                                             value={endpoint}
                                             onChange={e => setEndpoint(e.target.value)}
                                             required
-                                            placeholder="https://your-server.com/api/payment/callback"
+                                            placeholder={__('general.https_your_server_com_api_payment_callback')}
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="phone">Target Phone Number</Label>
+                                        <Label htmlFor="phone">{__('general.target_phone_number')}</Label>
                                         <Input
                                             id="phone"
                                             type="text"
                                             value={phone}
                                             onChange={e => setPhone(e.target.value)}
                                             required
-                                            placeholder="e.g. 01012345678"
+                                            placeholder={__('general.e_g_01012345678')}
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -114,7 +108,7 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
                                             type="text"
                                             value={authToken}
                                             onChange={e => setAuthToken(e.target.value)}
-                                            placeholder="ey..."
+                                            placeholder={__('general.ey')}
                                         />
                                     </div>
                                     
@@ -122,7 +116,7 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
                                         <Code className="h-4 w-4 text-slate-600" />
                                         <AlertDescription className="text-slate-600 font-mono text-xs mt-2 space-y-2">
                                             <p className="font-semibold text-slate-900 mb-1">Generated Request Headers:</p>
-                                            <p>Content-Type: application/json</p>
+                                            <p>{__('general.content_type_application_json')}</p>
                                             <p>User-Agent: Text Payment Gateway-Integration-Tester/1.0</p>
                                             {authToken && <p>Authorization: Bearer {authToken.substring(0, 10)}...</p>}
                                         </AlertDescription>
@@ -130,7 +124,7 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
                                 </CardContent>
                                 <div className="p-4 border-t bg-slate-50 flex justify-end">
                                     <Button type="submit" disabled={testing || !endpoint || !phone} className="bg-indigo-600 hover:bg-indigo-700">
-                                        {testing ? <span className="animate-pulse">Running Simulation...</span> : <span className="flex items-center"><Play className="w-4 h-4 mr-2" /> Dispatch Mock Payload</span>}
+                                        {testing ? <span className="animate-pulse">{__('general.running_simulation')}</span> : <span className="flex items-center"><Play className="w-4 h-4 mr-2" />{__('general.dispatch_mock_payload')}</span>}
                                     </Button>
                                 </div>
                             </form>
@@ -139,15 +133,11 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
                         <Card className="flex flex-col h-full bg-slate-900 border-slate-800 text-slate-300">
                             <CardHeader className="border-b border-slate-800">
                                 <CardTitle className="flex items-center gap-2 text-slate-100">
-                                    <FileJson className="w-5 h-5 text-indigo-400" />
-                                    Execution Output
-                                </CardTitle>
+                                    <FileJson className="w-5 h-5 text-indigo-400" />{__('general.execution_output')}</CardTitle>
                             </CardHeader>
                             <CardContent className="p-0 flex-1 overflow-auto bg-slate-950 font-mono text-xs">
                                 {!result ? (
-                                    <div className="flex items-center justify-center h-full min-h-[300px] text-slate-600">
-                                        Awaiting execution...
-                                    </div>
+                                    <div className="flex items-center justify-center h-full min-h-[300px] text-slate-600">{__('general.awaiting_execution')}</div>
                                 ) : (
                                     <div className="p-4 space-y-6">
                                         <div>
@@ -166,7 +156,7 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
 
                                         {result.payload_sent && (
                                             <div>
-                                                <h3 className="text-slate-400 mb-2 uppercase tracking-wider font-semibold border-b border-slate-800 pb-1">Payload Sent</h3>
+                                                <h3 className="text-slate-400 mb-2 uppercase tracking-wider font-semibold border-b border-slate-800 pb-1">{__('general.payload_sent')}</h3>
                                                 <pre className="text-indigo-300 overflow-x-auto whitespace-pre-wrap break-all">
                                                     {JSON.stringify(result.payload_sent, null, 2)}
                                                 </pre>
@@ -175,7 +165,7 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
 
                                         {result.response_body !== undefined && (
                                             <div>
-                                                <h3 className="text-slate-400 mb-2 uppercase tracking-wider font-semibold border-b border-slate-800 pb-1">Server Response</h3>
+                                                <h3 className="text-slate-400 mb-2 uppercase tracking-wider font-semibold border-b border-slate-800 pb-1">{__('general.server_response')}</h3>
                                                 <pre className="text-emerald-300 overflow-x-auto whitespace-pre-wrap break-all">
                                                     {typeof result.response_body === 'object' 
                                                         ? JSON.stringify(result.response_body, null, 2) 

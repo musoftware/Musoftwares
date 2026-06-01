@@ -186,7 +186,7 @@ class AdminTaskController extends Controller
             return response()->json(['success' => true]);
         }
         
-        return redirect()->back()->with('message', 'Task status updated successfully.');
+        return redirect()->back()->with('message', __('general.task_status_updated_successfully'));
     }
 
     /**
@@ -210,7 +210,7 @@ class AdminTaskController extends Controller
         
         $todo->save();
 
-        return redirect()->back()->with('message', 'Task added to the queue.');
+        return redirect()->back()->with('message', __('general.task_added_to_the_queue'));
     }
 
     /**
@@ -223,7 +223,7 @@ class AdminTaskController extends Controller
         }
         
         $todo->delete();
-        return redirect()->back()->with('message', 'Task removed from the queue.');
+        return redirect()->back()->with('message', __('general.task_removed_from_the_queue'));
     }
 
     /**
@@ -318,7 +318,7 @@ class AdminTaskController extends Controller
                         \Illuminate\Support\Facades\Log::warning('Google Calendar sync failed: ' . $e->getMessage());
                     }
 
-                    return redirect()->back()->with('message', 'Task scheduled and billed successfully!');
+                    return redirect()->back()->with('message', __('general.task_scheduled_and_billed_successfully'));
 
                 } catch (\Throwable $e) {
                     \Illuminate\Support\Facades\DB::rollBack();
@@ -626,7 +626,7 @@ class AdminTaskController extends Controller
 
         if ($invalidSlot) {
             $this->refundInvalidSlotTodo($todo, $user);
-            return redirect()->back()->with('message', 'Refund processed successfully!');
+            return redirect()->back()->with('message', __('general.refund_processed_successfully'));
         }
 
         if ($now->gte($end)) {
@@ -637,7 +637,7 @@ class AdminTaskController extends Controller
         $totalSeconds = $start->diffInSeconds($end);
         if ($totalSeconds <= 0) {
             $this->refundInvalidSlotTodo($todo, $user);
-            return redirect()->back()->with('message', 'Refund processed successfully!');
+            return redirect()->back()->with('message', __('general.refund_processed_successfully'));
         }
 
         // Only count time from when the slot actually starts (not "now" if the slot is in the future)
@@ -716,7 +716,7 @@ class AdminTaskController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('message', 'Refund processed successfully!');
+        return redirect()->back()->with('message', __('general.refund_processed_successfully'));
     }
 
     /**
@@ -815,7 +815,7 @@ class AdminTaskController extends Controller
         $todo->end_at   = $end->toDateTimeString();
         $todo->save();
 
-        return redirect()->back()->with('message', 'Time scheduled successfully!');
+        return redirect()->back()->with('message', __('general.time_scheduled_successfully'));
     }
 
     /**
@@ -943,7 +943,7 @@ class AdminTaskController extends Controller
                         \Illuminate\Support\Facades\Log::warning('Google Calendar sync failed: ' . $e->getMessage());
                     }
 
-                    return redirect()->back()->with('message', 'Scheduled task created and billed successfully!');
+                    return redirect()->back()->with('message', __('general.scheduled_task_created_and_billed_successfully'));
 
                 } catch (\Throwable $e) {
                     \Illuminate\Support\Facades\DB::rollBack();

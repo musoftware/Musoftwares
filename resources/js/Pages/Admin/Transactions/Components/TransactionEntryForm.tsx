@@ -180,14 +180,13 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                 <Card className="border-primary/20 bg-primary/5 shadow-none transition-all">
                     <CardContent className="p-4">
                         <h6 className="font-bold mb-3 text-primary flex items-center">
-                            <ArrowRightLeft className="mr-2 h-4 w-4" /> Currency Exchange
-                        </h6>
+                            <ArrowRightLeft className="mr-2 h-4 w-4" />{__('general.currency_exchange')}</h6>
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                             <div className="md:col-span-5 space-y-1">
-                                <Label className="text-xs text-muted-foreground uppercase tracking-wider font-bold">From Currency</Label>
+                                <Label className="text-xs text-muted-foreground uppercase tracking-wider font-bold">{__('general.from_currency')}</Label>
                                 <Select value={exchangeFromCurrency} onValueChange={setExchangeFromCurrency}>
                                     <SelectTrigger className="bg-white">
-                                        <SelectValue placeholder="Select currency...">
+                                        <SelectValue placeholder={__('general.select_currency')}>
                                             {exchangeFromCurrency ? currencies.find(c => c.id.toString() === exchangeFromCurrency)?.currency : "Select currency..."}
                                         </SelectValue>
                                     </SelectTrigger>
@@ -216,13 +215,13 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
 
             <Card className="border shadow-sm">
                 <CardHeader className="bg-muted/30 border-b pb-4">
-                    <CardTitle className="text-lg">Entry Details</CardTitle>
+                    <CardTitle className="text-lg">{__('general.entry_details')}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 space-y-6">
                     
                     {/* Fee Source Row */}
                     <div className="space-y-3">
-                        <Label className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Payment Source & Fee</Label>
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground font-bold">{__('general.payment_source_fee')}</Label>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                             {feeSources.map(s => (
                                 <div 
@@ -265,7 +264,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                         variant="secondary" 
                                         className="rounded-l-none h-12 px-3 border-l-0"
                                         onClick={() => setShowExchange(!showExchange)}
-                                        title="Currency Exchange"
+                                        title={__('general.currency_exchange')}
                                     >
                                         <ArrowRightLeft className="h-4 w-4 text-muted-foreground" />
                                     </Button>
@@ -306,8 +305,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                             onClick={subtractFeeFromAmount}
                                             className="text-xs text-destructive hover:underline font-medium flex items-center justify-end w-full"
                                         >
-                                            <MinusCircle className="h-3 w-3 mr-1" /> Subtract fee from amount
-                                        </button>
+                                            <MinusCircle className="h-3 w-3 mr-1" />{__('general.subtract_fee_from_amount')}</button>
                                     </div>
                                 )}
                             </div>
@@ -316,11 +314,11 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
 
                     {/* Reason */}
                     <div className="space-y-1">
-                        <Label>Reason / Description</Label>
+                        <Label>{__('general.reason_description')}</Label>
                         <Input 
                             value={reason} 
                             onChange={e => setReason(e.target.value)} 
-                            placeholder="Description of the transaction" 
+                            placeholder={__('general.description_of_the_transaction')} 
                             onKeyDown={e => e.key === 'Enter' && addItem()}
                         />
                     </div>
@@ -331,11 +329,10 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Layers className="h-4 w-4 text-muted-foreground" />
-                                    <Label className="font-semibold">Split Across Projects</Label>
+                                    <Label className="font-semibold">{__('general.split_across_projects')}</Label>
                                 </div>
                                 <Button type="button" variant="ghost" size="sm" onClick={() => setProjectSplits([...projectSplits, { projectId: '', percentage: '100' }])}>
-                                    <Plus className="h-3 w-3 mr-1" /> Add Split
-                                </Button>
+                                    <Plus className="h-3 w-3 mr-1" />{__('general.add_split')}</Button>
                             </div>
                             {projectSplits.length > 0 && (
                                 <div className="space-y-2 pt-2 border-t">
@@ -347,7 +344,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                                 setProjectSplits(newS);
                                             }}>
                                                 <SelectTrigger className="flex-1">
-                                                    <SelectValue placeholder="Select Project" />
+                                                    <SelectValue placeholder={__('general.select_project')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {activeProjects.map(p => (
@@ -376,7 +373,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                         <Button type="button" variant="link" size="sm" className="text-xs text-muted-foreground" onClick={() => {
                                             const p = (100 / projectSplits.length).toFixed(1);
                                             setProjectSplits(projectSplits.map(s => ({ ...s, percentage: p })));
-                                        }}>Split Evenly</Button>
+                                        }}>{__('general.split_evenly')}</Button>
                                     </div>
                                 </div>
                             )}
@@ -387,15 +384,13 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                     {type === 'timer-received' || type === 'receive' ? (
                         <div className="flex items-center gap-2">
                             <Switch id="isUsed" checked={isUsed} onCheckedChange={(c: boolean) => setIsUsed(c)} />
-                            <label htmlFor="isUsed" className="text-sm text-muted-foreground cursor-pointer user-select-none">
-                                Mark as used money <span className="text-xs opacity-70">(Funds already spent/utilized)</span>
+                            <label htmlFor="isUsed" className="text-sm text-muted-foreground cursor-pointer user-select-none">{__('general.mark_as_used_money')}<span className="text-xs opacity-70">(Funds already spent/utilized)</span>
                             </label>
                         </div>
                     ) : null}
 
                     <Button type="button" className="w-full" onClick={addItem} disabled={!amount || parseFloat(amount) <= 0}>
-                        <Plus className="h-4 w-4 mr-2" /> Add To List
-                    </Button>
+                        <Plus className="h-4 w-4 mr-2" />{__('general.add_to_list')}</Button>
                 </CardContent>
             </Card>
 
@@ -454,7 +449,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                         {(type === 'timer-received' || type === 'receive' || type === 'timer-due' || type === 'charge') && (
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <Switch checked={tryPayUnpaid} onCheckedChange={setTryPayUnpaid} />
-                                <span className="text-sm font-medium">Try pay unpaid invoices if user has balance</span>
+                                <span className="text-sm font-medium">{__('general.try_pay_unpaid_invoices_if_user_has_balance')}</span>
                             </label>
                         )}
                     </div>

@@ -176,7 +176,7 @@ class ServiceLandingPageSubmissionController extends Controller
             return redirect($whatsappUrl);
         }
 
-        return redirect()->back()->with('success', 'Thank you! Your form has been submitted successfully.');
+        return redirect()->back()->with('success', __('general.thank_you_your_form_has_been_submitted_successfully'));
     }
 
 
@@ -189,7 +189,7 @@ class ServiceLandingPageSubmissionController extends Controller
 
         if (!$landingPage) {
             return redirect()->route('services.mine')
-                ->with('error', 'No landing page found for this service.');
+                ->with('error', __('general.no_landing_page_found_for_this_service'));
         }
 
         $query = $landingPage->formSubmissions();
@@ -230,7 +230,7 @@ class ServiceLandingPageSubmissionController extends Controller
         $landingPage = $service->landingPage;
         if (!$landingPage || $submission->landing_page_id !== $landingPage->id) {
             return redirect()->route('services.landing-page.submissions', $service)
-                ->with('error', 'Submission not found or access denied.');
+                ->with('error', __('general.submission_not_found_or_access_denied'));
         }
 
         $submissionName = $submission->submitted_by_name ?? 'Unknown';
@@ -250,7 +250,7 @@ class ServiceLandingPageSubmissionController extends Controller
 
         if (!$landingPage) {
             return redirect()->route('services.mine')
-                ->with('error', 'No landing page found for this service.');
+                ->with('error', __('general.no_landing_page_found_for_this_service'));
         }
 
         $query = $landingPage->formSubmissions();

@@ -157,7 +157,7 @@ export default function Notes({ user, notes: initialNotes, stats }) {
 
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold font-sora">Secure Notes</h1>
+                    <h1 className="text-3xl font-bold font-sora">{__('general.secure_notes')}</h1>
                     <p className="text-slate-500">Manage encrypted notes for {user.name}</p>
                 </div>
                 <div className="flex space-x-2">
@@ -177,16 +177,14 @@ export default function Notes({ user, notes: initialNotes, stats }) {
                     <h4 className={`font-bold mb-1 ${isPasswordSet ? 'text-green-900' : 'text-amber-900'}`}>
                         {isPasswordSet ? 'End-to-End Encryption Active' : 'Encryption Password Required'}
                     </h4>
-                    <p className={`text-sm mb-0 ${isPasswordSet ? 'text-green-700' : 'text-amber-700'}`}>
-                        All notes are encrypted client-side before being saved. The server cannot read your data.
-                    </p>
+                    <p className={`text-sm mb-0 ${isPasswordSet ? 'text-green-700' : 'text-amber-700'}`}>{__('general.all_notes_are_encrypted_client_side_before_being_saved_the_server_cannot_read_your_data')}</p>
                 </div>
                 <div>
                     {!isPasswordSet ? (
                         <form onSubmit={handleSetPassword} className="flex gap-2">
                             <Input 
                                 type="password" 
-                                placeholder="Master Password" 
+                                placeholder={__('general.master_password')} 
                                 value={password} 
                                 onChange={e => setPassword(e.target.value)} 
                                 className="w-48 bg-white border-amber-300"
@@ -195,9 +193,7 @@ export default function Notes({ user, notes: initialNotes, stats }) {
                             <Button type="submit" className="bg-amber-600 hover:bg-amber-700 text-white">Unlock</Button>
                         </form>
                     ) : (
-                        <Button variant="outline" onClick={handleClearPassword} className="border-green-300 text-green-700 hover:bg-green-100">
-                            Lock & Clear Session
-                        </Button>
+                        <Button variant="outline" onClick={handleClearPassword} className="border-green-300 text-green-700 hover:bg-green-100">{__('general.lock_clear_session')}</Button>
                     )}
                 </div>
             </div>
@@ -209,7 +205,7 @@ export default function Notes({ user, notes: initialNotes, stats }) {
                     <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center justify-between">
                         <div className="flex items-center gap-4 flex-1">
                             <Input 
-                                placeholder="Search decrypted notes..." 
+                                placeholder={__('general.search_decrypted_notes')} 
                                 value={searchQuery}
                                 onChange={e => setSearchQuery(e.target.value)}
                                 className="max-w-xs"
@@ -220,10 +216,10 @@ export default function Notes({ user, notes: initialNotes, stats }) {
                                 value={filterCategory}
                                 onChange={e => setFilterCategory(e.target.value)}
                             >
-                                <option value="all">All Categories</option>
+                                <option value="all">{__('general.all_categories')}</option>
                                 <option value="password">Passwords</option>
                                 <option value="anydesk">AnyDesk</option>
-                                <option value="notes">General Notes</option>
+                                <option value="notes">{__('general.general_notes')}</option>
                                 <option value="archived">Archived</option>
                             </select>
                         </div>
@@ -268,8 +264,7 @@ export default function Notes({ user, notes: initialNotes, stats }) {
                                             : <div dangerouslySetInnerHTML={renderMarkdown(note.decryptedContent)} />
                                     ) : (
                                         <div className="flex items-center justify-center py-4 text-slate-400 font-medium text-sm">
-                                            <Key size={16} className="mr-2" /> Encrypted Content Hidden
-                                        </div>
+                                            <Key size={16} className="mr-2" />{__('general.encrypted_content_hidden')}</div>
                                     )}
                                 </div>
                             </div>
@@ -279,7 +274,7 @@ export default function Notes({ user, notes: initialNotes, stats }) {
                                 <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
                                     <FileText size={32} />
                                 </div>
-                                <h3 className="text-lg font-bold text-slate-900 mb-1">No Notes Found</h3>
+                                <h3 className="text-lg font-bold text-slate-900 mb-1">{__('general.no_notes_found_1')}</h3>
                                 <p className="text-slate-500 text-sm">
                                     {isPasswordSet ? "Create a new note or adjust your filters." : "Unlock with your master password to view notes."}
                                 </p>
@@ -296,8 +291,8 @@ export default function Notes({ user, notes: initialNotes, stats }) {
                                 <ShieldCheck size={20} />
                             </div>
                             <div>
-                                <h3 className="font-bold text-slate-900 font-sora">Create Note</h3>
-                                <p className="text-xs text-slate-500">Encrypted before saving</p>
+                                <h3 className="font-bold text-slate-900 font-sora">{__('general.create_note')}</h3>
+                                <p className="text-xs text-slate-500">{__('general.encrypted_before_saving')}</p>
                             </div>
                         </div>
 
@@ -323,7 +318,7 @@ export default function Notes({ user, notes: initialNotes, stats }) {
                                     id="title"
                                     type="text"
                                     className="w-full border-slate-300 rounded-lg shadow-sm text-sm focus:border-slate-900 focus:ring-slate-900 bg-slate-50"
-                                    placeholder="e.g. Database Credentials"
+                                    placeholder={__('general.e_g_database_credentials')}
                                     value={title}
                                     onChange={e => setTitle(e.target.value)}
                                     required
@@ -333,7 +328,7 @@ export default function Notes({ user, notes: initialNotes, stats }) {
 
                             <div>
                                 <Label htmlFor="content" className="text-slate-700 font-bold mb-1.5 flex justify-between">
-                                    <span>Secure Content</span>
+                                    <span>{__('general.secure_content')}</span>
                                     <span className="text-[10px] font-bold uppercase tracking-wider text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-200 flex items-center gap-1">
                                         <Key size={10} /> Encrypted
                                     </span>
@@ -342,7 +337,7 @@ export default function Notes({ user, notes: initialNotes, stats }) {
                                     id="content"
                                     className="w-full border-slate-300 rounded-lg shadow-sm text-sm focus:border-slate-900 focus:ring-slate-900 font-mono bg-slate-50"
                                     rows={8}
-                                    placeholder="Enter sensitive information here..."
+                                    placeholder={__('general.enter_sensitive_information_here')}
                                     value={content}
                                     onChange={e => setContent(e.target.value)}
                                     required

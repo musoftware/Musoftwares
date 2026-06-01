@@ -46,6 +46,6 @@ class MarketplaceOrderController extends Controller
             return back()->withErrors(['error' => $e->getMessage()]);
         }
 
-        return back()->with('success', 'Order resolved successfully.');
+        return back()->with('success', __('general.order_resolved_successfully'));
     }
 }

@@ -59,23 +59,22 @@ export default function Create({ currencies, categories, stats }) {
     const yearDaysList = getYearDaysList();
 
     return (
-        <AdminSidebarLayout title="Add Recurring Cost" header="Business Operations">
-            <Head title="Add Recurring Cost" />
+        <AdminSidebarLayout title={__('general.add_recurring_cost')} header="Business Operations">
+            <Head title={__('general.add_recurring_cost')} />
 
             <div className="mb-4">
                 <Link href={route('admin.recurring_costs.index')} className="text-sm text-gray-500 hover:text-black flex items-center gap-1">
-                    <ArrowLeft className="w-4 h-4" /> Back to Recurring Costs
-                </Link>
+                    <ArrowLeft className="w-4 h-4" />{__('general.back_to_recurring_costs')}</Link>
             </div>
 
             <div className="bg-white p-6 rounded-xl border shadow-sm max-w-2xl">
-                <h2 className="text-xl font-bold text-slate-900 mb-2">Add Recurring Cost</h2>
-                <p className="text-sm text-gray-500 mb-6">Add a new overhead expense that repeats automatically.</p>
+                <h2 className="text-xl font-bold text-slate-900 mb-2">{__('general.add_recurring_cost')}</h2>
+                <p className="text-sm text-gray-500 mb-6">{__('general.add_a_new_overhead_expense_that_repeats_automatically')}</p>
 
                 <form onSubmit={handleCreate} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="title">Title / Description</Label>
-                        <Input id="title" required value={newCost.title} onChange={e => setNewCost({...newCost, title: e.target.value})} placeholder="e.g. AWS Hosting Fee" />
+                        <Label htmlFor="title">{__('general.title_description')}</Label>
+                        <Input id="title" required value={newCost.title} onChange={e => setNewCost({...newCost, title: e.target.value})} placeholder={__('general.e_g_aws_hosting_fee')} />
                         {errors.title && <span className="text-red-600 text-xs block">{errors.title}</span>}
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -93,7 +92,7 @@ export default function Create({ currencies, categories, stats }) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Category / Reason</Label>
+                        <Label>{__('general.category_reason')}</Label>
                         <div className="grid grid-cols-2 gap-2">
                             <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={createReasonOption} onChange={e => {
                                 setCreateReasonOption(e.target.value);
@@ -108,14 +107,14 @@ export default function Create({ currencies, categories, stats }) {
                                 <option value="custom">-- Custom Reason --</option>
                             </select>
                             {createReasonOption === 'custom' && (
-                                <Input required placeholder="Specify reason..." value={newCost.custom_reason} onChange={e => setNewCost({...newCost, custom_reason: e.target.value})} />
+                                <Input required placeholder={__('general.specify_reason')} value={newCost.custom_reason} onChange={e => setNewCost({...newCost, custom_reason: e.target.value})} />
                             )}
                         </div>
                         {errors.reason_choice && <span className="text-red-600 text-xs block">{errors.reason_choice}</span>}
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="start_date">Start Date</Label>
+                        <Label htmlFor="start_date">{__('general.start_date')}</Label>
                         <Input id="start_date" type="date" required value={newCost.start_date} onChange={e => setNewCost({...newCost, start_date: e.target.value})} />
                         {errors.start_date && <span className="text-red-600 text-xs block">{errors.start_date}</span>}
                     </div>
@@ -142,7 +141,7 @@ export default function Create({ currencies, categories, stats }) {
 
                     {newCost.recurring === 'week' && (
                         <div className="space-y-2">
-                            <Label htmlFor="week-days">Specific Week Days</Label>
+                            <Label htmlFor="week-days">{__('general.specific_week_days')}</Label>
                             <select
                                 id="week-days"
                                 multiple
@@ -155,13 +154,13 @@ export default function Create({ currencies, categories, stats }) {
                             >
                                 {weekDays.map(wd => <option key={wd} value={wd}>{wd}</option>)}
                             </select>
-                            <span className="text-xs text-gray-400">Hold Ctrl/Cmd to select multiple days.</span>
+                            <span className="text-xs text-gray-400">{__('general.hold_ctrl_cmd_to_select_multiple_days')}</span>
                         </div>
                     )}
 
                     {newCost.recurring === 'month' && (
                         <div className="space-y-2">
-                            <Label htmlFor="month-days">Specific Month Days</Label>
+                            <Label htmlFor="month-days">{__('general.specific_month_days')}</Label>
                             <select
                                 id="month-days"
                                 multiple
@@ -174,13 +173,13 @@ export default function Create({ currencies, categories, stats }) {
                             >
                                 {monthDays.map(d => <option key={d} value={d.toString()}>{d.toString().padStart(2, '0')}</option>)}
                             </select>
-                            <span className="text-xs text-gray-400">Hold Ctrl/Cmd to select multiple days.</span>
+                            <span className="text-xs text-gray-400">{__('general.hold_ctrl_cmd_to_select_multiple_days')}</span>
                         </div>
                     )}
 
                     {newCost.recurring === 'year' && (
                         <div className="space-y-2">
-                            <Label htmlFor="year-days">Specific Year Dates</Label>
+                            <Label htmlFor="year-days">{__('general.specific_year_dates')}</Label>
                             <select
                                 id="year-days"
                                 multiple
@@ -193,11 +192,11 @@ export default function Create({ currencies, categories, stats }) {
                             >
                                 {yearDaysList.map(yd => <option key={yd.val} value={yd.val}>{yd.label}</option>)}
                             </select>
-                            <span className="text-xs text-gray-400">Hold Ctrl/Cmd to select multiple dates.</span>
+                            <span className="text-xs text-gray-400">{__('general.hold_ctrl_cmd_to_select_multiple_dates')}</span>
                         </div>
                     )}
                     <div className="pt-4 border-t">
-                        <Button type="submit" className="bg-black hover:bg-slate-800 text-white">Create Recurring Cost</Button>
+                        <Button type="submit" className="bg-black hover:bg-slate-800 text-white">{__('general.create_recurring_cost')}</Button>
                     </div>
                 </form>
             </div>

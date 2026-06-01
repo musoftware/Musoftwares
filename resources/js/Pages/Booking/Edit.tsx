@@ -46,7 +46,7 @@ export default function Edit({ event }: Props) {
 
     return (
         <WorkspaceLayout
-            title="Edit Event Type"
+            title={__('general.edit_event_type')}
             workspaceName="Booking Settings"
             tenantId="SYS-BOOKING"
             menuItems={[
@@ -57,13 +57,13 @@ export default function Edit({ event }: Props) {
                 { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
-            <Head title="Edit Event Type" />
+            <Head title={__('general.edit_event_type')} />
             
             <div className="max-w-2xl mx-auto space-y-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">Edit Event Type</h1>
-                        <p className="text-muted-foreground">Update your booking event details and settings.</p>
+                        <h1 className="text-2xl font-bold tracking-tight">{__('general.edit_event_type')}</h1>
+                        <p className="text-muted-foreground">{__('general.update_your_booking_event_details_and_settings')}</p>
                     </div>
                     <div className="mt-4 sm:mt-0">
                         <Link href={route('booking.events.index')} className="text-sm font-medium text-slate-500 hover:text-slate-900">
@@ -75,17 +75,17 @@ export default function Edit({ event }: Props) {
                 <form onSubmit={submit} className="mt-6 space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Basic Details</CardTitle>
+                            <CardTitle>{__('general.basic_details')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="title">Event Name</Label>
+                                <Label htmlFor="title">{__('general.event_name')}</Label>
                                 <Input 
                                     id="title" 
                                     value={data.title}
                                     onChange={e => setData('title', e.target.value)}
-                                    placeholder="e.g. 30 Minute Consultation"
+                                    placeholder={__('general.e_g_30_minute_consultation')}
                                     required
                                 />
                                 {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
@@ -111,7 +111,7 @@ export default function Edit({ event }: Props) {
                                     id="description" 
                                     value={data.description}
                                     onChange={e => setData('description', e.target.value)}
-                                    placeholder="Tell invitees what this meeting is about..."
+                                    placeholder={__('general.tell_invitees_what_this_meeting_is_about')}
                                     rows={4}
                                 />
                                 {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
@@ -122,7 +122,7 @@ export default function Edit({ event }: Props) {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Scheduling & Status</CardTitle>
+                            <CardTitle>{__('general.scheduling_status')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                         <div className="space-y-6">
@@ -143,8 +143,8 @@ export default function Edit({ event }: Props) {
 
                             <div className="flex items-center justify-between p-4 border rounded-lg bg-slate-50/50">
                                 <div className="space-y-0.5">
-                                    <Label>Active Status</Label>
-                                    <p className="text-sm text-muted-foreground">Allow invitees to book this event type.</p>
+                                    <Label>{__('general.active_status')}</Label>
+                                    <p className="text-sm text-muted-foreground">{__('general.allow_invitees_to_book_this_event_type')}</p>
                                 </div>
                                 <Switch 
                                     checked={data.is_active}
@@ -157,14 +157,14 @@ export default function Edit({ event }: Props) {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Payment Options</CardTitle>
+                            <CardTitle>{__('general.payment_options')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between p-4 border rounded-lg bg-slate-50/50">
                                 <div className="space-y-0.5">
-                                    <Label>Require Payment</Label>
-                                    <p className="text-sm text-muted-foreground">Ask for payment when booking.</p>
+                                    <Label>{__('general.require_payment')}</Label>
+                                    <p className="text-sm text-muted-foreground">{__('general.ask_for_payment_when_booking')}</p>
                                 </div>
                                 <Switch 
                                     checked={data.requires_payment}
@@ -211,9 +211,7 @@ export default function Edit({ event }: Props) {
                         >
                             Cancel
                         </Link>
-                        <LoadingButton loading={processing} type="submit">
-                            Save Changes
-                        </LoadingButton>
+                        <LoadingButton loading={processing} type="submit">{__('general.save_changes')}</LoadingButton>
                     </div>
                 </form>
             </div>

@@ -19,16 +19,12 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
     return (
         <GuestLayout>
-            <Head title="Forgot password" />
+            <Head title={__('general.forgot_password')} />
 
             <div className="space-y-6">
                 <div className="space-y-1.5">
-                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-                        Reset your password
-                    </h1>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">
-                        Enter your email address and we will send you a link to reset your password.
-                    </p>
+                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{__('general.reset_your_password')}</h1>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">{__('general.enter_your_email_address_and_we_will_send_you_a_link_to_reset_your_password')}</p>
                 </div>
 
                 {status && (
@@ -39,13 +35,11 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
                 <form onSubmit={submit} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="email" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                            Email address
-                        </Label>
+                        <Label htmlFor="email" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{__('general.email_address_1')}</Label>
                         <Input
                             id="email"
                             type="email"
-                            placeholder="name@company.com"
+                            placeholder={__('general.name_company_com')}
                             value={data.email}
                             autoFocus
                             onChange={(e) => setData('email', e.target.value)}
@@ -65,10 +59,10 @@ export default function ForgotPassword({ status }: { status?: string }) {
                             {processing ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin text-zinc-400 dark:text-zinc-600" />
-                                    <span>Sending reset link...</span>
+                                    <span>{__('general.sending_reset_link')}</span>
                                 </>
                             ) : (
-                                <span>Send reset link</span>
+                                <span>{__('general.send_reset_link')}</span>
                             )}
                         </Button>
                     </div>
@@ -80,7 +74,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                         className="inline-flex items-center space-x-2 text-xs font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
                     >
                         <ArrowLeft className="w-3.5 h-3.5" />
-                        <span>Back to log in</span>
+                        <span>{__('general.back_to_log_in')}</span>
                     </Link>
                 </div>
             </div>

@@ -37,17 +37,17 @@ export default function Subscribe({ tool, plan, walletBalance, walletCurrency = 
 
     if (hasExisting) {
         return (
-            <ToolsPublicLayout title="Already Subscribed" activeNav="downloads">
-                <Head title="Already Subscribed" />
+            <ToolsPublicLayout title={__('general.already_subscribed_1')} activeNav="downloads">
+                <Head title={__('general.already_subscribed_1')} />
                 <div className="max-w-md mx-auto py-20 px-4 text-center">
                     <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto mb-5">
                         <CheckCircle2 className="h-8 w-8 text-emerald-500" />
                     </div>
-                    <h1 className="text-xl font-bold text-slate-900 mb-2">Already subscribed</h1>
-                    <p className="text-slate-500 mb-6 text-sm">You can open the tool from your My Tools page.</p>
+                    <h1 className="text-xl font-bold text-slate-900 mb-2">{__('general.already_subscribed')}</h1>
+                    <p className="text-slate-500 mb-6 text-sm">{__('general.you_can_open_the_tool_from_your_my_tools_page')}</p>
                     <div className="flex gap-3 justify-center">
-                        <Button onClick={() => router.visit(route('tools.downloads'))}>My Tools</Button>
-                        <Button variant="outline" onClick={() => router.visit(route('tools.show', tool.slug))}>Open Tool</Button>
+                        <Button onClick={() => router.visit(route('tools.downloads'))}>{__('general.my_tools')}</Button>
+                        <Button variant="outline" onClick={() => router.visit(route('tools.show', tool.slug))}>{__('general.open_tool')}</Button>
                     </div>
                 </div>
             </ToolsPublicLayout>
@@ -100,9 +100,7 @@ export default function Subscribe({ tool, plan, walletBalance, walletCurrency = 
                                     ))}
                                 </div>
                             ) : (
-                                <span className="inline-flex items-center px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-md text-xs font-medium">
-                                    Monthly Only
-                                </span>
+                                <span className="inline-flex items-center px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-md text-xs font-medium">{__('general.monthly_only')}</span>
                             )}
                         </div>
 
@@ -128,7 +126,7 @@ export default function Subscribe({ tool, plan, walletBalance, walletCurrency = 
 
                     {/* Payment method */}
                     <div className="space-y-2.5">
-                        <p className="text-sm font-semibold text-slate-700">Payment Method</p>
+                        <p className="text-sm font-semibold text-slate-700">{__('general.payment_method')}</p>
                         <div className="grid grid-cols-2 gap-3">
                             {[
                                 {
@@ -169,9 +167,7 @@ export default function Subscribe({ tool, plan, walletBalance, walletCurrency = 
 
                         {data.payment_method === 'wallet' && !canPayByWallet && (
                             <div className="flex items-start gap-2 p-3 bg-amber-50 rounded-lg border border-amber-200 text-xs text-amber-800">
-                                <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                                Insufficient wallet balance. Please add funds or pay by card.
-                            </div>
+                                <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />{__('general.insufficient_wallet_balance_please_add_funds_or_pay_by_card')}</div>
                         )}
                     </div>
 
@@ -186,9 +182,7 @@ export default function Subscribe({ tool, plan, walletBalance, walletCurrency = 
                     </Button>
 
                     <p className="text-xs text-slate-400 text-center flex items-center justify-center gap-1">
-                        <Shield className="h-3 w-3" />
-                        Cancel anytime. Access continues until end of billing period.
-                    </p>
+                        <Shield className="h-3 w-3" />{__('general.cancel_anytime_access_continues_until_end_of_billing_period')}</p>
                 </form>
             </div>
         </ToolsPublicLayout>

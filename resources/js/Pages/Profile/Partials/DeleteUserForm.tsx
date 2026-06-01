@@ -52,9 +52,7 @@ export default function DeleteUserForm({
     return (
         <section className={`space-y-6 ${className}`}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900">
-                    Delete Account
-                </h2>
+                <h2 className="text-lg font-medium text-gray-900">{__('general.delete_account')}</h2>
 
                 <p className="mt-1 text-sm text-gray-600">
                     Once your account is deleted, all of its resources and data
@@ -64,15 +62,11 @@ export default function DeleteUserForm({
                 </p>
             </header>
 
-            <DangerButton onClick={confirmUserDeletion}>
-                Delete Account
-            </DangerButton>
+            <DangerButton onClick={confirmUserDeletion}>{__('general.delete_account')}</DangerButton>
 
             <Modal show={confirmingUserDeletion} onClose={closeModal}>
                 <form onSubmit={deleteUser} className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900">
-                        Are you sure you want to delete your account?
-                    </h2>
+                    <h2 className="text-lg font-medium text-gray-900">{__('general.are_you_sure_you_want_to_delete_your_account')}</h2>
 
                     <p className="mt-1 text-sm text-gray-600">
                         Once your account is deleted, all of its resources and
@@ -113,9 +107,7 @@ export default function DeleteUserForm({
                             Cancel
                         </SecondaryButton>
 
-                        <DangerButton className="ms-3" disabled={processing}>
-                            Delete Account
-                        </DangerButton>
+                        <DangerButton className="ms-3" disabled={processing}>{__('general.delete_account')}</DangerButton>
                     </div>
                 </form>
             </Modal>

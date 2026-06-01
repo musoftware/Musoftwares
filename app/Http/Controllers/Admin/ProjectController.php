@@ -51,34 +51,34 @@ class ProjectController extends Controller
     {
         $this->projectService->createProject($request->validated());
 
-        return redirect()->back()->with('success', 'Project created successfully.');
+        return redirect()->back()->with('success', __('general.project_created_successfully'));
     }
 
     public function update(UpdateProjectRequest $request, $id)
     {
         $this->projectService->updateProject($id, $request->validated());
 
-        return redirect()->back()->with('success', 'Project updated successfully.');
+        return redirect()->back()->with('success', __('general.project_updated_successfully'));
     }
 
     public function archive($id)
     {
         $this->projectService->archiveProject($id);
 
-        return redirect()->back()->with('success', 'Project archived.');
+        return redirect()->back()->with('success', __('general.project_archived'));
     }
 
     public function restore($id)
     {
         $this->projectService->restoreProject($id);
 
-        return redirect()->back()->with('success', 'Project restored.');
+        return redirect()->back()->with('success', __('general.project_restored'));
     }
 
     public function destroy($id)
     {
         $this->projectService->deleteProject($id);
 
-        return redirect()->back()->with('success', 'Project deleted.');
+        return redirect()->back()->with('success', __('general.project_deleted'));
     }
 }

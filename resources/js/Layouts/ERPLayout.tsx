@@ -86,7 +86,7 @@ export default function ERPLayout({
                     <button 
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none"
-                        aria-label="Close navigation menu"
+                        aria-label={__('general.close_navigation_menu')}
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -160,7 +160,7 @@ export default function ERPLayout({
                     {lockedAddons.length > 0 && (
                         <div className="mt-2 pt-3 border-t border-slate-100">
                             <div className="px-3 pb-2">
-                                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-300">Available Add-ons</span>
+                                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-300">{__('general.available_add_ons')}</span>
                             </div>
                             <nav className="space-y-0.5">
                                 {lockedAddons.map((addon) => {
@@ -215,7 +215,7 @@ export default function ERPLayout({
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
                             className="lg:hidden -ml-2 p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none"
-                            aria-label="Open navigation menu"
+                            aria-label={__('general.open_navigation_menu')}
                         >
                             <Menu className="w-5 h-5" />
                         </button>
@@ -234,7 +234,7 @@ export default function ERPLayout({
                                 className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" /> 
-                                <span>{__('Logout')}</span>
+                                <span>{__('general.logout')}</span>
                             </Link>
                         ) : (
                             <Link 
@@ -242,8 +242,8 @@ export default function ERPLayout({
                                 className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" /> 
-                                <span className="hidden sm:inline">{__('Exit to Main Hub')}</span>
-                                <span className="sm:hidden">{__('Exit')}</span>
+                                <span className="hidden sm:inline">{__('general.exit_to_main_hub')}</span>
+                                <span className="sm:hidden">{__('general.exit')}</span>
                             </Link>
                         )}
                     </div>
@@ -330,7 +330,7 @@ export default function ERPLayout({
                                 {lockedAddons.length > 0 && (
                                     <div className="mt-2 pt-3 border-t border-slate-100">
                                         <div className="px-3 pb-2">
-                                            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-300">Available Add-ons</span>
+                                            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-300">{__('general.available_add_ons')}</span>
                                         </div>
                                         <nav className="space-y-0.5">
                                             {lockedAddons.map((addon) => {

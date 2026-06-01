@@ -158,7 +158,7 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
                                                         <Dialog>
                                                             <DialogTrigger asChild>
                                                                 <Button variant="ghost" className="h-8 w-8 p-0">
-                                                                    <span className="sr-only">Open menu</span>
+                                                                    <span className="sr-only">{__('general.open_menu')}</span>
                                                                     <MoreHorizontal className="h-4 w-4" />
                                                                 </Button>
                                                             </DialogTrigger>
@@ -219,7 +219,7 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
                                                 <Dialog>
                                                     <DialogTrigger asChild>
                                                         <Button variant="ghost" className="h-8 w-8 p-0">
-                                                            <span className="sr-only">Open menu</span>
+                                                            <span className="sr-only">{__('general.open_menu')}</span>
                                                             <MoreHorizontal className="h-4 w-4" />
                                                         </Button>
                                                     </DialogTrigger>

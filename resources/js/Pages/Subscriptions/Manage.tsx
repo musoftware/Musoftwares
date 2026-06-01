@@ -95,37 +95,36 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
 
     return (
         <WorkspaceLayout 
-            title="My Subscriptions"
+            title={__('general.my_subscriptions')}
             workspaceName="Musoftware Portal"
             tenantId="CUST-PORTAL"
             menuItems={menuItems}
         >
             <div className="space-y-8">
                 <ModulePageHeader 
-                    title="My Subscriptions"
-                    description="Manage your unified platform subscription, renewals, and billing history."
+                    title={__('general.my_subscriptions')}
+                    description={__('general.manage_your_unified_platform_subscription_renewals_and_billing_history')}
                     actions={
                         <Link href={route('subscriptions.plans')}>
                             <Button className="shadow-sm bg-primary hover:bg-primary-hover text-white font-semibold h-9 text-xs gap-1.5">
-                                <Crown className="h-3.5 w-3.5" /> Explore Plans
-                            </Button>
+                                <Crown className="h-3.5 w-3.5" />{__('general.explore_plans')}</Button>
                         </Link>
                     }
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <MetricCard 
-                        label="Active Subscription"
+                        label={__('general.active_subscription')}
                         value={activeCount > 0 ? subscriptions.find(s => s.status === 'active')?.plan_name ?? 'None' : 'None'}
                         icon={Layers}
                     />
                     <MetricCard 
-                        label="Monthly Run Rate"
+                        label={__('general.monthly_run_rate')}
                         value={`${formatMoney(monthlySpend)}/mo`}
                         icon={Receipt}
                     />
                     <MetricCard 
-                        label="Wallet Balance"
+                        label={__('general.wallet_balance')}
                         value={formatMoney(walletBalance)}
                         icon={Wallet}
                     />
@@ -133,15 +132,14 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
 
                 <div className="space-y-6">
                     <h3 className="text-sm font-bold tracking-wider uppercase text-text-muted flex items-center gap-2">
-                        <Layers className="h-4 w-4" /> Subscription History
-                    </h3>
+                        <Layers className="h-4 w-4" />{__('general.subscription_history')}</h3>
                     
                     {subscriptions.length === 0 ? (
                         <OperationalCard>
                             <EmptyState 
                                 icon={Clock}
-                                title="No subscriptions yet"
-                                description="Subscribe to a plan to unlock platform features. Build your own or pick from our curated tiers."
+                                title={__('general.no_subscriptions_yet')}
+                                description={__('general.subscribe_to_a_plan_to_unlock_platform_features_build_your_own_or_pick_from_our_curated_tiers')}
                                 action={{ label: "Explore Plans", href: route('subscriptions.plans') }}
                             />
                         </OperationalCard>
@@ -178,7 +176,7 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
 
                                                 <div>
                                                     {isActive && <StatusBadge status="active" />}
-                                                    {isCancelled && <span className="inline-flex items-center rounded-full border px-2.5 py-1 text-[12px] font-sans font-medium bg-amber-50 text-amber-700 border-amber-100"><span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-amber-500"></span>Pending Expiry</span>}
+                                                    {isCancelled && <span className="inline-flex items-center rounded-full border px-2.5 py-1 text-[12px] font-sans font-medium bg-amber-50 text-amber-700 border-amber-100"><span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-amber-500"></span>{__('general.pending_expiry')}</span>}
                                                     {isExpired && <StatusBadge status="expired" />}
                                                 </div>
                                             </div>
@@ -213,8 +211,7 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                                                         size="sm"
                                                         className="shadow-none text-danger hover:text-danger hover:bg-danger/10 border-border bg-transparent h-8 text-xs font-semibold gap-1.5"
                                                     >
-                                                        <Ban className="h-3.5 w-3.5" /> Cancel Auto-Renew
-                                                    </Button>
+                                                        <Ban className="h-3.5 w-3.5" />{__('general.cancel_auto_renew')}</Button>
                                                 )}
 
                                                 {(isCancelled || isExpired) && (
@@ -223,8 +220,7 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                                                         size="sm"
                                                         className="shadow-none bg-primary hover:bg-primary-hover text-white font-semibold h-8 text-xs gap-1.5"
                                                     >
-                                                        <RefreshCw className="h-3.5 w-3.5" /> Renew via Wallet
-                                                    </Button>
+                                                        <RefreshCw className="h-3.5 w-3.5" />{__('general.renew_via_wallet')}</Button>
                                                 )}
                                             </div>
                                         </div>
@@ -237,8 +233,7 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
 
                 <div className="space-y-6">
                     <h3 className="text-sm font-bold tracking-wider uppercase text-text-muted flex items-center gap-2">
-                        <Receipt className="h-4 w-4" /> Platform Billing History
-                    </h3>
+                        <Receipt className="h-4 w-4" />{__('general.platform_billing_history')}</h3>
 
                     <OperationalCard noPadding>
                         <DataTable 
@@ -247,7 +242,7 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                             emptyState={
                                 <EmptyState 
                                     icon={Receipt}
-                                    title="No invoice history found"
+                                    title={__('general.no_invoice_history_found')}
                                 />
                             }
                             className="border-0 shadow-none rounded-none"

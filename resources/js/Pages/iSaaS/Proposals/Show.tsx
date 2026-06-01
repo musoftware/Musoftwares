@@ -46,9 +46,7 @@ export default function Show({ proposal, auth }: Props) {
             <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
                 <div className="mb-6">
                     <Link href={route('isaas.proposals.index')} className="text-sm font-medium text-gray-500 hover:text-gray-900 flex items-center">
-                        <ArrowLeft className="mr-1 h-4 w-4" />
-                        Back to Proposals
-                    </Link>
+                        <ArrowLeft className="mr-1 h-4 w-4" />{__('general.back_to_proposals')}</Link>
                 </div>
 
                 <div className="flex justify-between items-start mb-8">
@@ -72,7 +70,7 @@ export default function Show({ proposal, auth }: Props) {
                     <div className="md:col-span-2 space-y-6">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-lg">AI Estimate Breakdown</CardTitle>
+                                <CardTitle className="text-lg">{__('general.ai_estimate_breakdown')}</CardTitle>
                                 <CardDescription>Estimated timeline: {proposal.ai_estimate?.timeline_weeks || 0} weeks</CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -81,7 +79,7 @@ export default function Show({ proposal, auth }: Props) {
                                         <table className="w-full text-sm text-left">
                                             <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                                                 <tr>
-                                                    <th className="px-4 py-3 rounded-tl-lg">Line Item</th>
+                                                    <th className="px-4 py-3 rounded-tl-lg">{__('general.line_item')}</th>
                                                     <th className="px-4 py-3 text-right">Duration</th>
                                                     <th className="px-4 py-3 text-right rounded-tr-lg">Cost</th>
                                                 </tr>
@@ -97,7 +95,7 @@ export default function Show({ proposal, auth }: Props) {
                                             </tbody>
                                             <tfoot>
                                                 <tr className="font-bold text-gray-900">
-                                                    <td className="px-4 py-4" colSpan={2}>Total Estimate</td>
+                                                    <td className="px-4 py-4" colSpan={2}>{__('general.total_estimate')}</td>
                                                     <td className="px-4 py-4 text-right text-lg text-purple-600">
                                                         {formatMoney(proposal.total_amount, proposal.currency || businessCurrency)}
                                                     </td>
@@ -106,7 +104,7 @@ export default function Show({ proposal, auth }: Props) {
                                         </table>
                                     </div>
                                 ) : (
-                                    <p className="text-gray-500 italic">No line items provided in the estimate.</p>
+                                    <p className="text-gray-500 italic">{__('general.no_line_items_provided_in_the_estimate')}</p>
                                 )}
                             </CardContent>
                         </Card>
@@ -116,9 +114,7 @@ export default function Show({ proposal, auth }: Props) {
                         <Card>
                             <CardHeader>
                                 <CardTitle className="text-lg flex items-center">
-                                    <FileText className="h-5 w-5 mr-2 text-gray-400" />
-                                    Original Requirements
-                                </CardTitle>
+                                    <FileText className="h-5 w-5 mr-2 text-gray-400" />{__('general.original_requirements')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <p className="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">

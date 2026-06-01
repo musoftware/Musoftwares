@@ -65,15 +65,13 @@ export default function Index({ proposals }) {
 
     return (
         <AuthenticatedLayout>
-            <Head title="Price Calculator" />
+            <Head title={__('general.price_calculator')} />
             
             <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
                 <div className="mb-2">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 mb-3 border border-slate-200">
-                        Freelance Tools
-                    </span>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 mb-3 border border-slate-200">{__('general.freelance_tools')}</span>
                     <div className="flex items-baseline gap-3">
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Smart Price Calculator</h1>
+                        <h1 className="text-3xl font-bold tracking-tight text-slate-900">{__('general.smart_price_calculator')}</h1>
                         <span className="text-slate-500 font-medium">/ AI Proposals</span>
                     </div>
                 </div>
@@ -84,19 +82,15 @@ export default function Index({ proposals }) {
                     <div className="lg:col-span-1 space-y-6">
                         <Card className="border border-slate-200">
                             <CardHeader>
-                                <CardTitle>AI Cost Estimator</CardTitle>
-                                <CardDescription>
-                                    Describe the project requirements in detail. The AI will generate a structured breakdown and pricing in EGP.
-                                </CardDescription>
+                                <CardTitle>{__('general.ai_cost_estimator')}</CardTitle>
+                                <CardDescription>{__('general.describe_the_project_requirements_in_detail_the_ai_will_generate_a_structured_breakdown_and_pricing_in_egp')}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Project Details
-                                    </label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{__('general.project_details')}</label>
                                     <Textarea
                                         rows={8}
-                                        placeholder="e.g. A marketplace app like Uber, needs iOS and Android apps, plus a web dashboard for admins..."
+                                        placeholder={__('general.e_g_a_marketplace_app_like_uber_needs_ios_and_android_apps_plus_a_web_dashboard_for_admins')}
                                         value={projectDetails}
                                         onChange={(e) => setProjectDetails(e.target.value)}
                                     />
@@ -107,9 +101,9 @@ export default function Index({ proposals }) {
                                     disabled={isCalculating}
                                 >
                                     {isCalculating ? (
-                                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Calculating...</>
+                                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{__('general.calculating')}</>
                                     ) : (
-                                        <><Play className="mr-2 h-4 w-4" /> Calculate with AI</>
+                                        <><Play className="mr-2 h-4 w-4" />{__('general.calculate_with_ai')}</>
                                     )}
                                 </Button>
                             </CardContent>
@@ -118,7 +112,7 @@ export default function Index({ proposals }) {
                         {/* Saved Proposals List */}
                         <Card className="border border-slate-200">
                             <CardHeader>
-                                <CardTitle>Saved Proposals</CardTitle>
+                                <CardTitle>{__('general.saved_proposals')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
@@ -135,18 +129,15 @@ export default function Index({ proposals }) {
                                             </div>
                                             {proposal.status === 'converted_to_contract' ? (
                                                 <div className="text-xs text-green-600 font-medium flex items-center mt-2">
-                                                    <CheckCircle2 className="w-3 h-3 mr-1" /> Converted to Contract
-                                                </div>
+                                                    <CheckCircle2 className="w-3 h-3 mr-1" />{__('general.converted_to_contract')}</div>
                                             ) : (
                                                 <div className="mt-2 flex space-x-2">
-                                                    <Button size="sm" className="w-full text-xs bg-slate-900 hover:bg-slate-800 text-white" onClick={() => handleConvertToContract(proposal.id)}>
-                                                        Convert to Contract
-                                                    </Button>
+                                                    <Button size="sm" className="w-full text-xs bg-slate-900 hover:bg-slate-800 text-white" onClick={() => handleConvertToContract(proposal.id)}>{__('general.convert_to_contract')}</Button>
                                                 </div>
                                             )}
                                         </div>
                                     )) : (
-                                        <div className="text-sm text-gray-500 text-center py-4">No saved proposals yet.</div>
+                                        <div className="text-sm text-gray-500 text-center py-4">{__('general.no_saved_proposals_yet')}</div>
                                     )}
                                 </div>
                             </CardContent>
@@ -158,8 +149,8 @@ export default function Index({ proposals }) {
                         <Card className="h-full min-h-[600px] border border-slate-200">
                             <CardHeader className="flex flex-row items-center justify-between">
                                 <div>
-                                    <CardTitle>Proposal & Breakdown</CardTitle>
-                                    <CardDescription>Review the generated estimate before saving.</CardDescription>
+                                    <CardTitle>{__('general.proposal_breakdown')}</CardTitle>
+                                    <CardDescription>{__('general.review_the_generated_estimate_before_saving')}</CardDescription>
                                 </div>
                                 {aiResult && (
                                     <Button onClick={handleSaveProposal} disabled={isSaving} variant="default" className="bg-slate-900 hover:bg-slate-800 text-white">
@@ -173,17 +164,17 @@ export default function Index({ proposals }) {
                                     <div className="space-y-6">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/50">
-                                                <div className="text-sm text-slate-500 font-medium">Estimated Duration</div>
+                                                <div className="text-sm text-slate-500 font-medium">{__('general.estimated_duration')}</div>
                                                 <div className="text-2xl font-bold text-slate-900">{aiResult.parsed_data.total_duration_days} Days</div>
                                             </div>
                                             <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/50">
-                                                <div className="text-sm text-slate-500 font-medium">Estimated Cost</div>
+                                                <div className="text-sm text-slate-500 font-medium">{__('general.estimated_cost')}</div>
                                                 <div className="text-2xl font-bold text-slate-900">{formatMoney(aiResult.total_cost_egp, 'EGP')}</div>
                                             </div>
                                         </div>
                                         
                                         <div>
-                                            <h3 className="font-semibold text-lg text-slate-800 mb-2">Proposal Document</h3>
+                                            <h3 className="font-semibold text-lg text-slate-800 mb-2">{__('general.proposal_document')}</h3>
                                             <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
                                                 <pre className="text-sm text-slate-200 font-mono whitespace-pre-wrap">
                                                     {aiResult.ascii_table}
@@ -194,7 +185,7 @@ export default function Index({ proposals }) {
                                 ) : (
                                     <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-4 py-24">
                                         <Calculator className="w-16 h-16 opacity-20" />
-                                        <p>Enter project details and click Calculate to view results.</p>
+                                        <p>{__('general.enter_project_details_and_click_calculate_to_view_results')}</p>
                                     </div>
                                 )}
                             </CardContent>

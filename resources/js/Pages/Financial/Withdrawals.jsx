@@ -40,11 +40,11 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                 <Card className="shadow-none border-primary/20 bg-muted/10">
                     <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="space-y-2 text-center md:text-left">
-                            <span className="text-sm font-semibold text-primary uppercase tracking-wider">Available Earned Funds</span>
+                            <span className="text-sm font-semibold text-primary uppercase tracking-wider">{__('general.available_earned_funds')}</span>
                             <div className="text-4xl sm:text-5xl font-bold tracking-tight">
                                 {formatMoney(maxAvailable, wallet?.currency || 'USD')}
                              </div>
-                            <p className="text-sm text-muted-foreground">You can only withdraw funds that have been earned on the platform.</p>
+                            <p className="text-sm text-muted-foreground">{__('general.you_can_only_withdraw_funds_that_have_been_earned_on_the_platform')}</p>
                         </div>
 
                         <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -57,8 +57,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                             ) : (!payoutMethods || payoutMethods.length === 0) ? (
                                 <Button asChild variant="secondary" className="h-12 px-6 shadow-none">
                                     <Link href={route('financial.payout-methods.index')}>
-                                        <CreditCard className="mr-2 h-5 w-5" /> Setup Payout Method
-                                    </Link>
+                                        <CreditCard className="mr-2 h-5 w-5" />{__('general.setup_payout_method')}</Link>
                                 </Button>
                             ) : (
                                 <Button
@@ -66,8 +65,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                                     disabled={maxAvailable <= 0}
                                     className="h-12 px-6 shadow-none"
                                 >
-                                    <ArrowUpRight className="mr-2 h-5 w-5" /> Request Payout
-                                </Button>
+                                    <ArrowUpRight className="mr-2 h-5 w-5" />{__('general.request_payout')}</Button>
                             )}
                         </div>
                     </CardContent>
@@ -77,8 +75,8 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                 <Card className="shadow-none">
                     <CardHeader className="flex flex-row items-center justify-between">
                         <div className="space-y-1">
-                            <CardTitle className="text-base font-semibold">Withdrawal History</CardTitle>
-                            <CardDescription>View your past withdrawal requests and their statuses.</CardDescription>
+                            <CardTitle className="text-base font-semibold">{__('general.withdrawal_history')}</CardTitle>
+                            <CardDescription>{__('general.view_your_past_withdrawal_requests_and_their_statuses')}</CardDescription>
                         </div>
                         <Badge variant="secondary" className="font-normal">{withdrawals?.total || 0} Requests</Badge>
                     </CardHeader>
@@ -88,7 +86,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="pl-6">ID #</TableHead>
-                                    <TableHead>Payout Method</TableHead>
+                                    <TableHead>{__('general.payout_method')}</TableHead>
                                     <TableHead>Amount</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead className="pr-6 text-right">Date</TableHead>
@@ -97,9 +95,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                             <TableBody>
                                 {(!withdrawals?.data || withdrawals.data.length === 0) ? (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
-                                            No withdrawal requests found.
-                                        </TableCell>
+                                        <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">{__('general.no_withdrawal_requests_found')}</TableCell>
                                     </TableRow>
                                 ) : (
                                     withdrawals.data.map((w) => (
@@ -136,7 +132,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                     <div className="p-6 space-y-6">
                         <div className="flex items-center gap-2">
                             <Wallet className="h-5 w-5 text-primary" />
-                            <h2 className="text-xl font-semibold tracking-tight">Request Withdrawal</h2>
+                            <h2 className="text-xl font-semibold tracking-tight">{__('general.request_withdrawal')}</h2>
                         </div>
                         
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -169,7 +165,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="payout_method">Destination Payout Method</Label>
+                                <Label htmlFor="payout_method">{__('general.destination_payout_method')}</Label>
                                 <select
                                     id="payout_method"
                                     value={data.payout_method_id}
@@ -188,9 +184,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
 
                             <div className="flex items-center justify-end gap-3 pt-4 border-t">
                                 <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-                                <Button type="submit" disabled={processing} className="shadow-none">
-                                    Confirm Withdrawal
-                                </Button>
+                                <Button type="submit" disabled={processing} className="shadow-none">{__('general.confirm_withdrawal')}</Button>
                             </div>
                         </form>
                     </div>

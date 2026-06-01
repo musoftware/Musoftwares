@@ -17,7 +17,7 @@
     @if($searchable)
         <div class="mb-3 d-flex justify-content-between align-items-center">
             <div>
-                <input type="text" class="form-control" placeholder="Search..." wire:model.debounce.300ms="search">
+                <input type="text" class="form-control" placeholder="{{ __('general.search') }}" wire:model.debounce.300ms="search">
             </div>
         </div>
     @endif

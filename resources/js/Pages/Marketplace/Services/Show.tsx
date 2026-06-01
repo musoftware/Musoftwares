@@ -143,9 +143,7 @@ export default function Show({ service }: any) {
                             <div className="space-y-8">
                                 {/* Description */}
                                 <div>
-                                    <h3 className="mb-4 text-xl font-bold text-gray-900">
-                                        About This Service
-                                    </h3>
+                                    <h3 className="mb-4 text-xl font-bold text-gray-900">{__('general.about_this_service')}</h3>
                                     <div className="prose max-w-none text-gray-700">
                                         <p className="whitespace-pre-wrap">
                                             {service.description}
@@ -155,9 +153,7 @@ export default function Show({ service }: any) {
 
                                 {/* Seller Card */}
                                 <div>
-                                    <h3 className="mb-4 text-xl font-bold text-gray-900">
-                                        About The Seller
-                                    </h3>
+                                    <h3 className="mb-4 text-xl font-bold text-gray-900">{__('general.about_the_seller')}</h3>
                                     <div className="flex flex-col items-center gap-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:flex-row md:items-start">
                                         <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-3xl font-bold text-indigo-700">
                                             {service.seller?.name?.charAt(0) ||
@@ -188,9 +184,7 @@ export default function Show({ service }: any) {
                                                     service.seller?.created_at,
                                                 ).getFullYear()}
                                             </p>
-                                            <button className="rounded-md border border-indigo-600 px-6 py-2 font-medium text-indigo-600 transition hover:bg-indigo-50">
-                                                Contact Me
-                                            </button>
+                                            <button className="rounded-md border border-indigo-600 px-6 py-2 font-medium text-indigo-600 transition hover:bg-indigo-50">{__('general.contact_me')}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -198,9 +192,7 @@ export default function Show({ service }: any) {
                         )}
 
                         {activeTab === 'reviews' && (
-                            <div className="py-8 text-center text-gray-500">
-                                Reviews will be displayed here.
-                            </div>
+                            <div className="py-8 text-center text-gray-500">{__('general.reviews_will_be_displayed_here')}</div>
                         )}
                     </div>
 
@@ -281,9 +273,7 @@ export default function Show({ service }: any) {
                                                                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                                                             ></path>
                                                         </svg>
-                                                        <span>
-                                                            Unlimited Revisions
-                                                        </span>
+                                                        <span>{__('general.unlimited_revisions')}</span>
                                                     </div>
                                                 </div>
 
@@ -386,9 +376,7 @@ export default function Show({ service }: any) {
                                                             ).toFixed(2)}{' '}
                                                             more to purchase
                                                         </div>
-                                                        <button className="w-full rounded-lg bg-amber-500 px-4 py-3 font-bold text-white transition hover:bg-amber-600">
-                                                            Top up wallet
-                                                        </button>
+                                                        <button className="w-full rounded-lg bg-amber-500 px-4 py-3 font-bold text-white transition hover:bg-amber-600">{__('general.top_up_wallet')}</button>
                                                     </div>
                                                 )}
                                             </div>

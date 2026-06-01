@@ -47,7 +47,7 @@ class AdminToolController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        return redirect()->route('admin.tools.index')->with('error', 'Tools are now managed in config/tools.php.');
+        return redirect()->route('admin.tools.index')->with('error', __('general.tools_are_now_managed_in_config_tools_php'));
     }
 
     public function edit(string $slug): Response
@@ -107,13 +107,13 @@ class AdminToolController extends Controller
 
     public function destroy(string $slug): RedirectResponse
     {
-        return redirect()->route('admin.tools.index')->with('error', 'Tools are now managed in config/tools.php.');
+        return redirect()->route('admin.tools.index')->with('error', __('general.tools_are_now_managed_in_config_tools_php'));
     }
 
     // ─── Version / Release Management ───────────────────────────────────────────
 
     public function uploadVersion(Request $request, string $slug): RedirectResponse
     {
-        return back()->with('error', 'Versions are now managed in config/tools.php and public directories.');
+        return back()->with('error', __('general.versions_are_now_managed_in_config_tools_php_and_public_directories'));
     }
 }

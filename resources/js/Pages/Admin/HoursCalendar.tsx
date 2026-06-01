@@ -143,7 +143,7 @@ export default function HoursCalendar({ years, auth }: any) {
 
     return (
         <AdminSidebarLayout 
-            title="Work Hours Calendar"
+            title={__('general.work_hours_calendar')}
             header="Work Hours Calendar"
             user={auth?.user}
         >
@@ -153,8 +153,8 @@ export default function HoursCalendar({ years, auth }: any) {
                         <div className="flex items-center gap-2 mb-1">
                             <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">Productivity</span>
                         </div>
-                        <h1 className="text-2xl font-bold text-slate-900">Work Hours Calendar</h1>
-                        <p className="text-sm text-slate-500 mt-1">Track your productivity throughout the year.</p>
+                        <h1 className="text-2xl font-bold text-slate-900">{__('general.work_hours_calendar')}</h1>
+                        <p className="text-sm text-slate-500 mt-1">{__('general.track_your_productivity_throughout_the_year')}</p>
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
                         <select 
@@ -174,21 +174,21 @@ export default function HoursCalendar({ years, auth }: any) {
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
                             <div className="bg-slate-100 text-slate-700 p-3 rounded-lg"><Clock className="w-6 h-6"/></div>
                             <div>
-                                <p className="text-sm font-medium text-slate-500 uppercase">Total Hours</p>
+                                <p className="text-sm font-medium text-slate-500 uppercase">{__('general.total_hours')}</p>
                                 <p className="text-2xl font-bold text-slate-900">{totalHours.toFixed(1)}</p>
                             </div>
                         </div>
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
                             <div className="bg-slate-100 text-slate-700 p-3 rounded-lg"><CalendarCheck className="w-6 h-6"/></div>
                             <div>
-                                <p className="text-sm font-medium text-slate-500 uppercase">Active Days</p>
+                                <p className="text-sm font-medium text-slate-500 uppercase">{__('general.active_days')}</p>
                                 <p className="text-2xl font-bold text-slate-900">{activeDays}</p>
                             </div>
                         </div>
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
                             <div className="bg-slate-100 text-slate-700 p-3 rounded-lg"><BarChart2 className="w-6 h-6"/></div>
                             <div>
-                                <p className="text-sm font-medium text-slate-500 uppercase">Average / Day</p>
+                                <p className="text-sm font-medium text-slate-500 uppercase">{__('general.average_day')}</p>
                                 <p className="text-2xl font-bold text-slate-900">{averageHours.toFixed(1)}</p>
                             </div>
                         </div>
@@ -199,7 +199,7 @@ export default function HoursCalendar({ years, auth }: any) {
                     {isLoading && (
                         <div className="absolute inset-0 bg-white/70 z-10 flex flex-col items-center justify-center rounded-xl">
                             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-slate-900 mb-3"></div>
-                            <span className="text-slate-600 font-medium">Loading data...</span>
+                            <span className="text-slate-600 font-medium">{__('general.loading_data')}</span>
                         </div>
                     )}
 

@@ -113,7 +113,7 @@ export function DataTable({
                             <SearchInput
                                 value={filters?.search || ''}
                                 onChange={onSearch}
-                                placeholder="Search..."
+                                placeholder={__('general.search')}
                                 className=""
                             />
                         </div>

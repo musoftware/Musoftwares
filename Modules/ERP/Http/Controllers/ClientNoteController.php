@@ -24,7 +24,7 @@ class ClientNoteController extends Controller
     {
         $tenant = $this->resolveTenant();
         if ($client->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access.');
+            abort(403, __('general.unauthorized_access'));
         }
     }
 
@@ -32,7 +32,7 @@ class ClientNoteController extends Controller
     {
         $tenant = $this->resolveTenant();
         if ($client->tenant_id !== $tenant->id || $note->client_id !== $client->id || $note->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access.');
+            abort(403, __('general.unauthorized_access'));
         }
     }
 

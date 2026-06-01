@@ -75,7 +75,7 @@ class ExpenseController extends Controller
             $expense
         );
 
-        return redirect()->route('erp.dashboard', ['section' => 'expenses'])->with('success', 'Expense logged successfully.');
+        return redirect()->route('erp.dashboard', ['section' => 'expenses'])->with('success', __('general.expense_logged_successfully'));
     }
 
     /**
@@ -85,12 +85,12 @@ class ExpenseController extends Controller
     {
         $tenant = $this->resolveTenant();
         if (!$tenant) {
-            abort(404, 'No active workspace found.');
+            abort(404, __('general.no_active_workspace_found'));
         }
         $expense = Expense::findOrFail($id);
 
         if ($expense->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to expense.');
+            abort(403, __('general.unauthorized_access_to_expense'));
         }
 
         return Inertia::render('ERP/Expenses/Edit', [
@@ -114,7 +114,7 @@ class ExpenseController extends Controller
         $expense = Expense::findOrFail($id);
 
         if (!$tenant || $expense->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to expense.');
+            abort(403, __('general.unauthorized_access_to_expense'));
         }
 
         $validated = $request->validate([
@@ -139,7 +139,7 @@ class ExpenseController extends Controller
             $expense
         );
 
-        return redirect()->route('erp.dashboard', ['section' => 'expenses'])->with('success', 'Expense updated successfully.');
+        return redirect()->route('erp.dashboard', ['section' => 'expenses'])->with('success', __('general.expense_updated_successfully'));
     }
 
     /**
@@ -151,7 +151,7 @@ class ExpenseController extends Controller
         $expense = Expense::findOrFail($id);
 
         if (!$tenant || $expense->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to expense.');
+            abort(403, __('general.unauthorized_access_to_expense'));
         }
 
         $title = $expense->title;
@@ -163,6 +163,6 @@ class ExpenseController extends Controller
             null
         );
 
-        return redirect()->route('erp.dashboard', ['section' => 'expenses'])->with('success', 'Expense deleted successfully.');
+        return redirect()->route('erp.dashboard', ['section' => 'expenses'])->with('success', __('general.expense_deleted_successfully'));
     }
 }

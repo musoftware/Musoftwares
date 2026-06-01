@@ -161,7 +161,7 @@ export default function FacebookExtractorRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-[#1877F2] rounded-lg flex items-center justify-center shadow-sm">
                         <Users className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 tracking-tight">AMC Facebook Data Extractor</span>
+                    <span className="font-bold text-sm text-slate-800 tracking-tight">{__('general.amc_facebook_data_extractor')}</span>
                 </div>
                 <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-amber-500 animate-pulse' : 'bg-slate-400'}`} />
@@ -172,8 +172,8 @@ export default function FacebookExtractorRunner({ tool }: any) {
             <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
                     <div>
-                        <h1 className="text-xl font-bold tracking-tight text-slate-900">Facebook Data Extractor</h1>
-                        <p className="text-sm text-slate-500 mt-1">Extract members, followers, following, comments, and likes directly from the Facebook UI without APIs.</p>
+                        <h1 className="text-xl font-bold tracking-tight text-slate-900">{__('general.facebook_data_extractor')}</h1>
+                        <p className="text-sm text-slate-500 mt-1">{__('general.extract_members_followers_following_comments_and_likes_directly_from_the_facebook_ui_without_apis')}</p>
                     </div>
 
                     <div className="space-y-4">
@@ -184,7 +184,7 @@ export default function FacebookExtractorRunner({ tool }: any) {
                                 onClick={() => setType('members')}
                             >
                                 <Users className="w-4 h-4 shrink-0" />
-                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">Group Members</span>
+                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">{__('general.group_members')}</span>
                             </Button>
                             <Button 
                                 variant={type === 'followers' ? 'default' : 'outline'} 
@@ -208,7 +208,7 @@ export default function FacebookExtractorRunner({ tool }: any) {
                                 onClick={() => setType('comments')}
                             >
                                 <MessageCircle className="w-4 h-4 shrink-0" />
-                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">Post Comments</span>
+                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">{__('general.post_comments')}</span>
                             </Button>
                             <Button 
                                 variant={type === 'likes' ? 'default' : 'outline'} 
@@ -216,7 +216,7 @@ export default function FacebookExtractorRunner({ tool }: any) {
                                 onClick={() => setType('likes')}
                             >
                                 <Heart className="w-4 h-4 shrink-0" />
-                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">Post Likes</span>
+                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">{__('general.post_likes')}</span>
                             </Button>
                         </div>
 
@@ -241,7 +241,7 @@ export default function FacebookExtractorRunner({ tool }: any) {
                                     type="number"
                                     value={limit}
                                     onChange={e => setLimit(e.target.value === '' ? '' : parseInt(e.target.value))}
-                                    placeholder="Limit (leave empty for infinite)"
+                                    placeholder={__('general.limit_leave_empty_for_infinite')}
                                     className="h-11 text-sm bg-slate-50"
                                     disabled={status === 'running'}
                                 />
@@ -261,16 +261,14 @@ export default function FacebookExtractorRunner({ tool }: any) {
                                     disabled={!url.trim()}
                                     className="flex-1 h-12 bg-[#1877F2] hover:bg-[#166FE5] text-white rounded-xl font-bold shadow-md"
                                 >
-                                    <Play className="w-4 h-4 mr-2 fill-current" /> Start Extraction
-                                </Button>
+                                    <Play className="w-4 h-4 mr-2 fill-current" />{__('general.start_extraction')}</Button>
                             ) : (
                                 <Button
                                     onClick={handleStop}
                                     variant="destructive"
                                     className="flex-1 h-12 rounded-xl font-bold shadow-md"
                                 >
-                                    <Square className="w-4 h-4 mr-2 fill-current" /> Stop Extraction
-                                </Button>
+                                    <Square className="w-4 h-4 mr-2 fill-current" />{__('general.stop_extraction')}</Button>
                             )}
                         </div>
                     </div>
@@ -281,9 +279,7 @@ export default function FacebookExtractorRunner({ tool }: any) {
                     <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 animate-in fade-in slide-in-from-bottom-4">
                         <div className="flex items-center justify-between">
                             <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                <Activity className="w-5 h-5 text-blue-500" /> 
-                                Extraction Progress
-                            </h2>
+                                <Activity className="w-5 h-5 text-blue-500" />{__('general.extraction_progress')}</h2>
                             <span className="text-2xl font-black text-[#1877F2]">{count.toLocaleString()}</span>
                         </div>
                         
@@ -292,9 +288,7 @@ export default function FacebookExtractorRunner({ tool }: any) {
                                 <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                                     <div className="h-full bg-[#1877F2] w-full rounded-full animate-pulse" />
                                 </div>
-                                <p className="text-xs text-slate-500 text-center animate-pulse">
-                                    Automating browser to load more results... Please keep the Facebook tab active.
-                                </p>
+                                <p className="text-xs text-slate-500 text-center animate-pulse">{__('general.automating_browser_to_load_more_results_please_keep_the_facebook_tab_active')}</p>
                             </div>
                         )}
 
@@ -309,22 +303,19 @@ export default function FacebookExtractorRunner({ tool }: any) {
                                         className="h-11 font-bold gap-2 text-[#1877F2] border-[#1877F2] hover:bg-blue-50"
                                         onClick={() => handleExport('csv')}
                                     >
-                                        <Download className="w-4 h-4" /> Download CSV
-                                    </Button>
+                                        <Download className="w-4 h-4" />{__('general.download_csv')}</Button>
                                     <Button 
                                         variant="outline" 
                                         className="h-11 font-bold gap-2 text-slate-600 border-slate-300 hover:bg-slate-50"
                                         onClick={() => handleExport('txt')}
                                     >
-                                        <Download className="w-4 h-4" /> Download TXT
-                                    </Button>
+                                        <Download className="w-4 h-4" />{__('general.download_txt')}</Button>
                                     <Button 
                                         variant="outline" 
                                         className="h-11 font-bold gap-2 text-emerald-600 border-emerald-300 hover:bg-emerald-50"
                                         onClick={() => handleExport('ids')}
                                     >
-                                        <Download className="w-4 h-4" /> Export IDs Only
-                                    </Button>
+                                        <Download className="w-4 h-4" />{__('general.export_ids_only')}</Button>
                                 </div>
                             </div>
                         )}

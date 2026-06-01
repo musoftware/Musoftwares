@@ -61,9 +61,7 @@ export default function IndexClient({
                     {/* Balances */}
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                         <div className="overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
-                            <h3 className="text-sm font-medium text-gray-500">
-                                Total Balance
-                            </h3>
+                            <h3 className="text-sm font-medium text-gray-500">{__('general.total_balance')}</h3>
                             <p className="mt-2 text-3xl font-semibold text-gray-900">
                                 {formatMoney(wallet?.balance || 0, wallet?.currency || 'USD')}
                             </p>
@@ -77,9 +75,7 @@ export default function IndexClient({
                             </p>
                         </div>
                         <div className="overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
-                            <h3 className="text-sm font-medium text-gray-500">
-                                Available for Withdrawal
-                            </h3>
+                            <h3 className="text-sm font-medium text-gray-500">{__('general.available_for_withdrawal')}</h3>
                             <p className="mt-2 text-3xl font-semibold text-green-600">
                                 {formatMoney(availableBalance, wallet?.currency || 'USD')}
                             </p>
@@ -90,16 +86,12 @@ export default function IndexClient({
                         <button
                             onClick={() => setShowRequestForm(!showRequestForm)}
                             className="inline-flex items-center rounded-md border border-transparent bg-gray-800 px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase ring-gray-300 transition duration-150 ease-in-out hover:bg-gray-700 focus:border-gray-900 focus:ring focus:outline-none active:bg-gray-900 disabled:opacity-25"
-                        >
-                            Request Withdrawal
-                        </button>
+                        >{__('general.request_withdrawal')}</button>
                     </div>
 
                     {showRequestForm && (
                         <div className="overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
-                            <h3 className="mb-4 text-lg font-medium text-gray-900">
-                                Request New Withdrawal
-                            </h3>
+                            <h3 className="mb-4 text-lg font-medium text-gray-900">{__('general.request_new_withdrawal')}</h3>
                             <form
                                 onSubmit={submitRequest}
                                 className="max-w-md space-y-4"
@@ -124,14 +116,12 @@ export default function IndexClient({
                                     )}
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        Payment Method ID
-                                    </label>
+                                    <label className="block text-sm font-medium text-gray-700">{__('general.payment_method_id')}</label>
                                     {/* In a real app, this would be a select dropdown of user's approved payment methods */}
                                     <input
                                         type="text"
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                        placeholder="Enter Payment Method ID"
+                                        placeholder={__('general.enter_payment_method_id')}
                                         value={data.payment_method_id}
                                         onChange={(e) =>
                                             setData(
@@ -150,18 +140,14 @@ export default function IndexClient({
                                     type="submit"
                                     disabled={processing}
                                     className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
-                                >
-                                    Submit Request
-                                </button>
+                                >{__('general.submit_request')}</button>
                             </form>
                         </div>
                     )}
 
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="border-b border-gray-200 bg-white p-6">
-                            <h3 className="mb-4 text-lg font-medium text-gray-900">
-                                Withdrawal History
-                            </h3>
+                            <h3 className="mb-4 text-lg font-medium text-gray-900">{__('general.withdrawal_history')}</h3>
                             <div className="overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
@@ -228,9 +214,7 @@ export default function IndexClient({
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="text-indigo-600 hover:text-indigo-900"
-                                                            >
-                                                                View Proof
-                                                            </a>
+                                                            >{__('general.view_proof')}</a>
                                                         )}
                                                 </td>
                                             </tr>
@@ -242,8 +226,8 @@ export default function IndexClient({
                                                     className="px-6 py-12 text-center text-sm"
                                                 >
                                                     <div className="flex flex-col items-center justify-center space-y-2 text-gray-500">
-                                                        <span className="font-semibold text-gray-700">No withdrawal records found.</span>
-                                                        <span className="text-xs">Submit a new request to withdraw your cleared earnings to your designated payout account.</span>
+                                                        <span className="font-semibold text-gray-700">{__('general.no_withdrawal_records_found')}</span>
+                                                        <span className="text-xs">{__('general.submit_a_new_request_to_withdraw_your_cleared_earnings_to_your_designated_payout_account')}</span>
                                                     </div>
                                                 </td>
                                             </tr>

@@ -61,21 +61,17 @@ export default function CommandPalette() {
                             autoFocus
                             value={query}
                             onValueChange={setQuery}
-                            placeholder="Search clients, invoices, services... (Cmd+K)"
+                            placeholder={__('general.search_clients_invoices_services_cmd_k')}
                             className="flex-1 border-0 bg-transparent px-4 py-4 text-sm outline-none placeholder:text-gray-400 focus:ring-0"
                         />
                     </div>
 
                     <Command.List className="max-h-96 overflow-y-auto p-2">
                         {loading && (
-                            <div className="p-4 text-center text-sm text-gray-500">
-                                Searching...
-                            </div>
+                            <div className="p-4 text-center text-sm text-gray-500">{__('general.searching')}</div>
                         )}
                         {!loading && query && results.length === 0 && (
-                            <div className="p-4 text-center text-sm text-gray-500">
-                                No results found.
-                            </div>
+                            <div className="p-4 text-center text-sm text-gray-500">{__('general.no_results_found')}</div>
                         )}
 
                         {!loading && results.length > 0 && (
@@ -108,19 +104,19 @@ export default function CommandPalette() {
                                     onSelect={() => { setOpen(false); /* Emit or navigate to Add Lead */ }}
                                     className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-gray-900 select-none aria-selected:bg-gray-100"
                                 >
-                                    <span className="font-medium">Create New Lead</span>
+                                    <span className="font-medium">{__('general.create_new_lead')}</span>
                                 </Command.Item>
                                 <Command.Item
                                     onSelect={() => { setOpen(false); /* Emit or navigate to Add Task */ }}
                                     className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-gray-900 select-none aria-selected:bg-gray-100"
                                 >
-                                    <span className="font-medium">Create New Task</span>
+                                    <span className="font-medium">{__('general.create_new_task')}</span>
                                 </Command.Item>
                                 <Command.Item
                                     onSelect={() => { setOpen(false); router.visit(route('crm.dashboard')); }}
                                     className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-gray-900 select-none aria-selected:bg-gray-100"
                                 >
-                                    <span className="font-medium">Go to CRM Dashboard</span>
+                                    <span className="font-medium">{__('general.go_to_crm_dashboard')}</span>
                                 </Command.Item>
                             </Command.Group>
                         )}

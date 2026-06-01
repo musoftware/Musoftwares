@@ -188,17 +188,13 @@ export default function ProductTourModal({ user, isOpen, onClose, currentStep, o
                                     onClick={handleFinish}
                                     className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:border-slate-400 transition-colors flex items-center justify-center gap-1.5"
                                 >
-                                    <Wallet className="w-3.5 h-3.5 text-emerald-500" />
-                                    Add Balance
-                                </Link>
+                                    <Wallet className="w-3.5 h-3.5 text-emerald-500" />{__('general.add_balance')}</Link>
                                 <Link
                                     href="/erp/invoices"
                                     onClick={handleFinish}
                                     className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:border-slate-400 transition-colors flex items-center justify-center gap-1.5"
                                 >
-                                    <FileText className="w-3.5 h-3.5 text-rose-500" />
-                                    View Invoices
-                                </Link>
+                                    <FileText className="w-3.5 h-3.5 text-rose-500" />{__('general.view_invoices')}</Link>
                             </div>
                         )}
                     </div>

@@ -122,8 +122,7 @@ function FunnelBuilder({ funnel, onClose, onSave }: { funnel: any; onClose: () =
                 <div className="flex items-center gap-2">
                     <Button onClick={() => onSave({ ...funnel, nodes })}
                         className="gap-1.5 h-8 bg-blue-500 text-white rounded-lg text-xs font-bold hover:bg-blue-400 transition-all">
-                        <Save className="w-3 h-3" /> Save Funnel
-                    </Button>
+                        <Save className="w-3 h-3" />{__('general.save_funnel')}</Button>
                     <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-slate-500 hover:text-white hover:bg-transparent transition-colors"><X className="w-4 h-4" /></Button>
                 </div>
             </div>
@@ -131,7 +130,7 @@ function FunnelBuilder({ funnel, onClose, onSave }: { funnel: any; onClose: () =
             <div className="flex flex-1 overflow-hidden">
                 {/* Node sidebar */}
                 <div className="w-52 bg-slate-900 border-r border-slate-800 p-3 space-y-1.5 overflow-y-auto shrink-0">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2 px-1">Add Node</p>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2 px-1">{__('general.add_node')}</p>
                     {NODE_TYPES.map(t => {
                         const Icon = t.icon;
                         return (
@@ -152,7 +151,7 @@ function FunnelBuilder({ funnel, onClose, onSave }: { funnel: any; onClose: () =
                         <div className="absolute inset-0 flex items-center justify-center">
                             <div className="text-center">
                                 <GitBranch className="w-10 h-10 text-slate-800 mx-auto mb-3" />
-                                <p className="text-xs text-slate-600">Add nodes from the sidebar to build your funnel</p>
+                                <p className="text-xs text-slate-600">{__('general.add_nodes_from_the_sidebar_to_build_your_funnel')}</p>
                             </div>
                         </div>
                     ) : (
@@ -172,7 +171,7 @@ function FunnelBuilder({ funnel, onClose, onSave }: { funnel: any; onClose: () =
                 {/* Properties panel */}
                 {selected && (
                     <div className="w-64 bg-slate-900 border-l border-slate-800 p-4 shrink-0 overflow-y-auto">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-3">Node Properties</p>
+                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-3">{__('general.node_properties')}</p>
                         {(() => {
                             const node = nodes.find(n => n.id === selected);
                             if (!node) return null;
@@ -186,8 +185,8 @@ function FunnelBuilder({ funnel, onClose, onSave }: { funnel: any; onClose: () =
                                     </div>
                                     {node.type === 'message' && (
                                         <div>
-                                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Message Text</label>
-                                            <Textarea rows={4} placeholder="Hello {{name}}, we have a special offer..."
+                                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.message_text')}</label>
+                                            <Textarea rows={4} placeholder={__('general.hello_name_we_have_a_special_offer')}
                                                 className="text-xs bg-slate-800 border-slate-700 text-white resize-none focus-visible:ring-blue-500"
                                                 onChange={e => setNodes(prev => prev.map(n => n.id === selected ? { ...n, config: { ...n.config, preview: e.target.value.slice(0, 40) + '...', text: e.target.value } } : n))} />
                                             <p className="text-[10px] text-slate-600 mt-1">Use {'{{name}}'}, {'{{phone}}'} for personalization</p>
@@ -195,7 +194,7 @@ function FunnelBuilder({ funnel, onClose, onSave }: { funnel: any; onClose: () =
                                     )}
                                     {node.type === 'delay' && (
                                         <div>
-                                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Wait Duration</label>
+                                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.wait_duration')}</label>
                                             <div className="flex gap-2">
                                                 <Input type="number" min={1} defaultValue={1} className="h-9 text-xs bg-slate-800 border-slate-700 text-white focus-visible:ring-blue-500" />
                                                 <select className="h-9 px-3 text-xs bg-slate-800 border border-slate-700 rounded-md outline-none text-white focus:border-blue-500">
@@ -206,8 +205,8 @@ function FunnelBuilder({ funnel, onClose, onSave }: { funnel: any; onClose: () =
                                     )}
                                     {(node.type === 'condition') && (
                                         <div>
-                                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">If reply contains</label>
-                                            <Input type="text" placeholder="yes, interested, price..."
+                                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.if_reply_contains')}</label>
+                                            <Input type="text" placeholder={__('general.yes_interested_price')}
                                                 className="h-9 text-xs bg-slate-800 border-slate-700 text-white focus-visible:ring-blue-500" />
                                         </div>
                                     )}
@@ -261,7 +260,7 @@ export default function WaFunnelEngineRunner({ tool }: any) {
         <div className="min-h-screen bg-slate-950 flex items-center justify-center">
             <div className="text-center space-y-3">
                 <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm font-semibold text-slate-500">Connecting to Runtime...</p>
+                <p className="text-sm font-semibold text-slate-500">{__('general.connecting_to_runtime')}</p>
             </div>
         </div>
     );
@@ -274,10 +273,10 @@ export default function WaFunnelEngineRunner({ tool }: any) {
             {showNew && (
                 <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
                     <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-                        <h3 className="text-sm font-bold text-white flex items-center gap-2"><GitBranch className="w-4 h-4 text-blue-400" /> New Funnel</h3>
+                        <h3 className="text-sm font-bold text-white flex items-center gap-2"><GitBranch className="w-4 h-4 text-blue-400" />{__('general.new_funnel')}</h3>
                         <div>
-                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Funnel Name</label>
-                            <Input value={newName} onChange={e => setNewName(e.target.value)} onKeyDown={e => e.key === 'Enter' && createFunnel()} placeholder="Welcome Sequence, Product Launch..."
+                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.funnel_name')}</label>
+                            <Input value={newName} onChange={e => setNewName(e.target.value)} onKeyDown={e => e.key === 'Enter' && createFunnel()} placeholder={__('general.welcome_sequence_product_launch')}
                                 className="h-10 text-sm bg-slate-800 border-slate-700 focus-visible:ring-blue-500 text-white" autoFocus />
                         </div>
                         <div className="flex gap-3">
@@ -294,11 +293,10 @@ export default function WaFunnelEngineRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
                         <GitBranch className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm">WhatsApp Campaigns</span>
+                    <span className="font-bold text-sm">{__('general.whatsapp_campaigns')}</span>
                 </div>
                 <Button onClick={() => setShowNew(true)} className="gap-1.5 h-9 bg-blue-500 text-white hover:bg-blue-400 shadow-lg shadow-blue-500/20">
-                    <Plus className="w-3.5 h-3.5" /> New Funnel
-                </Button>
+                    <Plus className="w-3.5 h-3.5" />{__('general.new_funnel')}</Button>
             </div>
 
             <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
@@ -324,8 +322,8 @@ export default function WaFunnelEngineRunner({ tool }: any) {
                 <div className="bg-gradient-to-r from-blue-500/10 to-indigo-500/5 border border-blue-500/20 rounded-2xl p-4 flex items-start gap-3">
                     <GitBranch className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
                     <div>
-                        <p className="text-sm font-bold text-blue-300">Visual Drag-and-Drop Funnel Builder</p>
-                        <p className="text-xs text-slate-400 mt-0.5">Build automated WhatsApp workflows with message nodes, time delays, conditional branches, and AI auto-reply nodes. The engine manages thousands of contacts concurrently using a persistent state machine.</p>
+                        <p className="text-sm font-bold text-blue-300">{__('general.visual_drag_and_drop_funnel_builder')}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">{__('general.build_automated_whatsapp_workflows_with_message_nodes_time_delays_conditional_branches_and_ai_auto_reply_nodes_the_engine_manages_thousands_of_contacts_concurrently_using_a_persistent_state_machine')}</p>
                     </div>
                 </div>
 
@@ -343,11 +341,10 @@ export default function WaFunnelEngineRunner({ tool }: any) {
                 ) : (
                     <div className="py-24 text-center border border-dashed border-slate-800 rounded-2xl">
                         <GitBranch className="w-12 h-12 text-slate-800 mx-auto mb-4" />
-                        <h3 className="text-sm font-bold text-slate-400">No funnels created yet</h3>
-                        <p className="text-xs text-slate-600 mt-2 max-w-md mx-auto">Create your first WhatsApp funnel with drag-and-drop nodes. Build multi-step sequences with time delays, conditional routing, and AI-powered auto-replies that run 24/7 on your local machine.</p>
+                        <h3 className="text-sm font-bold text-slate-400">{__('general.no_funnels_created_yet')}</h3>
+                        <p className="text-xs text-slate-600 mt-2 max-w-md mx-auto">{__('general.create_your_first_whatsapp_funnel_with_drag_and_drop_nodes_build_multi_step_sequences_with_time_delays_conditional_routing_and_ai_powered_auto_replies_that_run_24_7_on_your_local_machine')}</p>
                         <Button onClick={() => setShowNew(true)} className="mt-6 gap-2 h-10 bg-blue-500 text-white hover:bg-blue-400 mx-auto shadow-lg shadow-blue-500/20">
-                            <Plus className="w-4 h-4" /> Create First Funnel
-                        </Button>
+                            <Plus className="w-4 h-4" />{__('general.create_first_funnel')}</Button>
                     </div>
                 )}
             </div>

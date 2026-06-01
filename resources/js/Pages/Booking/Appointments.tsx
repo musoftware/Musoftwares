@@ -98,7 +98,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
 
     const getPaymentBadge = (status: string, method?: string) => {
         if (status === 'free') return <Badge variant="outline" className="text-slate-500">Free</Badge>;
-        if (status === 'pending') return <Badge variant="outline" className="text-amber-600 border-amber-200">Payment Pending</Badge>;
+        if (status === 'pending') return <Badge variant="outline" className="text-amber-600 border-amber-200">{__('general.payment_pending')}</Badge>;
         if (status === 'paid') return <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50">Paid via {method}</Badge>;
         return null;
     };
@@ -122,7 +122,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">Appointments</h1>
-                        <p className="text-muted-foreground">Manage your bookings, consultations, and operational pipeline.</p>
+                        <p className="text-muted-foreground">{__('general.manage_your_bookings_consultations_and_operational_pipeline')}</p>
                     </div>
                     
                     <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
@@ -131,7 +131,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
                             value={providerId}
                             onChange={(e) => setProviderId(e.target.value)}
                         >
-                            <option value="">All Providers</option>
+                            <option value="">{__('general.all_providers')}</option>
                             {providers.map((p: any) => (
                                 <option key={p.id} value={p.id}>{p.name}</option>
                             ))}
@@ -140,7 +140,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
                         <div className="relative w-full sm:w-64">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                             <Input 
-                                placeholder="Search guest name or email..." 
+                                placeholder={__('general.search_guest_name_or_email')} 
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
                                 className="pl-9 bg-white"
@@ -167,8 +167,8 @@ export default function Appointments({ bookings, providers, filters }: any) {
                 {bookings.data.length === 0 ? (
                     <EmptyState 
                         icon={Calendar}
-                        title="No appointments yet"
-                        description="Share your booking links to start receiving appointments from clients."
+                        title={__('general.no_appointments_yet')}
+                        description={__('general.share_your_booking_links_to_start_receiving_appointments_from_clients')}
                         action={{
                             label: "View Event Types",
                             href: route('booking.index')
@@ -256,41 +256,35 @@ export default function Appointments({ bookings, providers, filters }: any) {
                                                 <MoreVertical className="h-4 w-4 text-slate-500" />
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="w-56">
-                                                <DropdownMenuLabel>Manage Appointment</DropdownMenuLabel>
+                                                <DropdownMenuLabel>{__('general.manage_appointment')}</DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
                                                 
                                                 {/* Status Actions */}
                                                 {booking.status === 'pending' && (
                                                     <DropdownMenuItem onClick={() => handleUpdateStatus(booking.id, 'confirmed')}>
-                                                        <CheckCircle className="h-4 w-4 mr-2 text-slate-500" /> Confirm Booking
-                                                    </DropdownMenuItem>
+                                                        <CheckCircle className="h-4 w-4 mr-2 text-slate-500" />{__('general.confirm_booking')}</DropdownMenuItem>
                                                 )}
                                                 {(booking.status === 'confirmed' || booking.status === 'pending') && (
                                                     <DropdownMenuItem onClick={() => handleUpdateStatus(booking.id, 'cancelled')}>
-                                                        <XCircle className="h-4 w-4 mr-2 text-slate-500" /> Cancel Booking
-                                                    </DropdownMenuItem>
+                                                        <XCircle className="h-4 w-4 mr-2 text-slate-500" />{__('general.cancel_booking')}</DropdownMenuItem>
                                                 )}
                                                 {booking.status === 'confirmed' && (
                                                     <DropdownMenuItem onClick={() => handleUpdateStatus(booking.id, 'completed')}>
-                                                        <CheckCircle className="h-4 w-4 mr-2 text-slate-500" /> Mark Completed
-                                                    </DropdownMenuItem>
+                                                        <CheckCircle className="h-4 w-4 mr-2 text-slate-500" />{__('general.mark_completed')}</DropdownMenuItem>
                                                 )}
 
                                                 <DropdownMenuSeparator />
                                                 
                                                 <DropdownMenuItem onClick={() => openNotesModal(booking)}>
-                                                    <FileText className="h-4 w-4 mr-2 text-slate-500" /> Internal Notes
-                                                </DropdownMenuItem>
+                                                    <FileText className="h-4 w-4 mr-2 text-slate-500" />{__('general.internal_notes_1')}</DropdownMenuItem>
 
                                                 <DropdownMenuSeparator />
-                                                <DropdownMenuLabel className="text-xs text-slate-500">Pipeline Workflow</DropdownMenuLabel>
+                                                <DropdownMenuLabel className="text-xs text-slate-500">{__('general.pipeline_workflow')}</DropdownMenuLabel>
                                                 
                                                 <DropdownMenuItem onClick={() => handleCreateProject(booking.id)}>
-                                                    <Briefcase className="h-4 w-4 mr-2 text-slate-500" /> Convert to Project
-                                                </DropdownMenuItem>
+                                                    <Briefcase className="h-4 w-4 mr-2 text-slate-500" />{__('general.convert_to_project')}</DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => handleCreateInvoice(booking.id)}>
-                                                    <CreditCard className="h-4 w-4 mr-2 text-slate-500" /> Generate Invoice
-                                                </DropdownMenuItem>
+                                                    <CreditCard className="h-4 w-4 mr-2 text-slate-500" />{__('general.generate_invoice')}</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>
@@ -305,26 +299,22 @@ export default function Appointments({ bookings, providers, filters }: any) {
             <Dialog open={isNotesModalOpen} onOpenChange={setIsNotesModalOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Internal Notes</DialogTitle>
-                        <DialogDescription>
-                            Add private notes for this appointment. The guest will not see this.
-                        </DialogDescription>
+                        <DialogTitle>{__('general.internal_notes_1')}</DialogTitle>
+                        <DialogDescription>{__('general.add_private_notes_for_this_appointment_the_guest_will_not_see_this')}</DialogDescription>
                     </DialogHeader>
                     
                     <form onSubmit={handleSaveNotes} className="space-y-4 py-4">
                         <Textarea 
                             value={notesData.internal_notes}
                             onChange={e => setNotesData('internal_notes', e.target.value)}
-                            placeholder="Add your notes here..."
+                            placeholder={__('general.add_your_notes_here')}
                             rows={5}
                         />
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsNotesModalOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={processingNotes}>
-                                Save Notes
-                            </Button>
+                            <Button type="submit" disabled={processingNotes}>{__('general.save_notes')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

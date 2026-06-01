@@ -36,7 +36,7 @@ export function UpgradeOverlay({
             <CardContent className="p-8 md:p-10 relative z-10 space-y-6">
                 <div className="flex items-center gap-2">
                     <Lock className="h-5 w-5 text-primary" />
-                    <span className="font-semibold text-primary text-sm tracking-wide">Premium Feature</span>
+                    <span className="font-semibold text-primary text-sm tracking-wide">{__('general.premium_feature')}</span>
                 </div>
                 <div className="space-y-3">
                     <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground leading-tight">

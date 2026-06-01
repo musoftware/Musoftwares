@@ -374,7 +374,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, sel
                                 } catch (err: any) {
                                     alert('Failed to clear inbox: ' + err.message);
                                 }
-                            }} className="text-white/70 hover:text-red-300 hover:bg-white/10 h-8 w-8" title="Clear Inbox">
+                            }} className="text-white/70 hover:text-red-300 hover:bg-white/10 h-8 w-8" title={__('general.clear_inbox')}>
                                 <Trash2 className="w-4 h-4" />
                             </Button>
                             <Button variant="ghost" size="icon" onClick={fetchThreads} className="text-white/70 hover:text-white hover:bg-white/10 h-8 w-8">
@@ -523,7 +523,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, sel
                                     size="icon"
                                     onClick={() => setShowCopilot(!showCopilot)}
                                     className={`h-8 w-8 rounded-full shrink-0 ${showCopilot ? 'bg-teal-500/10 text-teal-600 border border-teal-500/20' : 'text-muted-foreground'}`}
-                                    title="AI Copilot"
+                                    title={__('general.ai_copilot')}
                                 >
                                     <Bot className="w-4 h-4" />
                                 </Button>
@@ -645,7 +645,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, sel
                                             onClick={fetchCopilotDraft}
                                             disabled={draftLoading}
                                             className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                                            title="Regenerate Draft"
+                                            title={__('general.regenerate_draft')}
                                         >
                                             <RefreshCw className={`w-3.5 h-3.5 ${draftLoading ? 'animate-spin' : ''}`} />
                                         </Button>
@@ -656,7 +656,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, sel
                                         <div className="p-3 rounded-xl border bg-muted/40 text-start space-y-2">
                                             <div className="flex justify-between items-center">
                                                 <span className="text-[10px] font-bold text-muted-foreground uppercase">{isRtl ? 'تحليل العميل الحالي' : 'Live Lead Analysis'}</span>
-                                                <Badge className="text-[9px] font-mono font-bold bg-teal-500/10 text-teal-600 border border-teal-500/20 px-1 py-0 h-4">Active Context</Badge>
+                                                <Badge className="text-[9px] font-mono font-bold bg-teal-500/10 text-teal-600 border border-teal-500/20 px-1 py-0 h-4">{__('general.active_context')}</Badge>
                                             </div>
                                             <div className="grid grid-cols-2 gap-2 pt-1 font-sans">
                                                 <div className="p-2 rounded bg-background border text-center">

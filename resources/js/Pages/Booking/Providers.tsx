@@ -309,7 +309,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
 
     return (
         <WorkspaceLayout
-            title="Booking Providers"
+            title={__('general.booking_providers')}
             workspaceName="Booking Settings"
             tenantId="SYS-BOOKING"
             menuItems={[
@@ -320,20 +320,18 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                 { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
-            <Head title="Booking Providers & Schedules" />
+            <Head title={__('general.booking_providers_schedules')} />
 
             <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">Providers & Schedules</h1>
-                        <p className="text-muted-foreground">Configure doctors, consultants, multi-host rosters, and availability calendars.</p>
+                        <h1 className="text-2xl font-bold tracking-tight">{__('general.providers_schedules')}</h1>
+                        <p className="text-muted-foreground">{__('general.configure_doctors_consultants_multi_host_rosters_and_availability_calendars')}</p>
                     </div>
                     <div className="mt-4 sm:mt-0">
                         {activeTab === 'registry' && !isFormOpen && (
                             <Button onClick={handleAddProviderClick} className="bg-slate-900 hover:bg-slate-800 text-white shadow-sm">
-                                <Plus className="w-4 h-4 mr-2" />
-                                Add Provider
-                            </Button>
+                                <Plus className="w-4 h-4 mr-2" />{__('general.add_provider')}</Button>
                         )}
                     </div>
                 </div>
@@ -341,9 +339,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                 <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as any)} className="w-full">
                     <TabsList className="bg-slate-100 border border-slate-200/60 p-1">
                         <TabsTrigger value="registry" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                            <Users className="w-4 h-4 mr-2" />
-                            Providers Registry
-                        </TabsTrigger>
+                            <Users className="w-4 h-4 mr-2" />{__('general.providers_registry')}</TabsTrigger>
                         <TabsTrigger value="schedule" className="data-[state=active]:bg-white data-[state=active]:shadow-sm" disabled={!selectedProvider}>
                             <Calendar className="w-4 h-4 mr-2" />
                             {selectedProvider ? `${selectedProvider.name}'s Schedule` : 'Schedule Builder'}
@@ -365,50 +361,48 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                             <X className="h-4 w-4" />
                                         </Button>
                                     </div>
-                                    <CardDescription>
-                                        Configure profile bio details, contact records, and match them with active client services.
-                                    </CardDescription>
+                                    <CardDescription>{__('general.configure_profile_bio_details_contact_records_and_match_them_with_active_client_services')}</CardDescription>
                                 </CardHeader>
                                 <form onSubmit={handleProfileSubmit}>
                                     <CardContent className="space-y-6 pt-6">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label htmlFor="name">Full Name</Label>
+                                                <Label htmlFor="name">{__('general.full_name')}</Label>
                                                 <Input
                                                     id="name"
                                                     value={profileForm.name}
                                                     onChange={e => profileForm.setData('name', e.target.value)}
-                                                    placeholder="Dr. John Doe"
+                                                    placeholder={__('general.dr_john_doe')}
                                                     required
                                                 />
                                                 {profileForm.errors.name && <p className="text-sm text-red-500">{profileForm.errors.name}</p>}
                                             </div>
 
                                             <div className="space-y-2">
-                                                <Label htmlFor="specialty">Specialty / Title</Label>
+                                                <Label htmlFor="specialty">{__('general.specialty_title')}</Label>
                                                 <Input
                                                     id="specialty"
                                                     value={profileForm.specialty}
                                                     onChange={e => profileForm.setData('specialty', e.target.value)}
-                                                    placeholder="e.g. Cardiologist, Senior Consultant, Math Tutor"
+                                                    placeholder={__('general.e_g_cardiologist_senior_consultant_math_tutor')}
                                                 />
                                                 {profileForm.errors.specialty && <p className="text-sm text-red-500">{profileForm.errors.specialty}</p>}
                                             </div>
 
                                             <div className="space-y-2">
-                                                <Label htmlFor="email">Email Address</Label>
+                                                <Label htmlFor="email">{__('general.email_address')}</Label>
                                                 <Input
                                                     id="email"
                                                     type="email"
                                                     value={profileForm.email}
                                                     onChange={e => profileForm.setData('email', e.target.value)}
-                                                    placeholder="john.doe@hospital.com"
+                                                    placeholder={__('general.john_doe_hospital_com')}
                                                 />
                                                 {profileForm.errors.email && <p className="text-sm text-red-500">{profileForm.errors.email}</p>}
                                             </div>
 
                                             <div className="space-y-2">
-                                                <Label htmlFor="phone">Phone Number</Label>
+                                                <Label htmlFor="phone">{__('general.phone_number')}</Label>
                                                 <Input
                                                     id="phone"
                                                     value={profileForm.phone}
@@ -420,24 +414,22 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="description">About / Profile Summary</Label>
+                                            <Label htmlFor="description">{__('general.about_profile_summary')}</Label>
                                             <Textarea
                                                 id="description"
                                                 value={profileForm.description}
                                                 onChange={e => profileForm.setData('description', e.target.value)}
-                                                placeholder="Write a brief professional description that will be visible to booking clients..."
+                                                placeholder={__('general.write_a_brief_professional_description_that_will_be_visible_to_booking_clients')}
                                                 rows={4}
                                             />
                                             {profileForm.errors.description && <p className="text-sm text-red-500">{profileForm.errors.description}</p>}
                                         </div>
 
                                         <div className="space-y-3">
-                                            <Label className="block mb-1">Performs Services / Event Types</Label>
-                                            <p className="text-xs text-muted-foreground mb-2">Select which services this provider is certified to perform.</p>
+                                            <Label className="block mb-1">{__('general.performs_services_event_types')}</Label>
+                                            <p className="text-xs text-muted-foreground mb-2">{__('general.select_which_services_this_provider_is_certified_to_perform')}</p>
                                             {eventTypes.length === 0 ? (
-                                                <div className="p-4 border rounded-lg bg-slate-50 text-center text-sm text-slate-500">
-                                                    No services exist yet. Please create a Booking Event Type first.
-                                                </div>
+                                                <div className="p-4 border rounded-lg bg-slate-50 text-center text-sm text-slate-500">{__('general.no_services_exist_yet_please_create_a_booking_event_type_first')}</div>
                                             ) : (
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto p-3 border rounded-lg bg-slate-50">
                                                     {eventTypes.map(event => {
@@ -471,8 +463,8 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
 
                                         <div className="flex items-center justify-between p-4 border rounded-lg bg-slate-50/50">
                                             <div className="space-y-0.5">
-                                                <Label>Active Roster Status</Label>
-                                                <p className="text-xs text-muted-foreground">Inactive providers cannot be selected for public scheduling slots.</p>
+                                                <Label>{__('general.active_roster_status')}</Label>
+                                                <p className="text-xs text-muted-foreground">{__('general.inactive_providers_cannot_be_selected_for_public_scheduling_slots')}</p>
                                             </div>
                                             <Switch
                                                 checked={profileForm.is_active}
@@ -496,14 +488,10 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                 {providers.length === 0 ? (
                                     <div className="border border-dashed border-slate-300 rounded-xl p-12 text-center bg-slate-50/50">
                                         <Users className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-                                        <h3 className="text-lg font-medium text-slate-900 mb-1">Roster is empty</h3>
-                                        <p className="text-sm text-slate-500 max-w-md mx-auto mb-6">
-                                            Register staff members, doctors, or practitioners to enable multi-host booking flows.
-                                        </p>
+                                        <h3 className="text-lg font-medium text-slate-900 mb-1">{__('general.roster_is_empty')}</h3>
+                                        <p className="text-sm text-slate-500 max-w-md mx-auto mb-6">{__('general.register_staff_members_doctors_or_practitioners_to_enable_multi_host_booking_flows')}</p>
                                         <Button onClick={handleAddProviderClick} className="bg-slate-900 hover:bg-slate-800 text-white">
-                                            <Plus className="w-4 h-4 mr-2" />
-                                            Register First Provider
-                                        </Button>
+                                            <Plus className="w-4 h-4 mr-2" />{__('general.register_first_provider')}</Button>
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -556,10 +544,10 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                     )}
 
                                                     <div className="mt-4">
-                                                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Assigned Services</span>
+                                                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">{__('general.assigned_services')}</span>
                                                         <div className="flex flex-wrap gap-1">
                                                             {provider.event_types.length === 0 ? (
-                                                                <span className="text-xs text-slate-400 italic">No services assigned</span>
+                                                                <span className="text-xs text-slate-400 italic">{__('general.no_services_assigned')}</span>
                                                             ) : (
                                                                 provider.event_types.map(et => (
                                                                     <Badge key={et.id} variant="outline" className="text-xs px-2 py-0.5 bg-slate-50 text-slate-600 border-slate-200">
@@ -578,9 +566,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                         onClick={() => handleEditProviderClick(provider)} 
                                                         className="flex-1 text-slate-700 bg-white border-slate-200"
                                                     >
-                                                        <Edit2 className="w-3.5 h-3.5 mr-1.5" />
-                                                        Edit Profile
-                                                    </Button>
+                                                        <Edit2 className="w-3.5 h-3.5 mr-1.5" />{__('general.edit_profile')}</Button>
                                                     <Button 
                                                         size="sm" 
                                                         onClick={() => handleManageScheduleClick(provider)}
@@ -607,8 +593,8 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                 <div className="lg:col-span-2 space-y-6">
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle>Recurring Weekly Schedules</CardTitle>
-                                            <CardDescription>Specify recurring weekly shifts that repeat indefinitely. Enabled days are rendered as dynamic booking windows.</CardDescription>
+                                            <CardTitle>{__('general.recurring_weekly_schedules')}</CardTitle>
+                                            <CardDescription>{__('general.specify_recurring_weekly_shifts_that_repeat_indefinitely_enabled_days_are_rendered_as_dynamic_booking_windows')}</CardDescription>
                                         </CardHeader>
                                         <CardContent>
                                         <div className="space-y-4">
@@ -664,11 +650,10 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                                     onClick={() => addWeeklyShift(value)}
                                                                     className="text-xs text-slate-700 hover:text-slate-900 hover:bg-slate-100 mt-1 w-max h-7 px-2"
                                                                 >
-                                                                    <Plus className="w-3 h-3 mr-1" /> Add Shift
-                                                                </Button>
+                                                                    <Plus className="w-3 h-3 mr-1" />{__('general.add_shift')}</Button>
                                                             </div>
                                                         ) : (
-                                                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-2 sm:mt-0">Unavailable / Off</span>
+                                                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-2 sm:mt-0">{__('general.unavailable_off')}</span>
                                                         )}
                                                     </div>
                                                 );
@@ -676,13 +661,9 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                         </div>
 
                                         <div className="mt-6 flex justify-end gap-3 border-t border-slate-100 pt-5">
-                                            <Button variant="outline" onClick={() => setActiveTab('registry')}>
-                                                Back to Roster
-                                            </Button>
+                                            <Button variant="outline" onClick={() => setActiveTab('registry')}>{__('general.back_to_roster')}</Button>
                                             <Button onClick={handleSaveSchedule} className="bg-slate-900 text-white hover:bg-slate-800">
-                                                <Save className="w-4 h-4 mr-2" />
-                                                Save All Schedules
-                                            </Button>
+                                                <Save className="w-4 h-4 mr-2" />{__('general.save_all_schedules')}</Button>
                                         </div>
                                         </CardContent>
                                     </Card>
@@ -693,13 +674,13 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                     {/* Add Override Form */}
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle>Custom Override Date</CardTitle>
-                                            <CardDescription>Configure vacation periods, holidays, or temporary schedule shifts. Set custom hours or uncheck enabled to block completely.</CardDescription>
+                                            <CardTitle>{__('general.custom_override_date')}</CardTitle>
+                                            <CardDescription>{__('general.configure_vacation_periods_holidays_or_temporary_schedule_shifts_set_custom_hours_or_uncheck_enabled_to_block_completely')}</CardDescription>
                                         </CardHeader>
                                         <CardContent>
                                         <form onSubmit={handleAddOverride} className="space-y-4">
                                             <div className="space-y-2">
-                                                <Label htmlFor="override-date">Target Date</Label>
+                                                <Label htmlFor="override-date">{__('general.target_date')}</Label>
                                                 <Input
                                                     id="override-date"
                                                     type="date"
@@ -712,8 +693,8 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
 
                                             <div className="flex items-center justify-between p-3 border rounded-lg bg-slate-50/50">
                                                 <div className="space-y-0.5">
-                                                    <span className="text-xs font-semibold text-slate-800 block">Available on this date?</span>
-                                                    <span className="text-[10px] text-slate-400 block">Disable to mark as a blocked holiday/day off.</span>
+                                                    <span className="text-xs font-semibold text-slate-800 block">{__('general.available_on_this_date')}</span>
+                                                    <span className="text-[10px] text-slate-400 block">{__('general.disable_to_mark_as_a_blocked_holiday_day_off')}</span>
                                                 </div>
                                                 <Switch
                                                     checked={newOverride.is_enabled}
@@ -747,8 +728,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                             )}
 
                                             <Button type="submit" variant="outline" className="w-full border-slate-200 text-slate-900 bg-slate-50/50 hover:bg-slate-100">
-                                                <Plus className="w-4 h-4 mr-2" /> Add Date Override
-                                            </Button>
+                                                <Plus className="w-4 h-4 mr-2" />{__('general.add_date_override')}</Button>
                                         </form>
                                         </CardContent>
                                     </Card>
@@ -756,13 +736,11 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                     {/* Overrides List */}
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle>Configured Overrides</CardTitle>
+                                            <CardTitle>{__('general.configured_overrides')}</CardTitle>
                                         </CardHeader>
                                         <CardContent>
                                         {oneTimeRules.length === 0 ? (
-                                            <div className="text-center py-6 text-xs text-slate-400 italic">
-                                                No date overrides defined. The weekly schedule will apply consistently.
-                                            </div>
+                                            <div className="text-center py-6 text-xs text-slate-400 italic">{__('general.no_date_overrides_defined_the_weekly_schedule_will_apply_consistently')}</div>
                                         ) : (
                                             <div className="space-y-3 max-h-96 overflow-y-auto">
                                                 {oneTimeRules.map((rule, idx) => (

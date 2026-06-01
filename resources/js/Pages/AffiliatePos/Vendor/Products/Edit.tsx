@@ -28,7 +28,7 @@ export default function VendorProductsEdit({ product }: any) {
                     <ArrowLeft className="w-5 h-5 text-gray-600" />
                 </Button>
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Edit Product</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{__('general.edit_product')}</h1>
                     <p className="text-sm text-gray-500 mt-1">Update details for {product.name}</p>
                 </div>
             </div>
@@ -37,14 +37,13 @@ export default function VendorProductsEdit({ product }: any) {
                 <Card className="shadow-sm border-gray-200 bg-white">
                     <CardHeader className="bg-gray-50/50 border-b p-5">
                         <CardTitle className="text-lg flex items-center gap-2">
-                            <Edit3 className="w-5 h-5 text-gray-500" /> Basic Information
-                        </CardTitle>
-                        <CardDescription>Details that affiliates will see when browsing products.</CardDescription>
+                            <Edit3 className="w-5 h-5 text-gray-500" />{__('general.basic_information')}</CardTitle>
+                        <CardDescription>{__('general.details_that_affiliates_will_see_when_browsing_products')}</CardDescription>
                     </CardHeader>
                     <CardContent className="p-6 space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2 col-span-2">
-                                <label className="text-sm font-medium text-gray-700">Product Name</label>
+                                <label className="text-sm font-medium text-gray-700">{__('general.product_name')}</label>
                                 <Input 
                                     value={data.name} 
                                     onChange={e => setData('name', e.target.value)} 
@@ -83,9 +82,7 @@ export default function VendorProductsEdit({ product }: any) {
                         Cancel
                     </Button>
                     <Button type="submit" className="bg-blue-600 hover:bg-blue-700 shadow-md" disabled={processing}>
-                        <Save className="w-4 h-4 mr-2" />
-                        Update Product
-                    </Button>
+                        <Save className="w-4 h-4 mr-2" />{__('general.update_product')}</Button>
                 </div>
             </form>
         </div>

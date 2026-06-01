@@ -45,16 +45,11 @@ export default function Billing({ subscriptions }: Props) {
                 {/* Page header */}
                 <div className="flex items-start justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                            Billing & Subscriptions
-                        </h1>
-                        <p className="text-sm text-slate-500 mt-1">
-                            Manage your tool subscriptions and billing history.
-                        </p>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{__('general.billing_subscriptions')}</h1>
+                        <p className="text-sm text-slate-500 mt-1">{__('general.manage_your_tool_subscriptions_and_billing_history')}</p>
                     </div>
                     <Button variant="outline" size="sm" className="gap-2" onClick={() => router.visit(route('tools.explore'))}>
-                        <ShoppingBag className="h-4 w-4" /> Browse More Tools
-                    </Button>
+                        <ShoppingBag className="h-4 w-4" />{__('general.browse_more_tools')}</Button>
                 </div>
 
                 {subscriptions.length > 0 && (
@@ -64,8 +59,8 @@ export default function Billing({ subscriptions }: Props) {
                                 <Calculator className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-slate-900 dark:text-white">Monthly Run Rate</p>
-                                <p className="text-xs text-slate-500">Total estimated cost per month for active tools</p>
+                                <p className="text-sm font-medium text-slate-900 dark:text-white">{__('general.monthly_run_rate')}</p>
+                                <p className="text-xs text-slate-500">{__('general.total_estimated_cost_per_month_for_active_tools')}</p>
                             </div>
                         </div>
                         <div className="text-right">
@@ -78,14 +73,12 @@ export default function Billing({ subscriptions }: Props) {
                 )}
 
                 {subscriptions.length === 0 ? (
-                    <EmptyState icon={Receipt} title="No subscriptions yet"
-                        description="Subscribe to a tool to see your billing history here."
+                    <EmptyState icon={Receipt} title={__('general.no_subscriptions_yet')}
+                        description={__('general.subscribe_to_a_tool_to_see_your_billing_history_here')}
                         action={{ label: 'Browse Tools', href: route('tools.explore') }} />
                 ) : (
                     <section className="space-y-4">
-                        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                            Your Subscriptions
-                        </h2>
+                        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.your_subscriptions')}</h2>
                         <div className="space-y-4">
                             {subscriptions.map(sub => (
                                 <div key={sub.id} className={`bg-white dark:bg-slate-900 border rounded-xl p-5 shadow-sm transition-all hover:border-slate-300 dark:hover:border-slate-700 ${sub.is_active ? 'border-slate-200 dark:border-slate-800' : 'border-slate-100 dark:border-slate-800/50'}`}>

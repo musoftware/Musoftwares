@@ -55,21 +55,21 @@ class AdminLanguageLineController extends Controller
     {
         LanguageLine::create($request->validated());
 
-        return redirect()->back()->with('success', 'Translation key created successfully.');
+        return redirect()->back()->with('success', __('general.translation_key_created_successfully'));
     }
 
     public function update(UpdateLanguageLineRequest $request, LanguageLine $languageLine)
     {
         $languageLine->update($request->validated());
 
-        return redirect()->back()->with('success', 'Translation updated successfully.');
+        return redirect()->back()->with('success', __('general.translation_updated_successfully'));
     }
 
     public function destroy(LanguageLine $languageLine)
     {
         $languageLine->delete();
 
-        return redirect()->back()->with('success', 'Translation key deleted successfully.');
+        return redirect()->back()->with('success', __('general.translation_key_deleted_successfully'));
     }
 
     public function autoTranslate(Request $request)
@@ -151,6 +151,6 @@ class AdminLanguageLineController extends Controller
 
         Cache::flush();
 
-        return back()->with('success', "Imported {$count} translation strings from files and JSON.");
+        return back()->with('success', __('general.imported_count_translation_strings_from_files_and_json'));
     }
 }

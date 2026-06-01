@@ -109,20 +109,16 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
     const calendarDays = eachDayOfInterval({ start: startDate, end: endDate });
 
     return (
-        <AdminSidebarLayout title="Task Calendar" header="Task Calendar">
-            <Head title="Task Calendar — Admin" />
+        <AdminSidebarLayout title={__('general.task_calendar')} header="Task Calendar">
+            <Head title={__('general.task_calendar_admin')} />
 
             <div className="space-y-6">
                 {/* Page Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                            <CalendarIcon className="h-6 w-6 text-indigo-600" />
-                            Task Calendar
-                        </h1>
-                        <p className="text-sm text-slate-500 mt-1">
-                            Detailed overview of all tasks, todos, and busy times by date across platform clients.
-                        </p>
+                            <CalendarIcon className="h-6 w-6 text-indigo-600" />{__('general.task_calendar')}</h1>
+                        <p className="text-sm text-slate-500 mt-1">{__('general.detailed_overview_of_all_tasks_todos_and_busy_times_by_date_across_platform_clients')}</p>
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -131,7 +127,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                             onChange={e => handleClientChange(e.target.value)}
                             className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
-                            <option value="">All Clients</option>
+                            <option value="">{__('general.all_clients')}</option>
                             {clients.map(c => (
                                 <option key={c.id} value={c.id}>{c.name}</option>
                             ))}

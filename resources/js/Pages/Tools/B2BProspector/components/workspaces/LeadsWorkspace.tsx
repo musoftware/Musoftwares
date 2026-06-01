@@ -54,8 +54,8 @@ export function LeadsWorkspace(props: LeadsWorkspaceProps) {
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-800 bg-clip-text text-transparent">Lead Database</h1>
-                    <p className="text-xs text-slate-500 mt-1">Review harvested decision makers, verified contact emails, and outbound status.</p>
+                    <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-800 bg-clip-text text-transparent">{__('general.lead_database')}</h1>
+                    <p className="text-xs text-slate-500 mt-1">{__('general.review_harvested_decision_makers_verified_contact_emails_and_outbound_status')}</p>
                 </div>
                 <Button onClick={props.handleExportLeads} disabled={!!props.exportingJobId} variant="outline" className="gap-1.5">
                     <Download className="w-4 h-4" /> 
@@ -67,7 +67,7 @@ export function LeadsWorkspace(props: LeadsWorkspaceProps) {
                 <div className="p-3.5 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-xl text-xs flex items-start gap-2.5">
                     <CheckCircle className="w-4.5 h-4.5 text-emerald-600 shrink-0 mt-0.5" />
                     <div>
-                        <p className="font-bold">Leads Exported to Local Drive</p>
+                        <p className="font-bold">{__('general.leads_exported_to_local_drive')}</p>
                         <p className="text-[11px] opacity-90 mt-0.5 font-mono select-all">{props.exportFilePath}</p>
                     </div>
                 </div>
@@ -77,7 +77,7 @@ export function LeadsWorkspace(props: LeadsWorkspaceProps) {
                 <div className="relative flex-1 w-full">
                     <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
                     <Input 
-                        type="text" placeholder="Search by name, company, or email..." 
+                        type="text" placeholder={__('general.search_by_name_company_or_email')} 
                         value={props.leadsSearch}
                         onChange={(e) => { props.setLeadsSearch(e.target.value); props.setLeadsOffset(0); }}
                         className="pl-9 bg-slate-50 border-slate-200 h-10 w-full"
@@ -90,7 +90,7 @@ export function LeadsWorkspace(props: LeadsWorkspaceProps) {
                         onChange={(e) => { props.setSelectedCampaignId(e.target.value); props.setLeadsOffset(0); }}
                         className="md:w-44 bg-slate-50 border border-slate-200 h-10 text-xs rounded-lg px-2.5 outline-none focus:border-ring focus:ring-3 focus:ring-ring/50 transition-colors"
                     >
-                        <option value="">All Campaigns</option>
+                        <option value="">{__('general.all_campaigns')}</option>
                         {props.campaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
 
@@ -99,10 +99,10 @@ export function LeadsWorkspace(props: LeadsWorkspaceProps) {
                         onChange={(e) => { props.setLeadsEmailFilter(e.target.value); props.setLeadsOffset(0); }}
                         className="md:w-44 bg-slate-50 border border-slate-200 h-10 text-xs rounded-lg px-2.5 outline-none focus:border-ring focus:ring-3 focus:ring-ring/50 transition-colors"
                     >
-                        <option value="">All Verification States</option>
-                        <option value="valid">Verified Clean</option>
-                        <option value="invalid">Risky Bounce</option>
-                        <option value="catchall">Accept All</option>
+                        <option value="">{__('general.all_verification_states')}</option>
+                        <option value="valid">{__('general.verified_clean')}</option>
+                        <option value="invalid">{__('general.risky_bounce')}</option>
+                        <option value="catchall">{__('general.accept_all')}</option>
                         <option value="unverified">Unverified</option>
                     </select>
                 </div>
@@ -111,8 +111,8 @@ export function LeadsWorkspace(props: LeadsWorkspaceProps) {
             {props.leads.length === 0 ? (
                 <div className="py-20 text-center bg-white border border-slate-200 rounded-2xl">
                     <MailQuestion className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                    <h3 className="text-sm font-bold text-slate-900">No matching leads found</h3>
-                    <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">Verify that you have launched an active lead finder campaign, or try clearing search queries.</p>
+                    <h3 className="text-sm font-bold text-slate-900">{__('general.no_matching_leads_found')}</h3>
+                    <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">{__('general.verify_that_you_have_launched_an_active_lead_finder_campaign_or_try_clearing_search_queries')}</p>
                 </div>
             ) : (
                 <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
@@ -121,10 +121,10 @@ export function LeadsWorkspace(props: LeadsWorkspaceProps) {
                             <thead>
                                 <tr className="bg-slate-50/50 border-b border-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
                                     <th className="p-4 pl-6">Profile</th>
-                                    <th className="p-4">Corporate Role</th>
-                                    <th className="p-4">Contact Info</th>
-                                    <th className="p-4">Quality Score</th>
-                                    <th className="p-4">Outbox status</th>
+                                    <th className="p-4">{__('general.corporate_role')}</th>
+                                    <th className="p-4">{__('general.contact_info')}</th>
+                                    <th className="p-4">{__('general.quality_score')}</th>
+                                    <th className="p-4">{__('general.outbox_status')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 text-xs">

@@ -145,15 +145,15 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
     };
 
     return (
-        <AdminSidebarLayout title={__('Serial Softwares')} header={__('Serial Softwares')}>
-            <Head title={__('Serial Softwares')} />
+        <AdminSidebarLayout title={__('general.serial_softwares')} header={__('general.serial_softwares')}>
+            <Head title={__('general.serial_softwares')} />
 
             <div className="p-4 sm:p-6 space-y-6">
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">{__('Serial Softwares')}</h1>
+                    <h1 className="text-2xl font-bold tracking-tight">{__('general.serial_softwares')}</h1>
                     <p className="text-muted-foreground text-sm mt-1">
-                        {__('Software registry — auto-created on first API check-in')}
+                        {__('general.software_registry_auto_created_on_first_api_check_in')}
                     </p>
                 </div>
 
@@ -163,31 +163,31 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                     <Card>
                         <CardContent className="p-4">
-                            <p className="text-xs text-muted-foreground font-medium">{__('Total Softwares')}</p>
+                            <p className="text-xs text-muted-foreground font-medium">{__('general.total_softwares')}</p>
                             <p className="text-2xl font-bold mt-1">{stats.total_softwares}</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardContent className="p-4">
-                            <p className="text-xs text-muted-foreground font-medium">{__('Total Devices')}</p>
+                            <p className="text-xs text-muted-foreground font-medium">{__('general.total_devices')}</p>
                             <p className="text-2xl font-bold mt-1">{stats.total_devices_all}</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardContent className="p-4">
-                            <p className="text-xs text-muted-foreground font-medium">{__('Active Devices')}</p>
+                            <p className="text-xs text-muted-foreground font-medium">{__('general.active_devices')}</p>
                             <p className="text-2xl font-bold mt-1 text-green-600">{stats.active_devices_all}</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardContent className="p-4">
-                            <p className="text-xs text-muted-foreground font-medium">{__('Inactive Devices')}</p>
+                            <p className="text-xs text-muted-foreground font-medium">{__('general.inactive_devices')}</p>
                             <p className="text-2xl font-bold mt-1">{stats.inactive_devices_all}</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardContent className="p-4">
-                            <p className="text-xs text-muted-foreground font-medium">{__('Blocked Devices')}</p>
+                            <p className="text-xs text-muted-foreground font-medium">{__('general.blocked_devices')}</p>
                             <p className="text-2xl font-bold mt-1 text-red-600">{stats.blocked_devices_all}</p>
                         </CardContent>
                     </Card>
@@ -200,7 +200,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                         onClick={() => setShowAddForm(!showAddForm)}
                     >
                         <div className="flex items-center justify-between">
-                            <CardTitle className="text-sm font-semibold">{__('Add Software Manually')}</CardTitle>
+                            <CardTitle className="text-sm font-semibold">{__('general.add_software_manually')}</CardTitle>
                             <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
                                 {showAddForm ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                             </Button>
@@ -210,16 +210,16 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                         <CardContent>
                             <form onSubmit={store} className="flex flex-col sm:flex-row flex-wrap gap-3 items-end">
                                 <div className="flex-1 min-w-48 w-full sm:w-auto">
-                                    <Label className="text-xs mb-1 block">{__('Software Name')}</Label>
+                                    <Label className="text-xs mb-1 block">{__('general.software_name')}</Label>
                                     <Input
-                                        placeholder={__('e.g. MyApp.exe')}
+                                        placeholder={__('general.e_g_myapp_exe')}
                                         value={form.name}
                                         onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                                         required
                                     />
                                 </div>
                                 <div className="w-full sm:w-40">
-                                    <Label className="text-xs mb-1 block">{__('Default Status')}</Label>
+                                    <Label className="text-xs mb-1 block">{__('general.default_status')}</Label>
                                     <Select
                                         value={form.default_status}
                                         onValueChange={v => setForm(f => ({ ...f, default_status: v || 'active' }))}
@@ -234,7 +234,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                     </Select>
                                 </div>
                                 <Button type="submit" className="gap-2 w-full sm:w-auto">
-                                    <Plus className="w-4 h-4" /> {__('Add')}
+                                    <Plus className="w-4 h-4" /> {__('general.add')}
                                 </Button>
                             </form>
                         </CardContent>
@@ -250,20 +250,20 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                 <Label className="text-xs mb-1 block">{__('Search')}</Label>
                                 <div className="flex gap-2">
                                     <Input
-                                        placeholder={__('Search by software name...')}
+                                        placeholder={__('general.search_by_software_name')}
                                         value={search}
                                         onChange={e => setSearch(e.target.value)}
                                         className="flex-1"
                                     />
                                     <Button type="submit" variant="outline" size="sm" className="px-3 shrink-0">
-                                        {__('Go')}
+                                        {__('general.go')}
                                     </Button>
                                 </div>
                             </form>
 
                             {/* Status Filter */}
                             <div className="w-full sm:w-36">
-                                <Label className="text-xs mb-1 block">{__('Default Status')}</Label>
+                                <Label className="text-xs mb-1 block">{__('general.default_status')}</Label>
                                 <Select
                                     value={filters.default_status || 'all'}
                                     onValueChange={v => applyFilters({ default_status: v === 'all' ? null : v })}
@@ -281,7 +281,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
 
                             {/* Per Page */}
                             <div className="w-full sm:w-28">
-                                <Label className="text-xs mb-1 block">{__('Per Page')}</Label>
+                                <Label className="text-xs mb-1 block">{__('general.per_page')}</Label>
                                 <Select
                                     value={String(filters.per_page)}
                                     onValueChange={v => applyFilters({ per_page: parseInt(v ?? '20') })}
@@ -305,7 +305,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                     className="inline-flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium hover:bg-muted transition-colors w-full sm:w-auto"
                                 >
                                     <Download className="w-4 h-4" />
-                                    {__('Export CSV')}
+                                    {__('general.export_csv')}
                                 </a>
 
                                 {hasActiveFilters && (
@@ -327,7 +327,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>
-                                            <SortHeader column="name">{__('Software')}</SortHeader>
+                                            <SortHeader column="name">{__('general.software')}</SortHeader>
                                         </TableHead>
                                         <TableHead className="text-center">
                                             <SortHeader column="total_devices">{__('Total')}</SortHeader>
@@ -336,12 +336,12 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                             <SortHeader column="active_count">{__('Active')}</SortHeader>
                                         </TableHead>
                                         <TableHead className="text-center hidden sm:table-cell">{__('Inactive')}</TableHead>
-                                        <TableHead className="text-center hidden sm:table-cell">{__('Blocked')}</TableHead>
+                                        <TableHead className="text-center hidden sm:table-cell">{__('general.blocked')}</TableHead>
                                         <TableHead className="hidden md:table-cell">
-                                            <SortHeader column="default_status">{__('Default Status')}</SortHeader>
+                                            <SortHeader column="default_status">{__('general.default_status')}</SortHeader>
                                         </TableHead>
                                         <TableHead className="hidden lg:table-cell">
-                                            <SortHeader column="created_at">{__('Registered')}</SortHeader>
+                                            <SortHeader column="created_at">{__('general.registered')}</SortHeader>
                                         </TableHead>
                                         <TableHead className="w-10"></TableHead>
                                     </TableRow>
@@ -352,10 +352,10 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                             <TableCell colSpan={8} className="text-center py-16 text-muted-foreground">
                                                 <div className="flex flex-col items-center gap-2">
                                                     <Layers className="w-8 h-8 opacity-30" />
-                                                    <p>{__('No software registered yet.')}</p>
+                                                    <p>{__('general.no_software_registered_yet')}</p>
                                                     {hasActiveFilters && (
                                                         <Button variant="link" size="sm" onClick={clearFilters}>
-                                                            {__('Clear filters')}
+                                                            {__('general.clear_filters')}
                                                         </Button>
                                                     )}
                                                 </div>
@@ -432,12 +432,12 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                             onClick={() => router.visit(route('admin.serial-devices.index', { software_id: sw.id }))}
                                                         >
                                                             <Eye className="w-4 h-4 mr-2" />
-                                                            {__('View Devices')}
+                                                            {__('general.view_devices')}
                                                         </DropdownMenuItem>
 
                                                         {/* Mobile: show status changer in dropdown */}
                                                         <div className="md:hidden px-1.5 py-1">
-                                                            <p className="text-xs text-muted-foreground mb-1">{__('Default Status')}</p>
+                                                            <p className="text-xs text-muted-foreground mb-1">{__('general.default_status')}</p>
                                                             <Select
                                                                 value={sw.default_status}
                                                                 onValueChange={v => updateStatus(sw, v || 'active')}

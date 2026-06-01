@@ -51,10 +51,8 @@ export default function Show({ transfer }) {
                             <CheckCircle className="w-6 h-6" />
                         </div>
                         <div className="space-y-1">
-                            <Badge variant="outline" className="font-medium bg-emerald-50 text-emerald-700 border-emerald-200 uppercase tracking-wider text-[10px]">
-                                Transaction Successful
-                            </Badge>
-                            <CardTitle className="text-xl font-bold tracking-tight">Wallet Transfer Receipt</CardTitle>
+                            <Badge variant="outline" className="font-medium bg-emerald-50 text-emerald-700 border-emerald-200 uppercase tracking-wider text-[10px]">{__('general.transaction_successful')}</Badge>
+                            <CardTitle className="text-xl font-bold tracking-tight">{__('general.wallet_transfer_receipt')}</CardTitle>
                             <CardDescription className="text-xs">Immutable Ledger Reference ID: #{transfer.id}</CardDescription>
                         </div>
                     </CardHeader>
@@ -106,7 +104,7 @@ export default function Show({ transfer }) {
 
                         {/* Detailed Ledger Audit Section */}
                         <div className="space-y-4">
-                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">Financial Audit Details</span>
+                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">{__('general.financial_audit_details')}</span>
                             
                             <div className="space-y-2.5 text-sm">
                                 <div className="flex justify-between">
@@ -166,7 +164,7 @@ export default function Show({ transfer }) {
                         {/* Memo / Reason details */}
                         {transfer.reason && (
                             <div className="p-3 border border-dashed rounded-lg bg-muted/5 space-y-1">
-                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Transfer Memo / Note</span>
+                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">{__('general.transfer_memo_note')}</span>
                                 <p className="text-sm italic text-foreground">"{transfer.reason}"</p>
                             </div>
                         )}
@@ -175,9 +173,8 @@ export default function Show({ transfer }) {
                     
                     <CardFooter className="bg-muted/5 border-t border-primary/5 py-4 flex items-center justify-between text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
-                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Fully Secured by Musoftware Ledger
-                        </span>
-                        <span>Standard P2P Transfer</span>
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />{__('general.fully_secured_by_musoftware_ledger')}</span>
+                        <span>{__('general.standard_p2p_transfer')}</span>
                     </CardFooter>
                 </Card>
             </div>

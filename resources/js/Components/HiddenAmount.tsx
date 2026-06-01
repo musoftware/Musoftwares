@@ -21,7 +21,7 @@ export default function HiddenAmount({
         <div 
             className={`cursor-pointer inline-flex items-center gap-2 select-none ${className}`} 
             onClick={() => setIsHidden(!isHidden)}
-            title="Toggle visibility"
+            title={__('general.toggle_visibility')}
         >
             {isHidden ? (
                 <Badge variant="secondary" className="font-jetbrains text-xs flex items-center gap-1 text-slate-500">

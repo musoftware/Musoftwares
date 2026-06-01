@@ -105,7 +105,7 @@ class FinancialController extends Controller
                 $withdrawal->status = 'pending';
                 $withdrawal->save();
             });
-            return back()->with('success', 'Withdrawal requested successfully.');
+            return back()->with('success', __('general.withdrawal_requested_successfully'));
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => 'An error occurred while processing your withdrawal request.']);
         }
@@ -141,12 +141,12 @@ class FinancialController extends Controller
 
     public function success(Request $request)
     {
-        return redirect()->route('financial.transactions')->with('success', 'Your deposit was successful and has been credited to your wallet balance.');
+        return redirect()->route('financial.transactions')->with('success', __('general.your_deposit_was_successful_and_has_been_credited_to_your_wallet_balance'));
     }
 
     public function failure(Request $request)
     {
-        return redirect()->route('financial.add-balance')->with('error', 'Payment failed or was canceled. Please try again.');
+        return redirect()->route('financial.add-balance')->with('error', __('general.payment_failed_or_was_canceled_please_try_again'));
     }
 
     public function webhook(Request $request)

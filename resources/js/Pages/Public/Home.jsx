@@ -37,7 +37,7 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
     return (
         <PublicLayout>
             <Head>
-                <title>musoftware — Unified Workspace</title>
+                <title>{__('general.musoftware_unified_workspace')}</title>
                 <meta name="description" content="Manage clients, billing, and operations from one workspace." />
             </Head>
 
@@ -53,27 +53,17 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
                             variants={staggerContainer}
                             className="max-w-2xl"
                         >
-                            <motion.h1 variants={fadeUp} className="text-5xl lg:text-7xl font-semibold tracking-tight text-slate-900 leading-[1.05] mb-8">
-                                Unified operations for modern businesses.
-                            </motion.h1>
-                            <motion.p variants={fadeUp} className="text-xl text-slate-500 leading-relaxed font-light mb-10 max-w-lg">
-                                Select exactly what you need from our marketplace. From billing to CRM, engineered for calm clarity and high performance.
-                            </motion.p>
+                            <motion.h1 variants={fadeUp} className="text-5xl lg:text-7xl font-semibold tracking-tight text-slate-900 leading-[1.05] mb-8">{__('general.unified_operations_for_modern_businesses')}</motion.h1>
+                            <motion.p variants={fadeUp} className="text-xl text-slate-500 leading-relaxed font-light mb-10 max-w-lg">{__('general.select_exactly_what_you_need_from_our_marketplace_from_billing_to_crm_engineered_for_calm_clarity_and_high_performance')}</motion.p>
                             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4">
                                 <Link href="/register?trial=true">
-                                    <Button size="lg" className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white rounded-full px-8 h-14 text-base font-medium shadow-md hover:shadow-xl transition-all">
-                                        Start Free Trial
-                                    </Button>
+                                    <Button size="lg" className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white rounded-full px-8 h-14 text-base font-medium shadow-md hover:shadow-xl transition-all">{__('general.start_free_trial')}</Button>
                                 </Link>
                                 <a href="#features">
-                                    <Button size="lg" variant="ghost" className="w-full sm:w-auto hover:bg-slate-50 text-slate-900 rounded-full px-8 h-14 text-base font-medium transition-all">
-                                        Explore Features
-                                    </Button>
+                                    <Button size="lg" variant="ghost" className="w-full sm:w-auto hover:bg-slate-50 text-slate-900 rounded-full px-8 h-14 text-base font-medium transition-all">{__('general.explore_features')}</Button>
                                 </a>
                             </motion.div>
-                            <motion.p variants={fadeUp} className="text-sm text-slate-500 mt-4">
-                                No credit card required for 14-day trial on modules (Tools excluded).
-                            </motion.p>
+                            <motion.p variants={fadeUp} className="text-sm text-slate-500 mt-4">{__('general.no_credit_card_required_for_14_day_trial_on_modules_tools_excluded')}</motion.p>
                         </motion.div>
 
                         {/* RIGHT: REAL Modern Corporate Memphis SVG */}
@@ -94,12 +84,8 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
             <section id="features" className="py-24 lg:py-32 bg-white relative">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="text-center max-w-2xl mx-auto mb-20">
-                        <h2 className="text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight mb-4">
-                            Everything you need. Nothing you don't.
-                        </h2>
-                        <p className="text-lg text-slate-500 font-light">
-                            Our modular approach means you only see and pay for the tools that fit your workflow.
-                        </p>
+                        <h2 className="text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight mb-4">{__('general.everything_you_need_nothing_you_don_t')}</h2>
+                        <p className="text-lg text-slate-500 font-light">{__('general.our_modular_approach_means_you_only_see_and_pay_for_the_tools_that_fit_your_workflow')}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -131,12 +117,8 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
             <section id="pricing" className="py-24 lg:py-32 bg-slate-50">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="text-center max-w-2xl mx-auto mb-16">
-                        <h2 className="text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight mb-4">
-                            Build Your Perfect Plan
-                        </h2>
-                        <p className="text-lg text-slate-500 font-light">
-                            Select exactly what you need. No more, no less.
-                        </p>
+                        <h2 className="text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight mb-4">{__('general.build_your_perfect_plan')}</h2>
+                        <p className="text-lg text-slate-500 font-light">{__('general.select_exactly_what_you_need_no_more_no_less')}</p>
                     </div>
 
                     <PricingBuilder serviceItems={serviceItems} currency={currency} />
@@ -146,9 +128,7 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
             {/* FAQ */}
             <section id="faq" className="py-24 lg:py-32 bg-white">
                 <div className="max-w-3xl mx-auto px-6 lg:px-8">
-                    <h2 className="text-3xl font-semibold text-slate-900 tracking-tight mb-12 text-center">
-                        Common questions
-                    </h2>
+                    <h2 className="text-3xl font-semibold text-slate-900 tracking-tight mb-12 text-center">{__('general.common_questions')}</h2>
                     <div className="space-y-4">
                         {[
                             { q: "Is there a setup fee?", a: "No. You can start using the platform immediately without any initial setup fees." },
@@ -179,20 +159,12 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
             <section className="relative py-24 lg:py-32 bg-slate-900 text-white text-center overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-indigo-900/40 via-slate-900 to-slate-900"></div>
                 <div className="max-w-3xl mx-auto px-6 lg:px-8 relative z-10">
-                    <h2 className="text-4xl lg:text-5xl font-semibold tracking-tight mb-8">
-                        Ready for operational clarity?
-                    </h2>
-                    <p className="text-xl text-slate-400 font-light mb-10 max-w-2xl mx-auto">
-                        Join the platform that unifies your business from the ground up. Experience the calm.
-                    </p>
+                    <h2 className="text-4xl lg:text-5xl font-semibold tracking-tight mb-8">{__('general.ready_for_operational_clarity')}</h2>
+                    <p className="text-xl text-slate-400 font-light mb-10 max-w-2xl mx-auto">{__('general.join_the_platform_that_unifies_your_business_from_the_ground_up_experience_the_calm')}</p>
                     <Link href="/register?trial=true">
-                        <Button size="lg" className="bg-white hover:bg-indigo-50 text-slate-900 rounded-full px-10 h-14 text-lg font-medium shadow-xl hover:scale-105 transition-all">
-                            Start Free Trial
-                        </Button>
+                        <Button size="lg" className="bg-white hover:bg-indigo-50 text-slate-900 rounded-full px-10 h-14 text-lg font-medium shadow-xl hover:scale-105 transition-all">{__('general.start_free_trial')}</Button>
                     </Link>
-                    <p className="text-sm text-slate-400 mt-4">
-                        No credit card required for 14-day trial on modules (Tools excluded).
-                    </p>
+                    <p className="text-sm text-slate-400 mt-4">{__('general.no_credit_card_required_for_14_day_trial_on_modules_tools_excluded')}</p>
                 </div>
             </section>
 

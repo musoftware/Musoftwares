@@ -160,7 +160,7 @@ class MarketplaceController extends Controller
 
         if (!$hasAccess) {
             return redirect()->route('tools.show', $slug)
-                ->with('error', 'You need an active Fully Genius subscription or tool pass to access this.');
+                ->with('error', __('general.you_need_an_active_fully_genius_subscription_or_tool_pass_to_access_this'));
         }
 
         $plan = collect($tool['plans'] ?? [])->first();
@@ -199,7 +199,7 @@ class MarketplaceController extends Controller
 
         if (!$hasAccess) {
             return redirect()->route('tools.show', $slug)
-                ->with('error', 'You need an active Fully Genius subscription or tool pass to access this.');
+                ->with('error', __('general.you_need_an_active_fully_genius_subscription_or_tool_pass_to_access_this'));
         }
 
         $requirements = $tool['requirements'] ?? [];

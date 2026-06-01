@@ -25,7 +25,7 @@ class ReferralController extends Controller
     {
         $user = $this->resolveTenantUser();
         if (!$user || !$user->hasModuleSubscription('erp-referrals')) {
-            abort(403, 'Upgrade to enable Referral Program.');
+            abort(403, __('general.upgrade_to_enable_referral_program'));
         }
     }
 

@@ -379,8 +379,8 @@
                                 <label class="form-label fw-bold">{{ __('services.form.main_image') }} <span class="text-danger">*</span></label>
                                 <div class="dropzone-area" onclick="document.getElementById('image').click()">
                                     <i class="ti ti-cloud-upload"></i>
-                                    <div class="dropzone-text">Click or drag & drop to upload main image</div>
-                                    <div class="dropzone-hint">Recommended size: 800x600px. Max: 5MB</div>
+                                    <div class="dropzone-text">{{ __('general.click_or_drag_drop_to_upload_main_image') }}</div>
+                                    <div class="dropzone-hint">{{ __('general.recommended_size_800x600px_max_5mb') }}</div>
                                     <input type="file" id="image" name="image" class="d-none" accept="image/*" required>
                                 </div>
                                 <div id="mainImagePreview" class="media-previews"></div>
@@ -390,7 +390,7 @@
                                 <label class="form-label fw-bold">{{ __('services.form.additional_images') }}</label>
                                 <div class="dropzone-area" onclick="document.getElementById('images').click()">
                                     <i class="ti ti-photo-plus"></i>
-                                    <div class="dropzone-text">Add more images to your gallery</div>
+                                    <div class="dropzone-text">{{ __('general.add_more_images_to_your_gallery') }}</div>
                                     <input type="file" id="images" name="images[]" class="d-none" accept="image/*" multiple>
                                 </div>
                                 <div id="galleryPreviews" class="media-previews"></div>
@@ -470,14 +470,12 @@
                                 <div class="mb-4">
                                     <i class="ti ti-confetti text-success" style="font-size: 4rem;"></i>
                                 </div>
-                                <h4>Ready to go live!</h4>
-                                <p class="text-muted mb-4">Please review your service details on the right before publishing.</p>
+                                <h4>{{ __('general.ready_to_go_live') }}</h4>
+                                <p class="text-muted mb-4">{{ __('general.please_review_your_service_details_on_the_right_before_publishing') }}</p>
                                 
                                 <div class="alert alert-info d-flex align-items-center text-start">
                                     <i class="ti ti-info-circle me-3 fs-3"></i>
-                                    <div>
-                                        Once published, your service will be visible to everyone. You can always edit it later or mark it as inactive.
-                                    </div>
+                                    <div>{{ __('general.once_published_your_service_will_be_visible_to_everyone_you_can_always_edit_it_later_or_mark_it_as_inactive') }}</div>
                                 </div>
                             </div>
                         </x-client.form-card>
@@ -513,7 +511,7 @@
                         </div>
                         <div class="preview-body">
                             <div class="preview-category" id="cardPreviewCategory">Category</div>
-                            <h3 class="preview-title" id="cardPreviewTitle">Service Title...</h3>
+                            <h3 class="preview-title" id="cardPreviewTitle">{{ __('general.service_title_1') }}</h3>
                             
                             <div class="preview-footer">
                                 <div class="preview-price">
@@ -532,7 +530,7 @@
                                 <i class="ti ti-bulb text-warning fs-3"></i>
                             </div>
                             <div class="flex-grow-1">
-                                <div class="fw-bold text-dark small">PRO TIP</div>
+                                <div class="fw-bold text-dark small">{{ __('general.pro_tip') }}</div>
                                 <div class="text-muted extra-small">{{ __('services.tip.create_help_text') }}</div>
                             </div>
                         </div>
@@ -786,7 +784,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.className = 'row g-3 mb-3 pb-3 border-bottom extra-row';
                 row.innerHTML = `
                             <div class="col-md-4">
-                                <input type="text" name="extras[${extraCount}][title]" class="form-control" placeholder="Title (e.g., Fast Delivery)" required>
+                                <input type="text" name="extras[${extraCount}][title]" class="form-control" placeholder="{{ __('general.title_e_g_fast_delivery') }}" required>
                             </div>
                             <div class="col-md-3">
                                 <div class="input-group">
@@ -795,8 +793,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <input type="number" name="extras[${extraCount}][duration_days]" class="form-control" placeholder="Extra Days" min="0">
-                                <div class="form-text mt-0" style="font-size: 0.75rem;">Duration added to delivery</div>
+                                <input type="number" name="extras[${extraCount}][duration_days]" class="form-control" placeholder="{{ __('general.extra_days') }}" min="0">
+                                <div class="form-text mt-0" style="font-size: 0.75rem;">{{ __('general.duration_added_to_delivery') }}</div>
                             </div>
                             <div class="col-md-2 d-flex align-items-center">
                                 <button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="this.closest('.extra-row').remove()" aria-label="Delete">
@@ -1071,7 +1069,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <button type="button" class="btn-close position-absolute top-0 end-0 m-2" onclick="this.closest('.at-card').remove()"></button>
             <div class="row g-3">
                 <div class="col-md-6">
-                    <input type="text" name="extras[${extraCount}][title]" class="form-control" placeholder="Title (e.g., Fast Delivery)" required>
+                    <input type="text" name="extras[${extraCount}][title]" class="form-control" placeholder="{{ __('general.title_e_g_fast_delivery') }}" required>
                 </div>
                 <div class="col-md-3">
                     <div class="input-group">
@@ -1080,7 +1078,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <input type="number" name="extras[${extraCount}][duration_days]" class="form-control" placeholder="Extra Days" min="0">
+                    <input type="number" name="extras[${extraCount}][duration_days]" class="form-control" placeholder="{{ __('general.extra_days') }}" min="0">
                 </div>
             </div>
         `;

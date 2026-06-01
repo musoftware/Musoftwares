@@ -136,7 +136,7 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
             <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center font-sans">
                 <div className="text-center space-y-4">
                     <div className="w-10 h-10 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto" />
-                    <p className="text-sm font-semibold text-slate-600">Syncing with Local Runtime Agent...</p>
+                    <p className="text-sm font-semibold text-slate-600">{__('general.syncing_with_local_runtime_agent')}</p>
                 </div>
             </div>
         );
@@ -156,7 +156,7 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
                         <div className="w-6.5 h-6.5 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
                             <Download className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <span className="font-bold text-sm tracking-tight text-slate-900">Telegram Downloader</span>
+                        <span className="font-bold text-sm tracking-tight text-slate-900">{__('general.telegram_downloader')}</span>
                     </div>
                     
                     <div className="h-5 w-px bg-slate-200" />
@@ -165,9 +165,7 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
                         <Button variant={activeTab === 'auth' ? 'default' : 'ghost'} size="sm" onClick={() => setActiveTab('auth')}>
                             Authentication
                         </Button>
-                        <Button variant={activeTab === 'channels' ? 'default' : 'ghost'} size="sm" onClick={() => setActiveTab('channels')} disabled={!isAuthenticated}>
-                            Channels & Downloads
-                        </Button>
+                        <Button variant={activeTab === 'channels' ? 'default' : 'ghost'} size="sm" onClick={() => setActiveTab('channels')} disabled={!isAuthenticated}>{__('general.channels_downloads')}</Button>
                     </nav>
                 </div>
             </header>
@@ -178,16 +176,15 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
                     {activeTab === 'auth' && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <div>
-                                <h1 className="text-2xl font-bold">Telegram Authentication</h1>
-                                <p className="text-sm text-slate-500">Connect to your Telegram account using MTProto to download media securely.</p>
+                                <h1 className="text-2xl font-bold">{__('general.telegram_authentication')}</h1>
+                                <p className="text-sm text-slate-500">{__('general.connect_to_your_telegram_account_using_mtproto_to_download_media_securely')}</p>
                             </div>
 
                             <Card className="max-w-xl">
                                 <CardHeader>
                                     <CardTitle className="text-sm flex items-center gap-2">
-                                        <Key className="w-4 h-4 text-slate-500" /> API Credentials
-                                    </CardTitle>
-                                    <CardDescription>Get these from my.telegram.org</CardDescription>
+                                        <Key className="w-4 h-4 text-slate-500" />{__('general.api_credentials')}</CardTitle>
+                                    <CardDescription>{__('general.get_these_from_my_telegram_org')}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     {isAuthenticated ? (
@@ -195,18 +192,18 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
                                             <CheckCircle className="w-6 h-6 text-emerald-600" />
                                             <div>
                                                 <h4 className="font-bold text-emerald-900 text-sm">Authenticated</h4>
-                                                <p className="text-xs text-emerald-700">Your session is active and securely saved.</p>
+                                                <p className="text-xs text-emerald-700">{__('general.your_session_is_active_and_securely_saved')}</p>
                                             </div>
                                         </div>
                                     ) : (
                                         <>
                                             <div className="space-y-2">
-                                                <Label>API ID</Label>
-                                                <Input value={apiId} onChange={e => setApiId(e.target.value)} placeholder="e.g. 1234567" disabled={isAuthenticating} />
+                                                <Label>{__('general.api_id')}</Label>
+                                                <Input value={apiId} onChange={e => setApiId(e.target.value)} placeholder={__('general.e_g_1234567')} disabled={isAuthenticating} />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>API Hash</Label>
-                                                <Input value={apiHash} onChange={e => setApiHash(e.target.value)} placeholder="e.g. 0123456789abcdef0123456789abcdef" disabled={isAuthenticating} />
+                                                <Label>{__('general.api_hash')}</Label>
+                                                <Input value={apiHash} onChange={e => setApiHash(e.target.value)} placeholder={__('general.e_g_0123456789abcdef0123456789abcdef')} disabled={isAuthenticating} />
                                             </div>
                                             
                                             {authPrompt ? (
@@ -250,23 +247,22 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <h1 className="text-2xl font-bold">Channels & Downloads</h1>
-                                    <p className="text-sm text-slate-500">Select a channel and start downloading media.</p>
+                                    <h1 className="text-2xl font-bold">{__('general.channels_downloads')}</h1>
+                                    <p className="text-sm text-slate-500">{__('general.select_a_channel_and_start_downloading_media')}</p>
                                 </div>
                                 <Button onClick={fetchChannels} variant="outline" className="gap-2">
-                                    <RefreshCw className="w-4 h-4" /> Refresh Channels
-                                </Button>
+                                    <RefreshCw className="w-4 h-4" />{__('general.refresh_channels')}</Button>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <Card className="md:col-span-2">
                                     <CardHeader>
-                                        <CardTitle className="text-sm">Available Channels</CardTitle>
+                                        <CardTitle className="text-sm">{__('general.available_channels')}</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <div className="h-96 overflow-y-auto space-y-2 pr-2">
                                             {channels.length === 0 ? (
-                                                <div className="text-center p-8 text-slate-500">No channels fetched. Click Refresh.</div>
+                                                <div className="text-center p-8 text-slate-500">{__('general.no_channels_fetched_click_refresh')}</div>
                                             ) : (
                                                 channels.map(c => (
                                                     <div 
@@ -285,28 +281,27 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
 
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle className="text-sm">Download Settings</CardTitle>
+                                        <CardTitle className="text-sm">{__('general.download_settings')}</CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div className="space-y-2">
-                                            <Label>Output Directory</Label>
+                                            <Label>{__('general.output_directory')}</Label>
                                             <Input value={outputDir} onChange={e => setOutputDir(e.target.value)} />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Message Limit</Label>
+                                            <Label>{__('general.message_limit')}</Label>
                                             <Input type="number" value={downloadLimit} onChange={e => setDownloadLimit(Number(e.target.value))} />
                                         </div>
                                         
                                         <div className="pt-4">
                                             <Button onClick={startDownload} disabled={!selectedChannel} className="w-full gap-2">
-                                                <Download className="w-4 h-4" /> Start Download
-                                            </Button>
+                                                <Download className="w-4 h-4" />{__('general.start_download')}</Button>
                                         </div>
 
                                         {downloadProgress > 0 && (
                                             <div className="mt-4 space-y-1">
                                                 <div className="flex justify-between text-xs text-slate-500">
-                                                    <span>Downloading...</span>
+                                                    <span>{__('general.downloading')}</span>
                                                     <span>{downloadProgress}%</span>
                                                 </div>
                                                 <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
@@ -326,7 +321,7 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
                     <div className="p-5 flex-1 flex flex-col min-h-0">
                         <div className="flex items-center gap-2 mb-4">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping" />
-                            <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">Live Activity Feed</h3>
+                            <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">{__('general.live_activity_feed')}</h3>
                         </div>
                         <div className="flex-1 overflow-y-auto space-y-3 pr-1 font-sans scrollbar-thin">
                             {realtimeLogs.map(log => (

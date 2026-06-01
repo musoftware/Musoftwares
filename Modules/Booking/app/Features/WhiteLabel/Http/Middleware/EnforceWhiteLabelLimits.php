@@ -18,11 +18,11 @@ class EnforceWhiteLabelLimits
         $tenantId = $request->attributes->get('tenant_id') ?? ($request->user() ? $request->user()->tenant_id : null);
 
         if (!$tenantId) {
-            abort(403, 'Tenant context not found.');
+            abort(403, __('general.tenant_context_not_found'));
         }
 
         if (!feature('booking.white_label')) {
-            abort(403, 'White label feature is not enabled for your plan.');
+            abort(403, __('general.white_label_feature_is_not_enabled_for_your_plan'));
         }
 
         $limitsService = app(\Modules\Booking\app\Features\WhiteLabel\Services\BookingWhiteLabelLimitsService::class);
@@ -35,7 +35,7 @@ class EnforceWhiteLabelLimits
         };
 
         if (!$allowed) {
-            abort(403, "You have reached the maximum allowed limit for {$limitType}s.");
+            abort(403, __('general.you_have_reached_the_maximum_allowed_limit_for_limittype_s'));
         }
 
         return $next($request);

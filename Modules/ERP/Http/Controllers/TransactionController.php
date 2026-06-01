@@ -27,7 +27,7 @@ class TransactionController extends Controller
 
         // Verify ownership
         if ($transaction->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to transaction.');
+            abort(403, __('general.unauthorized_access_to_transaction'));
         }
 
         $transaction->load(['client.currency', 'creator', 'currency']);

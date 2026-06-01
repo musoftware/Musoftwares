@@ -63,7 +63,7 @@ export default function Transactions({ transactions, filters }: TransactionsProp
                                 <Activity className="w-6 h-6 text-indigo-600" />
                                 {__('All Transactions')}
                             </h1>
-                            <p className="text-slate-500 mt-1">{__('View all SMS receipts captured from your connected Android devices.')}</p>
+                            <p className="text-slate-500 mt-1">{__('general.view_all_sms_receipts_captured_from_your_connected_android_devices')}</p>
                         </div>
                         <div className="flex gap-2">
                             <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
@@ -97,7 +97,7 @@ export default function Transactions({ transactions, filters }: TransactionsProp
                                         {transactions.data.length === 0 ? (
                                             <TableRow>
                                                 <TableCell colSpan={6} className="text-center py-12 text-slate-500">
-                                                    {__('No transactions found.')}
+                                                    {__('general.no_transactions_found')}
                                                 </TableCell>
                                             </TableRow>
                                         ) : (

@@ -291,7 +291,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
             <div className="min-h-screen bg-[#FDFDFD] flex items-center justify-center font-sans">
                 <div className="text-center space-y-4">
                     <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto" />
-                    <p className="text-sm font-medium text-slate-500">Connecting to Email Engine...</p>
+                    <p className="text-sm font-medium text-slate-500">{__('general.connecting_to_email_engine')}</p>
                 </div>
             </div>
         );
@@ -311,7 +311,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                         <div className="w-6 h-6 bg-blue-600 rounded-md flex items-center justify-center shadow-sm">
                             <Mail className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <span className="font-semibold text-[15px] tracking-tight">Bulk Email Sender Pro</span>
+                        <span className="font-semibold text-[15px] tracking-tight">{__('general.bulk_email_sender_pro')}</span>
                     </div>
                     
                     <div className="h-4 w-px bg-slate-200" />
@@ -341,7 +341,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Engine Online</span>
+                        <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">{__('general.engine_online')}</span>
                     </div>
                 </div>
             </div>
@@ -354,26 +354,26 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-                            <p className="text-sm text-slate-500 mt-1">Overview of your email sending performance.</p>
+                            <p className="text-sm text-slate-500 mt-1">{__('general.overview_of_your_email_sending_performance')}</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h3 className="font-medium text-slate-500">Total Sent</h3>
+                                    <h3 className="font-medium text-slate-500">{__('general.total_sent')}</h3>
                                     <Send className="w-5 h-5 text-blue-500" />
                                 </div>
                                 <p className="text-3xl font-bold text-slate-900">{globalStats.sent}</p>
                             </div>
                             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h3 className="font-medium text-slate-500">Unique Opens</h3>
+                                    <h3 className="font-medium text-slate-500">{__('general.unique_opens')}</h3>
                                     <Activity className="w-5 h-5 text-emerald-500" />
                                 </div>
                                 <p className="text-3xl font-bold text-slate-900">{globalStats.opens}</p>
                             </div>
                             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h3 className="font-medium text-slate-500">Total Clicks</h3>
+                                    <h3 className="font-medium text-slate-500">{__('general.total_clicks')}</h3>
                                     <CheckCircle2 className="w-5 h-5 text-indigo-500" />
                                 </div>
                                 <p className="text-3xl font-bold text-slate-900">{globalStats.clicks}</p>
@@ -387,17 +387,17 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                             </div>
                         </div>
 
-                        <h2 className="text-lg font-bold tracking-tight mt-8 mb-4">Recent Campaigns</h2>
+                        <h2 className="text-lg font-bold tracking-tight mt-8 mb-4">{__('general.recent_campaigns')}</h2>
                         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                             {campaigns.length === 0 ? (
                                 <div className="py-12 text-center">
-                                    <p className="text-sm text-slate-500">No campaigns yet.</p>
+                                    <p className="text-sm text-slate-500">{__('general.no_campaigns_yet_1')}</p>
                                 </div>
                             ) : (
                                 <table className="w-full text-sm text-left">
                                     <thead className="text-xs text-slate-500 bg-slate-50 border-b border-slate-100 uppercase">
                                         <tr>
-                                            <th className="px-6 py-3 font-medium">Campaign Name</th>
+                                            <th className="px-6 py-3 font-medium">{__('general.campaign_name')}</th>
                                             <th className="px-6 py-3 font-medium">Status</th>
                                             <th className="px-6 py-3 font-medium">Progress</th>
                                         </tr>
@@ -429,27 +429,26 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                         <div className="flex items-center justify-between">
                             <div>
                                 <h1 className="text-2xl font-bold tracking-tight">Campaigns</h1>
-                                <p className="text-sm text-slate-500 mt-1">Manage and track your email broadcasts.</p>
+                                <p className="text-sm text-slate-500 mt-1">{__('general.manage_and_track_your_email_broadcasts')}</p>
                             </div>
                             <Dialog open={isCampaignModalOpen} onOpenChange={setIsCampaignModalOpen}>
                                 <DialogTrigger asChild>
                                     <Button className="gap-1.5 h-9 bg-black text-white hover:bg-slate-800 shadow-sm">
-                                        <Plus className="w-4 h-4" /> New Campaign
-                                    </Button>
+                                        <Plus className="w-4 h-4" />{__('general.new_campaign')}</Button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-md">
                                     <DialogHeader>
-                                        <DialogTitle>Create New Campaign</DialogTitle>
+                                        <DialogTitle>{__('general.create_new_campaign')}</DialogTitle>
                                     </DialogHeader>
                                     <div className="space-y-4 py-4">
                                         <div className="space-y-2">
-                                            <Label>Campaign Name</Label>
-                                            <Input value={campaignForm.name} onChange={e => setCampaignForm({...campaignForm, name: e.target.value})} placeholder="e.g. Weekly Newsletter" />
+                                            <Label>{__('general.campaign_name')}</Label>
+                                            <Input value={campaignForm.name} onChange={e => setCampaignForm({...campaignForm, name: e.target.value})} placeholder={__('general.e_g_weekly_newsletter')} />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Contact List</Label>
+                                            <Label>{__('general.contact_list')}</Label>
                                             <Select value={campaignForm.list_id} onValueChange={v => setCampaignForm({...campaignForm, list_id: v})}>
-                                                <SelectTrigger><SelectValue placeholder="Select audience" /></SelectTrigger>
+                                                <SelectTrigger><SelectValue placeholder={__('general.select_audience')} /></SelectTrigger>
                                                 <SelectContent>
                                                     {lists.map(l => <SelectItem key={l.id} value={l.id}>{l.name} ({l.contact_count})</SelectItem>)}
                                                 </SelectContent>
@@ -458,16 +457,16 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                         <div className="space-y-2">
                                             <Label>Template</Label>
                                             <Select value={campaignForm.template_id} onValueChange={v => setCampaignForm({...campaignForm, template_id: v})}>
-                                                <SelectTrigger><SelectValue placeholder="Select email design" /></SelectTrigger>
+                                                <SelectTrigger><SelectValue placeholder={__('general.select_email_design')} /></SelectTrigger>
                                                 <SelectContent>
                                                     {templates.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
                                                 </SelectContent>
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>SMTP Account</Label>
+                                            <Label>{__('general.smtp_account')}</Label>
                                             <Select value={campaignForm.smtp_account_id} onValueChange={v => setCampaignForm({...campaignForm, smtp_account_id: v})}>
-                                                <SelectTrigger><SelectValue placeholder="Select sender" /></SelectTrigger>
+                                                <SelectTrigger><SelectValue placeholder={__('general.select_sender')} /></SelectTrigger>
                                                 <SelectContent>
                                                     {accounts.map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}
                                                 </SelectContent>
@@ -476,23 +475,23 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                         <div className="space-y-2">
                                             <Label>Pacing Delay (ms)</Label>
                                             <Input type="number" value={campaignForm.delay_ms} onChange={e => setCampaignForm({...campaignForm, delay_ms: e.target.value})} disabled={campaignForm.is_warmup} />
-                                            <p className="text-xs text-slate-500">Wait time between emails (disabled in warm-up mode).</p>
+                                            <p className="text-xs text-slate-500">{__('general.wait_time_between_emails_disabled_in_warm_up_mode')}</p>
                                         </div>
                                         <div className="flex items-center gap-2 pt-2">
                                             <input type="checkbox" id="is_warmup" className="rounded border-slate-300 text-black focus:ring-black" checked={campaignForm.is_warmup} onChange={e => setCampaignForm({...campaignForm, is_warmup: e.target.checked})} />
-                                            <Label htmlFor="is_warmup" className="font-semibold cursor-pointer">Enable Progressive Warm-Up</Label>
+                                            <Label htmlFor="is_warmup" className="font-semibold cursor-pointer">{__('general.enable_progressive_warm_up')}</Label>
                                         </div>
                                         {campaignForm.is_warmup && (
                                             <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
                                                 <div className="space-y-2">
-                                                    <Label>Starting Daily Limit</Label>
+                                                    <Label>{__('general.starting_daily_limit')}</Label>
                                                     <Input type="number" value={campaignForm.warmup_initial} onChange={e => setCampaignForm({...campaignForm, warmup_initial: e.target.value})} />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label>Daily Increase (%)</Label>
                                                     <Input type="number" value={campaignForm.warmup_increase} onChange={e => setCampaignForm({...campaignForm, warmup_increase: e.target.value})} />
                                                 </div>
-                                                <p className="text-xs text-slate-500 col-span-2">Delay between emails will be calculated automatically to distribute sends evenly over 24 hours.</p>
+                                                <p className="text-xs text-slate-500 col-span-2">{__('general.delay_between_emails_will_be_calculated_automatically_to_distribute_sends_evenly_over_24_hours')}</p>
                                             </div>
                                         )}
                                         <Button className="w-full bg-black text-white hover:bg-slate-800 mt-4" onClick={handleCreateCampaign} disabled={isSubmitting}>
@@ -505,15 +504,15 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                         {campaigns.length === 0 ? (
                             <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                 <Send className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                <h3 className="text-sm font-semibold text-slate-900">No campaigns yet</h3>
-                                <p className="text-sm text-slate-500 mt-1">Create your first campaign to start sending emails.</p>
+                                <h3 className="text-sm font-semibold text-slate-900">{__('general.no_campaigns_yet')}</h3>
+                                <p className="text-sm text-slate-500 mt-1">{__('general.create_your_first_campaign_to_start_sending_emails')}</p>
                             </div>
                         ) : (
                             <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                                 <table className="w-full text-sm text-left">
                                     <thead className="text-xs text-slate-500 bg-slate-50 border-b border-slate-100 uppercase">
                                         <tr>
-                                            <th className="px-6 py-3 font-medium">Campaign Name</th>
+                                            <th className="px-6 py-3 font-medium">{__('general.campaign_name')}</th>
                                             <th className="px-6 py-3 font-medium">Status</th>
                                             <th className="px-6 py-3 font-medium">Progress</th>
                                             <th className="px-6 py-3 font-medium">Opens</th>
@@ -585,23 +584,22 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-2xl font-bold tracking-tight">Contact Lists</h1>
-                                <p className="text-sm text-slate-500 mt-1">Manage your email contacts and audiences.</p>
+                                <h1 className="text-2xl font-bold tracking-tight">{__('general.contact_lists')}</h1>
+                                <p className="text-sm text-slate-500 mt-1">{__('general.manage_your_email_contacts_and_audiences')}</p>
                             </div>
                             <Dialog open={isListModalOpen} onOpenChange={setIsListModalOpen}>
                                 <DialogTrigger asChild>
                                     <Button className="gap-1.5 h-9 bg-black text-white hover:bg-slate-800 shadow-sm">
-                                        <Plus className="w-4 h-4" /> Import Contacts
-                                    </Button>
+                                        <Plus className="w-4 h-4" />{__('general.import_contacts')}</Button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-md">
                                     <DialogHeader>
-                                        <DialogTitle>Import Contacts</DialogTitle>
+                                        <DialogTitle>{__('general.import_contacts')}</DialogTitle>
                                     </DialogHeader>
                                     <div className="space-y-4 py-4">
                                         <div className="space-y-2">
-                                            <Label>List Name</Label>
-                                            <Input value={listForm.name} onChange={e => setListForm({...listForm, name: e.target.value})} placeholder="e.g. VIP Customers" />
+                                            <Label>{__('general.list_name')}</Label>
+                                            <Input value={listForm.name} onChange={e => setListForm({...listForm, name: e.target.value})} placeholder={__('general.e_g_vip_customers')} />
                                         </div>
                                         <div className="space-y-2">
                                             <Label>Description</Label>
@@ -612,7 +610,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                             <Textarea 
                                                 value={listForm.raw_contacts} 
                                                 onChange={e => setListForm({...listForm, raw_contacts: e.target.value})} 
-                                                placeholder="email@example.com, John Doe&#10;another@example.com, Jane Doe" 
+                                                placeholder={__('general.email_example_com_john_doe_10_another_example_com_jane_doe')} 
                                                 className="min-h-[150px] font-mono text-xs"
                                             />
                                             <p className="text-xs text-slate-500">Format: email, name (one per line)</p>
@@ -627,8 +625,8 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                         {lists.length === 0 ? (
                             <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                 <Users className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                <h3 className="text-sm font-semibold text-slate-900">No contact lists</h3>
-                                <p className="text-sm text-slate-500 mt-1">Import contacts via CSV to get started.</p>
+                                <h3 className="text-sm font-semibold text-slate-900">{__('general.no_contact_lists')}</h3>
+                                <p className="text-sm text-slate-500 mt-1">{__('general.import_contacts_via_csv_to_get_started')}</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -637,7 +635,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                         <h3 className="font-semibold text-slate-900 pr-8">{l.name}</h3>
                                         <p className="text-2xl font-bold text-slate-800 mt-3">{l.contact_count}</p>
                                         <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mt-1 mb-4">Subscribers</p>
-                                        <Button variant="outline" size="sm" onClick={() => handleViewContacts(l.id)} className="w-full text-xs">View Contacts</Button>
+                                        <Button variant="outline" size="sm" onClick={() => handleViewContacts(l.id)} className="w-full text-xs">{__('general.view_contacts')}</Button>
                                         <Button 
                                             variant="ghost" 
                                             size="icon" 
@@ -656,8 +654,8 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                             <DialogContent className="sm:max-w-3xl max-h-[80vh] flex flex-col">
                                 <DialogHeader>
                                     <div className="flex items-center justify-between pr-8">
-                                        <DialogTitle>Contact List</DialogTitle>
-                                        <Button variant="outline" size="sm" onClick={handleExportCSV}>Export CSV</Button>
+                                        <DialogTitle>{__('general.contact_list')}</DialogTitle>
+                                        <Button variant="outline" size="sm" onClick={handleExportCSV}>{__('general.export_csv')}</Button>
                                     </div>
                                 </DialogHeader>
                                 <div className="flex-1 overflow-y-auto mt-4 pr-2">
@@ -672,7 +670,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
                                             {viewingContacts.length === 0 && (
-                                                <tr><td colSpan={4} className="text-center py-4 text-slate-500">No contacts found</td></tr>
+                                                <tr><td colSpan={4} className="text-center py-4 text-slate-500">{__('general.no_contacts_found')}</td></tr>
                                             )}
                                             {viewingContacts.map(c => (
                                                 <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
@@ -706,32 +704,31 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                         <div className="flex items-center justify-between">
                             <div>
                                 <h1 className="text-2xl font-bold tracking-tight">Templates</h1>
-                                <p className="text-sm text-slate-500 mt-1">Design and manage your email templates.</p>
+                                <p className="text-sm text-slate-500 mt-1">{__('general.design_and_manage_your_email_templates')}</p>
                             </div>
                             <Dialog open={isTemplateModalOpen} onOpenChange={setIsTemplateModalOpen}>
                                 <DialogTrigger asChild>
                                     <Button className="gap-1.5 h-9 bg-black text-white hover:bg-slate-800 shadow-sm">
-                                        <Plus className="w-4 h-4" /> New Template
-                                    </Button>
+                                        <Plus className="w-4 h-4" />{__('general.new_template')}</Button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-2xl">
                                     <DialogHeader>
-                                        <DialogTitle>Create HTML Template</DialogTitle>
+                                        <DialogTitle>{__('general.create_html_template')}</DialogTitle>
                                     </DialogHeader>
                                     <div className="space-y-4 py-4">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label>Template Name</Label>
-                                                <Input value={templateForm.name} onChange={e => setTemplateForm({...templateForm, name: e.target.value})} placeholder="e.g. Welcome Email" />
+                                                <Label>{__('general.template_name')}</Label>
+                                                <Input value={templateForm.name} onChange={e => setTemplateForm({...templateForm, name: e.target.value})} placeholder={__('general.e_g_welcome_email')} />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Email Subject</Label>
-                                                <Input value={templateForm.subject} onChange={e => setTemplateForm({...templateForm, subject: e.target.value})} placeholder="Welcome to Musoftware!" />
+                                                <Label>{__('general.email_subject')}</Label>
+                                                <Input value={templateForm.subject} onChange={e => setTemplateForm({...templateForm, subject: e.target.value})} placeholder={__('general.welcome_to_musoftware')} />
                                             </div>
                                         </div>
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between">
-                                                <Label>HTML Content</Label>
+                                                <Label>{__('general.html_content')}</Label>
                                                 <div className="flex gap-1.5">
                                                     <Button variant="outline" size="sm" className="h-6 text-xs px-2" onClick={() => insertShortcode('{name}')}>{`{name}`}</Button>
                                                     <Button variant="outline" size="sm" className="h-6 text-xs px-2" onClick={() => insertShortcode('{email}')}>{`{email}`}</Button>
@@ -741,7 +738,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                             <Textarea 
                                                 value={templateForm.html_content} 
                                                 onChange={e => setTemplateForm({...templateForm, html_content: e.target.value})} 
-                                                placeholder="<h1>Hi {name},</h1><p>Welcome to our platform!</p>" 
+                                                placeholder="<h1>Hi {name},</h1><p>{__('general.welcome_to_our_platform')}</p>" 
                                                 className="min-h-[300px] font-mono text-sm"
                                             />
                                         </div>
@@ -755,8 +752,8 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                         {templates.length === 0 ? (
                             <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                 <FileText className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                <h3 className="text-sm font-semibold text-slate-900">No templates</h3>
-                                <p className="text-sm text-slate-500 mt-1">Create an HTML email template.</p>
+                                <h3 className="text-sm font-semibold text-slate-900">{__('general.no_templates')}</h3>
+                                <p className="text-sm text-slate-500 mt-1">{__('general.create_an_html_email_template')}</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -785,7 +782,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                         <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
                             <DialogContent className="sm:max-w-4xl h-[80vh] flex flex-col p-0 overflow-hidden">
                                 <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                                    <h3 className="font-semibold text-slate-800">Template Preview</h3>
+                                    <h3 className="font-semibold text-slate-800">{__('general.template_preview')}</h3>
                                 </div>
                                 <div className="flex-1 bg-white overflow-auto p-8">
                                     <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
@@ -800,31 +797,30 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-2xl font-bold tracking-tight">SMTP Accounts</h1>
-                                <p className="text-sm text-slate-500 mt-1">Connect your email sending providers.</p>
+                                <h1 className="text-2xl font-bold tracking-tight">{__('general.smtp_accounts')}</h1>
+                                <p className="text-sm text-slate-500 mt-1">{__('general.connect_your_email_sending_providers')}</p>
                             </div>
                             <Dialog open={isAccountModalOpen} onOpenChange={setIsAccountModalOpen}>
                                 <DialogTrigger asChild>
                                     <Button className="gap-1.5 h-9 bg-black text-white hover:bg-slate-800 shadow-sm">
-                                        <Plus className="w-4 h-4" /> Add SMTP
-                                    </Button>
+                                        <Plus className="w-4 h-4" />{__('general.add_smtp')}</Button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-lg">
                                     <DialogHeader>
-                                        <DialogTitle>Add SMTP Account</DialogTitle>
+                                        <DialogTitle>{__('general.add_smtp_account')}</DialogTitle>
                                     </DialogHeader>
                                     <div className="space-y-4 py-4">
                                         <div className="space-y-2">
-                                            <Label>Account Nickname</Label>
-                                            <Input value={accountForm.name} onChange={e => setAccountForm({...accountForm, name: e.target.value})} placeholder="e.g. Info@Company" />
+                                            <Label>{__('general.account_nickname')}</Label>
+                                            <Input value={accountForm.name} onChange={e => setAccountForm({...accountForm, name: e.target.value})} placeholder={__('general.e_g_info_company')} />
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label>SMTP Host</Label>
-                                                <Input value={accountForm.host} onChange={e => setAccountForm({...accountForm, host: e.target.value})} placeholder="smtp.gmail.com" />
+                                                <Label>{__('general.smtp_host')}</Label>
+                                                <Input value={accountForm.host} onChange={e => setAccountForm({...accountForm, host: e.target.value})} placeholder={__('general.smtp_gmail_com')} />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>SMTP Port</Label>
+                                                <Label>{__('general.smtp_port')}</Label>
                                                 <Input value={accountForm.port} onChange={e => setAccountForm({...accountForm, port: e.target.value})} placeholder="465" />
                                             </div>
                                         </div>
@@ -840,12 +836,12 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label>From Name</Label>
-                                                <Input value={accountForm.from_name} onChange={e => setAccountForm({...accountForm, from_name: e.target.value})} placeholder="John Doe" />
+                                                <Label>{__('general.from_name')}</Label>
+                                                <Input value={accountForm.from_name} onChange={e => setAccountForm({...accountForm, from_name: e.target.value})} placeholder={__('general.john_doe')} />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>From Email</Label>
-                                                <Input value={accountForm.from_email} onChange={e => setAccountForm({...accountForm, from_email: e.target.value})} placeholder="john@example.com" />
+                                                <Label>{__('general.from_email')}</Label>
+                                                <Input value={accountForm.from_email} onChange={e => setAccountForm({...accountForm, from_email: e.target.value})} placeholder={__('general.john_example_com')} />
                                             </div>
                                         </div>
                                         <div className="space-y-2">
@@ -853,14 +849,14 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                             <Select value={accountForm.encryption} onValueChange={v => setAccountForm({...accountForm, encryption: v})}>
                                                 <SelectTrigger><SelectValue /></SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="ssl">SSL / TLS</SelectItem>
+                                                    <SelectItem value="ssl">{__('general.ssl_tls')}</SelectItem>
                                                     <SelectItem value="starttls">STARTTLS</SelectItem>
                                                     <SelectItem value="none">None</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
                                         <div className="flex gap-3 pt-4">
-                                            <Button variant="outline" className="flex-1" onClick={handleTestAccount} disabled={isSubmitting}>Test Connection</Button>
+                                            <Button variant="outline" className="flex-1" onClick={handleTestAccount} disabled={isSubmitting}>{__('general.test_connection')}</Button>
                                             <Button className="flex-1 bg-black text-white hover:bg-slate-800" onClick={handleCreateAccount} disabled={isSubmitting}>
                                                 {isSubmitting ? 'Saving...' : 'Save Account'}
                                             </Button>
@@ -872,8 +868,8 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                         {accounts.length === 0 ? (
                             <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                 <Server className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                <h3 className="text-sm font-semibold text-slate-900">No SMTP accounts</h3>
-                                <p className="text-sm text-slate-500 mt-1">Add an SMTP account to start sending emails.</p>
+                                <h3 className="text-sm font-semibold text-slate-900">{__('general.no_smtp_accounts')}</h3>
+                                <p className="text-sm text-slate-500 mt-1">{__('general.add_an_smtp_account_to_start_sending_emails')}</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -886,7 +882,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
                                                 <span className="text-xs font-medium text-slate-600">Connected</span>
                                             </div>
-                                            <Button variant="outline" size="sm" className="text-xs" onClick={() => handleEditAccount(a)}>Edit Account</Button>
+                                            <Button variant="outline" size="sm" className="text-xs" onClick={() => handleEditAccount(a)}>{__('general.edit_account')}</Button>
                                         </div>
                                         <Button variant="ghost" size="icon" onClick={() => handleDelete('deleteSmtpAccount', a.id)} className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 h-8 w-8 text-slate-400 hover:text-rose-600 transition-opacity">
                                             <Trash2 className="w-4 h-4" />
@@ -904,22 +900,22 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                         <div className="flex items-center justify-between">
                             <div>
                                 <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-                                <p className="text-sm text-slate-500 mt-1">Configure your email sender integration.</p>
+                                <p className="text-sm text-slate-500 mt-1">{__('general.configure_your_email_sender_integration')}</p>
                             </div>
                         </div>
                         <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-xl">
-                            <h3 className="font-semibold text-slate-900 mb-4">Cloud Tracking Integration</h3>
+                            <h3 className="font-semibold text-slate-900 mb-4">{__('general.cloud_tracking_integration')}</h3>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700">Musoftware API Key</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.musoftware_api_key')}</label>
                                     <input 
                                         type="text" 
                                         className="mt-1 w-full border border-slate-200 rounded-lg h-10 px-3 text-sm focus:ring-black focus:border-black"
-                                        placeholder="Paste your user API key here"
+                                        placeholder={__('general.paste_your_user_api_key_here')}
                                         value={settings.api_key}
                                         onChange={(e) => setSettings({ ...settings, api_key: e.target.value })}
                                     />
-                                    <p className="text-xs text-slate-500 mt-2">Required to sync email open events from the cloud tracking server to your local machine.</p>
+                                    <p className="text-xs text-slate-500 mt-2">{__('general.required_to_sync_email_open_events_from_the_cloud_tracking_server_to_your_local_machine')}</p>
                                 </div>
                                 <Button 
                                     className="w-full bg-black text-white hover:bg-slate-800"
@@ -933,9 +929,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                             setTimeout(() => btn.textContent = originalText, 2000);
                                         }
                                     }}
-                                >
-                                    Save Settings
-                                </Button>
+                                >{__('general.save_settings')}</Button>
                             </div>
                         </div>
                     </div>
@@ -945,7 +939,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                 <Dialog open={isReportModalOpen} onOpenChange={setIsReportModalOpen}>
                     <DialogContent className="sm:max-w-3xl max-h-[80vh] flex flex-col">
                         <DialogHeader>
-                            <DialogTitle>Campaign Activity Logs</DialogTitle>
+                            <DialogTitle>{__('general.campaign_activity_logs')}</DialogTitle>
                         </DialogHeader>
                         <div className="flex-1 overflow-y-auto mt-4 pr-2">
                             <table className="w-full text-sm text-left">
@@ -958,7 +952,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {reportLogs.length === 0 && (
-                                        <tr><td colSpan={3} className="text-center py-4 text-slate-500">No logs found</td></tr>
+                                        <tr><td colSpan={3} className="text-center py-4 text-slate-500">{__('general.no_logs_found')}</td></tr>
                                     )}
                                     {reportLogs.map(log => (
                                         <tr key={log.id} className="hover:bg-slate-50/50 transition-colors">

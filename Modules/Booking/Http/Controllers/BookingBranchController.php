@@ -47,7 +47,7 @@ class BookingBranchController extends Controller
             'is_active' => $request->is_active ?? true,
         ]);
 
-        return back()->with('success', 'Branch created successfully.');
+        return back()->with('success', __('general.branch_created_successfully'));
     }
 
     public function update(Request $request, $id)
@@ -63,7 +63,7 @@ class BookingBranchController extends Controller
 
         $branch->update($request->only('name', 'address', 'timezone', 'is_active'));
 
-        return back()->with('success', 'Branch updated successfully.');
+        return back()->with('success', __('general.branch_updated_successfully'));
     }
 
     public function destroy($id)
@@ -75,6 +75,6 @@ class BookingBranchController extends Controller
         $branch->is_active = false;
         $branch->save();
 
-        return back()->with('success', 'Branch deactivated.');
+        return back()->with('success', __('general.branch_deactivated'));
     }
 }

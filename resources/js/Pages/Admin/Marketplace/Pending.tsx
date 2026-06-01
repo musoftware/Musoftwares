@@ -54,7 +54,7 @@ export default function Pending({ auth, services, filters }: any) {
     };
 
     return (
-        <AdminSidebarLayout user={auth?.user} title="Pending Services" header="Pending Services">
+        <AdminSidebarLayout user={auth?.user} title={__('general.pending_services')} header="Pending Services">
             <div className="py-8 bg-slate-50 min-h-screen">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
                     
@@ -63,7 +63,7 @@ export default function Pending({ auth, services, filters }: any) {
                             <div className="relative flex items-center">
                                 <Search className="absolute left-3 h-4 w-4 text-slate-400" />
                                 <Input
-                                    placeholder="Search by title or seller..."
+                                    placeholder={__('general.search_by_title_or_seller')}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && applySearch()}
@@ -137,9 +137,7 @@ export default function Pending({ auth, services, filters }: any) {
                                             </div>
 
                                             <div className="mb-4 rounded-lg border border-slate-100 bg-slate-50/50 p-4">
-                                                <h4 className="mb-2 text-xs font-bold tracking-wider text-slate-500 uppercase">
-                                                    Description Preview
-                                                </h4>
+                                                <h4 className="mb-2 text-xs font-bold tracking-wider text-slate-500 uppercase">{__('general.description_preview')}</h4>
                                                 <p className="line-clamp-3 text-sm text-slate-700">
                                                     {service.description}
                                                 </p>
@@ -172,9 +170,7 @@ export default function Pending({ auth, services, filters }: any) {
                                             rel="noreferrer"
                                             className="mt-2 flex items-center justify-center gap-1 text-sm font-medium text-slate-600 hover:text-black transition-colors"
                                         >
-                                            <Eye className="h-4 w-4" />
-                                            View Full Service
-                                        </a>
+                                            <Eye className="h-4 w-4" />{__('general.view_full_service')}</a>
                                     </div>
                                 </div>
                             ))}
@@ -226,18 +222,12 @@ export default function Pending({ auth, services, filters }: any) {
             <Modal show={rejectingServiceId !== null} onClose={() => setRejectingServiceId(null)}>
                 <form onSubmit={submitReject} className="p-6">
                     <h2 className="mb-4 flex items-center gap-2 text-lg font-medium text-slate-900">
-                        <X className="h-6 w-6 text-red-500" />
-                        Reject Service
-                    </h2>
+                        <X className="h-6 w-6 text-red-500" />{__('general.reject_service')}</h2>
 
-                    <p className="mt-1 mb-4 text-sm text-slate-600">
-                        Please provide a reason for rejecting this service. This note will be visible to the seller so they can correct the issues and resubmit.
-                    </p>
+                    <p className="mt-1 mb-4 text-sm text-slate-600">{__('general.please_provide_a_reason_for_rejecting_this_service_this_note_will_be_visible_to_the_seller_so_they_can_correct_the_issues_and_resubmit')}</p>
 
                     <div className="mt-4">
-                        <label htmlFor="rejectionNote" className="sr-only">
-                            Rejection Note
-                        </label>
+                        <label htmlFor="rejectionNote" className="sr-only">{__('general.rejection_note')}</label>
                         <textarea
                             id="rejectionNote"
                             name="rejectionNote"
@@ -245,7 +235,7 @@ export default function Pending({ auth, services, filters }: any) {
                             onChange={(e) => setRejectionNote(e.target.value)}
                             className="w-full rounded-md border-slate-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 text-sm"
                             rows={4}
-                            placeholder="e.g., Description is too vague, cover image violates guidelines..."
+                            placeholder={__('general.e_g_description_is_too_vague_cover_image_violates_guidelines')}
                             required
                         />
                     </div>
@@ -254,9 +244,7 @@ export default function Pending({ auth, services, filters }: any) {
                         <Button type="button" variant="outline" onClick={() => setRejectingServiceId(null)}>
                             Cancel
                         </Button>
-                        <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white">
-                            Confirm Rejection
-                        </Button>
+                        <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white">{__('general.confirm_rejection')}</Button>
                     </div>
                 </form>
             </Modal>

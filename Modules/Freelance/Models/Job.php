@@ -41,6 +41,11 @@ class Job extends Model
         return $this->hasMany(Proposal::class);
     }
 
+    public function contracts()
+    {
+        return $this->hasMany(Contract::class);
+    }
+
     public function skills()
     {
         return $this->belongsToMany(Skill::class, 'freelance_job_skills')

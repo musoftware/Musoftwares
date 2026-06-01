@@ -52,7 +52,7 @@ class BookingExceptionController extends Controller
             'recurring_pattern' => $request->recurring_pattern,
         ]);
         
-        return back()->with('success', 'Exception added successfully.');
+        return back()->with('success', __('general.exception_added_successfully'));
     }
     
     public function destroy($id)
@@ -64,6 +64,6 @@ class BookingExceptionController extends Controller
         
         $exception->delete();
         
-        return back()->with('success', 'Exception removed successfully.');
+        return back()->with('success', __('general.exception_removed_successfully'));
     }
 }

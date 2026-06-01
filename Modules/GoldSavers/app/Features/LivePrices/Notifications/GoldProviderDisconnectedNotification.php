@@ -28,9 +28,9 @@ class GoldProviderDisconnectedNotification extends Notification
             ->greeting("Hello {$notifiable->name},")
             ->line("The gold price provider **{$this->source->name}** for market **{$this->source->market_key}** has been disconnected.")
             ->line("Reason: {$this->reason}")
-            ->line('The system has automatically switched to the next available provider.')
+            ->line(__('general.the_system_has_automatically_switched_to_the_next_available_provider'))
             ->action('View Provider Status', url('/isaas/gold-savers/live-prices/sources'))
-            ->line('Please investigate and restore the primary provider.');
+            ->line(__('general.please_investigate_and_restore_the_primary_provider'));
     }
 
     public function toArray($notifiable): array

@@ -131,14 +131,12 @@ export default function ExcelMergerRunner({ tool, subscription }: any) {
                     <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-inner mb-6 shadow-indigo-200">
                         <FileSpreadsheet className="w-6 h-6 text-white" />
                     </div>
-                    <h1 className="text-xl font-black tracking-tight text-slate-900 mb-2">Excel Merger</h1>
-                    <p className="text-sm font-medium text-slate-500 mb-8 leading-relaxed">
-                        Fast, local, privacy-first Excel and CSV file merger. Your files never leave your browser.
-                    </p>
+                    <h1 className="text-xl font-black tracking-tight text-slate-900 mb-2">{__('general.excel_merger')}</h1>
+                    <p className="text-sm font-medium text-slate-500 mb-8 leading-relaxed">{__('general.fast_local_privacy_first_excel_and_csv_file_merger_your_files_never_leave_your_browser')}</p>
 
                     <div className="space-y-6">
                         <div className="space-y-4">
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Merge Settings</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">{__('general.merge_settings')}</h3>
                             
                             <label className="flex items-start gap-3 cursor-pointer group p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-indigo-200 transition-colors">
                                 <div className="relative flex items-center justify-center mt-0.5">
@@ -152,8 +150,8 @@ export default function ExcelMergerRunner({ tool, subscription }: any) {
                                     <CheckCircle className="w-3.5 h-3.5 text-white absolute opacity-0 peer-checked:opacity-100 transition-opacity" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">Deduplicate Rows</span>
-                                    <span className="text-xs font-medium text-slate-500 leading-relaxed mt-0.5">Remove identical rows across all files.</span>
+                                    <span className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">{__('general.deduplicate_rows')}</span>
+                                    <span className="text-xs font-medium text-slate-500 leading-relaxed mt-0.5">{__('general.remove_identical_rows_across_all_files')}</span>
                                 </div>
                             </label>
 
@@ -169,8 +167,8 @@ export default function ExcelMergerRunner({ tool, subscription }: any) {
                                     <CheckCircle className="w-3.5 h-3.5 text-white absolute opacity-0 peer-checked:opacity-100 transition-opacity" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">Extract Phone Numbers</span>
-                                    <span className="text-xs font-medium text-slate-500 leading-relaxed mt-0.5">Scan rows for Egyptian phone numbers and append.</span>
+                                    <span className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">{__('general.extract_phone_numbers')}</span>
+                                    <span className="text-xs font-medium text-slate-500 leading-relaxed mt-0.5">{__('general.scan_rows_for_egyptian_phone_numbers_and_append')}</span>
                                 </div>
                             </label>
                         </div>
@@ -180,18 +178,14 @@ export default function ExcelMergerRunner({ tool, subscription }: any) {
                                 disabled
                                 className="w-full h-12 rounded-xl bg-slate-100 text-slate-400 font-bold shadow-none gap-2 mt-4"
                             >
-                                <RefreshCw className="w-4 h-4 animate-spin" />
-                                Merging...
-                            </Button>
+                                <RefreshCw className="w-4 h-4 animate-spin" />{__('general.merging')}</Button>
                         ) : (
                             <Button 
                                 onClick={handleMerge}
                                 disabled={files.length === 0}
                                 className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-500/25 gap-2 mt-4 transition-all disabled:opacity-50"
                             >
-                                <FileSpreadsheet className="w-4 h-4 fill-current" />
-                                Merge & Download
-                            </Button>
+                                <FileSpreadsheet className="w-4 h-4 fill-current" />{__('general.merge_download')}</Button>
                         )}
 
                         {status === 'error' && (
@@ -230,9 +224,7 @@ export default function ExcelMergerRunner({ tool, subscription }: any) {
                         <h3 className="text-lg font-black text-slate-800 mb-2">
                             {isDragActive ? 'Drop files here...' : 'Drag & drop Excel or CSV files'}
                         </h3>
-                        <p className="text-sm font-medium text-slate-500">
-                            or click to browse from your computer. Files are processed entirely locally.
-                        </p>
+                        <p className="text-sm font-medium text-slate-500">{__('general.or_click_to_browse_from_your_computer_files_are_processed_entirely_locally')}</p>
                     </div>
 
                     {files.length > 0 && (
@@ -246,9 +238,7 @@ export default function ExcelMergerRunner({ tool, subscription }: any) {
                                     variant="ghost" 
                                     size="sm" 
                                     className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 h-8 font-bold"
-                                >
-                                    Clear All
-                                </Button>
+                                >{__('general.clear_all')}</Button>
                             </div>
                             <div className="divide-y divide-slate-100">
                                 {files.map((f, i) => (

@@ -62,7 +62,7 @@ class KycController extends Controller
         $user = Auth::user();
 
         if ($user->kyc_verified) {
-            return back()->with('error', 'You are already KYC verified.');
+            return back()->with('error', __('general.you_are_already_kyc_verified'));
         }
 
         // Check if document type already exists
@@ -92,7 +92,7 @@ class KycController extends Controller
             'status' => 'pending',
         ]);
 
-        return back()->with('success', 'Document uploaded successfully. Please submit for review when ready.');
+        return back()->with('success', __('general.document_uploaded_successfully_please_submit_for_review_when_ready'));
     }
 
     /**
@@ -103,7 +103,7 @@ class KycController extends Controller
         $user = Auth::user();
 
         if ($user->kyc_verified) {
-            return back()->with('error', 'You are already KYC verified.');
+            return back()->with('error', __('general.you_are_already_kyc_verified'));
         }
 
         // Check if all required documents are uploaded
@@ -121,7 +121,7 @@ class KycController extends Controller
             'kyc_notes' => 'KYC documents submitted for review on ' . now()->format('Y-m-d H:i:s'),
         ]);
 
-        return back()->with('success', 'KYC application submitted successfully. We will review it shortly.');
+        return back()->with('success', __('general.kyc_application_submitted_successfully_we_will_review_it_shortly'));
     }
 
     /**
@@ -137,7 +137,7 @@ class KycController extends Controller
         }
 
         if ($document->status === 'approved') {
-            return back()->with('error', 'Cannot delete an approved document.');
+            return back()->with('error', __('general.cannot_delete_an_approved_document'));
         }
 
         // Delete file from storage
@@ -146,7 +146,7 @@ class KycController extends Controller
         // Delete record
         $document->delete();
 
-        return back()->with('success', 'Document deleted successfully.');
+        return back()->with('success', __('general.document_deleted_successfully'));
     }
 
     /**

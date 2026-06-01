@@ -87,9 +87,9 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
         <h1>403</h1>
-        <h2>Access Forbidden</h2>
-        <p>You do not have permission to view this resource.</p>
-        <a href="/" class="btn">Go Home</a>
+        <h2>{{ __('general.access_forbidden') }}</h2>
+        <p>{{ __('general.you_do_not_have_permission_to_view_this_resource') }}</p>
+        <a href="/" class="btn">{{ __('general.go_home') }}</a>
     </div>
 </body>
 </html>

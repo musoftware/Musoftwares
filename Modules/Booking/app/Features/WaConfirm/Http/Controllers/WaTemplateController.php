@@ -11,7 +11,7 @@ class WaTemplateController extends Controller
     public function index()
     {
         if (!feature('booking.wa_confirm')) {
-            abort(403, 'Unlock WhatsApp Confirmations to manage templates.');
+            abort(403, __('general.unlock_whatsapp_confirmations_to_manage_templates'));
         }
 
         $templates = BookingWaTemplate::all();

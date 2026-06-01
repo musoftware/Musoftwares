@@ -225,7 +225,7 @@ class FreelanceJobController extends Controller
         ]);
 
         $job->update($validated);
-        return back()->with('success', 'Job updated successfully.');
+        return back()->with('success', __('general.job_updated_successfully'));
     }
 
     public function destroy(Request $request, Job $job)
@@ -233,6 +233,6 @@ class FreelanceJobController extends Controller
         Gate::authorize('delete', $job);
 
         $job->delete();
-        return redirect()->route('freelance.my-jobs')->with('success', 'Job deleted.');
+        return redirect()->route('freelance.my-jobs')->with('success', __('general.job_deleted'));
     }
 }

@@ -48,7 +48,7 @@ function AgentCard({ agent, onToggle, onEdit }: { agent: any; onToggle: () => vo
             <div className="grid grid-cols-3 gap-2 mb-4">
                 <div className="bg-slate-800/60 rounded-xl p-2.5 text-center">
                     <p className="text-sm font-black text-white">{agent.conversations_today ?? 0}</p>
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">Convos Today</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">{__('general.convos_today')}</p>
                 </div>
                 <div className="bg-slate-800/60 rounded-xl p-2.5 text-center">
                     <p className="text-sm font-black text-emerald-400">{agent.qualified_leads ?? 0}</p>
@@ -56,13 +56,12 @@ function AgentCard({ agent, onToggle, onEdit }: { agent: any; onToggle: () => vo
                 </div>
                 <div className="bg-slate-800/60 rounded-xl p-2.5 text-center">
                     <p className="text-sm font-black text-indigo-400">{agent.response_rate ?? '—'}%</p>
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">Reply Rate</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">{__('general.reply_rate')}</p>
                 </div>
             </div>
 
             <Button variant="outline" onClick={onEdit} className="w-full h-9 bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700 hover:text-slate-300">
-                <Settings className="w-3 h-3 mr-1.5" /> Configure Agent
-            </Button>
+                <Settings className="w-3 h-3 mr-1.5" />{__('general.configure_agent')}</Button>
         </div>
     );
 }
@@ -81,23 +80,23 @@ function AddAgentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (a: any
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
             <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5 my-4">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2"><Bot className="w-4 h-4 text-indigo-400" /> Create AI Sales Agent</h3>
+                    <h3 className="text-sm font-bold text-white flex items-center gap-2"><Bot className="w-4 h-4 text-indigo-400" />{__('general.create_ai_sales_agent')}</h3>
                     <Button variant="ghost" size="icon" onClick={onClose} className="h-6 w-6 text-slate-600 hover:text-white hover:bg-transparent"><X className="w-4 h-4" /></Button>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                     <div>
-                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Agent Name</label>
-                        <Input value={name} onChange={e => setName(e.target.value)} placeholder="Sales Bot, Support Agent..."
+                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.agent_name')}</label>
+                        <Input value={name} onChange={e => setName(e.target.value)} placeholder={__('general.sales_bot_support_agent')}
                             className="h-10 text-sm bg-slate-800 border-slate-700 focus-visible:ring-indigo-500 text-white" />
                     </div>
                     <div>
-                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">WhatsApp Number</label>
+                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.whatsapp_number')}</label>
                         <Input value={number} onChange={e => setNumber(e.target.value)} placeholder="+962 7..."
                             className="h-10 text-sm bg-slate-800 border-slate-700 focus-visible:ring-indigo-500 text-white font-mono" />
                     </div>
                     <div>
-                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Arabic Dialect</label>
+                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.arabic_dialect')}</label>
                         <select value={dialect} onChange={e => setDialect(e.target.value)} className="w-full h-10 px-3 text-sm bg-slate-800 border border-slate-700 focus:border-indigo-500 rounded-md outline-none text-white">
                             {['gulf', 'egyptian', 'levantine', 'msa', 'english'].map(d => <option key={d} value={d}>{d.charAt(0).toUpperCase() + d.slice(1)}</option>)}
                         </select>
@@ -111,22 +110,22 @@ function AddAgentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (a: any
                 </div>
 
                 <div>
-                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Business Context</label>
-                    <Textarea value={context} onChange={e => setContext(e.target.value)} rows={3} placeholder="Describe your business, products, pricing, and FAQs. The AI uses this to answer customer questions..."
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.business_context')}</label>
+                    <Textarea value={context} onChange={e => setContext(e.target.value)} rows={3} placeholder={__('general.describe_your_business_products_pricing_and_faqs_the_ai_uses_this_to_answer_customer_questions')}
                         className="text-sm bg-slate-800 border-slate-700 focus-visible:ring-indigo-500 text-white resize-none" />
                 </div>
 
                 <div>
-                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Sales Goal</label>
-                    <Input value={goal} onChange={e => setGoal(e.target.value)} placeholder="Book a meeting, Share price list, Collect email..."
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.sales_goal')}</label>
+                    <Input value={goal} onChange={e => setGoal(e.target.value)} placeholder={__('general.book_a_meeting_share_price_list_collect_email')}
                         className="h-10 text-sm bg-slate-800 border-slate-700 focus-visible:ring-indigo-500 text-white" />
                 </div>
 
                 <div>
-                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">OpenAI API Key</label>
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.openai_api_key')}</label>
                     <div className="relative">
                         <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
-                        <Input value={apiKey} onChange={e => setApiKey(e.target.value)} type="password" placeholder="sk-..."
+                        <Input value={apiKey} onChange={e => setApiKey(e.target.value)} type="password" placeholder={__('general.sk')}
                             className="pl-9 h-10 text-sm bg-slate-800 border-slate-700 focus-visible:ring-indigo-500 text-white font-mono" />
                     </div>
                 </div>
@@ -135,9 +134,7 @@ function AddAgentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (a: any
                     <Button variant="outline" onClick={onClose} className="flex-1 h-10 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-400">Cancel</Button>
                     <Button onClick={() => { if (!name.trim() || !number.trim()) return; onAdd({ name, number, dialect, tone, context, goal, apiKey, active: false, conversations_today: 0, qualified_leads: 0, response_rate: 0 }); onClose(); }}
                         disabled={!name.trim() || !number.trim()}
-                        className="flex-1 h-10 bg-indigo-600 text-white hover:bg-indigo-500">
-                        Deploy Agent
-                    </Button>
+                        className="flex-1 h-10 bg-indigo-600 text-white hover:bg-indigo-500">{__('general.deploy_agent')}</Button>
                 </div>
             </div>
         </div>
@@ -187,7 +184,7 @@ export default function WaAiAgentRunner({ tool }: any) {
         <div className="min-h-screen bg-slate-950 flex items-center justify-center">
             <div className="text-center space-y-3">
                 <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm font-semibold text-slate-500">Connecting to Runtime...</p>
+                <p className="text-sm font-semibold text-slate-500">{__('general.connecting_to_runtime')}</p>
             </div>
         </div>
     );
@@ -202,12 +199,11 @@ export default function WaAiAgentRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20">
                         <Brain className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm">WhatsApp AI Sales Agent</span>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/10 rounded px-1.5 py-0.5 border border-indigo-500/20">GPT-4o Powered</span>
+                    <span className="font-bold text-sm">{__('general.whatsapp_ai_sales_agent')}</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/10 rounded px-1.5 py-0.5 border border-indigo-500/20">{__('general.gpt_4o_powered')}</span>
                 </div>
                 <Button onClick={() => setShowAdd(true)} className="gap-1.5 h-9 bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-500/20">
-                    <Plus className="w-3.5 h-3.5" /> Deploy Agent
-                </Button>
+                    <Plus className="w-3.5 h-3.5" />{__('general.deploy_agent')}</Button>
             </div>
 
             <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
@@ -233,8 +229,8 @@ export default function WaAiAgentRunner({ tool }: any) {
                 <div className="bg-gradient-to-r from-indigo-500/10 to-violet-500/5 border border-indigo-500/20 rounded-2xl p-4 flex items-start gap-3">
                     <Globe className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
                     <div>
-                        <p className="text-sm font-bold text-indigo-300">Arabic-First AI with Regional Dialect Support</p>
-                        <p className="text-xs text-slate-400 mt-0.5">Each agent understands and responds naturally in Gulf, Egyptian, or Levantine Arabic. The AI adapts its language and tone based on how the customer writes — no rigid rules needed.</p>
+                        <p className="text-sm font-bold text-indigo-300">{__('general.arabic_first_ai_with_regional_dialect_support')}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">{__('general.each_agent_understands_and_responds_naturally_in_gulf_egyptian_or_levantine_arabic_the_ai_adapts_its_language_and_tone_based_on_how_the_customer_writes_no_rigid_rules_needed')}</p>
                     </div>
                 </div>
 
@@ -248,11 +244,10 @@ export default function WaAiAgentRunner({ tool }: any) {
                 ) : (
                     <div className="py-24 text-center border border-dashed border-slate-800 rounded-2xl">
                         <Brain className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-                        <h3 className="text-sm font-bold text-slate-400">No AI Agents deployed yet</h3>
-                        <p className="text-xs text-slate-600 mt-2 max-w-md mx-auto">Deploy an autonomous Arabic-speaking AI agent that monitors your WhatsApp number, engages inbound leads 24/7, and qualifies them using your business context — powered by GPT-4o.</p>
+                        <h3 className="text-sm font-bold text-slate-400">{__('general.no_ai_agents_deployed_yet')}</h3>
+                        <p className="text-xs text-slate-600 mt-2 max-w-md mx-auto">{__('general.deploy_an_autonomous_arabic_speaking_ai_agent_that_monitors_your_whatsapp_number_engages_inbound_leads_24_7_and_qualifies_them_using_your_business_context_powered_by_gpt_4o')}</p>
                         <Button onClick={() => setShowAdd(true)} className="mt-6 gap-2 h-10 bg-indigo-600 text-white hover:bg-indigo-500 mx-auto shadow-lg shadow-indigo-500/20">
-                            <Bot className="w-4 h-4" /> Deploy First Agent
-                        </Button>
+                            <Bot className="w-4 h-4" />{__('general.deploy_first_agent')}</Button>
                     </div>
                 )}
             </div>

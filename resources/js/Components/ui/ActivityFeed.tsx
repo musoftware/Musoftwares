@@ -110,8 +110,8 @@ export function ActivityFeed({ items, className, showWorkspace = false }: Activi
         return (
             <div className="flex flex-col items-center justify-center py-10 text-slate-400">
                 <Activity className="w-8 h-8 mb-3 opacity-40" />
-                <p className="text-sm font-medium">No activity yet.</p>
-                <p className="text-xs mt-1">Actions across the platform will appear here.</p>
+                <p className="text-sm font-medium">{__('general.no_activity_yet')}</p>
+                <p className="text-xs mt-1">{__('general.actions_across_the_platform_will_appear_here')}</p>
             </div>
         );
     }

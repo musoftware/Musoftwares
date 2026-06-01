@@ -81,7 +81,7 @@ class PayoutMethodController extends Controller
             'status' => 'approved', // Auto approved for now; can be changed to 'pending' for admin review
         ]);
 
-        return back()->with('success', 'Payout method added successfully.');
+        return back()->with('success', __('general.payout_method_added_successfully'));
     }
 
     public function update(Request $request, PayoutMethod $payoutMethod)
@@ -130,7 +130,7 @@ class PayoutMethodController extends Controller
             'is_default' => $request->is_default ?? false,
         ]);
 
-        return back()->with('success', 'Payout method updated successfully.');
+        return back()->with('success', __('general.payout_method_updated_successfully'));
     }
 
     public function destroy(Request $request, PayoutMethod $payoutMethod)
@@ -151,6 +151,6 @@ class PayoutMethodController extends Controller
 
         $payoutMethod->delete();
 
-        return back()->with('success', 'Payout method removed successfully.');
+        return back()->with('success', __('general.payout_method_removed_successfully'));
     }
 }

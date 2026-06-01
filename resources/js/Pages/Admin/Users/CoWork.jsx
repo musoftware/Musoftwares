@@ -42,9 +42,7 @@ function TagList({ tags, colorClass = 'bg-emerald-50 text-emerald-700 border-eme
             {expanded && hidden > 0 && (
                 <button
                     onClick={() => setExpanded(false)}
-                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200 transition-colors">
-                    show less
-                </button>
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200 transition-colors">{__('general.show_less')}</button>
             )}
         </div>
     );
@@ -68,7 +66,7 @@ function FreelancerCard({ user }) {
                 <Link
                     href={`/admin/users/${user.id}`}
                     className="text-indigo-600 hover:text-indigo-800 transition-colors flex-shrink-0"
-                    title="View profile"
+                    title={__('general.view_profile')}
                 >
                     <ChevronRight className="w-5 h-5" />
                 </Link>
@@ -77,7 +75,7 @@ function FreelancerCard({ user }) {
             <div className="flex flex-wrap gap-1.5">
                 {user.skills?.length > 0
                     ? <TagList tags={user.skills} colorClass="bg-indigo-50 text-indigo-700 border-indigo-100" />
-                    : <span className="text-xs text-slate-400 italic">No skills listed</span>
+                    : <span className="text-xs text-slate-400 italic">{__('general.no_skills_listed')}</span>
                 }
             </div>
 
@@ -108,7 +106,7 @@ function LegacyCard({ worker }) {
                 <Link
                     href={`/admin/users/legacy-coworker/${worker.id}`}
                     className="text-emerald-600 hover:text-emerald-800 transition-colors flex-shrink-0"
-                    title="View details"
+                    title={__('general.view_details_1')}
                 >
                     <ChevronRight className="w-5 h-5" />
                 </Link>
@@ -188,8 +186,8 @@ export default function CoWork({ freelancers = [], legacyCoWorkers = [] }) {
     const current = activeTab === 'freelancers' ? filteredFreelancers : filteredLegacy;
 
     return (
-        <AdminSidebarLayout title="Co-Work" header="Private Co-Work">
-            <Head title="Co-Work" />
+        <AdminSidebarLayout title={__('general.co_work')} header="Private Co-Work">
+            <Head title={__('general.co_work')} />
 
             {/* Stats row */}
             <div className="mb-6 grid grid-cols-2 gap-4">
@@ -199,7 +197,7 @@ export default function CoWork({ freelancers = [], legacyCoWorkers = [] }) {
                 </div>
                 <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center">
                     <span className="text-2xl font-semibold text-emerald-600">{legacyCoWorkers.length}</span>
-                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Legacy Co-Workers</span>
+                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.legacy_co_workers')}</span>
                 </div>
             </div>
 
@@ -264,9 +262,7 @@ export default function CoWork({ freelancers = [], legacyCoWorkers = [] }) {
                                 }
                             </p>
                             {activeTab === 'freelancers' && !search && (
-                                <p className="text-xs text-slate-400 max-w-sm text-center">
-                                    Users appear here once they add at least one skill via the Freelance module.
-                                </p>
+                                <p className="text-xs text-slate-400 max-w-sm text-center">{__('general.users_appear_here_once_they_add_at_least_one_skill_via_the_freelance_module')}</p>
                             )}
                         </div>
                     ) : (

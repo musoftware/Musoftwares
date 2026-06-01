@@ -170,20 +170,19 @@ export default function DuplicateFinderRunner({ tool }: any) {
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans">
             <div className="h-14 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center px-6 sticky top-0 z-10">
                 <Copy className="w-5 h-5 text-amber-500 mr-2" />
-                <span className="font-bold text-sm">Duplicate File Finder</span>
+                <span className="font-bold text-sm">{__('general.duplicate_file_finder')}</span>
             </div>
 
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm mb-6">
                     <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                        <HardDrive className="w-5 h-5 text-slate-400" /> Target Directory
-                    </h2>
+                        <HardDrive className="w-5 h-5 text-slate-400" />{__('general.target_directory')}</h2>
                     
                     <div className="flex gap-2">
                         <Input 
                             value={targetPath} 
                             onChange={e => setTargetPath(e.target.value)} 
-                            placeholder="e.g. D:\Pictures" 
+                            placeholder={__('general.e_g_d_pictures')} 
                             className="flex-1"
                             disabled={status === 'running'}
                         />
@@ -238,7 +237,7 @@ export default function DuplicateFinderRunner({ tool }: any) {
                         {duplicates.length === 0 ? (
                             <div className="p-12 text-center">
                                 <CheckCircle className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-                                <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">Clean! No duplicates found.</h3>
+                                <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">{__('general.clean_no_duplicates_found')}</h3>
                             </div>
                         ) : (
                             <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[60vh] overflow-y-auto">

@@ -201,9 +201,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                     <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
                         <div className="md:col-span-4">
                             <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">1. Client Details</h2>
-                            <p className="text-sm text-slate-500 mt-2 leading-relaxed">
-                                Select the client, adjust billing dates, and choose the correct currency.
-                            </p>
+                            <p className="text-sm text-slate-500 mt-2 leading-relaxed">{__('general.select_the_client_adjust_billing_dates_and_choose_the_correct_currency')}</p>
                         </div>
                         <div className="md:col-span-8 bg-white p-6 rounded-xl border border-slate-100 shadow-sm space-y-6">
                             <div className="space-y-1.5">
@@ -222,7 +220,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                         setClientError('');
                                     }}
                                 >
-                                    <option value="">Select a client...</option>
+                                    <option value="">{__('general.select_a_client')}</option>
                                     {clients.map((c) => (
                                         <option key={c.id} value={c.id}>
                                             {c.name} ({c.currency?.currency || c.currency_code || 'N/A'})
@@ -255,14 +253,12 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div className="space-y-1.5">
-                                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Invoice Number
-                                    </Label>
+                                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.invoice_number')}</Label>
                                     <Input
                                         className="h-11 rounded-lg border-slate-200 bg-slate-50/50 focus:bg-white"
                                         value={data.invoice_number}
                                         onChange={e => setData('invoice_number', e.target.value)}
-                                        placeholder="INV-001"
+                                        placeholder={__('general.inv_001')}
                                     />
                                     <FieldError message={errors.invoice_number} />
                                 </div>
@@ -276,15 +272,13 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                         disabled
                                         readOnly
                                     />
-                                    <p className="text-[10px] text-slate-400">
-                                        Inherited from client profile
-                                    </p>
+                                    <p className="text-[10px] text-slate-400">{__('general.inherited_from_client_profile')}</p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div className="space-y-1.5">
-                                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Issue Date</Label>
+                                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.issue_date')}</Label>
                                     <Input
                                         className="h-11 rounded-lg border-slate-200 bg-slate-50/50 focus:bg-white"
                                         type="date"
@@ -293,7 +287,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Due Date</Label>
+                                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.due_date')}</Label>
                                     <Input
                                         className="h-11 rounded-lg border-slate-200 bg-slate-50/50 focus:bg-white"
                                         type="date"
@@ -313,16 +307,14 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                         <div className="flex items-center justify-between">
                             <div>
                                 <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">2. Line Items</h2>
-                                <p className="text-sm text-slate-500 mt-1">
-                                    Add the products or services provided. Use Tab to navigate quickly.
-                                </p>
+                                <p className="text-sm text-slate-500 mt-1">{__('general.add_the_products_or_services_provided_use_tab_to_navigate_quickly')}</p>
                             </div>
                         </div>
 
                         <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
                             {/* Table Header */}
                             <div className="flex items-center px-6 py-3 border-b border-slate-100 bg-slate-50/50 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                                <div className="flex-1">Item Description</div>
+                                <div className="flex-1">{__('general.item_description')}</div>
                                 <div className="w-24 text-right">Qty</div>
                                 <div className="w-32 text-right">Price</div>
                                 <div className="w-32 text-right">Total</div>
@@ -371,7 +363,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                                     "hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all placeholder:text-slate-300",
                                                     itemErrors[index] ? "border-red-300" : ""
                                                 )}
-                                                placeholder="Service or product name..."
+                                                placeholder={__('general.service_or_product_name')}
                                                 value={item.title}
                                                 onChange={e => updateItem(index, 'title', e.target.value)}
                                             />
@@ -380,7 +372,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                             )}
                                             <Input
                                                 className="h-8 text-sm text-slate-500 shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2 placeholder:text-slate-300"
-                                                placeholder="Optional description..."
+                                                placeholder={__('general.optional_description')}
                                                 value={item.description || ''}
                                                 onChange={e => updateItem(index, 'description', e.target.value)}
                                             />
@@ -436,8 +428,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                     onClick={() => addItem('simple')}
                                     className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 font-medium"
                                 >
-                                    <Plus className="mr-1.5 h-4 w-4" /> Add Line Item
-                                </Button>
+                                    <Plus className="mr-1.5 h-4 w-4" />{__('general.add_line_item')}</Button>
                             </div>
                         </div>
                     </section>
@@ -448,11 +439,9 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                     <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
                         <div className="md:col-span-6 space-y-6">
                             <div className="space-y-1.5">
-                                <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    Invoice Notes
-                                </Label>
+                                <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.invoice_notes')}</Label>
                                 <textarea
-                                    placeholder="Payment instructions, thank you message, or additional details..."
+                                    placeholder={__('general.payment_instructions_thank_you_message_or_additional_details')}
                                     className="flex min-h-[120px] w-full rounded-xl border-slate-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors resize-none placeholder:text-slate-400"
                                     value={data.notes}
                                     onChange={e => setData('notes', e.target.value)}
@@ -476,14 +465,12 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                 </button>
                                 {showCosts && (
                                     <div className="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
-                                        <p className="text-xs text-slate-500">
-                                            Track internal expenses (e.g. outsourcing, software) associated with this invoice.
-                                        </p>
+                                        <p className="text-xs text-slate-500">{__('general.track_internal_expenses_e_g_outsourcing_software_associated_with_this_invoice')}</p>
                                         {data.costs.map((cost, index) => (
                                             <div key={index} className="flex gap-3 items-center">
                                                 <Input
                                                     className="h-8 bg-white"
-                                                    placeholder="Cost description..."
+                                                    placeholder={__('general.cost_description')}
                                                     value={cost.title}
                                                     onChange={e => updateCost(index, 'title', e.target.value)}
                                                 />
@@ -510,8 +497,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                             className="w-full h-8 text-xs bg-white shadow-sm"
                                             onClick={addCost}
                                         >
-                                            <Plus className="mr-1.5 h-3 w-3" /> Add Cost
-                                        </Button>
+                                            <Plus className="mr-1.5 h-3 w-3" />{__('general.add_cost')}</Button>
                                     </div>
                                 )}
                             </div>
@@ -548,7 +534,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                     </div>
                                 </div>
                                 <div className="pt-4 mt-2 border-t border-slate-200 flex justify-between items-end">
-                                    <span className="font-semibold text-slate-900">Total Due</span>
+                                    <span className="font-semibold text-slate-900">{__('general.total_due')}</span>
                                     <div className="text-right">
                                         <div className="text-3xl font-bold tracking-tight text-indigo-600">
                                             <CurrencyDisplay amount={total} currency={data.amount_currency} />

@@ -137,26 +137,24 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('tasks');
 
     return (
-        <ERPLayout title="Current Tasks As List" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__('general.current_tasks_as_list')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-8 font-sans text-sm">
                 
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-foreground">Current Tasks</h1>
-                        <p className="text-muted-foreground text-xs mt-1">List view of all active checklist items grouped by client and task.</p>
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground">{__('general.current_tasks')}</h1>
+                        <p className="text-muted-foreground text-xs mt-1">{__('general.list_view_of_all_active_checklist_items_grouped_by_client_and_task')}</p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                         <Button asChild size="sm" className="h-9 gap-1.5">
                             <Link href={route('erp.tasks.index')}>
-                                <Plus className="h-4 w-4" /> Add New Task
-                            </Link>
+                                <Plus className="h-4 w-4" />{__('general.add_new_task')}</Link>
                         </Button>
                         <Button asChild variant="outline" size="sm" className="h-9 gap-1.5 bg-card">
                             <Link href={route('erp.tasks.index')}>
-                                <ListTodo className="h-4 w-4" /> View As Summary
-                            </Link>
+                                <ListTodo className="h-4 w-4" />{__('general.view_as_summary')}</Link>
                         </Button>
                     </div>
                 </div>
@@ -177,7 +175,7 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
                         {clientsData.length === 0 ? (
                             <div className="py-16 text-center text-muted-foreground text-xs italic space-y-2">
                                 <ListTodo className="h-10 w-10 text-muted-foreground/30 mx-auto" />
-                                <p>No active checklist items found.</p>
+                                <p>{__('general.no_active_checklist_items_found')}</p>
                             </div>
                         ) : (
                             <div className="divide-y divide-border">
@@ -211,14 +209,12 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
                                                         <Link href={route('erp.clients.wallet.index', clientGroup.client.id)} className="flex items-center gap-2 cursor-pointer">
-                                                            <HandCoins className="h-4 w-4 text-success" /> Receive Money
-                                                        </Link>
+                                                            <HandCoins className="h-4 w-4 text-success" />{__('general.receive_money')}</Link>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem asChild>
                                                         <Link href={route('erp.invoices.create', { client_id: clientGroup.client.id })} className="flex items-center gap-2 cursor-pointer">
-                                                            <Plus className="h-4 w-4 text-primary" /> New Invoice
-                                                        </Link>
+                                                            <Plus className="h-4 w-4 text-primary" />{__('general.new_invoice')}</Link>
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -239,8 +235,7 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
                                                         <div className="flex flex-wrap items-center gap-1.5">
                                                             <Button asChild size="sm" variant="default" className="h-7 text-[10px] px-2.5 bg-blue-600 hover:bg-blue-700">
                                                                 <Link href={route('erp.tasks.index')}>
-                                                                    <Plus className="h-3 w-3 mr-1" /> New Task
-                                                                </Link>
+                                                                    <Plus className="h-3 w-3 mr-1" />{__('general.new_task')}</Link>
                                                             </Button>
                                                             <Button asChild size="sm" variant="default" className="h-7 text-[10px] px-2.5 bg-purple-600 hover:bg-purple-700">
                                                                 <Link href={route('erp.tasks.show', task.id)}>
@@ -249,8 +244,7 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
                                                             </Button>
                                                             <Button asChild size="sm" variant="default" className="h-7 text-[10px] px-2.5 bg-green-600 hover:bg-green-700">
                                                                 <Link href={route('erp.tasks.show', task.id)}>
-                                                                    <FilePlus2 className="h-3 w-3 mr-1" /> Add Todo
-                                                                </Link>
+                                                                    <FilePlus2 className="h-3 w-3 mr-1" />{__('general.add_todo')}</Link>
                                                             </Button>
                                                             <Button asChild size="sm" variant="default" className="h-7 text-[10px] px-2.5 bg-slate-500 hover:bg-slate-600">
                                                                 <Link href={route('erp.tasks.show', task.id)}>
@@ -339,7 +333,7 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
                                                                     {/* Quick link to the task board */}
                                                                     <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                                                                         <Button asChild variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-primary">
-                                                                            <Link href={route('erp.tasks.show', task.id)} title="Go to Task Board">
+                                                                            <Link href={route('erp.tasks.show', task.id)} title={__('general.go_to_task_board')}>
                                                                                 <Edit3 className="h-3.5 w-3.5" />
                                                                             </Link>
                                                                         </Button>

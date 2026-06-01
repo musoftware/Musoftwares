@@ -106,8 +106,8 @@ export default function TicketsIndex({ tickets, isAdmin }) {
     const emptyStateContent = (
         <EmptyState
             icon={Ticket}
-            title="No support tickets yet."
-            description="Need help with billing, services, or your workspace? Open your first support ticket."
+            title={__('general.no_support_tickets_yet')}
+            description={__('general.need_help_with_billing_services_or_your_workspace_open_your_first_support_ticket')}
             actionLabel="Open Ticket"
             actionIcon={Plus}
             onClick={() => setIsCreating(true)}
@@ -116,18 +116,17 @@ export default function TicketsIndex({ tickets, isAdmin }) {
 
     return (
         <AuthenticatedLayout header="Support Tickets">
-            <Head title="Support Tickets" />
+            <Head title={__('general.support_tickets')} />
 
             <AppPage>
                 <PageHeader
-                    title="Support Tickets"
+                    title={__('general.support_tickets')}
                     subtitle={isAdmin ? "Manage client support requests and communications." : "Manage conversations and requests with the support team."}
                     icon={MessageSquare}
                     actions={
                         !isAdmin && (
                             <Button onClick={() => setIsCreating(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
-                                <Plus className="w-4 h-4 mr-2" /> Open Ticket
-                            </Button>
+                                <Plus className="w-4 h-4 mr-2" />{__('general.open_ticket')}</Button>
                         )
                     }
                 />
@@ -140,9 +139,9 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                 onChange={(e) => setFilterStatus(e.target.value)}
                                 className="h-9 w-full rounded-md border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
                             >
-                                <option value="">All Statuses</option>
+                                <option value="">{__('general.all_statuses')}</option>
                                 <option value="Open">Open</option>
-                                <option value="In Progress">In Progress</option>
+                                <option value="In Progress">{__('general.in_progress')}</option>
                                 <option value="Resolved">Resolved</option>
                             </select>
                             <select
@@ -150,7 +149,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                 onChange={(e) => setFilterPriority(e.target.value)}
                                 className="h-9 w-full rounded-md border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
                             >
-                                <option value="">All Priorities</option>
+                                <option value="">{__('general.all_priorities')}</option>
                                 <option value="High">High</option>
                                 <option value="Medium">Medium</option>
                                 <option value="Low">Low</option>
@@ -173,12 +172,8 @@ export default function TicketsIndex({ tickets, isAdmin }) {
             <Modal show={isCreating} onClose={() => setIsCreating(false)}>
                 <div className="p-6 space-y-6">
                     <div className="flex flex-col space-y-1">
-                        <h2 className="text-xl font-semibold tracking-tight text-gray-900">
-                            Open New Ticket
-                        </h2>
-                        <p className="text-sm text-gray-500">
-                            Please describe your issue below. We'll get back to you as soon as possible.
-                        </p>
+                        <h2 className="text-xl font-semibold tracking-tight text-gray-900">{__('general.open_new_ticket')}</h2>
+                        <p className="text-sm text-gray-500">{__('general.please_describe_your_issue_below_we_ll_get_back_to_you_as_soon_as_possible')}</p>
                     </div>
                     
                     <form onSubmit={submitTicket} className="space-y-4">
@@ -196,7 +191,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                     })
                                 }
                                 required
-                                placeholder="E.g., Problem with billing invoice"
+                                placeholder={__('general.e_g_problem_with_billing_invoice')}
                             />
                             <InputError message={errors.subject} />
                         </div>
@@ -214,9 +209,9 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                     })
                                 }
                             >
-                                <option value="Low">Low - General Question</option>
-                                <option value="Medium">Medium - Issue / Bug</option>
-                                <option value="High">High - Urgent / Blocker</option>
+                                <option value="Low">{__('general.low_general_question')}</option>
+                                <option value="Medium">{__('general.medium_issue_bug')}</option>
+                                <option value="High">{__('general.high_urgent_blocker')}</option>
                             </select>
                             <InputError message={errors.priority} />
                         </div>
@@ -235,7 +230,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                     })
                                 }
                                 required
-                                placeholder="Please provide detailed information about your request..."
+                                placeholder={__('general.please_provide_detailed_information_about_your_request')}
                             />
                             <InputError message={errors.description} />
                         </div>
@@ -244,9 +239,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                             <Button type="button" variant="outline" onClick={() => setIsCreating(false)}>
                                 Cancel
                             </Button>
-                            <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
-                                Submit Ticket
-                            </Button>
+                            <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">{__('general.submit_ticket')}</Button>
                         </div>
                     </form>
                 </div>
@@ -280,9 +273,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                         variant="outline"
                                         className="border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                                         onClick={() => markResolved(selectedTicket.id)}
-                                    >
-                                        Mark as Resolved
-                                    </Button>
+                                    >{__('general.mark_as_resolved')}</Button>
                                 )}
                                 <Button variant="secondary" onClick={() => setSelectedTicket(null)}>
                                     Close

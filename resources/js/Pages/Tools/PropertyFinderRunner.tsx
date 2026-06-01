@@ -119,7 +119,7 @@ function LeadCard({ lead, idx }: { lead: any; idx: number }) {
                     variant="ghost" size="icon"
                     onClick={copyRow}
                     className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 hover:bg-slate-100 shrink-0"
-                    title="Copy row"
+                    title={__('general.copy_row')}
                 >
                     {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> : <Clipboard className="w-3.5 h-3.5 text-slate-400" />}
                 </Button>
@@ -152,8 +152,7 @@ function LeadsTable({ leads, status, onExport }: { leads: any[]; status?: string
                     onClick={onExport}
                     className="h-8 gap-1.5 px-3 bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold"
                 >
-                    <Download className="w-3.5 h-3.5" /> Export CSV
-                </Button>
+                    <Download className="w-3.5 h-3.5" />{__('general.export_csv')}</Button>
             </div>
 
             {/* Rows */}
@@ -450,7 +449,7 @@ export default function PropertyFinderRunner({ tool }: any) {
         <div className="min-h-screen bg-slate-50 flex items-center justify-center font-sans">
             <div className="text-center space-y-3">
                 <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm font-semibold text-slate-500">Connecting to Runtime...</p>
+                <p className="text-sm font-semibold text-slate-500">{__('general.connecting_to_runtime')}</p>
             </div>
         </div>
     );
@@ -463,7 +462,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
                         <Building2 className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 tracking-tight">PropertyFinder Extractor</span>
+                    <span className="font-bold text-sm text-slate-800 tracking-tight">{__('general.propertyfinder_extractor')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                     {leads.length > 0 && status !== 'idle' && (
@@ -472,8 +471,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                             onClick={() => exportCSV(leads)}
                             className="h-8 gap-1.5 px-3 bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 text-xs font-bold"
                         >
-                            <Download className="w-3.5 h-3.5" /> Export CSV
-                        </Button>
+                            <Download className="w-3.5 h-3.5" />{__('general.export_csv')}</Button>
                     )}
                     <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                         <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-indigo-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
@@ -515,14 +513,14 @@ export default function PropertyFinderRunner({ tool }: any) {
                         {/* Config card */}
                         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                             <div className="mb-5">
-                                <h1 className="text-xl font-bold tracking-tight text-slate-900">Find Real Estate Leads</h1>
-                                <p className="text-sm text-slate-400 mt-1">Extract property listings with contact details from PropertyFinder, Bayut & Sarouty.</p>
+                                <h1 className="text-xl font-bold tracking-tight text-slate-900">{__('general.find_real_estate_leads')}</h1>
+                                <p className="text-sm text-slate-400 mt-1">{__('general.extract_property_listings_with_contact_details_from_propertyfinder_bayut_sarouty')}</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                 {/* Keyword */}
                                 <div className="md:col-span-1">
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Keyword / Category</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.keyword_category')}</label>
                                     <div className="relative">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
@@ -530,7 +528,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                                             value={keyword}
                                             onChange={e => setKeyword(e.target.value)}
                                             onKeyDown={e => e.key === 'Enter' && handleStart()}
-                                            placeholder="apartment, villa, office..."
+                                            placeholder={__('general.apartment_villa_office')}
                                             className="pl-9 h-11 text-sm bg-slate-50"
                                         />
                                     </div>
@@ -538,7 +536,7 @@ export default function PropertyFinderRunner({ tool }: any) {
 
                                 {/* Country */}
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Country / Site</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.country_site')}</label>
                                     <div className="relative">
                                         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <select
@@ -556,7 +554,7 @@ export default function PropertyFinderRunner({ tool }: any) {
 
                                 {/* Limit */}
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Max Properties</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.max_properties')}</label>
                                     <div className="relative">
                                         <Home className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
@@ -586,8 +584,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                                         disabled={!keyword.trim()}
                                         className="h-11 gap-2 px-6 bg-gradient-to-r from-indigo-500 to-blue-600 text-white shadow-md text-sm font-bold hover:opacity-90"
                                     >
-                                        <Play className="w-4 h-4" /> Start Extraction
-                                    </Button>
+                                        <Play className="w-4 h-4" />{__('general.start_extraction')}</Button>
                                 )}
                                 {leads.length > 0 && status !== 'running' && (
                                     <Button
@@ -634,9 +631,9 @@ export default function PropertyFinderRunner({ tool }: any) {
                         {leads.length > 0 && (
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 animate-in fade-in duration-300">
                                 <StatCard label="Total" value={leads.length} icon={Building2} color="bg-indigo-50 border-indigo-200" />
-                                <StatCard label="With Phone" value={leads.filter((l: any) => l.phone).length} icon={Phone} />
+                                <StatCard label={__('general.with_phone')} value={leads.filter((l: any) => l.phone).length} icon={Phone} />
                                 <StatCard label="WhatsApp" value={leads.filter((l: any) => l.whatsapp).length} icon={MessageCircle} color="bg-emerald-50 border-emerald-200" />
-                                <StatCard label="With Beds" value={leads.filter((l: any) => l.bedrooms).length} icon={BedDouble} color="bg-blue-50 border-blue-200" />
+                                <StatCard label={__('general.with_beds')} value={leads.filter((l: any) => l.bedrooms).length} icon={BedDouble} color="bg-blue-50 border-blue-200" />
                                 <StatCard label="Country" value={COUNTRIES.find(c => c.code === country)?.name} icon={MapPin} />
                             </div>
                         )}
@@ -648,10 +645,8 @@ export default function PropertyFinderRunner({ tool }: any) {
                         {status === 'idle' && leads.length === 0 && (
                             <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                 <Building2 className="w-10 h-10 text-slate-300 mx-auto mb-4" />
-                                <h3 className="text-sm font-bold text-slate-700">PropertyFinder, Bayut & Sarouty</h3>
-                                <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">
-                                    Search for properties across the Middle East & North Africa. Extract real listings with contact details, prices, and property specs.
-                                </p>
+                                <h3 className="text-sm font-bold text-slate-700">{__('general.propertyfinder_bayut_sarouty')}</h3>
+                                <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">{__('general.search_for_properties_across_the_middle_east_north_africa_extract_real_listings_with_contact_details_prices_and_property_specs')}</p>
                             </div>
                         )}
                     </TabsContent>
@@ -669,8 +664,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                                         onClick={() => { setSelectedCampaign(null); setCampaignLeads([]); }}
                                         className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-700 transition-colors mb-4"
                                     >
-                                        <ArrowLeft className="w-3.5 h-3.5" /> Back to campaigns
-                                    </button>
+                                        <ArrowLeft className="w-3.5 h-3.5" />{__('general.back_to_campaigns')}</button>
 
                                     <div className="flex items-start justify-between">
                                         <div>
@@ -700,9 +694,9 @@ export default function PropertyFinderRunner({ tool }: any) {
                                     {campaignLeads.length > 0 && (
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
                                             <StatCard label="Total" value={campaignLeads.length} icon={Building2} color="bg-indigo-50 border-indigo-200" />
-                                            <StatCard label="With Phone" value={campaignLeads.filter(l => l.phone).length} icon={Phone} />
+                                            <StatCard label={__('general.with_phone')} value={campaignLeads.filter(l => l.phone).length} icon={Phone} />
                                             <StatCard label="WhatsApp" value={campaignLeads.filter(l => l.whatsapp).length} icon={MessageCircle} color="bg-emerald-50 border-emerald-200" />
-                                            <StatCard label="With Beds" value={campaignLeads.filter(l => l.bedrooms).length} icon={BedDouble} color="bg-blue-50 border-blue-200" />
+                                            <StatCard label={__('general.with_beds')} value={campaignLeads.filter(l => l.bedrooms).length} icon={BedDouble} color="bg-blue-50 border-blue-200" />
                                         </div>
                                     )}
                                 </div>
@@ -711,7 +705,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                                 {loadingDetail ? (
                                     <div className="py-16 text-center">
                                         <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                                        <p className="text-xs text-slate-400 font-medium">Loading properties...</p>
+                                        <p className="text-xs text-slate-400 font-medium">{__('general.loading_properties')}</p>
                                     </div>
                                 ) : (
                                     <LeadsTable
@@ -723,7 +717,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                                 {!loadingDetail && campaignLeads.length === 0 && (
                                     <div className="py-16 text-center bg-white border border-dashed border-slate-200 rounded-2xl">
                                         <Building2 className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                        <p className="text-sm text-slate-500 font-medium">No properties in this campaign</p>
+                                        <p className="text-sm text-slate-500 font-medium">{__('general.no_properties_in_this_campaign')}</p>
                                     </div>
                                 )}
                             </div>
@@ -731,7 +725,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                             /* Campaign List View */
                             <div className="space-y-4 animate-in fade-in duration-300">
                                 <div className="flex items-center justify-between">
-                                    <h2 className="text-lg font-bold text-slate-800">Past Campaigns</h2>
+                                    <h2 className="text-lg font-bold text-slate-800">{__('general.past_campaigns')}</h2>
                                     <Button
                                         variant="outline"
                                         onClick={loadCampaigns}
@@ -745,13 +739,13 @@ export default function PropertyFinderRunner({ tool }: any) {
                                 {loadingCampaigns && campaigns.length === 0 ? (
                                     <div className="py-16 text-center">
                                         <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                                        <p className="text-xs text-slate-400 font-medium">Loading campaigns...</p>
+                                        <p className="text-xs text-slate-400 font-medium">{__('general.loading_campaigns')}</p>
                                     </div>
                                 ) : campaigns.length === 0 ? (
                                     <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                         <History className="w-10 h-10 text-slate-300 mx-auto mb-4" />
-                                        <h3 className="text-sm font-bold text-slate-700">No campaigns yet</h3>
-                                        <p className="text-xs text-slate-400 mt-2">Start an extraction from the Extract tab to see campaigns here.</p>
+                                        <h3 className="text-sm font-bold text-slate-700">{__('general.no_campaigns_yet')}</h3>
+                                        <p className="text-xs text-slate-400 mt-2">{__('general.start_an_extraction_from_the_extract_tab_to_see_campaigns_here')}</p>
                                     </div>
                                 ) : (
                                     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">

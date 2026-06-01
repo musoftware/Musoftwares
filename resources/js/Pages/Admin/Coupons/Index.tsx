@@ -127,12 +127,12 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
             {/* Code & Name */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <Label htmlFor="code">Coupon Code</Label>
+                    <Label htmlFor="code">{__('general.coupon_code')}</Label>
                     <Input
                         id="code"
                         value={formData.code}
                         onChange={(e) => set('code', e.target.value.toUpperCase())}
-                        placeholder="Leave empty to auto-generate"
+                        placeholder={__('general.leave_empty_to_auto_generate')}
                     />
                 </div>
                 <div>
@@ -141,7 +141,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                         id="name"
                         value={formData.name}
                         onChange={(e) => set('name', e.target.value)}
-                        placeholder="e.g. Summer Sale"
+                        placeholder={__('general.e_g_summer_sale')}
                         required
                     />
                 </div>
@@ -156,13 +156,13 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                     rows={2}
                     value={formData.description}
                     onChange={(e) => set('description', e.target.value)}
-                    placeholder="Optional description..."
+                    placeholder={__('general.optional_description')}
                 />
             </div>
 
             {/* Type */}
             <div>
-                <Label htmlFor="type">Discount Type <span className="text-red-500">*</span></Label>
+                <Label htmlFor="type">{__('general.discount_type')}<span className="text-red-500">*</span></Label>
                 <select
                     id="type"
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black"
@@ -170,7 +170,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                     onChange={(e) => set('type', e.target.value)}
                     required
                 >
-                    <option value="fixed">Fixed Amount</option>
+                    <option value="fixed">{__('general.fixed_amount')}</option>
                     <option value="percentage">Percentage</option>
                 </select>
             </div>
@@ -179,7 +179,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
             <div className="grid grid-cols-2 gap-4">
                 {formData.type === 'fixed' ? (
                     <div>
-                        <Label htmlFor="discount_amount">Discount Amount</Label>
+                        <Label htmlFor="discount_amount">{__('general.discount_amount')}</Label>
                         <Input
                             id="discount_amount"
                             type="number"
@@ -201,7 +201,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                             max="100"
                             value={formData.discount_percentage}
                             onChange={(e) => set('discount_percentage', e.target.value)}
-                            placeholder="e.g. 10"
+                            placeholder={__('general.e_g_10')}
                         />
                     </div>
                 )}
@@ -224,7 +224,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
 
             {/* Min Purchase */}
             <div>
-                <Label htmlFor="min_purchase_amount">Minimum Purchase Amount</Label>
+                <Label htmlFor="min_purchase_amount">{__('general.minimum_purchase_amount')}</Label>
                 <Input
                     id="min_purchase_amount"
                     type="number"
@@ -232,14 +232,14 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                     min="0"
                     value={formData.min_purchase_amount}
                     onChange={(e) => set('min_purchase_amount', e.target.value)}
-                    placeholder="Leave empty for no minimum"
+                    placeholder={__('general.leave_empty_for_no_minimum')}
                 />
             </div>
 
             {/* Usage Limits */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <Label htmlFor="max_uses_per_user">Max Uses / User</Label>
+                    <Label htmlFor="max_uses_per_user">{__('general.max_uses_user')}</Label>
                     <Input
                         id="max_uses_per_user"
                         type="number"
@@ -250,7 +250,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                     />
                 </div>
                 <div>
-                    <Label htmlFor="max_total_uses">Max Total Uses</Label>
+                    <Label htmlFor="max_total_uses">{__('general.max_total_uses')}</Label>
                     <Input
                         id="max_total_uses"
                         type="number"
@@ -265,7 +265,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
             {/* Dates */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <Label htmlFor="starts_at">Starts At</Label>
+                    <Label htmlFor="starts_at">{__('general.starts_at')}</Label>
                     <Input
                         id="starts_at"
                         type="datetime-local"
@@ -274,7 +274,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                     />
                 </div>
                 <div>
-                    <Label htmlFor="expires_at">Expires At</Label>
+                    <Label htmlFor="expires_at">{__('general.expires_at')}</Label>
                     <Input
                         id="expires_at"
                         type="datetime-local"
@@ -286,14 +286,14 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
 
             {/* Admin Notes */}
             <div>
-                <Label htmlFor="admin_notes">Admin Notes</Label>
+                <Label htmlFor="admin_notes">{__('general.admin_notes')}</Label>
                 <textarea
                     id="admin_notes"
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black"
                     rows={2}
                     value={formData.admin_notes}
                     onChange={(e) => set('admin_notes', e.target.value)}
-                    placeholder="Internal notes..."
+                    placeholder={__('general.internal_notes')}
                 />
             </div>
 
@@ -306,7 +306,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                     onChange={(e) => set('is_active', e.target.checked)}
                     className="rounded border-gray-300 text-black focus:ring-black"
                 />
-                <Label htmlFor="is_active">Coupon is Active</Label>
+                <Label htmlFor="is_active">{__('general.coupon_is_active')}</Label>
             </div>
         </div>
     );
@@ -315,7 +315,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
 
     return (
         <AdminSidebarLayout title="Coupons" header="Coupons Manager">
-            <Head title="Admin — Coupons" />
+            <Head title={__('general.admin_coupons')} />
 
             {/* Header bar */}
             <div className="mb-6 flex items-center justify-between">
@@ -325,10 +325,10 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 </div>
 
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                    <DialogTrigger render={<Button><Plus className="mr-2 h-4 w-4" />Create Coupon</Button>} />
+                    <DialogTrigger render={<Button><Plus className="mr-2 h-4 w-4" />{__('general.create_coupon')}</Button>} />
                     <DialogContent className="max-w-lg">
                         <DialogHeader>
-                            <DialogTitle>Create New Coupon</DialogTitle>
+                            <DialogTitle>{__('general.create_new_coupon')}</DialogTitle>
                         </DialogHeader>
                         <form onSubmit={handleCreateSubmit}>
                             {renderFormFields()}
@@ -336,7 +336,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                                 <Button type="button" variant="outline" onClick={() => { setIsCreateOpen(false); resetForm(); }}>
                                     Cancel
                                 </Button>
-                                <Button type="submit">Save Coupon</Button>
+                                <Button type="submit">{__('general.save_coupon')}</Button>
                             </DialogFooter>
                         </form>
                     </DialogContent>
@@ -441,9 +441,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                         {items.length === 0 && (
                             <tr>
                                 <td colSpan={8} className="p-8 text-center text-gray-400">
-                                    <Tag className="mx-auto mb-2 h-8 w-8 opacity-30" />
-                                    No coupons found.
-                                </td>
+                                    <Tag className="mx-auto mb-2 h-8 w-8 opacity-30" />{__('general.no_coupons_found')}</td>
                             </tr>
                         )}
                     </tbody>
@@ -481,7 +479,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                             <Button type="button" variant="outline" onClick={() => { setIsEditOpen(false); resetForm(); }}>
                                 Cancel
                             </Button>
-                            <Button type="submit">Save Changes</Button>
+                            <Button type="submit">{__('general.save_changes')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

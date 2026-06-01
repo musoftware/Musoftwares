@@ -20,7 +20,7 @@ class TeamMemberController extends Controller
     protected function checkOwner()
     {
         if (session()->has('erp_team_member_id')) {
-            abort(403, 'Only the workspace owner can manage team members.');
+            abort(403, __('general.only_the_workspace_owner_can_manage_team_members'));
         }
     }
 

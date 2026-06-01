@@ -45,7 +45,7 @@ class VendorOrderController extends Controller
         })->exists();
 
         if (!$hasVendorItem) {
-            abort(403, 'Unauthorized access to order.');
+            abort(403, __('general.unauthorized_access_to_order'));
         }
 
         $order->load(['items' => function($q) use ($userId) {

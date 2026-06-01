@@ -88,6 +88,6 @@ class TeamAuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('erp.team.login')
-            ->with('message', 'Logged out successfully.');
+            ->with('message', __('general.logged_out_successfully'));
     }
 }

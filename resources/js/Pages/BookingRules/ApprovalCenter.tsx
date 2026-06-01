@@ -9,23 +9,22 @@ export default function ApprovalCenter({ pendingApprovals }) {
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">Approval Center</h1>
-                <p className="text-muted-foreground mt-2">Manage bookings halted by advanced rules requiring manual intervention.</p>
+                <h1 className="text-3xl font-bold tracking-tight">{__('general.approval_center')}</h1>
+                <p className="text-muted-foreground mt-2">{__('general.manage_bookings_halted_by_advanced_rules_requiring_manual_intervention')}</p>
             </div>
 
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <Clock className="h-5 w-5 text-orange-500" /> Pending Approvals
-                    </CardTitle>
+                        <Clock className="h-5 w-5 text-orange-500" />{__('general.pending_approvals')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Date / Time</TableHead>
-                                <TableHead>Rule Triggered</TableHead>
-                                <TableHead>Booking Ref</TableHead>
+                                <TableHead>{__('general.date_time')}</TableHead>
+                                <TableHead>{__('general.rule_triggered')}</TableHead>
+                                <TableHead>{__('general.booking_ref')}</TableHead>
                                 <TableHead>Reason</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>

@@ -39,27 +39,27 @@ export default function TagsIndex({ tags }: { tags: any[] }) {
     };
 
     const handleDelete = (id: number) => {
-        if (confirm(__('Are you sure you want to delete this tag?'))) {
+        if (confirm(__('general.are_you_sure_you_want_to_delete_this_tag'))) {
             router.delete(route('crm.tags.destroy', id));
         }
     };
 
     if (!hasManagementFeature) {
         return (
-            <CrmLayout title={__('Tags & Attributes')} activeMenu="tags">
+            <CrmLayout title={__('general.tags_attributes')} activeMenu="tags">
                 <ModulePageHeader 
-                    title={__('Tags & Attributes')}
-                    description={__('Manage tags used to categorize leads and contacts.')}
+                    title={__('general.tags_attributes')}
+                    description={__('general.manage_tags_used_to_categorize_leads_and_contacts')}
                     icon={Tag}
                     module="CRM"
                 />
                 <div className="px-8 pb-8">
                     <UpgradeOverlay 
-                        title={__('Sales Management Add-on Required')}
-                        description={__('To create and manage custom tags and attributes, you need the Sales Management & Tracking add-on.')}
+                        title={__('general.sales_management_add_on_required')}
+                        description={__('general.to_create_and_manage_custom_tags_and_attributes_you_need_the_sales_management_tracking_add_on')}
                         icon={Tag}
                         module="crm-sales-management"
-                        priceText={__('Subscribe to Sales Management')}
+                        priceText={__('general.subscribe_to_sales_management')}
                     />
                 </div>
             </CrmLayout>
@@ -67,16 +67,16 @@ export default function TagsIndex({ tags }: { tags: any[] }) {
     }
 
     return (
-        <CrmLayout title={__('Tags & Attributes')} activeMenu="tags">
+        <CrmLayout title={__('general.tags_attributes')} activeMenu="tags">
             <ModulePageHeader 
-                title={__('Tags & Attributes')}
-                description={__('Manage tags used to categorize leads and contacts.')}
+                title={__('general.tags_attributes')}
+                description={__('general.manage_tags_used_to_categorize_leads_and_contacts')}
                 icon={Tag}
                 module="CRM"
                 action={
                     <Button onClick={() => setIsCreateModalOpen(true)} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
                         <Plus size={16} />
-                        {__('Create Tag')}
+                        {__('general.create_tag')}
                     </Button>
                 }
             />
@@ -85,14 +85,14 @@ export default function TagsIndex({ tags }: { tags: any[] }) {
                 {/* Content */}
                 <Card className="flex-1 overflow-hidden border-slate-200 shadow-sm">
                     <CardHeader className="p-4 border-b border-slate-100 bg-slate-50/50">
-                        <CardTitle className="font-semibold text-slate-800">{__('All Tags')}</CardTitle>
+                        <CardTitle className="font-semibold text-slate-800">{__('general.all_tags')}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0 overflow-y-auto">
                         <table className="w-full text-sm text-left">
                             <thead className="text-xs text-slate-500 uppercase bg-slate-50/80 border-b">
                                 <tr>
-                                    <th className="px-6 py-4 font-medium">{__('Tag Name')}</th>
-                                    <th className="px-6 py-4 font-medium">{__('Color')}</th>
+                                    <th className="px-6 py-4 font-medium">{__('general.tag_name')}</th>
+                                    <th className="px-6 py-4 font-medium">{__('general.color')}</th>
                                     <th className="px-6 py-4 font-medium">{__('Created At')}</th>
                                     <th className="px-6 py-4 font-medium text-right">{__('Actions')}</th>
                                 </tr>
@@ -133,9 +133,9 @@ export default function TagsIndex({ tags }: { tags: any[] }) {
                                         <td colSpan={4} className="px-6 py-12 text-center text-slate-500">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <Tag size={32} className="text-slate-300" />
-                                                <p>{__('No tags found.')}</p>
+                                                <p>{__('general.no_tags_found')}</p>
                                                 <Button variant="outline" size="sm" onClick={() => setIsCreateModalOpen(true)} className="mt-2">
-                                                    {__('Create your first tag')}
+                                                    {__('general.create_your_first_tag')}
                                                 </Button>
                                             </div>
                                         </td>
@@ -152,24 +152,24 @@ export default function TagsIndex({ tags }: { tags: any[] }) {
                 <DialogContent>
                     <form onSubmit={handleSubmit}>
                         <DialogHeader>
-                            <DialogTitle>{__('Create New Tag')}</DialogTitle>
+                            <DialogTitle>{__('general.create_new_tag')}</DialogTitle>
                         </DialogHeader>
                         
                         <div className="space-y-4 py-4">
                             <div className="space-y-2">
-                                <Label htmlFor="name">{__('Tag Name')}</Label>
+                                <Label htmlFor="name">{__('general.tag_name')}</Label>
                                 <Input 
                                     id="name" 
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
-                                    placeholder={__('e.g. VIP Customer')}
+                                    placeholder={__('general.e_g_vip_customer')}
                                     required
                                 />
                                 {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
                             </div>
                             
                             <div className="space-y-2">
-                                <Label>{__('Color')}</Label>
+                                <Label>{__('general.color')}</Label>
                                 <div className="flex flex-wrap gap-2 mt-2">
                                     {presetColors.map((color) => (
                                         <button
@@ -189,7 +189,7 @@ export default function TagsIndex({ tags }: { tags: any[] }) {
                                 {__('Cancel')}
                             </Button>
                             <Button type="submit" disabled={processing} className="bg-indigo-600 hover:bg-indigo-700 text-white">
-                                {__('Save Tag')}
+                                {__('general.save_tag')}
                             </Button>
                         </DialogFooter>
                     </form>

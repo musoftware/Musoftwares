@@ -31,14 +31,14 @@ class ServiceLandingPagePublicController extends Controller
             ->get();
 
         if ($landingPages->isEmpty()) {
-            abort(404, 'Landing page not found');
+            abort(404, __('general.landing_page_not_found'));
         }
 
         // Find the parent page (the one without parent_variant_id)
         $parentPage = $landingPages->firstWhere('parent_variant_id', null);
 
         if (!$parentPage) {
-            abort(404, 'Landing page not found');
+            abort(404, __('general.landing_page_not_found'));
         }
 
         // Select which variant to show (if A/B testing is enabled)

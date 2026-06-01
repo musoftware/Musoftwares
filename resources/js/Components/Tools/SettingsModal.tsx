@@ -55,9 +55,7 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
             >
                 <div className="h-12 border-b border-white/10 flex items-center justify-between px-4 bg-white/5">
                     <div className="flex items-center gap-2 text-white font-medium">
-                        <SettingsIcon className="w-4 h-4 text-slate-400" />
-                        Desktop Settings
-                    </div>
+                        <SettingsIcon className="w-4 h-4 text-slate-400" />{__('general.desktop_settings')}</div>
                     <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-md text-slate-400 hover:text-white transition-colors">
                         <X className="w-5 h-5" />
                     </button>
@@ -67,13 +65,12 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
                     {/* Widget Settings */}
                     <div>
                         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                            <span className="text-blue-400">#</span> Widgets & Behavior
-                        </h3>
+                            <span className="text-blue-400">#</span>{__('general.widgets_behavior')}</h3>
                         <div className="flex flex-col gap-3 bg-white/5 p-4 rounded-xl border border-white/5">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h4 className="font-medium">Open with Single Click</h4>
-                                    <p className="text-xs text-slate-400 mt-1">Open tools and folders with a single click instead of double click</p>
+                                    <h4 className="font-medium">{__('general.open_with_single_click')}</h4>
+                                    <p className="text-xs text-slate-400 mt-1">{__('general.open_tools_and_folders_with_a_single_click_instead_of_double_click')}</p>
                                 </div>
                                 <label className="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" className="sr-only peer" checked={openWithOneClick} onChange={onToggleOneClick} />
@@ -83,8 +80,8 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
                             
                             <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/10">
                                 <div>
-                                    <h4 className="font-medium">Prayer Times</h4>
-                                    <p className="text-xs text-slate-400 mt-1">Display local prayer times in the taskbar</p>
+                                    <h4 className="font-medium">{__('general.prayer_times')}</h4>
+                                    <p className="text-xs text-slate-400 mt-1">{__('general.display_local_prayer_times_in_the_taskbar')}</p>
                                 </div>
                                 <label className="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" className="sr-only peer" checked={showPrayerTimes} onChange={onTogglePrayerTimes} />
@@ -115,25 +112,25 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs text-slate-400 mb-1 block">Calculation Method</label>
+                                        <label className="text-xs text-slate-400 mb-1 block">{__('general.calculation_method')}</label>
                                         <select 
                                             value={prayerMethod}
                                             onChange={(e) => onPrayerSettingsChange(prayerCity, prayerCountry, e.target.value)}
                                             className="w-full bg-[#1c1c1c] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
                                         >
-                                            <option value="1">University of Islamic Sciences, Karachi</option>
-                                            <option value="2">Islamic Society of North America</option>
-                                            <option value="3">Muslim World League</option>
-                                            <option value="4">Umm Al-Qura University, Makkah</option>
-                                            <option value="5">Egyptian General Authority of Survey</option>
-                                            <option value="8">Gulf Region</option>
+                                            <option value="1">{__('general.university_of_islamic_sciences_karachi')}</option>
+                                            <option value="2">{__('general.islamic_society_of_north_america')}</option>
+                                            <option value="3">{__('general.muslim_world_league')}</option>
+                                            <option value="4">{__('general.umm_al_qura_university_makkah')}</option>
+                                            <option value="5">{__('general.egyptian_general_authority_of_survey')}</option>
+                                            <option value="8">{__('general.gulf_region')}</option>
                                             <option value="9">Kuwait</option>
                                             <option value="10">Qatar</option>
-                                            <option value="11">Majlis Ugama Islam Singapura</option>
-                                            <option value="12">Union Organization islamic de France</option>
-                                            <option value="13">Diyanet İşleri Başkanlığı, Turkey</option>
-                                            <option value="14">Spiritual Administration of Muslims of Russia</option>
-                                            <option value="15">Moonsighting Committee Worldwide</option>
+                                            <option value="11">{__('general.majlis_ugama_islam_singapura')}</option>
+                                            <option value="12">{__('general.union_organization_islamic_de_france')}</option>
+                                            <option value="13">{__('general.diyanet_i_leri_ba_kanl_turkey')}</option>
+                                            <option value="14">{__('general.spiritual_administration_of_muslims_of_russia')}</option>
+                                            <option value="15">{__('general.moonsighting_committee_worldwide')}</option>
                                             <option value="16">Dubai</option>
                                         </select>
                                     </div>
@@ -166,13 +163,13 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
                             ))}
                         </div>
                         <div className="mt-4">
-                            <label className="text-xs text-slate-400 mb-1 block">Custom URL</label>
+                            <label className="text-xs text-slate-400 mb-1 block">{__('general.custom_url')}</label>
                             <input 
                                 type="text"
                                 value={wallpaperUrl}
                                 onChange={(e) => onWallpaperChange(e.target.value)}
                                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
-                                placeholder="https://..."
+                                placeholder={__('general.https')}
                             />
                         </div>
                     </div>

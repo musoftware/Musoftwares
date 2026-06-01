@@ -87,9 +87,9 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
         <h1>419</h1>
-        <h2>Page Expired</h2>
-        <p>Your session has expired. Please refresh the page and try again.</p>
-        <a href="/" class="btn">Go Home</a>
+        <h2>{{ __('general.page_expired') }}</h2>
+        <p>{{ __('general.your_session_has_expired_please_refresh_the_page_and_try_again') }}</p>
+        <a href="/" class="btn">{{ __('general.go_home') }}</a>
     </div>
 </body>
 </html>

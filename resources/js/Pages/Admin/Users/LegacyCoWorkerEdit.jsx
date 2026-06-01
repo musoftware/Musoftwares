@@ -42,10 +42,8 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                     <ArrowLeft className="w-5 h-5" />
                 </Link>
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                        Edit Legacy Co-Worker
-                    </h1>
-                    <p className="text-sm text-slate-500">Update coworker contact, availability, and skills</p>
+                    <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">{__('general.edit_legacy_co_worker')}</h1>
+                    <p className="text-sm text-slate-500">{__('general.update_coworker_contact_availability_and_skills')}</p>
                 </div>
             </div>
 
@@ -55,10 +53,10 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                         
                         {/* Basic Info */}
                         <div className="space-y-4">
-                            <h2 className="text-lg font-semibold text-slate-800">Basic Information</h2>
+                            <h2 className="text-lg font-semibold text-slate-800">{__('general.basic_information')}</h2>
                             
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.full_name')}</label>
                                 <input
                                     type="text"
                                     value={data.person_name}
@@ -69,7 +67,7 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.email_address')}</label>
                                 <input
                                     type="email"
                                     value={data.email}
@@ -80,7 +78,7 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Mobile Number</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.mobile_number')}</label>
                                 <input
                                     type="text"
                                     value={data.mobile}
@@ -105,10 +103,10 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
 
                         {/* Social & Availability */}
                         <div className="space-y-4">
-                            <h2 className="text-lg font-semibold text-slate-800">Social & Availability</h2>
+                            <h2 className="text-lg font-semibold text-slate-800">{__('general.social_availability')}</h2>
                             
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Facebook URL</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.facebook_url')}</label>
                                 <input
                                     type="url"
                                     value={data.facebook}
@@ -119,7 +117,7 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">LinkedIn URL</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.linkedin_url')}</label>
                                 <input
                                     type="url"
                                     value={data.linked_in}
@@ -131,7 +129,7 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Available From</label>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.available_from')}</label>
                                     <input
                                         type="time"
                                         value={data.time_from}
@@ -141,7 +139,7 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                                     {errors.time_from && <p className="text-red-500 text-xs mt-1">{errors.time_from}</p>}
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Available To</label>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.available_to')}</label>
                                     <input
                                         type="time"
                                         value={data.time_to}
@@ -156,7 +154,7 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
 
                     {/* Tech Tags */}
                     <div className="mt-8">
-                        <h2 className="text-lg font-semibold text-slate-800 mb-3">Programming Technologies</h2>
+                        <h2 className="text-lg font-semibold text-slate-800 mb-3">{__('general.programming_technologies')}</h2>
                         <div className="flex flex-wrap gap-2">
                             {techTags.map(tag => (
                                 <button
@@ -184,9 +182,7 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                             Cancel
                         </Link>
                         <Button type="submit" disabled={processing} className="flex items-center gap-2">
-                            <Save className="w-4 h-4" />
-                            Save Changes
-                        </Button>
+                            <Save className="w-4 h-4" />{__('general.save_changes')}</Button>
                     </div>
                 </form>
             </div>

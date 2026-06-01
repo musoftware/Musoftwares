@@ -87,23 +87,19 @@ export default function Index({ projects, clients, currentTab }) {
                     <Link
                         href={route('admin.projects.index', { status: 'active' })}
                         className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'active' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                    >
-                        Active Projects
-                    </Link>
+                    >{__('general.active_projects')}</Link>
                     <Link
                         href={route('admin.projects.index', { status: 'archived' })}
                         className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'archived' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                    >
-                        Archived Projects
-                    </Link>
+                    >{__('general.archived_projects')}</Link>
                 </div>
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
-                        <Button>Create Project</Button>
+                        <Button>{__('general.create_project')}</Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Create New Project</DialogTitle>
+                            <DialogTitle>{__('general.create_new_project')}</DialogTitle>
                         </DialogHeader>
                         <form onSubmit={handleCreateSubmit} className="space-y-4">
                             <div>
@@ -115,7 +111,7 @@ export default function Index({ projects, clients, currentTab }) {
                                     onChange={(e) => setFormData({ ...formData, user_id: e.target.value })}
                                     required
                                 >
-                                    <option value="">Select a client...</option>
+                                    <option value="">{__('general.select_a_client')}</option>
                                     {clients.map((client) => (
                                         <option key={client.id} value={client.id}>
                                             {client.name} ({client.email})
@@ -124,7 +120,7 @@ export default function Index({ projects, clients, currentTab }) {
                                 </select>
                             </div>
                             <div>
-                                <Label htmlFor="project_name">Project Name</Label>
+                                <Label htmlFor="project_name">{__('general.project_name')}</Label>
                                 <Input
                                     id="project_name"
                                     value={formData.project_name}
@@ -224,9 +220,7 @@ export default function Index({ projects, clients, currentTab }) {
                         ))}
                         {projects.length === 0 && (
                             <tr>
-                                <td colSpan="5" className="p-4 text-center text-gray-500">
-                                    No projects found.
-                                </td>
+                                <td colSpan="5" className="p-4 text-center text-gray-500">{__('general.no_projects_found')}</td>
                             </tr>
                         )}
                     </tbody>
@@ -237,11 +231,11 @@ export default function Index({ projects, clients, currentTab }) {
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit Project</DialogTitle>
+                        <DialogTitle>{__('general.edit_project')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleEditSubmit} className="space-y-4">
                         <div>
-                            <Label htmlFor="edit_name">Project Name</Label>
+                            <Label htmlFor="edit_name">{__('general.project_name')}</Label>
                             <Input
                                 id="edit_name"
                                 value={formData.project_name}
@@ -263,7 +257,7 @@ export default function Index({ projects, clients, currentTab }) {
                             <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button type="submit">Save Changes</Button>
+                            <Button type="submit">{__('general.save_changes')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

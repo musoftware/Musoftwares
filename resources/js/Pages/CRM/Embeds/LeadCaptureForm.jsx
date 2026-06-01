@@ -48,7 +48,7 @@ export default function LeadCaptureForm({ campaign, token, flash }) {
                             )}
 
                             <div className="space-y-2">
-                                <Label htmlFor="name" className="text-slate-700 font-medium">Full Name <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="name" className="text-slate-700 font-medium">{__('general.full_name')}<span className="text-red-500">*</span></Label>
                                 <Input
                                     id="name"
                                     name="name"
@@ -63,7 +63,7 @@ export default function LeadCaptureForm({ campaign, token, flash }) {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="email" className="text-slate-700 font-medium">Email Address <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="email" className="text-slate-700 font-medium">{__('general.email_address')}<span className="text-red-500">*</span></Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -78,7 +78,7 @@ export default function LeadCaptureForm({ campaign, token, flash }) {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="phone" className="text-slate-700 font-medium">Phone Number</Label>
+                                <Label htmlFor="phone" className="text-slate-700 font-medium">{__('general.phone_number')}</Label>
                                 <Input
                                     id="phone"
                                     name="phone"
@@ -112,8 +112,7 @@ export default function LeadCaptureForm({ campaign, token, flash }) {
                 </CardContent>
             </Card>
             <div className="mt-4 text-center">
-                <a href="https://musoftwares.com" target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-400 font-medium hover:text-slate-500 transition-colors uppercase tracking-widest flex items-center justify-center gap-1">
-                    Powered by <span className="font-bold">Musoftware</span>
+                <a href="https://musoftwares.com" target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-400 font-medium hover:text-slate-500 transition-colors uppercase tracking-widest flex items-center justify-center gap-1">{__('general.powered_by')}<span className="font-bold">Musoftware</span>
                 </a>
             </div>
         </div>

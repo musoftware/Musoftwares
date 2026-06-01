@@ -26,7 +26,7 @@ class AdminTransactionController extends Controller
         $type = $request->query('type', 'receive'); // Default type for the UI
 
         if (!$userId) {
-            return redirect()->route('admin.users.index')->with('danger', 'Please select a user to add a transaction.');
+            return redirect()->route('admin.users.index')->with('danger', __('general.please_select_a_user_to_add_a_transaction'));
         }
 
         $user = User::with('projects')->findOrFail($userId);
@@ -139,6 +139,6 @@ class AdminTransactionController extends Controller
 
         $this->transactionService->recalculateUserBalance($user, $project);
 
-        return redirect()->back()->with('success', 'Balances recalculated successfully.');
+        return redirect()->back()->with('success', __('general.balances_recalculated_successfully'));
     }
 }

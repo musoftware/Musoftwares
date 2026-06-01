@@ -26,7 +26,7 @@ class PublicBookingPageController extends Controller
         // This requires bypassing the auth() check and checking via the tenant ID directly.
         // Assuming `feature()` accepts an optional tenant_id as a second parameter in your architecture:
         if (!feature('booking-online-page', $data['tenant_id'])) {
-            abort(403, 'This booking page is currently unavailable.');
+            abort(403, __('general.this_booking_page_is_currently_unavailable'));
         }
 
         return response()->json($data);

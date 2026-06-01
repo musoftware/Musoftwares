@@ -89,7 +89,7 @@ function AdjustDialog({ user, onClose }: { user: UserRow; onClose: () => void })
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Current balance */}
                     <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-center">
-                        <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Current Balance</p>
+                        <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">{__('general.current_balance')}</p>
                         <p className="text-2xl font-bold text-slate-900">
                             {user.coins_balance.toLocaleString()}
                             <span className="ml-1 text-sm font-normal text-slate-400">pts</span>
@@ -109,14 +109,14 @@ function AdjustDialog({ user, onClose }: { user: UserRow; onClose: () => void })
                         <Input
                             id="adj-amount"
                             type="number"
-                            placeholder="e.g. 500 to add, -200 to deduct"
+                            placeholder={__('general.e_g_500_to_add_200_to_deduct')}
                             value={data.amount}
                             onChange={(e) => setData('amount', e.target.value)}
                             autoFocus
                             className={errors.amount ? 'border-red-500' : ''}
                         />
                         {errors.amount && <p className="text-xs text-red-500">{errors.amount}</p>}
-                        <p className="text-xs text-slate-400">Positive = add · Negative = deduct</p>
+                        <p className="text-xs text-slate-400">{__('general.positive_add_negative_deduct')}</p>
                     </div>
 
                     {/* Reason */}
@@ -124,7 +124,7 @@ function AdjustDialog({ user, onClose }: { user: UserRow; onClose: () => void })
                         <Label htmlFor="adj-reason">Reason</Label>
                         <Input
                             id="adj-reason"
-                            placeholder="e.g. Bonus for referral campaign"
+                            placeholder={__('general.e_g_bonus_for_referral_campaign')}
                             value={data.reason}
                             onChange={(e) => setData('reason', e.target.value)}
                             className={errors.reason ? 'border-red-500' : ''}
@@ -188,21 +188,15 @@ function HistoryDialog({ user, onClose }: { user: UserRow; onClose: () => void }
                             Loading history…
                         </div>
                     ) : error ? (
-                        <div className="flex items-center justify-center py-12 text-red-500 text-sm">
-                            Failed to load history.
-                        </div>
+                        <div className="flex items-center justify-center py-12 text-red-500 text-sm">{__('general.failed_to_load_history')}</div>
                     ) : entries.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 text-slate-400 text-sm gap-2">
-                            <History className="h-8 w-8 opacity-30" />
-                            No points history found.
-                        </div>
+                            <History className="h-8 w-8 opacity-30" />{__('general.no_points_history_found')}</div>
                     ) : (
                         <table className="w-full text-left text-[13px]">
                             <thead className="sticky top-0 bg-slate-50 border-b border-slate-200">
                                 <tr>
-                                    <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                                        Action / Label
-                                    </th>
+                                    <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{__('general.action_label')}</th>
                                     <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 text-center">
                                         Points
                                     </th>
@@ -274,17 +268,15 @@ export default function Index({ users, search }: Props) {
     const rows = users?.data ?? [];
 
     return (
-        <AdminSidebarLayout title="Points Control" header="Points Control">
-            <Head title="Points Control" />
+        <AdminSidebarLayout title={__('general.points_control')} header="Points Control">
+            <Head title={__('general.points_control')} />
 
             <div className="space-y-6">
                 {/* Page Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-xl font-semibold text-slate-900">Points Control</h1>
-                        <p className="text-sm text-slate-500 mt-0.5">
-                            View and adjust user points balances across the platform.
-                        </p>
+                        <h1 className="text-xl font-semibold text-slate-900">{__('general.points_control')}</h1>
+                        <p className="text-sm text-slate-500 mt-0.5">{__('general.view_and_adjust_user_points_balances_across_the_platform')}</p>
                     </div>
                     <div className="flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5">
                         <Coins className="h-4 w-4 text-amber-500" />
@@ -300,7 +292,7 @@ export default function Index({ users, search }: Props) {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                         <Input
                             type="text"
-                            placeholder="Search by name or email…"
+                            placeholder={__('general.search_by_name_or_email')}
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
                             className="pl-9 pr-8"
@@ -328,9 +320,7 @@ export default function Index({ users, search }: Props) {
                                 <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                                     User
                                 </th>
-                                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                                    Points Balance
-                                </th>
+                                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{__('general.points_balance')}</th>
                                 <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 text-right">
                                     Actions
                                 </th>

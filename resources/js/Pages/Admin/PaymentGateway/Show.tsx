@@ -250,14 +250,10 @@ export default function Show({ client, payments, stats }: Props) {
                 </div>
                 <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={() => setIsDocsOpen(true)}>
-                        <Code className="h-4 w-4 mr-1" /> Integration Docs
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => setIsEditOpen(true)}>
-                        Edit Client
-                    </Button>
+                        <Code className="h-4 w-4 mr-1" />{__('general.integration_docs')}</Button>
+                    <Button variant="outline" size="sm" onClick={() => setIsEditOpen(true)}>{__('general.edit_client')}</Button>
                     <Button variant="destructive" size="sm" onClick={() => setIsRegenOpen(true)}>
-                        <RefreshCw className="h-4 w-4 mr-1" /> Regenerate Secrets
-                    </Button>
+                        <RefreshCw className="h-4 w-4 mr-1" />{__('general.regenerate_secrets')}</Button>
                 </div>
             </div>
 
@@ -265,7 +261,7 @@ export default function Show({ client, payments, stats }: Props) {
             <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
                 <StatCard
                     icon={DollarSign}
-                    label="Total Volume"
+                    label={__('general.total_volume')}
                     value={formatCurrency(stats.total_volume, 'EGP')}
                     sub={`${stats.successful_count} successful payments`}
                 />
@@ -277,7 +273,7 @@ export default function Show({ client, payments, stats }: Props) {
                 />
                 <StatCard
                     icon={CreditCard}
-                    label="Client Net (60%)"
+                    label={__('general.client_net_60')}
                     value={formatCurrency(stats.total_net, 'EGP')}
                 />
                 <StatCard
@@ -290,26 +286,24 @@ export default function Show({ client, payments, stats }: Props) {
 
             {/* ── Credentials Card ──────────────────────────────────────── */}
             <div className="mb-6 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-                <h2 className="mb-4 text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                    API Credentials
-                </h2>
+                <h2 className="mb-4 text-sm font-semibold text-gray-700 uppercase tracking-wider">{__('general.api_credentials')}</h2>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <SecretField
-                        label="Client ID"
+                        label={__('general.client_id')}
                         value={client.client_id}
                         copyKey="client_id"
                         copied={copied}
                         onCopy={copy}
                     />
                     <SecretField
-                        label="Client Secret"
+                        label={__('general.client_secret')}
                         value={client.client_secret}
                         copyKey="client_secret"
                         copied={copied}
                         onCopy={copy}
                     />
                     <SecretField
-                        label="Webhook Secret"
+                        label={__('general.webhook_secret')}
                         value={client.webhook_secret}
                         copyKey="webhook_secret"
                         copied={copied}
@@ -318,25 +312,23 @@ export default function Show({ client, payments, stats }: Props) {
                 </div>
                 <div className="mt-4 rounded-lg bg-amber-50 border border-amber-200 p-3 flex items-start gap-2">
                     <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                    <p className="text-xs text-amber-700">
-                        Keep these secrets confidential. Use the webhook secret to verify incoming payment notifications from Musoftware.
-                    </p>
+                    <p className="text-xs text-amber-700">{__('general.keep_these_secrets_confidential_use_the_webhook_secret_to_verify_incoming_payment_notifications_from_musoftware')}</p>
                 </div>
             </div>
 
             {/* ── Payments Table ────────────────────────────────────────── */}
             <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
                 <div className="border-b bg-gray-50 px-5 py-3">
-                    <h2 className="text-sm font-semibold text-gray-700">Payment History</h2>
+                    <h2 className="text-sm font-semibold text-gray-700">{__('general.payment_history')}</h2>
                 </div>
                 <table className="w-full text-left text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
-                            <th className="p-4 font-medium text-gray-600">Order ID</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.order_id')}</th>
                             <th className="p-4 font-medium text-gray-600">Customer</th>
                             <th className="p-4 font-medium text-gray-600">Amount</th>
                             <th className="p-4 font-medium text-gray-600">Commission</th>
-                            <th className="p-4 font-medium text-gray-600">Net to Client</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.net_to_client')}</th>
                             <th className="p-4 font-medium text-gray-600">Status</th>
                             <th className="p-4 font-medium text-gray-600">Date</th>
                         </tr>
@@ -374,9 +366,7 @@ export default function Show({ client, payments, stats }: Props) {
                         ))}
                         {items.length === 0 && (
                             <tr>
-                                <td colSpan={7} className="p-10 text-center text-gray-400">
-                                    No payments yet for this client.
-                                </td>
+                                <td colSpan={7} className="p-10 text-center text-gray-400">{__('general.no_payments_yet_for_this_client')}</td>
                             </tr>
                         )}
                     </tbody>
@@ -405,7 +395,7 @@ export default function Show({ client, payments, stats }: Props) {
             {/* ── Edit Modal ────────────────────────────────────────────── */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent className="max-w-md">
-                    <DialogHeader><DialogTitle>Edit Client</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle>{__('general.edit_client')}</DialogTitle></DialogHeader>
                     <form onSubmit={handleEdit}>
                         <div className="space-y-4 py-2">
                             <div>
@@ -438,7 +428,7 @@ export default function Show({ client, payments, stats }: Props) {
                                 </div>
                             </div>
                             <div>
-                                <Label>Allowed IPs</Label>
+                                <Label>{__('general.allowed_ips')}</Label>
                                 <Input
                                     value={editForm.allowed_ips}
                                     onChange={e => setEdit('allowed_ips', e.target.value)}
@@ -448,7 +438,7 @@ export default function Show({ client, payments, stats }: Props) {
                         </div>
                         <DialogFooter className="mt-6">
                             <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-                            <Button type="submit">Save Changes</Button>
+                            <Button type="submit">{__('general.save_changes')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -457,12 +447,11 @@ export default function Show({ client, payments, stats }: Props) {
             {/* ── Regenerate Secrets Confirm ────────────────────────────── */}
             <Dialog open={isRegenOpen} onOpenChange={setIsRegenOpen}>
                 <DialogContent className="max-w-sm">
-                    <DialogHeader><DialogTitle>Regenerate API Secrets?</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle>{__('general.regenerate_api_secrets')}</DialogTitle></DialogHeader>
                     <div className="py-2">
                         <div className="rounded-lg bg-red-50 border border-red-200 p-3 flex items-start gap-2">
                             <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-                            <p className="text-sm text-red-700">
-                                The current <strong>client_secret</strong> and <strong>webhook_secret</strong> will be invalidated immediately.
+                            <p className="text-sm text-red-700">{__('general.the_current')}<strong>client_secret</strong> and <strong>webhook_secret</strong> will be invalidated immediately.
                                 You must update your integration code with the new credentials.
                             </p>
                         </div>
@@ -470,8 +459,7 @@ export default function Show({ client, payments, stats }: Props) {
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsRegenOpen(false)}>Cancel</Button>
                         <Button variant="destructive" onClick={handleRegenerate}>
-                            <RefreshCw className="h-4 w-4 mr-1" /> Yes, Regenerate
-                        </Button>
+                            <RefreshCw className="h-4 w-4 mr-1" />{__('general.yes_regenerate')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

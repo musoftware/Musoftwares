@@ -66,25 +66,24 @@ export default function Edit({ income, currencies, categories }) {
     const yearDaysList = getYearDaysList();
 
     return (
-        <AdminSidebarLayout title="Edit Recurring Income" header="Business Operations">
-            <Head title="Edit Recurring Income" />
+        <AdminSidebarLayout title={__('general.edit_recurring_income')} header="Business Operations">
+            <Head title={__('general.edit_recurring_income')} />
 
             <div className="mb-4">
                 <Link href={route('admin.recurring_income.index')} className="text-sm text-gray-500 hover:text-black flex items-center gap-1">
-                    <ArrowLeft className="w-4 h-4" /> Back to Recurring Income
-                </Link>
+                    <ArrowLeft className="w-4 h-4" />{__('general.back_to_recurring_income')}</Link>
             </div>
 
             <div className="bg-white border rounded-xl shadow-sm max-w-2xl overflow-hidden">
                 <div className="border-b px-6 py-4 bg-slate-50">
-                    <h2 className="text-lg font-bold text-slate-900">Edit Recurring Income Details</h2>
-                    <p className="text-sm text-gray-500 mt-0.5">Modify the parameters for this recurring automated revenue.</p>
+                    <h2 className="text-lg font-bold text-slate-900">{__('general.edit_recurring_income_details')}</h2>
+                    <p className="text-sm text-gray-500 mt-0.5">{__('general.modify_the_parameters_for_this_recurring_automated_revenue')}</p>
                 </div>
 
                 <form onSubmit={handleUpdate} className="p-6 space-y-6">
                     <div className="space-y-2">
-                        <Label htmlFor="title">Title / Description</Label>
-                        <Input id="title" required value={editIncome.title} onChange={e => setEditIncome({...editIncome, title: e.target.value})} placeholder="e.g. Monthly SaaS Subscription" />
+                        <Label htmlFor="title">{__('general.title_description')}</Label>
+                        <Input id="title" required value={editIncome.title} onChange={e => setEditIncome({...editIncome, title: e.target.value})} placeholder={__('general.e_g_monthly_saas_subscription')} />
                         {errors.title && <span className="text-red-600 text-xs block">{errors.title}</span>}
                     </div>
 
@@ -103,7 +102,7 @@ export default function Edit({ income, currencies, categories }) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Category / Reason</Label>
+                        <Label>{__('general.category_reason')}</Label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={reasonOption} onChange={e => {
                                 setReasonOption(e.target.value);
@@ -118,14 +117,14 @@ export default function Edit({ income, currencies, categories }) {
                                 <option value="custom">-- Custom Reason --</option>
                             </select>
                             {reasonOption === 'custom' && (
-                                <Input required placeholder="Specify reason..." value={editIncome.custom_reason} onChange={e => setEditIncome({...editIncome, custom_reason: e.target.value})} />
+                                <Input required placeholder={__('general.specify_reason')} value={editIncome.custom_reason} onChange={e => setEditIncome({...editIncome, custom_reason: e.target.value})} />
                             )}
                         </div>
                         {errors.reason_choice && <span className="text-red-600 text-xs block">{errors.reason_choice}</span>}
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="start_date">Start Date</Label>
+                        <Label htmlFor="start_date">{__('general.start_date')}</Label>
                         <Input id="start_date" type="date" required value={editIncome.start_date} onChange={e => setEditIncome({...editIncome, start_date: e.target.value})} />
                         {errors.start_date && <span className="text-red-600 text-xs block">{errors.start_date}</span>}
                     </div>
@@ -152,7 +151,7 @@ export default function Edit({ income, currencies, categories }) {
 
                     {editIncome.recurring === 'week' && (
                         <div className="space-y-2">
-                            <Label htmlFor="week-days">Specific Week Days</Label>
+                            <Label htmlFor="week-days">{__('general.specific_week_days')}</Label>
                             <select
                                 id="week-days"
                                 multiple
@@ -171,7 +170,7 @@ export default function Edit({ income, currencies, categories }) {
 
                     {editIncome.recurring === 'month' && (
                         <div className="space-y-2">
-                            <Label htmlFor="month-days">Specific Month Days</Label>
+                            <Label htmlFor="month-days">{__('general.specific_month_days')}</Label>
                             <select
                                 id="month-days"
                                 multiple
@@ -190,7 +189,7 @@ export default function Edit({ income, currencies, categories }) {
 
                     {editIncome.recurring === 'year' && (
                         <div className="space-y-2">
-                            <Label htmlFor="year-days">Specific Year Dates</Label>
+                            <Label htmlFor="year-days">{__('general.specific_year_dates')}</Label>
                             <select
                                 id="year-days"
                                 multiple
@@ -209,8 +208,7 @@ export default function Edit({ income, currencies, categories }) {
 
                     <div className="flex gap-4 pt-4 border-t">
                         <Button type="submit" className="bg-black hover:bg-slate-800 text-white flex items-center gap-2">
-                            <Save className="w-4 h-4" /> Save Changes
-                        </Button>
+                            <Save className="w-4 h-4" />{__('general.save_changes')}</Button>
                         <Link href={route('admin.recurring_income.index')}>
                             <Button type="button" variant="outline">Cancel</Button>
                         </Link>

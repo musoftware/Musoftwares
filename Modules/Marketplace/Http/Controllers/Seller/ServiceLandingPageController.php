@@ -145,7 +145,7 @@ class ServiceLandingPageController extends Controller
         ]);
 
         return redirect()->route('services.landing-page.edit', $service)
-            ->with('success', 'Landing page created successfully!');
+            ->with('success', __('general.landing_page_created_successfully'));
     }
 
     public function edit(Service $service, ?ServiceLandingPage $landingPage = null)
@@ -432,7 +432,7 @@ class ServiceLandingPageController extends Controller
                 'service' => $service,
                 'landingPage' => $landingPage->id
             ])
-            ->with('success', 'Landing page updated successfully!');
+            ->with('success', __('general.landing_page_updated_successfully'));
     }
 
     public function duplicate(ServiceLandingPage $landingPage)
@@ -487,7 +487,7 @@ class ServiceLandingPageController extends Controller
         }
 
         return redirect()->route('services.landing-page.edit', ['service' => $landingPage->service, 'landingPage' => $newVariant])
-            ->with('success', "Variant {$nextVariantName} created successfully! You can now edit it.");
+            ->with('success', __('general.variant_nextvariantname_created_successfully_you_can_now_edit_it'));
     }
 
     /**

@@ -198,7 +198,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
     const applyBulkAction = () => {
         if (selectedIds.length === 0) return;
         if (!bulkAction) {
-            alert(__('Please select a bulk action first.'));
+            alert(__('general.please_select_a_bulk_action_first'));
             return;
         }
 
@@ -239,12 +239,12 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
     /* ── Stats cards ─────────────────────────────────────────────── */
 
     const statsCards = [
-        { label: __('Total Devices'), value: stats.total, onClick: () => clearFilters() },
+        { label: __('general.total_devices'), value: stats.total, onClick: () => clearFilters() },
         { label: __('Active'), value: stats.active, className: 'text-green-600', onClick: () => applyFilter('status', 'active') },
         { label: __('Inactive'), value: stats.inactive, className: 'text-muted-foreground', onClick: () => applyFilter('status', 'inactive') },
-        { label: __('Blocked'), value: stats.blocked, className: 'text-red-600', onClick: () => applyFilter('status', 'blocked') },
-        { label: __('Checked-in Today'), value: stats.checked_in_today, onClick: () => {} },
-        { label: __('New This Week'), value: stats.new_this_week, onClick: () => {} },
+        { label: __('general.blocked'), value: stats.blocked, className: 'text-red-600', onClick: () => applyFilter('status', 'blocked') },
+        { label: __('general.checked_in_today'), value: stats.checked_in_today, onClick: () => {} },
+        { label: __('general.new_this_week'), value: stats.new_this_week, onClick: () => {} },
     ];
 
     /* ── Reports: devices per software ───────────────────────────── */
@@ -254,21 +254,21 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
     /* ── Render ──────────────────────────────────────────────────── */
 
     return (
-        <AdminSidebarLayout title={__('Serial Devices')} header={__('Serial Devices')}>
-            <Head title={__('Serial Devices')} />
+        <AdminSidebarLayout title={__('general.serial_devices')} header={__('general.serial_devices')}>
+            <Head title={__('general.serial_devices')} />
 
             <div className="p-4 md:p-6 space-y-6">
 
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">{__('Serial Devices')}</h1>
-                        <p className="text-muted-foreground text-sm mt-0.5">{__('All registered client machines')}</p>
+                        <h1 className="text-2xl font-bold tracking-tight">{__('general.serial_devices')}</h1>
+                        <p className="text-muted-foreground text-sm mt-0.5">{__('general.all_registered_client_machines')}</p>
                     </div>
                     <a href={exportUrl} className="inline-flex">
                         <Button variant="outline" size="sm">
                             <Download className="w-4 h-4 mr-1.5" />
-                            {__('Export CSV')}
+                            {__('general.export_csv')}
                         </Button>
                     </a>
                 </div>
@@ -298,7 +298,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                             className="pl-9"
-                            placeholder={__('Device ID or machine name...')}
+                            placeholder={__('general.device_id_or_machine_name')}
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && applyFilter('search', search)}
@@ -321,7 +321,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                             <SelectValue placeholder={__('Status')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">{__('All Statuses')}</SelectItem>
+                            <SelectItem value="all">{__('general.all_statuses')}</SelectItem>
                             {statuses.map(s => (
                                 <SelectItem key={s} value={s} className="capitalize">{__(s.charAt(0).toUpperCase() + s.slice(1))}</SelectItem>
                             ))}
@@ -330,10 +330,10 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     {/* Software */}
                     <Select onValueChange={v => applyFilter('software_id', v || null)} value={String(filters.software_id ?? '')}>
                         <SelectTrigger className="w-48">
-                            <SelectValue placeholder={__('All Software')} />
+                            <SelectValue placeholder={__('general.all_software')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">{__('All Software')}</SelectItem>
+                            <SelectItem value="">{__('general.all_software')}</SelectItem>
                             {softwares.map(sw => (
                                 <SelectItem key={sw.id} value={String(sw.id)}>{sw.name}</SelectItem>
                             ))}
@@ -346,7 +346,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                         </SelectTrigger>
                         <SelectContent>
                             {perPageOptions.map(n => (
-                                <SelectItem key={n} value={String(n)}>{n} / {__('page')}</SelectItem>
+                                <SelectItem key={n} value={String(n)}>{n} / {__('general.page')}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
@@ -354,7 +354,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     {/* Toggle advanced */}
                     <Button variant="outline" size="sm" onClick={() => setShowAdvanced(p => !p)} className="gap-1.5">
                         <Filter className="w-3.5 h-3.5" />
-                        {showAdvanced ? __('Hide Filters') : __('More Filters')}
+                        {showAdvanced ? __('general.hide_filters') : __('general.more_filters')}
                     </Button>
 
                     {/* Clear filters */}
@@ -371,7 +371,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 border rounded-lg bg-muted/30">
                         {/* Date From */}
                         <div>
-                            <label className="text-xs text-muted-foreground mb-1 block">{__('Registered From')}</label>
+                            <label className="text-xs text-muted-foreground mb-1 block">{__('general.registered_from')}</label>
                             <input
                                 type="date"
                                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -381,7 +381,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                         </div>
                         {/* Date To */}
                         <div>
-                            <label className="text-xs text-muted-foreground mb-1 block">{__('Registered To')}</label>
+                            <label className="text-xs text-muted-foreground mb-1 block">{__('general.registered_to')}</label>
                             <input
                                 type="date"
                                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -391,7 +391,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                         </div>
                         {/* Last Check From */}
                         <div>
-                            <label className="text-xs text-muted-foreground mb-1 block">{__('Last Check From')}</label>
+                            <label className="text-xs text-muted-foreground mb-1 block">{__('general.last_check_from')}</label>
                             <input
                                 type="date"
                                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -401,7 +401,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                         </div>
                         {/* Last Check To */}
                         <div>
-                            <label className="text-xs text-muted-foreground mb-1 block">{__('Last Check To')}</label>
+                            <label className="text-xs text-muted-foreground mb-1 block">{__('general.last_check_to')}</label>
                             <input
                                 type="date"
                                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -411,7 +411,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                         </div>
                         {/* OS Version */}
                         <div>
-                            <label className="text-xs text-muted-foreground mb-1 block">{__('OS Version')}</label>
+                            <label className="text-xs text-muted-foreground mb-1 block">{__('general.os_version')}</label>
                             <Select onValueChange={v => applyFilter('os_version', v || null)} value={filters.os_version ?? ''}>
                                 <SelectTrigger>
                                     <SelectValue placeholder={__('All')} />
@@ -426,28 +426,28 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                         </div>
                         {/* 64-bit */}
                         <div>
-                            <label className="text-xs text-muted-foreground mb-1 block">{__('64-bit OS')}</label>
+                            <label className="text-xs text-muted-foreground mb-1 block">{__('general.64_bit_os')}</label>
                             <Select onValueChange={v => applyFilter('is_64bit', v || null)} value={filters.is_64bit !== undefined && filters.is_64bit !== null && filters.is_64bit !== '' ? String(filters.is_64bit) : ''}>
                                 <SelectTrigger>
                                     <SelectValue placeholder={__('All')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="">{__('All')}</SelectItem>
-                                    <SelectItem value="1">{__('Yes')}</SelectItem>
+                                    <SelectItem value="1">{__('general.yes')}</SelectItem>
                                     <SelectItem value="0">{__('No')}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                         {/* Has Linked User */}
                         <div>
-                            <label className="text-xs text-muted-foreground mb-1 block">{__('Has Linked User')}</label>
+                            <label className="text-xs text-muted-foreground mb-1 block">{__('general.has_linked_user')}</label>
                             <Select onValueChange={v => applyFilter('has_user', v || null)} value={filters.has_user ?? ''}>
                                 <SelectTrigger>
                                     <SelectValue placeholder={__('All')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="">{__('All')}</SelectItem>
-                                    <SelectItem value="yes">{__('Yes')}</SelectItem>
+                                    <SelectItem value="yes">{__('general.yes')}</SelectItem>
                                     <SelectItem value="no">{__('No')}</SelectItem>
                                 </SelectContent>
                             </Select>
@@ -470,11 +470,11 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                 className="rounded border-muted-foreground/30"
                                             />
                                         </TableHead>
-                                        <SortTh column="device_id">{__('Device ID')}</SortTh>
-                                        <SortTh column="machine_name">{__('Machine')}</SortTh>
+                                        <SortTh column="device_id">{__('general.device_id')}</SortTh>
+                                        <SortTh column="machine_name">{__('general.machine')}</SortTh>
                                         <SortTh column="user_name">{__('User')}</SortTh>
-                                        <SortTh column="serial_software_id">{__('Software')}</SortTh>
-                                        <SortTh column="last_check_date">{__('Last Check')}</SortTh>
+                                        <SortTh column="serial_software_id">{__('general.software')}</SortTh>
+                                        <SortTh column="last_check_date">{__('general.last_check')}</SortTh>
                                         <SortTh column="status">{__('Status')}</SortTh>
                                         <TableHead className="text-right w-12">{__('Actions')}</TableHead>
                                     </TableRow>
@@ -483,7 +483,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                     {devices.data.length === 0 && (
                                         <TableRow>
                                             <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
-                                                {__('No devices found.')}
+                                                {__('general.no_devices_found')}
                                             </TableCell>
                                         </TableRow>
                                     )}
@@ -540,22 +540,22 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                     <DropdownMenuContent align="end" side="bottom">
                                                         <DropdownMenuItem onClick={() => setDetail(device)}>
                                                             <Monitor className="w-4 h-4 mr-2" />
-                                                            {__('View Details')}
+                                                            {__('general.view_details')}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuSeparator />
                                                         {device.status !== 'active' && (
                                                             <DropdownMenuItem onClick={() => updateStatus(device, 'active')}>
-                                                                {__('Set Active')}
+                                                                {__('general.set_active')}
                                                             </DropdownMenuItem>
                                                         )}
                                                         {device.status !== 'inactive' && (
                                                             <DropdownMenuItem onClick={() => updateStatus(device, 'inactive')}>
-                                                                {__('Set Inactive')}
+                                                                {__('general.set_inactive')}
                                                             </DropdownMenuItem>
                                                         )}
                                                         {device.status !== 'blocked' && (
                                                             <DropdownMenuItem onClick={() => updateStatus(device, 'blocked')}>
-                                                                {__('Set Blocked')}
+                                                                {__('general.set_blocked')}
                                                             </DropdownMenuItem>
                                                         )}
                                                         <DropdownMenuSeparator />
@@ -590,13 +590,13 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                 <div className="w-48">
                                     <Select value={bulkAction} onValueChange={(val) => setBulkAction(val)}>
                                         <SelectTrigger className="h-9">
-                                            <SelectValue placeholder={__('Bulk Actions')} />
+                                            <SelectValue placeholder={__('general.bulk_actions')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="active">{__('Set Active')}</SelectItem>
-                                            <SelectItem value="inactive">{__('Set Inactive')}</SelectItem>
-                                            <SelectItem value="blocked">{__('Set Blocked')}</SelectItem>
-                                            <SelectItem value="delete" className="text-red-600 focus:text-red-600 focus:bg-red-50">{__('Delete Selected')}</SelectItem>
+                                            <SelectItem value="active">{__('general.set_active')}</SelectItem>
+                                            <SelectItem value="inactive">{__('general.set_inactive')}</SelectItem>
+                                            <SelectItem value="blocked">{__('general.set_blocked')}</SelectItem>
+                                            <SelectItem value="delete" className="text-red-600 focus:text-red-600 focus:bg-red-50">{__('general.delete_selected')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -604,7 +604,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                     {__('Apply')}
                                 </Button>
                                 <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={() => { setSelectedIds([]); setBulkAction(''); }}>
-                                    {__('Deselect All')}
+                                    {__('general.deselect_all')}
                                 </Button>
                             </div>
                         )}
@@ -625,7 +625,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     >
                         <span className="flex items-center gap-2">
                             <BarChart3 className="w-4 h-4" />
-                            {__('Devices per Software')}
+                            {__('general.devices_per_software')}
                         </span>
                         <ChevronRight className={`w-4 h-4 transition-transform ${showReports ? 'rotate-90' : ''}`} />
                     </button>
@@ -633,7 +633,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                         <div className="px-4 pb-4 space-y-2">
                             <Separator />
                             {stats.devices_per_software.length === 0 && (
-                                <p className="text-sm text-muted-foreground py-2">{__('No data available.')}</p>
+                                <p className="text-sm text-muted-foreground py-2">{__('general.no_data_available')}</p>
                             )}
                             {stats.devices_per_software.map(sw => (
                                 <div key={sw.id} className="flex items-center gap-3">
@@ -658,36 +658,36 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Monitor className="w-4 h-4" />
-                            {__('Device Details')}
+                            {__('general.device_details')}
                         </DialogTitle>
                     </DialogHeader>
                     {detail && (
                         <div className="mt-6 space-y-4 text-sm">
-                            <Row label={__('Device ID')}    value={<span className="font-mono text-xs">{detail.device_id}</span>} />
-                            <Row label={__('Machine Name')} value={detail.machine_name} />
-                            <Row label={__('User Name')}    value={detail.user_name} />
-                            <Row label={__('User Domain')}  value={detail.user_domain} />
-                            <Row label={__('Software')}     value={detail.software?.name ?? '—'} />
+                            <Row label={__('general.device_id')}    value={<span className="font-mono text-xs">{detail.device_id}</span>} />
+                            <Row label={__('general.machine_name')} value={detail.machine_name} />
+                            <Row label={__('general.user_name')}    value={detail.user_name} />
+                            <Row label={__('general.user_domain')}  value={detail.user_domain} />
+                            <Row label={__('general.software')}     value={detail.software?.name ?? '—'} />
                             <Row label={__('Status')} value={
                                 <Badge variant={statusVariant[detail.status] ?? 'outline'} className="capitalize text-xs">
                                     {__(detail.status.charAt(0).toUpperCase() + detail.status.slice(1))}
                                 </Badge>
                             } />
                             <Separator />
-                            <Row label={__('OS Version')}     value={detail.os_version ?? '—'} />
-                            <Row label={__('Framework')}      value={detail.framework_version ?? '—'} />
-                            <Row label={__('64-bit OS')}      value={detail.is_64bit_os == null ? '—' : detail.is_64bit_os ? __('Yes') : __('No')} />
-                            <Row label={__('64-bit Process')} value={detail.is_64bit_process == null ? '—' : detail.is_64bit_process ? __('Yes') : __('No')} />
-                            <Row label={__('Culture')}        value={detail.current_culture ?? '—'} />
-                            <Row label={__('UI Culture')}     value={detail.current_ui_culture ?? '—'} />
-                            <Row label={__('Directory')}      value={<span className="font-mono text-xs break-all">{detail.current_directory ?? '—'}</span>} />
+                            <Row label={__('general.os_version')}     value={detail.os_version ?? '—'} />
+                            <Row label={__('general.framework')}      value={detail.framework_version ?? '—'} />
+                            <Row label={__('general.64_bit_os')}      value={detail.is_64bit_os == null ? '—' : detail.is_64bit_os ? __('general.yes') : __('No')} />
+                            <Row label={__('general.64_bit_process')} value={detail.is_64bit_process == null ? '—' : detail.is_64bit_process ? __('general.yes') : __('No')} />
+                            <Row label={__('general.culture')}        value={detail.current_culture ?? '—'} />
+                            <Row label={__('general.ui_culture')}     value={detail.current_ui_culture ?? '—'} />
+                            <Row label={__('general.directory')}      value={<span className="font-mono text-xs break-all">{detail.current_directory ?? '—'}</span>} />
                             <Separator />
-                            <Row label={__('Last Check')}  value={detail.last_check_date_full ?? '—'} />
-                            <Row label={__('Registered')}  value={detail.created_at ?? '—'} />
+                            <Row label={__('general.last_check')}  value={detail.last_check_date_full ?? '—'} />
+                            <Row label={__('general.registered')}  value={detail.created_at ?? '—'} />
                             {detail.userDeviceAssignment?.user && (
                                 <>
                                     <Separator />
-                                    <Row label={__('Linked User')} value={
+                                    <Row label={__('general.linked_user')} value={
                                         <Link
                                             href={route('admin.users.show', detail.userDeviceAssignment.user.id)}
                                             className="text-blue-600 hover:underline"
@@ -706,10 +706,10 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
             <Dialog open={deleteConfirmId !== null} onOpenChange={open => !open && setDeleteConfirmId(null)}>
                 <DialogContent className="sm:max-w-sm">
                     <DialogHeader>
-                        <DialogTitle>{__('Confirm Delete')}</DialogTitle>
+                        <DialogTitle>{__('general.confirm_delete')}</DialogTitle>
                     </DialogHeader>
                     <p className="text-sm text-muted-foreground mt-2">
-                        {__('Are you sure you want to delete this device? This action cannot be undone.')}
+                        {__('general.are_you_sure_you_want_to_delete_this_device_this_action_cannot_be_undone')}
                     </p>
                     <div className="flex justify-end gap-2 mt-4">
                         <Button variant="outline" size="sm" onClick={() => setDeleteConfirmId(null)}>
@@ -733,7 +733,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
             <Dialog open={bulkDeleteConfirm} onOpenChange={open => !open && setBulkDeleteConfirm(false)}>
                 <DialogContent className="sm:max-w-sm">
                     <DialogHeader>
-                        <DialogTitle>{__('Confirm Bulk Delete')}</DialogTitle>
+                        <DialogTitle>{__('general.confirm_bulk_delete')}</DialogTitle>
                     </DialogHeader>
                     <p className="text-sm text-muted-foreground mt-2">
                         {__('Are you sure you want to delete :count device(s)? This action cannot be undone.', { count: String(selectedIds.length) })}
@@ -743,7 +743,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                             {__('Cancel')}
                         </Button>
                         <Button variant="destructive" size="sm" onClick={bulkDelete}>
-                            {__('Delete All')}
+                            {__('general.delete_all')}
                         </Button>
                     </div>
                 </DialogContent>

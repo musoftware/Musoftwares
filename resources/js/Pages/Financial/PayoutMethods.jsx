@@ -74,17 +74,16 @@ export default function PayoutMethods({ payoutMethods }) {
 
     return (
         <AuthenticatedLayout header="Payout Methods">
-            <Head title="Payout Methods" />
+            <Head title={__('general.payout_methods')} />
 
             <div className="max-w-[1000px] mx-auto px-4 py-8 space-y-8">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-foreground">Stored Payout Methods</h1>
-                        <p className="text-sm text-muted-foreground mt-1">Manage destination accounts for withdrawing earned funds.</p>
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground">{__('general.stored_payout_methods')}</h1>
+                        <p className="text-sm text-muted-foreground mt-1">{__('general.manage_destination_accounts_for_withdrawing_earned_funds')}</p>
                     </div>
                     <Button onClick={() => { setEditingMethod(null); reset(); setIsCreating(true); }} className="shadow-none">
-                        <Plus className="w-4 h-4 mr-2" /> Add New Method
-                    </Button>
+                        <Plus className="w-4 h-4 mr-2" />{__('general.add_new_method')}</Button>
                 </div>
 
                 {(!payoutMethods || payoutMethods.length === 0) ? (
@@ -93,13 +92,10 @@ export default function PayoutMethods({ payoutMethods }) {
                             <div className="w-16 h-16 bg-muted flex items-center justify-center rounded-2xl mb-4">
                                 <CreditCard className="w-8 h-8 text-muted-foreground" />
                             </div>
-                            <h3 className="text-lg font-semibold text-foreground">No payout methods configured</h3>
-                            <p className="text-sm text-muted-foreground max-w-md mx-auto mt-2 mb-6 leading-relaxed">
-                                Add a bank account, PayPal, Vodafone Cash, or InstaPay to enable fast, secure withdrawals from your earned balance.
-                            </p>
+                            <h3 className="text-lg font-semibold text-foreground">{__('general.no_payout_methods_configured')}</h3>
+                            <p className="text-sm text-muted-foreground max-w-md mx-auto mt-2 mb-6 leading-relaxed">{__('general.add_a_bank_account_paypal_vodafone_cash_or_instapay_to_enable_fast_secure_withdrawals_from_your_earned_balance')}</p>
                             <Button onClick={() => { setEditingMethod(null); reset(); setIsCreating(true); }} className="shadow-none">
-                                <Plus className="w-4 h-4 mr-2" /> Setup Payout Method
-                            </Button>
+                                <Plus className="w-4 h-4 mr-2" />{__('general.setup_payout_method')}</Button>
                         </CardContent>
                     </Card>
                 ) : (
@@ -160,7 +156,7 @@ export default function PayoutMethods({ payoutMethods }) {
                                             size="icon"
                                             onClick={() => openEdit(pm)}
                                             className="h-8 w-8 text-muted-foreground hover:text-primary"
-                                            title="Edit method"
+                                            title={__('general.edit_method')}
                                         >
                                             <Edit2 className="w-4 h-4" />
                                         </Button>
@@ -169,7 +165,7 @@ export default function PayoutMethods({ payoutMethods }) {
                                             size="icon"
                                             onClick={() => handleDelete(pm.id)}
                                             className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                            title="Delete method"
+                                            title={__('general.delete_method')}
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </Button>
@@ -324,7 +320,7 @@ export default function PayoutMethods({ payoutMethods }) {
                                     onChange={(e) => setData('is_default', e.target.checked)}
                                     className="rounded border-border text-primary shadow-sm focus:ring-primary/20 w-5 h-5 bg-background"
                                 />
-                                <span className="text-sm font-semibold text-foreground">Set as default payout method</span>
+                                <span className="text-sm font-semibold text-foreground">{__('general.set_as_default_payout_method')}</span>
                             </label>
 
                             <div className="flex items-center justify-end gap-3 pt-4 border-t">

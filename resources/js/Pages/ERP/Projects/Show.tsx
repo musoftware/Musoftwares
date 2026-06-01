@@ -301,7 +301,7 @@ export default function ProjectShow({
                         {project.description && (
                             <Card className="bg-white border border-slate-200 shadow-sm">
                                 <CardHeader className="pb-3">
-                                    <CardTitle className="text-slate-900 text-sm font-semibold">About Project</CardTitle>
+                                    <CardTitle className="text-slate-900 text-sm font-semibold">{__('general.about_project')}</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-slate-600 text-sm leading-relaxed">{project.description}</p>
@@ -348,13 +348,13 @@ export default function ProjectShow({
                                 {/* 1. Invoices Tab */}
                                 {activeTab === 'invoices' && (
                                     invoices.length === 0 ? (
-                                        <EmptyState icon={FileText} title="No invoices linked" description="Create invoices for this project to track billings." className="border-0 rounded-none py-10" />
+                                        <EmptyState icon={FileText} title={__('general.no_invoices_linked')} description={__('general.create_invoices_for_this_project_to_track_billings')} className="border-0 rounded-none py-10" />
                                     ) : (
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-left text-sm border-collapse">
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                                        <th className="px-6 py-3">Invoice Number</th>
+                                                        <th className="px-6 py-3">{__('general.invoice_number')}</th>
                                                         <th className="px-6 py-3">Date</th>
                                                         <th className="px-6 py-3 text-right">Amount</th>
                                                         <th className="px-6 py-3 text-right">Value (Base)</th>
@@ -442,13 +442,13 @@ export default function ProjectShow({
                                 {/* 3. Expenses Tab */}
                                 {activeTab === 'expenses' && (
                                     expenses.length === 0 ? (
-                                        <EmptyState icon={TrendingDown} title="No expenses recorded" description="Add costs inside invoices to log project expenses." className="border-0 rounded-none py-10" />
+                                        <EmptyState icon={TrendingDown} title={__('general.no_expenses_recorded')} description={__('general.add_costs_inside_invoices_to_log_project_expenses')} className="border-0 rounded-none py-10" />
                                     ) : (
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-left text-sm border-collapse">
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                                        <th className="px-6 py-3">Cost Item</th>
+                                                        <th className="px-6 py-3">{__('general.cost_item')}</th>
                                                         <th className="px-6 py-3">Date</th>
                                                         <th className="px-6 py-3">Payer</th>
                                                         <th className="px-6 py-3 text-right">Amount</th>
@@ -485,7 +485,7 @@ export default function ProjectShow({
                                 {/* 3. Tasks Tab */}
                                 {activeTab === 'tasks' && (
                                     tasks.length === 0 ? (
-                                        <EmptyState icon={CheckSquare} title="No tasks assigned" description="Create tasks and link them to this project." className="border-0 rounded-none py-10" />
+                                        <EmptyState icon={CheckSquare} title={__('general.no_tasks_assigned')} description={__('general.create_tasks_and_link_them_to_this_project')} className="border-0 rounded-none py-10" />
                                     ) : (
                                         <div className="divide-y divide-slate-100">
                                             {tasks.map((task) => (
@@ -518,7 +518,7 @@ export default function ProjectShow({
                                 {/* 4. Tickets Tab */}
                                 {activeTab === 'tickets' && hasTickets && (
                                     tickets.length === 0 ? (
-                                        <EmptyState icon={MessageSquare} title="No tickets submitted" description="No support tickets opened for this project." className="border-0 rounded-none py-10" />
+                                        <EmptyState icon={MessageSquare} title={__('general.no_tickets_submitted')} description={__('general.no_support_tickets_opened_for_this_project')} className="border-0 rounded-none py-10" />
                                     ) : (
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-left text-sm border-collapse">
@@ -560,7 +560,7 @@ export default function ProjectShow({
                                 {/* 5. Activities Tab */}
                                 {activeTab === 'activities' && (
                                     activities.length === 0 ? (
-                                        <EmptyState icon={Activity} title="No activity yet" description="History actions will show up here." className="border-0 rounded-none py-10" />
+                                        <EmptyState icon={Activity} title={__('general.no_activity_yet_1')} description={__('general.history_actions_will_show_up_here')} className="border-0 rounded-none py-10" />
                                     ) : (
                                         <div className="p-6 space-y-6">
                                             {activities.map((act, index) => (
@@ -588,8 +588,7 @@ export default function ProjectShow({
                         <Card className="bg-white border border-slate-200 shadow-sm">
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-slate-900 text-sm font-semibold flex items-center gap-2">
-                                    <CheckSquare className="w-4 h-4 text-slate-400" /> Tasks Progress
-                                </CardTitle>
+                                    <CheckSquare className="w-4 h-4 text-slate-400" />{__('general.tasks_progress')}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
@@ -599,7 +598,7 @@ export default function ProjectShow({
                                 <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                                     <div className="bg-indigo-600 h-full rounded-full transition-all duration-500" style={{ width: `${taskProgress}%` }} />
                                 </div>
-                                <p className="text-xs text-slate-400">Completion rate of tasks assigned directly to this project.</p>
+                                <p className="text-xs text-slate-400">{__('general.completion_rate_of_tasks_assigned_directly_to_this_project')}</p>
                             </CardContent>
                         </Card>
 
@@ -607,28 +606,27 @@ export default function ProjectShow({
                         <Card className="bg-white border border-slate-200 shadow-sm">
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-slate-900 text-sm font-semibold flex items-center gap-2">
-                                    <BarChart2 className="w-4 h-4 text-slate-400" /> Project Summary
-                                </CardTitle>
+                                    <BarChart2 className="w-4 h-4 text-slate-400" />{__('general.project_summary')}</CardTitle>
                             </CardHeader>
                             <CardContent className="divide-y divide-slate-100">
                                 <div className="py-2.5 flex justify-between text-sm">
-                                    <span className="text-slate-500">Project Leader</span>
+                                    <span className="text-slate-500">{__('general.project_leader')}</span>
                                     <span className="font-medium text-slate-900">{project.leader}</span>
                                 </div>
                                 <div className="py-2.5 flex justify-between text-sm">
-                                    <span className="text-slate-500">Created Date</span>
+                                    <span className="text-slate-500">{__('general.created_date')}</span>
                                     <span className="font-medium text-slate-900">{project.created_at ? new Date(project.created_at).toLocaleDateString() : '—'}</span>
                                 </div>
                                 <div className="py-2.5 flex justify-between text-sm">
-                                    <span className="text-slate-500">Total Invoiced</span>
+                                    <span className="text-slate-500">{__('general.total_invoiced')}</span>
                                     <span className="font-semibold text-slate-900"><CurrencyDisplay amount={stats.totalInvoiced} currency={businessCurrency} /></span>
                                 </div>
                                 <div className="py-2.5 flex justify-between text-sm">
-                                    <span className="text-slate-500">Total Paid</span>
+                                    <span className="text-slate-500">{__('general.total_paid')}</span>
                                     <span className="font-semibold text-emerald-600"><CurrencyDisplay amount={stats.totalPaid} currency={businessCurrency} /></span>
                                 </div>
                                 <div className="py-2.5 flex justify-between text-sm">
-                                    <span className="text-slate-500">Total Costs</span>
+                                    <span className="text-slate-500">{__('general.total_costs')}</span>
                                     <span className="font-semibold text-rose-600"><CurrencyDisplay amount={stats.totalExpenses} currency={businessCurrency} /></span>
                                 </div>
                             </CardContent>

@@ -42,7 +42,7 @@ export default function EditClient({ client, currencies }: { client: any, curren
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Edit Client</h1>
+                        <h1 className="text-2xl font-bold text-slate-900">{__('general.edit_client')}</h1>
                         <p className="text-slate-500 text-sm mt-0.5">Update billing information for {client.name}.</p>
                     </div>
                 </div>
@@ -50,39 +50,36 @@ export default function EditClient({ client, currencies }: { client: any, curren
                 <Card className="bg-white border border-slate-200 shadow-sm">
                     <CardHeader>
                         <CardTitle className="text-slate-900 flex items-center gap-2">
-                            <Edit2 className="w-5 h-5" /> Client Profile
-                        </CardTitle>
-                        <CardDescription className="text-slate-500">
-                            Modify the existing client profile information below.
-                        </CardDescription>
+                            <Edit2 className="w-5 h-5" />{__('general.client_profile')}</CardTitle>
+                        <CardDescription className="text-slate-500">{__('general.modify_the_existing_client_profile_information_below')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Client/Company Name <span className="text-red-500">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.client_company_name')}<span className="text-red-500">*</span></label>
                                     <Input 
                                         required 
                                         value={form.name} 
                                         onChange={e => setForm({...form, name: e.target.value})} 
-                                        placeholder="Acme Corp" 
+                                        placeholder={__('general.acme_corp')} 
                                         className="bg-white border-slate-200 text-slate-900"
                                     />
                                     {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Email Address</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.email_address')}</label>
                                     <Input 
                                         type="email" 
                                         value={form.email} 
                                         onChange={e => setForm({...form, email: e.target.value})} 
-                                        placeholder="contact@acme.com" 
+                                        placeholder={__('general.contact_acme_com')} 
                                         className="bg-white border-slate-200 text-slate-900"
                                     />
                                     {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Phone Number</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.phone_number')}</label>
                                     <Input 
                                         value={form.phone} 
                                         onChange={e => setForm({...form, phone: e.target.value})} 
@@ -92,10 +89,10 @@ export default function EditClient({ client, currencies }: { client: any, curren
                                     {errors.phone && <p className="text-xs text-red-500">{errors.phone}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Billing Currency <span className="text-red-500">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.billing_currency')}<span className="text-red-500">*</span></label>
                                     <Select value={form.currency} onValueChange={(val) => setForm({...form, currency: val})}>
                                         <SelectTrigger className="bg-white border-slate-200 text-slate-900">
-                                            <SelectValue placeholder="Select currency" />
+                                            <SelectValue placeholder={__('general.select_currency_1')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white border-slate-200 text-slate-900">
                                             {currencies.map(c => (

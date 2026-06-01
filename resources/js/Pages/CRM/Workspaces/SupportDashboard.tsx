@@ -9,14 +9,14 @@ import { Link } from '@inertiajs/react';
 
 export default function SupportDashboard({ stats, priorityMessages }: { stats: any, priorityMessages?: any[] }) {
     return (
-        <CrmLayout title={__('Support Workspace')} activeMenu="workspaces">
+        <CrmLayout title={__('general.support_workspace')} activeMenu="workspaces">
             <div className="flex flex-col h-full gap-6 p-8 pt-6">
                 
                 {/* Dashboard Header */}
                 <div className="flex justify-between items-end">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-foreground">{__('Customer Support')}</h1>
-                        <p className="text-sm text-muted-foreground mt-1">{__('Monitor tickets and response SLAs.')}</p>
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground">{__('general.customer_support')}</h1>
+                        <p className="text-sm text-muted-foreground mt-1">{__('general.monitor_tickets_and_response_slas')}</p>
                     </div>
                     <div className="flex items-center gap-2">
                     </div>
@@ -25,25 +25,25 @@ export default function SupportDashboard({ stats, priorityMessages }: { stats: a
                 {/* KPI Bar */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <KPICard 
-                        title={__('Open Tickets')} 
+                        title={__('general.open_tickets')} 
                         value={stats?.open_tickets ?? 0} 
                         icon={AlertCircle} 
                         colorClass="bg-red-100 text-red-600" 
                     />
                     <KPICard 
-                        title={__('Unread Messages')} 
+                        title={__('general.unread_messages')} 
                         value={stats?.unread_messages ?? 0} 
                         icon={MessageSquare} 
                         colorClass="bg-blue-100 text-blue-600" 
                     />
                     <KPICard 
-                        title={__('Avg Response Time')} 
+                        title={__('general.avg_response_time')} 
                         value={stats?.avg_response_time ?? '0m'} 
                         icon={Clock} 
                         colorClass="bg-amber-100 text-amber-600" 
                     />
                     <KPICard 
-                        title={__('Resolved Today')} 
+                        title={__('general.resolved_today')} 
                         value={stats?.resolved_today ?? 0} 
                         icon={CheckCircle2} 
                         colorClass="bg-emerald-100 text-emerald-600" 
@@ -54,7 +54,7 @@ export default function SupportDashboard({ stats, priorityMessages }: { stats: a
                 <div className="flex-1 flex gap-6 min-h-0">
                     <Card className="flex-1 flex flex-col overflow-hidden shadow-sm">
                         <CardHeader className="p-4 border-b bg-muted/50 space-y-0 flex flex-row justify-between items-center">
-                            <CardTitle className="font-semibold">{__('Priority Inbox')}</CardTitle>
+                            <CardTitle className="font-semibold">{__('general.priority_inbox')}</CardTitle>
                         </CardHeader>
                         <CardContent className="flex-1 p-4 overflow-y-auto">
                             {priorityMessages && priorityMessages.length > 0 ? (
@@ -72,14 +72,14 @@ export default function SupportDashboard({ stats, priorityMessages }: { stats: a
                                                 <p className="text-sm text-slate-600 truncate">{msg.preview}</p>
                                             </div>
                                             <Button variant="ghost" size="sm" className="shrink-0 text-indigo-600">
-                                                    {__('Reply')}
+                                                    {__('general.reply')}
                                             </Button>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
                                 <div className="flex items-center justify-center h-40 text-sm text-muted-foreground border border-dashed rounded-lg">
-                                    {__('No priority messages at the moment.')}
+                                    {__('general.no_priority_messages_at_the_moment')}
                                 </div>
                             )}
                         </CardContent>

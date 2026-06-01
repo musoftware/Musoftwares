@@ -11,20 +11,19 @@ export default function RulesDashboard({ rules, stats }) {
         <div className="p-6 max-w-7xl mx-auto space-y-8">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Booking Advanced Rules</h1>
-                    <p className="text-muted-foreground mt-2">Automate scheduling policies, approvals, and workflows.</p>
+                    <h1 className="text-3xl font-bold tracking-tight">{__('general.booking_advanced_rules')}</h1>
+                    <p className="text-muted-foreground mt-2">{__('general.automate_scheduling_policies_approvals_and_workflows')}</p>
                 </div>
                 <Link href="/booking-rules/builder">
                     <Button>
-                        <Plus className="mr-2 h-4 w-4" /> Create New Rule
-                    </Button>
+                        <Plus className="mr-2 h-4 w-4" />{__('general.create_new_rule')}</Button>
                 </Link>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Active Rules</CardTitle>
+                        <CardTitle className="text-sm font-medium">{__('general.active_rules')}</CardTitle>
                         <Settings className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
@@ -42,7 +41,7 @@ export default function RulesDashboard({ rules, stats }) {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Failed/Conflicts</CardTitle>
+                        <CardTitle className="text-sm font-medium">{__('general.failed_conflicts')}</CardTitle>
                         <AlertCircle className="h-4 w-4 text-red-500" />
                     </CardHeader>
                     <CardContent>
@@ -53,8 +52,8 @@ export default function RulesDashboard({ rules, stats }) {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Configured Rules</CardTitle>
-                    <CardDescription>Manage priority and active status of your booking rules.</CardDescription>
+                    <CardTitle>{__('general.configured_rules')}</CardTitle>
+                    <CardDescription>{__('general.manage_priority_and_active_status_of_your_booking_rules')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Table>

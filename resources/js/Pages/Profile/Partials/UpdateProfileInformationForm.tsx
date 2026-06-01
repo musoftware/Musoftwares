@@ -32,13 +32,9 @@ export default function UpdateProfileInformation({
     return (
         <section className={className}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900">
-                    Profile Information
-                </h2>
+                <h2 className="text-lg font-medium text-gray-900">{__('general.profile_information')}</h2>
 
-                <p className="mt-1 text-sm text-gray-600">
-                    Update your account's profile information and email address.
-                </p>
+                <p className="mt-1 text-sm text-gray-600">{__('general.update_your_account_s_profile_information_and_email_address')}</p>
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
@@ -76,16 +72,12 @@ export default function UpdateProfileInformation({
 
                 {mustVerifyEmail && user.email_verified_at === null && (
                     <div>
-                        <p className="mt-2 text-sm text-gray-800">
-                            Your email address is unverified.
-                            <Link
+                        <p className="mt-2 text-sm text-gray-800">{__('general.your_email_address_is_unverified')}<Link
                                 href={route('verification.send')}
                                 method="post"
                                 as="button"
                                 className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
-                            >
-                                Click here to re-send the verification email.
-                            </Link>
+                            >{__('general.click_here_to_re_send_the_verification_email')}</Link>
                         </p>
 
                         {status === 'verification-link-sent' && (
@@ -107,7 +99,7 @@ export default function UpdateProfileInformation({
                         leave="transition ease-in-out"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-gray-600">Saved.</p>
+                        <p className="text-sm text-gray-600">{__('general.saved')}</p>
                     </Transition>
                 </div>
             </form>

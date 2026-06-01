@@ -65,7 +65,7 @@ class PointPurchaseController extends Controller
 
         try {
             $this->pointsService->processWalletPayment($user, $points, $costInEgp);
-            return back()->with('success', 'Points purchased successfully using Wallet balance.');
+            return back()->with('success', __('general.points_purchased_successfully_using_wallet_balance'));
         } catch (\Exception $e) {
             if ($e->getMessage() === 'INSUFFICIENT_FUNDS') {
                 return Inertia::location('https://payments.kashier.io');
@@ -82,7 +82,7 @@ class PointPurchaseController extends Controller
         
         try {
             $this->pointsService->processWalletPayment($user, $package->points, $package->price);
-            return back()->with('success', 'Points purchased successfully using Wallet balance.');
+            return back()->with('success', __('general.points_purchased_successfully_using_wallet_balance'));
         } catch (\Exception $e) {
             if ($e->getMessage() === 'INSUFFICIENT_FUNDS') {
                 return Inertia::location('https://payments.kashier.io');

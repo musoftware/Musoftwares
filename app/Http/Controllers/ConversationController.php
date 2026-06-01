@@ -26,7 +26,7 @@ class ConversationController extends Controller
         }
 
         if (!$conversation) {
-            abort(404, 'Conversation not found.');
+            abort(404, __('general.conversation_not_found'));
         }
 
         return $conversation;

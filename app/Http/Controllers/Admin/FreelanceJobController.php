@@ -37,11 +37,35 @@ class FreelanceJobController extends Controller
 
     public function show(Job $job)
     {
-        $job->load(['client', 'skills', 'proposals.freelancer']);
+        $job->load(['client', 'skills', 'proposals.freelancer', 'contracts.freelancer']);
 
         return Inertia::render('Admin/Freelance/Jobs/Show', [
             'job' => $job
         ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('Admin/Freelance/Jobs/Create');
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'budget' => 'nullable|numeric|min:0',
+            'client_id' => 'required|exists:users,id',
+            'duration' => 'nullable|string|max:255',
+            'type' => 'nullable|string|in:fixed,hourly',
+        ]);
+
+        $validated['status'] = 'published';
+
+        $job = Job::create($validated);
+
+        return redirect()->route('admin.freelance.jobs.show', $job->id)
+                         ->with('success', __('freelance.job_posted_success'));
     }
 
     public function edit(Job $job)
@@ -62,7 +86,7 @@ class FreelanceJobController extends Controller
         $job->update($validated);
 
         return redirect()->route('admin.freelance.jobs.show', $job->id)
-                         ->with('success', __('freelance.job_updated_success', [], 'en'));
+                         ->with('success', __('freelance.job_updated_success'));
     }
 
     public function updateStatus(Request $request, Job $job)
@@ -73,19 +97,19 @@ class FreelanceJobController extends Controller
 
         $job->update(['status' => $request->status]);
 
-        return back()->with('success', __('freelance.job_status_updated', [], 'en'));
+        return back()->with('success', __('freelance.job_status_updated'));
     }
 
     public function destroy(Job $job)
     {
         $job->delete();
-        return redirect()->route('admin.freelance.jobs.index')->with('success', __('freelance.job_deleted', [], 'en'));
+        return redirect()->route('admin.freelance.jobs.index')->with('success', __('freelance.job_deleted'));
     }
 
     public function forceRefund(Job $job, AddPointsAction $addPointsAction)
     {
         if (!$job->client_id) {
-            return back()->with('error', __('freelance.client_not_found', [], 'en'));
+            return back()->with('error', __('freelance.client_not_found'));
         }
 
         $refundAmount = 25 + ($job->min_proposal_points ?? 0);
@@ -94,14 +118,14 @@ class FreelanceJobController extends Controller
             $addPointsAction->execute(
                 $job->client_id,
                 $refundAmount,
-                __('freelance.admin_forced_refund', ['job' => $job->title], 'en'),
+                __('freelance.admin_forced_refund', ['job' => $job->title]),
                 'job_refund',
                 $job->id
             );
             
             $job->update(['status' => 'cancelled']);
             
-            return back()->with('success', __('freelance.points_refunded_success', ['amount' => $refundAmount], 'en'));
+            return back()->with('success', __('freelance.points_refunded_success', ['amount' => $refundAmount]));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
