@@ -1,3 +1,4 @@
+import { __ } from '@/lib/i18n';
 import { Button } from '@/Components/ui/button';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, useEffect, useState } from 'react';
