@@ -8,7 +8,6 @@ import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { ArrowLeft, TrendingUp, Users } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
-const __ = (key: string) => key;
 
 export default function Earnings({ earnings }: { earnings: any }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('overview');

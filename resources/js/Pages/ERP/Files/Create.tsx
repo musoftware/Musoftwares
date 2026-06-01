@@ -65,7 +65,7 @@ export default function CreateFile() {
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">File <span className="text-red-500">*</span></label>
+                                <label className="text-sm font-medium text-slate-700">{__('general.file')} <span className="text-red-500">*</span></label>
                                 <Input 
                                     required 
                                     type="file"
@@ -95,11 +95,11 @@ export default function CreateFile() {
                             <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
                                 <Link href={route('erp.dashboard', { section: 'documents' })}>
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-900 hover:bg-slate-100">
-                                        Cancel
+                                        {__('general.cancel')}
                                     </Button>
                                 </Link>
                                 <Button type="submit" disabled={isSubmitting}>
-                                    {isSubmitting ? 'Uploading...' : 'Upload File'}
+                                    {isSubmitting ? __('general.uploading') : __('general.upload_file')}
                                 </Button>
                             </div>
                         </form>

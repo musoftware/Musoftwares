@@ -80,12 +80,12 @@ class FileController extends Controller
         $tenant = Tenant::where('user_id', $user->id)->first();
 
         if (!$tenant) {
-            return back()->withErrors(['error' => 'No active workspace found.']);
+            return back()->withErrors(['error' => __('errors.no_active_workspace')]);
         }
 
         $provider = TenantStorageProvider::where('tenant_id', $tenant->id)->where('is_default', true)->first();
         if (!$provider) {
-            return back()->withErrors(['error' => 'Please configure your AWS S3 Storage Provider first.']);
+            return back()->withErrors(['error' => __('errors.configure_storage_provider')]);
         }
 
         $request->validate([
@@ -126,7 +126,7 @@ class FileController extends Controller
             return back()->with('success', __('general.file_uploaded_successfully'));
 
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'File upload failed: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => __('errors.file_upload_failed', ['message' => $e->getMessage()])]);
         }
     }
 
@@ -152,7 +152,7 @@ class FileController extends Controller
 
             return redirect($url);
         } catch (\Exception $e) {
-            abort(500, 'Failed to generate download URL: ' . $e->getMessage());
+            abort(500, __('errors.failed_generate_download_url', ['message' => $e->getMessage()]));
         }
     }
 
@@ -188,7 +188,7 @@ class FileController extends Controller
             return back()->with('success', __('general.file_deleted_successfully'));
 
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'File deletion failed: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => __('errors.file_deletion_failed', ['message' => $e->getMessage()])]);
         }
     }
 }

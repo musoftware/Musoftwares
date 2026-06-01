@@ -25,24 +25,32 @@ class PosCheckoutTest extends TestCase
         $currency = Currency::factory()->create(['currency' => 'USD']);
         
         $this->user = User::factory()->create();
-        $this->tenant = Tenant::factory()->create([
+        $this->tenant = Tenant::create([
             'user_id' => $this->user->id,
+            'name' => 'Acme Corp',
+            'status' => 'active',
             'base_currency_id' => $currency->id
         ]);
         
-        \Modules\ERP\Models\UserSubscription::factory()->create([
+        \App\Models\UserSubscription::create([
             'user_id' => $this->user->id,
-            'module_name' => 'erp-pos',
-            'status' => 'active'
+            'object' => 'erp-pos',
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addYear(),
         ]);
         
-        $this->client = TenantClient::factory()->create([
+        $this->client = TenantClient::create([
             'tenant_id' => $this->tenant->id,
+            'name' => 'Test Client',
+            'email' => 'client@test.com',
             'currency_id' => $currency->id
         ]);
 
-        $this->product = Product::factory()->create([
+        $this->product = Product::create([
             'tenant_id' => $this->tenant->id,
+            'name' => 'Test Product',
+            'type' => 'product',
             'currency_id' => $currency->id,
             'price' => 100,
             'cost_price' => 60,
@@ -52,7 +60,7 @@ class PosCheckoutTest extends TestCase
 
     public function test_can_checkout_as_guest_with_payment_and_cost_expense()
     {
-        $response = $this->actingAs($this->user)->postJson(route('pos.checkout'), [
+        $response = $this->actingAs($this->user)->postJson(route('erp.pos.checkout'), [
             'client_id' => null,
             'payment_method' => 'cash',
             'is_paid' => true,
@@ -80,7 +88,7 @@ class PosCheckoutTest extends TestCase
         $this->assertEquals(10, $invoice->discount_amount);
 
         // Verify Transaction
-        $this->assertDatabaseHas('erp_transactions', [
+        $this->assertDatabaseHas('erp_client_transactions', [
             'client_id' => $walkInClient->id,
             'amount' => 190,
             'type' => 'received',
@@ -100,7 +108,7 @@ class PosCheckoutTest extends TestCase
 
     public function test_can_checkout_existing_client_as_unpaid()
     {
-        $response = $this->actingAs($this->user)->postJson(route('pos.checkout'), [
+        $response = $this->actingAs($this->user)->postJson(route('erp.pos.checkout'), [
             'client_id' => $this->client->id,
             'payment_method' => 'card',
             'is_paid' => false,
@@ -123,7 +131,7 @@ class PosCheckoutTest extends TestCase
         $this->assertEquals(100, $invoice->amount);
 
         // Verify NO Transaction generated because it's unpaid
-        $this->assertDatabaseMissing('erp_transactions', [
+        $this->assertDatabaseMissing('erp_client_transactions', [
             'reference_type' => 'invoice_payment',
             'reference_id' => $invoice->id,
         ]);

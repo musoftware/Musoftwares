@@ -238,7 +238,7 @@ class PayrollController extends Controller
                 'amount' => $payslip->net_amount, // Amount in business currency
                 'category' => 'Payroll',
                 'date' => now()->toDateString(),
-                'description' => "Salary payment for {$payslip->member->name} for period {$payslip->month}/{$payslip->year}",
+                'description' => __('erp.salary_payment_for', ['name' => $payslip->member->name, 'month' => $payslip->month, 'year' => $payslip->year]),
                 'created_by' => $user->id,
             ]);
         });

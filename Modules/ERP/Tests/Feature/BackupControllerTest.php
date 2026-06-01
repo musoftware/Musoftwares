@@ -96,6 +96,7 @@ class BackupControllerTest extends TestCase
         // Upload and Restore
         $file = new UploadedFile($backupPath, 'backup.json', 'application/json', null, true);
 
+        $this->withoutExceptionHandling();
         $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/backup/restore", [
             'backup_file' => $file,
         ]);

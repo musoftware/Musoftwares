@@ -2,11 +2,10 @@
 
 namespace Modules\ERP\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
 
-class TenantFile extends Model
+class TenantFile extends TenantModel
 {
     use SoftDeletes;
 

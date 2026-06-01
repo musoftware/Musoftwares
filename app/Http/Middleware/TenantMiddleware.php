@@ -13,7 +13,7 @@ class TenantMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next)
     {
         if (!auth()->guard('web')->check() && !auth()->guard('erp_team')->check()) {
             abort(403, __('general.unauthorized_access'));

@@ -18,6 +18,7 @@ class MultiBranchServiceTest extends TestCase
         
         $limitsMock = \Mockery::mock(ERPMultiBranchLimitsService::class);
         $limitsMock->shouldReceive('checkUsage')->once()->with($tenantId, 'max_branches')->andReturn(true);
+        $limitsMock->shouldReceive('increaseUsage')->once()->with($tenantId, 'max_branches')->andReturnNull();
         
         $service = new MultiBranchService($limitsMock);
         

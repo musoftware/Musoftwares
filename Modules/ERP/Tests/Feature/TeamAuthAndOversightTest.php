@@ -47,7 +47,7 @@ class TeamAuthAndOversightTest extends TestCase
             'password' => 'secret123',
         ]);
 
-        $response->assertRedirect(route('erp.dashboard'));
+        $response->assertRedirect(route('crm.dashboard'));
         $this->assertTrue(Auth::guard('erp_team')->check());
         $this->assertEquals($teamMember->id, Auth::guard('erp_team')->id());
         $this->assertEquals($tenant->id, session('tenant_id'));
@@ -188,6 +188,13 @@ class TeamAuthAndOversightTest extends TestCase
             'email_verified_at' => now(),
             'onboarding_completed' => true,
         ]);
+        \App\Models\UserSubscription::create([
+            'user_id' => $owner->id,
+            'object' => 'erp-tasks',
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addMonth()
+        ]);
         $tenant = Tenant::create([
             'user_id' => $owner->id,
             'name' => 'Acme Corp',
@@ -225,6 +232,13 @@ class TeamAuthAndOversightTest extends TestCase
         $owner = User::factory()->create([
             'email_verified_at' => now(),
             'onboarding_completed' => true,
+        ]);
+        \App\Models\UserSubscription::create([
+            'user_id' => $owner->id,
+            'object' => 'erp-tasks',
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addMonth()
         ]);
         $tenant = Tenant::create([
             'user_id' => $owner->id,
@@ -276,10 +290,11 @@ class TeamAuthAndOversightTest extends TestCase
     public function test_admin_can_access_oversight_pages(): void
     {
         $admin = User::factory()->create([
-            'role' => 'admin',
             'email_verified_at' => now(),
             'onboarding_completed' => true,
         ]);
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $admin->assignRole('admin');
 
         // Let's create a tenant to view
         $owner = User::factory()->create([
@@ -308,7 +323,6 @@ class TeamAuthAndOversightTest extends TestCase
     public function test_non_admin_cannot_access_oversight_pages(): void
     {
         $user = User::factory()->create([
-            'role' => 'client',
             'email_verified_at' => now(),
             'onboarding_completed' => true,
         ]);

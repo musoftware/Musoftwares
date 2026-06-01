@@ -4,7 +4,6 @@ namespace Modules\ERP\app\Features\MultiBranch\Services;
 
 use Modules\ERP\Models\Branch;
 use Illuminate\Support\Facades\DB;
-use App\Helpers\UsageHelper;
 
 class MultiBranchService
 {
@@ -25,7 +24,7 @@ class MultiBranchService
         DB::beginTransaction();
         try {
             $branch = Branch::create(array_merge($data, ['tenant_id' => $tenantId]));
-            UsageHelper::increaseUsage($tenantId, 'max_branches');
+            $this->limitsService->increaseUsage($tenantId, 'max_branches');
             
             DB::commit();
             return $branch;

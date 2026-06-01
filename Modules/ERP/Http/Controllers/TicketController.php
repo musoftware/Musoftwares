@@ -22,8 +22,10 @@ class TicketController extends Controller
 
     public function create()
     {
-        $user = Auth::user();
-        if (!$user->hasModuleSubscription('erp-tickets')) {
+        $tenant = $this->getTenant();
+        $user = $tenant ? $tenant->user : Auth::user();
+
+        if (!$user || !$user->hasModuleSubscription('erp-tickets')) {
             abort(403, __('general.upgrade_to_enable_support_tickets'));
         }
 
@@ -37,14 +39,14 @@ class TicketController extends Controller
 
     public function store(Request $request)
     {
-        $user = Auth::user();
-        if (!$user->hasModuleSubscription('erp-tickets')) {
-            abort(403, __('general.upgrade_to_enable_support_tickets'));
-        }
-
         $tenant = $this->getTenant();
         if (!$tenant) {
             return back()->withErrors(['error' => 'No active workspace found.']);
+        }
+
+        $user = $tenant->user;
+        if (!$user || !$user->hasModuleSubscription('erp-tickets')) {
+            abort(403, __('general.upgrade_to_enable_support_tickets'));
         }
 
         $validated = $request->validate([
@@ -54,6 +56,8 @@ class TicketController extends Controller
             'priority' => 'required|in:low,medium,high,critical',
         ]);
 
+        $authUser = auth('erp_team')->check() ? auth('erp_team')->user() : Auth::user();
+
         SupportTicket::create([
             'tenant_id' => $tenant->id,
             'client_id' => $validated['client_id'] ?? null,
@@ -61,7 +65,7 @@ class TicketController extends Controller
             'description' => $validated['description'] ?? '',
             'priority' => $validated['priority'],
             'status' => 'open',
-            'created_by' => $user->id,
+            'created_by' => $authUser?->id,
         ]);
 
         return redirect()->route('erp.dashboard', ['section' => 'overview'])

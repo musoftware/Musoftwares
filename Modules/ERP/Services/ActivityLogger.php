@@ -43,6 +43,13 @@ class ActivityLogger
             return null; // Cannot log without tenant context
         }
 
+        $causerId = Auth::check() ? Auth::id() : null;
+        if (Auth::guard('erp_team')->check()) {
+            $member = Auth::guard('erp_team')->user();
+            $causerId = $member->tenant->user_id ?? null;
+            $properties = array_merge($properties, ['team_member_id' => $member->id]);
+        }
+
         return Activity::create([
             'tenant_id' => $tenantId,
             'client_id' => $clientId,
@@ -50,7 +57,7 @@ class ActivityLogger
             'subject_id' => $subject ? $subject->id : null,
             'action' => $action,
             'description' => $description,
-            'causer_id' => Auth::id(),
+            'causer_id' => $causerId,
             'properties' => $properties,
         ]);
     }

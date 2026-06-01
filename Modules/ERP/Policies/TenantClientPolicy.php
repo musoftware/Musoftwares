@@ -34,17 +34,27 @@ class TenantClientPolicy
 
     public function create(User $user)
     {
+        if ($user instanceof \Modules\ERP\Models\TeamMember && !$user->isManager()) {
+            return false;
+        }
         return $this->getTenant($user) !== null;
     }
 
+
     public function update(User $user, TenantClient $client)
     {
+        if ($user instanceof \Modules\ERP\Models\TeamMember && !$user->isManager()) {
+            return false;
+        }
         $tenant = $this->getTenant($user);
         return $tenant && $client->tenant_id === $tenant->id;
     }
 
     public function delete(User $user, TenantClient $client)
     {
+        if ($user instanceof \Modules\ERP\Models\TeamMember && !$user->isManager()) {
+            return false;
+        }
         $tenant = $this->getTenant($user);
         return $tenant && $client->tenant_id === $tenant->id;
     }

@@ -14,7 +14,7 @@ export default function CreateTicket() {
     const [form, setForm] = useState({
         title: '',
         description: '',
-        priority: 'Normal'
+        priority: 'medium'
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,22 +67,22 @@ export default function CreateTicket() {
                                     {errors.title && <p className="text-xs text-red-500">{errors.title}</p>}
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
-                                    <label className="text-sm font-medium text-slate-700">Priority</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.priority')}</label>
                                     <Select value={form.priority} onValueChange={(val) => setForm({...form, priority: val})}>
                                         <SelectTrigger className="bg-white border-slate-200 text-slate-900 w-full">
                                             <SelectValue placeholder={__('general.select_priority_1')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white border-slate-200 text-slate-900">
-                                            <SelectItem value="Low">Low</SelectItem>
-                                            <SelectItem value="Normal">Normal</SelectItem>
-                                            <SelectItem value="High">High</SelectItem>
-                                            <SelectItem value="Urgent">Urgent</SelectItem>
+                                            <SelectItem value="low">{__('general.priority_low')}</SelectItem>
+                                            <SelectItem value="medium">{__('general.priority_medium')}</SelectItem>
+                                            <SelectItem value="high">{__('general.priority_high')}</SelectItem>
+                                            <SelectItem value="critical">{__('general.priority_critical')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     {errors.priority && <p className="text-xs text-red-500">{errors.priority}</p>}
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
-                                    <label className="text-sm font-medium text-slate-700">Description</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.description')}</label>
                                     <Textarea 
                                         value={form.description} 
                                         onChange={e => setForm({...form, description: e.target.value})} 
@@ -96,11 +96,11 @@ export default function CreateTicket() {
                             <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
                                 <Link href={route('erp.dashboard', { section: 'tickets' })}>
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-900 hover:bg-slate-100">
-                                        Cancel
+                                        {__('general.cancel')}
                                     </Button>
                                 </Link>
                                 <Button type="submit" disabled={isSubmitting}>
-                                    {isSubmitting ? 'Creating...' : 'Create Ticket'}
+                                    {isSubmitting ? __('general.creating') : __('general.create_ticket')}
                                 </Button>
                             </div>
                         </form>

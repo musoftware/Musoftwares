@@ -16,11 +16,12 @@ class ERPMultiBranchFlowTest extends TestCase
     public function test_full_multi_branch_lifecycle()
     {
         $tenantId = 1;
-        $user = User::factory()->create(['tenant_id' => $tenantId]);
+        $user = User::factory()->create();
         
         // Mock the limits service
         $limitsMock = \Mockery::mock(ERPMultiBranchLimitsService::class);
         $limitsMock->shouldReceive('checkUsage')->andReturn(true);
+        $limitsMock->shouldReceive('increaseUsage')->andReturnNull();
         $this->app->instance(ERPMultiBranchLimitsService::class, $limitsMock);
 
         // Service initialization
