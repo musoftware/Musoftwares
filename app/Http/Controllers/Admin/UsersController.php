@@ -770,7 +770,7 @@ class UsersController extends Controller
         }
 
         $request->validate([
-            'role' => 'required|string|in:admin,client,user,employee,manager,moderator',
+            'role' => 'required|string|in:admin,client,employee,manager,moderator',
         ]);
 
         $roleName = $request->input('role');

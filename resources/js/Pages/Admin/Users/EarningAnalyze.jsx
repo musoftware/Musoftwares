@@ -93,7 +93,7 @@ function MonthlyBarChart({ data, fmt }) {
 // ─────────────────────────────────────────────────────────────
 // Metric card — Black & White aesthetic per Admin UI skill
 // ─────────────────────────────────────────────────────────────
-function MetricCard({ label, value, sub, icon: Icon, tooltip, accent = false, danger = false, warning = false, success = false }) {
+function MetricCard({ label, value, sub, icon: Icon, tooltip, accent = false, danger = false, warning = false, success = false, href = null }) {
     const valueClass = danger
         ? 'text-red-600'
         : warning
@@ -102,8 +102,8 @@ function MetricCard({ label, value, sub, icon: Icon, tooltip, accent = false, da
                 ? 'text-green-600'
                 : 'text-slate-900';
 
-    return (
-        <Card className="border-slate-200">
+    const cardContent = (
+        <Card className={`border-slate-200 h-full relative ${href ? 'hover:border-slate-300 hover:shadow-sm transition-all group' : ''}`}>
             <CardContent className="p-5">
                 <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
@@ -128,14 +128,21 @@ function MetricCard({ label, value, sub, icon: Icon, tooltip, accent = false, da
                         {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
                     </div>
                     {Icon && (
-                        <div className="rounded-lg p-2 bg-slate-50 flex-shrink-0">
-                            <Icon className="h-4 w-4 text-slate-500" />
+                        <div className={`rounded-lg p-2 flex-shrink-0 relative bg-slate-50 ${href ? 'group-hover:bg-slate-100 transition-colors' : ''}`}>
+                            <Icon className={`h-4 w-4 text-slate-500 ${href ? 'group-hover:opacity-0 transition-opacity' : ''}`} />
+                            {href && <ArrowUpRight className="h-4 w-4 text-slate-900 absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity" />}
                         </div>
                     )}
                 </div>
             </CardContent>
         </Card>
     );
+
+    if (href) {
+        return <Link href={href} className="block h-full outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 rounded-xl">{cardContent}</Link>;
+    }
+
+    return cardContent;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -260,6 +267,7 @@ export default function EarningAnalyze({
                         label="Unique Earners"
                         value={(stats?.total_earners ?? 0).toLocaleString()}
                         sub="Users who earned commissions"
+                        href="/admin/users"
                     />
                     <MetricCard
                         icon={CheckCircle2}
@@ -310,6 +318,7 @@ export default function EarningAnalyze({
                         value={fmt(annual?.closing_balance)}
                         sub="Updated in real-time"
                         tooltip="The sum of all platform transactions (business_amount) up to today. Represents total liquid funds on the platform."
+                        href="/admin/transactions"
                     />
                     <Card className="border-slate-200">
                         <CardContent className="p-5">
@@ -355,6 +364,7 @@ export default function EarningAnalyze({
                         value={fmt(liquidity?.floating_cash)}
                         sub="Total platform cash right now"
                         tooltip="All liquid funds held across all platform accounts."
+                        href="/admin/transactions"
                     />
                     <MetricCard
                         icon={ArrowDownCircle}
@@ -363,6 +373,7 @@ export default function EarningAnalyze({
                         sub="Funds allocated to pending invoices"
                         danger={liquidity?.unpaid_invoices > 0}
                         tooltip="Total value of invoices that have been issued but not yet settled. These are immediate liabilities."
+                        href="/admin/invoices/unpaid"
                     />
                     <MetricCard
                         icon={CheckCircle2}
@@ -392,6 +403,8 @@ export default function EarningAnalyze({
                         sub="Approved withdrawal payouts"
                         success
                         tooltip="Total amount that has been approved and paid out to users via withdrawal requests."
+                        icon={ArrowUpRight}
+                        href="/admin/withdraw-requests"
                     />
                     <MetricCard
                         label="In Clearing"
@@ -641,12 +654,18 @@ export default function EarningAnalyze({
                                             #{e.id}
                                         </TableCell>
                                         <TableCell>
-                                            <div className="text-sm font-medium text-slate-900">{e.user_name}</div>
-                                            <div className="text-xs text-slate-400">{e.user_email}</div>
+                                            <Link href={`/admin/users/${e.user_id}`} className="block hover:opacity-80 transition-opacity">
+                                                <div className="text-sm font-medium text-slate-900 flex items-center gap-1">
+                                                    {e.user_name} <ExternalLink className="h-3 w-3 text-slate-400" />
+                                                </div>
+                                                <div className="text-xs text-slate-400">{e.user_email}</div>
+                                            </Link>
                                         </TableCell>
                                         <TableCell>
-                                            {e.referred_user_name ? (
-                                                <span className="text-sm text-slate-600">{e.referred_user_name}</span>
+                                            {e.referred_user_id ? (
+                                                <Link href={`/admin/users/${e.referred_user_id}`} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900 transition-colors">
+                                                    {e.referred_user_name} <ExternalLink className="h-3 w-3 text-slate-400" />
+                                                </Link>
                                             ) : (
                                                 <span className="text-xs text-slate-400 italic">No referral</span>
                                             )}

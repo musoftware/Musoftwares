@@ -3,7 +3,9 @@ import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button, buttonVariants } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
-import { Eye, Trash2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/Components/ui/dropdown-menu';
+import { Eye, Trash2, CheckCircle, XCircle, AlertCircle, MoreHorizontal, Edit, RefreshCw } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ jobs, filters }: any) {
     const [search, setSearch] = useState(filters.search || '');
@@ -26,14 +28,22 @@ export default function Index({ jobs, filters }: any) {
         });
     };
 
+    const forceRefund = (id: any) => {
+        if (confirm('Are you sure you want to cancel this job and force refund points to the client?')) {
+            router.post(route('admin.freelance.jobs.force-refund', id), {}, {
+                preserveScroll: true
+            });
+        }
+    };
+
     return (
-        <AdminSidebarLayout title="Freelance Jobs" header="Manage Freelance Jobs">
+        <AdminSidebarLayout title={__('freelance.admin_jobs')} header={__('freelance.manage_jobs')}>
             <div className="mb-6 flex items-center justify-between">
                 <form onSubmit={handleSearch} className="flex space-x-2 w-full max-w-2xl">
                     <Input 
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Search jobs by title or client name/email..."
+                        placeholder={__('freelance.search_placeholder')}
                         className="flex-1"
                     />
                     <select
@@ -41,18 +51,19 @@ export default function Index({ jobs, filters }: any) {
                         onChange={(e) => setStatus(e.target.value)}
                         className="rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm"
                     >
-                        <option value="all">All Statuses</option>
+                        <option value="all">{__('freelance.all_statuses')}</option>
                         <option value="draft">Draft</option>
                         <option value="published">Published</option>
+                        <option value="open">Open</option>
                         <option value="in_progress">In Progress</option>
                         <option value="completed">Completed</option>
                         <option value="cancelled">Cancelled</option>
                         <option value="suspended">Suspended</option>
                     </select>
-                    <Button type="submit" variant="secondary">Filter</Button>
+                    <Button type="submit" variant="secondary">{__('freelance.filter')}</Button>
                     {(search || status !== 'all') && (
                         <Button type="button" variant="ghost" onClick={() => { setSearch(''); setStatus('all'); router.get(route('admin.freelance.jobs.index')); }}>
-                            Clear
+                            {__('freelance.clear')}
                         </Button>
                     )}
                 </form>
@@ -62,13 +73,13 @@ export default function Index({ jobs, filters }: any) {
                 <table className="w-full text-left text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
-                            <th className="p-4 font-medium text-gray-600">Job Title</th>
-                            <th className="p-4 font-medium text-gray-600">Client</th>
-                            <th className="p-4 font-medium text-gray-600">Budget</th>
-                            <th className="p-4 font-medium text-gray-600">Proposals</th>
-                            <th className="p-4 font-medium text-gray-600">Status</th>
-                            <th className="p-4 font-medium text-gray-600">Created At</th>
-                            <th className="p-4 font-medium text-gray-600 text-right">Actions</th>
+                            <th className="p-4 font-medium text-gray-600">{__('freelance.job_title')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('freelance.client')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('freelance.budget')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('freelance.proposals')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('freelance.status')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('freelance.created_at')}</th>
+                            <th className="p-4 font-medium text-gray-600 text-right">{__('freelance.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,14 +87,14 @@ export default function Index({ jobs, filters }: any) {
                             <tr key={job.id} className="border-b hover:bg-gray-50">
                                 <td className="p-4 font-medium text-gray-900">{job.title}</td>
                                 <td className="p-4 text-gray-700">
-                                    <div>{job.client?.name || 'Unknown'}</div>
+                                    <div>{job.client?.name || __('freelance.unknown_client')}</div>
                                     <div className="text-xs text-gray-500">{job.client?.email}</div>
                                 </td>
                                 <td className="p-4 font-medium text-slate-900">{job.formatted_budget}</td>
                                 <td className="p-4">{job.proposals_count || 0}</td>
                                 <td className="p-4 capitalize">
                                     <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 
-                                        ${job.status === 'published' ? 'bg-green-100 text-green-800' : 
+                                        ${job.status === 'published' || job.status === 'open' ? 'bg-green-100 text-green-800' : 
                                           job.status === 'suspended' ? 'bg-red-100 text-red-800' :
                                           job.status === 'completed' ? 'bg-blue-100 text-blue-800' :
                                           'bg-gray-100 text-gray-800'}`}>
@@ -91,33 +102,66 @@ export default function Index({ jobs, filters }: any) {
                                     </span>
                                 </td>
                                 <td className="p-4 text-gray-500">{new Date(job.created_at).toLocaleDateString()}</td>
-                                <td className="p-4 space-x-2 text-right">
-                                    <Link href={route('admin.freelance.jobs.show', job.id)} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
-                                        <Eye className="h-4 w-4 mr-1" /> View
-                                    </Link>
-                                    
-                                    {job.status === 'published' && (
-                                        <Button variant="secondary" size="sm" className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800" onClick={() => updateStatus(job.id, 'suspended')}>
-                                            <AlertCircle className="h-4 w-4 mr-1" /> Suspend
-                                        </Button>
-                                    )}
-                                    
-                                    {job.status === 'suspended' && (
-                                        <Button variant="secondary" size="sm" className="bg-green-100 hover:bg-green-200 text-green-800" onClick={() => updateStatus(job.id, 'published')}>
-                                            <CheckCircle className="h-4 w-4 mr-1" /> Restore
-                                        </Button>
-                                    )}
+                                <td className="p-4 text-right">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <span className="sr-only">Open menu</span>
+                                                <MoreHorizontal className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-56">
+                                            <DropdownMenuLabel>{__('freelance.actions')}</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem asChild>
+                                                <Link href={route('admin.freelance.jobs.show', job.id)} className="cursor-pointer flex w-full items-center">
+                                                    <Eye className="mr-2 h-4 w-4" />
+                                                    <span>{__('freelance.view')}</span>
+                                                </Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem asChild>
+                                                <Link href={route('admin.freelance.jobs.edit', job.id)} className="cursor-pointer flex w-full items-center">
+                                                    <Edit className="mr-2 h-4 w-4" />
+                                                    <span>{__('freelance.edit')}</span>
+                                                </Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            
+                                            {(job.status === 'published' || job.status === 'open') && (
+                                                <DropdownMenuItem onClick={() => updateStatus(job.id, 'suspended')} className="text-yellow-600 focus:text-yellow-600 focus:bg-yellow-50 cursor-pointer">
+                                                    <AlertCircle className="mr-2 h-4 w-4" />
+                                                    <span>{__('freelance.suspend')}</span>
+                                                </DropdownMenuItem>
+                                            )}
+                                            
+                                            {job.status === 'suspended' && (
+                                                <DropdownMenuItem onClick={() => updateStatus(job.id, 'published')} className="text-green-600 focus:text-green-600 focus:bg-green-50 cursor-pointer">
+                                                    <CheckCircle className="mr-2 h-4 w-4" />
+                                                    <span>{__('freelance.restore')}</span>
+                                                </DropdownMenuItem>
+                                            )}
 
-                                    <Button variant="destructive" size="sm" onClick={() => handleDelete(job.id)}>
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
+                                            {(job.status === 'published' || job.status === 'open' || job.status === 'suspended') && (
+                                                <DropdownMenuItem onClick={() => forceRefund(job.id)} className="text-orange-600 focus:text-orange-600 focus:bg-orange-50 cursor-pointer">
+                                                    <RefreshCw className="mr-2 h-4 w-4" />
+                                                    <span>{__('freelance.force_refund')}</span>
+                                                </DropdownMenuItem>
+                                            )}
+
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem onClick={() => handleDelete(job.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                <span>{__('freelance.delete')}</span>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </td>
                             </tr>
                         ))}
                         {jobs.data.length === 0 && (
                             <tr>
                                 <td colSpan={7} className="p-4 text-center text-gray-500">
-                                    No jobs found.
+                                    {__('freelance.no_jobs_found')}
                                 </td>
                             </tr>
                         )}

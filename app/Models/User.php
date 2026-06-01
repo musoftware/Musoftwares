@@ -274,6 +274,16 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class);
     }
 
+    public function actions()
+    {
+        return $this->hasMany(\App\Models\Action::class);
+    }
+
+    public function costTransactions()
+    {
+        return $this->hasMany(\App\Models\CostTransaction::class, 'user_id');
+    }
+
     public function withdraw()
     {
         return $this->hasMany(\App\Models\UserReferralRequestWithdraw::class);

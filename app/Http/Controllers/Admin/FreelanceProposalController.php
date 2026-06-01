@@ -61,6 +61,6 @@ class FreelanceProposalController extends Controller
         $proposal = Proposal::findOrFail($id);
         $proposal->delete();
 
-        return back()->with('success', __('Proposal deleted successfully.'));
+        return back()->with('success', __('freelance.proposal_deleted', [], 'en'));
     }
 }

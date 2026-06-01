@@ -10,8 +10,11 @@ import {
     DialogTrigger,
     DialogFooter,
 } from '@/Components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/Components/ui/dropdown-menu';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { MoreHorizontal, Edit, Trash2, CheckCircle, XCircle, Ban } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ skills, filters }: any) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -89,7 +92,7 @@ export default function Index({ skills, filters }: any) {
     const renderFormFields = () => (
         <div className="space-y-4 p-1">
             <div>
-                <Label htmlFor="name">Skill Name</Label>
+                <Label htmlFor="name">{__('freelance.skill_name', undefined, 'Skill Name')}</Label>
                 <Input
                     id="name"
                     value={formData.name}
@@ -99,7 +102,7 @@ export default function Index({ skills, filters }: any) {
             </div>
 
             <div>
-                <Label htmlFor="description">Description (Optional)</Label>
+                <Label htmlFor="description">{__('freelance.description_optional', undefined, 'Description (Optional)')}</Label>
                 <Input
                     id="description"
                     value={formData.description}
@@ -110,38 +113,38 @@ export default function Index({ skills, filters }: any) {
     );
 
     return (
-        <AdminSidebarLayout title="Freelance Skills" header="Manage Freelance Skills">
+        <AdminSidebarLayout title={__('freelance.admin_skills', undefined, 'Freelance Skills')} header={__('freelance.manage_skills', undefined, 'Manage Freelance Skills')}>
             <div className="mb-6 flex items-center justify-between">
                 <form onSubmit={handleSearch} className="flex space-x-2">
                     <Input 
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Search skills..."
+                        placeholder={__('freelance.search_skills', undefined, 'Search skills...')}
                         className="w-64"
                     />
-                    <Button type="submit" variant="secondary">Search</Button>
+                    <Button type="submit" variant="secondary">{__('freelance.search')}</Button>
                     {search && (
                         <Button type="button" variant="ghost" onClick={() => { setSearch(''); router.get(route('admin.freelance.skills.index')); }}>
-                            Clear
+                            {__('freelance.clear')}
                         </Button>
                     )}
                 </form>
 
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
-                        <Button>Create Skill</Button>
+                        <Button>{__('freelance.create_skill', undefined, 'Create Skill')}</Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Create New Skill</DialogTitle>
+                            <DialogTitle>{__('freelance.create_new_skill', undefined, 'Create New Skill')}</DialogTitle>
                         </DialogHeader>
                         <form onSubmit={handleCreateSubmit}>
                             {renderFormFields()}
                             <DialogFooter className="mt-6">
                                 <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
-                                    Cancel
+                                    {__('freelance.cancel')}
                                 </Button>
-                                <Button type="submit">Save Skill</Button>
+                                <Button type="submit">{__('freelance.save_skill', undefined, 'Save Skill')}</Button>
                             </DialogFooter>
                         </form>
                     </DialogContent>
@@ -153,11 +156,11 @@ export default function Index({ skills, filters }: any) {
                     <thead className="border-b bg-gray-50">
                         <tr>
                             <th className="p-4 font-medium text-gray-600">ID</th>
-                            <th className="p-4 font-medium text-gray-600">Name</th>
-                            <th className="p-4 font-medium text-gray-600">Description</th>
-                            <th className="p-4 font-medium text-gray-600">Status</th>
-                            <th className="p-4 font-medium text-gray-600">Created By</th>
-                            <th className="p-4 font-medium text-gray-600 text-right">Actions</th>
+                            <th className="p-4 font-medium text-gray-600">{__('freelance.skill_name', undefined, 'Name')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('freelance.description')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('freelance.status')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('freelance.created_by', undefined, 'Created By')}</th>
+                            <th className="p-4 font-medium text-gray-600 text-right">{__('freelance.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -176,39 +179,57 @@ export default function Index({ skills, filters }: any) {
                                     </span>
                                 </td>
                                 <td className="p-4 text-gray-500">
-                                    {skill.creator ? (
-                                        <div className="flex items-center space-x-2">
-                                            <span>{skill.creator.name}</span>
-                                            <Button variant="ghost" size="sm" onClick={() => handleBlockUser(skill.creator.id, skill.creator.name)} className="h-6 px-2 text-xs text-red-600">
-                                                Block User
-                                            </Button>
-                                        </div>
-                                    ) : 'System'}
+                                    {skill.creator ? skill.creator.name : __('freelance.system', undefined, 'System')}
                                 </td>
-                                <td className="p-4 space-x-2 text-right">
-                                    {skill.status === 'pending' && (
-                                        <>
-                                            <Button variant="secondary" size="sm" onClick={() => handleApprove(skill.id)}>
-                                                Approve
+                                <td className="p-4 text-right">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <span className="sr-only">Open menu</span>
+                                                <MoreHorizontal className="h-4 w-4" />
                                             </Button>
-                                            <Button variant="destructive" size="sm" onClick={() => handleReject(skill.id)}>
-                                                Decline
-                                            </Button>
-                                        </>
-                                    )}
-                                    <Button variant="outline" size="sm" onClick={() => openEditModal(skill)}>
-                                        Edit
-                                    </Button>
-                                    <Button variant="destructive" size="sm" onClick={() => handleDelete(skill.id)}>
-                                        Delete
-                                    </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-56">
+                                            <DropdownMenuLabel>{__('freelance.actions')}</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            {skill.status === 'pending' && (
+                                                <>
+                                                    <DropdownMenuItem onClick={() => handleApprove(skill.id)} className="cursor-pointer">
+                                                        <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
+                                                        <span>{__('freelance.approve_skill', undefined, 'Approve')}</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleReject(skill.id)} className="cursor-pointer text-yellow-600">
+                                                        <XCircle className="mr-2 h-4 w-4" />
+                                                        <span>{__('freelance.decline_skill', undefined, 'Decline')}</span>
+                                                    </DropdownMenuItem>
+                                                </>
+                                            )}
+                                            <DropdownMenuItem onClick={() => openEditModal(skill)} className="cursor-pointer">
+                                                <Edit className="mr-2 h-4 w-4 text-blue-600" />
+                                                <span>{__('freelance.edit')}</span>
+                                            </DropdownMenuItem>
+                                            
+                                            {skill.creator && (
+                                                <DropdownMenuItem onClick={() => handleBlockUser(skill.creator.id, skill.creator.name)} className="cursor-pointer text-orange-600">
+                                                    <Ban className="mr-2 h-4 w-4" />
+                                                    <span>{__('freelance.block_user_skills', undefined, 'Block User')}</span>
+                                                </DropdownMenuItem>
+                                            )}
+
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem onClick={() => handleDelete(skill.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                <span>{__('freelance.delete')}</span>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </td>
                             </tr>
                         ))}
                         {skills.data.length === 0 && (
                             <tr>
                                 <td colSpan={6} className="p-4 text-center text-gray-500">
-                                    No skills found.
+                                    {__('freelance.no_skills_found', undefined, 'No skills found.')}
                                 </td>
                             </tr>
                         )}
@@ -238,15 +259,15 @@ export default function Index({ skills, filters }: any) {
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit Skill</DialogTitle>
+                        <DialogTitle>{__('freelance.edit_skill', undefined, 'Edit Skill')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleEditSubmit}>
                         {renderFormFields()}
                         <DialogFooter className="mt-6">
                             <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
-                                Cancel
+                                {__('freelance.cancel')}
                             </Button>
-                            <Button type="submit">Save Changes</Button>
+                            <Button type="submit">{__('freelance.save_changes')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

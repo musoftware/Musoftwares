@@ -12,6 +12,7 @@ class UserReferralRequestWithdraw extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
     protected $appends = ['formatted_amount'];
 
     public function getFormattedAmountAttribute()

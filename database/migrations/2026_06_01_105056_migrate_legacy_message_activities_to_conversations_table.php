@@ -104,6 +104,8 @@ return new class extends Migration
     }
 };
 
-function clone_string($str) {
-    return $str ?? '';
+if (!function_exists('clone_string')) {
+    function clone_string($str) {
+        return $str ?? '';
+    }
 }

@@ -360,6 +360,7 @@ class EarningAnalyzeService
                 'user_id'               => $e->user_id,
                 'user_name'             => $e->user?->name ?? 'Deleted User',
                 'user_email'            => $e->user?->email ?? '—',
+                'referred_user_id'      => $e->referred_user?->id ?? null,
                 'referred_user_name'    => $e->referred_user?->name ?? null,
                 'amount'                => (float) $e->amount,
                 'amount_business'       => round((float) CurrenciesExchange::RateToday($e->amount, $e->currency_id, $businessCurrency), 2),

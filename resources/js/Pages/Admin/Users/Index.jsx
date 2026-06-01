@@ -258,8 +258,9 @@ export default function Index({ clients, filters, stats }) {
                 onChange={(e) => handleFilter('role', e.target.value)}
             >
                 <option value="">All Roles</option>
-                <option value="user">Users</option>
+                <option value="client">Clients</option>
                 <option value="admin">Admins</option>
+                <option value="employee">Employees</option>
             </select>
             <select 
                 className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
@@ -368,7 +369,6 @@ export default function Index({ clients, filters, stats }) {
                                         required
                                     >
                                         <option value="client">{__("Client")}</option>
-                                        <option value="user">{__("User")}</option>
                                         <option value="admin">{__("Admin")}</option>
                                         <option value="manager">{__("Manager")}</option>
                                         <option value="employee">{__("Employee")}</option>

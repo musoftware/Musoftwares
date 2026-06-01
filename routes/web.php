@@ -317,7 +317,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/kyc/{id}/reject', [\App\Http\Controllers\Admin\KycController::class, 'reject'])->name('kyc.reject');
 
     // ── Admin Blog Articles ─────────────────────────────────────────
-    Route::resource('/blog-articles', \App\Http\Controllers\Admin\AdminBlogArticleController::class)->only(['index']);
+    Route::resource('/blog-articles', \App\Http\Controllers\Admin\AdminBlogArticleController::class);
 
     // ── Admin Employee Todos ────────────────────────────────────────
     Route::get('/employee-todos', [\App\Http\Controllers\Admin\EmployeeTodoController::class, 'index'])->name('employee-todos.index');
@@ -444,10 +444,12 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::post('skills/{skill}/reject', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'reject'])->name('skills.reject');
         Route::post('skills/block-user/{user}', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'blockUser'])->name('skills.block-user');
         Route::resource('skills', \App\Http\Controllers\Admin\FreelanceSkillController::class)->except(['show']);
-        Route::resource('jobs', \App\Http\Controllers\Admin\FreelanceJobController::class)->only(['index', 'show', 'destroy']);
+        Route::resource('jobs', \App\Http\Controllers\Admin\FreelanceJobController::class)->except(['create', 'store']);
         Route::post('jobs/{job}/status', [\App\Http\Controllers\Admin\FreelanceJobController::class, 'updateStatus'])->name('jobs.status');
+        Route::post('jobs/{job}/force-refund', [\App\Http\Controllers\Admin\FreelanceJobController::class, 'forceRefund'])->name('jobs.force-refund');
         Route::resource('contracts', \App\Http\Controllers\Admin\FreelanceContractController::class)->only(['index', 'show', 'destroy']);
         Route::post('contracts/{contract}/status', [\App\Http\Controllers\Admin\FreelanceContractController::class, 'updateStatus'])->name('contracts.status');
+        Route::post('contracts/{contract}/resolve-dispute', [\App\Http\Controllers\Admin\FreelanceContractController::class, 'resolveDispute'])->name('contracts.resolve-dispute');
         Route::resource('proposals', \App\Http\Controllers\Admin\FreelanceProposalController::class)->only(['index', 'show', 'destroy']);
     });
 
