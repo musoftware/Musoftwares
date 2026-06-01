@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader } from '@/Components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { __ } from '@/lib/i18n';
 
 export default function AffiliateOrdersIndex({ orders, filters }: any) {
     const [status, setStatus] = useState(filters?.status || 'all');

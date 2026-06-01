@@ -10,6 +10,7 @@ import { Button, buttonVariants } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { FileText, Eye, CreditCard, Wallet, AlertCircle } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface Invoice {
     id: number;

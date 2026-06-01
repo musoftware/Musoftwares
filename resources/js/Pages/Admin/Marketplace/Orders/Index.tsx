@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Badge } from '@/Components/ui/badge';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ orders }) {
 

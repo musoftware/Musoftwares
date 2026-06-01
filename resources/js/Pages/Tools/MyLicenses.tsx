@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { Card } from '@/Components/ui/card';
 import { ExternalLink, Key, Copy, Check, Monitor, Smartphone, ShoppingBag } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface License {
     id: number; license_key: string; status: string; is_valid: boolean;

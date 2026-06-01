@@ -18,6 +18,7 @@ import { Badge } from '@/Components/ui/badge';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 
 interface Transaction {
     id: number;

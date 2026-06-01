@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Crown, AlertTriangle, TrendingUp } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function PriorityDashboard({ stats, recentEscalations }) {
     return (

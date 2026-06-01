@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { Activity, LayoutGrid, BarChart3, Zap } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface Log {
     id: number;

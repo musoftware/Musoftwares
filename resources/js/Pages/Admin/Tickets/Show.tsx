@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { useToast } from '@/Components/ui/use-toast';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import { __ } from '@/lib/i18n';
 import {
     Dialog,
     DialogContent,

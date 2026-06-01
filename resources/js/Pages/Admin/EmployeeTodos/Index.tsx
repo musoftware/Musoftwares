@@ -23,6 +23,7 @@ import { Textarea } from '@/Components/ui/textarea';
 import { useToast } from '@/Components/ui/use-toast';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { __ } from '@/lib/i18n';
 import {
     MoreHorizontal,
     Plus,

@@ -13,6 +13,7 @@ import {
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Tag, Plus, Pencil, Trash2, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 const emptyForm = {
     code: '',

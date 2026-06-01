@@ -1,6 +1,7 @@
 import React from 'react';
 import ERPLayout from '@/Layouts/ERPLayout';
 import { Head, Link } from '@inertiajs/react';
+import { __ } from '@/lib/i18n';
 
 export default function CustomersIndex({ customers }: { customers: any }) {
     return (

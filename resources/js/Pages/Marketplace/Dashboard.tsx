@@ -24,6 +24,7 @@ import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { useMarketplaceMode } from '@/Components/Marketplace/MarketplaceModeContext';
+import { __ } from '@/lib/i18n';
 
 export default function MarketplaceDashboard({
     stats: initialStats,

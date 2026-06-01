@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Shield, Search, Trash2, Plus, Users } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface Assignment {
     id: number;

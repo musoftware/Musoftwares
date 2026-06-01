@@ -3,6 +3,7 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 import { Loader2 } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     const { post, processing } = useForm({});

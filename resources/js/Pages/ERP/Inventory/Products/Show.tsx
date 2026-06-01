@@ -3,6 +3,7 @@ import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Edit, Plus, Minus } from 'lucide-react';
 import Pagination from '@/components/Pagination';
+import { __ } from '@/lib/i18n';
 
 export default function Show({ product, stockLogs }: { product: any, stockLogs: any }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('inventory');

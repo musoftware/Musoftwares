@@ -5,6 +5,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { B2BCampaign, B2BSequence } from '../../types/b2b.types';
+import { __ } from '@/lib/i18n';
 
 interface OutreachWorkspaceProps {
     campaigns: B2BCampaign[];

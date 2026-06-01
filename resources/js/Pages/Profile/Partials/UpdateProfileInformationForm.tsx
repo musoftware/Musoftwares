@@ -5,6 +5,7 @@ import TextInput from '@/Components/TextInput';
 import { Transition } from '@headlessui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import { __ } from '@/lib/i18n';
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,

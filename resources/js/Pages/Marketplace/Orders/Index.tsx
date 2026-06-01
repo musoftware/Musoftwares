@@ -4,6 +4,7 @@ import { Head, Link, router } from '@inertiajs/react';
 
 import { useEffect } from 'react';
 import { useMarketplaceMode } from '@/Components/Marketplace/MarketplaceModeContext';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ orders, tab }: any) {
     const { mode, setMode } = useMarketplaceMode();

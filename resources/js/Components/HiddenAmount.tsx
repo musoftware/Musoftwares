@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Badge } from '@/Components/ui/badge';
+import { __ } from '@/lib/i18n';
 
 interface HiddenAmountProps {
     amount: React.ReactNode;

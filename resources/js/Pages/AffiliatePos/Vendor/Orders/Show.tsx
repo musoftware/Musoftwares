@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Package, Truck, CheckCircle2, Clock, MapPin, User, ArrowLeft } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function VendorOrderShow({ order }: any) {
     const TimelineStep = ({ title, active, isLast }: { title: string, active: boolean, isLast?: boolean }) => (

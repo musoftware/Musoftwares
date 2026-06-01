@@ -3,6 +3,7 @@ import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
 import { Image as ImageIcon, Video, X, UploadCloud } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
+import { __ } from '@/lib/i18n';
 
 export default function GalleryStep({ data, setData, errors }: any) {
     const onDrop = useCallback((acceptedFiles: File[]) => {

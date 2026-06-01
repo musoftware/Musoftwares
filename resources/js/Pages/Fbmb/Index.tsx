@@ -12,6 +12,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
 import { useToast } from "@/Components/ui/use-toast";
 import { cn } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 interface PageProps {
     pointsBalance: number;

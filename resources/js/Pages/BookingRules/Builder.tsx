@@ -4,6 +4,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
 import { Plus, Settings2, Play, GitMerge } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function RuleBuilder({ rule }) {
     const [conditions, setConditions] = useState(rule?.conditions || []);

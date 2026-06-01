@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ManageCategoriesModal } from './Components/ManageCategoriesModal';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ products, hasInventoryFeature, filters }: { products: any, hasInventoryFeature: boolean, filters?: any }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('inventory');

@@ -3,6 +3,7 @@ import { Head } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { ShoppingCart, Search, Plus, Minus, Trash2, CreditCard, ArrowLeft } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function PosIndex({ initialProducts, categories }: any) {
     const [cart, setCart] = useState<any[]>([]);

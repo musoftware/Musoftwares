@@ -15,6 +15,7 @@ import { Textarea } from '@/Components/ui/textarea';
 
 import { useRuntimeWS } from '@/hooks/useRuntimeWS';
 import { RuntimePluginModals } from '@/Components/Tools/RuntimePluginModals';
+import { __ } from '@/lib/i18n';
 
 // ── Helper: status badge style ────────────────────────────────────────────────
 function statusStyle(status: string) {

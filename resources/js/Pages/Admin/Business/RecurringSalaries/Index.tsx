@@ -15,6 +15,7 @@ import {
 } from "@/Components/ui/dialog";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
+import { __ } from '@/lib/i18n';
 
 export default function Index({ salaries, currencies, users }) {
     const { errors } = usePage().props;

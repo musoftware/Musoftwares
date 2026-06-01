@@ -657,4 +657,168 @@ class InvoiceController extends Controller
         }
         return redirect()->back()->with('error', $result['message']);
     }
+
+    public function calculatePayService(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
+    {
+        $request->validate([
+            'service_amount' => 'required|numeric',
+            'currency' => 'required|integer',
+            'service_pay_source' => 'required|string',
+            'service_pay_dest' => 'required|string',
+            'service_revenue' => 'required|integer',
+        ]);
+
+        $calc = $this->runPayServiceCalculation(
+            $invoice,
+            $request->service_amount,
+            $request->currency,
+            $request->service_pay_source,
+            $request->service_pay_dest,
+            $request->service_revenue
+        );
+
+        return response()->json([
+            'cost' => round($calc['cost'], 2),
+            'total' => round($calc['total'], 2),
+            'total_usd' => round($calc['total_usd'], 2),
+            'invoice_currency_id' => $invoice->currency_id,
+            'invoice_currency' => $invoice->currency ? $invoice->currency->currency : null,
+        ]);
+    }
+
+    private function runPayServiceCalculation(\App\Models\Invoice $invoice, $service_amount, $currency, $source, $dest, $revenue)
+    {
+        $ex_cost = \App\Models\CurrenciesExchange::RateToday((int) $service_amount, $currency, $invoice->currency_id);
+        $total_cost = $ex_cost;
+
+        if ($source == 'wallet') {
+            $total_cost = round($total_cost / (1 - 0.01), 2);
+        }
+        if ($source == 'paypal') {
+            $total_cost = round($total_cost / (1 - 0.05), 2);
+        }
+        if ($source == 'gumroad') {
+            $total_cost = round($total_cost / (1 - 0.14), 2);
+        }
+        if ($source == 'payoneer') {
+            $total_cost = round($total_cost / (1 - 0.03), 2);
+        }
+        if ($dest == 'cib') {
+            if ($currency == 2) {
+                $total_cost = round($total_cost * 1.05, 2);
+                $total_cost = round($total_cost / (1 - 0.02), 2);
+            } else {
+                $total_cost = round($total_cost / (1 - 0.044), 2);
+                $total_cost = round($total_cost / (1 - 0.05), 2);
+            }
+        }
+        if ($dest == 'cib_swype') {
+            $total_cost = round($total_cost * 1.05, 2);
+            $total_cost = round($total_cost / (1 - 0.02), 2);
+
+            $months = 12; // Assuming a 12-month installment plan
+            $interestRate = 2.67 / 100; // Convert percentage to decimal
+
+            $monthlyInstallment = ($total_cost * $interestRate * pow(1 + $interestRate, $months)) /
+                (pow(1 + $interestRate, $months) - 1);
+
+            $total_cost = round($monthlyInstallment * $months, 2);
+        }
+        if ($dest == 'alex') {
+            $total_cost = round($total_cost / (1 - 0.044), 2);
+            $total_cost = round($total_cost / (1 - 0.06), 2);
+        }
+        if ($dest == 'redot') {
+            $item = \App\Models\GoldWorldPrice::query()
+                ->select(\Illuminate\Support\Facades\DB::raw('DATE(price_date) as price_date, avg(price_24k) as price_24k, avg(price_22k) as price_22k, avg(price_21k) as price_21k, avg(price_18k) as price_18k, avg(price_14k) as price_14k'))
+                ->groupBy(\Illuminate\Support\Facades\DB::raw('DATE(price_date)'))
+                ->orderBy(\Illuminate\Support\Facades\DB::raw('DATE(price_date)'), 'desc')
+                ->first();
+            
+            if ($item) {
+                $usdPrice1 = \App\Models\CurrenciesExchange::RateByDate($item->price_date, $item->price_21k, 2, 1);
+                $price_21 = \App\Models\GoldPrice::query()->where(\Illuminate\Support\Facades\DB::raw('DATE(price_date)'), $item->price_date)->select(\Illuminate\Support\Facades\DB::raw('avg(price_21k) as price_21k'))->groupBy(\Illuminate\Support\Facades\DB::raw('DATE(price_date)'))->first();
+
+                if ($usdPrice1 > 0 && $price_21) {
+                    $total_cost = (int) $service_amount * ($price_21->price_21k / $usdPrice1);
+                    $total_cost = round($total_cost / (1 - 0.044), 2);
+                    $total_cost = round($total_cost / (1 - 0.035), 2);
+                }
+            }
+        }
+        if ($dest == 'wallet') {
+            $total_cost = round($total_cost / (1 - 0.01), 2);
+        }
+
+        $cost = $total_cost;
+        $total = $cost;
+        switch ((int) $revenue) {
+            case 3: $total = round($cost / (1 - 0.25), 2); break;
+            case 2: $total = round($cost / (1 - 0.175), 2); break;
+            case 1: $total = round($cost / (1 - 0.1125), 2); break;
+            case 0: $total = round($cost / (1 - 0.0475), 2); break;
+            case -1: $total = round($cost / (1 - 0.01125), 2); break;
+            default: $total = round($cost / (1 - 0.0175), 2); break;
+        }
+
+        $total_usd = \App\Models\CurrenciesExchange::RateToday($cost, $invoice->currency_id, 1);
+        $total_usd = round($total_usd / (1 - 0.20), 2);
+
+        return [
+            'cost' => $cost,
+            'total' => $total,
+            'total_usd' => $total_usd,
+        ];
+    }
+
+    public function storePayService(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
+    {
+        $request->validate([
+            'service_amount' => 'required|numeric',
+            'currency' => 'required|integer',
+            'service_pay_source' => 'required|string',
+            'service_pay_dest' => 'required|string',
+            'service_revenue' => 'required|integer',
+        ]);
+
+        if ($invoice->status != 'unpaid') {
+            return redirect()->back()->with('error', __('admin.only_unpaid_invoices_can_be_edited'));
+        }
+
+        $calc = $this->runPayServiceCalculation(
+            $invoice,
+            $request->service_amount,
+            $request->currency,
+            $request->service_pay_source,
+            $request->service_pay_dest,
+            $request->service_revenue
+        );
+
+        $cost = round((float) $calc['cost'], 3);
+        $total = round((float) $calc['total']); 
+
+        $item = new \App\Models\InvoiceItem();
+        $item->invoice_id = $invoice->id;
+        $item->item_title = 'Service Payment - ' . $request->service_pay_source;
+        $item->qty = 1;
+        $item->amount = $total;
+        $item->item_type = 'simple';
+        $item->save();
+
+        $nextSort = (int) \App\Models\InvoiceCostLine::where('invoice_id', $invoice->id)->max('sort_order') + 1;
+        
+        $costLine = new \App\Models\InvoiceCostLine();
+        $costLine->invoice_id = $invoice->id;
+        $costLine->line_type = 'direct';
+        $costLine->amount = $cost;
+        $costLine->description = 'Service Payment - ' . $request->service_pay_source;
+        $costLine->sort_order = $nextSort;
+        $costLine->save();
+
+        $invoice->update([
+            'cost' => (float) \App\Models\InvoiceCostLine::where('invoice_id', $invoice->id)->sum('amount'),
+        ]);
+
+        return redirect()->back()->with('success', __('admin.service_payment_added_successfully'));
+    }
 }

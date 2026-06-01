@@ -7,6 +7,7 @@ import { Input } from '@/Components/ui/input';
 import { Search, FilterX, Check, X, Eye, FileWarning } from 'lucide-react';
 import { DateDisplay } from '@/Components/ui/DateDisplay';
 import { Badge } from '@/Components/ui/badge';
+import { __ } from '@/lib/i18n';
 
 export default function Pending({ auth, services, filters }: any) {
     const [search, setSearch] = useState(filters?.search || '');

@@ -15,6 +15,7 @@ import {
     CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer 
 } from 'recharts';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 
 export default function ReportsIndex({
     pnl,

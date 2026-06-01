@@ -4,6 +4,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { B2BInbox } from '../../types/b2b.types';
+import { __ } from '@/lib/i18n';
 
 interface InboxesWorkspaceProps {
     inboxes: B2BInbox[];

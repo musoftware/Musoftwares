@@ -1,6 +1,7 @@
 import React from 'react';
 import { HelpCircle } from 'lucide-react';
 import { RealtimeLog, LinkedInSession, B2BInbox } from '../../types/b2b.types';
+import { __ } from '@/lib/i18n';
 
 interface SidebarProps {
     realtimeLogs: RealtimeLog[];

@@ -4,6 +4,7 @@ import { Head } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 import { Plus } from 'lucide-react';
 import { useERPMenu } from '@/hooks/useERPMenu';
+import { __ } from '@/lib/i18n';
 
 interface Props {
     branches: Array<any>;

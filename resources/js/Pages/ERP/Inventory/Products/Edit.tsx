@@ -3,6 +3,7 @@ import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import InputError from '@/components/InputError';
+import { __ } from '@/lib/i18n';
 
 export default function Edit({ product, currencies, categories, hasMultiCurrency, stockLogs }: { product: any, currencies: any[], categories: any[], hasMultiCurrency: boolean, stockLogs?: any[] }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('inventory');

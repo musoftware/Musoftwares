@@ -11,6 +11,7 @@ import PricingStep from './Steps/PricingStep';
 import DescriptionStep from './Steps/DescriptionStep';
 import GalleryStep from './Steps/GalleryStep';
 import PublishStep from './Steps/PublishStep';
+import { __ } from '@/lib/i18n';
 
 interface Category { id: number; name: string; slug: string; }
 interface Props { categories: Category[]; service: any; }

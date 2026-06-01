@@ -6,6 +6,7 @@ import {
     FileIcon, AlertCircle, CheckCircle, RefreshCw
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 
 export default function ExcelMergerRunner({ tool, subscription }: any) {
     const [files, setFiles] = useState<File[]>([]);

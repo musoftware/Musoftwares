@@ -17,6 +17,7 @@ import {
 import { Switch } from '@/Components/ui/switch';
 
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 const statusMap: Record<string, string> = {
     active: 'success', suspended: 'danger', suspended_by_reseller: 'danger',

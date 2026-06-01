@@ -4,6 +4,7 @@ import { Button } from '@/Components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Badge } from '@/Components/ui/badge';
 import { CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function ApprovalCenter({ pendingApprovals }) {
     return (

@@ -5,6 +5,7 @@ import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
 import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 import { Calendar, Clock, Users, ArrowUpRight, CheckCircle2, XCircle, CalendarOff } from 'lucide-react';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
+import { __ } from '@/lib/i18n';
 
 interface DashboardProps {
     stats: {

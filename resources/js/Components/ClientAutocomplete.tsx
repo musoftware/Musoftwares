@@ -5,6 +5,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import axios from 'axios';
+import { __ } from '@/lib/i18n';
 
 // Declare route as any since Ziggy is global
 declare const route: any;

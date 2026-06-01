@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/Components/ui/button';
 import { Link } from '@inertiajs/react';
+import { __ } from '@/lib/i18n';
 import {
     Check, Layers, Crown, Sparkles, Building2, MessageSquare, Zap, Store, Wrench
 } from 'lucide-react';

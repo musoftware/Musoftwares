@@ -3,6 +3,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { cn } from '@/lib/utils';
 import { X } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function OverviewStep({ data, setData, errors, categories }: any) {
     const [tagInput, setTagInput] = useState('');

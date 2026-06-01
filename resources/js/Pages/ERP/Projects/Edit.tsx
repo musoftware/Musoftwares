@@ -8,6 +8,7 @@ import { Input } from '@/Components/ui/input';
 import { ArrowLeft, Briefcase, Edit2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { ClientAutocomplete } from '@/Components/ClientAutocomplete';
+import { __ } from '@/lib/i18n';
 
 export default function EditProject({ project, clients = [] }: { project: any, clients?: any[] }) {
     const [form, setForm] = useState({

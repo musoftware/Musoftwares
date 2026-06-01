@@ -4,29 +4,53 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { ArrowLeft, Trash2, ShieldAlert, CheckCircle, XCircle, AlertTriangle, Users, ArrowRightLeft } from 'lucide-react';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { __ } from '@/lib/i18n';
 
 export default function Show({ contract }: any) {
-    const handleDelete = () => {
-        if (confirm('Are you sure you want to delete this contract permanently?')) {
-            router.delete(route('admin.freelance.contracts.destroy', contract.id));
+    const [confirmAction, setConfirmAction] = useState<{
+        action: () => void,
+        title: string,
+        description: string,
+        confirmLabel: string,
+        variant?: "danger" | "default" | "warning"
+    } | null>(null);
+
+    const executeAction = () => {
+        if (confirmAction) {
+            confirmAction.action();
+            setConfirmAction(null);
         }
+    };
+
+    const handleDelete = () => {
+        setConfirmAction({
+            action: () => router.delete(route('admin.freelance.contracts.destroy', contract.id)),
+            title: __('freelance.confirm_delete_contract', undefined, 'Delete Contract?'),
+            description: __('freelance.confirm_delete_contract_msg', undefined, 'Are you sure you want to delete this contract permanently?'),
+            confirmLabel: __('freelance.delete', undefined, 'Delete'),
+            variant: 'danger'
+        });
     };
 
     const updateStatus = (newStatus: string) => {
-        if (confirm(`Are you sure you want to change the status to ${newStatus}?`)) {
-            router.post(route('admin.freelance.contracts.status', contract.id), { status: newStatus }, {
-                preserveScroll: true
-            });
-        }
+        setConfirmAction({
+            action: () => router.post(route('admin.freelance.contracts.status', contract.id), { status: newStatus }, { preserveScroll: true }),
+            title: __('freelance.confirm_status_change', { status: newStatus }, `Change status to ${newStatus}?`),
+            description: __('freelance.confirm_status_change_msg', { status: newStatus }, `Are you sure you want to change the contract status to ${newStatus}?`),
+            confirmLabel: __('general.confirm', undefined, 'Confirm'),
+            variant: 'default'
+        });
     };
 
     const resolveDispute = (resolution: string) => {
-        if (confirm(`Are you sure you want to resolve the dispute by: ${resolution}?`)) {
-            router.post(route('admin.freelance.contracts.resolve-dispute', contract.id), { resolution }, {
-                preserveScroll: true
-            });
-        }
+        setConfirmAction({
+            action: () => router.post(route('admin.freelance.contracts.resolve-dispute', contract.id), { resolution }, { preserveScroll: true }),
+            title: __('freelance.confirm_resolve_dispute', undefined, 'Resolve Dispute?'),
+            description: __('freelance.confirm_resolve_dispute_msg', { resolution }, `Are you sure you want to resolve the dispute by: ${resolution}?`),
+            confirmLabel: __('general.confirm', undefined, 'Confirm'),
+            variant: 'warning'
+        });
     };
 
     return (
@@ -232,6 +256,17 @@ export default function Show({ contract }: any) {
                     </div>
                 </div>
             </div>
+
+            <ConfirmModal 
+                isOpen={!!confirmAction} 
+                onCancel={() => setConfirmAction(null)}
+                onConfirm={executeAction}
+                title={confirmAction?.title || ''}
+                description={confirmAction?.description || ''}
+                confirmLabel={confirmAction?.confirmLabel || ''}
+                cancelLabel={__('general.cancel', undefined, 'Cancel')}
+                variant={confirmAction?.variant || 'default'}
+            />
         </AdminSidebarLayout>
     );
 }

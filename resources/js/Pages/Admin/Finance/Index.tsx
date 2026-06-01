@@ -38,6 +38,7 @@ import {
 } from "@/Components/ui/sheet";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
+import { __ } from '@/lib/i18n';
 
 declare const route: any;
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/Components/ui/button';
 import { Send, Rocket } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function PublishStep({ data, setStep, processing }: any) {
     return (

@@ -12,6 +12,7 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import { MoreHorizontal, ToggleLeft, ToggleRight, Trash2, Clock, RefreshCw, CalendarDays, AlertCircle } from 'lucide-react';
 import { useToast } from '@/Components/ui/use-toast';
+import { __ } from '@/lib/i18n';
 
 interface BusyTime {
     id: number;

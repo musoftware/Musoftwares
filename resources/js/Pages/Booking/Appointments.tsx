@@ -26,6 +26,7 @@ import { EmptyState } from '@/Components/ui/EmptyState';
 import { format } from 'date-fns';
 import { Calendar, Clock, CreditCard, ExternalLink, MoreVertical, Search, UserCircle2, Briefcase, FileText, CheckCircle, XCircle, Users, LayoutList, CalendarDays, CalendarOff } from 'lucide-react';
 import { SimpleCalendar } from '@/Components/Booking/SimpleCalendar';
+import { __ } from '@/lib/i18n';
 
 export default function Appointments({ bookings, providers, filters }: any) {
     const [search, setSearch] = useState(filters?.search || '');

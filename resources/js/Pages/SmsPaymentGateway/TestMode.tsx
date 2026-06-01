@@ -9,6 +9,7 @@ import {
     ArrowLeft, Beaker, Zap, Database, Trash2, Power, Send
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/Components/ui/alert';
+import { __ } from '@/lib/i18n';
 
 interface TestModeProps {
     testModeEnabled: boolean;

@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { ArrowLeft, Save } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function Edit({ income, currencies, categories }) {
     const { errors } = usePage().props;

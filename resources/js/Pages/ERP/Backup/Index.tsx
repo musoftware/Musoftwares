@@ -10,6 +10,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { useToast } from '@/Components/ui/use-toast';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { __ } from '@/lib/i18n';
 
 export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: boolean }) {
     const { auth } = usePage().props as any;

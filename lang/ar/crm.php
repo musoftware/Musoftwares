@@ -1,10 +1,31 @@
 <?php
 
 return [
+    'actions' => 'actions',
+    'company' => 'company',
+    'custom_field_created' => 'custom_field_created',
+    'custom_field_deleted' => 'custom_field_deleted',
+    'custom_field_updated' => 'custom_field_updated',
+    'customer_deleted' => 'customer_deleted',
+    'customers' => 'customers',
+    'email' => 'email',
+    'name' => 'name',
+    'no_pipelines_found' => 'no_pipelines_found',
+    'pipeline_created' => 'pipeline_created',
+    'pipeline_deleted' => 'pipeline_deleted',
+    'pipelines' => 'pipelines',
+    'settings_saved_successfully' => 'settings_saved_successfully',
+    'total_value' => 'total_value',
+    'view' => 'view',
+    'widget_created' => 'widget_created',
+    'widget_created_successfully' => 'widget_created_successfully',
+    'widget_deleted' => 'widget_deleted',
+    'widget_deleted_successfully' => 'widget_deleted_successfully',
+    'widget_updated' => 'widget_updated',
+    'widget_updated_successfully' => 'widget_updated_successfully',
     'template_created' => 'تم إنشاء القالب بنجاح.',
     'template_updated' => 'تم تحديث القالب بنجاح.',
     'template_deleted' => 'تم حذف القالب بنجاح.',
-    
     'campaign_created' => 'تم إنشاء الحملة بنجاح.',
     'campaign_updated' => 'تم تحديث الحملة بنجاح.',
     'only_draft_campaigns_deleted' => 'يمكن حذف الحملات كمسودة فقط.',
@@ -16,28 +37,21 @@ return [
     'campaign_cancelled' => 'تم إلغاء الحملة بنجاح.',
     'campaign_duplicated' => 'تم استنساخ الحملة بنجاح.',
     'campaign_content_saved' => 'تم حفظ محتوى الحملة بنجاح.',
-    
     'audience_updated' => 'تم تحديث الجمهور بنجاح.',
     'audience_deleted' => 'تم حذف الجمهور بنجاح.',
-    
     'sequence_created' => 'تم إنشاء التسلسل بنجاح.',
     'sequence_deleted' => 'تم حذف التسلسل بنجاح.',
     'step_added' => 'تم إضافة الخطوة بنجاح.',
     'step_updated' => 'تم تحديث الخطوة بنجاح.',
     'step_deleted' => 'تم حذف الخطوة بنجاح.',
     'ai_steps_applied' => 'تم تطبيق خطوات الذكاء الاصطناعي بنجاح.',
-    
     'tag_added' => 'تم إضافة العلامة للعميل بنجاح.',
     'tag_removed' => 'تم إزالة العلامة من العميل بنجاح.',
-    
     'note_added' => 'تم إضافة الملاحظة بنجاح.',
     'note_updated' => 'تم تحديث الملاحظة بنجاح.',
     'note_deleted' => 'تم حذف الملاحظة بنجاح.',
-    
     'lead_stale_warning' => 'هذا العميل لم يتم التواصل معه منذ :days أيام.',
     'pipeline_updated' => 'تم تحديث مرحلة العميل بنجاح.',
-
-    // Manager Dashboard
     'Agent' => 'الموظف',
     'Calls' => 'المكالمات',
     'Closed' => 'المغلقة',
@@ -49,8 +63,6 @@ return [
     'days ago' => 'أيام مضت',
     'Last touched:' => 'آخر تواصل:',
     'View' => 'عرض',
-    
-    // Marketing Dashboard
     'Marketing Workspace' => 'مساحة التسويق',
     'Marketing & Growth' => 'التسويق والنمو',
     'Campaign performance and lead acquisition.' => 'أداء الحملات واستقطاب العملاء.',
@@ -62,8 +74,6 @@ return [
     'Campaign ROI' => 'عائد استثمار الحملات',
     'Top Performing Campaigns' => 'أفضل الحملات أداءً',
     'No active campaigns data available.' => 'لا تتوفر بيانات عن حملات نشطة.',
-
-    // Support Dashboard
     'Support Workspace' => 'مساحة الدعم الفني',
     'Customer Support' => 'دعم العملاء',
     'Monitor tickets, WhatsApp messages, and response SLAs.' => 'مراقبة التذاكر، رسائل الواتساب، وأوقات الاستجابة.',
@@ -74,16 +84,12 @@ return [
     'Resolved Today' => 'تم حلها اليوم',
     'Priority Inbox' => 'الرسائل ذات الأولوية',
     'No priority messages at the moment.' => 'لا توجد رسائل ذات أولوية في الوقت الحالي.',
-    
     'lead_status_updated' => 'تم تحديث حالة العميل بنجاح.',
     'lead_assignment_updated' => 'تم تحديث تعيين العميل بنجاح.',
     'lead_deleted' => 'تم حذف العميل بنجاح.',
-    
     'lead_info_submitted' => 'شكراً لك! تم إرسال معلوماتك بنجاح.',
     'lead_info_error' => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.',
-    
     'no_workspace_access' => 'ليس لديك صلاحية للوصول إلى أي مساحة عمل في النظام. يرجى التواصل مع الدعم الفني أو ترقية اشتراكك.',
-    
     'campaign_edit_state_error' => 'يمكن تعديل الحملة فقط إذا كانت كمسودة أو متوقفة مؤقتاً.',
     'campaign_schedule_draft_error' => 'يمكن جدولة الحملات التي هي كمسودة فقط.',
     'campaign_not_running' => 'الحملة لا تعمل حالياً.',
@@ -92,8 +98,6 @@ return [
     'campaign_validation_failed' => 'فشل التحقق من الحملة: :errors',
     'campaign_no_audience' => 'الحملة ليس لديها جمهور معين.',
     'no_connected_whatsapp_accounts' => 'لا توجد حسابات واتساب متصلة ومتاحة للإرسال.',
-
-    // ── إدارة فريق CRM ──
     'team_members' => 'أعضاء الفريق',
     'team_members_desc' => 'أضف موظفين وعيّن أدوار CRM بصلاحيات محددة.',
     'invite_member' => 'إضافة موظف',
@@ -131,8 +135,6 @@ return [
     'advanced_roles' => 'الأدوار المتقدمة',
     'advanced_roles_locked' => 'الأدوار المتقدمة (تحتاج إضافة)',
     'advanced_roles_unlock' => 'احصل على إضافة الأدوار المتقدمة لفتح أدوار المديرين.',
-
-    // أسماء الأدوار
     'role_member' => 'عضو',
     'role_telesales' => 'تيلي سيلز',
     'role_social_media' => 'سوشيال ميديا',
@@ -140,8 +142,6 @@ return [
     'role_support_manager' => 'مدير الدعم الفني',
     'role_sales_manager' => 'مدير المبيعات',
     'role_manager' => 'مدير',
-
-    // وصف الأدوار
     'role_member_desc' => 'صلاحيات أساسية — عرض العملاء وإضافة ملاحظات',
     'role_telesales_desc' => 'إجراء مكالمات، إدارة المراحل، تحديث حالة العملاء',
     'role_social_media_desc' => 'إضافة عملاء من إعلانات السوشيال ميديا',
@@ -149,8 +149,6 @@ return [
     'role_support_manager_desc' => 'إدارة فريق الدعم والإشراف على التذاكر',
     'role_sales_manager_desc' => 'إدارة فريق المبيعات، توزيع العملاء، متابعة الأداء',
     'role_manager_desc' => 'صلاحيات كاملة لجميع مزايا الـ CRM',
-
-    // تسجيل دخول الفريق
     'team_login_title' => 'تسجيل دخول الفريق',
     'team_login_subtitle' => 'سجل دخولك لمساحة عمل الـ CRM',
     'team_login_button' => 'تسجيل الدخول',
@@ -159,8 +157,6 @@ return [
     'login_success' => 'أهلا بيك!',
     'logout_success' => 'تم تسجيل خروجك.',
     'account_suspended' => 'حسابك موقوف. تواصل مع مديرك.',
-    
-    // إضافة عميل يدوياً
     'create_lead' => 'إضافة عميل',
     'add_new_lead' => 'إضافة عميل جديد',
     'lead_created_success' => 'تم إضافة العميل بنجاح.',
@@ -170,5 +166,5 @@ return [
     'lead_phone' => 'رقم الهاتف',
     'lead_company' => 'اسم الشركة',
     'lead_message' => 'ملاحظات / رسالة',
-    'submitting' => 'جاري الإرسال...',
+    'submitting' => 'جاري الإرسال...'
 ];

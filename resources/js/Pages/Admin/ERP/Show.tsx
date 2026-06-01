@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
+import { __ } from '@/lib/i18n';
 
 interface TenantDetail {
     id: number;

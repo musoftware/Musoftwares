@@ -5,6 +5,7 @@ import {
     CreditCard, MessageSquare, ShieldCheck, Bell,
 } from 'lucide-react';
 import { cn, formatDateRelative } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export interface ActivityTimelineItem {
     id?: number;

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, router } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 import { ExternalLink, Shield, Smartphone, RefreshCw, CheckCircle2, Monitor } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface UserSubscription {
     id: number;

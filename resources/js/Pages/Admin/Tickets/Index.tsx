@@ -13,6 +13,7 @@ import {
     MessageSquare,
 } from 'lucide-react';
 import { useToast } from '@/Components/ui/use-toast';
+import { __ } from '@/lib/i18n';
 
 /* ─── Types ─────────────────────────────────────────────────── */
 interface Ticket {

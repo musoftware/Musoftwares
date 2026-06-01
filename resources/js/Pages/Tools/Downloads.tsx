@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { ExternalLink, Zap, Clock, ShoppingBag, CheckCircle2, Monitor, Download, Globe } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface AvailableTool {
     tool_slug: string;

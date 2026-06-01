@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { Badge } from '@/Components/ui/badge';
 import { Users, Link as LinkIcon, Network, TrendingUp, Copy, ExternalLink, ChevronRight } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 const __ = (key: string) => key;
 

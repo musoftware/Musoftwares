@@ -9,6 +9,7 @@ import {
     ArrowLeft, TestTube, Code, CheckCircle, XCircle, Play, Server, FileJson
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/Components/ui/alert';
+import { __ } from '@/lib/i18n';
 
 interface IntegrationTesterProps {
     webhook: any;

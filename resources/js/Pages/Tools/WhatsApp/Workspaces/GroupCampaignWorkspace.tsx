@@ -6,6 +6,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Switch } from '@/Components/ui/switch';
+import { __ } from '@/lib/i18n';
 
 export default function GroupCampaignWorkspace({ callRPC, sessions, t, locale }: any) {
     const isRtl = locale === 'ar';

@@ -8,6 +8,7 @@ import { Textarea } from '@/Components/ui/textarea';
 import { Switch } from '@/Components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { ArrowLeft, Save } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function Edit({ article, services }) {
     const { data, setData, put, processing, errors, transform } = useForm({

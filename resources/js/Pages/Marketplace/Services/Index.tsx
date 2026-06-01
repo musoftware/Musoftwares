@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { formatDate, formatMoney } from '@/lib/utils';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ services }: any) {
     const [loading, setLoading] = useState(false);

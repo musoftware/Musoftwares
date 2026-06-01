@@ -26,6 +26,7 @@ import {
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
+import { __ } from '@/lib/i18n';
 import {
     DropdownMenu,
     DropdownMenuContent,

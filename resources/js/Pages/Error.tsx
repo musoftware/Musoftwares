@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { __ } from '@/lib/i18n';
 
 export default function Error({ status }: { status: number }) {
     const title =

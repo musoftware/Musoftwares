@@ -8,6 +8,7 @@ import { LeadsWorkspace } from './components/workspaces/LeadsWorkspace';
 import { InboxesWorkspace } from './components/workspaces/InboxesWorkspace';
 import { OutreachWorkspace } from './components/workspaces/OutreachWorkspace';
 import { LinkedInWorkspace } from './components/workspaces/LinkedInWorkspace';
+import { __ } from '@/lib/i18n';
 import { 
     useB2BProspectorState,
     useProspectingCampaigns,

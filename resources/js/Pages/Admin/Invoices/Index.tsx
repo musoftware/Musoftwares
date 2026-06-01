@@ -27,6 +27,7 @@ import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+import { __ } from '@/lib/i18n';
 import {
     Dialog,
     DialogContent,

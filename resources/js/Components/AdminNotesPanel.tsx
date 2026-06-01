@@ -3,6 +3,7 @@ import axios from 'axios';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { Pin, Archive, Trash2, Key, Monitor, FileText, Upload } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface AdminNote {
     id: number;

@@ -10,6 +10,7 @@ import { SearchInput } from './SearchInput';
 import { SkeletonTable } from './SkeletonLoaders';
 import { EmptyState } from './EmptyState';
 import { Link } from '@inertiajs/react';
+import { __ } from '@/lib/i18n';
 
 // ── Column format A: legacy {key, label, render?, sortable?}
 export interface ColumnDefKey {

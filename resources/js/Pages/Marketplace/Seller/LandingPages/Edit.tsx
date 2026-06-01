@@ -1,6 +1,7 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
+import { __ } from '@/lib/i18n';
 
 export default function Edit({ service, landingPage }: any) {
     return (

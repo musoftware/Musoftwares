@@ -20,6 +20,7 @@ const statusMap: Record<string, string> = {
 };
 
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3, href: '/admin', isActive: false },

@@ -8,6 +8,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Store, Search, ChevronRight, Users } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function ResellersCreate() {
     const [form, setForm] = useState({

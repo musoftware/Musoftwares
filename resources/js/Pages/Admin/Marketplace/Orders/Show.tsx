@@ -5,6 +5,7 @@ import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { AlertTriangle, CheckCircle, ShieldAlert, MessageCircle } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export default function Show({ order }) {
     const { post, processing } = useForm({

@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/Components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Truck, Package, Clock, XCircle, CheckCircle2 } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function OrdersIndex({ orders, filters }: any) {
     const [search, setSearch] = useState(filters?.search || '');

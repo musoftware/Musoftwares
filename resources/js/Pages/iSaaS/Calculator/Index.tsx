@@ -6,6 +6,7 @@ import { Textarea } from '@/Components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Calculator, Save, CheckCircle2, Play, Loader2 } from 'lucide-react';
 import { formatMoney } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ proposals }) {
     const [projectDetails, setProjectDetails] = useState('');

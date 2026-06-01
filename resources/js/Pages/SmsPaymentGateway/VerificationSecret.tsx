@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { ShieldAlert, ArrowLeft, RefreshCw, KeyRound, Copy, Check } from 'lucide-react';
 import { Alert, AlertDescription } from '@/Components/ui/alert';
+import { __ } from '@/lib/i18n';
 
 interface VerificationSecretProps {
     secret: string;

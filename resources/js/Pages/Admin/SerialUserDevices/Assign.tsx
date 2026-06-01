@@ -8,6 +8,7 @@ import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Textarea } from '@/Components/ui/textarea';
 import { ArrowLeft, Monitor, User } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface AvailableDevice {
     device_id: string;

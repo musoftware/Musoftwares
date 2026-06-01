@@ -4,6 +4,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { ArrowLeft, Calendar, Clock, User, List, History, AlertCircle, Edit, Trash2 } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export default function View({ salary, transactions, upcomingSchedule, total_stat }) {
     const [activeTab, setActiveTab] = useState<'history' | 'schedule'>('history');

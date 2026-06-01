@@ -6,6 +6,7 @@ import { Store, TrendingUp, AlertTriangle, Activity } from 'lucide-react';
 import { BranchSwitcher } from '@/Components/ERP/BranchSwitcher';
 import { formatMoney } from '@/lib/utils';
 import { useERPMenu } from '@/hooks/useERPMenu';
+import { __ } from '@/lib/i18n';
 
 interface Props {
     activeBranchId: number | null;

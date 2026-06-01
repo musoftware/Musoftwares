@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { ArrowLeft, KeySquare, ShieldCheck, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/Components/ui/alert';
+import { __ } from '@/lib/i18n';
 
 interface VerificationProps {
     token: { name: string, created_at: string } | null;

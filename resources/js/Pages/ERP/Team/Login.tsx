@@ -5,6 +5,7 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 import { Eye, EyeOff, Loader2, Users } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function Login({ status }: { status?: string }) {
     const { data, setData, post, processing, errors, reset } = useForm({

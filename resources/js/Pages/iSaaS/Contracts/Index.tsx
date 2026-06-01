@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from '@/Components/ui/button';
 import { MoreHorizontal, FileText, Send, CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 import {
     DropdownMenu,
     DropdownMenuContent,

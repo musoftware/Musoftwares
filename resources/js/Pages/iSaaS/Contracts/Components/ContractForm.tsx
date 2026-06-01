@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Trash2, Plus, Wand2, Calculator, Search, X } from 'lucide-react';
 import { Switch } from '@/Components/ui/switch';
 import { toast } from 'sonner';
+import { __ } from '@/lib/i18n';
 
 interface PricingItem {
     item: string;

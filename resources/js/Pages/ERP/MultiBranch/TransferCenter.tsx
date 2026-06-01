@@ -7,6 +7,7 @@ import { useERPMenu } from '@/hooks/useERPMenu';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { Badge } from '@/Components/ui/badge';
 import { format } from 'date-fns';
+import { __ } from '@/lib/i18n';
 
 const __ = (key: string) => {
     if (typeof window !== 'undefined' && typeof (window as any).__ === 'function') {

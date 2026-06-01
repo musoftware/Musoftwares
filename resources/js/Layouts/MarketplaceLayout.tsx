@@ -2,6 +2,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode } from 'react';
 import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
+import { __ } from '@/lib/i18n';
 
 export default function MarketplaceLayout({
     header,

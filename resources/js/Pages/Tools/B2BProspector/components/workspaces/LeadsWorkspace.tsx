@@ -3,6 +3,7 @@ import { Download, CheckCircle, Search, MailQuestion } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { B2BCampaign, B2BLead } from '../../types/b2b.types';
+import { __ } from '@/lib/i18n';
 
 interface LeadsWorkspaceProps {
     leads: B2BLead[];

@@ -3,6 +3,7 @@ import { Head, router, Link } from '@inertiajs/react';
 import { Monitor, Wifi, CheckCircle2, AlertCircle, Loader2, Shield, Terminal, Download } from 'lucide-react';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 
 interface Props {
     code:        string;

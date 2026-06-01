@@ -8,6 +8,7 @@ import { Input } from '@/Components/ui/input';
 import { ArrowLeft, Briefcase } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { ClientAutocomplete } from '@/Components/ClientAutocomplete';
+import { __ } from '@/lib/i18n';
 
 export default function CreateProject({ clients = [] }: { clients?: any[] }) {
     const [form, setForm] = useState({

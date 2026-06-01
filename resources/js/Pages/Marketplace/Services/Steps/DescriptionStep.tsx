@@ -3,6 +3,7 @@ import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
 import { cn } from '@/lib/utils';
 import { Plus, Trash2, HelpCircle, ListChecks } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function DescriptionStep({ data, setData, errors }: any) {
     const addFaq = () => {

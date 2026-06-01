@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { ArrowLeft } from 'lucide-react';
 import ContractForm from './Components/ContractForm';
+import { __ } from '@/lib/i18n';
 
 interface CreateProps {
     currencies: Array<{ id: number; name: string; symbol: string }>;

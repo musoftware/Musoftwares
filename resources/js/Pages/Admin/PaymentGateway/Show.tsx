@@ -27,6 +27,7 @@ import {
     Clock,
 } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

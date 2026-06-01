@@ -11,6 +11,7 @@ import { Tags, Plus, Trash2, Loader2 } from 'lucide-react';
 import TextInput from '@/Components/TextInput';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { __ } from '@/lib/i18n';
 
 export function ManageCategoriesModal() {
     const [open, setOpen] = useState(false);

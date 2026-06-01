@@ -1,23 +1,38 @@
+import translationsData from '../translations.json';
+import { __ } from '@/lib/i18n';
+
+const translations: Record<string, any> = translationsData;
+
+function getNestedValue(obj: any, path: string): any {
+    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+}
+
 /**
  * Frontend translation helper.
  *
- * For now, this is a passthrough function that returns the key as-is.
- * When a full i18n system (e.g., laravel-vue-i18n or a custom Inertia
- * shared-prop translator) is integrated, this function will be replaced
- * with actual locale-aware lookups.
- *
- * Usage:
- *   import { __ } from '@/lib/i18n';
- *   <button>{__('Save Changes')}</button>
+ * This reads from translations.json which is generated during build time
+ * via `php artisan translations:export`.
  */
 export function __(key: string, replacements?: Record<string, string | number>): string {
-    let result = key;
+    const locale = typeof document !== 'undefined' ? document.documentElement.lang || 'en' : 'en';
+    const localeTranslations = translations[locale] || translations['en'] || {};
 
-    if (replacements) {
+    let result = getNestedValue(localeTranslations, key);
+
+    if (result === undefined) {
+        // Check if it's a flat key with dots from the root JSON file
+        if (localeTranslations[key] !== undefined) {
+            result = localeTranslations[key];
+        } else {
+            result = key; // Fallback to raw key
+        }
+    }
+
+    if (replacements && typeof result === 'string') {
         Object.entries(replacements).forEach(([k, v]) => {
-            result = result.replace(`:${k}`, String(v));
+            result = result.replace(new RegExp(`:${k}`, 'gi'), String(v));
         });
     }
 
-    return result;
+    return String(result);
 }

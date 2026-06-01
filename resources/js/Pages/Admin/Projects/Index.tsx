@@ -16,6 +16,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import ProjectActionsSheet from './ProjectActionsSheet';
 import { formatMoney } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ projects, clients, currentTab }) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);

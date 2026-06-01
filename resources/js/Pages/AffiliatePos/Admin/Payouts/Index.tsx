@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function PayoutsIndex({ payouts, filters }: any) {
     const { post, processing } = useForm({

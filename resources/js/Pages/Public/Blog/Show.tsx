@@ -7,6 +7,7 @@ import { motion, useScroll, useSpring } from 'framer-motion';
 import { ArrowLeft, Calendar, User, Clock, Globe, Share2, Bookmark } from 'lucide-react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import { __ } from '@/lib/i18n';
 
 interface BlogArticle {
     id: number;

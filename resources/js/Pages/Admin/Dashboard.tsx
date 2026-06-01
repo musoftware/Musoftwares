@@ -20,6 +20,7 @@ import { DataTable } from '@/Components/ui/DataTable';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export default function Dashboard({ 
     stats, operationalStats, systemHealth, revenueChartData, 

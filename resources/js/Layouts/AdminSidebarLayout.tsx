@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
 
 import { TooltipProvider } from '@/Components/ui/tooltip';
+import { __ } from '@/lib/i18n';
 
 interface AdminSidebarLayoutProps extends PropsWithChildren {
     title?: string;

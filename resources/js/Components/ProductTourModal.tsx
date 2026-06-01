@@ -7,6 +7,7 @@ import {
     FileText
 } from 'lucide-react';
 import { Link } from '@inertiajs/react';
+import { __ } from '@/lib/i18n';
 
 interface User {
     id: number;

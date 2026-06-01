@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, Monitor, User, Clock } from 'lucide-react';
 import { usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { __ } from '@/lib/i18n';
 
 interface UserRow {
     id: number;

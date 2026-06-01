@@ -13,6 +13,7 @@ import {
     SelectValue,
 } from '@/Components/ui/select';
 import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface Category {
     id: number;
