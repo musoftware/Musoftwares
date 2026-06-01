@@ -71,7 +71,9 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
         <div className="flex min-h-screen flex-col bg-white text-slate-900 antialiased font-sans">
             {/* Enterprise Header */}
             <header 
-                className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+                className={`sticky top-0 w-full transition-all duration-300 ${
+                    mobileMenuOpen ? 'z-40' : 'z-50'
+                } ${
                     scrolled 
                         ? 'border-b border-slate-200 bg-white/95 backdrop-blur-xl py-3 shadow-sm' 
                         : 'border-b border-transparent bg-transparent py-5'
@@ -82,7 +84,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                     {/* Left Side: Logo */}
                     <div className="flex items-center gap-10">
                         <Link href="/" className="flex items-center gap-2.5 group focus:outline-none">
-                            <div className="relative flex h-9.5 w-9.5 items-center justify-center rounded-lg bg-slate-900 shadow-md group-hover:scale-105 transition-transform duration-300">
+                            <div className="relative flex h-10 w-10 items-center justify-center rounded-lg bg-slate-900 shadow-md group-hover:scale-105 transition-transform duration-300">
                                 <ApplicationLogo className="h-5 w-5 text-white fill-current" />
                             </div>
                             <span className="text-xl font-extrabold tracking-tight text-slate-900">
@@ -170,10 +172,10 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
 
             {/* Custom Mobile Menu Drawer Overlay */}
             {mobileMenuOpen && (
-                <div className="fixed inset-0 z-40 bg-white flex flex-col lg:hidden animate-in fade-in text-slate-900 overflow-y-auto">
+                <div className="fixed inset-0 z-50 bg-white flex flex-col lg:hidden animate-in fade-in text-slate-900 overflow-y-auto">
                     <div className="h-20 flex items-center justify-between px-4 sm:px-6 border-b border-slate-100">
                         <div className="flex items-center gap-2">
-                            <div className="h-8.5 w-8.5 rounded-lg bg-slate-900 flex items-center justify-center">
+                            <div className="h-9 w-9 rounded-lg bg-slate-900 flex items-center justify-center">
                                 <ApplicationLogo className="h-4 w-4 text-white fill-current" />
                             </div>
                             <span className="text-lg font-extrabold text-slate-900">musoftware</span>

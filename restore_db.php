@@ -66,8 +66,8 @@ echo "SQL Import finished successfully.\n";
 }
 
 echo "\n3. Running migrations to update the schema...\n";
-Artisan::call('migrate', ['--force' => true]);
-echo trim(Artisan::output()) . "\n\n";
+system('php force_sync_migrations.php');
+echo "\n\n";
 
 echo "\n3.5 Migrating old phone numbers to mobile_1 and mobile_2...\n";
 try {
@@ -124,12 +124,8 @@ foreach ($suites as $suite => $description) {
     echo "    Suite:   {$suite}\n";
     echo str_repeat('─', 70) . "\n";
 
-    $exitCode = Artisan::call('test', [
-        '--testsuite' => $suite,
-        '--no-interaction' => true,
-    ]);
-
-    $output = trim(Artisan::output());
+    exec("C:\tools\php83\php.exe artisan test --testsuite=$suite --no-interaction", $outputLines, $exitCode);
+    $output = implode("\n", $outputLines);
     echo $output . "\n";
 
     if ($exitCode === 0) {

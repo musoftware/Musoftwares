@@ -23,7 +23,7 @@ it('rejects zero or negative prices', function () {
         priceLocalGram14k: 0.0,
         buyPrice: 0.0,
         sellPrice: 0.0,
-        currency: 'EGP',
+        currencyId: 1,
         exchangeRate: 50.0,
         latencyMs: 100
     );
@@ -51,7 +51,7 @@ it('detects massive price spikes as anomalies', function () {
         priceLocalGram14k: 3500.0,
         buyPrice: 6000.0,
         sellPrice: 5900.0,
-        currency: 'EGP',
+        currencyId: 1,
         exchangeRate: 50.0,
         latencyMs: 100
     );
@@ -77,7 +77,7 @@ it('rejects out of range prices', function () {
         priceLocalGram14k: 3500.0,
         buyPrice: 6000.0,
         sellPrice: 5900.0,
-        currency: 'EGP',
+        currencyId: 1,
         exchangeRate: 50.0,
         latencyMs: 100
     );
@@ -104,7 +104,7 @@ it('skips duplicate prices within 30 seconds', function () {
         priceLocalGram14k: 2333.0,
         buyPrice: 4000.0,
         sellPrice: 3950.0,
-        currency: 'EGP',
+        currencyId: 1,
         exchangeRate: 50.0,
         latencyMs: 100
     );
