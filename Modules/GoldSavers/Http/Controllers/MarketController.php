@@ -32,26 +32,51 @@ class MarketController extends Controller implements HasMiddleware
         $hasHistoricalCharts = $user->hasModuleSubscription('gold-historical-charts');
         
         $latestPrice = null;
+        $priceChanges = null;
         $historicalData = [];
 
         if ($hasLivePrices) {
             $latestPrice = GoldLivePrice::orderBy('fetched_at', 'desc')->first();
+            
+            if ($latestPrice) {
+                $previousPrice = GoldLivePrice::where('id', '!=', $latestPrice->id)
+                    ->whereDate('fetched_at', '<', $latestPrice->fetched_at)
+                    ->orderBy('fetched_at', 'desc')
+                    ->first();
+
+                if ($previousPrice) {
+                    $priceChanges = [
+                        'price_gram_24k' => $this->calculatePercentageChange($previousPrice->price_gram_24k, $latestPrice->price_gram_24k),
+                        'price_gram_21k' => $this->calculatePercentageChange($previousPrice->price_gram_21k, $latestPrice->price_gram_21k),
+                        'price_gram_18k' => $this->calculatePercentageChange($previousPrice->price_gram_18k, $latestPrice->price_gram_18k),
+                        'price_ounce_usd' => $this->calculatePercentageChange($previousPrice->price_ounce_usd, $latestPrice->price_ounce_usd),
+                    ];
+                }
+            }
         }
 
         if ($hasHistoricalCharts) {
-            // Fetch daily candles from GoldPriceHistory for the last 30 days
+            $karat = request('karat', 21);
+            $period = request('period', '1m');
+            
+            $startDate = now()->subDays(30)->startOfDay(); // Default 1M
+            if ($period === '1w') $startDate = now()->subDays(7)->startOfDay();
+            if ($period === '6m') $startDate = now()->subMonths(6)->startOfDay();
+            if ($period === '1y') $startDate = now()->subYear()->startOfDay();
+
+            // Fetch daily candles from GoldPriceHistory
             $historicalData = GoldPriceHistory::where('market_key', 'local_egp')
                 ->where('interval', 'day')
-                ->where('karat', 21) // Focus on 21k as it's the standard for trends in Egypt
-                ->where('period_start', '>=', now()->subDays(30)->startOfDay())
+                ->where('karat', $karat)
+                ->where('period_start', '>=', $startDate)
                 ->orderBy('period_start', 'asc')
                 ->get()
-                ->map(function ($history) {
+                ->map(function ($history) use ($karat) {
                     return [
                         'date' => \Carbon\Carbon::parse($history->period_start)->format('Y-m-d'),
-                        'avg_24k' => (float) $history->avg_price, // Assuming avg_price holds the main value for the chart line
-                        'min_24k' => (float) $history->low_price,
-                        'max_24k' => (float) $history->high_price,
+                        "avg_{$karat}k" => (float) $history->avg_price,
+                        "min_{$karat}k" => (float) $history->low_price,
+                        "max_{$karat}k" => (float) $history->high_price,
                     ];
                 });
         }
@@ -60,7 +85,18 @@ class MarketController extends Controller implements HasMiddleware
             'hasLivePrices' => $hasLivePrices,
             'hasHistoricalCharts' => $hasHistoricalCharts,
             'latestPrice' => $latestPrice,
+            'priceChanges' => $priceChanges,
             'historicalData' => $historicalData,
+            'filters' => [
+                'karat' => request('karat', 21),
+                'period' => request('period', '1m')
+            ]
         ]);
+    }
+
+    private function calculatePercentageChange($old, $new)
+    {
+        if (!$old || $old == 0) return 0;
+        return round((($new - $old) / $old) * 100, 2);
     }
 }

@@ -30,9 +30,9 @@ it('rejects zero or negative prices', function () {
 
     $result = $this->aggregator->validate($payload, null, 1);
 
-    expect($result->isValid)->toBeFalse()
+    expect($result->passed)->toBeFalse()
         ->and($result->isAnomaly)->toBeFalse()
-        ->and($result->reason)->toBe('price_zero');
+        ->and($result->failureCode)->toBe('price_zero');
 });
 
 it('detects massive price spikes as anomalies', function () {
@@ -58,12 +58,12 @@ it('detects massive price spikes as anomalies', function () {
 
     $result = $this->aggregator->validate($payload, $existing, 1);
 
-    expect($result->isValid)->toBeFalse()
+    expect($result->passed)->toBeFalse()
         ->and($result->isAnomaly)->toBeTrue()
-        ->and($result->reason)->toBe('spike_detected');
+        ->and($result->failureCode)->toBe('spike_detected');
 
     Event::assertDispatched(GoldPriceAnomalyDetected::class, function ($event) {
-        return $event->tenantId === 1 && $event->reason === 'spike_detected';
+        return $event->tenantId === 1 && $event->anomalyType === 'spike_detected';
     });
 });
 
@@ -84,9 +84,9 @@ it('rejects out of range prices', function () {
 
     $result = $this->aggregator->validate($payload, null, 1);
 
-    expect($result->isValid)->toBeFalse()
+    expect($result->passed)->toBeFalse()
         ->and($result->isAnomaly)->toBeTrue()
-        ->and($result->reason)->toBe('price_out_of_range');
+        ->and($result->failureCode)->toBe('price_out_of_range');
 });
 
 it('skips duplicate prices within 30 seconds', function () {
@@ -116,11 +116,11 @@ it('skips duplicate prices within 30 seconds', function () {
 
 it('marks prices stale after 30 minutes', function () {
     $stalePrice = new GoldLivePrice([
-        'fetched_at' => now()->subHours(2)->toDateTimeString()
+        'fetched_at' => now()->subHours(2)
     ]);
 
     $freshPrice = new GoldLivePrice([
-        'fetched_at' => now()->subMinutes(5)->toDateTimeString()
+        'fetched_at' => now()->subMinutes(5)
     ]);
 
     expect($this->aggregator->isStale($stalePrice))->toBeTrue()

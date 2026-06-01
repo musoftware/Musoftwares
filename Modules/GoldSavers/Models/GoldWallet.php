@@ -22,6 +22,14 @@ class GoldWallet extends Model
         'is_active',
     ];
 
+    protected $casts = [
+        'target_grams' => 'float',
+        'target_amount' => 'float',
+        'balance_grams' => 'float',
+        'balance_amount' => 'float',
+        'is_active' => 'boolean',
+    ];
+
     public function transactions()
     {
         return $this->hasMany(GoldTransaction::class, 'wallet_id');
@@ -37,7 +45,7 @@ class GoldWallet extends Model
         $this->balance_grams = 0;
         $this->balance_amount = 0;
 
-        foreach ($this->transactions as $tx) {
+        foreach ($this->transactions()->get() as $tx) {
             if (in_array($tx->type, ['buy', 'transfer_in'])) {
                 $this->balance_grams += $tx->grams;
                 $this->balance_amount += $tx->total_amount;
@@ -48,5 +56,10 @@ class GoldWallet extends Model
         }
 
         $this->save();
+    }
+
+    protected static function newFactory()
+    {
+        return \Database\Factories\GoldWalletFactory::new();
     }
 }

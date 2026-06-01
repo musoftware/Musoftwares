@@ -22,9 +22,27 @@ class DashboardController extends Controller
         // Get latest price or fallback
         $hasLivePrices = $user->hasModuleSubscription('gold-live-prices');
         $latestPrice = null;
+        $priceChanges = null;
         
         if ($hasLivePrices) {
             $latestPrice = GoldLivePrice::orderBy('fetched_at', 'desc')->first();
+            
+            if ($latestPrice) {
+                // Fetch the closest price before today's latest to calculate daily change
+                $previousPrice = GoldLivePrice::where('id', '!=', $latestPrice->id)
+                    ->whereDate('fetched_at', '<', $latestPrice->fetched_at)
+                    ->orderBy('fetched_at', 'desc')
+                    ->first();
+
+                if ($previousPrice) {
+                    $priceChanges = [
+                        'price_gram_24k' => $this->calculatePercentageChange($previousPrice->price_gram_24k, $latestPrice->price_gram_24k),
+                        'price_gram_21k' => $this->calculatePercentageChange($previousPrice->price_gram_21k, $latestPrice->price_gram_21k),
+                        'price_gram_18k' => $this->calculatePercentageChange($previousPrice->price_gram_18k, $latestPrice->price_gram_18k),
+                        'price_ounce_usd' => $this->calculatePercentageChange($previousPrice->price_ounce_usd, $latestPrice->price_ounce_usd),
+                    ];
+                }
+            }
         }
         
         // Fetch user's wallets
@@ -52,7 +70,7 @@ class DashboardController extends Controller
         $smartInsights = [];
         if ($hasSmartInsights) {
             $cacheKey = "user_{$user->id}_gold_insights_" . date('Y-m-d');
-            $smartInsights = \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->endOfDay(), function() use ($wallets, $totalGrams, $totalInvested, $currentValue, $totalProfit, $latestPrice) {
+            $smartInsights = \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->endOfDay(), function() use ($wallets, $totalGrams, $totalInvested, $currentValue, $totalProfit, $latestPrice, $priceChanges) {
                 $service = new \Modules\GoldSavers\Services\GeminiInsightService();
                 $portfolioData = [
                     'total_grams' => $totalGrams,
@@ -60,7 +78,7 @@ class DashboardController extends Controller
                     'current_value' => $currentValue,
                     'total_profit' => $totalProfit,
                 ];
-                return $service->generateInsights($wallets, $portfolioData, $latestPrice);
+                return $service->generateInsights($wallets, $portfolioData, $latestPrice, $priceChanges);
             });
         }
 
@@ -75,8 +93,15 @@ class DashboardController extends Controller
                 'profit_percentage' => round($profitPercentage, 2),
             ],
             'hasLivePrices' => $hasLivePrices,
+            'priceChanges' => $priceChanges,
             'hasSmartInsights' => $hasSmartInsights,
             'smartInsights' => $smartInsights,
         ]);
+    }
+
+    private function calculatePercentageChange($old, $new)
+    {
+        if (!$old || $old == 0) return 0;
+        return round((($new - $old) / $old) * 100, 2);
     }
 }

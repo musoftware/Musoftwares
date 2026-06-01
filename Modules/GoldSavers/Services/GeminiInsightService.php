@@ -10,7 +10,7 @@ class GeminiInsightService
     /**
      * Generate smart insights for a user's gold saving wallets using Google Gemini API.
      */
-    public function generateInsights($wallets, $portfolioData, $latestPrice)
+    public function generateInsights($wallets, $portfolioData, $latestPrice, $priceChanges = null)
     {
         $keysString = \App\Models\AdminSettings::GetValue('gemini_api_keys');
         $keys = array_filter(array_map('trim', explode(',', $keysString ?? '')));
@@ -18,7 +18,7 @@ class GeminiInsightService
         $apiKey = count($keys) > 0 ? $keys[array_rand($keys)] : env('GEMINI_API_KEY');
         
         if (!$apiKey) {
-            return $this->fallbackInsights($wallets, $portfolioData);
+            return $this->fallbackInsights($wallets, $portfolioData, $priceChanges);
         }
 
         $language = app()->getLocale() == 'ar' ? 'Arabic' : 'English';
@@ -31,9 +31,13 @@ Total Grams: {$portfolioData['total_grams']}g
 Current Value: {$portfolioData['current_value']}
 Profit: {$portfolioData['total_profit']}
 Live 21k Gold Price: " . ($latestPrice ? $latestPrice->price_gram_21k : 'N/A') . "
-
-Wallets data:
 ";
+        if ($priceChanges) {
+            $prompt .= "Daily Market Change (21k): " . $priceChanges['price_gram_21k'] . "%\n";
+            $prompt .= "Daily Market Change (24k): " . $priceChanges['price_gram_24k'] . "%\n";
+        }
+        
+        $prompt .= "\nWallets data:\n";
         foreach ($wallets as $wallet) {
             $prompt .= "- Wallet '{$wallet->name}': {$wallet->balance_grams}g saved out of {$wallet->target_grams}g target.\n";
         }
@@ -68,22 +72,26 @@ Wallets data:
             Log::error('Gemini Service Exception', ['message' => $e->getMessage()]);
         }
 
-        return $this->fallbackInsights($wallets, $portfolioData);
+        return $this->fallbackInsights($wallets, $portfolioData, $priceChanges);
     }
 
-    private function fallbackInsights($wallets = null, $portfolioData = null)
+    private function fallbackInsights($wallets = null, $portfolioData = null, $priceChanges = null)
     {
         $insights = [];
 
-        // 1. Growth/Profit Insight
-        $profitPercentage = ($portfolioData && isset($portfolioData['total_invested']) && $portfolioData['total_invested'] > 0) 
-            ? ($portfolioData['total_profit'] / $portfolioData['total_invested']) * 100 
-            : 0;
-
-        if ($profitPercentage > 0) {
-            $insights[] = ['icon' => 'TrendingUp', 'text' => __('gold_saver.insight_gold_profit', ['percentage' => number_format($profitPercentage, 1)])];
+        // 1. Growth/Market Insight
+        if ($priceChanges && isset($priceChanges['price_gram_21k']) && $priceChanges['price_gram_21k'] < 0) {
+            $insights[] = ['icon' => 'TrendingUp', 'text' => __('gold_saver.insight_market_down', ['percentage' => abs($priceChanges['price_gram_21k'])])];
         } else {
-            $insights[] = ['icon' => 'TrendingUp', 'text' => __('gold_saver.insight_gold_up')];
+            $profitPercentage = ($portfolioData && isset($portfolioData['total_invested']) && $portfolioData['total_invested'] > 0) 
+                ? ($portfolioData['total_profit'] / $portfolioData['total_invested']) * 100 
+                : 0;
+
+            if ($profitPercentage > 0) {
+                $insights[] = ['icon' => 'TrendingUp', 'text' => __('gold_saver.insight_gold_profit', ['percentage' => number_format($profitPercentage, 1)])];
+            } else {
+                $insights[] = ['icon' => 'TrendingUp', 'text' => __('gold_saver.insight_gold_up')];
+            }
         }
 
         // 2. Goal Near Insight

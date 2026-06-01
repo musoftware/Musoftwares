@@ -9,6 +9,11 @@ class GoldLivePrice extends Model
 {
     use HasFactory;
 
+    protected static function newFactory()
+    {
+        return \Database\Factories\GoldLivePriceFactory::new();
+    }
+
     protected $fillable = [
         'tenant_id',
         'source_id',

@@ -107,4 +107,9 @@ class GoldMarketSource extends Model
     {
         return !$this->is_healthy;
     }
+
+    protected static function newFactory()
+    {
+        return \Database\Factories\GoldMarketSourceFactory::new();
+    }
 }

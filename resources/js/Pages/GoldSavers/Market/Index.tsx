@@ -28,9 +28,15 @@ interface MarketProps {
     hasHistoricalCharts: boolean;
     latestPrice: GoldPrice | null;
     historicalData: HistoricalPoint[];
+    priceChanges?: {
+        price_gram_24k: number;
+        price_gram_21k: number;
+        price_gram_18k: number;
+        price_ounce_usd: number;
+    } | null;
 }
 
-export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latestPrice, historicalData }: MarketProps) {
+export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latestPrice, historicalData, priceChanges }: MarketProps) {
     return (
         <AuthenticatedLayout
             header={
@@ -74,26 +80,50 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                             <div className={!hasLivePrices ? "opacity-20 select-none pointer-events-none" : ""}>
                                 {latestPrice || !hasLivePrices ? (
                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
-                                        <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-sm">
+                                        <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-sm relative">
                                             <div className="text-slate-500 text-sm font-medium mb-2">24k {__('Purity')}</div>
                                             <div className="font-bold text-3xl text-slate-900">{latestPrice?.price_gram_24k ?? '4,050'}</div>
                                             <div className="text-xs text-slate-400 mt-2">{latestPrice?.currency ?? 'EGP'} / {__('G')}</div>
+                                            {priceChanges?.price_gram_24k !== undefined && (
+                                                <div className={`text-xs font-semibold mt-2 flex items-center justify-center gap-1 ${priceChanges.price_gram_24k >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                    <TrendingUp className={`w-3 h-3 ${priceChanges.price_gram_24k >= 0 ? '' : 'rotate-180'}`} />
+                                                    {priceChanges.price_gram_24k >= 0 ? '+' : ''}{priceChanges.price_gram_24k}%
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="p-6 rounded-xl bg-indigo-50 border border-indigo-100 shadow-sm relative overflow-hidden">
                                             <div className="absolute top-0 right-0 w-3 h-3 bg-indigo-500 rounded-bl-xl opacity-20"></div>
                                             <div className="text-indigo-600 text-sm font-medium mb-2">21k {__('Purity')}</div>
                                             <div className="font-bold text-3xl text-indigo-700">{latestPrice?.price_gram_21k ?? '3,550'}</div>
                                             <div className="text-xs text-indigo-400 mt-2">{latestPrice?.currency ?? 'EGP'} / {__('G')}</div>
+                                            {priceChanges?.price_gram_21k !== undefined && (
+                                                <div className={`text-xs font-semibold mt-2 flex items-center justify-center gap-1 ${priceChanges.price_gram_21k >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                    <TrendingUp className={`w-3 h-3 ${priceChanges.price_gram_21k >= 0 ? '' : 'rotate-180'}`} />
+                                                    {priceChanges.price_gram_21k >= 0 ? '+' : ''}{priceChanges.price_gram_21k}%
+                                                </div>
+                                            )}
                                         </div>
-                                        <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-sm">
+                                        <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-sm relative">
                                             <div className="text-slate-500 text-sm font-medium mb-2">18k {__('Purity')}</div>
                                             <div className="font-bold text-3xl text-slate-900">{latestPrice?.price_gram_18k ?? '3,040'}</div>
                                             <div className="text-xs text-slate-400 mt-2">{latestPrice?.currency ?? 'EGP'} / {__('G')}</div>
+                                            {priceChanges?.price_gram_18k !== undefined && (
+                                                <div className={`text-xs font-semibold mt-2 flex items-center justify-center gap-1 ${priceChanges.price_gram_18k >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                    <TrendingUp className={`w-3 h-3 ${priceChanges.price_gram_18k >= 0 ? '' : 'rotate-180'}`} />
+                                                    {priceChanges.price_gram_18k >= 0 ? '+' : ''}{priceChanges.price_gram_18k}%
+                                                </div>
+                                            )}
                                         </div>
-                                        <div className="p-6 rounded-xl bg-slate-900 border border-slate-800 shadow-sm text-white">
+                                        <div className="p-6 rounded-xl bg-slate-900 border border-slate-800 shadow-sm text-white relative">
                                             <div className="text-slate-400 text-sm font-medium mb-2">{__('Global Ounce')}</div>
                                             <div className="font-bold text-3xl">{latestPrice?.price_ounce_usd ?? '2,350'}</div>
                                             <div className="text-xs text-slate-500 mt-2">USD / {__('Ounce')}</div>
+                                            {priceChanges?.price_ounce_usd !== undefined && (
+                                                <div className={`text-xs font-semibold mt-2 flex items-center justify-center gap-1 ${priceChanges.price_ounce_usd >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                    <TrendingUp className={`w-3 h-3 ${priceChanges.price_ounce_usd >= 0 ? '' : 'rotate-180'}`} />
+                                                    {priceChanges.price_ounce_usd >= 0 ? '+' : ''}{priceChanges.price_ounce_usd}%
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 ) : (

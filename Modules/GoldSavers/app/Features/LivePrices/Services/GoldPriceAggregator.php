@@ -76,6 +76,6 @@ class GoldPriceAggregator
     public function isStale(?GoldLivePrice $livePrice): bool
     {
         if (!$livePrice || !$livePrice->fetched_at) return true;
-        return now()->diffInMinutes($livePrice->fetched_at) >= $this->staleAfterMinutes;
+        return abs(now()->diffInMinutes($livePrice->fetched_at)) >= $this->staleAfterMinutes;
     }
 }
