@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { __ } from '@/lib/i18n';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';

@@ -1,4 +1,5 @@
 import React from 'react';
+import { __ } from '@/lib/i18n';
 import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
 import { Head, router, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';

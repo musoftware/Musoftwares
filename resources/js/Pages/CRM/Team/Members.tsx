@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { __ } from '@/lib/i18n';
 import CrmLayout from '@/Layouts/CrmLayout';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
