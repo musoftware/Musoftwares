@@ -113,8 +113,8 @@ class AdminSettingController extends Controller
         $currency = $request->input('currency');
 
         User::query()->update([
-            'hour_rate'          => $rate,
-            'hour_rate_currency' => $currency,
+            'hour_rate'             => $rate,
+            'hour_rate_currency_id' => $currency,
         ]);
 
         if ($request->boolean('update_projects')) {

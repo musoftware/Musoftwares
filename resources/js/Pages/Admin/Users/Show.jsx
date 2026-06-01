@@ -703,6 +703,20 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                     <span className="text-slate-500">Referral Enabled:</span>
                                     <span className="font-bold text-slate-900">{client.allow_referral_system ? "Yes" : "No"}</span>
                                 </div>
+                                <div className="flex justify-between text-sm mb-2">
+                                    <span className="text-slate-500">Commission %:</span>
+                                    <span className="font-bold text-slate-900">{client.affiliate_commission_percentage || "0.00"}%</span>
+                                </div>
+                                <div className="flex justify-between text-sm mb-2">
+                                    <span className="text-slate-500">Add to Total:</span>
+                                    <span className="font-bold text-slate-900">{client.add_commission_to_total ? "Yes" : "No"}</span>
+                                </div>
+                                {client.ref_user_id && (
+                                    <div className="flex justify-between text-sm mb-2">
+                                        <span className="text-slate-500">Referred By (ID):</span>
+                                        <span className="font-bold text-slate-900">#{client.ref_user_id}</span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between text-sm mb-1">
                                     <span className="text-slate-500">Total Referrals:</span>
                                     <span className="font-bold text-slate-900">{client.referrals_count || 0}</span>

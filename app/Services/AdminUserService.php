@@ -51,6 +51,44 @@ class AdminUserService
         $user->city                = $request->input('city');
         $user->currency_id         = $request->input('currency') ?? $user->currency_id ?? 2;
         $user->max_devices         = $request->input('max_devices');
+        
+        // Expanded Fields from Edit.jsx
+        if ($request->has('full_name')) $user->full_name = $request->input('full_name');
+        if ($request->has('facebook')) $user->facebook = $request->input('facebook');
+        if ($request->has('skype')) $user->skype = $request->input('skype');
+        if ($request->has('phone_number')) $user->phone_number = $request->input('phone_number');
+        if ($request->has('phone_number2')) $user->phone_number2 = $request->input('phone_number2');
+        if ($request->has('disable_unpaid_balance_whatsapp')) $user->disable_unpaid_balance_whatsapp = $request->boolean('disable_unpaid_balance_whatsapp');
+        if ($request->has('job')) $user->job = $request->input('job');
+        if ($request->has('address')) $user->address = $request->input('address');
+        
+        if ($request->has('hour_rate_currency')) $user->hour_rate_currency = $request->input('hour_rate_currency');
+        if ($request->has('hour_rate')) $user->hour_rate = $request->input('hour_rate');
+        if ($request->has('booking_rate_currency')) $user->booking_rate_currency = $request->input('booking_rate_currency');
+        if ($request->has('booking_rate')) $user->booking_rate = $request->input('booking_rate');
+        if ($request->has('booking_rate_expires_at')) $user->booking_rate_expires_at = $request->input('booking_rate_expires_at');
+        if ($request->has('salary')) $user->salary = $request->input('salary');
+        if ($request->has('usd_type')) $user->usd_type = $request->input('usd_type');
+        
+        if ($request->has('subscription_date')) $user->subscription_date = $request->input('subscription_date');
+        if ($request->has('subscription_plan')) $user->plan_id = $request->input('subscription_plan');
+        if ($request->has('postpaid_limit')) $user->postpaid_limit = $request->input('postpaid_limit');
+        if ($request->has('subscription_force')) $user->subscription_force = $request->boolean('subscription_force');
+        
+        if ($request->has('client_taxable')) $user->client_taxable = $request->boolean('client_taxable');
+        if ($request->has('invoice_taxable')) $user->invoice_taxable = $request->boolean('invoice_taxable');
+        if ($request->has('timer_taxable')) $user->timer_taxable = $request->boolean('timer_taxable');
+        
+        if ($request->has('allow_referral_system')) $user->allow_referral_system = $request->boolean('allow_referral_system');
+        if ($request->has('allow_view_times')) $user->allow_view_times = $request->boolean('allow_view_times');
+        if ($request->has('allow_postpaid')) $user->allow_postpaid = $request->boolean('allow_postpaid');
+        
+        // Referral configuration fields
+        if ($request->has('affiliate_commission_percentage')) $user->affiliate_commission_percentage = $request->input('affiliate_commission_percentage');
+        if ($request->has('add_commission_to_total')) $user->add_commission_to_total = $request->boolean('add_commission_to_total');
+        if ($request->has('ref_user_id')) $user->ref_user_id = $request->input('ref_user_id');
+        if ($request->has('slug')) $user->slug = $request->input('slug');
+
 
         // Account control
         if ($request->has('account_status')) {

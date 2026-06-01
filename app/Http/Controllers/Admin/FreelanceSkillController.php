@@ -39,7 +39,7 @@ class FreelanceSkillController extends Controller
 
         Skill::create($validated);
 
-        return redirect()->route('admin.freelance.skills.index')->with('success', 'Skill created successfully.');
+        return redirect()->route('admin.freelance.skills.index')->with('success', __('freelance.skill_created', [], 'en'));
     }
 
     public function update(Request $request, Skill $skill)
@@ -51,30 +51,30 @@ class FreelanceSkillController extends Controller
 
         $skill->update($validated);
 
-        return redirect()->route('admin.freelance.skills.index')->with('success', 'Skill updated successfully.');
+        return redirect()->route('admin.freelance.skills.index')->with('success', __('freelance.skill_updated', [], 'en'));
     }
 
     public function approve(Skill $skill)
     {
         $skill->update(['status' => 'approved']);
-        return redirect()->route('admin.freelance.skills.index')->with('success', 'Skill approved successfully.');
+        return redirect()->route('admin.freelance.skills.index')->with('success', __('freelance.skill_approved', [], 'en'));
     }
 
     public function reject(Skill $skill)
     {
         $skill->update(['status' => 'rejected']);
-        return redirect()->route('admin.freelance.skills.index')->with('success', 'Skill rejected successfully.');
+        return redirect()->route('admin.freelance.skills.index')->with('success', __('freelance.skill_rejected', [], 'en'));
     }
 
     public function blockUser(\App\Models\User $user)
     {
         $user->update(['can_add_freelance_skills' => false]);
-        return redirect()->route('admin.freelance.skills.index')->with('success', "User {$user->name} has been blocked from adding new skills.");
+        return redirect()->route('admin.freelance.skills.index')->with('success', __('freelance.user_blocked_skills', ['name' => $user->name], 'en'));
     }
 
     public function destroy(Skill $skill)
     {
         $skill->delete();
-        return redirect()->route('admin.freelance.skills.index')->with('success', 'Skill deleted successfully.');
+        return redirect()->route('admin.freelance.skills.index')->with('success', __('freelance.skill_deleted', [], 'en'));
     }
 }

@@ -8,7 +8,7 @@ use App\Helpers\BalancesHelper;
 use App\Helpers\FinanceHelper;
 use App\Helpers\TextHelper;
 use App\Helpers\TimezoneHelper;
-use App\Models\Operations\CharityCounter;
+use App\Models\CharityCounter;
 use App\Models\Transaction;
 use App\Services\VoucherService;
 use Carbon\Carbon;

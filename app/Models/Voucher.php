@@ -15,9 +15,9 @@ class Voucher extends Model
         'name',
         'description',
         'spend_amount',
-        'spend_currency',
+        'spend_currency_id',
         'reward_amount',
-        'reward_currency',
+        'reward_currency_id',
         'type',
         'reward_percentage',
         'max_uses_per_user',
@@ -44,12 +44,12 @@ class Voucher extends Model
     // Relationships
     public function spendCurrency()
     {
-        return $this->belongsTo(Currency::class, 'spend_currency');
+        return $this->belongsTo(Currency::class, 'spend_currency_id');
     }
 
     public function rewardCurrency()
     {
-        return $this->belongsTo(Currency::class, 'reward_currency');
+        return $this->belongsTo(Currency::class, 'reward_currency_id');
     }
 
     public function redemptions()

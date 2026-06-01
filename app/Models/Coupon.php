@@ -18,7 +18,7 @@ class Coupon extends Model
         'type',
         'discount_amount',
         'discount_percentage',
-        'currency',
+        'currency_id',
         'min_purchase_amount',
         'max_uses_per_user',
         'max_total_uses',
@@ -44,7 +44,7 @@ class Coupon extends Model
     // Relationships
     public function currencyRelation()
     {
-        return $this->belongsTo(Currency::class, 'currency');
+        return $this->belongsTo(Currency::class, 'currency_id');
     }
 
     public function redemptions()
