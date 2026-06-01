@@ -449,8 +449,11 @@ export default function Show({ invoice }: { invoice: any }) {
                         </div>
                         <div className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">{__('general.total_billable_hours')}</div>
                         
-                        <Button onClick={handleAddTimerItem} variant="link" className="mt-4 text-blue-600 font-bold hover:text-blue-800">
-                            <Plus className="w-3 h-3 mr-1" />{__('general.add_manual_entry')}</Button>
+                        {isUnpaid && (
+                            <Button onClick={handleAddTimerItem} variant="link" className="mt-4 text-blue-600 font-bold hover:text-blue-800">
+                                <Plus className="w-3 h-3 mr-1" />{__('general.add_manual_entry')}
+                            </Button>
+                        )}
                     </CardContent>
                 </Card>
 

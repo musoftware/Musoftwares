@@ -310,7 +310,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                             <label className="text-sm font-medium">{__('Type')}</label>
                                             <Select 
                                                 value={newTx.type} 
-                                                onValueChange={(value: 'buy' | 'sell') => setNewTx({...newTx, type: value})}
+                                                onValueChange={(value) => setNewTx({...newTx, type: (value || 'buy') as 'buy' | 'sell'})}
                                             >
                                                 <SelectTrigger className="w-full">
                                                     <SelectValue placeholder={__('general.select_type')} />
@@ -488,7 +488,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                         <label className="text-sm font-medium">{__('Type')}</label>
                                         <Select 
                                             value={editingTx.type} 
-                                            onValueChange={(value: 'buy' | 'sell') => setEditingTx({...editingTx, type: value})}
+                                            onValueChange={(value) => setEditingTx({...editingTx, type: (value || 'buy') as 'buy' | 'sell'})}
                                         >
                                             <SelectTrigger className="w-full">
                                                 <SelectValue placeholder={__('general.select_type')} />

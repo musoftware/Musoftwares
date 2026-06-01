@@ -103,91 +103,143 @@ class FinancialOperationsController extends Controller
                 $entriesQuery = \App\Models\Transaction::with(['user', 'project'])->whereIn('type', ['received', 'refunded', 'sent']);
             } elseif ($currentTab === 'salaries') {
                 $entriesQuery = CostTransaction::with(['user', 'project'])->where('reason', 'salary');
+            } elseif ($currentTab === 'projects') {
+                $entriesQuery = \App\Models\Project::with(['client', 'client_balance' => function($q) {
+                    $q->whereIn('type', ['received', 'earned']);
+                }, 'cost_transactions']);
+            } elseif ($currentTab === 'budgets') {
+                $entriesQuery = \App\Models\ExpenseBudget::with('currency');
             } else {
                 // Default: expenses (excluding salaries)
                 $entriesQuery = CostTransaction::with(['user', 'project'])->where('reason', '!=', 'salary');
             }
 
-            // Apply filters
-            if ($search) {
-                $entriesQuery->where(function($q) use ($search) {
-                    $q->where('reason', 'like', "%{$search}%");
-                });
-            }
-            if ($category) {
-                if ($currentTab === 'income') {
-                    $entriesQuery->where('reason', $category);
-                } else {
-                    $entriesQuery->where(function($q) use ($category) {
-                        $q->where('reason', $category)
-                          ->orWhereExists(function ($sub) use ($category) {
-                              $sub->select(\Illuminate\Support\Facades\DB::raw(1))
-                                  ->from('recurring_cost_transactions')
-                                  ->join('recurring_costs', 'recurring_cost_transactions.recurring_cost_id', '=', 'recurring_costs.id')
-                                  ->whereColumn('recurring_cost_transactions.cost_transaction_id', 'cost_transactions.id')
-                                  ->where('recurring_costs.reason', $category);
-                          });
-                      });
+            if ($entriesQuery) {
+                // Apply filters
+                if ($currentTab !== 'projects' && $currentTab !== 'budgets') {
+                    if ($search) {
+                        $entriesQuery->where(function($q) use ($search) {
+                            $q->where('reason', 'like', "%{$search}%");
+                        });
+                    }
+                    if ($category) {
+                        if ($currentTab === 'income') {
+                            $entriesQuery->where('reason', $category);
+                        } else {
+                            $entriesQuery->where(function($q) use ($category) {
+                                $q->where('reason', $category)
+                                  ->orWhereExists(function ($sub) use ($category) {
+                                      $sub->select(\Illuminate\Support\Facades\DB::raw(1))
+                                          ->from('recurring_cost_transactions')
+                                          ->join('recurring_costs', 'recurring_cost_transactions.recurring_cost_id', '=', 'recurring_costs.id')
+                                          ->whereColumn('recurring_cost_transactions.cost_transaction_id', 'cost_transactions.id')
+                                          ->where('recurring_costs.reason', $category);
+                                  });
+                              });
+                        }
+                    }
+                    if ($status) {
+                        $entriesQuery->where('status', $status);
+                    }
+                    if ($userId) {
+                        $entriesQuery->where('user_id', $userId);
+                    }
+                    $entriesQuery->orderBy($sortBy, $sortDir);
+                } else if ($currentTab === 'projects') {
+                    if ($search) { $entriesQuery->where('project_name', 'like', "%{$search}%"); }
+                    $entriesQuery->orderBy('id', 'desc');
+                } else if ($currentTab === 'budgets') {
+                    if ($search) { $entriesQuery->where('category', 'like', "%{$search}%"); }
+                    $entriesQuery->orderBy('id', 'desc');
                 }
-            }
-            if ($status) {
-                $entriesQuery->where('status', $status);
-            }
-            if ($userId) {
-                $entriesQuery->where('user_id', $userId);
-            }
 
-            $entriesQuery->orderBy($sortBy, $sortDir);
-            $entries = $entriesQuery->paginate(50)->withQueryString();
+                $entries = $entriesQuery->paginate(50)->withQueryString();
+            }
 
             $currencies = \App\Models\Currency::as_array();
             
-            $entries->getCollection()->transform(function ($entry) use ($currentTab, $currencies) {
-                $currId = $entry->currency_id ?? $entry->currency;
-                $currRow = isset($currencies[$currId]) ? $currencies[$currId] : null;
-                $currencyCode = $currRow ? $currRow->currency : 'EGP';
-                $currencySymbol = $currRow ? $currRow->symbol : 'e£';
+            if ($currentTab !== 'projects' && $currentTab !== 'budgets') {
+                $entries->getCollection()->transform(function ($entry) use ($currentTab, $currencies) {
+                    $currId = $entry->currency_id ?? $entry->currency;
+                    $currRow = isset($currencies[$currId]) ? $currencies[$currId] : null;
+                    $currencyCode = $currRow ? $currRow->currency : 'EGP';
+                    $currencySymbol = $currRow ? $currRow->symbol : 'e£';
 
-                $isRecurring = false;
-                $categoryName = $entry->reason;
-                $title = $entry->reason;
+                    $isRecurring = false;
+                    $categoryName = $entry->reason;
+                    $title = $entry->reason;
 
-                if ($entry instanceof CostTransaction) {
-                    try {
-                        $recTx = \Illuminate\Support\Facades\DB::table('recurring_cost_transactions')
-                            ->join('recurring_costs', 'recurring_cost_transactions.recurring_cost_id', '=', 'recurring_costs.id')
-                            ->where('recurring_cost_transactions.cost_transaction_id', $entry->id)
-                            ->select('recurring_costs.title as source_title', 'recurring_costs.reason as source_reason')
-                            ->first();
-                        
-                        if ($recTx) {
-                            $isRecurring = true;
-                            $categoryName = $recTx->source_reason;
-                            $title = $entry->reason ?: $recTx->source_title;
+                    if ($entry instanceof CostTransaction) {
+                        try {
+                            $recTx = \Illuminate\Support\Facades\DB::table('recurring_cost_transactions')
+                                ->join('recurring_costs', 'recurring_cost_transactions.recurring_cost_id', '=', 'recurring_costs.id')
+                                ->where('recurring_cost_transactions.cost_transaction_id', $entry->id)
+                                ->select('recurring_costs.title as source_title', 'recurring_costs.reason as source_reason')
+                                ->first();
+                            
+                            if ($recTx) {
+                                $isRecurring = true;
+                                $categoryName = $recTx->source_reason;
+                                $title = $entry->reason ?: $recTx->source_title;
+                            }
+                        } catch (\Throwable $e) {
+                            $isRecurring = false;
                         }
-                    } catch (\Throwable $e) {
-                        $isRecurring = false;
                     }
-                }
 
-                return [
-                    'id' => $entry->id,
-                    'title' => ucfirst($title ?? ($currentTab === 'income' ? 'Income' : 'Cost')),
-                    'amount' => $entry->amount,
-                    'business_amount' => $entry->business_amount,
-                    'currency' => $currencyCode,
-                    'currency_symbol' => $currencySymbol,
-                    'currency_id' => $currId,
-                    'category' => ['name' => ucfirst($categoryName ?? ($currentTab === 'income' ? 'Income' : 'Cost'))],
-                    'is_recurring' => $isRecurring,
-                    'next_due_date' => $entry->due_date,
-                    'status' => $entry->status ?? 'completed',
-                    'user' => $entry->user ? ['id' => $entry->user->id, 'name' => $entry->user->name, 'email' => $entry->user->email] : null,
-                    'project' => $entry->project ? ['id' => $entry->project->id, 'name' => $entry->project->name] : null,
-                    'created_at' => $entry->created_at,
-                    'type' => $entry instanceof \App\Models\Transaction ? $entry->type : ($entry->reason === 'salary' ? 'salary' : 'expense'),
-                ];
-            });
+                    return [
+                        'id' => $entry->id,
+                        'title' => ucfirst($title ?? ($currentTab === 'income' ? 'Income' : 'Cost')),
+                        'amount' => $entry->amount,
+                        'business_amount' => $entry->business_amount,
+                        'currency' => $currencyCode,
+                        'currency_symbol' => $currencySymbol,
+                        'currency_id' => $currId,
+                        'category' => ['name' => ucfirst($categoryName ?? ($currentTab === 'income' ? 'Income' : 'Cost'))],
+                        'is_recurring' => $isRecurring,
+                        'next_due_date' => $entry->due_date,
+                        'status' => $entry->status ?? 'completed',
+                        'user' => $entry->user ? ['id' => $entry->user->id, 'name' => $entry->user->name, 'email' => $entry->user->email] : null,
+                        'project' => $entry->project ? ['id' => $entry->project->id, 'name' => $entry->project->name] : null,
+                        'created_at' => $entry->created_at,
+
+                        'type' => $entry instanceof \App\Models\Transaction ? $entry->type : ($entry->reason === 'salary' ? 'salary' : 'expense'),
+                    ];
+                });
+            } else if ($currentTab === 'projects') {
+                $entries->getCollection()->transform(function ($project) {
+                    $revenue = $project->client_balance->sum('business_amount');
+                    $costs = $project->cost_transactions->sum('business_amount');
+                    $margin = $revenue > 0 ? (($revenue - $costs) / $revenue) * 100 : 0;
+                    return [
+                        'id' => $project->id,
+                        'name' => $project->project_name,
+                        'client' => $project->client ? ['name' => $project->client->name] : null,
+                        'revenue' => $revenue,
+                        'costs' => $costs,
+                        'margin' => round($margin, 2),
+                        'profit' => $revenue - $costs,
+                        'type' => 'project'
+                    ];
+                });
+            } else if ($currentTab === 'budgets') {
+                $entries->getCollection()->transform(function ($budget) use ($currencies) {
+                    $spent = \App\Models\CostTransaction::where('reason', $budget->category)
+                        ->whereMonth('created_at', now()->month)
+                        ->whereYear('created_at', now()->year)
+                        ->sum('amount');
+                    return [
+                        'id' => $budget->id,
+                        'category' => $budget->category,
+                        'amount' => $budget->amount,
+                        'spent' => $spent,
+                        'period' => $budget->period,
+                        'notify_on_exceed' => $budget->notify_on_exceed,
+                        'currency_symbol' => $budget->currency ? $budget->currency->symbol : '$',
+                        'type' => 'budget'
+                    ];
+                });
+            }
         }
 
         if ($currentTab === 'income') {
@@ -278,6 +330,48 @@ class FinancialOperationsController extends Controller
                         ];
                     }
                     return $trends;
+                })(),
+                'forecast_receivables' => (function() {
+                    $invoices = \App\Models\Invoice::whereIn('status', ['sent', 'partially_paid', 'unpaid', 'pending'])
+                        ->get();
+                    
+                    $total_outstanding = 0;
+                    $thirty_days = 0;
+                    $sixty_days = 0;
+                    $ninety_days = 0;
+                    
+                    foreach ($invoices as $inv) {
+                        $due = $inv->created_at ? \Carbon\Carbon::parse($inv->created_at)->addDays(30) : now()->addDays(30);
+                        $amount = $inv->total ?? 0; // assuming total or unpaid
+
+                        if (method_exists($inv, 'unpaidAmount')) {
+                            $amount = $inv->unpaidAmount();
+                        } else if (isset($inv->unpaid)) {
+                            $amount = $inv->unpaid;
+                        }
+                        
+                        $business_amount = $amount; // in a real scenario we convert this, but simple sum for now
+                        try {
+                            $businessCurrencyId = \App\Models\AdminSettings::business_currency();
+                            if ($inv->currency != $businessCurrencyId) {
+                                $business_amount = \App\Models\CurrenciesExchange::RateByDate(now(), $amount, $inv->currency, $businessCurrencyId);
+                            }
+                        } catch (\Throwable $e) {}
+
+                        $total_outstanding += $business_amount;
+                        
+                        $days = now()->diffInDays($due, false);
+                        if ($days >= 0 && $days <= 30) $thirty_days += $business_amount;
+                        else if ($days > 30 && $days <= 60) $sixty_days += $business_amount;
+                        else if ($days > 60 && $days <= 90) $ninety_days += $business_amount;
+                    }
+                    
+                    return [
+                        'total_outstanding' => $total_outstanding,
+                        'next_30_days' => $thirty_days,
+                        'next_60_days' => $sixty_days,
+                        'next_90_days' => $ninety_days,
+                    ];
                 })(),
                 'expense_categories' => CostTransaction::whereYear('created_at', now()->year)
                     ->whereMonth('created_at', now()->month)
@@ -569,5 +663,83 @@ class FinancialOperationsController extends Controller
         }
 
         return redirect()->back()->with('success', __('general.ledger_entry_marked_as_paid'));
+    }
+
+    public function export(Request $request)
+    {
+        $type = $request->query('type', 'pnl'); // pnl or ledger
+        $month = $request->query('month', now()->month);
+        $year = $request->query('year', now()->year);
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=finance_{$type}_{$year}_{$month}.csv",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $callback = function() use ($type, $month, $year) {
+            $file = fopen('php://output', 'w');
+            
+            if ($type === 'pnl') {
+                fputcsv($file, ['Category', 'Type', 'Business Amount']);
+                
+                // Income
+                $incomeQuery = \App\Models\Transaction::whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month);
+                
+                $received = (clone $incomeQuery)->where('type', 'received')->sum('business_amount') ?? 0;
+                $refunded = (clone $incomeQuery)->where('type', 'refunded')->sum('business_amount') ?? 0;
+                $sent = (clone $incomeQuery)->where('type', 'sent')->sum('business_amount') ?? 0;
+                
+                fputcsv($file, ['Gross Income', 'Income', $received]);
+                fputcsv($file, ['Refunds/Sent', 'Income Deduction', -($refunded + $sent)]);
+                
+                // Expenses
+                $expenses = \App\Models\CostTransaction::whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month)
+                    ->select('reason', \Illuminate\Support\Facades\DB::raw('SUM(business_amount) as total'))
+                    ->groupBy('reason')
+                    ->get();
+                
+                foreach ($expenses as $exp) {
+                    fputcsv($file, [ucfirst($exp->reason), 'Expense', $exp->total]);
+                }
+            } else {
+                fputcsv($file, ['Date', 'Title', 'Type', 'Category', 'Original Amount', 'Currency', 'Business Amount']);
+                
+                $incomes = \App\Models\Transaction::with(['currency_info'])
+                    ->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month)
+                    ->whereIn('type', ['received', 'refunded', 'sent'])
+                    ->get();
+                    
+                $costs = \App\Models\CostTransaction::with(['currency_info'])
+                    ->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month)
+                    ->get();
+                    
+                $merged = $incomes->concat($costs)->sortByDesc('created_at')->values();
+                
+                foreach ($merged as $entry) {
+                    $typeStr = $entry instanceof \App\Models\Transaction ? 'Income (' . $entry->type . ')' : 'Expense';
+                    $currencyCode = $entry->currency_info ? $entry->currency_info->currency : 'SYS';
+                    fputcsv($file, [
+                        $entry->created_at->format('Y-m-d H:i'),
+                        $entry->reason,
+                        $typeStr,
+                        $entry->reason,
+                        $entry->amount,
+                        $currencyCode,
+                        $entry->business_amount
+                    ]);
+                }
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }
