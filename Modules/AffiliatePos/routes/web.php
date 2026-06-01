@@ -26,6 +26,7 @@ Route::middleware(['auth', 'verified', 'feature:affiliate_pos'])->prefix('vendor
     Route::get('products/create', [\Modules\AffiliatePos\app\Features\VendorPortal\Controllers\VendorProductController::class, 'create'])->name('affiliate_pos.vendor.products.create');
     Route::get('products/{product}/edit', [\Modules\AffiliatePos\app\Features\VendorPortal\Controllers\VendorProductController::class, 'edit'])->name('affiliate_pos.vendor.products.edit');
     Route::post('products', [\Modules\AffiliatePos\app\Features\VendorPortal\Controllers\VendorProductController::class, 'storeSimple'])->name('affiliate_pos.vendor.products.store');
+    Route::put('products/{product}', [\Modules\AffiliatePos\app\Features\VendorPortal\Controllers\VendorProductController::class, 'update'])->name('affiliate_pos.vendor.products.update');
     Route::patch('products/{product}/stock', [\Modules\AffiliatePos\app\Features\VendorPortal\Controllers\VendorProductController::class, 'updateStock'])->name('affiliate_pos.vendor.products.stock');
 });
 

@@ -134,6 +134,8 @@ class TextHelper
 
     public static function secondsToTime($init)
     {
+        $isNegative = $init < 0;
+        $init = abs($init);
         $day = floor($init / 86400);
         $hours = floor(($init - ($day * 86400)) / 3600);
         $minutes = floor(($init / 60) % 60);
@@ -144,7 +146,8 @@ class TextHelper
         } else {
             $day = '';
         }
-        return (!empty($day) ? $day . ' ' : '') . "{$hours}h:{$minutes}m:{$seconds}s";
+        $sign = $isNegative ? '-' : '';
+        return $sign . (!empty($day) ? $day . ' ' : '') . sprintf("%02dh:%02dm:%02ds", $hours, $minutes, $seconds);
     }
 
     /**

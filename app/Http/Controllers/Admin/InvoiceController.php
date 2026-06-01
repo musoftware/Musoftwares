@@ -606,8 +606,8 @@ class InvoiceController extends Controller
     {
         $item = \App\Models\InvoiceItem::findOrFail($item_id);
         
-        if ($item->invoice && $item->invoice->status === 'cancelled') {
-            return redirect()->back()->with('error', __('admin.cannot_modify_cancelled_invoice'));
+        if ($item->invoice && $item->invoice->status !== 'unpaid') {
+            return redirect()->back()->with('error', __('admin.only_unpaid_invoices_can_be_edited'));
         }
 
         $request->validate([
@@ -636,8 +636,8 @@ class InvoiceController extends Controller
     {
         $item = \App\Models\InvoiceItem::findOrFail($item_id);
         
-        if ($item->invoice && $item->invoice->status === 'cancelled') {
-            return redirect()->back()->with('error', __('admin.cannot_modify_cancelled_invoice'));
+        if ($item->invoice && $item->invoice->status !== 'unpaid') {
+            return redirect()->back()->with('error', __('admin.only_unpaid_invoices_can_be_edited'));
         }
 
         $timer = \App\Models\InvoiceItemTimer::where('invoice_item_id', $item->id)->findOrFail($timer_id);

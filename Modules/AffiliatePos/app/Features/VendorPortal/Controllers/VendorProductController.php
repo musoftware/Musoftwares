@@ -102,4 +102,25 @@ class VendorProductController extends Controller
 
         return back()->with('success', 'Stock updated successfully. Current stock: ' . $sku->stock());
     }
+
+    public function update(Request $request, Product $product)
+    {
+        if ($product->user_id !== Auth::id()) {
+            abort(403, __('general.unauthorized_access_to_product'));
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'commission' => 'required|numeric|min:0',
+        ]);
+
+        $product->update([
+            'name' => $request->name,
+            'price' => $request->price,
+            'commission' => $request->commission,
+        ]);
+
+        return back()->with('success', __('general.product_updated_successfully'));
+    }
 }

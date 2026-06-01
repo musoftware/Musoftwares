@@ -1,9 +1,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { __ } from '@/lib/i18n';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
-import { TrendingUp, Lock, ExternalLink, Activity } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import { TrendingUp, Lock, Activity } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import GoldSaversTabs from '../Components/GoldSaversTabs';
 import { Button } from '@/Components/ui/button';
 
@@ -21,6 +21,8 @@ interface GoldPrice {
 interface HistoricalPoint {
     date: string;
     avg_24k: number;
+    avg_21k: number;
+    avg_18k: number;
 }
 
 interface MarketProps {
@@ -34,9 +36,21 @@ interface MarketProps {
         price_gram_18k: number;
         price_ounce_usd: number;
     } | null;
+    filters: {
+        karat: number;
+        period: string;
+    };
 }
 
-export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latestPrice, historicalData, priceChanges }: MarketProps) {
+export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latestPrice, historicalData, priceChanges, filters }: MarketProps) {
+    const handleFilterChange = (key: string, value: string | number) => {
+        router.get(route('isaas.gold-savers.market.index'), {
+            ...filters,
+            [key]: value
+        }, { preserveState: true, preserveScroll: true, replace: true });
+    };
+
+    const currentKaratKey = `avg_${filters.karat}k`;
     return (
         <AuthenticatedLayout
             header={
@@ -163,44 +177,83 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                             ) : null}
 
                             <div className={!hasHistoricalCharts ? "opacity-20 select-none pointer-events-none" : ""}>
-                                <div className="h-[400px] w-full">
-                                    {historicalData && historicalData.length > 0 ? (
-                                        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                                            <LineChart data={historicalData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                                <XAxis 
-                                                    dataKey="date" 
-                                                    axisLine={false}
-                                                    tickLine={false}
-                                                    tick={{ fill: '#64748b', fontSize: 12 }}
-                                                    dy={10}
-                                                />
-                                                <YAxis 
-                                                    axisLine={false}
-                                                    tickLine={false}
-                                                    tick={{ fill: '#64748b', fontSize: 12 }}
-                                                    domain={['auto', 'auto']}
-                                                    tickFormatter={(value) => `$${value}`}
-                                                />
-                                                <RechartsTooltip 
-                                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                                    formatter={(value: number | string | (number | string)[] | undefined) => [`${value ?? 0} EGP`, '24k Price']}
-                                                />
-                                                <Line 
-                                                    type="monotone" 
-                                                    dataKey="avg_24k" 
-                                                    stroke="#4f46e5" 
-                                                    strokeWidth={3}
-                                                    dot={false}
-                                                    activeDot={{ r: 6, fill: '#4f46e5', stroke: '#fff', strokeWidth: 2 }}
-                                                />
-                                            </LineChart>
-                                        </ResponsiveContainer>
-                                    ) : (
-                                        <div className="flex items-center justify-center h-full border-2 border-dashed border-slate-200 rounded-xl">
-                                            <p className="text-slate-500">{__('No Historical Data')}</p>
+                                <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-sm col-span-1 md:col-span-3">
+                                    <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
+                                        <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
+                                            {[24, 21, 18].map(k => (
+                                                <button
+                                                    key={k}
+                                                    onClick={() => handleFilterChange('karat', k)}
+                                                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${filters.karat == k ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                                >
+                                                    {k}k
+                                                </button>
+                                            ))}
                                         </div>
-                                    )}
+                                        <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
+                                            {[
+                                                { label: '1W', value: '1w' },
+                                                { label: '1M', value: '1m' },
+                                                { label: '6M', value: '6m' },
+                                                { label: '1Y', value: '1y' }
+                                            ].map(p => (
+                                                <button
+                                                    key={p.value}
+                                                    onClick={() => handleFilterChange('period', p.value)}
+                                                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${filters.period === p.value ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                                >
+                                                    {p.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="h-80 w-full">
+                                        {historicalData && historicalData.length > 0 ? (
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <AreaChart data={historicalData}>
+                                                    <defs>
+                                                        <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                                                            <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
+                                                            <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                                                        </linearGradient>
+                                                    </defs>
+                                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                                    <XAxis 
+                                                        dataKey="date" 
+                                                        axisLine={false} 
+                                                        tickLine={false} 
+                                                        tick={{ fill: '#94a3b8', fontSize: 12 }} 
+                                                        dy={10}
+                                                    />
+                                                    <YAxis 
+                                                        axisLine={false} 
+                                                        tickLine={false} 
+                                                        tick={{ fill: '#94a3b8', fontSize: 12 }}
+                                                        domain={['auto', 'auto']}
+                                                        tickFormatter={(val) => `${val}`}
+                                                    />
+                                                    <RechartsTooltip 
+                                                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
+                                                        formatter={(value: any) => [`${value} EGP`, `Price (${filters.karat}k)`]}
+                                                        labelStyle={{ color: '#64748b', marginBottom: '4px' }}
+                                                    />
+                                                    <Area 
+                                                        type="monotone" 
+                                                        dataKey={currentKaratKey} 
+                                                        stroke="#4f46e5" 
+                                                        strokeWidth={3}
+                                                        fillOpacity={1} 
+                                                        fill="url(#colorPrice)" 
+                                                        activeDot={{ r: 6, strokeWidth: 0, fill: '#4f46e5' }}
+                                                    />
+                                                </AreaChart>
+                                            </ResponsiveContainer>
+                                        ) : (
+                                            <div className="flex items-center justify-center h-full border-2 border-dashed border-slate-200 rounded-xl">
+                                                <p className="text-slate-500">{__('No Historical Data')}</p>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </CardContent>

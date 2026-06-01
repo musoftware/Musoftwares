@@ -56,6 +56,12 @@ export default function Show({ invoice }: { invoice: any }) {
         amount: ''
     });
 
+    const [jobStatusModal, setJobStatusModal] = useState(false);
+    const [jobStatusForm, setJobStatusForm] = useState(invoice.job_status || 'pending');
+
+    const [transferModal, setTransferModal] = useState(false);
+    const [transferProjectId, setTransferProjectId] = useState<string | number | null>(invoice.project?.id || null);
+
     const resetState = () => {
         if (invoice && invoice.items) {
             const itemsSource = invoice.items.data ? invoice.items.data : invoice.items;
@@ -424,7 +430,7 @@ export default function Show({ invoice }: { invoice: any }) {
                         {invoice.status !== 'paid' && (
                             <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
                                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.delivery_status')}</span>
-                                <Button onClick={() => { const s = prompt('Enter job status (done, processing, pending):', invoice.job_status || 'pending'); if(s) router.post(route('admin.invoices.change-job-status', invoice.id), { job_status: s }); }} variant="outline" size="sm" className="h-7 text-xs border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100">{__('general.update_status')}</Button>
+                                <Button onClick={() => { setJobStatusForm(invoice.job_status || 'pending'); setJobStatusModal(true); }} variant="outline" size="sm" className="h-7 text-xs border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100">{__('general.update_status')}</Button>
                             </div>
                         )}
                     </CardContent>
@@ -1000,15 +1006,8 @@ export default function Show({ invoice }: { invoice: any }) {
                             <Button 
                                 variant="outline"
                                 onClick={() => {
-                                    const projectOptions = invoice.user.projects.map((p: any) => `${p.id}: ${p.project_name}`).join('\n');
-                                    const projectId = prompt('Transfer to project (enter project ID):\n' + projectOptions, invoice.project?.id || '');
-                                    if (projectId !== null) {
-                                        router.post(route('admin.invoices.bulk-action'), { 
-                                            action: 'change_project', 
-                                            invoices: [invoice.id], 
-                                            project_id: projectId || null 
-                                        });
-                                    }
+                                    setTransferProjectId(invoice.project?.id || null);
+                                    setTransferModal(true);
                                 }}
                             >
                                 Transfer
@@ -1244,6 +1243,68 @@ export default function Show({ invoice }: { invoice: any }) {
                 </DialogContent>
             </Dialog>
 
+            <Dialog open={jobStatusModal} onOpenChange={setJobStatusModal}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{__('general.update_status') || 'Update Job Status'}</DialogTitle>
+                        <DialogDescription>{__('general.select_job_status') || 'Select the current job status for this invoice.'}</DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <PremiumCombobox
+                            value={jobStatusForm}
+                            onChange={(val) => setJobStatusForm(val as string)}
+                            options={[
+                                { value: 'pending', label: 'Pending' },
+                                { value: 'processing', label: 'Processing' },
+                                { value: 'done', label: 'Done' }
+                            ]}
+                            placeholder="Select job status"
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setJobStatusModal(false)}>{__('general.cancel') || 'Cancel'}</Button>
+                        <Button onClick={() => {
+                            router.post(route('admin.invoices.change-job-status', invoice.id), { job_status: jobStatusForm }, {
+                                onSuccess: () => setJobStatusModal(false),
+                                preserveScroll: true
+                            });
+                        }} className="bg-blue-600 hover:bg-blue-700 text-white">{__('general.save_changes') || 'Save Status'}</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={transferModal} onOpenChange={setTransferModal}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Transfer to Project</DialogTitle>
+                        <DialogDescription>Select the project to transfer this invoice to.</DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <PremiumCombobox
+                            value={transferProjectId || ''}
+                            onChange={(val) => setTransferProjectId(val)}
+                            options={invoice.user?.projects?.map((p: any) => ({
+                                value: p.id,
+                                label: p.project_name
+                            })) || []}
+                            placeholder="Select project"
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setTransferModal(false)}>{__('general.cancel') || 'Cancel'}</Button>
+                        <Button onClick={() => {
+                            router.post(route('admin.invoices.bulk-action'), { 
+                                action: 'change_project', 
+                                invoices: [invoice.id], 
+                                project_id: transferProjectId 
+                            }, {
+                                onSuccess: () => setTransferModal(false),
+                                preserveScroll: true
+                            });
+                        }} className="bg-blue-600 hover:bg-blue-700 text-white">Transfer</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </AdminSidebarLayout>
     );
 }

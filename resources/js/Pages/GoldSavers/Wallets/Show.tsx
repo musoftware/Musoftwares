@@ -43,9 +43,17 @@ interface GoldWallet {
 interface ShowProps {
     wallet: GoldWallet;
     hasGoalTracking: boolean;
+    latestPrice?: any;
+    gamification?: {
+        averageCost: number;
+        currentValue: number;
+        isProfit: boolean;
+        profitAmount: number;
+        monthsToGoal?: number | null;
+    };
 }
 
-export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
+export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamification }: ShowProps) {
     const [isCreatingTx, setIsCreatingTx] = useState(false);
     const [isEditingWallet, setIsEditingWallet] = useState(false);
     const [editingTx, setEditingTx] = useState<GoldTransaction | null>(null);
@@ -216,37 +224,76 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                         </Card>
                     )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <Card>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <Card className="bg-slate-50 border-slate-200 shadow-none">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground">{__('Total Grams')}</CardTitle>
+                                <CardTitle className="text-sm font-medium text-slate-500">{__('Total Grams')}</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-bold text-indigo-700">{wallet.balance_grams} {__('G')}</div>
+                                <div className="text-3xl font-bold text-slate-900">{wallet.balance_grams} {__('G')}</div>
                             </CardContent>
                         </Card>
-                        <Card>
+                        <Card className="bg-slate-50 border-slate-200 shadow-none">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground">{__('Total Investment Value')}</CardTitle>
+                                <CardTitle className="text-sm font-medium text-slate-500">{__('Total Cost')}</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-bold">{formatNumber(wallet.balance_amount)} <span className="text-lg text-muted-foreground">{wallet.currency}</span></div>
+                                <div className="text-3xl font-bold text-slate-900">{formatNumber(wallet.balance_amount)} <span className="text-lg text-slate-500">{wallet.currency}</span></div>
+                                {gamification && gamification.averageCost > 0 && (
+                                    <p className="text-xs text-slate-500 mt-1">{__('Avg. Cost')}: {formatNumber(gamification.averageCost)} / {__('G')}</p>
+                                )}
                             </CardContent>
                         </Card>
-                        <Card>
+                        
+                        {gamification && latestPrice ? (
+                            <Card className={gamification.isProfit ? "bg-green-50 border-green-200 shadow-none" : "bg-red-50 border-red-200 shadow-none"}>
+                                <CardHeader className="pb-2">
+                                    <CardTitle className={`text-sm font-medium ${gamification.isProfit ? 'text-green-700' : 'text-red-700'}`}>
+                                        {__('Current Value')} (21k)
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className={`text-3xl font-bold ${gamification.isProfit ? 'text-green-700' : 'text-red-700'}`}>
+                                        {formatNumber(gamification.currentValue)} <span className="text-lg opacity-70">{wallet.currency}</span>
+                                    </div>
+                                    <div className={`text-xs mt-1 font-semibold flex items-center gap-1 ${gamification.isProfit ? 'text-green-600' : 'text-red-600'}`}>
+                                        {gamification.isProfit ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                                        {gamification.isProfit ? '+' : ''}{formatNumber(gamification.profitAmount)} {wallet.currency}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <Card className="bg-slate-50 border-slate-200 shadow-none">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-sm font-medium text-slate-500">{__('Current Value')}</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-3xl font-bold text-slate-400">---</div>
+                                    <p className="text-xs text-slate-400 mt-1">{__('Requires Live Prices Addon')}</p>
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        <Card className="bg-slate-50 border-slate-200 shadow-none">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground">{__('Goal Progress')}</CardTitle>
+                                <CardTitle className="text-sm font-medium text-slate-500">{__('Goal Progress')}</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-bold">
+                                <div className="text-3xl font-bold text-slate-900">
                                     {wallet.target_grams > 0 
                                         ? `${((wallet.balance_grams / wallet.target_grams) * 100).toFixed(1)}%` 
                                         : __('Na')
                                     }
                                 </div>
-                                <p className="text-xs text-muted-foreground mt-1">
+                                <p className="text-xs text-slate-500 mt-1">
                                     {__('Target')}: {wallet.target_grams > 0 ? `${wallet.target_grams} ${__('G')}` : __('No Target Set')}
                                 </p>
+                                {gamification?.monthsToGoal && gamification.monthsToGoal > 0 && (
+                                    <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-600">
+                                        <TrendingUp className="w-4 h-4 text-indigo-500" />
+                                        <span>{__('gold_saver.est_time_to_goal', { months: gamification.monthsToGoal })}</span>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </div>
@@ -464,7 +511,7 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                                         <label className="text-sm font-medium">{__('Karat')}</label>
                                         <Select 
                                             value={String(editingTx.karat)} 
-                                            onValueChange={value => setEditingTx({...editingTx, karat: parseInt(value)})}
+                                            onValueChange={value => setEditingTx({...editingTx, karat: parseInt(value || '21')})}
                                         >
                                             <SelectTrigger className="w-full">
                                                 <SelectValue placeholder={__('general.select_karat')} />

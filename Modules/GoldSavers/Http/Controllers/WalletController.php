@@ -112,11 +112,53 @@ class WalletController extends Controller implements HasMiddleware
             abort(403);
         }
 
-        $wallet->load('transactions');
+        $wallet->load(['transactions' => function($q) {
+            $q->orderBy('transaction_date', 'desc');
+        }]);
+
+        // Fetch Live Prices for current value calculation
+        $latestPrice = null;
+        if ($user->hasModuleSubscription('gold-live-prices')) {
+            $latestPrice = \Modules\GoldSavers\app\Features\LivePrices\Models\GoldLivePrice::orderBy('fetched_at', 'desc')->first();
+        }
+
+        // Calculate Average Cost and Break-Even
+        $averageCost = $wallet->balance_grams > 0 ? ($wallet->balance_amount / $wallet->balance_grams) : 0;
+        
+        $currentValue = 0;
+        if ($latestPrice && $wallet->balance_grams > 0) {
+            $currentValue = $wallet->balance_grams * ($latestPrice->price_gram_21k ?? 0); // Default to 21k
+        }
+
+        $isProfit = $currentValue > $wallet->balance_amount;
+
+        // Calculate Time-to-Goal (Gamification)
+        $monthsToGoal = null;
+        if ($wallet->target_grams > 0 && $wallet->balance_grams < $wallet->target_grams && $wallet->transactions->count() > 0) {
+            $firstTx = $wallet->transactions->sortBy('transaction_date')->first();
+            if ($firstTx) {
+                $daysSinceStart = \Carbon\Carbon::parse($firstTx->transaction_date)->diffInDays(now());
+                $monthsSinceStart = max(1, $daysSinceStart / 30); // Avoid division by zero, min 1 month
+                $avgMonthlyGrams = $wallet->balance_grams / $monthsSinceStart;
+                
+                if ($avgMonthlyGrams > 0) {
+                    $remainingGrams = $wallet->target_grams - $wallet->balance_grams;
+                    $monthsToGoal = ceil($remainingGrams / $avgMonthlyGrams);
+                }
+            }
+        }
 
         return Inertia::render('GoldSavers/Wallets/Show', [
             'wallet' => $wallet,
             'hasGoalTracking' => $user->hasModuleSubscription('gold-goal-tracking'),
+            'latestPrice' => $latestPrice,
+            'gamification' => [
+                'averageCost' => round($averageCost, 2),
+                'currentValue' => round($currentValue, 2),
+                'isProfit' => $isProfit,
+                'profitAmount' => round($currentValue - $wallet->balance_amount, 2),
+                'monthsToGoal' => $monthsToGoal,
+            ]
         ]);
     }
 

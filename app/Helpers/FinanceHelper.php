@@ -73,20 +73,26 @@ class FinanceHelper
 
     public static function secondsToTimeHTML($init)
     {
+        $isNegative = $init < 0;
+        $init = abs($init);
         $day = floor($init / 86400);
         $hours = floor(($init - ($day * 86400)) / 3600);
         $minutes = floor(($init / 60) % 60);
         $seconds = $init % 60;
-        return (!empty($day) ? "<b>$day</b>" . 'D ' : '') . "<b>{$hours}</b>H <b>{$minutes}</b>M <b>{$seconds}</b>S";
+        $sign = $isNegative ? '-' : '';
+        return $sign . (!empty($day) ? "<b>$day</b>" . 'D ' : '') . "<b>" . sprintf("%02d", $hours) . "</b>H <b>" . sprintf("%02d", $minutes) . "</b>M <b>" . sprintf("%02d", $seconds) . "</b>S";
     }
 
     public static function secondsToTime($init)
     {
+        $isNegative = $init < 0;
+        $init = abs($init);
         $day = floor($init / 86400);
         $hours = floor(($init - ($day * 86400)) / 3600);
         $minutes = floor(($init / 60) % 60);
         $seconds = $init % 60;
-        return (!empty($day) ? "<b>$day</b>" . 'D ' : '') . "<b>{$hours}</b>H <b>{$minutes}</b>M <b>{$seconds}</b>S";
+        $sign = $isNegative ? '-' : '';
+        return $sign . (!empty($day) ? "<b>$day</b>" . 'D ' : '') . "<b>" . sprintf("%02d", $hours) . "</b>H <b>" . sprintf("%02d", $minutes) . "</b>M <b>" . sprintf("%02d", $seconds) . "</b>S";
     }
 
     public function calc_single_finance_summary($item, &$total_paids)

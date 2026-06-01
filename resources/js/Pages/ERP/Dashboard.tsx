@@ -618,11 +618,17 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     // Log Expense
     const handleAddExpense = (e: React.FormEvent) => {
         e.preventDefault();
-        // Fallback to fake state if route doesn't exist yet, but in a real operational 
-        // system this should be router.post(route('erp.expenses.store'), expenseForm)
-        toast({ description: 'Expense logging is coming soon.' });
-        setShowAddExpenseModal(false);
-        setExpenseForm({ title: '', category: 'Software', amount: '', date: '', status: 'Pending' });
+        router.post(route('erp.expenses.store'), expenseForm, {
+            onSuccess: () => {
+                setShowAddExpenseModal(false);
+                setExpenseForm({ title: '', category: 'Software', amount: '', date: '', status: 'Pending' });
+                toast({ description: 'Expense logged successfully.' });
+                prependActivity('Expense Logged', `Logged expense ${expenseForm.title}.`);
+            },
+            onError: (errors) => {
+                toast({ variant: 'destructive', description: Object.values(errors)[0] as string });
+            }
+        });
     };
 
     // Add Storage Provider
@@ -758,9 +764,17 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     // Draft Contract
     const handleAddContract = (e: React.FormEvent) => {
         e.preventDefault();
-        toast({ description: 'Contract management is coming soon.' });
-        setShowAddContractModal(false);
-        setContractForm({ title: '', client: '', value: '', status: 'Draft' });
+        router.post(route('erp.contracts.store'), contractForm, {
+            onSuccess: () => {
+                setShowAddContractModal(false);
+                setContractForm({ title: '', client: '', value: '', status: 'Draft' });
+                toast({ description: 'Contract drafted successfully.' });
+                prependActivity('Contract Drafted', `Drafted contract ${contractForm.title}.`);
+            },
+            onError: (errors) => {
+                toast({ variant: 'destructive', description: Object.values(errors)[0] as string });
+            }
+        });
     };
 
     // Add Support Ticket

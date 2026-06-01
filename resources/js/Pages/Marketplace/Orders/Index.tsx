@@ -124,20 +124,14 @@ export default function Index({ orders, tab }: any) {
                                                 ? order.seller
                                                 : order.buyer;
 
-                                            // Calculate deadline mock if not present
-                                            const deliveryDays =
-                                                order.package?.delivery_days ||
-                                                7;
-                                            const orderDate = new Date(
-                                                order.created_at,
-                                            );
-                                            const deadlineDate = new Date(
-                                                orderDate,
-                                            );
-                                            deadlineDate.setDate(
-                                                deadlineDate.getDate() +
-                                                    deliveryDays,
-                                            );
+                                            // Use actual deadline if available, else format as TBD
+                                            const deliveryDays = order.package?.delivery_days;
+                                            const orderDate = new Date(order.created_at);
+                                            let deadlineDate = null;
+                                            if (deliveryDays) {
+                                                deadlineDate = new Date(orderDate);
+                                                deadlineDate.setDate(deadlineDate.getDate() + deliveryDays);
+                                            }
 
                                             return (
                                                 <tr
@@ -162,7 +156,7 @@ export default function Index({ orders, tab }: any) {
                                                                     />
                                                                 ) : (
                                                                     <div className="flex h-full w-full items-center justify-center text-xs text-gray-400">
-                                                                        Img
+                                                                        {__('general.no_image')}
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -209,11 +203,13 @@ export default function Index({ orders, tab }: any) {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm text-gray-900">
-                                                            {deadlineDate.toLocaleDateString()}
+                                                            {deadlineDate ? deadlineDate.toLocaleDateString() : __('general.tbd')}
                                                         </div>
-                                                        <div className="text-xs text-gray-500">
-                                                            {deliveryDays} days
-                                                        </div>
+                                                        {deliveryDays && (
+                                                            <div className="text-xs text-gray-500">
+                                                                {deliveryDays} {__('general.days')}
+                                                            </div>
+                                                        )}
                                                     </td>
                                                     <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
                                                         <Link

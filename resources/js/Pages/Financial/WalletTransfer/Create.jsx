@@ -372,7 +372,7 @@ export default function Create({ user, wallet }) {
                                         <AlertDescription className="text-xs">{__('general.peer_to_peer_wallet_transfers_are_direct_absolute_and_cannot_be_refunded_or_cancelled_once_processed_please_verify_the_recipient_email_carefully_before_proceeding')}</AlertDescription>
                                     </Alert>
 
-                                    {/* Summary Invoice Receipt Mock */}
+                                    {/* Summary Invoice Receipt Preview */}
                                     <div className="p-6 border border-dashed rounded-lg bg-muted/10 space-y-4">
                                         <h3 className="font-bold text-center text-sm tracking-wide uppercase text-muted-foreground">{__('general.transfer_confirmation')}</h3>
                                         <div className="space-y-2 text-sm">
