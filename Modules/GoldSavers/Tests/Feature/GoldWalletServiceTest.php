@@ -11,6 +11,12 @@ uses(Tests\TestCase::class, DatabaseTransactions::class);
 beforeEach(function () {
     $this->service = new GoldWalletService();
     $this->user = User::factory()->create();
+    
+    \Illuminate\Support\Facades\Cache::flush();
+    
+    // Create base currency for AdminSettings to avoid null constraint
+    $currency = \App\Models\Currency::factory()->create();
+    \Illuminate\Support\Facades\DB::table('admin_settings')->insert(['setting_key' => 'business_currency', 'setting_value' => $currency->id]);
 });
 
 it('creates a gold wallet correctly', function () {

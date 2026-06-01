@@ -54,7 +54,7 @@ class ProductController extends Controller
         $currencies = \App\Models\Currency::all();
         $user = $this->resolveTenantUser();
         $tenant = Tenant::where('user_id', $user->id)->first();
-        $hasMultiCurrency = $user && $user->hasModuleSubscription('multi-currency');
+        $hasMultiCurrency = $user && $user->hasModuleSubscription('erp-multi-currency');
 
         $categories = \Modules\ERP\Models\ProductCategory::where('tenant_id', $tenantId)->get();
 
@@ -123,7 +123,7 @@ class ProductController extends Controller
         $currencies = \App\Models\Currency::all();
         $user = $this->resolveTenantUser();
         $tenant = Tenant::where('user_id', $user->id)->first();
-        $hasMultiCurrency = $user && $user->hasModuleSubscription('multi-currency');
+        $hasMultiCurrency = $user && $user->hasModuleSubscription('erp-multi-currency');
 
         $categories = \Modules\ERP\Models\ProductCategory::where('tenant_id', $tenantId)->get();
 

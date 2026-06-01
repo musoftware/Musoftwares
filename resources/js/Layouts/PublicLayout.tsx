@@ -26,7 +26,19 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const navItems = [
+    type NavItem = {
+        id: string;
+        label: string;
+        href: string;
+        items: {
+            title: string;
+            desc: string;
+            href: string;
+            icon?: React.ReactNode;
+        }[];
+    };
+
+    const navItems: NavItem[] = [
         {
             id: 'platforms',
             label: 'Platforms',

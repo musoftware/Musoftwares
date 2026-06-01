@@ -39,13 +39,13 @@ it('fetches, validates, snapshots, caches, and broadcasts the live price', funct
     $livePrice = $service->fetchAndUpdate(1, 'egypt_local');
 
     // Asserts
-    expect($livePrice->price_gram_24k)->toBe(4000.0)
+    expect((float) $livePrice->price_gram_24k)->toBe(4000.0)
         ->and($livePrice->direction)->toBe('up') // Since previous was 0
         ->and($livePrice->tenant_id)->toBe(1);
 
     // Verify Cache
     $cached = Cache::get("gold.live.1.egypt_local");
-    expect($cached['price_gram_24k'])->toBe(4000.0);
+    expect((float) $cached['price_gram_24k'])->toBe(4000.0);
 
     // Verify DB
     $this->assertDatabaseHas('gold_live_prices', [
@@ -86,13 +86,13 @@ it('does not update the live row if the price is an anomaly', function () {
     $livePrice = $service->fetchAndUpdate(1, 'egypt_local');
 
     // The live price should remain 4000
-    expect($livePrice->price_gram_24k)->toBe(4000.0);
+    expect((float) $livePrice->price_gram_24k)->toBe(4000.0);
 
     // However, the snapshot SHOULD be saved (for audit) but flagged as anomaly
     $this->assertDatabaseHas('gold_price_snapshots', [
         'tenant_id' => 1,
         'market_key' => 'egypt_local',
-        'price_gram_24k' => 10,
-        'is_anomaly' => true,
+        'price_gram_24k' => 10.0, // The anomaly value
+        'anomaly_detected' => true,
     ]);
 });
