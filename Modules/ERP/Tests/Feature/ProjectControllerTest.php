@@ -26,6 +26,13 @@ class ProjectControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Test Tenant', 'status' => 'active']);
+        \App\Models\UserSubscription::create([
+            'user_id' => $user->id,
+            'object' => 'erp-projects',
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addYear(),
+        ]);
         
         // Create client with currency_id = 2 (e.g. EUR or another currency from seed)
         $client = TenantClient::create([
@@ -55,6 +62,13 @@ class ProjectControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Acme Tenant', 'status' => 'active']);
+        \App\Models\UserSubscription::create([
+            'user_id' => $user->id,
+            'object' => 'erp-projects',
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addYear(),
+        ]);
         $client = TenantClient::create(['tenant_id' => $tenant->id, 'name' => 'Client', 'email' => 'client@test.com', 'currency_id' => 1]);
         
         $project = Project::create([
@@ -107,6 +121,13 @@ class ProjectControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Acme Corp', 'status' => 'active']);
+        \App\Models\UserSubscription::create([
+            'user_id' => $user->id,
+            'object' => 'erp-projects',
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addYear(),
+        ]);
         $client = TenantClient::create(['tenant_id' => $tenant->id, 'name' => 'Client A', 'email' => 'clienta@test.com', 'currency_id' => 1]);
         
         $project = Project::create([
@@ -135,6 +156,13 @@ class ProjectControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Acme Corp', 'status' => 'active']);
+        \App\Models\UserSubscription::create([
+            'user_id' => $user->id,
+            'object' => 'erp-projects',
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addYear(),
+        ]);
         $client = TenantClient::create(['tenant_id' => $tenant->id, 'name' => 'Client A', 'email' => 'clienta@test.com', 'currency_id' => 1]);
         
         $project = Project::create([
@@ -169,6 +197,13 @@ class ProjectControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Acme Corp', 'status' => 'active']);
+        \App\Models\UserSubscription::create([
+            'user_id' => $user->id,
+            'object' => 'erp-projects',
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addYear(),
+        ]);
         $client = TenantClient::create(['tenant_id' => $tenant->id, 'name' => 'Client A', 'email' => 'clienta@test.com', 'currency_id' => 1]);
         
         $project = Project::create([
@@ -195,6 +230,13 @@ class ProjectControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Acme Corp', 'status' => 'active']);
+        \App\Models\UserSubscription::create([
+            'user_id' => $user->id,
+            'object' => 'erp-projects',
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addYear(),
+        ]);
 
         $response = $this->actingAs($user)
             ->withSession(['tenant_id' => $tenant->id])
@@ -212,6 +254,13 @@ class ProjectControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Acme Corp', 'status' => 'active']);
+        \App\Models\UserSubscription::create([
+            'user_id' => $user->id,
+            'object' => 'erp-projects',
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addYear(),
+        ]);
 
         $response = $this->actingAs($user)
             ->withSession(['tenant_id' => $tenant->id])

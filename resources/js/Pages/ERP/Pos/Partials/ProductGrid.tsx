@@ -26,7 +26,6 @@ interface ProductGridProps {
     currency: any;
 }
 
-const __ = (key: string) => key;
 
 export default function ProductGrid({ products, onAddToCart, currency }: ProductGridProps) {
     const [search, setSearch] = React.useState('');

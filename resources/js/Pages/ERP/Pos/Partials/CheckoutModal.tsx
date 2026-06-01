@@ -18,7 +18,6 @@ interface CheckoutModalProps {
     isProcessing: boolean;
 }
 
-const __ = (key: string) => key;
 
 export default function CheckoutModal({ isOpen, onClose, subtotal, currency, onConfirm, isProcessing }: CheckoutModalProps) {
     const [selectedMethod, setSelectedMethod] = useState<string>('cash');

@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { ArrowLeft, Network, Users } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
-const __ = (key: string) => key;
 
 function TreeNode({ client }: { client: any }) {
     return (

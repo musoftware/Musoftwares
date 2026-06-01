@@ -23,7 +23,6 @@ import {
     Wallet, ArrowDownLeft, RotateCcw
 } from 'lucide-react';
 
-const __ = (key: string) => key;
 
 interface Project {
     id: number;

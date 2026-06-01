@@ -70,7 +70,7 @@ export default function CreateStorageProvider() {
                                     {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Driver <span className="text-red-500">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.driver')} <span className="text-red-500">*</span></label>
                                     <Select value={form.driver} onValueChange={(val) => setForm({...form, driver: val})}>
                                         <SelectTrigger className="bg-white border-slate-200 text-slate-900">
                                             <SelectValue placeholder={__('general.select_driver')} />
@@ -119,7 +119,7 @@ export default function CreateStorageProvider() {
                                     {errors.bucket && <p className="text-xs text-red-500">{errors.bucket}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Region</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.region')}</label>
                                     <Input 
                                         value={form.region} 
                                         onChange={e => setForm({...form, region: e.target.value})} 
@@ -129,7 +129,7 @@ export default function CreateStorageProvider() {
                                     {errors.region && <p className="text-xs text-red-500">{errors.region}</p>}
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
-                                    <label className="text-sm font-medium text-slate-700">Custom Endpoint (Optional)</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.custom_endpoint_optional')}</label>
                                     <Input 
                                         value={form.endpoint} 
                                         onChange={e => setForm({...form, endpoint: e.target.value})} 
@@ -143,11 +143,11 @@ export default function CreateStorageProvider() {
                             <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
                                 <Link href={route('erp.dashboard', { section: 'system' })}>
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-900 hover:bg-slate-100">
-                                        Cancel
+                                        {__('general.cancel')}
                                     </Button>
                                 </Link>
                                 <Button type="submit" disabled={isSubmitting}>
-                                    {isSubmitting ? 'Saving...' : 'Save Configuration'}
+                                    {isSubmitting ? __('general.saving') : __('general.save_configuration')}
                                 </Button>
                             </div>
                         </form>

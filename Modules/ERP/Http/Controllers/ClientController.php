@@ -27,9 +27,12 @@ class ClientController extends Controller
     {
         $this->clientService = $clientService;
     }
-    private function resolveTenantId(): int
+    private function resolveTenant(): Tenant
     {
-        return Tenant::where('user_id', Auth::id())->firstOrFail()->id;
+        if (Auth::guard('erp_team')->check()) {
+            return Auth::guard('erp_team')->user()->tenant;
+        }
+        return Tenant::where('user_id', Auth::id())->firstOrFail();
     }
 
     /**
@@ -89,11 +92,8 @@ class ClientController extends Controller
 
     public function store(StoreClientRequest $request)
     {
-        $user = Auth::user();
-        $tenant = Tenant::firstOrCreate(
-            ['user_id' => $user->id],
-            ['name' => $user->name . "'s Workspace", 'status' => 'active']
-        );
+        $this->authorize('create', TenantClient::class);
+        $tenant = $this->resolveTenant();
 
         $this->clientService->createClient($request->validated(), $tenant);
 
@@ -125,7 +125,7 @@ class ClientController extends Controller
      */
     public function search(Request $request)
     {
-        $tenantId = $this->resolveTenantId();
+        $tenantId = $this->resolveTenant()->id;
         $limit = min((int) $request->input('limit', 20), 50);
         $term = $request->q;
 
@@ -138,7 +138,7 @@ class ClientController extends Controller
     {
         $this->authorize('delete', $client);
 
-        $this->clientService->deleteClient($client, $this->resolveTenantId());
+        $this->clientService->deleteClient($client, $this->resolveTenant()->id);
 
         return back()->with('success', __('erp.client_deleted_success'));
     }

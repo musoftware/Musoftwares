@@ -90,6 +90,8 @@ class PosTest extends TestCase
         $response = $this->actingAs($user)
                          ->withSession(['tenant_id' => $tenant->id])
                          ->post(route('erp.pos.checkout'), [
+                             'client_id' => null,
+                             'is_paid' => true,
                              'items' => [
                                  [
                                      'product_id' => $product->id,
@@ -101,7 +103,7 @@ class PosTest extends TestCase
                          ]);
         
         $response->assertStatus(200);
-        $response->assertJson(['message' => 'erp.checkout_successful']);
+        $response->assertJson(['message' => __('erp.checkout_successful')]);
 
         $this->assertDatabaseHas('erp_invoices', [
             'tenant_id' => $tenant->id,

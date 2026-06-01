@@ -20,7 +20,6 @@ interface CartSidebarProps {
     currency: any;
 }
 
-const __ = (key: string) => key;
 
 export default function CartSidebar({ cart, updateQuantity, removeFromCart, onCheckout, currency }: CartSidebarProps) {
     const subtotal = cart.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);

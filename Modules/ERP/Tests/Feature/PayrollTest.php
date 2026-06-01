@@ -22,20 +22,26 @@ class PayrollTest extends TestCase
         $currency = Currency::factory()->create(['currency' => 'USD']);
         
         $this->user = User::factory()->create();
-        $this->tenant = Tenant::factory()->create([
+        $this->tenant = Tenant::create([
             'user_id' => $this->user->id,
+            'name' => 'Acme Corp',
+            'status' => 'active',
             'base_currency_id' => $currency->id
         ]);
         
-        \Modules\ERP\Models\UserSubscription::factory()->create([
+        \App\Models\UserSubscription::create([
             'user_id' => $this->user->id,
-            'module_name' => 'erp-payroll',
-            'status' => 'active'
+            'object' => 'erp-payroll',
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addYear(),
         ]);
         
-        $this->member = TeamMember::factory()->create([
+        $this->member = TeamMember::create([
             'tenant_id' => $this->tenant->id,
+            'name' => 'John Doe',
             'email' => 'employee@example.com',
+            'password' => bcrypt('password'),
             'status' => 'active'
         ]);
     }
@@ -139,7 +145,22 @@ class PayrollTest extends TestCase
             'status' => 'draft',
         ]);
 
-        $paymentMethod = \Modules\ERP\Models\PaymentMethod::factory()->create(['tenant_id' => $this->tenant->id]);
+        $client = \Modules\ERP\Models\TenantClient::create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Dummy Client',
+            'email' => 'client@test.com',
+            'currency_id' => $this->tenant->base_currency_id
+        ]);
+        
+        $paymentMethod = \Modules\ERP\Models\PaymentMethod::create([
+            'tenant_id' => $this->tenant->id,
+            'client_id' => $client->id,
+            'type' => 'bank_transfer',
+            'status' => 'approved',
+            'bank_name' => 'Test Bank',
+            'account_holder_name' => 'John Doe',
+            'account_number' => '123456789'
+        ]);
 
         $response = $this->actingAs($this->user)->post(route('erp.payroll.payslips.mark_paid', $payslip->id), [
             'payment_method_id' => $paymentMethod->id

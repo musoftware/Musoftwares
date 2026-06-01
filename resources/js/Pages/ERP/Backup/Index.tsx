@@ -73,7 +73,7 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
                         description={__('general.upgrade_your_workspace_to_unlock_the_erp_backup_service_download_full_snapshots_of_your_clients_invoices_tasks_and_ledgers_in_json_format_and_instantly_restore_them_if_needed')}
                         icon={HardDrive}
                         module="erp-backup"
-                        priceText="Unlock Backup Addon for 500 EGP/Yr"
+                        priceText={__('general.unlock_backup_addon_price', {price: '500 EGP'})}
                     />
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
@@ -121,7 +121,7 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
                                         onClick={handleRestoreSubmit}
                                         className="w-full"
                                     >
-                                        {isRestoring ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{__('general.restoring')}</> : 'Restore from File'}
+                                        {isRestoring ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{__('general.restoring')}</> : __('general.restore_from_file')}
                                     </Button>
                                 </div>
                             </CardContent>
@@ -134,7 +134,7 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
                 isOpen={confirmRestore}
                 title={__('general.confirm_data_restore')}
                 description={__('general.are_you_absolutely_sure_you_want_to_restore_from_this_backup_file_this_action_will_overwrite_all_current_clients_invoices_tasks_and_data_for_this_workspace_this_action_cannot_be_undone')}
-                confirmLabel="Yes, Wipe and Restore"
+                confirmLabel={__('general.yes_wipe_and_restore')}
                 variant="danger"
                 onConfirm={performRestore}
                 onCancel={() => setConfirmRestore(false)}

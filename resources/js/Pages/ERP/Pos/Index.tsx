@@ -8,7 +8,6 @@ import CheckoutModal from './Partials/CheckoutModal';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
 
-const __ = (key: string) => key;
 
 interface Product {
     id: number;

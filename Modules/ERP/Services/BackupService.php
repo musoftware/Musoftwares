@@ -32,7 +32,9 @@ class BackupService
             'referral_earnings' => \Illuminate\Support\Facades\Schema::hasTable('erp_referral_earnings') ? \Modules\ERP\Models\ReferralEarning::where('tenant_id', $tenant->id)->get()->toArray() : [],
             'withdrawal_requests' => \Illuminate\Support\Facades\Schema::hasTable('erp_withdrawal_requests') ? \Modules\ERP\Models\WithdrawalRequest::where('tenant_id', $tenant->id)->get()->toArray() : [],
             'withdrawals' => \Illuminate\Support\Facades\Schema::hasTable('erp_withdrawals') ? \Modules\ERP\Models\Withdrawal::where('tenant_id', $tenant->id)->get()->toArray() : [],
-            'timer_sessions' => \Illuminate\Support\Facades\Schema::hasTable('erp_timer_sessions') ? \Modules\ERP\Models\TimerSession::where('tenant_id', $tenant->id)->get()->toArray() : [],
+            'timer_sessions' => \Illuminate\Support\Facades\Schema::hasTable('erp_timer_sessions') ? \Modules\ERP\Models\TimerSession::whereHas('invoiceItem.invoice', function($q) use ($tenant) {
+                $q->where('tenant_id', $tenant->id);
+            })->get()->toArray() : [],
         ];
 
         $json = json_encode($data, JSON_PRETTY_PRINT);
@@ -94,7 +96,11 @@ class BackupService
             if (\Illuminate\Support\Facades\Schema::hasTable('erp_expense_transactions')) \Modules\ERP\Models\ExpenseTransaction::where('tenant_id', $tenant->id)->delete();
             if (\Illuminate\Support\Facades\Schema::hasTable('erp_product_stock_logs')) \Modules\ERP\Models\ProductStockLog::where('tenant_id', $tenant->id)->delete();
             if (\Illuminate\Support\Facades\Schema::hasTable('erp_referral_earnings')) \Modules\ERP\Models\ReferralEarning::where('tenant_id', $tenant->id)->delete();
-            if (\Illuminate\Support\Facades\Schema::hasTable('erp_timer_sessions')) \Modules\ERP\Models\TimerSession::where('tenant_id', $tenant->id)->delete();
+            if (\Illuminate\Support\Facades\Schema::hasTable('erp_timer_sessions')) {
+                \Modules\ERP\Models\TimerSession::whereHas('invoiceItem.invoice', function($q) use ($tenant) {
+                    $q->where('tenant_id', $tenant->id);
+                })->delete();
+            }
 
             // Delete primary records
             \Modules\ERP\Models\Invoice::where('tenant_id', $tenant->id)->delete();
@@ -142,7 +148,7 @@ class BackupService
             if (isset($data['clients'])) {
                 foreach ($data['clients'] as $item) {
                     $oldId = $item['id'];
-                    unset($item['id']);
+                    unset($item['id'], $item['balance'], $item['locked_balance'], $item['avatar_url'], $item['debt_balance']);
                     $remapForeignKeys($item);
                     $maps['client_id'][$oldId] = DB::table('erp_tenant_clients')->insertGetId($item);
                 }
@@ -209,7 +215,7 @@ class BackupService
             if (isset($data['invoices'])) {
                 foreach ($data['invoices'] as $invoiceData) {
                     $oldId = $invoiceData['id'];
-                    unset($invoiceData['id']);
+                    unset($invoiceData['id'], $invoiceData['amount_currency'], $invoiceData['business_currency']);
                     
                     $items = $invoiceData['items'] ?? [];
                     $costs = $invoiceData['costs'] ?? [];

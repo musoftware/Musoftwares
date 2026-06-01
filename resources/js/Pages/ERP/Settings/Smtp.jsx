@@ -8,6 +8,7 @@ import { Label } from '@/Components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Mail, Shield, Save } from 'lucide-react';
 import { useToast } from '@/Components/ui/use-toast';
+import { __ } from '@/lib/i18n';
 
 export default function Smtp({ smtp }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('settings');
@@ -28,15 +29,15 @@ export default function Smtp({ smtp }) {
         put(route('erp.settings.smtp.update'), {
             onSuccess: () => {
                 toast({
-                    title: 'Settings Updated',
-                    description: 'SMTP settings have been successfully saved.',
+                    title: __('general.settings_updated'),
+                    description: __('general.smtp_settings_have_been_successfully_saved'),
                 });
             },
             onError: () => {
                 toast({
                     variant: 'destructive',
-                    title: 'Error',
-                    description: 'Failed to update SMTP settings. Please check your inputs.',
+                    title: __('general.error'),
+                    description: __('general.failed_to_update_smtp_settings'),
                 });
             }
         });
@@ -46,7 +47,7 @@ export default function Smtp({ smtp }) {
         <ERPLayout title={__('general.smtp_settings')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
             <div className="max-w-4xl mx-auto px-4 py-10">
                 <div className="mb-8">
-                    <h1 className="text-2xl font-bold tracking-tight">Email Delivery (SMTP)</h1>
+                    <h1 className="text-2xl font-bold tracking-tight">{__('general.email_delivery_smtp')}</h1>
                     <p className="text-muted-foreground mt-1">{__('general.configure_your_smtp_server_to_send_invoices_and_notifications_directly_from_your_own_email_address')}</p>
                 </div>
 
@@ -115,7 +116,7 @@ export default function Smtp({ smtp }) {
                             
                             <div className="grid gap-6 md:grid-cols-2">
                                 <div className="space-y-2">
-                                    <Label htmlFor="username">Username <span className="text-destructive">*</span></Label>
+                                    <Label htmlFor="username">{__('general.username')} <span className="text-destructive">*</span></Label>
                                     <Input
                                         id="username"
                                         value={data.username}
@@ -125,20 +126,20 @@ export default function Smtp({ smtp }) {
                                     {errors.username && <p className="text-xs text-destructive">{errors.username}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="password">Password <span className="text-destructive">*</span></Label>
+                                    <Label htmlFor="password">{__('general.password')} <span className="text-destructive">*</span></Label>
                                     <Input
                                         id="password"
                                         type="password"
                                         value={data.password}
                                         onChange={e => setData('password', e.target.value)}
-                                        placeholder={smtp?.password ? 'Leave blank to keep current password' : 'Your SMTP password'}
+                                        placeholder={smtp?.password ? __('general.leave_blank_to_keep_current_password') : __('general.your_smtp_password')}
                                     />
                                     {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
                                 </div>
                             </div>
 
                             <div className="space-y-2 md:w-1/2">
-                                <Label htmlFor="encryption">Encryption</Label>
+                                <Label htmlFor="encryption">{__('general.encryption')}</Label>
                                 <select
                                     id="encryption"
                                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"

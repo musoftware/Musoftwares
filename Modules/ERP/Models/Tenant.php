@@ -4,11 +4,19 @@ namespace Modules\ERP\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\User;
 
 class Tenant extends Model
 {
+    use HasFactory;
+
+    protected static function newFactory()
+    {
+        return \Database\Factories\TenantFactory::new();
+    }
+
     protected $table = 'erp_tenants';
 
     protected $fillable = ['user_id', 'name', 'status', 'base_currency_id', 'trial_ends_at', 'subscription_ends_at'];

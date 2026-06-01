@@ -2,9 +2,7 @@
 
 namespace Modules\ERP\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class TenantStorageProvider extends Model
+class TenantStorageProvider extends TenantModel
 {
     protected $table = 'erp_tenant_storage_providers';
 

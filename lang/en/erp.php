@@ -186,5 +186,23 @@ return [
     'todo_created_success' => 'Todo assigned successfully.',
     'todo_updated_success' => 'Todo updated successfully.',
     'todo_deleted_success' => 'Todo deleted successfully.',
-    'role_updated_success' => 'Permissions/Role updated successfully.'
+    'role_updated_success' => 'Permissions/Role updated successfully.',
+
+    // ERP Debts translations
+    'debts_management' => 'Debts Management',
+    'debts_and_loans' => 'Debts and Loans',
+    'debts_description' => 'Track outstanding balances you owe to clients and what clients owe to you.',
+    'total_owed_to_me' => 'Total Owed to Me',
+    'total_i_owe' => 'Total I Owe',
+    'search_clients' => 'Search clients...',
+    'client_owes_you' => 'Client owes you',
+    'you_owe_client' => 'You owe client',
+    'settled' => 'Settled',
+    'no_debt_records_found' => 'No debt records found.',
+    'client_debt_details' => 'Client Debt Details',
+    'current_debt_balance' => 'Current Debt Balance',
+    'debt_transactions_history' => 'Debt Transactions History',
+    'debt_given_to_client' => 'Debt given to client',
+    'debt_received_from_client' => 'Debt received from client',
+    'no_debt_transactions_found' => 'No debt transactions found.',
 ];

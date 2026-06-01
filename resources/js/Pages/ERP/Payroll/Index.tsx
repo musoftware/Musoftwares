@@ -15,7 +15,7 @@ import { Plus, CheckCircle, FileText, Settings2, Edit } from 'lucide-react';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { __ } from '@/lib/i18n';
 
-export default function Index({ members, payslips, filters, auth }: any) {
+export default function Index({ members, payslips, filters, auth, paymentMethods }: any) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('payroll');
     const currency = auth?.user?.tenant?.currency || { code: 'USD', symbol: '$' };
 

@@ -23,7 +23,7 @@ class StorageProviderController extends Controller
         $tenant = Tenant::where('user_id', $user->id)->first();
 
         if (!$tenant) {
-            return back()->withErrors(['error' => 'No active workspace found.']);
+            return back()->withErrors(['error' => __('errors.no_active_workspace')]);
         }
 
         $validated = $request->validate([

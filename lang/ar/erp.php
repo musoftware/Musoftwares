@@ -186,5 +186,23 @@ return [
     'todo_created_success' => 'تم إضافة المهمة بنجاح.',
     'todo_updated_success' => 'تم تحديث المهمة بنجاح.',
     'todo_deleted_success' => 'تم حذف المهمة بنجاح.',
-    'role_updated_success' => 'تم تحديث الصلاحيات/الدور بنجاح.'
+    'role_updated_success' => 'تم تحديث الصلاحيات/الدور بنجاح.',
+
+    // ERP Debts translations
+    'debts_management' => 'إدارة الديون',
+    'debts_and_loans' => 'الديون والقروض',
+    'debts_description' => 'تتبع الأرصدة المستحقة التي تدين بها للعملاء وما يدين به العملاء لك.',
+    'total_owed_to_me' => 'إجمالي ما لي',
+    'total_i_owe' => 'إجمالي ما علي',
+    'search_clients' => 'البحث عن عملاء...',
+    'client_owes_you' => 'العميل يدين لك',
+    'you_owe_client' => 'أنت تدين للعميل',
+    'settled' => 'مسدد',
+    'no_debt_records_found' => 'لا توجد سجلات ديون.',
+    'client_debt_details' => 'تفاصيل دين العميل',
+    'current_debt_balance' => 'رصيد الدين الحالي',
+    'debt_transactions_history' => 'سجل حركات الديون',
+    'debt_given_to_client' => 'دين أُعطي للعميل',
+    'debt_received_from_client' => 'دين تم استلامه من العميل',
+    'no_debt_transactions_found' => 'لا توجد حركات ديون.',
 ];

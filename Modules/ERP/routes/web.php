@@ -90,6 +90,7 @@ Route::middleware(['web', 'auth:web,erp_team', 'tenant.active'])
         Route::post('storage-providers', [\Modules\ERP\Http\Controllers\StorageProviderController::class, 'store'])->name('storage-providers.store');
         
         // ── Files ──
+        Route::get('files', [\Modules\ERP\Http\Controllers\FileController::class, 'index'])->name('files.index');
         Route::get('files/create', [\Modules\ERP\Http\Controllers\FileController::class, 'create'])->name('files.create');
         Route::post('files', [\Modules\ERP\Http\Controllers\FileController::class, 'store'])->name('files.store');
         Route::get('files/{file}', [\Modules\ERP\Http\Controllers\FileController::class, 'show'])->name('files.show');
