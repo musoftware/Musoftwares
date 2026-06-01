@@ -3,8 +3,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/Components/ui/button';
 import { Link } from '@inertiajs/react';
 import {
-    Check, Layers, Sparkles, Building2, MessageSquare, Zap, Store, Wrench,
-    ChevronRight, ShoppingBag, CalendarDays
+    Check, Layers, Crown, Sparkles, Building2, MessageSquare, Zap, Store, Wrench
 } from 'lucide-react';
 
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -58,46 +57,37 @@ export default function PricingBuilder({
     serviceItems, 
     currency, 
     activeSubscription,
-    isNewSystem = true,
+    isNewSystem = true, // default for guests is new system
     onSystemTypeChange,
     renderActions,
     proratedRefund = 0
 }: PricingBuilderProps) {
     const [billing, setBilling] = useState<'1_month' | '6_months' | '1_year'>('1_month');
     
-    const ownedActiveIds = useMemo(() => {
-        return new Set(
-            activeSubscription?.owned_features
-                ?.filter(f => f.status === 'active')
-                ?.map(f => f.id) || []
-        );
-    }, [activeSubscription]);
-
     // Determine default selected items (e.g., ERP and CRM) plus any module passed via URL
     const activeItems = useMemo(() => {
-        const items: string[] = [];
-
+        const items = [];
         if (isNewSystem) {
-            serviceItems.filter(i => i.id === 'erp' || i.id === 'crm').forEach(i => {
-                if (!ownedActiveIds.has(i.id)) {
-                    items.push(i.id);
-                }
-            });
+            items.push(...serviceItems.filter(i => i.id === 'erp' || i.id === 'crm').map(i => i.id));
         }
         
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
             const mod = params.get('module');
-            if (mod && !items.includes(mod) && !ownedActiveIds.has(mod)) {
-                items.push(mod);
+            if (mod && !items.includes(mod)) {
+                // If they are upgrading, check if they already own it
+                const ownsMod = !isNewSystem && activeSubscription?.owned_features?.find(f => f.id === mod && f.status === 'active');
+                if (!ownsMod) {
+                    items.push(mod);
+                }
             }
         }
         return items;
-    }, [isNewSystem, serviceItems, activeSubscription, ownedActiveIds]);
+    }, [isNewSystem, serviceItems, activeSubscription]);
 
     useEffect(() => {
         setSelectedItems(activeItems);
-    }, [isNewSystem]);
+    }, [isNewSystem]); // Only reset when switching modes, not when activeItems changes (to allow URL param to be set once)
 
     const [selectedItems, setSelectedItems] = useState<string[]>(activeItems);
 
@@ -111,6 +101,7 @@ export default function PricingBuilder({
         if (item?.type === 'module') {
             setSelectedItems(prev => {
                 if (prev.includes(id)) {
+                    // Deselect module AND all its nested addons
                     return prev.filter(i => i !== id && serviceItems.find(si => si.id === i)?.parent_id !== id);
                 }
                 return [...prev, id];
@@ -123,7 +114,7 @@ export default function PricingBuilder({
     };
 
     const handleSelectAllTools = () => {
-        const toolIds = tools.map(t => t.id).filter(id => !ownedActiveIds.has(id));
+        const toolIds = tools.map(t => t.id);
         if (toolIds.length === 0) return;
         
         const allSelected = toolIds.every(id => selectedItems.includes(id));
@@ -141,7 +132,7 @@ export default function PricingBuilder({
     const multiplier = useMemo(() => {
         if (billing === '1_month') return 1;
         if (billing === '6_months') return 6;
-        if (billing === '1_year') return 10;
+        if (billing === '1_year') return 10; // 2 months free
         return 1;
     }, [billing]);
 
@@ -162,8 +153,6 @@ export default function PricingBuilder({
         let toolsBaseTotal = 0;
 
         selectedItems.forEach((id) => {
-            if (ownedActiveIds.has(id)) return;
-
             const item = serviceItems.find((i) => i.id === id);
             if (item) {
                 if (item.type === 'tool') {
@@ -184,14 +173,13 @@ export default function PricingBuilder({
         }
 
         return baseSubtotal + toolsSubtotal;
-    }, [selectedItems, serviceItems, ownedActiveIds]);
+    }, [selectedItems, serviceItems]);
 
     const toolsDiscount = useMemo(() => {
         let paidToolsCount = 0;
         let toolsBaseTotal = 0;
         
         selectedItems.forEach((id) => {
-            if (ownedActiveIds.has(id)) return;
             const item = serviceItems.find((i) => i.id === id);
             if (item && item.type === 'tool' && item.monthly_price > 0) {
                 paidToolsCount++;
@@ -205,143 +193,79 @@ export default function PricingBuilder({
         const discountedToolsPrice = toolsBaseTotal * (1 - (discountPercent / 100));
         
         return (toolsBaseTotal - discountedToolsPrice) * months;
-    }, [selectedItems, serviceItems, months, ownedActiveIds]);
+    }, [selectedItems, serviceItems, months]);
 
     const total = subtotal * multiplier;
     const originalTotal = subtotal * months;
     const discount = originalTotal - total;
 
-    const newItemsCount = selectedItems.filter(id => !ownedActiveIds.has(id)).length;
-
     const renderItemCard = (item: ServiceItem, isAddon: boolean = false) => {
         const isSelected = selectedItems.includes(item.id);
         const Icon = item.icon && ICON_MAP[item.icon] ? ICON_MAP[item.icon] : Layers;
-        const ownedFeature = activeSubscription?.owned_features?.find(f => f.id === item.id);
-        const isActivelyOwned = ownedFeature?.status === 'active';
+        const ownedFeature = isNewSystem ? undefined : activeSubscription?.owned_features?.find(f => f.id === item.id);
 
         return (
             <div
                 key={item.id}
-                onClick={() => {
-                    if (isActivelyOwned) return;
-                    toggleItem(item.id);
-                }}
+                onClick={() => toggleItem(item.id)}
                 className={cn(
-                    'relative rounded-2xl border transition-all duration-200 text-left overflow-hidden',
-                    isAddon ? 'p-4' : 'p-5',
-                    isActivelyOwned
-                        ? 'border-emerald-200 bg-gradient-to-br from-emerald-50/60 to-emerald-50/20 cursor-default'
-                        : 'cursor-pointer group',
-                    !isActivelyOwned && (isAddon ? 'bg-white hover:bg-slate-50/50' : 'bg-white hover:shadow-md hover:shadow-slate-100/80'),
-                    !isActivelyOwned && isSelected
-                        ? (isAddon
-                            ? 'border-indigo-300 bg-indigo-50/40 ring-1 ring-indigo-200/50'
-                            : 'border-indigo-500 bg-gradient-to-br from-indigo-50/50 to-white ring-1 ring-indigo-200/60 shadow-md shadow-indigo-100/40')
-                        : !isActivelyOwned ? 'border-slate-200/80 hover:border-slate-300' : ''
+                    'relative flex items-start gap-4 rounded-2xl border transition-all duration-300 cursor-pointer group text-left',
+                    isAddon ? 'p-4 bg-white/50 hover:bg-white' : 'p-5 bg-white hover:shadow-sm',
+                    isSelected
+                        ? (isAddon ? 'border-indigo-400 bg-indigo-50/50' : 'border-indigo-600 bg-indigo-50/50 shadow-md shadow-indigo-100/50')
+                        : 'border-slate-200 hover:border-indigo-300'
                 )}
             >
-                {/* Active glow line for selected */}
-                {!isActivelyOwned && isSelected && !isAddon && (
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500 to-violet-500" />
-                )}
-                {isActivelyOwned && !isAddon && (
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-emerald-400 to-teal-400" />
-                )}
-
-                <div className="flex items-start gap-4">
-                    {/* Checkbox */}
-                    <div className={cn(
-                        'flex items-center justify-center rounded-lg border mt-0.5 shrink-0 transition-all duration-200',
-                        isAddon ? 'w-5 h-5 rounded-md' : 'w-6 h-6',
-                        isActivelyOwned
-                            ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm'
-                            : isSelected
-                                ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm shadow-indigo-200/50'
-                                : 'bg-white border-slate-300 text-transparent group-hover:border-indigo-400 group-hover:bg-indigo-50/50'
-                    )}>
-                        <Check className={cn(isAddon ? "w-3 h-3" : "w-3.5 h-3.5", "stroke-[3]")} />
-                    </div>
-                    
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start gap-3">
-                            <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                    <div className={cn(
-                                        'w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-colors',
-                                        isActivelyOwned
-                                            ? 'bg-emerald-100 text-emerald-600'
-                                            : isSelected
-                                                ? 'bg-indigo-100 text-indigo-600'
-                                                : 'bg-slate-100 text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-500'
+                <div className={cn(
+                    'flex items-center justify-center rounded-md border mt-0.5 shrink-0 transition-colors',
+                    isAddon ? 'w-5 h-5' : 'w-6 h-6',
+                    isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-slate-50 border-slate-300 text-transparent group-hover:border-indigo-400'
+                )}>
+                    <Check className={isAddon ? "w-3 h-3" : "w-4 h-4"} />
+                </div>
+                
+                <div className="flex-1">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <Icon className={cn("w-4 h-4", isSelected ? 'text-indigo-600' : 'text-slate-400')} />
+                                <h3 className={cn("font-semibold", isSelected ? 'text-indigo-900' : 'text-slate-900')}>
+                                    {item.name}
+                                </h3>
+                                {ownedFeature && (
+                                    <span className={cn(
+                                        "ml-2 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full",
+                                        ownedFeature.status === 'active' 
+                                            ? "bg-emerald-100 text-emerald-700" 
+                                            : "bg-red-100 text-red-700"
                                     )}>
-                                        <Icon className="w-3.5 h-3.5" />
-                                    </div>
-                                    <h3 className={cn(
-                                        "font-semibold text-[15px] tracking-tight",
-                                        isActivelyOwned ? 'text-emerald-900' : isSelected ? 'text-slate-900' : 'text-slate-800'
-                                    )}>
-                                        {item.name}
-                                    </h3>
-                                    {isActivelyOwned && (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-emerald-500 text-white shadow-sm">
-                                            <Check className="w-2.5 h-2.5 stroke-[3]" />
-                                            Subscribed
-                                        </span>
-                                    )}
-                                    {ownedFeature && ownedFeature.status === 'expired' && (
-                                        <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-red-100 text-red-600 border border-red-200">
-                                            Expired
-                                        </span>
-                                    )}
-                                </div>
-                                {item.description && (
-                                    <p className={cn(
-                                        "text-[13px] mt-1.5 leading-relaxed",
-                                        isActivelyOwned ? 'text-emerald-700/70' : 'text-slate-500'
-                                    )}>
-                                        {item.description}
-                                    </p>
-                                )}
-                                {isActivelyOwned && (
-                                    <div className="flex items-center gap-1.5 mt-2">
-                                        <CalendarDays className="w-3 h-3 text-emerald-500" />
-                                        <p className="text-[11px] font-medium text-emerald-600">
-                                            Expires {ownedFeature!.expires_at}
-                                        </p>
-                                    </div>
-                                )}
-                                {ownedFeature && ownedFeature.status === 'expired' && (
-                                    <p className="text-[11px] mt-1.5 font-medium text-red-500">
-                                        Expired on {ownedFeature.expires_at} — Select to renew
-                                    </p>
+                                        {ownedFeature.status === 'active' ? 'Active' : 'Expired'}
+                                    </span>
                                 )}
                             </div>
-
-                            {/* Price */}
-                            <div className="text-right shrink-0">
-                                {isActivelyOwned ? (
-                                    <div className="flex items-center gap-1.5 text-emerald-600">
-                                        <span className="text-[13px] font-semibold">Active</span>
-                                    </div>
-                                ) : (
-                                    <>
-                                        {item.type === 'module' && (
-                                            <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-0.5">From</div>
-                                        )}
-                                        <div className="flex items-baseline gap-0.5">
-                                            <span className={cn(
-                                                "font-bold tracking-tight",
-                                                isAddon ? "text-base" : "text-lg",
-                                                isSelected ? 'text-indigo-700' : 'text-slate-900'
-                                            )}>
-                                                {calculateItemPrice(item).toFixed(2)}
-                                            </span>
-                                            <span className="text-[11px] text-slate-400 ml-0.5">{currency}</span>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
+                            {item.description && (
+                                <p className="text-sm text-slate-500 mt-1 leading-relaxed">
+                                    {item.description}
+                                </p>
+                            )}
+                            {ownedFeature && (
+                                <p className={cn(
+                                    "text-xs mt-1.5 font-medium",
+                                    ownedFeature.status === 'active' ? "text-emerald-600" : "text-red-500"
+                                )}>
+                                    {ownedFeature.status === 'active' ? 'Renews / Expires on' : 'Expired on'} {ownedFeature.expires_at}
+                                    {ownedFeature.status === 'expired' && " - Select to Renew"}
+                                </p>
+                            )}
+                        </div>
+                        <div className="text-right shrink-0 ml-2">
+                            {item.type === 'module' && (
+                                <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-0.5 text-right">Starts from</div>
+                            )}
+                            <span className="text-lg font-bold text-slate-900">
+                                {calculateItemPrice(item).toFixed(2)}
+                            </span>
+                            <span className="text-xs text-slate-500 ml-1">{currency}</span>
                         </div>
                     </div>
                 </div>
@@ -353,32 +277,25 @@ export default function PricingBuilder({
         <div className="flex flex-col lg:flex-row gap-8 items-start w-full">
             {/* ── Products List (Left) ── */}
             <div className="flex-1 w-full space-y-10 text-left">
-                {/* Core Modules */}
                 <section>
-                    <div className="mb-5 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-sm">
-                            <Building2 className="w-4 h-4 text-white" />
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-bold text-slate-900 tracking-tight">Core Modules</h2>
-                            <p className="text-[13px] text-slate-500">The foundation for your business operations.</p>
-                        </div>
+                    <div className="mb-4">
+                        <h2 className="text-xl font-semibold text-slate-900">Core Modules</h2>
+                        <p className="text-sm text-slate-500">The foundation for your business operations.</p>
                     </div>
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-1 gap-6">
                         {modules.map(module => {
                             const moduleAddons = addons.filter(a => a.parent_id === module.id);
                             const isModuleSelected = selectedItems.includes(module.id);
-                            const isModuleOwned = ownedActiveIds.has(module.id);
                             return (
                                 <div key={module.id} className="flex flex-col">
                                     {renderItemCard(module)}
                                     
                                     {/* Add-ons Section */}
-                                    {moduleAddons.length > 0 && (isModuleSelected || isModuleOwned) && (
-                                        <div className="mt-3 pl-5 md:pl-10 border-l-2 border-indigo-200/60 ml-5 md:ml-7 pb-1">
-                                            <h4 className="text-[13px] font-bold text-slate-700 mb-3 flex items-center gap-2">
-                                                <Sparkles className="w-3.5 h-3.5 text-indigo-500" /> 
-                                                Power-ups for {module.name}
+                                    {moduleAddons.length > 0 && (isModuleSelected || (isNewSystem ? false : activeSubscription?.owned_features?.find(f => f.id === module.id)?.status === 'active')) && (
+                                        <div className="mt-4 pl-4 md:pl-8 border-l-[3px] border-indigo-100 ml-4 md:ml-6 pb-2 animate-in slide-in-from-top-4 fade-in duration-300">
+                                            <h4 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2 tracking-tight">
+                                                <Sparkles className="w-4 h-4 text-indigo-500" /> 
+                                                Power up {module.name}
                                             </h4>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                 {moduleAddons.map(addon => renderItemCard(addon, true))}
@@ -393,173 +310,138 @@ export default function PricingBuilder({
 
                 <div className="border-t border-slate-100" />
 
-                {/* Automation Tools */}
                 <section>
-                    <div className="mb-5 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-sm">
-                                <Zap className="w-4 h-4 text-white" />
-                            </div>
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-900 tracking-tight">Automation Tools</h2>
-                                <p className="text-[13px] text-slate-500">Standalone tools to boost your productivity.</p>
-                            </div>
+                    <div className="mb-4 flex items-center justify-between">
+                        <div>
+                            <h2 className="text-xl font-semibold text-slate-900">Automation Tools</h2>
+                            <p className="text-sm text-slate-500">Standalone tools to boost your productivity.</p>
                         </div>
                         {tools.length > 0 && (
                             <Button 
                                 variant="outline" 
-                                size="sm"
+                                size="sm" 
                                 onClick={handleSelectAllTools}
-                                className="text-xs rounded-lg border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50 hover:text-indigo-700 transition-colors"
                             >
-                                {tools.filter(t => !ownedActiveIds.has(t.id)).every(t => selectedItems.includes(t.id)) ? 'Deselect All' : 'Select All'}
+                                {tools.every(t => selectedItems.includes(t.id)) ? 'Deselect All' : 'Select All Tools'}
                             </Button>
                         )}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {tools.map(tool => renderItemCard(tool))}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {tools.map(renderItemCard)}
                     </div>
                 </section>
             </div>
 
             {/* ── Sticky Summary Cart (Right) ── */}
-            <div className="w-full lg:w-[380px] shrink-0 sticky top-20 text-left">
-                <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-lg shadow-slate-200/30">
-                    {/* Cart Header */}
-                    <div className="p-5 bg-gradient-to-br from-slate-50 to-slate-50/50 border-b border-slate-100">
-                        <div className="flex items-center gap-2.5 mb-4">
-                            <div className="w-7 h-7 rounded-lg bg-slate-900 flex items-center justify-center">
-                                <ShoppingBag className="w-3.5 h-3.5 text-white" />
-                            </div>
-                            <div>
-                                <h3 className="text-[15px] font-bold text-slate-900 tracking-tight">Order Summary</h3>
-                                <p className="text-[11px] text-slate-400">Select billing cycle</p>
-                            </div>
+            <div className="w-full lg:w-[380px] shrink-0 sticky top-24 text-left">
+                <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+                    <div className="p-6 bg-slate-50/50 border-b border-slate-100 flex flex-col gap-3">
+                        <div>
+                            <h3 className="text-lg font-semibold text-slate-900">Workspace Summary</h3>
+                            <p className="text-sm text-slate-500">Select your preferred billing cycle</p>
                         </div>
                         
-                        {/* Billing Cycle Toggle */}
-                        <div className="flex bg-slate-200/40 p-1 rounded-xl">
+                        <div className="flex bg-slate-200/50 p-1 rounded-xl text-sm text-slate-500">
                             {[
-                                { id: '1_month', label: 'Monthly', sub: null },
-                                { id: '6_months', label: '6 Months', sub: null },
-                                { id: '1_year', label: 'Yearly', sub: 'Save 16%' },
+                                { id: '1_month', label: '1M' },
+                                { id: '6_months', label: '6M' },
+                                { id: '1_year', label: '1Y (Save 16%)' },
                             ].map(option => (
                                 <button
                                     key={option.id}
                                     onClick={() => setBilling(option.id as any)}
                                     className={cn(
-                                        'flex-1 py-2 px-2 text-center rounded-lg font-medium transition-all duration-200 relative',
+                                        'flex-1 py-2 px-1 text-center rounded-lg font-medium transition-all duration-200 text-xs sm:text-sm',
                                         billing === option.id
                                             ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-900/5'
-                                            : 'text-slate-500 hover:text-slate-700'
+                                            : 'hover:text-slate-700 hover:bg-slate-200'
                                     )}
                                 >
-                                    <span className="text-[12px]">{option.label}</span>
-                                    {option.sub && billing === option.id && (
-                                        <span className="absolute -top-2 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                                            {option.sub}
-                                        </span>
-                                    )}
+                                    {option.label}
                                 </button>
                             ))}
                         </div>
 
-                        {/* System Type Toggle */}
                         {activeSubscription?.owned_features && activeSubscription.owned_features.length > 0 && (
-                            <div className="mt-3 flex gap-2">
-                                {[
-                                    { isNew: false, label: 'Upgrade Current', icon: ChevronRight },
-                                    { isNew: true, label: 'Create New', icon: Building2 },
-                                ].map(opt => (
-                                    <button
-                                        key={String(opt.isNew)}
-                                        onClick={() => onSystemTypeChange?.(opt.isNew)}
-                                        className={cn(
-                                            'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[12px] font-medium transition-all border',
-                                            (isNewSystem === opt.isNew)
-                                                ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
-                                                : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
-                                        )}
-                                    >
-                                        <opt.icon className="w-3.5 h-3.5" />
-                                        {opt.label}
-                                    </button>
-                                ))}
+                            <div className="mt-4 flex flex-col gap-2 p-3 bg-white border border-slate-200 rounded-xl">
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input 
+                                        type="radio" 
+                                        className="text-indigo-600 focus:ring-indigo-500" 
+                                        checked={!isNewSystem} 
+                                        onChange={() => onSystemTypeChange?.(false)}
+                                    />
+                                    <span className="text-sm font-medium text-slate-700">Upgrade Current System</span>
+                                </label>
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input 
+                                        type="radio" 
+                                        className="text-indigo-600 focus:ring-indigo-500" 
+                                        checked={isNewSystem} 
+                                        onChange={() => onSystemTypeChange?.(true)}
+                                    />
+                                    <span className="text-sm font-medium text-slate-700">Create New System</span>
+                                </label>
                             </div>
                         )}
                     </div>
                     
-                    {/* Cart Items */}
-                    <div className="p-5">
-                        {newItemsCount === 0 ? (
-                            <div className="text-center py-10">
-                                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-slate-100">
+                    <div className="p-6">
+                        {selectedItems.length === 0 ? (
+                            <div className="text-center py-8">
+                                <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
                                     <Layers className="w-6 h-6 text-slate-300" />
                                 </div>
-                                <p className="text-slate-500 text-sm font-medium">No new items selected</p>
-                                <p className="text-[12px] text-slate-400 mt-1">Click on modules above to add them.</p>
+                                <p className="text-slate-500 text-sm">Select modules to build your workspace.</p>
                             </div>
                         ) : (
-                            <div className="space-y-3">
-                                {selectedItems.filter(id => !ownedActiveIds.has(id)).map(id => {
+                            <div className="space-y-4">
+                                {selectedItems.map(id => {
                                     const item = serviceItems.find(i => i.id === id);
                                     if (!item) return null;
                                     
                                     const isAddon = item.type === 'addon';
                                     
                                     return (
-                                        <div key={id} className={cn(
-                                            "flex justify-between items-center text-sm py-1",
-                                            isAddon ? "pl-3" : ""
-                                        )}>
-                                            <span className="flex items-center gap-2 text-slate-700">
-                                                {isAddon && <span className="text-indigo-300 text-xs">↳</span>}
-                                                <span className={cn(isAddon ? "text-[13px]" : "text-[13px] font-medium")}>{item.name}</span>
+                                        <div key={id} className={cn("flex justify-between text-sm", isAddon ? "pl-4 text-slate-500" : "text-slate-700 font-medium")}>
+                                            <span className="flex items-center gap-1.5">
+                                                {isAddon && <span className="text-slate-300">↳</span>}
+                                                {item.name}
                                             </span>
-                                            <span className={cn(
-                                                "font-semibold tabular-nums",
-                                                isAddon ? "text-slate-500 text-[13px]" : "text-slate-900 text-[13px]"
-                                            )}>
+                                            <span className={cn(isAddon ? "text-slate-500" : "text-slate-900")}>
                                                 {calculateItemPrice(item).toFixed(2)}
                                             </span>
                                         </div>
                                     );
                                 })}
                                 
-                                <div className="border-t border-dashed border-slate-200 my-3" />
+                                <div className="border-t border-slate-100 pt-4 mt-4" />
                                 
                                 {toolsDiscount > 0 && (
-                                    <div className="flex justify-between text-[13px] text-indigo-600 font-medium">
-                                        <span>Tools Discount</span>
+                                    <div className="flex justify-between text-sm text-indigo-600 font-medium">
+                                        <span>Tools Volume Discount</span>
                                         <span>-{toolsDiscount.toFixed(2)}</span>
                                     </div>
                                 )}
 
                                 {discount > 0 && (
-                                    <div className="flex justify-between text-[13px] text-emerald-600 font-medium">
-                                        <span>Annual Savings</span>
+                                    <div className="flex justify-between text-sm text-emerald-600 font-medium">
+                                        <span>Discount (Annual)</span>
                                         <span>-{discount.toFixed(2)}</span>
                                     </div>
                                 )}
 
                                 {!isNewSystem && proratedRefund > 0 && (
-                                    <div className="flex justify-between text-[13px] text-amber-600 font-medium">
-                                        <span>Prorated Refund</span>
+                                    <div className="flex justify-between text-sm text-amber-600 font-medium">
+                                        <span>Prorated Refund (Current Plan)</span>
                                         <span>-{proratedRefund.toFixed(2)}</span>
                                     </div>
                                 )}
 
-                                <div className="border-t border-slate-200 pt-3 mt-2" />
-
                                 <div className="flex justify-between items-end">
-                                    <div>
-                                        <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider block">Total</span>
-                                        <span className="text-[12px] text-slate-500">
-                                            {billing === '1_month' ? '1 month' : billing === '6_months' ? '6 months' : '1 year'}
-                                        </span>
-                                    </div>
+                                    <span className="text-base font-medium text-slate-900">Total To Pay</span>
                                     <div className="text-right">
-                                        <span className="text-2xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
+                                        <span className="text-3xl font-bold tracking-tight text-indigo-600">
                                             {Math.max(0, total - (!isNewSystem ? proratedRefund : 0)).toFixed(2)}
                                         </span>
                                         <span className="text-sm text-slate-400 ml-1">{currency}</span>
@@ -569,16 +451,15 @@ export default function PricingBuilder({
                         )}
                     </div>
 
-                    {/* Cart Actions */}
-                    <div className="p-5 pt-0 space-y-3">
-                        {renderActions ? renderActions({ selectedItems: selectedItems.filter(id => !ownedActiveIds.has(id)), billing, total }) : (
+                    <div className="p-6 pt-0 space-y-3">
+                        {renderActions ? renderActions({ selectedItems, billing, total }) : (
                             <Link href="/register?trial=true" className="block w-full">
                                 <Button
-                                    disabled={newItemsCount === 0}
+                                    disabled={selectedItems.length === 0}
                                     className={cn(
-                                        'w-full h-12 rounded-xl text-sm font-semibold gap-2.5 transition-all duration-200',
-                                        newItemsCount > 0
-                                            ? 'bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white shadow-md'
+                                        'w-full h-12 rounded-xl text-sm font-medium gap-2 transition-all',
+                                        selectedItems.length > 0
+                                            ? 'bg-slate-900 hover:bg-slate-800 text-white shadow-sm'
                                             : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                                     )}
                                 >
@@ -587,8 +468,8 @@ export default function PricingBuilder({
                             </Link>
                         )}
                         {!renderActions && (
-                            <p className="text-[11px] text-center text-slate-400 leading-relaxed">
-                                No credit card required for 14-day trial on ERP & modules.
+                            <p className="text-xs text-center text-slate-500 pt-2">
+                                No credit card required for 14-day trial on ERP & modules (Not applicable for tools).
                             </p>
                         )}
                     </div>
