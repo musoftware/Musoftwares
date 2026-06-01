@@ -44,10 +44,14 @@ export function formatMoney(amount: number | string, currency: any = 'USD') {
     if (currency && typeof currency === 'object' && typeof currency.currency === 'string') {
         found = currency;
     } else if (Array.isArray(dynamicCurrencies)) {
-        found = dynamicCurrencies.find(c => c.currency && c.currency.toUpperCase() === curCode);
+        found = dynamicCurrencies.find((c: any) => 
+            (c.currency && c.currency.toUpperCase() === curCode) || 
+            String(c.id) === curCode
+        );
     }
 
     if (found) {
+        curCode = found.currency ? found.currency.toUpperCase() : curCode;
         const symbol = found.symbol || curCode;
         const fmt = found.string_format;
         if (fmt) {

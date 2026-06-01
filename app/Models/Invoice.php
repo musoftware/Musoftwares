@@ -128,6 +128,11 @@ class Invoice extends Model
         return $unpaid;
     }
 
+    public function currency()
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
 
     public static function UnpaidInvoices()
     {
@@ -231,7 +236,7 @@ class Invoice extends Model
     {
         $invoice = new Invoice();
         $invoice->user_id = Auth::id();
-        $invoice->currency_id = $client->currency_id ?? $client->currency;
+        $invoice->currency_id = $client->currency_id ?? $client->currency ?? \App\Models\AdminSettings::GetValue('business_currency', 2);
         if ($project !== null) {
             $invoice->project_id = $project->id;
         }

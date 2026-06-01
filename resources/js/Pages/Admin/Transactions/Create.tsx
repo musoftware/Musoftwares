@@ -47,8 +47,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
     const handleTabChange = (value: string) => {
         setActiveTab(value);
         setData('type', value);
-        // Also update URL query param without full reload
-        router.visit(route('transactions.create', { 
+        router.visit(route('admin.transactions.create', { 
             user: user.id, 
             project: selectedProject?.id, 
             type: value.replace('timer-received', 'receive').replace('timer-due', 'charge').replace('earned', 'earn') 
@@ -75,7 +74,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('transactions.store'), {
+        post(route('admin.transactions.store'), {
             onSuccess: () => {
                 reset('data');
                 setData('data', [{ amount: '', reason: '', currency: user.currency_id || businessCurrency.id }]);

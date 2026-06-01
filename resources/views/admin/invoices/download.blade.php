@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ __('erp.invoice') }} {{ $invoice->invoice_number }}</title>
+    <title>{{ __('erp.invoice') }} {{ $invoice->enc_id() }}</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&family=Sora:wght@400;600;700&display=swap');
 
@@ -273,23 +273,23 @@
                         <img src="{{ public_path(config('app.logo')) }}" alt="Business Logo" class="logo" style="margin-bottom: 16px;">
                     @endif
 
-                    <div class="heading" style="margin-bottom: 16px;">{{ $invoice->client->name }}</div>
+                    <div class="heading" style="margin-bottom: 16px;">{{ $user->name ?? 'Client' }}</div>
 
                     <div class="company-info">
-                        @if($invoice->client->email)
-                            {{ $invoice->client->email }}<br>
+                        @if($user && $user->email)
+                            {{ $user->email }}<br>
                         @endif
-                        @if($invoice->client->phone)
-                            {{ $invoice->client->phone }}<br>
+                        @if($user && $user->phone)
+                            {{ $user->phone }}<br>
                         @endif
                     </div>
                 </td>
                 <td style="width: 50%;">
                     <div class="invoice-title">{{ strtoupper(__('erp.invoice')) }}</div>
                     <div class="invoice-details">
-                        <span class="money-code">{{ $invoice->invoice_number }}</span><br>
-                        {{ __('erp.issued') }}: {{ $invoice->issued_at ? $invoice->issued_at->format('M j, Y') : $invoice->created_at->format('M j, Y') }}<br>
-                        {{ __('erp.due_date') }}: {{ $invoice->due_date ? $invoice->due_date->format('M j, Y') : '-' }}
+                        <span class="money-code">{{ $invoice->enc_id() }}</span><br>
+                        {{ __('erp.issued') }}: {{ $invoice->created_at->format('M j, Y') }}<br>
+                        {{ __('erp.due_date') }}: -
                     </div>
                 </td>
             </tr>
@@ -307,25 +307,22 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($invoice->items as $index => $item)
+                @forelse($invoice_items as $index => $item)
                     <tr>
                         <td class="text-center">{{ $index + 1 }}</td>
                         <td>
-                            <div class="item-title">{{ $item->title }}</div>
-                            @if($item->description)
-                                <div class="item-desc" style="font-size: 12px; color: #475569;">{{ $item->description }}</div>
-                            @endif
+                            <div class="item-title">{{ $item->item_title }}</div>
                         </td>
                         <td class="text-center">
-                            {{ $item->quantity }}
+                            {{ $item->qty }}
                         </td>
                         <td class="text-right money-code">
                             @php
-                                $true_rate = $item->quantity > 0 ? ($item->total / $item->quantity) : 0;
+                                $true_rate = $item->qty > 0 ? ($item->total() / $item->qty) : 0;
                             @endphp
                             {{ \App\Helpers\FinanceHelper::instance()->format_money($true_rate, $invoice->currency_id) }}
                         </td>
-                        <td class="text-right money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($item->total, $invoice->currency_id) }}</td>
+                        <td class="text-right money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($item->total(), $invoice->currency_id) }}</td>
                     </tr>
                 @empty
                     <tr>
@@ -339,32 +336,37 @@
         <div class="totals-container">
             <table class="totals-table">
                 @php
-                    $subtotal = $invoice->items->sum('total') ?? $invoice->amount;
+                    $subtotal = $invoice->sub_total();
+                    $discount_amount = $invoice->discount + $invoice->second_discount;
+                    $tax_amount = $invoice->tax();
+                    $tax_rate = $user && $user->invoice_taxable == '1' ? \App\Models\AdminSettings::GetValue('business_tax', 22.5) : 0;
+                    $business_currency_id = \App\Models\AdminSettings::GetValue('business_currency', 2);
+                    $business_currency_model = \App\Models\Currency::find($business_currency_id);
                 @endphp
                 <tr>
                     <td>{{ __('erp.subtotal') }}:</td>
                     <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($subtotal, $invoice->currency_id) }}</td>
                 </tr>
-                @if($invoice->discount_amount > 0)
+                @if($discount_amount > 0)
                     <tr>
                         <td>{{ __('erp.discount') }}:</td>
-                        <td class="money-code">-{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->discount_amount, $invoice->currency_id) }}</td>
+                        <td class="money-code">-{{ \App\Helpers\FinanceHelper::instance()->format_money($discount_amount, $invoice->currency_id) }}</td>
                     </tr>
                 @endif
-                @if($invoice->tax_amount > 0)
+                @if($tax_amount > 0)
                     <tr>
-                        <td>{{ __('erp.tax') }} ({{ number_format($invoice->tax_rate, 0) }}%):</td>
-                        <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->tax_amount, $invoice->currency_id) }}</td>
+                        <td>{{ __('erp.tax') }} ({{ number_format($tax_rate, 0) }}%):</td>
+                        <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($tax_amount, $invoice->currency_id) }}</td>
                     </tr>
                 @endif
                 <tr class="total-row">
                     <td>{{ strtoupper(__('erp.total')) }}:</td>
-                    <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->amount, $invoice->currency_id) }}</td>
+                    <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->total(), $invoice->currency_id) }}</td>
                 </tr>
-                @if($invoice->business_amount && $invoice->currency_id !== $invoice->business_currency_id)
+                @if($invoice->business_total() && $invoice->currency_id != $business_currency_id)
                     <tr class="currency-row">
-                        <td>{{ __('erp.in_currency', ['currency' => $invoice->businessCurrency?->currency]) }}:</td>
-                        <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->business_amount, $invoice->business_currency_id) }}</td>
+                        <td>{{ __('erp.in_currency', ['currency' => $business_currency_model ? $business_currency_model->currency : 'Base']) }}:</td>
+                        <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->business_total(), $business_currency_id) }}</td>
                     </tr>
                 @endif
             </table>
@@ -375,15 +377,11 @@
         <div class="notes-section">
             <div class="notes-title">{{ strtoupper(__('erp.notes')) }}:</div>
             <div class="notes-content">
-                @if($invoice->notes)
+                @if(isset($invoice->notes) && $invoice->notes)
                     {!! nl2br(e($invoice->notes)) !!}
                 @else
                     {{ __('erp.thank_you_for_business') }}<br><br>
-                    @if($invoice->due_date)
-                        {{ __('erp.payment_due_by', ['date' => $invoice->due_date->format('M j, Y')]) }}
-                    @else
-                        {{ __('erp.payment_due_upon_receipt') }}
-                    @endif
+                    {{ __('erp.payment_due_upon_receipt') }}
                 @endif
             </div>
         </div>
@@ -402,7 +400,7 @@
                 $angle = 0.0;
                 $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
                 
-                @if(!($invoice->tenant?->user?->hasModuleSubscription('erp-white-label')))
+                @if(!($user && $user->hasModuleSubscription('erp-white-label')))
                     $pdf->page_text(40, 820, "{!! __('erp.powered_by') !!}", $font, 9, $color, 0.0, 0.0, 0.0);
                 @endif
             }

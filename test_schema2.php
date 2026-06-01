@@ -1,1 +1,0 @@
-<?php require "vendor/autoload.php"; $app = require_once "bootstrap/app.php"; $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class); $kernel->bootstrap(); $tables = Illuminate\Support\Facades\DB::select("SHOW TABLES"); foreach($tables as $t) { $v = array_values((array)$t)[0]; if(strpos($v, "gold") !== false) echo $v . "\n"; }

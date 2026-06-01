@@ -182,7 +182,155 @@ class AdminTaskController extends Controller
         $todo->completed_at = $todo->completed ? now() : null;
         $todo->save();
 
-        return response()->json(['success' => true]);
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+        
+        return redirect()->back()->with('message', 'Task status updated successfully.');
+    }
+
+    /**
+     * Store an unpaid todo in the queue.
+     */
+    public function storeUnpaidTodo(Request $request, \App\Models\TenantClient $client)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255'
+        ]);
+
+        $todo = new Todo();
+        $todo->title = $request->title;
+        $todo->user_id = $client->id;
+        $todo->tenant_id = session('tenant_id');
+        $todo->is_paid = false;
+        
+        // Use client's hourly rate and currency for future calculation
+        $todo->cost = $client->hourly_rate ?? 0;
+        $todo->currency_id = $client->currency;
+        
+        $todo->save();
+
+        return redirect()->back()->with('message', 'Task added to the queue.');
+    }
+
+    /**
+     * Delete an unpaid todo.
+     */
+    public function destroyTodo(Todo $todo)
+    {
+        if ($todo->is_paid) {
+            return redirect()->back()->withErrors(['error' => 'Paid tasks cannot be deleted, they must be refunded.']);
+        }
+        
+        $todo->delete();
+        return redirect()->back()->with('message', 'Task removed from the queue.');
+    }
+
+    /**
+     * Pay and schedule an unpaid todo.
+     */
+    public function payAndScheduleTodo(Todo $todo)
+    {
+        $client = $todo->user;
+        if (!$client || $todo->is_paid) {
+            return back()->withErrors(['error' => 'Invalid task.']);
+        }
+
+        $userCurrencyId = (int) $client->currency;
+        $amountInUserCurrency = \App\Models\CurrenciesExchange::RateToday((float) $todo->cost, $todo->currency_id ?? 2, $userCurrencyId);
+
+        if ($client->available_balance() < $amountInUserCurrency) {
+            return back()->withErrors(['error' => 'Client has insufficient balance (' . \App\Helpers\FinanceHelper::instance()->format_money($client->available_balance(), $client->currency) . ' available).']);
+        }
+
+        try {
+            return \Illuminate\Support\Facades\Cache::lock('client_focus_calendar_slot', 30)->block(10, function () use ($todo, $client, $userCurrencyId, $amountInUserCurrency) {
+                
+                $todo->refresh();
+                if ($todo->is_paid) {
+                    return back()->withErrors(['error' => 'Task is already paid.']);
+                }
+
+                if ($todo->start_at && $todo->end_at) {
+                    $start = \Carbon\Carbon::parse($todo->start_at, 'Africa/Cairo');
+                    $end = \Carbon\Carbon::parse($todo->end_at, 'Africa/Cairo');
+                    if (Todo::focusCalendarSlotTaken($start, $end, $todo->id)) {
+                        return back()->withErrors(['error' => 'This time slot overlaps with an existing booking.']);
+                    }
+                }
+
+                \Illuminate\Support\Facades\DB::beginTransaction();
+                try {
+                    $todo->is_paid = true;
+                    $todo->save();
+
+                    $invoice = new \App\Models\Invoice();
+                    $invoice->user_id = $client->id;
+                    $invoice->currency = $userCurrencyId;
+                    $invoice->project_id = $todo->task ? $todo->task->project_id : null;
+                    $invoice->status = 'unpaid';
+                    $invoice->schedule = [
+                        'start_date' => $todo->start_at,
+                        'end_date'   => $todo->end_at,
+                    ];
+                    $client->invoices()->save($invoice);
+
+                    $item = new \App\Models\InvoiceItem();
+                    $item->item_title = \Illuminate\Support\Str::limit($todo->title, 255);
+                    $item->amount = 0;
+                    $item->qty = 1;
+                    $item->item_type = 'timer';
+                    $invoice->items()->save($item);
+
+                    if ($todo->start_at && $todo->end_at) {
+                        $timer = new \App\Models\InvoiceItemTimer();
+                        $timer->invoice_item_id = $item->id;
+                        $timer->user_id = $client->id;
+                        $timer->project_id = $invoice->project_id;
+                        $timer->date_start = $todo->start_at;
+                        $timer->date_end = $todo->end_at;
+                        $timer->amount = round($amountInUserCurrency, 2);
+                        $timer->currency_id = $invoice->currency;
+                        $item->timers()->save($timer);
+                    } else {
+                        // Just an item without a timer if no start/end
+                        $item->amount = round($amountInUserCurrency, 2);
+                        $item->save();
+                    }
+
+                    $invoice->unpaid = $invoice->total();
+                    $invoice->save();
+                    $invoice->bill_invoice();
+
+                    \Illuminate\Support\Facades\DB::commit();
+
+                    try {
+                        if (class_exists('App\Services\GoogleCalendarService') && $todo->start_at && $todo->end_at) {
+                            $calendarService = app(\App\Services\GoogleCalendarService::class);
+                            $calendarService->addEvent(
+                                'Task Paid (#' . $todo->id . '): ' . $todo->title,
+                                \Carbon\Carbon::parse($todo->start_at),
+                                \Carbon\Carbon::parse($todo->end_at),
+                                'Client ' . $client->name . ' (ID: ' . $client->id . ') paid for this task. Reference Todo #' . $todo->id
+                            );
+                        }
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::warning('Google Calendar sync failed: ' . $e->getMessage());
+                    }
+
+                    return redirect()->back()->with('message', 'Task scheduled and billed successfully!');
+
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\DB::rollBack();
+                    throw $e;
+                }
+            });
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+            return back()->withErrors(['error' => 'Booking system is currently busy. Please try again.']);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Admin payAndScheduleTodo failed: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Failed to process payment for task.']);
+        }
     }
 
     /**
@@ -367,12 +515,28 @@ class AdminTaskController extends Controller
             $completedTasks = Todo::where('user_id', $clientUser->id)->where('completed', true)->count();
             $latestTask = Task::where('user_id', $clientUser->id)->latest()->first();
 
+            $rateEgp = \App\Helpers\FinanceHelper::calculateOverheadHourlyRate();
+            if ((float) $clientUser->booking_rate > 0 && ($clientUser->booking_rate_expires_at === null || now('Africa/Cairo')->startOfDay()->lte(\Carbon\Carbon::parse($clientUser->booking_rate_expires_at)->startOfDay()))) {
+                $rateEgp = (float) \App\Models\CurrenciesExchange::RateToday($clientUser->booking_rate, $clientUser->booking_rate_currency ?? $clientUser->currency ?? 1, 2);
+            } else if ($clientUser->hasSubscription() && $clientUser->plan) {
+                $rateEgp = $clientUser->plan->calcDiscount((float) $rateEgp);
+            }
+            $fh = \App\Helpers\FinanceHelper::instance();
+            $baseCost = $fh->price_fixer($rateEgp, 2);
+            $commission = 0;
+            if ($clientUser->ref_user && $clientUser->ref_user->shouldAddCommissionToTotal()) {
+                $commission = $clientUser->ref_user->calculateCommissionAmount($baseCost, 2, $clientUser);
+            }
+            $finalCostEgp = $fh->price_fixer($baseCost + $commission, 2);
+            $hourlyRateInUserCurrency = \App\Models\CurrenciesExchange::RateToday((float) $finalCostEgp, 2, (int)$clientUser->currency);
+
             $selectedClient = [
                 'id'              => $clientUser->id,
                 'name'            => $clientUser->name,
                 'email'           => $clientUser->email,
                 'balance'         => (float) $clientUser->available_balance(),
                 'currency'        => $clientUser->currency_name(),
+                'hourly_rate'     => round($hourlyRateInUserCurrency, 2),
                 'total_tasks'     => $totalTasks,
                 'completed_tasks' => $completedTasks,
                 'latest_task_id'  => $latestTask ? $latestTask->id : null,

@@ -174,12 +174,15 @@ export default function Index({ clients, filters, stats }) {
         },
         {
             key: 'wallet',
-            label: 'Wallet Balance',
-            render: (client) => (
-                <span className="font-medium">
-                    {formatCurrency(client.available_balance || 0, client.currency || 'USD')}
-                </span>
-            ),
+            label: __('Wallet Balance'),
+            render: (client) => {
+                const balance = client.available_balance || 0;
+                return (
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold border ${balance < 0 ? 'bg-red-50 text-red-700 border-red-200' : 'bg-green-50 text-green-700 border-green-200'}`}>
+                        {formatCurrency(balance, client.currency || 'USD')}
+                    </span>
+                );
+            },
         },
         {
             key: 'actions',
