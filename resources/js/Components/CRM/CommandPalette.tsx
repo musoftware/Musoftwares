@@ -56,17 +56,17 @@ export function CommandPalette() {
 
                         <Command.Group heading="Quick Actions" className="text-xs font-medium text-slate-500 p-2">
                             <Command.Item 
-                                onSelect={() => runCommand(() => console.log('New Lead'))}
+                                onSelect={() => runCommand(() => router.visit(route('crm.leads.index')))}
                                 className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 rounded-md cursor-pointer hover:bg-slate-100 aria-selected:bg-slate-100"
                             >
                                 <User className="h-4 w-4 text-slate-400" />{__('general.create_new_lead')}</Command.Item>
                             <Command.Item 
-                                onSelect={() => runCommand(() => console.log('New Task'))}
+                                onSelect={() => runCommand(() => router.visit(route('erp.dashboard')))}
                                 className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 rounded-md cursor-pointer hover:bg-slate-100 aria-selected:bg-slate-100"
                             >
                                 <CheckSquare className="h-4 w-4 text-slate-400" />{__('general.create_new_task')}</Command.Item>
                             <Command.Item 
-                                onSelect={() => runCommand(() => console.log('New Campaign'))}
+                                onSelect={() => runCommand(() => router.visit(route('crm.campaigns.index')))}
                                 className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 rounded-md cursor-pointer hover:bg-slate-100 aria-selected:bg-slate-100"
                             >
                                 <Send className="h-4 w-4 text-slate-400" />{__('general.start_campaign')}</Command.Item>

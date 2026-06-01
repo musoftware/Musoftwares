@@ -157,11 +157,16 @@ it('tests inactivity refund rule (Unhappy Path)', function () {
         'status' => 'open'
     ]);
 
-    // Mock the refund action/cron job that runs daily
-    // Assuming there's an action or command for this:
-    // app(\Modules\Freelance\Domains\Job\Actions\RefundInactiveJobsAction::class)->execute();
+    // Initial points balance is 200 (since the factory gave 200, but they didn't really 'pay' for this factory job)
+    // For test purposes, assume they paid 35 points (25 base + 10 min bid)
+    $this->client->update(['points_balance' => 165]); // 200 - 35 = 165
+
+    // Execute the refund action
+    $refundCount = app(\Modules\Freelance\Domains\Job\Actions\RefundInactiveJobsAction::class)->execute();
     
-    // We will verify the logic directly if the action doesn't exist yet, 
-    // but the test marks the expectation that the refund must occur.
-    $this->markTestIncomplete('Implement RefundInactiveJobsAction to assert client gets points back.');
+    expect($refundCount)->toBe(1);
+    
+    // The client should get 35 points back -> 165 + 35 = 200
+    expect($this->client->fresh()->points_balance)->toBe(200);
+    expect($job->fresh()->status->getValue())->toBe('cancelled');
 });

@@ -11,7 +11,9 @@ interface LeadCardProps {
 }
 
 export default function LeadCard({ lead, index }: LeadCardProps) {
-    const openDrawer = (id: number) => { console.log('Open drawer for lead:', id); };
+    const openDrawer = (id: number) => { 
+        router.visit(route('crm.leads.show', id));
+    };
 
     // Dynamic SLA coloring
     const isSLABreached = lead.slaBreached;
@@ -53,17 +55,7 @@ export default function LeadCard({ lead, index }: LeadCardProps) {
                         </span>
                     </div>
 
-                    {/* Quick Actions (Appear on Hover) */}
-                    <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button 
-                            onClick={(e) => { e.stopPropagation(); /* handle call */ }}
-                            className="p-1.5 bg-white border border-slate-200 rounded-md text-blue-600 hover:bg-blue-50 shadow-sm"
-                            title={__('general.call_lead')}
-                        >
-                            <Phone size={14} />
-                        </button>
                     </div>
-                </div>
             )}
         </Draggable>
     );

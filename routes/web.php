@@ -384,7 +384,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/invoices/{invoice}/partial-pay', [\App\Http\Controllers\Admin\InvoiceController::class, 'partialPay'])->name('invoices.partial-pay');
     Route::post('/invoices/{invoice}/pay-service/calculate', [\App\Http\Controllers\Admin\InvoiceController::class, 'calculatePayService'])->name('invoices.pay-service.calculate');
     Route::post('/invoices/{invoice}/pay-service/store', [\App\Http\Controllers\Admin\InvoiceController::class, 'storePayService'])->name('invoices.pay-service.store');
-
+    Route::post('/invoices/{invoice}/share-link', [\App\Http\Controllers\Admin\InvoiceController::class, 'shareLink'])->name('invoices.share-link');
 
 
 
@@ -397,6 +397,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // ── Admin Financial Operations ────────────────────────────────
     Route::get('/finance', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'index'])->name('finance.index');
+    Route::get('/finance/export', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'export'])->name('finance.report.export');
     Route::post('/finance', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'store'])->name('finance.store');
     Route::put('/finance/{entry}', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'update'])->name('finance.update');
     Route::delete('/finance/{entry}', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'destroy'])->name('finance.destroy');
@@ -765,6 +766,13 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::post('/conversations/{id}/read', [\App\Http\Controllers\ConversationController::class, 'markAsRead']);
     Route::post('/conversations/{id}/messages', [\App\Http\Controllers\ConversationController::class, 'storeMessage']);
 });
+
+// ── Guest Invoice Pay ─────────────────────────
+Route::get('/guest/invoices/{invoice}', [\App\Http\Controllers\GuestInvoiceController::class, 'show'])->name('guest.invoices.show')->middleware('signed');
+Route::post('/guest/invoices/{invoice}/pay', [\App\Http\Controllers\GuestInvoiceController::class, 'initiatePay'])->name('guest.invoices.pay')->middleware('signed');
+Route::get('/guest/invoices/payment/success', [\App\Http\Controllers\GuestInvoiceController::class, 'paymentSuccess'])->name('guest.invoices.payment.success');
+Route::get('/guest/invoices/payment/failure', [\App\Http\Controllers\GuestInvoiceController::class, 'paymentFailure'])->name('guest.invoices.payment.failure');
+Route::post('/guest/invoices/payment/webhook', [\App\Http\Controllers\GuestInvoiceController::class, 'paymentWebhook'])->name('guest.invoices.payment.webhook');
 
 // Kashier Webhook (No Auth required)
 Route::post('/financial/add-balance/webhook', [\App\Http\Controllers\FinancialController::class, 'webhook'])->name('financial.add-balance.webhook');

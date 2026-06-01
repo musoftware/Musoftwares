@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
-import { Trash2, Edit, Plus, DollarSign, TrendingDown, TrendingUp, Users, CheckCircle2, AlertCircle, Clock, Search, X, ChevronUp, ChevronDown, Eye, ExternalLink, FileText, Layers, Calendar, RefreshCw, ChevronLeft, ChevronRight, CalendarDays, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Trash2, Edit, Plus, DollarSign, TrendingDown, TrendingUp, Users, CheckCircle2, AlertCircle, Clock, Search, X, ChevronUp, ChevronDown, Eye, ExternalLink, FileText, Layers, Calendar, RefreshCw, ChevronLeft, ChevronRight, CalendarDays, ArrowUpRight, ArrowDownRight, Download } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import {
@@ -358,7 +358,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-gray-200 mb-6">
+            <div className="flex overflow-x-auto whitespace-nowrap border-b border-gray-200 mb-6 pb-1 custom-scrollbar">
                 <button
                     onClick={() => handleTabChange('expenses')}
                     className={`py-3 px-6 font-medium text-sm border-b-2 transition-colors ${currentTab === 'expenses' ? 'border-black text-black font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200'}`}
@@ -367,6 +367,14 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                     onClick={() => handleTabChange('income')}
                     className={`py-3 px-6 font-medium text-sm border-b-2 transition-colors ${currentTab === 'income' ? 'border-black text-black font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200'}`}
                 >{__('general.income_streams')}</button>
+                <button
+                    onClick={() => handleTabChange('projects')}
+                    className={`py-3 px-6 font-medium text-sm border-b-2 transition-colors ${currentTab === 'projects' ? 'border-black text-black font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200'}`}
+                >Project Profitability</button>
+                <button
+                    onClick={() => handleTabChange('budgets')}
+                    className={`py-3 px-6 font-medium text-sm border-b-2 transition-colors ${currentTab === 'budgets' ? 'border-black text-black font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200'}`}
+                >Budgets</button>
                 <button
                     onClick={() => handleTabChange('salaries')}
                     className={`py-3 px-6 font-medium text-sm border-b-2 transition-colors ${currentTab === 'salaries' ? 'border-black text-black font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200'}`}
@@ -597,6 +605,11 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                         </div>
                     )}
 
+                    <a href={route('admin.finance.report.export', { type: currentTab === 'income' || currentTab === 'expenses' ? 'ledger' : 'pnl' })} target="_blank" rel="noreferrer">
+                        <Button variant="outline" className="h-9 mr-2 text-slate-700">
+                            <Download className="w-4 h-4 mr-2" /> Export CSV
+                        </Button>
+                    </a>
                     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                         <DialogTrigger asChild>
                             <Button className="bg-black hover:bg-slate-800 text-white h-9">
@@ -745,6 +758,76 @@ export default function Index({ entries, categories, users, currentTab, stats, a
             {/* Data Table */}
             {currentTab !== 'calendar' && (
                 <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
+                    {currentTab === 'projects' ? (
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Project Name</th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Client</th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Revenue</th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Costs</th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Margin</th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Profit</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {entries.data.map((project: any) => (
+                                    <tr key={project.id} className="hover:bg-gray-50">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{project.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.client?.name || '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{formatCurrency(project.revenue, stats.business_currency_code)}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">{formatCurrency(project.costs, stats.business_currency_code)}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{project.margin}%</td>
+                                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold ${project.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(project.profit, stats.business_currency_code)}</td>
+                                    </tr>
+                                ))}
+                                {entries.data.length === 0 && (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                                            <h3 className="text-lg font-medium text-gray-900">No projects found</h3>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    ) : currentTab === 'budgets' ? (
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Category</th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Budget Amount</th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Spent</th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Remaining</th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {entries.data.map((budget: any) => {
+                                    const remaining = budget.amount - budget.spent;
+                                    const percent = budget.amount > 0 ? (budget.spent / budget.amount) * 100 : 0;
+                                    return (
+                                    <tr key={budget.id} className="hover:bg-gray-50">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{budget.category}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{budget.currency_symbol}{budget.amount}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{budget.currency_symbol}{budget.spent}</td>
+                                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold ${remaining >= 0 ? 'text-green-600' : 'text-red-600'}`}>{budget.currency_symbol}{remaining}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                                <div className={`h-2.5 rounded-full ${percent > 100 ? 'bg-red-600' : percent > 80 ? 'bg-yellow-400' : 'bg-green-600'}`} style={{width: `${Math.min(percent, 100)}%`}}></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )})}
+                                {entries.data.length === 0 && (
+                                    <tr>
+                                        <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                                            <h3 className="text-lg font-medium text-gray-900">No budgets found</h3>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    ) : (
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
@@ -839,6 +922,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                             )}
                         </tbody>
                     </table>
+                    )}
                 </div>
             )}
 

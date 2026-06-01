@@ -246,5 +246,8 @@ class Project extends Model
         return $new_items;
     }
 
-
+    public function cost_transactions()
+    {
+        return $this->hasMany(CostTransaction::class, 'project_id');
+    }
 }

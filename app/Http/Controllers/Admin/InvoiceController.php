@@ -502,6 +502,35 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Generate a temporary signed link for guest view.
+     */
+    public function shareLink(Request $request, Invoice $invoice)
+    {
+        $duration = $request->input('duration', '24_hours');
+        
+        $expiresAt = now();
+        if ($duration === '3_days') {
+            $expiresAt->addDays(3);
+        } elseif ($duration === '1_month') {
+            $expiresAt->addMonth();
+        } else {
+            // Default 24 hours
+            $expiresAt->addHours(24);
+        }
+
+        $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'guest.invoices.show',
+            $expiresAt,
+            ['invoice' => $invoice->id]
+        );
+
+        return response()->json([
+            'url' => $url,
+            'expires_at' => $expiresAt->toDateTimeString()
+        ]);
+    }
+
+    /**
      * Record a partial payment on an invoice.
      */
     public function partialPay(Request $request, Invoice $invoice)
@@ -648,6 +677,10 @@ class InvoiceController extends Controller
 
     public function createTimerItem(\App\Models\Invoice $invoice)
     {
+        if ($invoice->status !== 'unpaid') {
+            return redirect()->back()->with('error', __('admin.only_unpaid_invoices_can_be_edited'));
+        }
+
         $item = new \App\Models\InvoiceItem();
         $item->invoice_id = $invoice->id;
         $item->item_title = 'Time Tracking';
