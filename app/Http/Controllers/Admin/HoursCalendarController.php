@@ -12,7 +12,10 @@ class HoursCalendarController extends Controller
 {
     public function index()
     {
-        $years_lists = InvoiceItemTimer::select(DB::raw('YEAR(date_start) as year'))
+        $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+        $yearQuery = $isSqlite ? "strftime('%Y', date_start) as year" : "YEAR(date_start) as year";
+        
+        $years_lists = InvoiceItemTimer::select(DB::raw($yearQuery))
             ->whereNotNull('date_start')
             ->distinct()
             ->orderBy('year', 'desc')
@@ -33,22 +36,43 @@ class HoursCalendarController extends Controller
         $invoice_item_timers = InvoiceItemTimer::query();
         $selected_year = (int)$request->input('year', date('Y'));
 
-        $yearly = $invoice_item_timers->select(
-            DB::raw('TIMESTAMPDIFF(SECOND, invoice_item_timers.date_start, invoice_item_timers.date_end) AS diff'),
-            DB::raw('YEAR(invoice_item_timers.created_at) as year'),
-            DB::raw('MONTH(invoice_item_timers.created_at) as month'),
-            DB::raw('DAY(invoice_item_timers.created_at) as day')
-        )
-            ->where(DB::raw('invoice_item_timers.date_end'), '>', DB::raw('invoice_item_timers.date_start'))
-            ->where(function ($query) use ($selected_year) {
-                if ($selected_year == date('Y')) {
-                    $query->where(DB::raw('invoice_item_timers.date_start'), '>', DB::raw('DATE_SUB(NOW(), INTERVAL 1 YEAR)'));
-                } else {
-                    $query->where(DB::raw('YEAR(invoice_item_timers.date_start)'), $selected_year);
-                }
-            })
-            ->orderBy('invoice_item_timers.id', 'desc')
-            ->get();
+        $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+
+        if ($isSqlite) {
+            $yearly = $invoice_item_timers->select(
+                DB::raw("CAST((julianday(invoice_item_timers.date_end) - julianday(invoice_item_timers.date_start)) * 86400 AS INTEGER) AS diff"),
+                DB::raw("strftime('%Y', invoice_item_timers.created_at) as year"),
+                DB::raw("strftime('%m', invoice_item_timers.created_at) as month"),
+                DB::raw("strftime('%d', invoice_item_timers.created_at) as day")
+            )
+                ->where(DB::raw('invoice_item_timers.date_end'), '>', DB::raw('invoice_item_timers.date_start'))
+                ->where(function ($query) use ($selected_year) {
+                    if ($selected_year == date('Y')) {
+                        $query->where(DB::raw('invoice_item_timers.date_start'), '>', DB::raw("date('now', '-1 year')"));
+                    } else {
+                        $query->where(DB::raw("strftime('%Y', invoice_item_timers.date_start)"), (string)$selected_year);
+                    }
+                })
+                ->orderBy('invoice_item_timers.id', 'desc')
+                ->get();
+        } else {
+            $yearly = $invoice_item_timers->select(
+                DB::raw('TIMESTAMPDIFF(SECOND, invoice_item_timers.date_start, invoice_item_timers.date_end) AS diff'),
+                DB::raw('YEAR(invoice_item_timers.created_at) as year'),
+                DB::raw('MONTH(invoice_item_timers.created_at) as month'),
+                DB::raw('DAY(invoice_item_timers.created_at) as day')
+            )
+                ->where(DB::raw('invoice_item_timers.date_end'), '>', DB::raw('invoice_item_timers.date_start'))
+                ->where(function ($query) use ($selected_year) {
+                    if ($selected_year == date('Y')) {
+                        $query->where(DB::raw('invoice_item_timers.date_start'), '>', DB::raw('DATE_SUB(NOW(), INTERVAL 1 YEAR)'));
+                    } else {
+                        $query->where(DB::raw('YEAR(invoice_item_timers.date_start)'), $selected_year);
+                    }
+                })
+                ->orderBy('invoice_item_timers.id', 'desc')
+                ->get();
+        }
 
         $merge = [];
         foreach ($yearly as $w) {

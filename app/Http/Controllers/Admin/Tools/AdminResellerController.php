@@ -35,7 +35,7 @@ class AdminResellerController extends Controller
             ->paginate(20);
 
         return Inertia::render('Admin/Resellers/Index', [
-            'resellers' => clone (new ToolResellerResource($resellers))->resolve(),
+            'resellers' => ToolResellerResource::collection($resellers->items())->resolve(),
             'meta'      => $resellers->toArray(),
         ]);
     }
@@ -83,9 +83,9 @@ class AdminResellerController extends Controller
             ->get();
 
         return Inertia::render('Admin/Resellers/Show', [
-            'reseller'       => clone (new ToolResellerResource($reseller))->resolve(),
-            'subUsers'       => $subUsers->through(fn ($u) => clone (new ToolResellerUserResource($u))->resolve()),
-            'transactions'   => $transactions->through(fn ($t) => clone (new ToolResellerTransactionResource($t))->resolve()),
+            'reseller'       => (new ToolResellerResource($reseller))->resolve(),
+            'subUsers'       => $subUsers->through(fn ($u) => (new ToolResellerUserResource($u))->resolve()),
+            'transactions'   => $transactions->through(fn ($t) => (new ToolResellerTransactionResource($t))->resolve()),
             'sharingFlagged' => ToolResellerUserResource::collection($sharingFlagged)->resolve(),
             'iframeUrl'      => url("/reseller/{$reseller->token}"),
         ]);

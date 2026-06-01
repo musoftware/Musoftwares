@@ -19,8 +19,14 @@ class FreelanceSkillController extends Controller
                   ->orWhere('description', 'like', "%{$search}%");
         }
 
-        $skills = $query->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected')")
-                        ->orderBy('name')
+        $isSqlite = \DB::connection()->getDriverName() === 'sqlite';
+        if ($isSqlite) {
+            $query->orderByRaw("CASE status WHEN 'pending' THEN 1 WHEN 'approved' THEN 2 WHEN 'rejected' THEN 3 ELSE 4 END");
+        } else {
+            $query->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected')");
+        }
+
+        $skills = $query->orderBy('name')
                         ->paginate(20)
                         ->withQueryString();
 

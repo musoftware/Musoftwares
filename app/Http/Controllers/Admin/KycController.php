@@ -30,7 +30,7 @@ class KycController extends Controller
                 $q->latest();
             }])
             ->paginate(15)
-            ->through(fn($u) => clone (new KycUserResource($u))->resolve());
+            ->through(fn($u) => (new KycUserResource($u))->resolve());
 
         return Inertia::render('Admin/Kyc/Index', [
             'users' => $users,

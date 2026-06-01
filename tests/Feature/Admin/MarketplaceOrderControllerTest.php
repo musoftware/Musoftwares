@@ -70,9 +70,12 @@ class MarketplaceOrderControllerTest extends TestCase
         $this->order = ServiceOrder::create([
             'buyer_id' => $this->buyerUser->id,
             'seller_id' => $this->sellerUser->id,
-            'service_package_id' => $this->package->id,
+            'package_id' => $this->package->id,
             'amount' => 50,
             'currency_id' => $currency->id,
+            'commission_amount' => 5,
+            'business_amount' => 50,
+            'business_currency_id' => $currency->id,
             'status' => 'pending',
         ]);
     }
@@ -100,7 +103,7 @@ class MarketplaceOrderControllerTest extends TestCase
         // Order must be disputed to resolve dispute
         $this->order->update(['status' => 'disputed']);
 
-        $response = $this->actingAs($this->admin)->post("/admin/marketplace/orders/{$this->order->id}/resolve-dispute", [
+        $response = $this->actingAs($this->admin)->post("/admin/marketplace/orders/{$this->order->id}/dispute", [
             'action' => 'refund_buyer' // this should match validation in ResolveMarketplaceDisputeRequest
         ]);
 

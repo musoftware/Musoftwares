@@ -48,7 +48,8 @@ class FreelanceProposalControllerTest extends TestCase
             'description' => 'Test Desc',
             'budget' => 100,
             'currency_id' => $currency->id,
-            'status' => 'published',
+            'status' => 'open',
+            'type' => 'fixed',
         ]);
 
         $this->proposal = Proposal::create([

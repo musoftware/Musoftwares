@@ -43,7 +43,8 @@ class FreelanceJobControllerTest extends TestCase
             'description' => 'Test Desc',
             'budget' => 100,
             'currency_id' => $currency->id,
-            'status' => 'published',
+            'status' => 'open',
+            'type' => 'fixed',
         ]);
     }
 
@@ -78,6 +79,7 @@ class FreelanceJobControllerTest extends TestCase
             'description' => 'New Desc',
             'budget' => 200,
             'client_id' => $this->clientUser->id,
+            'type' => 'fixed',
         ]);
 
         $response->assertRedirect();
@@ -97,6 +99,7 @@ class FreelanceJobControllerTest extends TestCase
             'title' => 'Updated Job',
             'description' => 'Updated Desc',
             'budget' => 300,
+            'type' => 'fixed',
         ]);
 
         $response->assertRedirect();

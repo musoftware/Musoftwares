@@ -28,13 +28,13 @@ class KycControllerTest extends TestCase
 
     public function test_admin_can_view_kyc_index(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('kyc.index'));
+        $response = $this->actingAs($this->admin)->get(route('admin.kyc.index'));
         $response->assertStatus(200);
     }
 
     public function test_non_admin_cannot_view_kyc_index(): void
     {
-        $response = $this->actingAs($this->clientUser)->get(route('kyc.index'));
+        $response = $this->actingAs($this->clientUser)->get(route('admin.kyc.index'));
         $response->assertStatus(403);
     }
 
@@ -44,10 +44,13 @@ class KycControllerTest extends TestCase
         $this->clientUser->kycDocuments()->create([
             'document_type' => 'passport',
             'file_path' => 'fake_path.jpg',
+            'original_filename' => 'passport.jpg',
+            'mime_type' => 'image/jpeg',
+            'file_size' => 1024,
             'status' => 'pending',
         ]);
 
-        $response = $this->actingAs($this->admin)->post(route('kyc.approve', $this->clientUser->id));
+        $response = $this->actingAs($this->admin)->post(route('admin.kyc.approve', $this->clientUser->id));
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -61,10 +64,13 @@ class KycControllerTest extends TestCase
         $this->clientUser->kycDocuments()->create([
             'document_type' => 'passport',
             'file_path' => 'fake_path.jpg',
+            'original_filename' => 'passport.jpg',
+            'mime_type' => 'image/jpeg',
+            'file_size' => 1024,
             'status' => 'pending',
         ]);
 
-        $response = $this->actingAs($this->admin)->post(route('kyc.reject', $this->clientUser->id), [
+        $response = $this->actingAs($this->admin)->post(route('admin.kyc.reject', $this->clientUser->id), [
             'reason' => 'Blurry image',
         ]);
 
@@ -72,12 +78,12 @@ class KycControllerTest extends TestCase
         $response->assertSessionHas('success');
 
         $this->assertFalse($this->clientUser->fresh()->kyc_verified);
-        $this->assertEquals('Blurry image', $this->clientUser->fresh()->kyc_notes);
+        $this->assertEquals('KYC rejected: Blurry image', $this->clientUser->fresh()->kyc_notes);
     }
 
     public function test_admin_reject_kyc_validation(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('kyc.reject', $this->clientUser->id), [
+        $response = $this->actingAs($this->admin)->post(route('admin.kyc.reject', $this->clientUser->id), [
             'reason' => '', // Reason required
         ]);
 

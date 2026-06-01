@@ -20,7 +20,7 @@ class MarketplaceOrderController extends Controller
         $orders = ServiceOrder::with(['buyer:id,name,email', 'seller:id,name,email', 'package.service'])
             ->latest()
             ->paginate(20)
-            ->through(fn($o) => clone (new MarketplaceOrderResource($o))->resolve());
+            ->through(fn($o) => (new MarketplaceOrderResource($o))->resolve());
 
         return Inertia::render('Admin/Marketplace/Orders/Index', [
             'orders' => $orders
@@ -32,7 +32,7 @@ class MarketplaceOrderController extends Controller
         $order = ServiceOrder::with(['buyer', 'seller', 'package.service'])->findOrFail($id);
 
         return Inertia::render('Admin/Marketplace/Orders/Show', [
-            'order' => clone (new MarketplaceOrderResource($order))->resolve()
+            'order' => (new MarketplaceOrderResource($order))->resolve()
         ]);
     }
 

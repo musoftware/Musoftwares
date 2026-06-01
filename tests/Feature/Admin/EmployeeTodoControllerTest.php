@@ -29,7 +29,7 @@ class EmployeeTodoControllerTest extends TestCase
 
     public function test_admin_can_view_employee_todos_index(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('employee-todos.index'));
+        $response = $this->actingAs($this->admin)->get(route('admin.employee-todos.index'));
         $response->assertStatus(200);
     }
 
@@ -39,7 +39,7 @@ class EmployeeTodoControllerTest extends TestCase
         $client = User::factory()->create(['onboarding_completed' => true]);
         $client->assignRole('client');
 
-        $response = $this->actingAs($client)->get(route('employee-todos.index'));
+        $response = $this->actingAs($client)->get(route('admin.employee-todos.index'));
         $response->assertStatus(403);
     }
 
@@ -55,7 +55,7 @@ class EmployeeTodoControllerTest extends TestCase
             'current_date' => now()->format('Y-m-d'),
         ];
 
-        $response = $this->actingAs($this->admin)->post(route('employee-todos.store'), $payload);
+        $response = $this->actingAs($this->admin)->post(route('admin.employee-todos.store'), $payload);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -77,7 +77,7 @@ class EmployeeTodoControllerTest extends TestCase
             'current_date' => now()->format('Y-m-d'),
         ];
 
-        $response = $this->actingAs($this->admin)->post(route('employee-todos.store'), $payload);
+        $response = $this->actingAs($this->admin)->post(route('admin.employee-todos.store'), $payload);
         $response->assertSessionHasErrors('title');
     }
 
@@ -102,7 +102,7 @@ class EmployeeTodoControllerTest extends TestCase
             'current_date' => now()->format('Y-m-d'),
         ];
 
-        $response = $this->actingAs($this->admin)->put(route('employee-todos.update', $todo->id), $payload);
+        $response = $this->actingAs($this->admin)->put(route('admin.employee-todos.update', $todo->id), $payload);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -131,7 +131,7 @@ class EmployeeTodoControllerTest extends TestCase
             'current_date' => now()->format('Y-m-d'),
         ];
 
-        $response = $this->actingAs($this->admin)->put(route('employee-todos.update', $todo->id), $payload);
+        $response = $this->actingAs($this->admin)->put(route('admin.employee-todos.update', $todo->id), $payload);
         $response->assertSessionHasErrors('priority');
     }
 
@@ -146,7 +146,7 @@ class EmployeeTodoControllerTest extends TestCase
             'current_date' => now()->format('Y-m-d'),
         ]);
 
-        $response = $this->actingAs($this->admin)->delete(route('employee-todos.destroy', $todo->id));
+        $response = $this->actingAs($this->admin)->delete(route('admin.employee-todos.destroy', $todo->id));
 
         $response->assertRedirect();
         $response->assertSessionHas('success');

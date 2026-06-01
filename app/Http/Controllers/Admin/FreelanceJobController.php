@@ -60,7 +60,7 @@ class FreelanceJobController extends Controller
             'type' => 'nullable|string|in:fixed,hourly',
         ]);
 
-        $validated['status'] = 'published';
+        $validated['status'] = 'open';
 
         $job = Job::create($validated);
 
@@ -92,7 +92,7 @@ class FreelanceJobController extends Controller
     public function updateStatus(Request $request, Job $job)
     {
         $request->validate([
-            'status' => 'required|string|in:draft,published,in_progress,completed,cancelled,suspended,open'
+            'status' => 'required|string|in:draft,open,in_progress,completed,cancelled,suspended'
         ]);
 
         $job->update(['status' => $request->status]);

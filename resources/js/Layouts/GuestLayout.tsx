@@ -33,8 +33,8 @@ export default function Guest({ children }: PropsWithChildren) {
                     <span>© Musoftware Inc.</span>
                     <div className="flex space-x-6 text-zinc-500 dark:text-zinc-400">
                         <span className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer">Help</span>
-                        <span className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer">Privacy</span>
-                        <span className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer">Terms</span>
+                        <Link href="/privacy-policy" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer">Privacy</Link>
+                        <Link href="/terms-of-service" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer">Terms</Link>
                     </div>
                 </div>
             </div>

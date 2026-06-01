@@ -25,6 +25,16 @@ class AdminResellerControllerTest extends TestCase
 
         $this->clientUser = User::factory()->create(['onboarding_completed' => true]);
         $this->clientUser->assignRole('client');
+
+        $this->currency = \App\Models\Currency::first();
+        if (!$this->currency) {
+            $this->currency = \App\Models\Currency::create([
+                'name' => 'US Dollar',
+                'code' => 'USD',
+                'symbol' => '$',
+                'exchange_rate' => 1,
+            ]);
+        }
     }
 
     public function test_admin_can_view_resellers_index()
@@ -51,7 +61,8 @@ class AdminResellerControllerTest extends TestCase
             'user_id' => $this->clientUser->id,
             'name' => 'Reseller Name',
             'status' => 'active',
-            'credit_balance' => 100
+            'credit_balance' => 100,
+            'currency_id' => $this->currency->id
         ]);
 
         $response->assertRedirect();
@@ -69,7 +80,8 @@ class AdminResellerControllerTest extends TestCase
             'name' => 'Test Reseller',
             'token' => 'random_token_123',
             'credit_balance' => 100,
-            'status' => 'active'
+            'status' => 'active',
+            'currency_id' => $this->currency->id
         ]);
 
         $response = $this->actingAs($this->admin)->get("/admin/resellers/{$reseller->id}");
@@ -83,12 +95,14 @@ class AdminResellerControllerTest extends TestCase
             'name' => 'Test Reseller',
             'token' => 'random_token_123',
             'credit_balance' => 100,
-            'status' => 'active'
+            'status' => 'active',
+            'currency_id' => $this->currency->id
         ]);
 
         $response = $this->actingAs($this->admin)->put("/admin/resellers/{$reseller->id}", [
             'name' => 'Updated Reseller',
-            'status' => 'inactive'
+            'status' => 'inactive',
+            'currency_id' => $this->currency->id
         ]);
 
         $response->assertRedirect();
@@ -107,15 +121,17 @@ class AdminResellerControllerTest extends TestCase
             'name' => 'Test Reseller',
             'token' => 'random_token_123',
             'credit_balance' => 100,
-            'status' => 'active'
+            'status' => 'active',
+            'currency_id' => $this->currency->id
         ]);
 
         $response = $this->actingAs($this->admin)->delete("/admin/resellers/{$reseller->id}");
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        $this->assertDatabaseMissing('tool_resellers', [
-            'id' => $reseller->id
+        $this->assertDatabaseHas('tool_resellers', [
+            'id' => $reseller->id,
+            'status' => 'inactive'
         ]);
     }
 
@@ -126,12 +142,13 @@ class AdminResellerControllerTest extends TestCase
             'name' => 'Test Reseller',
             'token' => 'random_token_123',
             'credit_balance' => 100,
-            'status' => 'active'
+            'status' => 'active',
+            'currency_id' => $this->currency->id
         ]);
 
         $response = $this->actingAs($this->admin)->post("/admin/resellers/{$reseller->id}/balance", [
             'amount' => 50,
-            'action' => 'add', // or maybe just positive number depends on request implementation
+            'type' => 'top_up',
             'note' => 'Add balance'
         ]);
 

@@ -7,7 +7,35 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Platforms
+Route::get('/platforms', [HomeController::class, 'platforms'])->name('platforms');
+Route::get('/platforms/crm', [HomeController::class, 'platformCrm'])->name('platforms.crm');
+Route::get('/platforms/erp', [HomeController::class, 'platformErp'])->name('platforms.erp');
+Route::get('/platforms/cloud', [HomeController::class, 'platformCloud'])->name('platforms.cloud');
+
+// Solutions
+Route::get('/solutions', [HomeController::class, 'solutions'])->name('solutions');
+Route::get('/solutions/healthcare', [HomeController::class, 'solutionHealthcare'])->name('solutions.healthcare');
+Route::get('/solutions/education', [HomeController::class, 'solutionEducation'])->name('solutions.education');
+Route::get('/solutions/ecommerce', [HomeController::class, 'solutionEcommerce'])->name('solutions.ecommerce');
+Route::get('/solutions/real-estate', [HomeController::class, 'solutionRealEstate'])->name('solutions.real-estate');
+Route::get('/solutions/finance', [HomeController::class, 'solutionFinance'])->name('solutions.finance');
+
+// Company
+Route::get('/company', [HomeController::class, 'company'])->name('company');
+Route::get('/company/about', [HomeController::class, 'companyAbout'])->name('company.about');
+Route::get('/company/careers', [HomeController::class, 'companyCareers'])->name('company.careers');
+Route::get('/company/contact', [HomeController::class, 'companyContact'])->name('company.contact');
+
+// Legal
+Route::get('/privacy-policy', [HomeController::class, 'privacyPolicy'])->name('legal.privacy');
+Route::get('/terms-of-service', [HomeController::class, 'termsOfService'])->name('legal.terms');
+Route::get('/cookie-policy', [HomeController::class, 'cookiePolicy'])->name('legal.cookies');
+
+// Pricing
+Route::get('/pricing', [HomeController::class, 'pricing'])->name('pricing');
 
 Route::get('/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
 
@@ -513,6 +541,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::delete('/users/{userId}/notes/{noteId}', [\App\Http\Controllers\Admin\UserNoteController::class, 'destroy'])->name('users.notes.destroy');
     Route::post('/users/{userId}/notes/{noteId}/archive', [\App\Http\Controllers\Admin\UserNoteController::class, 'archive'])->name('users.notes.archive');
     Route::post('/users/{userId}/notes/{noteId}/unarchive', [\App\Http\Controllers\Admin\UserNoteController::class, 'unarchive'])->name('users.notes.unarchive');
+    Route::post('/users/{userId}/notes/{noteId}/toggle-pin', [\App\Http\Controllers\Admin\UserNoteController::class, 'togglePin'])->name('users.notes.togglePin');
 
     // ── User Files ───────────────────────────────────────────────────
     // Recovered from old project: Admin/FileController

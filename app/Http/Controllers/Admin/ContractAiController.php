@@ -16,19 +16,19 @@ class ContractAiController extends Controller
         ]);
 
         $user = Auth::user();
-        $defaultProvider = $user->default_ai_model ?? 'openai';
+        $defaultProvider = \App\Models\AdminSettings::GetValue('default_ai_model', 'openai');
 
         if ($defaultProvider === 'openai') {
-            $apiKey = $user->openai_api_key ?? null;
-            $model = $user->openai_model ?? 'gpt-4o-mini';
+            $apiKey = \App\Models\AdminSettings::GetValue('openai_api_key', env('OPENAI_API_KEY'));
+            $model = \App\Models\AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
         } else {
-            $apiKey = $user->gemini_api ?? null;
-            $model = $user->gemini_model ?? 'gemini-2.0-flash';
+            $apiKey = \App\Models\AdminSettings::GetValue('gemini_api_key', env('GEMINI_API_KEY'));
+            $model = \App\Models\AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
         }
 
         if (empty($apiKey)) {
             return response()->json([
-                'error' => "Please set your {$defaultProvider} API key in settings."
+                'error' => "Please set your {$defaultProvider} API key in admin settings."
             ], 400);
         }
 
@@ -123,21 +123,21 @@ class ContractAiController extends Controller
         ]);
 
         $user = Auth::user();
-        $defaultProvider = $user->default_ai_model ?? 'openai';
+        $defaultProvider = \App\Models\AdminSettings::GetValue('default_ai_model', 'openai');
 
         if ($defaultProvider === 'openai') {
-            $apiKey = $user->openai_api_key ?? null;
-            $model = $user->openai_model ?? 'gpt-4o-mini';
+            $apiKey = \App\Models\AdminSettings::GetValue('openai_api_key', env('OPENAI_API_KEY'));
+            $model = \App\Models\AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
             $providerName = 'OpenAI';
         } else {
-            $apiKey = $user->gemini_api ?? null;
-            $model = $user->gemini_model ?? 'gemini-2.0-flash';
+            $apiKey = \App\Models\AdminSettings::GetValue('gemini_api_key', env('GEMINI_API_KEY'));
+            $model = \App\Models\AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
             $providerName = 'Gemini';
         }
 
         if (empty($apiKey)) {
             return response()->json([
-                'error' => "Please set your {$providerName} API key in your profile settings first."
+                'error' => "Please set your {$providerName} API key in admin settings."
             ], 400);
         }
 

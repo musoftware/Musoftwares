@@ -32,8 +32,8 @@ class FreelanceSkillControllerTest extends TestCase
             'description' => 'PHP programming language'
         ]);
         $this->skill->status = 'pending';
-        // 'creator_id' might not be in fillable.
-        $this->skill->creator_id = $this->clientUser->id;
+        // 'created_by' might not be in fillable.
+        $this->skill->created_by = $this->clientUser->id;
         $this->skill->save();
     }
 

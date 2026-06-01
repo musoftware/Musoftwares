@@ -31,13 +31,13 @@ class AdminTicketControllerTest extends TestCase
 
     public function test_admin_can_view_tickets_index(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('tickets.index'));
+        $response = $this->actingAs($this->admin)->get(route('admin.tickets.index'));
         $response->assertStatus(200);
     }
 
     public function test_non_admin_cannot_view_tickets_index(): void
     {
-        $response = $this->actingAs($this->clientUser)->get(route('tickets.index'));
+        $response = $this->actingAs($this->clientUser)->get(route('admin.tickets.index'));
         $response->assertStatus(403);
     }
 
@@ -51,7 +51,7 @@ class AdminTicketControllerTest extends TestCase
             'priority' => 'low',
         ]);
 
-        $response = $this->actingAs($this->admin)->get(route('tickets.show', $ticket->id));
+        $response = $this->actingAs($this->admin)->get(route('admin.tickets.show', $ticket->id));
         $response->assertStatus(200);
     }
 
@@ -65,7 +65,7 @@ class AdminTicketControllerTest extends TestCase
             'priority' => 'low',
         ]);
 
-        $response = $this->actingAs($this->admin)->put(route('tickets.update', $ticket->id), [
+        $response = $this->actingAs($this->admin)->put(route('admin.tickets.update', $ticket->id), [
             'action' => 'close',
             'comment' => 'Closing ticket',
         ]);
@@ -86,7 +86,7 @@ class AdminTicketControllerTest extends TestCase
             'priority' => 'low',
         ]);
 
-        $response = $this->actingAs($this->admin)->put(route('tickets.update', $ticket->id), [
+        $response = $this->actingAs($this->admin)->put(route('admin.tickets.update', $ticket->id), [
             'action' => 'invalid_action',
         ]);
 
@@ -103,13 +103,9 @@ class AdminTicketControllerTest extends TestCase
             'priority' => 'low',
         ]);
         
-        $ticket->conversation()->create([
-            'status' => 'open',
-            'subject' => 'Help me',
-            'user_id' => $this->clientUser->id,
-        ]);
+        $ticket->conversation()->create(['type' => 'ticket']);
 
-        $response = $this->actingAs($this->admin)->post(route('tickets.reply', $ticket->id), [
+        $response = $this->actingAs($this->admin)->post(route('admin.tickets.reply', $ticket->id), [
             'body' => 'Here is the answer',
             'is_internal' => false,
         ]);
@@ -128,7 +124,7 @@ class AdminTicketControllerTest extends TestCase
             'priority' => 'low',
         ]);
 
-        $response = $this->actingAs($this->admin)->post(route('tickets.reply', $ticket->id), [
+        $response = $this->actingAs($this->admin)->post(route('admin.tickets.reply', $ticket->id), [
             'body' => '',
             'is_internal' => false,
         ]);
@@ -146,7 +142,7 @@ class AdminTicketControllerTest extends TestCase
             'priority' => 'low',
         ]);
 
-        $response = $this->actingAs($this->admin)->post(route('tickets.assign', $ticket->id), [
+        $response = $this->actingAs($this->admin)->post(route('admin.tickets.assign', $ticket->id), [
             'assigned_employee_id' => $this->admin->id,
         ]);
 
@@ -166,7 +162,7 @@ class AdminTicketControllerTest extends TestCase
             'priority' => 'low',
         ]);
 
-        $response = $this->actingAs($this->admin)->post(route('tickets.assign', $ticket->id), [
+        $response = $this->actingAs($this->admin)->post(route('admin.tickets.assign', $ticket->id), [
             'assigned_employee_id' => 99999, // Invalid ID
         ]);
 
@@ -175,7 +171,7 @@ class AdminTicketControllerTest extends TestCase
 
     public function test_admin_can_add_canned_response(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('tickets.canned-responses.store'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.tickets.canned-responses.store'), [
             'title' => 'Greeting',
             'body' => 'Hello there!',
         ]);
@@ -191,7 +187,7 @@ class AdminTicketControllerTest extends TestCase
 
     public function test_admin_add_canned_response_validation(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('tickets.canned-responses.store'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.tickets.canned-responses.store'), [
             'title' => '',
             'body' => 'Hello there!',
         ]);

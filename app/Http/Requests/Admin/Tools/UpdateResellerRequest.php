@@ -15,7 +15,7 @@ class UpdateResellerRequest extends FormRequest
     {
         return [
             'name'     => ['required', 'string', 'max:191'],
-            'currency' => ['required', 'string', 'max:10'],
+            'currency_id' => ['required', 'integer', 'exists:currencies,id'],
             'status'   => ['required', 'in:active,suspended,inactive'],
             'notes'    => ['nullable', 'string'],
         ];

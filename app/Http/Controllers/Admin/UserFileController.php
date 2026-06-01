@@ -61,7 +61,7 @@ class UserFileController extends Controller
     public function upload(UploadUserFileRequest $request, int $userId)
     {
         User::findOrFail($userId);
-        $folder = $request->get('folder', '');
+        $folder = (string) $request->get('folder', '');
 
         $result = $this->userFileService->uploadFile($userId, $request->file('file'), $folder);
 
@@ -76,7 +76,7 @@ class UserFileController extends Controller
     {
         User::findOrFail($userId);
 
-        $path = $this->userFileService->createFolder($userId, $request->input('name'), $request->get('parent', ''));
+        $path = $this->userFileService->createFolder($userId, $request->input('name'), (string) $request->get('parent', ''));
 
         return response()->json(['success' => true, 'path' => $path]);
     }

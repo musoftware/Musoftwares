@@ -102,7 +102,7 @@ class UserFileService
             if (!str_starts_with($path, $base)) {
                 abort(403);
             }
-            $fullPath = storage_path('app/' . $path);
+            $fullPath = Storage::disk(self::DISK)->path($path);
             if (is_dir($fullPath)) {
                 Storage::disk(self::DISK)->deleteDirectory($path);
             } else {
@@ -114,7 +114,7 @@ class UserFileService
     public function download(int $userId, array $paths): BinaryFileResponse
     {
         if (count($paths) === 1) {
-            $fullPath = storage_path('app/' . $paths[0]);
+            $fullPath = Storage::disk(self::DISK)->path($paths[0]);
             if (is_file($fullPath)) {
                 return response()->download($fullPath, basename($paths[0]));
             }
@@ -126,7 +126,7 @@ class UserFileService
         $zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
         foreach ($paths as $relPath) {
-            $fullPath = storage_path('app/' . $relPath);
+            $fullPath = Storage::disk(self::DISK)->path($relPath);
             if (is_file($fullPath)) {
                 $zip->addFile($fullPath, basename($fullPath));
             } elseif (is_dir($fullPath)) {
