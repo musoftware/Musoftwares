@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'gold_saver_portfolio' => 'Gold Saver Portfolio',
@@ -106,9 +106,12 @@ return [
     'buy_gold' => 'Buy Gold',
     'sell_gold' => 'Sell Gold',
     'withdraw_gold' => 'Withdraw Gold',
-    'insight_gold_up' => 'Gold is up 2% this week.',
-    'insight_goal_near' => 'You are 80% to your wedding goal.',
-    'insight_average_cost' => 'Your average cost is /g.',
+    'insight_gold_up' => 'Keep saving, gold is a great long-term investment!',
+    'insight_gold_profit' => 'Your portfolio is up by :percentage%!',
+    'insight_goal_near' => 'You are :percentage% to your :goal goal.',
+    'insight_goal_general' => 'You are getting closer to your goals.',
+    'insight_average_cost' => 'Your average cost is :cost/g.',
+    'insight_average_cost_general' => 'Monitor prices for the best buying time.',
     'upgrade_for_multi_wallets' => 'upgrade_for_multi_wallets',
     'wallet_created_successfully' => 'Wallet created successfully.',
     'wallet_updated_successfully' => 'Wallet updated successfully.',

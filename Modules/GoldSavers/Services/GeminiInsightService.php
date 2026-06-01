@@ -18,7 +18,7 @@ class GeminiInsightService
         $apiKey = count($keys) > 0 ? $keys[array_rand($keys)] : env('GEMINI_API_KEY');
         
         if (!$apiKey) {
-            return $this->fallbackInsights();
+            return $this->fallbackInsights($wallets, $portfolioData);
         }
 
         $language = app()->getLocale() == 'ar' ? 'Arabic' : 'English';
@@ -68,15 +68,57 @@ Wallets data:
             Log::error('Gemini Service Exception', ['message' => $e->getMessage()]);
         }
 
-        return $this->fallbackInsights();
+        return $this->fallbackInsights($wallets, $portfolioData);
     }
 
-    private function fallbackInsights()
+    private function fallbackInsights($wallets = null, $portfolioData = null)
     {
-        return [
-            ['icon' => 'TrendingUp', 'text' => __('gold_saver.insight_gold_up') ?? 'Keep saving!'],
-            ['icon' => 'Target', 'text' => __('gold_saver.insight_goal_near') ?? 'You are getting closer to your goals.'],
-            ['icon' => 'Lightbulb', 'text' => __('gold_saver.insight_average_cost') ?? 'Monitor prices for best buying time.'],
-        ];
+        $insights = [];
+
+        // 1. Growth/Profit Insight
+        $profitPercentage = ($portfolioData && isset($portfolioData['total_invested']) && $portfolioData['total_invested'] > 0) 
+            ? ($portfolioData['total_profit'] / $portfolioData['total_invested']) * 100 
+            : 0;
+
+        if ($profitPercentage > 0) {
+            $insights[] = ['icon' => 'TrendingUp', 'text' => __('gold_saver.insight_gold_profit', ['percentage' => number_format($profitPercentage, 1)])];
+        } else {
+            $insights[] = ['icon' => 'TrendingUp', 'text' => __('gold_saver.insight_gold_up')];
+        }
+
+        // 2. Goal Near Insight
+        $closestWallet = null;
+        $highestProgress = 0;
+        
+        if ($wallets) {
+            foreach ($wallets as $wallet) {
+                if ($wallet->target_grams > 0) {
+                    $progress = ($wallet->balance_grams / $wallet->target_grams) * 100;
+                    if ($progress > $highestProgress) {
+                        $highestProgress = $progress;
+                        $closestWallet = $wallet;
+                    }
+                }
+            }
+        }
+
+        if ($closestWallet && $highestProgress > 0) {
+            $insights[] = ['icon' => 'Target', 'text' => __('gold_saver.insight_goal_near', [
+                'percentage' => number_format(min($highestProgress, 100), 0),
+                'goal' => $closestWallet->name
+            ])];
+        } else {
+            $insights[] = ['icon' => 'Target', 'text' => __('gold_saver.insight_goal_general')];
+        }
+
+        // 3. Average Cost Insight
+        if ($portfolioData && isset($portfolioData['total_grams'], $portfolioData['total_invested']) && $portfolioData['total_grams'] > 0) {
+            $avgCost = $portfolioData['total_invested'] / $portfolioData['total_grams'];
+            $insights[] = ['icon' => 'Lightbulb', 'text' => __('gold_saver.insight_average_cost', ['cost' => number_format($avgCost, 2)])];
+        } else {
+            $insights[] = ['icon' => 'Lightbulb', 'text' => __('gold_saver.insight_average_cost_general')];
+        }
+
+        return $insights;
     }
 }

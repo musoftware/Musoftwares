@@ -4,6 +4,13 @@ import { Head, router } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/Components/ui/select";
 import GoldSaversTabs from '../Components/GoldSaversTabs';
 import { formatNumber } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
@@ -105,42 +112,28 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                     
                     {/* Header Stats */}
                     {wallets.length > 0 && (
-                        <motion.div 
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
-                        >
-                            <Card className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-none shadow-lg">
-                                <CardContent className="p-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-3 bg-white/20 rounded-full">
-                                            <Scale className="w-6 h-6 text-white" />
-                                        </div>
-                                        <div>
-                                            <p className="text-indigo-100 text-sm font-medium">{__('Total Gold Saved')}</p>
-                                            <h3 className="text-3xl font-bold">{totalGrams.toFixed(2)} {__('G')}</h3>
-                                        </div>
-                                    </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">{__('Total Gold Saved')}</CardTitle>
+                                    <Scale className="w-4 h-4 text-muted-foreground" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{totalGrams.toFixed(2)} {__('G')}</div>
                                 </CardContent>
                             </Card>
                             
                             {hasGoalTracking && (
-                                <Card className="bg-white border-indigo-100 shadow-sm relative overflow-hidden">
-                                    <CardContent className="p-6">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div>
-                                                <p className="text-muted-foreground text-sm font-medium">{__('Overall Goals Progress')}</p>
-                                                <h3 className="text-2xl font-bold text-slate-800">{overallProgress.toFixed(1)}%</h3>
-                                            </div>
-                                            <div className="p-2 bg-indigo-50 text-indigo-600 rounded-full">
-                                                <Target className="w-5 h-5" />
-                                            </div>
-                                        </div>
+                                <Card>
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                        <CardTitle className="text-sm font-medium">{__('Overall Goals Progress')}</CardTitle>
+                                        <Target className="w-4 h-4 text-muted-foreground" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold">{overallProgress.toFixed(1)}%</div>
                                         <div className="w-full bg-slate-100 rounded-full h-2 mt-4">
-                                            <motion.div 
-                                                initial={{ width: 0 }}
-                                                animate={{ width: `${Math.min(overallProgress, 100)}%` }}
-                                                transition={{ duration: 1, delay: 0.2 }}
+                                            <div 
+                                                style={{ width: `${Math.min(overallProgress, 100)}%` }}
                                                 className="bg-indigo-600 h-2 rounded-full" 
                                             />
                                         </div>
@@ -148,17 +141,17 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                 </Card>
                             )}
 
-                            <Card className="bg-white border-slate-200 shadow-sm flex items-center justify-center p-6 border-dashed">
+                            <Card className="flex flex-col items-center justify-center p-6 border-dashed">
                                 <div className="text-center">
                                     <p className="text-muted-foreground mb-4">{__('Active Wallets')}: <span className="font-bold text-indigo-600">{wallets.length}</span></p>
                                     {(!wallets.length || hasMultiWallets) && (
-                                        <Button onClick={() => setIsCreating(!isCreating)} className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
+                                        <Button onClick={() => setIsCreating(!isCreating)} variant="outline" className="gap-2">
                                             <Plus className="w-4 h-4" /> {isCreating ? __('Cancel') : __('Create New Wallet')}
                                         </Button>
                                     )}
                                 </div>
                             </Card>
-                        </motion.div>
+                        </div>
                     )}
 
                     {/* Filters Bar */}
@@ -176,28 +169,30 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                             <div className="flex gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
                                 <div className="flex items-center gap-2">
                                     <LayoutGrid className="w-4 h-4 text-slate-400" />
-                                    <select 
-                                        className="border-slate-200 rounded-md text-sm focus:border-indigo-500 focus:ring-indigo-500 bg-slate-50"
-                                        value={goalFilter}
-                                        onChange={(e) => setGoalFilter(e.target.value)}
-                                    >
-                                        {goalTypes.map(type => (
-                                            <option key={type} value={type}>{__(type)}</option>
-                                        ))}
-                                    </select>
+                                    <Select value={goalFilter} onValueChange={(value) => setGoalFilter(value)}>
+                                        <SelectTrigger className="w-[180px] bg-slate-50 border-slate-200">
+                                            <SelectValue placeholder={__('Filter by Goal')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {goalTypes.map(type => (
+                                                <SelectItem key={type} value={type}>{__(type)}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <ArrowUpDown className="w-4 h-4 text-slate-400" />
-                                    <select 
-                                        className="border-slate-200 rounded-md text-sm focus:border-indigo-500 focus:ring-indigo-500 bg-slate-50"
-                                        value={sortBy}
-                                        onChange={(e) => setSortBy(e.target.value)}
-                                    >
-                                        <option value="recent">{__('Recent')}</option>
-                                        <option value="balance_desc">{__('Highest Balance')}</option>
-                                        <option value="balance_asc">{__('Lowest Balance')}</option>
-                                        {hasGoalTracking && <option value="target_progress">{__('Closest to Goal')}</option>}
-                                    </select>
+                                    <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>
+                                        <SelectTrigger className="w-[180px] bg-slate-50 border-slate-200">
+                                            <SelectValue placeholder={__('Sort by')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="recent">{__('Recent')}</SelectItem>
+                                            <SelectItem value="balance_desc">{__('Highest Balance')}</SelectItem>
+                                            <SelectItem value="balance_asc">{__('Lowest Balance')}</SelectItem>
+                                            {hasGoalTracking && <SelectItem value="target_progress">{__('Closest to Goal')}</SelectItem>}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
                         </div>
@@ -230,18 +225,22 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                             </div>
                                             <div className="space-y-2 flex-1 w-full">
                                                 <label className="text-sm font-medium text-slate-700">{__('Goal Type')}</label>
-                                                <select 
-                                                    className="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-white"
-                                                    value={newWallet.goal_type}
-                                                    onChange={e => setNewWallet({...newWallet, goal_type: e.target.value})}
+                                                <Select 
+                                                    value={newWallet.goal_type} 
+                                                    onValueChange={value => setNewWallet({...newWallet, goal_type: value})}
                                                 >
-                                                    <option value="Investment">{__('Investment')}</option>
-                                                    <option value="Wedding">{__('Wedding')}</option>
-                                                    <option value="Emergency">{__('Emergency')}</option>
-                                                    <option value="Kids">{__('Kids Savings')}</option>
-                                                    <option value="Hajj">{__('Hajj / Umrah')}</option>
-                                                    <option value="Retirement">{__('Retirement')}</option>
-                                                </select>
+                                                    <SelectTrigger className="w-full bg-white">
+                                                        <SelectValue placeholder={__('Select Goal Type')} />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="Investment">{__('Investment')}</SelectItem>
+                                                        <SelectItem value="Wedding">{__('Wedding')}</SelectItem>
+                                                        <SelectItem value="Emergency">{__('Emergency')}</SelectItem>
+                                                        <SelectItem value="Kids">{__('Kids Savings')}</SelectItem>
+                                                        <SelectItem value="Hajj">{__('Hajj / Umrah')}</SelectItem>
+                                                        <SelectItem value="Retirement">{__('Retirement')}</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
                                             </div>
                                             {hasGoalTracking && (
                                                 <div className="space-y-2 flex-1 w-full">
@@ -300,54 +299,41 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                     onClick={() => router.get(route('isaas.gold-savers.wallets.show', wallet.id))} 
                                     className="cursor-pointer group h-full"
                                 >
-                                    <Card className="h-full hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-100 transition-all duration-300 border-transparent hover:border-indigo-200 bg-white/50 backdrop-blur-sm relative overflow-hidden">
-                                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-400 to-purple-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                        <CardHeader className="pb-3 border-b border-slate-100/50">
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <CardTitle className="flex items-center gap-2 group-hover:text-indigo-700 transition-colors">
-                                                        <div className="p-2 bg-indigo-50 rounded-lg group-hover:bg-indigo-100 transition-colors">
-                                                            <Wallet className="w-5 h-5 text-indigo-600 group-hover:scale-110 transition-transform" />
-                                                        </div>
-                                                        {wallet.name}
-                                                    </CardTitle>
-                                                    <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-slate-100 text-slate-800 hover:bg-slate-200 mt-3">
-                                                        {__(wallet.goal_type)}
-                                                    </div>
-                                                </div>
+                                    <Card className="h-full hover:shadow-md transition-all duration-300">
+                                        <CardHeader>
+                                            <CardTitle className="flex items-center gap-2">
+                                                <Wallet className="w-5 h-5 text-muted-foreground" />
+                                                {wallet.name}
+                                            </CardTitle>
+                                            <div className="text-xs font-semibold text-muted-foreground mt-1">
+                                                {__(wallet.goal_type)}
                                             </div>
                                         </CardHeader>
-                                        <CardContent className="pt-6 space-y-4">
+                                        <CardContent className="space-y-4">
                                             <div className="flex justify-between items-end">
                                                 <div>
-                                                    <div className="text-sm text-slate-500 font-medium mb-1">{__('Current Balance')}</div>
-                                                    <div className="text-3xl font-bold text-slate-800">{wallet.balance_grams} <span className="text-lg text-slate-500 font-normal">{__('G')}</span></div>
-                                                    <div className="text-sm text-slate-500 mt-1">{formatNumber(wallet.balance_amount)} {wallet.currency}</div>
+                                                    <div className="text-sm font-medium text-muted-foreground mb-1">{__('Current Balance')}</div>
+                                                    <div className="text-2xl font-bold">{wallet.balance_grams} <span className="text-sm text-muted-foreground font-normal">{__('G')}</span></div>
+                                                    <div className="text-sm text-muted-foreground mt-1">{formatNumber(wallet.balance_amount)} {wallet.currency}</div>
                                                 </div>
                                             </div>
 
                                             {/* Progress Bar */}
                                             {hasGoalTracking && wallet.target_grams > 0 && (
-                                                <div className="mt-6 pt-6 border-t border-slate-100">
+                                                <div className="mt-4 pt-4 border-t">
                                                     <div className="flex justify-between text-sm mb-2">
-                                                        <span className="text-slate-500 font-medium flex items-center gap-1"><Target className="w-4 h-4"/> {__('Goal')}</span>
+                                                        <span className="text-muted-foreground font-medium flex items-center gap-1"><Target className="w-4 h-4"/> {__('Goal')}</span>
                                                         <span className="font-semibold">{((wallet.balance_grams / wallet.target_grams) * 100).toFixed(1)}%</span>
                                                     </div>
-                                                    <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-                                                        <motion.div 
-                                                            initial={{ width: 0 }}
-                                                            whileInView={{ width: `${Math.min((wallet.balance_grams / wallet.target_grams) * 100, 100)}%` }}
-                                                            viewport={{ once: true }}
-                                                            transition={{ duration: 1, delay: 0.2 }}
-                                                            className="bg-gradient-to-r from-indigo-500 to-indigo-600 h-full rounded-full relative" 
-                                                        >
-                                                            <div className="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
-                                                        </motion.div>
+                                                    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                                        <div 
+                                                            style={{ width: `${Math.min((wallet.balance_grams / wallet.target_grams) * 100, 100)}%` }}
+                                                            className="bg-indigo-600 h-full rounded-full" 
+                                                        />
                                                     </div>
-                                                    <div className="text-xs text-right text-slate-400 mt-1">{wallet.target_grams} {__('G')} {__('Target')}</div>
+                                                    <div className="text-xs text-right text-muted-foreground mt-1">{wallet.target_grams} {__('G')} {__('Target')}</div>
                                                 </div>
                                             )}
-
                                         </CardContent>
                                     </Card>
                                 </motion.div>

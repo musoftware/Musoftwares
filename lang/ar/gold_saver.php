@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'gold_saver_portfolio' => 'محفظة مدخرات الذهب',
@@ -106,9 +106,12 @@ return [
     'buy_gold' => 'شراء الذهب',
     'sell_gold' => 'بيع الذهب',
     'withdraw_gold' => 'سحب الذهب',
-    'insight_gold_up' => 'الذهب ارتفع بنسبة 2% هذا الأسبوع.',
-    'insight_goal_near' => 'أنت على بعد 80% من هدف زفافك.',
-    'insight_average_cost' => 'متوسط تكلفتك هو 50 دولار/جرام.',
+    'insight_gold_up' => 'استمر في الادخار، الذهب استثمار رائع على المدى الطويل!',
+    'insight_gold_profit' => 'محفظتك ارتفعت بنسبة :percentage%!',
+    'insight_goal_near' => 'أنت على بعد :percentage% من هدف :goal.',
+    'insight_goal_general' => 'أنت تقترب من أهدافك.',
+    'insight_average_cost' => 'متوسط التكلفة الخاص بك هو :cost/جرام.',
+    'insight_average_cost_general' => 'راقب الأسعار لمعرفة أفضل وقت للشراء.',
     'upgrade_for_multi_wallets' => 'يرجى الترقية لإضافة محافظ متعددة.',
     'wallet_created_successfully' => 'تم إنشاء المحفظة بنجاح.',
     'wallet_updated_successfully' => 'تم تحديث المحفظة بنجاح.',
