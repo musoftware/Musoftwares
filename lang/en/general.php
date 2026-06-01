@@ -4627,4 +4627,19 @@ return [
   'approx_usd' => 'Approx USD',
   'enter_details_to_calculate' => 'Enter details to calculate...',
   'add_service_charge' => 'Add Service Charge',
+
+  // Pay Service Modal
+  'pay_service' => 'Pay Service',
+  'pay_service_desc' => 'Record a service payment for this invoice.',
+  'service_pay_source' => 'Payment Source',
+  'service_pay_dest' => 'Payment Destination',
+  'revenue' => 'Revenue Margin',
+  'calculation_preview' => 'Calculation Preview',
+  'service_cost' => 'Service Cost',
+  'invoice_total_addition' => 'Total Addition to Invoice',
+  'business_currency_total' => 'Total in Base Currency',
+  'enter_details_to_preview' => 'Enter details to preview calculation...',
+  'save_service' => 'Save Service',
+  'calculating' => 'Calculating',
+  'cib_swype' => 'CIB Swype',
 ];
