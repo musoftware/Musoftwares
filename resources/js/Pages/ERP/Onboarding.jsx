@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { CurrencySelect } from '@/Components/CurrencySelect';
 
 export default function Onboarding({ currencies = [] }) {
     const [step, setStep] = useState(1);
@@ -81,30 +82,19 @@ export default function Onboarding({ currencies = [] }) {
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="baseCurrency">{__('general.base_currency')}</Label>
-                                        <select
+                                        <CurrencySelect
                                             id="baseCurrency"
+                                            currencies={currencies}
                                             value={data.baseCurrency}
-                                            onChange={e => {
+                                            onChange={(val) => {
                                                 setData(data => ({
                                                     ...data,
-                                                    baseCurrency: e.target.value,
-                                                    clientCurrency: e.target.value
+                                                    baseCurrency: val,
+                                                    clientCurrency: val
                                                 }));
                                             }}
-                                            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                        >
-                                            {currencies.map(c => (
-                                                <option key={c.id} value={c.currency}>{c.currency} ({c.symbol})</option>
-                                            ))}
-                                            {currencies.length === 0 && (
-                                                <>
-                                                    <option value="USD">USD ($)</option>
-                                                    <option value="EUR">EUR (€)</option>
-                                                    <option value="GBP">GBP (£)</option>
-                                                    <option value="EGP">EGP (E£)</option>
-                                                </>
-                                            )}
-                                        </select>
+                                            valueKey="currency"
+                                        />
                                         {errors.baseCurrency && <p className="text-xs text-destructive">{errors.baseCurrency}</p>}
                                     </div>
                                     <div className="space-y-2">
@@ -161,24 +151,13 @@ export default function Onboarding({ currencies = [] }) {
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="clientCurrency">Currency</Label>
-                                        <select
+                                        <CurrencySelect
                                             id="clientCurrency"
+                                            currencies={currencies}
                                             value={data.clientCurrency}
-                                            onChange={e => setData('clientCurrency', e.target.value)}
-                                            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                                        >
-                                            {currencies.map(c => (
-                                                <option key={c.id} value={c.currency}>{c.currency} ({c.symbol})</option>
-                                            ))}
-                                            {currencies.length === 0 && (
-                                                <>
-                                                    <option value="USD">USD ($)</option>
-                                                    <option value="EUR">EUR (€)</option>
-                                                    <option value="GBP">GBP (£)</option>
-                                                    <option value="EGP">EGP (E£)</option>
-                                                </>
-                                            )}
-                                        </select>
+                                            onChange={val => setData('clientCurrency', val)}
+                                            valueKey="currency"
+                                        />
                                     </div>
                                 </div>
                                 <div className="flex gap-3">

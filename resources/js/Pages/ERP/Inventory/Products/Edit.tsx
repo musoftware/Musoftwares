@@ -3,6 +3,7 @@ import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import InputError from '@/components/InputError';
+import { CurrencySelect } from '@/Components/CurrencySelect';
 import { __ } from '@/lib/i18n';
 
 export default function Edit({ product, currencies, categories, hasMultiCurrency, stockLogs }: { product: any, currencies: any[], categories: any[], hasMultiCurrency: boolean, stockLogs?: any[] }) {
@@ -93,20 +94,11 @@ export default function Edit({ product, currencies, categories, hasMultiCurrency
                                         <label htmlFor="currency_id" className="block text-sm font-medium text-gray-700">
                                             {t('erp.currency', 'Currency')}
                                         </label>
-                                        <select
-                                            id="currency_id"
+                                        <CurrencySelect 
+                                            currencies={currencies}
                                             value={data.currency_id}
-                                            onChange={(e) => setData('currency_id', e.target.value)}
-                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                            required
-                                        >
-                                            <option value="">{t('erp.select_currency', 'Select Currency')}</option>
-                                            {currencies.map((currency) => (
-                                                <option key={currency.id} value={currency.id}>
-                                                    {currency.currency} - {currency.symbol}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            onChange={(val) => setData('currency_id', val)}
+                                        />
                                     <InputError message={errors.currency_id} className="mt-2" />
                                 </div>
                             )}

@@ -64,7 +64,10 @@ export default function HoursCalendar({ years, auth }: any) {
         
         const currentDate = new Date(startDate);
         while (currentDate <= endDate) {
-            const dateString = currentDate.toISOString().slice(0, 10);
+            const yearStr = currentDate.getFullYear();
+            const monthStr = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const dayStr = String(currentDate.getDate()).padStart(2, '0');
+            const dateString = `${yearStr}-${monthStr}-${dayStr}`;
             days.push({
                 date: dateString,
                 count: dataMap[dateString] || 0,
@@ -100,7 +103,7 @@ export default function HoursCalendar({ years, auth }: any) {
         
         for (let month = 0; month < 12; month++) {
             const firstDay = new Date(year, month, 1);
-            const firstDayIndex = Math.floor((firstDay.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+            const firstDayIndex = Math.round((firstDay.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
             const firstGridIndex = firstDayIndex + startDayOfWeek;
             const weekStart = Math.floor(firstGridIndex / 7) + 1;
             
@@ -229,7 +232,7 @@ export default function HoursCalendar({ years, auth }: any) {
                                 </div>
                                 
                                 <div 
-                                    className="grid gap-[3px] flex-1" 
+                                    className="grid grid-flow-col gap-[3px] flex-1" 
                                     style={{ 
                                         gridTemplateColumns: `repeat(${weeksCount}, minmax(12px, 1fr))`,
                                         gridTemplateRows: 'repeat(7, 1fr)'

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Trash2, Plus, Wand2, Calculator, Search, X } from 'lucide-react';
 import { Switch } from '@/Components/ui/switch';
 import { toast } from 'sonner';
+import { CurrencySelect } from '@/Components/CurrencySelect';
 import { __ } from '@/lib/i18n';
 
 interface PricingItem {
@@ -281,17 +282,12 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <Label htmlFor="currency_id">Currency</Label>
-                                    <Select value={data.currency_id.toString()} onValueChange={v => setData('currency_id', parseInt(v))}>
-                                        <SelectTrigger>
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {currencies.map(c => (
-                                                <SelectItem key={c.id} value={c.id.toString()}>{c.symbol} ({c.name})</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <CurrencySelect 
+                                        currencies={currencies as any[]}
+                                        value={data.currency_id}
+                                        onChange={(val) => setData('currency_id', parseInt(val))}
+                                        valueKey="id"
+                                    />
                                 </div>
                                 <div>
                                     <Label htmlFor="total_amount">{__('general.total_amount')}</Label>

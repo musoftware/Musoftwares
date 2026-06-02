@@ -20,7 +20,7 @@ interface CheckoutSession {
     created_at: string;
     expires_at: string | null;
     currency: {
-        code: string;
+        currency: string;
         symbol: string;
     } | null;
 }
@@ -80,7 +80,7 @@ export default function CheckoutSessions({ sessions }: Props) {
                                                 {session.is_test && <Badge variant="outline" className="ml-2 bg-amber-50 text-amber-600 border-amber-200">Test</Badge>}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">
-                                                {formatMoney(session.amount, session.currency?.code || 'EGP')}
+                                                {formatMoney(session.amount, session.currency?.currency || 'EGP')}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                                                 {session.customer_name || '—'}

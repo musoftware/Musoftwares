@@ -53,7 +53,10 @@ class GuestInvoiceController extends Controller
             return redirect()->back()->with('error', __('general.invoice_total_zero'));
         }
 
-        $currency = $invoice->currency ? $invoice->currency->code : 'EGP';
+        if (!$invoice->currency) {
+            throw new \Exception("Invoice {$invoice->id} is missing an associated currency relation.");
+        }
+        $currency = $invoice->currency->currency;
 
         $paymentUrl = KashierHelper::buildInvoiceGuestPaymentUrl(
             $amount,

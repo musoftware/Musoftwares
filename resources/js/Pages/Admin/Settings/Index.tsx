@@ -15,6 +15,7 @@ import {
     RefreshCw,
     Lightbulb,
 } from 'lucide-react';
+import { CurrencySelect } from '@/Components/CurrencySelect';
 
 interface Currency {
     id: number;
@@ -237,19 +238,13 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                                         placeholder="22.5"
                                     />
                                 </Field>
-                                <SelectField
+                                <CurrencySelect 
                                     label={__('general.client_default_currency')}
-                                    name="business_currency"
+                                    currencies={currencies} 
                                     value={form.business_currency ?? ''}
                                     onChange={(v) => set('business_currency', v)}
-                                >
-                                    <option value="">-- select --</option>
-                                    {currencies.map((c) => (
-                                        <option key={c.id} value={String(c.id)}>
-                                            {c.currency}
-                                        </option>
-                                    ))}
-                                </SelectField>
+                                    valueKey="currency"
+                                />
                             </div>
                         </div>
                     </SectionCard>
@@ -431,18 +426,12 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                                     required
                                 />
                             </Field>
-                            <SelectField
+                            <CurrencySelect
                                 label="Currency"
-                                name="bulk_currency"
+                                currencies={currencies}
                                 value={bulkCurrency}
                                 onChange={setBulkCurrency}
-                            >
-                                {currencies.map((c) => (
-                                    <option key={c.id} value={String(c.id)}>
-                                        {c.currency}{c.symbol ? ` (${c.symbol})` : ''}
-                                    </option>
-                                ))}
-                            </SelectField>
+                            />
                         </div>
                         <div className="flex items-center gap-2">
                             <input

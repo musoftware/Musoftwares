@@ -31,6 +31,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
+import { CurrencySelect } from '@/Components/CurrencySelect';
 import { __ } from '@/lib/i18n';
 
 interface Task {
@@ -779,18 +780,12 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                             {/* Cost Currency */}
                             <div className="space-y-1.5 col-span-1">
                                 <Label htmlFor="todo_currency" className="text-xs font-semibold text-foreground">Currency</Label>
-                                <select
-                                    id="todo_currency"
+                                <CurrencySelect 
+                                    currencies={currencies}
                                     value={todoData.cost_currency}
-                                    onChange={(e) => setTodoData({ ...todoData, cost_currency: e.target.value })}
-                                    className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
-                                >
-                                    {currencies.map((c) => (
-                                        <option key={c.id} value={c.currency}>
-                                            {c.currency} ({c.symbol})
-                                        </option>
-                                    ))}
-                                </select>
+                                    onChange={(val) => setTodoData({ ...todoData, cost_currency: val })}
+                                    valueKey="currency"
+                                />
                             </div>
                         </div>
 

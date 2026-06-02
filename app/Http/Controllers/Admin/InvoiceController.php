@@ -531,6 +531,45 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Reschedule an invoice by updating its created_at date.
+     */
+    public function reschedule(Request $request, Invoice $invoice)
+    {
+        if (!in_array($invoice->status, ['unpaid', 'partially_paid'])) {
+            return redirect()->back()->with('error', __('admin.only_unpaid_can_be_rescheduled'));
+        }
+
+        $request->validate([
+            'new_date' => 'required|date',
+            'notify_client' => 'nullable|boolean'
+        ]);
+
+        try {
+            $newDate = \Carbon\Carbon::parse($request->new_date);
+            // Keep the current time, just change the date
+            $currentDate = \Carbon\Carbon::parse($invoice->created_at);
+            $newDate->setTime($currentDate->hour, $currentDate->minute, $currentDate->second);
+
+            $invoice->created_at = $newDate;
+            $invoice->clearSchedule();
+            $invoice->save();
+
+            if ($request->boolean('notify_client')) {
+                $reminderService = app(\App\Services\WhatsAppNotificationService::class);
+                $client = $invoice->user;
+                if ($client) {
+                    $reminderService->sendInvoiceReminder($client, collect([$invoice]));
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Invoice reschedule failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', __('general.error_occurred'));
+        }
+
+        return redirect()->back()->with('success', __('admin.invoice_rescheduled_successfully'));
+    }
+
+    /**
      * Record a partial payment on an invoice.
      */
     public function partialPay(Request $request, Invoice $invoice)

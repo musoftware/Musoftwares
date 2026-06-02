@@ -133,4 +133,40 @@ return [
     'paid' => 'مدفوع',
     'base_system_rate' => 'سعر النظام الأساسي',
     'client_rate' => 'سعر المستخدم',
+    
+    // Subscription Assignment
+    'add_subscription' => 'إضافة اشتراك',
+    'select_user' => 'اختيار مستخدم',
+    'select_user_to_assign_subscription' => 'اختر المستخدم الذي ترغب في تعيين الاشتراك له.',
+    'search_users_placeholder' => 'ابحث عن المستخدمين بالاسم، البريد الإلكتروني، أو الهاتف...',
+    'select_service' => 'اختيار الخدمة',
+    'select_service_to_assign' => 'اختر الخدمة، الإضافة، أو الأداة.',
+    'subscription_duration' => 'مدة الاشتراك',
+    'user_has_active_subscription' => 'هذا المستخدم لديه اشتراك نشط ينتهي في :date.',
+    'extend_expiration_date' => 'تمديد تاريخ الانتهاء',
+    'replace_expiration_date' => 'استبدال تاريخ الانتهاء',
+    '1_month' => 'شهر واحد',
+    '6_months' => '6 أشهر',
+    '1_year' => 'سنة واحدة',
+    'lifetime' => 'مدى الحياة',
+    'expiration_date' => 'تاريخ الانتهاء',
+    'subscription_assigned_successfully' => 'تم تعيين الاشتراك بنجاح.',
+
+    // Point Packages
+    'point_packages' => 'باقات النقاط',
+    'create_point_package' => 'إنشاء باقة نقاط',
+    'edit_point_package' => 'تعديل باقة النقاط',
+    'package_name' => 'اسم الباقة',
+    'points_amount' => 'عدد النقاط',
+    'point_package_created' => 'تم إنشاء باقة النقاط بنجاح.',
+    'point_package_updated' => 'تم تحديث باقة النقاط بنجاح.',
+    'point_package_deleted' => 'تم حذف باقة النقاط بنجاح.',
+    'manage_point_packages' => 'إدارة وإنشاء باقات النقاط التي يمكن للمستخدمين شراؤها.',
+    
+    // Reschedule Invoice
+    'reschedule_invoice' => 'إعادة جدولة الفاتورة',
+    'new_invoice_date' => 'تاريخ الفاتورة الجديد',
+    'notify_client' => 'إشعار العميل عبر الواتساب',
+    'invoice_rescheduled_successfully' => 'تمت إعادة جدولة الفاتورة بنجاح.',
+    'only_unpaid_can_be_rescheduled' => 'يمكن فقط إعادة جدولة الفواتير غير المدفوعة أو المدفوعة جزئياً.',
 ];

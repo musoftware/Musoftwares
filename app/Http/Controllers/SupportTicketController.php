@@ -94,9 +94,11 @@ class SupportTicketController extends Controller
     public function resolve($id)
     {
         $ticket = Ticket::findOrFail($id);
+        $user = Auth::user();
 
         // Authorize (only owner or admin)
-        if (Auth::id() !== $ticket->user_id && !Auth::user()->hasRole('admin')) {
+        $isAdmin = $user && ($user->hasRole(['admin', 'Admin']) || $user->roles->contains('name', 'Admin'));
+        if (!$user || ($user->id !== $ticket->user_id && !$isAdmin)) {
             abort(403);
         }
 
@@ -114,8 +116,10 @@ class SupportTicketController extends Controller
     public function close($id)
     {
         $ticket = Ticket::findOrFail($id);
+        $user = Auth::user();
 
-        if (Auth::id() !== $ticket->user_id && !Auth::user()->hasRole('admin')) {
+        $isAdmin = $user && ($user->hasRole(['admin', 'Admin']) || $user->roles->contains('name', 'Admin'));
+        if (!$user || ($user->id !== $ticket->user_id && !$isAdmin)) {
             abort(403);
         }
 
@@ -133,8 +137,10 @@ class SupportTicketController extends Controller
     public function destroy($id)
     {
         $ticket = Ticket::findOrFail($id);
+        $user = Auth::user();
 
-        if (Auth::id() !== $ticket->user_id && !Auth::user()->hasRole('admin')) {
+        $isAdmin = $user && ($user->hasRole(['admin', 'Admin']) || $user->roles->contains('name', 'Admin'));
+        if (!$user || ($user->id !== $ticket->user_id && !$isAdmin)) {
             abort(403);
         }
 

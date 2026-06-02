@@ -51,7 +51,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                 onSuccess: () =>
                     setSelectedTicket((prev) =>
                         prev?.id === id
-                            ? { ...prev, status: 'Resolved' }
+                            ? { ...prev, ticket_status: 'closed' }
                             : prev,
                     ),
             },
@@ -60,18 +60,18 @@ export default function TicketsIndex({ tickets, isAdmin }) {
 
     const columns = [
         { key: 'id', label: 'ID', render: (row) => <span className="font-medium text-gray-900 font-mono">#{row.id}</span> },
-        { key: 'subject', label: 'Subject', render: (row) => <span className="font-medium">{row.subject}</span> },
+        { key: 'subject', label: 'Subject', render: (row) => <span className="font-medium">{row.ticket_subject || row.subject || row.title}</span> },
         ...(isAdmin ? [{ key: 'client', label: 'Client', render: (row) => <span className="text-gray-600">{row.user?.name}</span> }] : []),
-        { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.status} /> },
+        { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.ticket_status || row.status || 'open'} /> },
         {
             key: 'priority',
             label: 'Priority',
             render: (row) => (
                 <span
                     className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                        row.priority === 'High'
+                        row.priority?.toLowerCase() === 'high'
                             ? 'bg-red-50 text-red-700 border border-red-200/50'
-                            : row.priority === 'Medium'
+                            : row.priority?.toLowerCase() === 'medium'
                               ? 'bg-amber-50 text-amber-700 border border-amber-200/50'
                               : 'bg-emerald-50 text-emerald-700 border border-emerald-200/50'
                     }`}
@@ -97,8 +97,9 @@ export default function TicketsIndex({ tickets, isAdmin }) {
 
     const filteredTickets =
         tickets?.data?.filter((ticket) => {
-            if (filterStatus && ticket.status !== filterStatus) return false;
-            if (filterPriority && ticket.priority !== filterPriority)
+            const tStatus = ticket.ticket_status || ticket.status;
+            if (filterStatus && tStatus !== filterStatus) return false;
+            if (filterPriority && ticket.priority?.toLowerCase() !== filterPriority.toLowerCase())
                 return false;
             return true;
         }) || tickets?.data || [];
@@ -140,9 +141,9 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                 className="h-9 w-full rounded-md border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
                             >
                                 <option value="">{__('general.all_statuses')}</option>
-                                <option value="Open">Open</option>
-                                <option value="In Progress">{__('general.in_progress')}</option>
-                                <option value="Resolved">Resolved</option>
+                                <option value="open">Open</option>
+                                <option value="in_progress">{__('general.in_progress')}</option>
+                                <option value="closed">Resolved</option>
                             </select>
                             <select
                                 value={filterPriority}
@@ -257,9 +258,9 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                             <div className="space-y-1">
                                 <div className="flex items-center gap-3">
                                     <h2 className="text-lg font-semibold tracking-tight text-gray-900">
-                                        #{selectedTicket.id} - {selectedTicket.subject}
+                                        #{selectedTicket.id} - {selectedTicket.ticket_subject || selectedTicket.subject || selectedTicket.title}
                                     </h2>
-                                    <StatusBadge status={selectedTicket.status} />
+                                    <StatusBadge status={selectedTicket.ticket_status || selectedTicket.status || 'open'} />
                                 </div>
                                 {isAdmin && selectedTicket.user && (
                                     <p className="text-sm text-gray-500 flex items-center gap-1">
@@ -268,7 +269,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                 )}
                             </div>
                             <div className="flex items-center gap-3">
-                                {isAdmin && selectedTicket.status !== 'Resolved' && (
+                                {isAdmin && selectedTicket.ticket_status !== 'closed' && (
                                     <Button
                                         variant="outline"
                                         className="border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
@@ -290,7 +291,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                         name: selectedTicket.user?.name,
                                     },
                                 ]}
-                                readOnly={selectedTicket.status === 'Resolved'}
+                                readOnly={selectedTicket.ticket_status === 'closed'}
                             />
                         </div>
                     </div>

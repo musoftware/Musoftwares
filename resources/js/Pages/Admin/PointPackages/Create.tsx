@@ -4,7 +4,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Checkbox } from '@/Components/ui/checkbox';
+import Checkbox from '@/Components/Checkbox';
 import { ArrowLeft } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
@@ -81,7 +81,7 @@ export default function Create() {
                             <Checkbox
                                 id="is_active"
                                 checked={data.is_active}
-                                onCheckedChange={(checked) => setData('is_active', checked as boolean)}
+                                onChange={(e) => setData('is_active', e.target.checked)}
                             />
                             <Label htmlFor="is_active" className="cursor-pointer">
                                 {__('admin.active')}

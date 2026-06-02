@@ -45,7 +45,10 @@ class GuestPaymentLinkController extends Controller
             return redirect()->back()->with('error', __('general.invoice_total_zero'));
         }
 
-        $currency = $paymentLink->currency ? $paymentLink->currency->code : 'EGP';
+        if (!$paymentLink->currency) {
+            throw new \Exception("Payment link {$paymentLink->id} is missing an associated currency relation.");
+        }
+        $currency = $paymentLink->currency->currency;
 
         $paymentUrl = KashierHelper::buildPaymentLinkUrl(
             $amount,

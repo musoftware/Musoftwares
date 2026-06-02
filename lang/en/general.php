@@ -4724,4 +4724,7 @@ return [
   'payment_successful' => 'Payment Successful',
   'payment_failed' => 'Payment Failed',
   'return_to_home' => 'Return to Home',
+  'password_entered_ready_to_save' => 'Password entered (click to change)',
+  'click_to_change_password' => 'Click to change password',
+  'enter_a_new_password_for_this_user_leave_it_empty_to_keep_the_current_password' => 'Enter a new password for this user. Leave it empty to keep the current password.',
 ];

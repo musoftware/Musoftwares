@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useFreelanceMode } from '@/Components/Freelance/FreelanceModeContext';
 import { cn } from '@/lib/utils';
 import { Zap } from 'lucide-react';
+import { CurrencySelect } from '@/Components/CurrencySelect';
 import { __ } from '@/lib/i18n';
 
 export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 1.00, preferredCurrency = 'USD' }) {
@@ -156,17 +157,12 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                         <div className="flex flex-col sm:flex-row gap-4">
                             <div className="w-full sm:w-1/3">
                                 <label className="block text-sm font-bold text-gray-700 mb-1">{__('Currency')}</label>
-                                <select
-                                    value={data.currency_id ?? ''}
-                                    onChange={e => setData('currency_id', parseInt(e.target.value))}
-                                    className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                >
-                                    {currencies.map(currency => (
-                                        <option key={currency.id} value={currency.id}>
-                                            {currency.currency} ({currency.symbol})
-                                        </option>
-                                    ))}
-                                </select>
+                                <CurrencySelect
+                                    currencies={currencies}
+                                    value={data.currency_id}
+                                    onChange={val => setData('currency_id', parseInt(val))}
+                                    valueKey="id"
+                                />
                             </div>
                             <div className="w-full sm:w-1/3">
                                 <label className="block text-sm font-bold text-gray-700 mb-1">{__('Project Budget')}</label>

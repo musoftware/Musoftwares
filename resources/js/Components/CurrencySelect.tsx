@@ -47,7 +47,7 @@ export function CurrencySelect({
             )}
             <Select 
                 value={value ? String(value) : undefined} 
-                onValueChange={onChange} 
+                onValueChange={(val: any) => onChange(val)} 
                 disabled={disabled}
             >
                 <SelectTrigger 
