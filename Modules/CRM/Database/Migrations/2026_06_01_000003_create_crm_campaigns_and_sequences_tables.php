@@ -8,6 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::dropIfExists('sequence_states');
+        Schema::dropIfExists('sequence_steps');
+        Schema::dropIfExists('sequences');
+        Schema::dropIfExists('campaign_lead');
+        Schema::dropIfExists('campaign_recipients');
+        Schema::dropIfExists('campaign_contents');
+        Schema::dropIfExists('campaigns');
+
         Schema::create('campaigns', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('workspace_id')->nullable();

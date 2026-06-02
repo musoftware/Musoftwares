@@ -4,6 +4,8 @@
     "description": "Customer Relationship Management Module",
     "keywords": [],
     "priority": 0,
-    "providers": [],
+    "providers": [
+        "Modules\\CRM\\Providers\\CRMServiceProvider"
+    ],
     "files": []
 }

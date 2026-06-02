@@ -11,6 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('custom_fields');
+        Schema::dropIfExists('widgets');
+        Schema::dropIfExists('customers');
+        Schema::dropIfExists('pipeline_stages');
+        Schema::dropIfExists('pipelines');
+
         Schema::create('pipelines', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('workspace_id')->nullable();
