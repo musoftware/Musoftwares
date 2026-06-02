@@ -41,6 +41,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'onboarding' => \App\Http\Middleware\EnsureOnboardingCompleted::class,
             'erp.team.permissions' => \Modules\ERP\Http\Middleware\EnforceTeamMemberPermissions::class,
             'reseller.sharing' => \App\Http\Middleware\ResellerSharingGuard::class,
+            'force.json' => \App\Http\Middleware\ForceJsonRequest::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

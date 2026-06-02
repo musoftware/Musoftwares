@@ -4716,4 +4716,12 @@ return [
   'Fri' => 'الجمعة',
   'Sat' => 'السبت',
   'Sun' => 'الأحد',
+  'payment_link_description' => 'يرجى إدخال بياناتك للمتابعة في الدفع.',
+  'full_name' => 'الاسم الكامل',
+  'email_address' => 'البريد الإلكتروني',
+  'pay_now' => 'ادفع الآن',
+  'processing' => 'جاري المعالجة...',
+  'payment_successful' => 'عملية الدفع ناجحة',
+  'payment_failed' => 'فشلت عملية الدفع',
+  'return_to_home' => 'العودة إلى الرئيسية',
 ];

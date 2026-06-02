@@ -43,6 +43,7 @@ const items = [
         { title: "Archived Invoices", url: "/admin/invoices/archive" },
         { title: "All Invoices", url: "/admin/invoices" },
         { title: "Financial Operations", url: "/admin/finance" },
+        { title: "Payment Links", url: "/admin/payment-links" },
         { title: "Hours Calendar", url: "/admin/hours-calendar" },
         { title: "Reports", url: "/admin/reports" },
         { title: "Recurring Costs", url: "/admin/business/recurring/costs" },

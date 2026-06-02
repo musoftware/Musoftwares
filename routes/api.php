@@ -15,9 +15,10 @@ use Illuminate\Support\Facades\Route;
 // Called by client software on startup to verify license status.
 // No authentication — device_id is the identity.
 // Returns: { "status": "active" } or { "status": "inactive" }
-Route::post('serial/device', [\App\Http\Controllers\Api\SerialDeviceController::class, 'register'])
-    ->middleware('throttle:60,1')
-    ->name('api.serial.register');
+
+Route::post('serial/device',
+    [\App\Http\Controllers\Api\SerialDeviceController::class, 'register']
+)->middleware('force.json');
 
 // ── Runtime Version Manifest (public) ─────────────────────────────────────────
 // Polled by local runtime agents to check for updates.
