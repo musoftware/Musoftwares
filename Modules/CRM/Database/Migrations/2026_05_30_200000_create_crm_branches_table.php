@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('crm_user_branches');
+        Schema::dropIfExists('crm_branches');
+
         Schema::create('crm_branches', function (Blueprint $table) {
             $table->id();
             $table->foreignId('workspace_id')->constrained('crm_workspaces')->cascadeOnDelete();
