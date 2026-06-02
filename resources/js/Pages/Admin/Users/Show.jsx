@@ -183,127 +183,154 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                     <div role="button" className="inline-flex cursor-pointer items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-[8px] hover:bg-slate-800 transition shadow-sm text-sm font-semibold select-none">{__('general.quick_actions')}<ChevronDown size={16} />
                     </div>
                 </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuGroup>
-                            <DropdownMenuLabel>{__('general.account_tools')}</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={handleLoginAsUser} disabled={isLoginAsLoading}>
-                                <Briefcase className="mr-2 h-4 w-4" />
-                                <span>{isLoginAsLoading ? 'Logging in...' : 'Login As'}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href={`/admin/users/${client.id}/edit`} className="w-full cursor-pointer flex items-center">
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    <span>{__('general.edit_profile')}</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { setIsResetPassOpen(true); setNewPassword(''); }}>
-                                <Key className="mr-2 h-4 w-4" />
-                                <span>{__('general.reset_password')}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { setSelectedRole(client.role || 'client'); setIsChangeRoleOpen(true); }}>
-                                <ShieldCheck className="mr-2 h-4 w-4" />
-                                <span>{__('general.change_role')}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setIsAssignTaskOpen(true)}>
-                                <Briefcase className="mr-2 h-4 w-4" />
-                                <span>{__('general.assign_task')}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href={`/admin/users/${client.id}/files`} className="w-full cursor-pointer flex items-center">
-                                    <FileText className="mr-2 h-4 w-4" />
-                                    <span>Files</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href={`/admin/users/${client.id}/reports`} className="w-full cursor-pointer flex items-center">
-                                    <FileText className="mr-2 h-4 w-4" />
-                                    <span>Reports</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href={`/admin/users/${client.id}/referrals`} className="w-full cursor-pointer flex items-center">
-                                    <MessageCircle className="mr-2 h-4 w-4" />
-                                    <span>{__('general.manage_referrals')}</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setIsActivateMembershipOpen(true)}>
-                                <Briefcase className="mr-2 h-4 w-4" />
-                                <span>{__('general.activate_membership')}</span>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                            <DropdownMenuLabel>Finance</DropdownMenuLabel>
-                            <DropdownMenuItem asChild>
-                                <Link href={`/admin/invoices/create?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
-                                    <FileText className="mr-2 h-4 w-4" />
-                                    <span>{__('general.new_invoice')}</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href={`/admin/invoices?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
-                                    <FileText className="mr-2 h-4 w-4" />
-                                    <span>Invoices</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href={`/admin/finance?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
-                                    <Wallet className="mr-2 h-4 w-4" />
-                                    <span>{__('general.all_transactions')}</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => {
-                                setWalletTxForm({ ...walletTxForm, type: 'receive' });
-                                setIsWalletModalOpen(true);
-                            }}>
-                                <Wallet className="mr-2 h-4 w-4" />
-                                <span>{__('general.receive_money')}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => {
-                                setWalletTxForm({ ...walletTxForm, type: 'send-money' });
-                                setIsWalletModalOpen(true);
-                            }}>
-                                <Wallet className="mr-2 h-4 w-4" />
-                                <span>{__('general.send_money')}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => {
-                                setWalletTxForm({ ...walletTxForm, type: 'earn' });
-                                setIsWalletModalOpen(true);
-                            }}>
-                                <Wallet className="mr-2 h-4 w-4" />
-                                <span>{__('general.earned_money')}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => {
-                                setWalletTxForm({ ...walletTxForm, type: 'charge' });
-                                setIsWalletModalOpen(true);
-                            }}>
-                                <Wallet className="mr-2 h-4 w-4" />
-                                <span>{__('general.charge_account')}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => {
-                                setWalletTxForm({ ...walletTxForm, type: 'refund' });
-                                setIsWalletModalOpen(true);
-                            }}>
-                                <Wallet className="mr-2 h-4 w-4" />
-                                <span>{__('general.refund_money')}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setIsSwapBudgetOpen(true)}>
-                                <Wallet className="mr-2 h-4 w-4" />
-                                <span>{__('general.swap_budgets')}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <a href={`/admin/users/${client.id}/balance-sheet`} target="_blank" rel="noopener noreferrer" className="w-full cursor-pointer flex items-center">
-                                    <FileText className="mr-2 h-4 w-4" />
-                                    <span>{__('general.due_balance_sheet')}</span>
-                                </a>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            <span>{__('general.delete_user')}</span>
-                        </DropdownMenuItem>
+                    <DropdownMenuContent align="end" className="w-[750px] p-4">
+                        <div className="grid grid-cols-3 gap-6">
+                            {/* Column 1: Profile & Security */}
+                            <div className="space-y-1">
+                                <DropdownMenuLabel className="text-slate-500 uppercase tracking-wider text-xs mb-2">{__('general.profile_and_security') || 'Profile & Security'}</DropdownMenuLabel>
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem onClick={handleLoginAsUser} disabled={isLoginAsLoading}>
+                                        <Briefcase className="mr-2 h-4 w-4" />
+                                        <span>{isLoginAsLoading ? 'Logging in...' : 'Login As'}</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/users/${client.id}/edit`} className="w-full cursor-pointer flex items-center">
+                                            <Edit className="mr-2 h-4 w-4" />
+                                            <span>{__('general.edit_profile')}</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => { setIsResetPassOpen(true); setNewPassword(''); }}>
+                                        <Key className="mr-2 h-4 w-4" />
+                                        <span>{__('general.reset_password')}</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => { setSelectedRole(client.role || 'client'); setIsChangeRoleOpen(true); }}>
+                                        <ShieldCheck className="mr-2 h-4 w-4" />
+                                        <span>{__('general.change_role')}</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                                
+                                <div className="pt-4 mt-4 border-t border-slate-100"></div>
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-700">
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        <span>{__('general.delete_user')}</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                            </div>
+
+                            {/* Column 2: Workspace & Tools */}
+                            <div className="space-y-1">
+                                <DropdownMenuLabel className="text-slate-500 uppercase tracking-wider text-xs mb-2">{__('general.workspace_and_tools') || 'Workspace & Tools'}</DropdownMenuLabel>
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem onClick={() => setIsAssignTaskOpen(true)}>
+                                        <Briefcase className="mr-2 h-4 w-4" />
+                                        <span>{__('general.assign_task')}</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/users/${client.id}/files`} className="w-full cursor-pointer flex items-center">
+                                            <FileText className="mr-2 h-4 w-4" />
+                                            <span>Files</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/users/${client.id}/notes`} className="w-full cursor-pointer flex items-center">
+                                            <ShieldCheck className="mr-2 h-4 w-4" />
+                                            <span>{__('general.secure_notes')}</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/users/${client.id}/reports`} className="w-full cursor-pointer flex items-center">
+                                            <FileText className="mr-2 h-4 w-4" />
+                                            <span>Reports</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/users/${client.id}/referrals`} className="w-full cursor-pointer flex items-center">
+                                            <MessageCircle className="mr-2 h-4 w-4" />
+                                            <span>{__('general.manage_referrals')}</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setIsActivateMembershipOpen(true)}>
+                                        <Briefcase className="mr-2 h-4 w-4" />
+                                        <span>{__('general.activate_membership')}</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                            </div>
+
+                            {/* Column 3: Billing & Finance */}
+                            <div className="space-y-1">
+                                <DropdownMenuLabel className="text-slate-500 uppercase tracking-wider text-xs mb-2">Finance</DropdownMenuLabel>
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/invoices/create?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
+                                            <FileText className="mr-2 h-4 w-4" />
+                                            <span>{__('general.new_invoice')}</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/invoices?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
+                                            <FileText className="mr-2 h-4 w-4" />
+                                            <span>Invoices</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/finance?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
+                                            <Wallet className="mr-2 h-4 w-4" />
+                                            <span>{__('general.all_transactions')}</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                                
+                                <div className="pt-2 mt-2 border-t border-slate-100"></div>
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem onClick={() => {
+                                        setWalletTxForm({ ...walletTxForm, type: 'receive' });
+                                        setIsWalletModalOpen(true);
+                                    }}>
+                                        <Wallet className="mr-2 h-4 w-4" />
+                                        <span>{__('general.receive_money')}</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => {
+                                        setWalletTxForm({ ...walletTxForm, type: 'send-money' });
+                                        setIsWalletModalOpen(true);
+                                    }}>
+                                        <Wallet className="mr-2 h-4 w-4" />
+                                        <span>{__('general.send_money')}</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => {
+                                        setWalletTxForm({ ...walletTxForm, type: 'earn' });
+                                        setIsWalletModalOpen(true);
+                                    }}>
+                                        <Wallet className="mr-2 h-4 w-4" />
+                                        <span>{__('general.earned_money')}</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => {
+                                        setWalletTxForm({ ...walletTxForm, type: 'charge' });
+                                        setIsWalletModalOpen(true);
+                                    }}>
+                                        <Wallet className="mr-2 h-4 w-4" />
+                                        <span>{__('general.charge_account')}</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => {
+                                        setWalletTxForm({ ...walletTxForm, type: 'refund' });
+                                        setIsWalletModalOpen(true);
+                                    }}>
+                                        <Wallet className="mr-2 h-4 w-4" />
+                                        <span>{__('general.refund_money')}</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setIsSwapBudgetOpen(true)}>
+                                        <Wallet className="mr-2 h-4 w-4" />
+                                        <span>{__('general.swap_budgets')}</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <a href={`/admin/users/${client.id}/balance-sheet`} target="_blank" rel="noopener noreferrer" className="w-full cursor-pointer flex items-center">
+                                            <FileText className="mr-2 h-4 w-4" />
+                                            <span>{__('general.due_balance_sheet')}</span>
+                                        </a>
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                            </div>
+                        </div>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
