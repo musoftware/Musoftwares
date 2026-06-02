@@ -118,5 +118,17 @@ return [
     'mo' => 'شهر',
     'no_active_services' => 'لا توجد خدمات نشطة.',
     'no_subscribers_found' => 'لا يوجد مشتركون.',
-    'service_payment_added_successfully' => 'تم إضافة تكلفة الخدمة بنجاح.'
+    'service_payment_added_successfully' => 'تم إضافة تكلفة الخدمة بنجاح.',
+    
+    // Payment Links
+    'payment_links' => 'روابط الدفع',
+    'create_payment_link' => 'إنشاء رابط دفع',
+    'copy_link' => 'نسخ الرابط',
+    'view_link' => 'عرض الرابط',
+    'no_payment_links_found' => 'لا توجد روابط دفع.',
+    'payment_link_title_placeholder' => 'مثال: صيانة الموقع',
+    'confirm_delete_payment_link' => 'هل أنت متأكد أنك تريد حذف رابط الدفع هذا؟',
+    'copied_to_clipboard' => 'تم النسخ إلى الحافظة',
+    'created_by' => 'بواسطة',
+    'paid' => 'مدفوع',
 ];
