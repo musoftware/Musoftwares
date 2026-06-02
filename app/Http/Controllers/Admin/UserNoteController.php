@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\UserNote;
+use App\Models\UserCredential;
 use App\Services\UserNoteService;
 use App\Http\Requests\Admin\User\StoreUserNoteRequest;
 use App\Http\Resources\UserNoteResource;
@@ -34,7 +34,7 @@ class UserNoteController extends Controller
     public function index(Request $request, int $userId): InertiaResponse
     {
         $user  = User::findOrFail($userId);
-        $notes = UserNote::where('user_id', $userId)
+        $notes = UserCredential::where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(fn($note) => (new UserNoteResource($note))->resolve());
@@ -53,7 +53,7 @@ class UserNoteController extends Controller
     {
         User::findOrFail($userId);
 
-        $notes = UserNote::where('user_id', $userId)
+        $notes = UserCredential::where('user_id', $userId)
             ->orderByDesc('is_pinned')
             ->orderByDesc('created_at')
             ->get()
@@ -147,7 +147,7 @@ class UserNoteController extends Controller
      */
     public function togglePin(Request $request, int $userId, int $noteId): JsonResponse
     {
-        $note = UserNote::where('user_id', $userId)->findOrFail($noteId);
+        $note = UserCredential::where('user_id', $userId)->findOrFail($noteId);
         $note->is_pinned = !$note->is_pinned;
         $note->save();
 

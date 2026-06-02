@@ -80,7 +80,7 @@ class FbmbLookupTest extends TestCase
         Storage::fake('local');
 
         $user = User::factory()->create([
-            'points_balance' => 10,
+            'points_balance' => 7, // User had 10, debited 3 upfront
         ]);
 
         // Create temporary input file
@@ -98,8 +98,8 @@ class FbmbLookupTest extends TestCase
             'download_token'    => $downloadToken,
             'total_ids'         => 3,
             'found_count'       => 0,
-            'credits_used'      => 0,
-            'remaining_balance' => 10,
+            'credits_used'      => 3, // debited upfront
+            'remaining_balance' => 7,
             'input_path'        => $inputPath,
             'result_path'       => null,
             'status'            => 'pending',
@@ -116,7 +116,7 @@ class FbmbLookupTest extends TestCase
         $this->assertEquals('completed', $record->status);
         $this->assertEquals(2, $record->found_count); // 12345 and 67890 matched
         $this->assertEquals(2, $record->credits_used);
-        $this->assertEquals(8, $user->points_balance); // 10 - 2 matches
+        $this->assertEquals(8, $user->points_balance); // 7 + 1 refund = 8
         $this->assertNotNull($record->result_path);
         $this->assertTrue(file_exists($record->result_path));
         $this->assertFalse(file_exists($inputPath)); // Input file deleted
@@ -127,31 +127,25 @@ class FbmbLookupTest extends TestCase
         }
     }
 
-    public function test_console_command_fails_gracefully_on_insufficient_points()
+    public function test_console_command_refunds_full_points_on_failure()
     {
         Storage::fake('local');
 
         $user = User::factory()->create([
-            'points_balance' => 0,
+            'points_balance' => 8, // starting balance after debit
         ]);
-
-        $tempDir = storage_path('app/fbmb_inputs');
-        if (!is_dir($tempDir)) {
-            mkdir($tempDir, 0755, true);
-        }
-        $inputPath = $tempDir . '/test_' . uniqid() . '.txt';
-        file_put_contents($inputPath, "12345\n67890\n");
 
         $downloadToken = md5(uniqid(mt_rand(), true));
 
+        // Create a pending lookup record with a non-existent input file to force a failure
         $record = FbmbLookupResult::create([
             'user_id'           => $user->id,
             'download_token'    => $downloadToken,
             'total_ids'         => 2,
             'found_count'       => 0,
-            'credits_used'      => 0,
-            'remaining_balance' => 0,
-            'input_path'        => $inputPath,
+            'credits_used'      => 2,
+            'remaining_balance' => 8,
+            'input_path'        => '/invalid/path/file.txt',
             'result_path'       => null,
             'status'            => 'pending',
             'expires_at'        => now()->addHours(24),
@@ -162,9 +156,11 @@ class FbmbLookupTest extends TestCase
         $this->assertEquals(0, $exitCode);
 
         $record->refresh();
+        $user->refresh();
+
         $this->assertEquals('failed', $record->status);
+        $this->assertEquals(0, $record->credits_used);
+        $this->assertEquals(10, $user->points_balance); // 8 + 2 refunded points
         $this->assertNotNull($record->error_message);
-        $this->assertStringContainsString('Insufficient points', $record->error_message);
-        $this->assertFalse(file_exists($inputPath)); // Input file cleaned up
     }
 }

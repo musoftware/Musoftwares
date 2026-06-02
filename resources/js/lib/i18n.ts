@@ -1,5 +1,4 @@
 import translationsData from '../translations.json';
-import { __ } from '@/lib/i18n';
 
 const translations: Record<string, any> = translationsData;
 

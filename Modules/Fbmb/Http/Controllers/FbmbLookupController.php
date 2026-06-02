@@ -11,10 +11,12 @@ use Exception;
 class FbmbLookupController extends Controller
 {
     protected FbmbLookupService $lookupService;
+    protected \App\Services\PointsService $pointsService;
 
-    public function __construct(FbmbLookupService $lookupService)
+    public function __construct(FbmbLookupService $lookupService, \App\Services\PointsService $pointsService)
     {
         $this->lookupService = $lookupService;
+        $this->pointsService = $pointsService;
     }
 
     public function index()
@@ -76,6 +78,25 @@ class FbmbLookupController extends Controller
                 ], 400);
             }
 
+            if ($pointsBalance < $totalIds) {
+                @unlink($fullPath);
+                return response()->json([
+                    'message' => __('general.insufficient_points_for_lookup', [
+                        'required'  => $totalIds,
+                        'available' => $pointsBalance,
+                        'total'     => $totalIds,
+                    ]),
+                ], 422);
+            }
+
+            // Debit points up-front
+            $this->pointsService->debit(
+                $user,
+                $totalIds,
+                'fbmb_lookup_reserve',
+                __('general.fbmb_lookup_reserve_points', ['total' => $totalIds])
+            );
+
             $downloadToken = md5(uniqid(mt_rand(), true));
 
             // Persist to database as pending
@@ -84,8 +105,8 @@ class FbmbLookupController extends Controller
                 'download_token'    => $downloadToken,
                 'total_ids'         => $totalIds,
                 'found_count'       => 0,
-                'credits_used'      => 0,
-                'remaining_balance' => $user->points_balance,
+                'credits_used'      => $totalIds,
+                'remaining_balance' => $user->fresh()->points_balance,
                 'input_path'        => $fullPath,
                 'result_path'       => null,
                 'status'            => 'pending',
@@ -103,6 +124,30 @@ class FbmbLookupController extends Controller
                 'message' => __('general.failed_to_queue_lookup_please_try_again'),
             ], 400);
         }
+    }
+
+    public function status($token)
+    {
+        $record = FbmbLookupResult::where('download_token', $token)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (! $record) {
+            return response()->json(['message' => 'Record not found'], 404);
+        }
+
+        return response()->json([
+            'id'                => $record->id,
+            'total_ids'         => $record->total_ids,
+            'found_count'       => $record->found_count,
+            'credits_used'      => $record->credits_used,
+            'remaining_balance' => $record->remaining_balance,
+            'download_token'    => $record->download_token,
+            'expired'           => $record->isExpired(),
+            'file_exists'       => $record->fileExists(),
+            'status'            => $record->status,
+            'error_message'     => $record->error_message,
+        ]);
     }
 
     public function download(Request $request)
