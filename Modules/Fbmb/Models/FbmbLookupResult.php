@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\fbmb\Models;
+namespace Modules\Fbmb\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

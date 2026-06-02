@@ -1,10 +1,10 @@
 <?php
 
-namespace Modules\WrittenCoursesEngine\App\Http\Controllers;
+namespace Modules\WrittenCoursesEngine\app\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\WrittenCoursesEngine\App\Services\CourseLoaderService;
+use Modules\WrittenCoursesEngine\app\Services\CourseLoaderService;
 
 class CourseApiController extends Controller
 {

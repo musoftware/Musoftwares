@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\fbmb\Services;
+namespace Modules\Fbmb\Services;
 
 use App\Services\PointsService;
 use App\Models\User;

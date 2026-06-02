@@ -1,11 +1,11 @@
 <?php
 
-namespace Modules\fbmb\Http\Controllers;
+namespace Modules\Fbmb\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\fbmb\Models\FbmbLookupResult;
-use Modules\fbmb\Services\FbmbLookupService;
+use Modules\Fbmb\Models\FbmbLookupResult;
+use Modules\Fbmb\Services\FbmbLookupService;
 use Exception;
 
 class FbmbLookupController extends Controller

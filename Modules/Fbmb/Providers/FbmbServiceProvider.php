@@ -1,11 +1,11 @@
 <?php
 
-namespace Modules\fbmb\Providers;
+namespace Modules\Fbmb\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Modules\fbmb\Services\FbmbLookupService;
-use Modules\fbmb\Console\CleanupExpiredFbmbResults;
+use Modules\Fbmb\Services\FbmbLookupService;
+use Modules\Fbmb\Console\CleanupExpiredFbmbResults;
 
 class FbmbServiceProvider extends ServiceProvider
 {
@@ -18,7 +18,7 @@ class FbmbServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->loadMigrationsFrom(module_path('fbmb', 'Database/Migrations'));
+        $this->loadMigrationsFrom(module_path('Fbmb', 'Database/Migrations'));
 
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -27,6 +27,6 @@ class FbmbServiceProvider extends ServiceProvider
         }
 
         Route::middleware('web')
-            ->group(module_path('fbmb', 'routes/web.php'));
+            ->group(module_path('Fbmb', 'routes/web.php'));
     }
 }

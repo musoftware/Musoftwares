@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\WrittenCoursesEngine\App\Providers;
+namespace Modules\WrittenCoursesEngine\app\Providers;
 
 use Illuminate\Support\ServiceProvider;
 

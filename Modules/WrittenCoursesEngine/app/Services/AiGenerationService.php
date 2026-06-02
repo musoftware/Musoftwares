@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\WrittenCoursesEngine\App\Services;
+namespace Modules\WrittenCoursesEngine\app\Services;
 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
