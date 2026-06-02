@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, Clock, DollarSign, Calendar, Play, Pause, Plus, Save, X, PlayCircle, StopCircle, History } from 'lucide-react';
+import { 
+    ArrowLeft, Clock, DollarSign, Calendar, Play, Pause, Plus, Save, X, 
+    PlayCircle, StopCircle, History, User, Folder, Eye, EyeOff, Edit, Link as LinkIcon
+} from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Card, CardContent } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
@@ -31,6 +34,10 @@ interface Props {
         invoice_number: string | null;
         invoice_status: string;
         client_name: string | null;
+        client_id: number | null;
+        project_name: string | null;
+        project_id: number | null;
+        date: string | null;
     };
     invoice_currency: Currency | null;
     timers: Timer[];
@@ -40,32 +47,24 @@ interface Props {
     hour_rate: number;
 }
 
-function formatDuration(seconds: number): string {
-    if (isNaN(seconds) || seconds < 0) return '00:00:00';
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-}
-
-function formatHumanDuration(seconds: number): string {
-    if (isNaN(seconds) || seconds < 0) return '0s';
+function formatDurationMS(seconds: number): string {
+    if (isNaN(seconds) || seconds < 0) return '00:00:00.000';
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    const parts = [];
-    if (h > 0) parts.push(`${h}h`);
-    if (m > 0) parts.push(`${m}m`);
-    if (s > 0 || parts.length === 0) parts.push(`${s}s`);
-    return parts.join(' ');
+    const s = Math.floor(seconds % 60);
+    const ms = Math.floor((seconds - Math.floor(seconds)) * 1000);
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(ms).padStart(3, '0')}`;
 }
 
 function parseDateTime(dateStr: string | null) {
-    if (!dateStr) return { date: '—', time: '—' };
+    if (!dateStr) return { date: '—', time: '—', full: '—' };
     const d = new Date(dateStr);
+    const pad = (n: number) => (n < 10 ? '0' + n : n);
+    const full = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     return {
         date: d.toLocaleDateString(),
-        time: d.toLocaleTimeString()
+        time: d.toLocaleTimeString(),
+        full
     };
 }
 
@@ -75,24 +74,84 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
     const [activeSessionStart, setActiveSessionStart] = useState<Date | null>(null);
     const [liveSeconds, setLiveSeconds] = useState(0);
 
-    // Manual Duration State
     const [manualHours, setManualHours] = useState('');
     const [manualMinutes, setManualMinutes] = useState('');
     const [rate, setRate] = useState<number>(hour_rate);
+    const [rateVisible, setRateVisible] = useState(false);
+    const [reason, setReason] = useState(item.item_title || '');
     const [isSaving, setIsSaving] = useState(false);
 
-    // Live ticker effect
+    // Bridge State
+    const [bridgeStatus, setBridgeStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
+    const [bridgeAutoMode, setBridgeAutoMode] = useState(false);
+    const [debugMsg, setDebugMsg] = useState('');
+    const bridgeSocketRef = useRef<WebSocket | null>(null);
+    const bridgeToken = 'mu-fixed-token-2026';
+
     useEffect(() => {
         let interval: NodeJS.Timeout;
         if (isRunning && activeSessionStart) {
             interval = setInterval(() => {
-                setLiveSeconds(Math.floor((new Date().getTime() - activeSessionStart.getTime()) / 1000));
-            }, 1000);
+                setLiveSeconds((new Date().getTime() - activeSessionStart.getTime()) / 1000);
+            }, 100); // 100ms for fast MS update
         }
         return () => clearInterval(interval);
     }, [isRunning, activeSessionStart]);
 
+    // Cleanup socket
+    useEffect(() => {
+        return () => {
+            if (bridgeSocketRef.current) bridgeSocketRef.current.close();
+        };
+    }, []);
+
+    const toggleBridge = () => {
+        if (bridgeStatus === 'connected' || bridgeStatus === 'connecting') {
+            if (bridgeSocketRef.current) bridgeSocketRef.current.close();
+            setBridgeStatus('disconnected');
+            setBridgeAutoMode(false);
+            if (isRunning) handleStop();
+        } else {
+            setBridgeStatus('connecting');
+            try {
+                const ws = new WebSocket(`ws://127.0.0.1:17845/ws?token=${bridgeToken}`);
+                bridgeSocketRef.current = ws;
+
+                ws.onopen = () => {
+                    setBridgeStatus('connected');
+                    setBridgeAutoMode(true);
+                };
+
+                ws.onmessage = (event) => {
+                    const msg = JSON.parse(event.data);
+                    if (msg.type === 'event') {
+                        if (msg.event === 'started' && !isRunning) handleStart();
+                        else if (msg.event === 'stopped' && isRunning) handleStop();
+                        setDebugMsg(`event: ${msg.event} (${new Date().toLocaleTimeString()})`);
+                    }
+                    if (msg.type === 'snapshot' || msg.type === 'state') {
+                        if (msg.state === 'active' && !isRunning) handleStart();
+                        else if (msg.state === 'idle' && isRunning) handleStop();
+                        setDebugMsg(`${msg.type}: ${msg.state} (${new Date().toLocaleTimeString()})`);
+                    }
+                };
+
+                ws.onclose = () => {
+                    setBridgeStatus('disconnected');
+                    setBridgeAutoMode(false);
+                };
+
+                ws.onerror = (err) => {
+                    console.error('Bridge Error:', err);
+                };
+            } catch (e) {
+                setBridgeStatus('disconnected');
+            }
+        }
+    };
+
     const handleStart = () => {
+        if (isRunning) return;
         setIsRunning(true);
         setActiveSessionStart(new Date());
         setLiveSeconds(0);
@@ -101,7 +160,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
     const handleStop = () => {
         if (!isRunning || !activeSessionStart) return;
         const end = new Date();
-        const duration = Math.floor((end.getTime() - activeSessionStart.getTime()) / 1000);
+        const duration = (end.getTime() - activeSessionStart.getTime()) / 1000;
         const amount = (duration / 3600) * rate;
 
         const newSession: Timer = {
@@ -109,11 +168,11 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
             start_date: activeSessionStart.toISOString(),
             end_date: end.toISOString(),
             duration_seconds: duration,
-            amount: parseFloat(amount.toFixed(2)),
+            amount: parseFloat(amount.toFixed(3)),
             isNew: true
         };
 
-        setTimers([...timers, newSession]);
+        setTimers(prev => [...prev, newSession]);
         setIsRunning(false);
         setActiveSessionStart(null);
         setLiveSeconds(0);
@@ -134,7 +193,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
             start_date: start.toISOString(),
             end_date: end.toISOString(),
             duration_seconds: duration,
-            amount: parseFloat(amount.toFixed(2)),
+            amount: parseFloat(amount.toFixed(3)),
             isNew: true
         };
 
@@ -163,300 +222,286 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
     };
 
     const handleSave = () => {
+        if (!reason.trim()) {
+            alert('Reason is empty. You have to type reason.');
+            return;
+        }
+
         const newSessions = timers.filter(t => t.isNew);
-        if (newSessions.length === 0) return;
+        if (newSessions.length === 0 && reason === item.item_title) {
+            alert('There is nothing to save');
+            return;
+        }
+
+        if (!confirm('Save timer entries to this invoice?')) return;
+
+        if (isRunning) handleStop();
 
         setIsSaving(true);
         router.post(route('admin.invoices.timer-details.store', item.id), {
-            sessions: newSessions
+            sessions: newSessions,
+            reason: reason
         }, {
-            onSuccess: () => {
-                setIsSaving(false);
-            },
-            onError: () => {
-                setIsSaving(false);
-            }
+            onSuccess: () => setIsSaving(false),
+            onError: () => setIsSaving(false)
         });
     };
 
     const currentTotalSeconds = timers.reduce((sum, t) => sum + t.duration_seconds, 0) + liveSeconds;
     const currentTotalBillable = timers.reduce((sum, t) => sum + t.amount, 0) + ((liveSeconds / 3600) * rate);
 
-    // Live Span calculation
-    const allStarts = timers.map(t => new Date(t.start_date).getTime());
-    if (activeSessionStart) allStarts.push(activeSessionStart.getTime());
+    const firstStartDate = timers.length > 0 ? parseDateTime(timers[0].start_date).full : (activeSessionStart ? parseDateTime(activeSessionStart.toISOString()).full : '—');
+    let lastEndDate = '—';
+    if (isRunning) lastEndDate = parseDateTime(new Date().toISOString()).full;
+    else if (timers.length > 0) lastEndDate = parseDateTime(timers[timers.length - 1].end_date).full;
 
-    const allEnds = timers.map(t => new Date(t.end_date).getTime());
-    if (activeSessionStart) allEnds.push(new Date().getTime());
-
-    const currentSpanSeconds = (allStarts.length > 0 && allEnds.length > 0)
-        ? Math.floor((Math.max(...allEnds) - Math.min(...allStarts)) / 1000)
-        : span_seconds;
-
-    const hasUnsavedChanges = timers.some(t => t.isNew);
+    const rateUrl = item.project_id ? route('admin.projects.edit', item.project_id) : route('admin.users.edit', item.client_id || 0);
 
     return (
         <AdminSidebarLayout>
-            <Head title={`${__('general.timer_details')} — ${item.item_title}`} />
+            <Head title={`${__('Timer Details')} - Invoice #${item.invoice_number}`} />
 
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <div className="flex items-center gap-4">
-                    <Link href={route('admin.invoices.show', item.invoice_id)}>
-                        <Button variant="outline" size="sm">
-                            <ArrowLeft className="w-4 h-4 mr-2" /> {__('general.back_to_invoice')}
-                        </Button>
-                    </Link>
-                    <div>
-                        <h1 className="text-2xl font-black text-gray-900">{item.item_title}</h1>
-                        <p className="text-sm text-gray-500">
-                            {__('Invoice')} #{item.invoice_number} • {item.client_name}
-                        </p>
+            <div className="max-w-6xl mx-auto pb-12">
+                <div className="mb-5">
+                    <span className="text-xs font-bold tracking-widest text-indigo-600 uppercase bg-indigo-50 px-2 py-1 rounded mb-2 inline-block">
+                        {__('Billing')}
+                    </span>
+                    <div className="flex items-baseline flex-wrap gap-3">
+                        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.04em', marginBottom: 0 }} className="text-gray-900">
+                            {__('Start Timer')}
+                        </h1>
+                        <div className="flex flex-wrap gap-2 items-center ml-auto">
+                            <Link href={route('admin.invoices.show', item.invoice_id)}>
+                                <Button variant="ghost" className="hover:bg-gray-100 text-gray-600">
+                                    <ArrowLeft className="w-4 h-4 mr-2" /> {__('Back')}
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
+                    <p className="text-gray-500 mt-2 mb-0 font-medium text-base">
+                        {__('Invoice')} #{item.invoice_number} · {item.client_name}
+                    </p>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    {hasUnsavedChanges && (
-                        <div className="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-200">
-                            {__('general.unsaved_sessions')}
+                {/* Info Cards (Modern Compact Row) */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                    <div className="p-2 border rounded-xl bg-white flex items-center gap-3 shadow-sm">
+                        <div className="rounded-full bg-blue-50 p-2 flex items-center justify-center w-10 h-10">
+                            <User className="w-4 h-4 text-blue-600" />
+                        </div>
+                        <div className="overflow-hidden">
+                            <small className="text-gray-400 block uppercase font-bold text-[10px] tracking-wider">Client</small>
+                            <Link href={route('admin.users.show', item.client_id || 0)} target="_blank" className="font-bold text-gray-900 text-sm truncate block hover:text-blue-600 transition-colors">
+                                {item.client_name}
+                            </Link>
+                        </div>
+                    </div>
+
+                    {item.project_name && (
+                        <div className="p-2 border rounded-xl bg-white flex items-center gap-3 shadow-sm">
+                            <div className="rounded-full bg-amber-50 p-2 flex items-center justify-center w-10 h-10">
+                                <Folder className="w-4 h-4 text-amber-600" />
+                            </div>
+                            <div>
+                                <small className="text-gray-400 block uppercase font-bold text-[10px] tracking-wider">Project</small>
+                                <span className="font-bold text-gray-900 text-sm">{item.project_name}</span>
+                            </div>
                         </div>
                     )}
-                    <Button onClick={handleSave} disabled={!hasUnsavedChanges || isSaving || item.invoice_status !== 'unpaid'} className="bg-blue-600 hover:bg-blue-700">
-                        <Save className="w-4 h-4 mr-2" /> {__('general.save_sessions')}
-                    </Button>
-                </div>
-            </div>
 
-            {/* Controls Bar */}
-            <Card className="shadow-sm mb-6 bg-white border-blue-100">
-                <CardContent className="p-4 sm:p-5">
-                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-
-                        {/* Live Timer Controls */}
-                        <div className="flex items-center gap-4">
-                            {!isRunning ? (
-                                <Button size="lg" onClick={handleStart} disabled={item.invoice_status !== 'unpaid'} className="bg-green-600 hover:bg-green-700 h-14 px-8 shadow-sm">
-                                    <Play className="w-5 h-5 mr-2" /> {__('general.start_timer')}
-                                </Button>
-                            ) : (
-                                <Button size="lg" onClick={handleStop} variant="destructive" className="h-14 px-8 shadow-sm animate-pulse">
-                                    <Pause className="w-5 h-5 mr-2" /> {__('general.pause_timer')}
-                                </Button>
-                            )}
-
-                            {isRunning && (
-                                <div className="flex flex-col">
-                                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center">
-                                        <span className="w-2 h-2 rounded-full bg-red-500 mr-2 animate-ping"></span>
-                                        {__('general.running_session')}
-                                    </span>
-                                    <span className="text-2xl font-black text-gray-900 tabular-nums">
-                                        {formatDuration(liveSeconds)}
-                                    </span>
-                                </div>
-                            )}
+                    <div className="p-2 border rounded-xl bg-white flex items-center gap-3 shadow-sm">
+                        <div className="rounded-full bg-green-50 p-2 flex items-center justify-center w-10 h-10">
+                            <Calendar className="w-4 h-4 text-green-600" />
                         </div>
-
-                        {/* Manual Duration Entry */}
-                        <div className="flex flex-wrap items-end gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                            <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">{__('Hourly Rate')}</label>
-                                <Input
-                                    type="number"
-                                    min="0"
-                                    value={rate}
-                                    onChange={(e) => setRate(parseFloat(e.target.value) || 0)}
-                                    className="w-20 bg-white"
-                                    disabled={item.invoice_status !== 'unpaid'}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">{__('general.hours')}</label>
-                                <Input
-                                    type="number"
-                                    min="0"
-                                    placeholder="0"
-                                    value={manualHours}
-                                    onChange={(e) => setManualHours(e.target.value)}
-                                    className="w-16 bg-white"
-                                    disabled={item.invoice_status !== 'unpaid'}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">{__('general.mins')}</label>
-                                <Input
-                                    type="number"
-                                    min="0"
-                                    max="59"
-                                    placeholder="0"
-                                    value={manualMinutes}
-                                    onChange={(e) => setManualMinutes(e.target.value)}
-                                    className="w-16 bg-white"
-                                    disabled={item.invoice_status !== 'unpaid'}
-                                />
-                            </div>
-                            <Button onClick={handleAddManual} variant="outline" disabled={item.invoice_status !== 'unpaid'} className="bg-white border-dashed">
-                                <Plus className="w-4 h-4 mr-2 text-blue-500" /> {__('general.add_duration')}
-                            </Button>
+                        <div>
+                            <small className="text-gray-400 block uppercase font-bold text-[10px] tracking-wider">Date</small>
+                            <span className="font-bold text-gray-900 text-sm">{item.date || parseDateTime(new Date().toISOString()).date}</span>
                         </div>
                     </div>
-                </CardContent>
-            </Card>
+                </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <Card className="shadow-sm">
-                    <CardContent className="p-5 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <Clock className="w-6 h-6 text-blue-600" />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.total_tracked_time')}</p>
-                            <p className="text-2xl font-black text-gray-900 tabular-nums">{formatDuration(currentTotalSeconds)}</p>
-                        </div>
-                    </CardContent>
-                </Card>
+                {/* Timer Component */}
+                <Card className="shadow-md border-0 rounded-2xl overflow-hidden">
+                    <CardContent className="p-6">
+                        
+                        {/* Top Controls */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Hour Rate</label>
+                                <div className="flex shadow-sm rounded-md">
+                                    <Input 
+                                        type={rateVisible ? 'number' : 'password'} 
+                                        value={rate} 
+                                        readOnly 
+                                        className="font-mono font-bold tracking-widest rounded-r-none border-r-0 focus-visible:ring-0 bg-gray-50"
+                                    />
+                                    <Button type="button" variant="outline" className="rounded-none border-l-0 px-3 hover:bg-gray-100" onClick={() => setRateVisible(!rateVisible)}>
+                                        {rateVisible ? <EyeOff className="w-4 h-4 text-gray-500" /> : <Eye className="w-4 h-4 text-gray-500" />}
+                                    </Button>
+                                    <Link href={rateUrl} target="_blank">
+                                        <Button type="button" variant="outline" className="rounded-l-none px-3 hover:bg-gray-100 border-l-0">
+                                            <Edit className="w-4 h-4 text-blue-600" />
+                                        </Button>
+                                    </Link>
+                                </div>
+                            </div>
 
-                <Card className="shadow-sm">
-                    <CardContent className="p-5 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                            <History className="w-6 h-6 text-indigo-600" />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.total_period_first_to_last')}</p>
-                            <p className="text-2xl font-black text-gray-900 tabular-nums">{formatDuration(currentSpanSeconds)}</p>
-                        </div>
-                    </CardContent>
-                </Card>
+                            <div>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Reason / Description</label>
+                                <Input 
+                                    type="text" 
+                                    value={reason} 
+                                    onChange={e => setReason(e.target.value)} 
+                                    placeholder="What did you work on?" 
+                                    onKeyDown={e => { if(e.key === 'Enter') handleStart() }}
+                                    className="shadow-sm"
+                                    disabled={item.invoice_status !== 'unpaid'}
+                                />
+                            </div>
 
-                <Card className="shadow-sm">
-                    <CardContent className="p-5 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                            <DollarSign className="w-6 h-6 text-green-600" />
+                            <div className="md:col-span-2">
+                                <div className="flex items-end gap-3 flex-wrap bg-gray-50/50 p-3 rounded-xl border border-gray-100">
+                                    <div className="w-24">
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Hours</label>
+                                        <Input type="number" min="0" placeholder="0" value={manualHours} onChange={e => setManualHours(e.target.value)} disabled={item.invoice_status !== 'unpaid'} />
+                                    </div>
+                                    <div className="w-24">
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Minutes</label>
+                                        <Input type="number" min="0" max="59" placeholder="0" value={manualMinutes} onChange={e => setManualMinutes(e.target.value)} disabled={item.invoice_status !== 'unpaid'} />
+                                    </div>
+                                    <Button type="button" variant="secondary" onClick={handleAddManual} disabled={item.invoice_status !== 'unpaid'}>
+                                        <Plus className="w-4 h-4 mr-2" /> Add Duration
+                                    </Button>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.total_billable')}</p>
-                            <p className="text-2xl font-black text-green-700">{formatCurrency(currentTotalBillable, invoice_currency?.code)}</p>
-                        </div>
-                    </CardContent>
-                </Card>
 
-                <Card className="shadow-sm">
-                    <CardContent className="p-5 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                            <Calendar className="w-6 h-6 text-purple-600" />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.total_sessions')}</p>
-                            <p className="text-2xl font-black text-gray-900">{timers.length}</p>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-
-            {/* Sessions Table */}
-            <Card className="shadow-sm overflow-hidden">
-                <CardHeader className="bg-gray-50 border-b py-3 flex flex-row items-center justify-between">
-                    <CardTitle className="text-base font-bold text-gray-900 flex items-center">
-                        <Clock className="w-4 h-4 mr-2 text-primary" />
-                        {__('general.logged_sessions')} ({timers.length})
-                    </CardTitle>
-                    <span className="badge bg-white text-gray-600 border rounded-full px-3 py-1 text-xs flex items-center shadow-sm">
-                        <History className="w-3 h-3 mr-1" /> {__('History')}
-                    </span>
-                </CardHeader>
-                <CardContent className="p-0">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                            <thead className="bg-gray-50 border-b">
-                                <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">#</th>
-                                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.start_session')}</th>
-                                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.end_session')}</th>
-                                    <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">{__('Duration')}</th>
-                                    <th className="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.earnings')}</th>
-                                    <th className="px-4 py-3 w-10"></th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {timers.map((timer, index) => {
-                                    const start = parseDateTime(timer.start_date);
-                                    const end = parseDateTime(timer.end_date);
-
-                                    return (
-                                        <tr key={timer.id} className={`transition-colors ${timer.isNew ? 'bg-amber-50/50 hover:bg-amber-50' : 'hover:bg-gray-50'}`}>
-                                            <td className="px-4 py-3 text-gray-500 font-mono text-xs">
-                                                {index + 1}
-                                                {timer.isNew && <span className="ml-2 inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">{__('general.new')}</span>}
+                        {/* Sessions Table */}
+                        <div className="border rounded-xl overflow-hidden mb-6">
+                            <table className="w-full text-sm">
+                                <thead className="bg-gray-50 border-b border-gray-200">
+                                    <tr>
+                                        <th className="px-4 py-2 text-left font-semibold text-gray-600 w-1/4">Start</th>
+                                        <th className="px-4 py-2 text-left font-semibold text-gray-600 w-1/4">End</th>
+                                        <th className="px-4 py-2 text-left font-semibold text-gray-600 w-1/4">Duration</th>
+                                        <th className="px-4 py-2 text-left font-semibold text-gray-600">{invoice_currency?.code || 'Amount'}</th>
+                                        <th className="px-4 py-2 w-12"></th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {timers.map((timer, index) => (
+                                        <tr key={timer.id} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-4 py-2.5 font-mono text-xs text-gray-600">{parseDateTime(timer.start_date).full}</td>
+                                            <td className="px-4 py-2.5 font-mono text-xs text-gray-600">{parseDateTime(timer.end_date).full}</td>
+                                            <td className="px-4 py-2.5 font-mono text-xs font-medium">
+                                                {formatDurationMS(timer.duration_seconds)}
+                                                {timer.isNew && <span className="ml-2 text-[9px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">New</span>}
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center">
-                                                    <div className="mr-2 text-green-600">
-                                                        <PlayCircle className="w-5 h-5" />
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-bold text-gray-900 text-sm">{start.date}</div>
-                                                        <div className="text-gray-500 text-xs">{start.time}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center">
-                                                    <div className="mr-2 text-red-500">
-                                                        <StopCircle className="w-5 h-5" />
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-bold text-gray-900 text-sm">{end.date}</div>
-                                                        <div className="text-gray-500 text-xs">{end.time}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
-                                                <span className="inline-flex items-center rounded-full border bg-gray-50 px-3 py-1 text-xs font-medium text-gray-700">
-                                                    {formatHumanDuration(timer.duration_seconds)}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-3 text-right font-bold text-gray-900 tabular-nums">
-                                                {formatCurrency(timer.amount, invoice_currency?.code)}
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
+                                            <td className="px-4 py-2.5 font-bold text-gray-900">{formatCurrency(timer.amount, invoice_currency?.code)}</td>
+                                            <td className="px-4 py-2.5 text-center">
                                                 {item.invoice_status === 'unpaid' && (
-                                                    <Button variant="ghost" size="sm" onClick={() => handleDelete(index)} className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50">
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
+                                                    <button onClick={() => handleDelete(index)} className="text-gray-400 hover:text-red-500 transition-colors">
+                                                        <X className="w-4 h-4" />
+                                                    </button>
                                                 )}
                                             </td>
                                         </tr>
-                                    );
-                                })}
-                                {timers.length === 0 && !isRunning && (
-                                    <tr>
-                                        <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                                            {__('No timer sessions recorded. Click "Start Timer" or add a manual duration.')}
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                            {(timers.length > 0 || isRunning) && (
-                                <tfoot className="bg-gray-50 border-t">
-                                    <tr>
-                                        <td colSpan={3} className="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase">{__('general.totals')}</td>
-                                        <td className="px-4 py-3 text-center">
-                                            <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800 tabular-nums">
-                                                {formatHumanDuration(currentTotalSeconds)}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-3 text-right font-black text-gray-900 tabular-nums">
-                                            {formatCurrency(currentTotalBillable, invoice_currency?.code)}
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
+                                    ))}
+                                    {timers.length === 0 && (
+                                        <tr>
+                                            <td colSpan={5} className="px-4 py-6 text-center text-gray-400 text-sm">
+                                                <Clock className="w-5 h-5 mx-auto mb-2 opacity-50" />
+                                                No sessions yet — start the timer to record time.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Control Bar */}
+                        <div className="mb-6">
+                            {isRunning && (
+                                <div className="flex items-center gap-3 bg-red-50 text-red-900 px-4 py-3 rounded-lg mb-4 border border-red-100 font-mono text-sm">
+                                    <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></div>
+                                    <span className="font-semibold uppercase tracking-wider text-xs">Timer running —</span>
+                                    <span className="font-bold text-base">{formatDurationMS(liveSeconds)}</span>
+                                    <span className="ml-auto font-bold">{formatCurrency((liveSeconds / 3600) * rate, invoice_currency?.code)}</span>
+                                </div>
                             )}
-                        </table>
-                    </div>
-                </CardContent>
-            </Card>
+
+                            <div className="flex items-center flex-wrap gap-3">
+                                <Button 
+                                    onClick={handleStart} 
+                                    disabled={isRunning || item.invoice_status !== 'unpaid'} 
+                                    className="bg-blue-600 hover:bg-blue-700 shadow-sm"
+                                >
+                                    <Play className="w-4 h-4 mr-2" /> Start
+                                </Button>
+                                <Button 
+                                    onClick={handleStop} 
+                                    disabled={!isRunning} 
+                                    variant="outline" 
+                                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                                >
+                                    <Pause className="w-4 h-4 mr-2" /> Pause
+                                </Button>
+
+                                <div className="flex items-center gap-2 ml-2 pl-2 border-l border-gray-200">
+                                    <Button
+                                        variant="outline"
+                                        onClick={toggleBridge}
+                                        className={`transition-colors ${
+                                            bridgeStatus === 'connected' ? 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100' : 
+                                            (bridgeStatus === 'connecting' ? 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100' : 'bg-gray-50 text-gray-600')
+                                        }`}
+                                    >
+                                        <div className={`w-2 h-2 rounded-full mr-2 ${
+                                            bridgeStatus === 'connected' ? 'bg-green-500' : 
+                                            (bridgeStatus === 'connecting' ? 'bg-amber-500 animate-pulse' : 'bg-gray-400')
+                                        }`}></div>
+                                        {bridgeStatus === 'connected' ? 'Bridge On' : (bridgeStatus === 'connecting' ? 'Connecting…' : 'Bridge Off')}
+                                    </Button>
+                                    {bridgeStatus === 'connected' && debugMsg && (
+                                        <span className="text-xs text-gray-400 font-mono hidden sm:inline-block max-w-xs truncate">{debugMsg}</span>
+                                    )}
+                                </div>
+
+                                <div className="ml-auto">
+                                    <Button 
+                                        onClick={handleSave} 
+                                        disabled={isSaving || item.invoice_status !== 'unpaid'} 
+                                        className="bg-gray-900 hover:bg-gray-800 text-white shadow-sm px-6"
+                                    >
+                                        <Save className="w-4 h-4 mr-2" /> {__('Save')}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Summary Bar */}
+                        <div className="bg-gray-50 rounded-xl p-4 flex flex-wrap gap-4 sm:gap-8 border border-gray-100">
+                            <div className="flex-1 min-w-[120px]">
+                                <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Start Date</span>
+                                <div className="font-mono text-sm text-gray-800">{firstStartDate}</div>
+                            </div>
+                            <div className="flex-1 min-w-[120px]">
+                                <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">End Date</span>
+                                <div className="font-mono text-sm text-gray-800">{lastEndDate}</div>
+                            </div>
+                            <div className="flex-1 min-w-[120px]">
+                                <span className="block text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1">Total Time</span>
+                                <div className="font-mono text-lg font-bold text-blue-700">{formatDurationMS(currentTotalSeconds)}</div>
+                            </div>
+                            <div className="flex-1 min-w-[120px]">
+                                <span className="block text-[10px] font-bold text-green-600 uppercase tracking-wider mb-1">{invoice_currency?.code || 'Amount'}</span>
+                                <div className="text-lg font-black text-green-700">{formatCurrency(currentTotalBillable, invoice_currency?.code)}</div>
+                            </div>
+                        </div>
+
+                    </CardContent>
+                </Card>
+            </div>
         </AdminSidebarLayout>
     );
 }

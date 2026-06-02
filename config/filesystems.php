@@ -60,10 +60,19 @@ return [
             'throw' => false,
         ],
 
+        'uploaded_user_files' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/uploaded_user_files'),
+            'url' => env('APP_URL').'/storage/uploaded_user_files',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
     ],
 
     'links' => [
         public_path('storage') => storage_path('app/public'),
+        public_path('uploaded_user_files') => storage_path('app/public/uploaded_user_files'),
     ],
 
 ];

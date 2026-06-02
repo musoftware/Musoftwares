@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { ShieldAlert, ShieldCheck, Key, Monitor, FileText, Archive, Pin, Trash2, Upload, RefreshCw } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Key, Monitor, FileText, Archive, Pin, Trash2, Upload, RefreshCw, Copy, Check } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/Components/ui/dialog';
+import { Textarea } from '@/Components/ui/textarea';
 import SimpleCrypto from '@/lib/SimpleCrypto';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
-export default function Notes({ user, notes: initialNotes, stats }) {
-    const [notes, setNotes] = useState(initialNotes || []);
+export default function Notes({ user, notes, stats }) {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [category, setCategory] = useState('notes');
@@ -19,6 +20,11 @@ export default function Notes({ user, notes: initialNotes, stats }) {
     const [password, setPassword] = useState('');
     const [isPasswordSet, setIsPasswordSet] = useState(false);
     const [cryptoInstance, setCryptoInstance] = useState(null);
+
+    // Modal state
+    const [selectedNote, setSelectedNote] = useState(null);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     // Filter states
     const [filterCategory, setFilterCategory] = useState('all');
@@ -85,8 +91,7 @@ export default function Notes({ user, notes: initialNotes, stats }) {
             category
         }, {
             preserveScroll: true,
-            onSuccess: (page) => {
-                setNotes(page.props.notes);
+            onSuccess: () => {
                 setTitle('');
                 setContent('');
                 setLoading(false);
@@ -96,12 +101,23 @@ export default function Notes({ user, notes: initialNotes, stats }) {
     };
 
     const handleTogglePin = (noteId) => {
-        window.axios.post(`/admin/users/${user.id}/notes/${noteId}/pin`)
-            .then(res => {
-                if (res.data.success) {
-                    router.reload({ only: ['notes', 'stats'] });
-                }
-            });
+        router.post(`/admin/users/${user.id}/notes/${noteId}/toggle-pin`, {}, {
+            preserveScroll: true,
+        });
+    };
+
+    const handleViewNote = (note) => {
+        setSelectedNote(note);
+        setIsViewModalOpen(true);
+        setCopied(false);
+    };
+
+    const handleCopy = () => {
+        if (selectedNote?.decryptedContent) {
+            navigator.clipboard.writeText(selectedNote.decryptedContent);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
     };
 
     const handleArchive = (noteId, currentCategory) => {
@@ -257,14 +273,24 @@ export default function Notes({ user, notes: initialNotes, stats }) {
                                         </button>
                                     </div>
                                 </div>
-                                <div className="prose prose-sm max-w-none text-slate-600 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                <div className="prose prose-sm max-w-none text-slate-600 bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-between items-center">
                                     {isPasswordSet ? (
                                         note.decryptedContent.startsWith('🔒') 
                                             ? <span className="text-red-500 font-medium"><Key size={14} className="inline mr-1"/> {note.decryptedContent}</span>
-                                            : <div dangerouslySetInnerHTML={renderMarkdown(note.decryptedContent)} />
+                                            : <span className="text-slate-500 line-clamp-1 flex-1 font-mono text-xs overflow-hidden text-ellipsis whitespace-nowrap">
+                                                 {note.decryptedContent}
+                                              </span>
                                     ) : (
-                                        <div className="flex items-center justify-center py-4 text-slate-400 font-medium text-sm">
-                                            <Key size={16} className="mr-2" />{__('general.encrypted_content_hidden')}</div>
+                                        <div className="flex items-center text-slate-400 font-medium text-sm">
+                                            <Key size={16} className="mr-2" />{__('general.encrypted_content_hidden')}
+                                        </div>
+                                    )}
+                                    
+                                    {isPasswordSet && !note.decryptedContent.startsWith('🔒') && (
+                                        <Button variant="outline" size="sm" className="ml-4 shrink-0 shadow-sm border-slate-200" onClick={() => handleViewNote(note)}>
+                                            <FileText size={14} className="mr-2 text-slate-400" />
+                                            View Note
+                                        </Button>
                                     )}
                                 </div>
                             </div>
@@ -358,6 +384,48 @@ export default function Notes({ user, notes: initialNotes, stats }) {
                 </div>
 
             </div>
+
+            {/* View Note Modal */}
+            <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+                <DialogContent className="sm:max-w-2xl bg-white p-0 overflow-hidden border-0 shadow-2xl">
+                    <div className="bg-slate-50 border-b border-slate-100 p-6 flex flex-col gap-2">
+                        <DialogTitle className="flex items-center gap-2 text-xl font-bold text-slate-900 font-sora">
+                            {selectedNote && getCategoryIcon(selectedNote.category)}
+                            {selectedNote?.decryptedTitle}
+                        </DialogTitle>
+                        <DialogDescription className="text-slate-500 text-xs font-medium flex items-center gap-2">
+                            <span className="bg-slate-200 text-slate-700 px-2 py-0.5 rounded capitalize">
+                                {selectedNote?.category}
+                            </span>
+                            {selectedNote && new Date(selectedNote.created_at).toLocaleString()}
+                        </DialogDescription>
+                    </div>
+                    
+                    <div className="p-6 relative bg-white">
+                        <div className="absolute top-8 right-8 z-10">
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className={`h-8 px-3 shadow-sm transition-all ${copied ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-50 hover:text-green-700' : 'bg-white hover:bg-slate-50 text-slate-600'}`}
+                                onClick={handleCopy}
+                            >
+                                {copied ? <><Check size={14} className="mr-1.5" /> Copied</> : <><Copy size={14} className="mr-1.5" /> Copy Text</>}
+                            </Button>
+                        </div>
+                        <Textarea 
+                            readOnly
+                            value={selectedNote?.decryptedContent || ''}
+                            className="min-h-[250px] font-mono text-sm bg-slate-50/50 border-slate-200 resize-y p-5 pt-12 text-slate-700 leading-relaxed focus-visible:ring-slate-300"
+                        />
+                    </div>
+                    
+                    <div className="flex justify-end p-4 border-t border-slate-100 bg-slate-50">
+                        <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>
+                            Close
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </AdminSidebarLayout>
     );
 }

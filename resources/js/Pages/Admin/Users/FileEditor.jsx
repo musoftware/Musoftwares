@@ -69,7 +69,7 @@ export default function FileEditor({ user, file }) {
                 <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-slate-200 shadow-sm">
                     <div className="flex items-center space-x-4">
                         <Link 
-                            href={route('admin.users.files.index', { user: user.id, folder: file.folder_id })} 
+                            href={route('admin.users.files.index', { userId: user.id, folder: file.folder_id })} 
                             className="text-slate-500 hover:text-slate-700 transition-colors"
                         >
                             <ArrowLeft className="h-5 w-5" />

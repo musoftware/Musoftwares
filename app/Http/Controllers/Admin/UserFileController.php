@@ -40,7 +40,7 @@ class UserFileController extends Controller
     public function index(Request $request, int $userId)
     {
         $user   = User::findOrFail($userId);
-        $folder = $request->get('folder', '');
+        $folder = (string) $request->get('folder', '');
 
         $data = $this->userFileService->getFilesAndFolders($userId, $folder);
         $breadcrumbs = $this->userFileService->buildBreadcrumbs($folder);
@@ -65,7 +65,7 @@ class UserFileController extends Controller
 
         $result = $this->userFileService->uploadFile($userId, $request->file('file'), $folder);
 
-        return response()->json(array_merge(['success' => true], $result));
+        return redirect()->back()->with('success', __('general.file_uploaded_successfully'));
     }
 
     /**
@@ -78,7 +78,7 @@ class UserFileController extends Controller
 
         $path = $this->userFileService->createFolder($userId, $request->input('name'), (string) $request->get('parent', ''));
 
-        return response()->json(['success' => true, 'path' => $path]);
+        return redirect()->back()->with('success', __('general.folder_created_successfully'));
     }
 
     /**
@@ -103,7 +103,7 @@ class UserFileController extends Controller
 
         $newPath = $this->userFileService->rename($userId, $request->input('path'), $request->input('new_name'));
 
-        return response()->json(['success' => true, 'new_path' => $newPath]);
+        return redirect()->back()->with('success', __('general.item_renamed_successfully'));
     }
 
     /**
@@ -116,7 +116,7 @@ class UserFileController extends Controller
 
         $this->userFileService->move($userId, $request->input('paths'), $request->input('destination'));
 
-        return response()->json(['success' => true]);
+        return redirect()->back()->with('success', __('general.items_moved_successfully'));
     }
 
     /**
@@ -129,6 +129,53 @@ class UserFileController extends Controller
 
         $this->userFileService->delete($userId, $request->input('paths'));
 
-        return response()->json(['success' => true]);
+        return redirect()->back()->with('success', __('general.items_deleted_successfully'));
+    }
+
+    /**
+     * Edit a file's content in the browser editor.
+     */
+    public function edit(Request $request, int $userId)
+    {
+        $user = User::findOrFail($userId);
+        $path = $request->query('path');
+        
+        if (!$path || !str_starts_with($path, 'file_')) {
+            abort(404, 'Invalid file path.');
+        }
+
+        $content = $this->userFileService->getFileContent($userId, $path);
+        
+        // Find filename for the editor's language detection
+        $realId = str_replace('file_', '', $path);
+        $file = \App\Models\File::where('user_id', $userId)->where('id', $realId)->firstOrFail();
+
+        return Inertia::render('Admin/Users/FileEditor', [
+            'user' => ['id' => $user->id, 'name' => $user->name],
+            'file' => [
+                'id' => $file->id,
+                'path' => $path,
+                'name' => $file->original_filename,
+                'content' => $content,
+                'folder_id' => $file->folder_id ? 'folder_' . $file->folder_id : ''
+            ]
+        ]);
+    }
+
+    /**
+     * Save the edited file content.
+     */
+    public function updateContent(Request $request, int $userId)
+    {
+        User::findOrFail($userId);
+        
+        $request->validate([
+            'path' => 'required|string',
+            'content' => 'required|string',
+        ]);
+
+        $this->userFileService->updateFileContent($userId, $request->input('path'), $request->input('content'));
+
+        return redirect()->back()->with('success', __('general.file_saved_successfully', [], 'File saved successfully.'));
     }
 }

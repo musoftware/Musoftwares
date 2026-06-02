@@ -69,93 +69,119 @@ class UserNoteController extends Controller
      * Create a new note for a user.
      * Recovered from old project: UserNotesController::addNote()
      */
-    public function store(StoreUserNoteRequest $request, int $userId): JsonResponse
+    public function store(StoreUserNoteRequest $request, int $userId)
     {
         User::findOrFail($userId);
 
         $note = $this->userNoteService->createNote($userId, $request->validated());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Note added successfully.',
-            'note'    => (new UserNoteResource($note))->resolve(),
-            'stats'   => $this->userNoteService->getStats($userId),
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Note added successfully.',
+                'note'    => (new UserNoteResource($note))->resolve(),
+                'stats'   => $this->userNoteService->getStats($userId),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Note added successfully.');
     }
 
     /**
      * Delete a note permanently.
      * Recovered from old project: UserNotesController::deleteNote()
      */
-    public function destroy(Request $request, int $userId, int $noteId): JsonResponse
+    public function destroy(Request $request, int $userId, int $noteId)
     {
         $this->userNoteService->deleteNote($userId, $noteId);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Note deleted.',
-            'stats'   => $this->userNoteService->getStats($userId),
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Note deleted.',
+                'stats'   => $this->userNoteService->getStats($userId),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Note deleted.');
     }
 
     /**
      * Archive a note — moves to 'archived' category, saves original category.
      * Recovered from old project: UserNotesController::archiveNote()
      */
-    public function archive(Request $request, int $userId, int $noteId): JsonResponse
+    public function archive(Request $request, int $userId, int $noteId)
     {
         try {
             $this->userNoteService->archiveNote($userId, $noteId);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ], 400);
+            }
+            return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Note archived.',
-            'stats'   => $this->userNoteService->getStats($userId),
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Note archived.',
+                'stats'   => $this->userNoteService->getStats($userId),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Note archived.');
     }
 
     /**
      * Restore an archived note to its original category.
      * Recovered from old project: UserNotesController::unarchiveNote()
      */
-    public function unarchive(Request $request, int $userId, int $noteId): JsonResponse
+    public function unarchive(Request $request, int $userId, int $noteId)
     {
         try {
             $originalCategory = $this->userNoteService->unarchiveNote($userId, $noteId);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ], 400);
+            }
+            return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Note restored to ' . ($originalCategory ?: 'notes') . '.',
-            'stats'   => $this->userNoteService->getStats($userId),
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Note restored to ' . ($originalCategory ?: 'notes') . '.',
+                'stats'   => $this->userNoteService->getStats($userId),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Note restored to ' . ($originalCategory ?: 'notes') . '.');
     }
 
     /**
      * Toggle the pinned status of a note.
      */
-    public function togglePin(Request $request, int $userId, int $noteId): JsonResponse
+    public function togglePin(Request $request, int $userId, int $noteId)
     {
         $note = UserCredential::where('user_id', $userId)->findOrFail($noteId);
         $note->is_pinned = !$note->is_pinned;
         $note->save();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Note pin status toggled.',
-            'is_pinned' => (bool) $note->is_pinned,
-            'stats'   => $this->userNoteService->getStats($userId),
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Note pin status toggled.',
+                'is_pinned' => (bool) $note->is_pinned,
+                'stats'   => $this->userNoteService->getStats($userId),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Note pin status toggled.');
     }
 }
