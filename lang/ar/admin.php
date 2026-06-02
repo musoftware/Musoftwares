@@ -131,4 +131,6 @@ return [
     'copied_to_clipboard' => 'تم النسخ إلى الحافظة',
     'created_by' => 'بواسطة',
     'paid' => 'مدفوع',
+    'base_system_rate' => 'سعر النظام الأساسي',
+    'client_rate' => 'سعر المستخدم',
 ];
