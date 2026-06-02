@@ -4716,4 +4716,12 @@ return [
   'Fri' => 'Fri',
   'Sat' => 'Sat',
   'Sun' => 'Sun',
+  'payment_link_description' => 'Please enter your details to proceed with the payment.',
+  'full_name' => 'Full Name',
+  'email_address' => 'Email Address',
+  'pay_now' => 'Pay Now',
+  'processing' => 'Processing...',
+  'payment_successful' => 'Payment Successful',
+  'payment_failed' => 'Payment Failed',
+  'return_to_home' => 'Return to Home',
 ];

@@ -400,6 +400,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/transactions/create', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'create'])->name('transactions.create');
     Route::post('/transactions', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'store'])->name('transactions.store');
 
+    // ── Admin Payment Links ───────────────────────────────────────
+    Route::resource('payment-links', \App\Http\Controllers\Admin\PaymentLinkController::class)->except(['create', 'edit', 'show', 'update']);
+
     // ── Admin Financial Operations ────────────────────────────────
     Route::get('/finance', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'index'])->name('finance.index');
     Route::get('/finance/export', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'export'])->name('finance.report.export');
@@ -826,5 +829,14 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
 // The heartbeat of the iSAAS ecosystem. Full-page operational activity log.
 Route::middleware(['auth', 'verified'])->group(function () {
     // Route::get('/activity', [\App\Http\Controllers\ActivityController::class, 'index'])->name('activity.index');
+});
+
+// ── Guest Payment Links ────────────────────────────────────────────────────────
+Route::prefix('pay')->name('guest.payment-links.')->group(function () {
+    Route::get('/success', [\App\Http\Controllers\GuestPaymentLinkController::class, 'paymentSuccess'])->name('success');
+    Route::get('/failure', [\App\Http\Controllers\GuestPaymentLinkController::class, 'paymentFailure'])->name('failure');
+    Route::post('/webhook', [\App\Http\Controllers\GuestPaymentLinkController::class, 'paymentWebhook'])->name('webhook')->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+    Route::get('/{uuid}', [\App\Http\Controllers\GuestPaymentLinkController::class, 'show'])->name('show');
+    Route::post('/{uuid}/initiate', [\App\Http\Controllers\GuestPaymentLinkController::class, 'initiatePay'])->name('pay');
 });
 

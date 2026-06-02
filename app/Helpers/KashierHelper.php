@@ -295,6 +295,60 @@ class KashierHelper
         return 'https://payments.kashier.io/?' . http_build_query($params);
     }
 
+    public static function buildPaymentLinkUrl(
+        float $amount,
+        int $paymentLinkId,
+        int $userId,
+        string $guestName,
+        string $guestEmail,
+        string $currency = 'EGP'
+    ): string {
+        $orderId = 'plnk_' . $paymentLinkId . '_' . uniqid();
+        $merchantId = config('services.kashier.merchant_id', 'MID-12345');
+        $mode = config('services.kashier.mode', 'live');
+        $successUrl = urlencode(route('guest.payment-links.success'));
+        $failureUrl = urlencode(route('guest.payment-links.failure'));
+        $webhookUrl = urlencode(route('guest.payment-links.webhook'));
+
+        $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
+
+        $customer = [
+            'firstName' => $guestName,
+            'email' => $guestEmail,
+            'reference' => 'user_' . $userId,
+        ];
+
+        $params = [
+            'merchantId' => $merchantId,
+            'orderId' => $orderId,
+            'amount' => $amount,
+            'currency' => $currency,
+            'hash' => $hash,
+            'mode' => $mode,
+            'merchantRedirect' => $successUrl,
+            'serverWebhook' => $webhookUrl,
+            'failureRedirect' => $failureUrl,
+            'redirectMethod' => 'get',
+            'type' => 'external',
+            'brandColor' => '#4f46e5',
+            'display' => app()->getLocale() ?: 'en',
+            'manualCapture' => 'false',
+            'customer' => json_encode($customer),
+            'saveCard' => 'optional',
+            'interactionSource' => 'Ecommerce',
+            'enable3DS' => 'true',
+            'allowedMethods' => 'card,wallet',
+            'CustomerReference' => $userId,
+            'metaData' => json_encode([
+                'user_id' => $userId,
+                'source' => 'payment-link',
+                'payment_link_id' => $paymentLinkId,
+            ]),
+        ];
+
+        return 'https://payments.kashier.io/?' . http_build_query($params);
+    }
+
     public static function validatePayload(): bool
     {
         $paymentApiKey = config('services.kashier.secret_key');
