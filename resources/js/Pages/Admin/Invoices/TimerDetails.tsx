@@ -223,17 +223,13 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
 
     const handleSave = () => {
         if (!reason.trim()) {
-            alert('Reason is empty. You have to type reason.');
+            alert(__('Reason is empty. You have to type reason.'));
             return;
         }
 
         const newSessions = timers.filter(t => t.isNew);
-        if (newSessions.length === 0 && reason === item.item_title) {
-            alert('There is nothing to save');
-            return;
-        }
 
-        if (!confirm('Save timer entries to this invoice?')) return;
+        if (!confirm(__('Save timer entries to this invoice?'))) return;
 
         if (isRunning) handleStop();
 
