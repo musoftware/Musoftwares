@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('marketplace_services', function (Blueprint $table) {
-            $table->boolean('is_featured')->default(false)->after('status');
-        });
+        if (Schema::hasTable('marketplace_services')) {
+            Schema::table('marketplace_services', function (Blueprint $table) {
+                if (!Schema::hasColumn('marketplace_services', 'is_featured')) {
+                    $table->boolean('is_featured')->default(false)->after('status');
+                }
+            });
+        }
     }
 
     /**
@@ -21,8 +25,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('marketplace_services', function (Blueprint $table) {
-            $table->dropColumn('is_featured');
-        });
+        if (Schema::hasTable('marketplace_services')) {
+            Schema::table('marketplace_services', function (Blueprint $table) {
+                if (Schema::hasColumn('marketplace_services', 'is_featured')) {
+                    $table->dropColumn('is_featured');
+                }
+            });
+        }
     }
 };

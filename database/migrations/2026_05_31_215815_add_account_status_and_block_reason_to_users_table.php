@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('account_status', 20)->default('active')->after('deleted_at')->index();
-            $table->text('block_reason')->nullable()->after('account_status');
+            if (!Schema::hasColumn('users', 'account_status')) {
+                $table->string('account_status', 20)->default('active')->after('deleted_at')->index();
+            }
+            if (!Schema::hasColumn('users', 'block_reason')) {
+                $table->text('block_reason')->nullable()->after('account_status');
+            }
         });
     }
 
@@ -23,7 +27,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['account_status', 'block_reason']);
+            if (Schema::hasColumn('users', 'account_status')) {
+                $table->dropColumn('account_status');
+            }
+            if (Schema::hasColumn('users', 'block_reason')) {
+                $table->dropColumn('block_reason');
+            }
         });
     }
 };

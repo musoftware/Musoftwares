@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('erp_invoice_items', function (Blueprint $table) {
-            $table->foreignId('product_id')->nullable()->constrained('erp_products')->nullOnDelete();
-        });
+        if (Schema::hasTable('erp_invoice_items')) {
+            Schema::table('erp_invoice_items', function (Blueprint $table) {
+                if (!Schema::hasColumn('erp_invoice_items', 'product_id')) {
+                    $table->foreignId('product_id')->nullable()->constrained('erp_products')->nullOnDelete();
+                }
+            });
+        }
     }
 
     /**
@@ -21,9 +25,13 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('erp_invoice_items', function (Blueprint $table) {
-            $table->dropForeign(['product_id']);
-            $table->dropColumn('product_id');
-        });
+        if (Schema::hasTable('erp_invoice_items')) {
+            Schema::table('erp_invoice_items', function (Blueprint $table) {
+                if (Schema::hasColumn('erp_invoice_items', 'product_id')) {
+                    $table->dropForeign(['product_id']);
+                    $table->dropColumn('product_id');
+                }
+            });
+        }
     }
 };

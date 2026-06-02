@@ -11,10 +11,29 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('erp_products', function (Blueprint $table) {
-            $table->softDeletes();
-            $table->unique(['tenant_id', 'sku']);
-        });
+        if (Schema::hasTable('erp_products')) {
+            $indexExists = false;
+            try {
+                $conn = Schema::getConnection();
+                $db = $conn->getDatabaseName();
+                $indexExists = collect($conn->select("
+                    SELECT 1 FROM information_schema.statistics 
+                    WHERE table_schema = ? 
+                    AND table_name = 'erp_products' 
+                    AND index_name = 'erp_products_tenant_id_sku_unique'
+                ", [$db]))->isNotEmpty();
+            } catch (\Exception $e) {
+            }
+
+            Schema::table('erp_products', function (Blueprint $table) use ($indexExists) {
+                if (!Schema::hasColumn('erp_products', 'deleted_at')) {
+                    $table->softDeletes();
+                }
+                if (!$indexExists) {
+                    $table->unique(['tenant_id', 'sku']);
+                }
+            });
+        }
     }
 
     /**
@@ -22,9 +41,28 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('erp_products', function (Blueprint $table) {
-            $table->dropUnique(['tenant_id', 'sku']);
-            $table->dropSoftDeletes();
-        });
+        if (Schema::hasTable('erp_products')) {
+            $indexExists = false;
+            try {
+                $conn = Schema::getConnection();
+                $db = $conn->getDatabaseName();
+                $indexExists = collect($conn->select("
+                    SELECT 1 FROM information_schema.statistics 
+                    WHERE table_schema = ? 
+                    AND table_name = 'erp_products' 
+                    AND index_name = 'erp_products_tenant_id_sku_unique'
+                ", [$db]))->isNotEmpty();
+            } catch (\Exception $e) {
+            }
+
+            Schema::table('erp_products', function (Blueprint $table) use ($indexExists) {
+                if ($indexExists) {
+                    $table->dropUnique(['tenant_id', 'sku']);
+                }
+                if (Schema::hasColumn('erp_products', 'deleted_at')) {
+                    $table->dropSoftDeletes();
+                }
+            });
+        }
     }
 };
