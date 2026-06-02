@@ -63,6 +63,7 @@ const items = [
         { title: "Busy Times", url: "/admin/busy-times" },
         { title: "Employee Todos", url: "/admin/employee-todos" },
         { title: "Points Control", url: "/admin/points_controller" },
+        { title: "Point Packages", url: "/admin/point-packages" },
         { title: "Charity", url: "/admin/charity-counter" },
         { title: "KYC Verification", url: "/admin/kyc" },
 

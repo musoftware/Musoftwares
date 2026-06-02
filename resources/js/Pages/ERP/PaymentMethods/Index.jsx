@@ -36,6 +36,7 @@ import {
     DropdownMenuTrigger
 } from '@/Components/ui/dropdown-menu';
 import { useToast } from '@/Components/ui/use-toast';
+import { CurrencySelect } from '@/Components/CurrencySelect';
 
 export default function Index({ auth, paymentMethods, currencies = [] }) {
     const { toast } = useToast();
@@ -158,18 +159,13 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                         </div>
                                         <div className="grid gap-2">
                                             <Label htmlFor="currency">Currency</Label>
-                                            <select
+                                            <CurrencySelect
                                                 id="currency"
-                                                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                                currencies={currencies}
                                                 value={data.bank_currency}
-                                                onChange={e => setData('bank_currency', e.target.value)}
-                                            >
-                                                {currencies.map((c) => (
-                                                    <option key={c.id} value={c.currency}>
-                                                        {c.currency}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                                onChange={val => setData('bank_currency', val)}
+                                                valueKey="currency"
+                                            />
                                         </div>
                                     </div>
 

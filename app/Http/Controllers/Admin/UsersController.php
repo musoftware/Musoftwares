@@ -195,30 +195,67 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-        $user = User::with(['kycDocuments', 'roles'])->findOrFail($id);
+        $user = User::with(['kycDocuments', 'roles', 'kycVerifier'])->findOrFail($id);
 
         return Inertia::render('Admin/Users/Edit', [
             'user' => [
                 'id'                   => $user->id,
                 'name'                 => $user->name,
+                'full_name'            => $user->full_name ?? '',
                 'email'                => $user->email,
-                'role'                 => $user->roles->first()?->name ?? 'user',
-                'phone_number'         => $user->phone_number,
-                'phone_number2'        => $user->phone_number2,
-                'mobile_1'             => $user->mobile_1,
-                'mobile_2'             => $user->mobile_2,
-                'whatsapp_number'      => $user->whatsapp_number,
-                'telegram_username'    => $user->telegram_username,
-                'country'              => $user->country,
-                'city'                 => $user->city,
-                'currency'             => $user->currency_id,
+                'role'                 => $user->roles->first()?->name ?? 'client',
+                'facebook'             => $user->facebook ?? '',
+                'skype'                => $user->skype ?? '',
+                'job'                  => $user->job ?? '',
+                'address'              => $user->address ?? '',
+                'phone_number'         => $user->phone_number ?? '',
+                'phone_number2'        => $user->phone_number2 ?? '',
+                'mobile_1'             => $user->mobile_1 ?? '',
+                'mobile_2'             => $user->mobile_2 ?? '',
+                'whatsapp_number'      => $user->whatsapp_number ?? '',
+                'disable_unpaid_balance_whatsapp' => (bool) ($user->disable_unpaid_balance_whatsapp ?? false),
+                'telegram_username'    => $user->telegram_username ?? '',
+                'country'              => $user->country ?? '',
+                'city'                 => $user->city ?? '',
+                'currency'             => $user->currency_id ?? $user->currency ?? '',
+                
+                'hour_rate_currency'   => $user->hour_rate_currency ?? '',
+                'hour_rate'            => $user->hour_rate ?? '',
+                'booking_rate_currency'=> $user->booking_rate_currency ?? '',
+                'booking_rate'         => $user->booking_rate ?? '',
+                'booking_rate_expires_at' => $user->booking_rate_expires_at ? $user->booking_rate_expires_at->format('Y-m-d') : '',
+                'salary'               => $user->salary ?? '',
+                'usd_type'             => $user->usd_type ?? 'bank_usd',
+
+                'subscription_date'    => $user->subscription_date ? (is_string($user->subscription_date) ? date('Y-m-d', strtotime($user->subscription_date)) : $user->subscription_date->format('Y-m-d')) : '',
+                'subscription_plan'    => $user->plan_id ?? '',
+                'postpaid_limit'       => $user->postpaid_limit ?? '',
+                'subscription_force'   => (bool) ($user->subscription_force ?? false),
+                
+                'client_taxable'       => (bool) ($user->client_taxable ?? false),
+                'invoice_taxable'      => (bool) ($user->invoice_taxable ?? false),
+                'timer_taxable'        => (bool) ($user->timer_taxable ?? false),
+                
+                'allow_referral_system'=> (bool) ($user->allow_referral_system ?? false),
+                'allow_view_times'     => (bool) ($user->allow_view_times ?? false),
+                'allow_postpaid'       => (bool) ($user->allow_postpaid ?? false),
+
                 'account_status'       => $user->account_status ?? 'active',
-                'block_reason'         => $user->block_reason,
-                'kyc_verified'         => (bool) $user->kyc_verified,
-                'kyc_notes'            => $user->kyc_notes,
-                'max_devices'          => $user->max_devices,
+                'block_reason'         => $user->block_reason ?? '',
+                
+                'kyc_verified'         => (bool) ($user->kyc_verified ?? false),
+                'kyc_notes'            => $user->kyc_notes ?? '',
+                'kyc_verified_at'      => $user->kyc_verified_at ? $user->kyc_verified_at->format('M d, Y \a\t H:i') : null,
+                'kyc_verifier'         => $user->kycVerifier ? ['name' => $user->kycVerifier->name] : null,
+                'kyc_documents_count'  => $user->kycDocuments ? $user->kycDocuments->count() : 0,
+                
+                'affiliate_commission_percentage' => $user->affiliate_commission_percentage ?? 1.00,
+                'add_commission_to_total' => (bool) ($user->add_commission_to_total ?? false),
+                'ref_user_id'          => $user->ref_user_id ?? '',
+                'slug'                 => $user->slug ?? '',
+                'max_devices'          => $user->max_devices ?? '',
             ],
-            'roles'      => ['admin', 'client'],
+            'roles'      => ['client', 'user', 'admin', 'manager', 'employee', 'moderator'],
             'currencies' => \App\Models\Currency::all(),
             'plans'      => \App\Models\ModulePlan::where('is_active', true)->get(),
             'statuses'   => ['active', 'blocked', 'suspended'],

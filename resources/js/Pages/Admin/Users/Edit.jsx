@@ -1,12 +1,14 @@
 import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Save, ArrowLeft } from 'lucide-react';
+import { Save, ArrowLeft, Info, AlertTriangle, CheckCircle } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
+import { CurrencySelect } from '@/Components/CurrencySelect';
 
-export default function Edit({ user, currencies = [], plans = [] }) {
+export default function Edit({ user, currencies = [], plans = [], statuses = [], roles = [] }) {
     const { data, setData, put, processing, errors } = useForm({
         name: user.name || '',
         full_name: user.full_name || '',
@@ -24,30 +26,30 @@ export default function Edit({ user, currencies = [], plans = [] }) {
         hour_rate: user.hour_rate || '',
         booking_rate_currency: user.booking_rate_currency || '',
         booking_rate: user.booking_rate || '',
-        booking_rate_expires_at: user.booking_rate_expires_at ? user.booking_rate_expires_at.split('T')[0] : '',
+        booking_rate_expires_at: user.booking_rate_expires_at || '',
         salary: user.salary || '',
         usd_type: user.usd_type || 'bank_usd',
         currency: user.currency || '',
-        subscription_date: user.subscription_date ? user.subscription_date.split('T')[0] : '',
-        subscription_plan: user.plan_id || '',
+        subscription_date: user.subscription_date || '',
+        subscription_plan: user.subscription_plan || '',
         postpaid_limit: user.postpaid_limit || '',
-        subscription_force: user.subscription_force === '1' || user.subscription_force === true,
-        client_taxable: user.client_taxable === '1' || user.client_taxable === true,
-        invoice_taxable: user.invoice_taxable === '1' || user.invoice_taxable === true,
-        timer_taxable: user.timer_taxable === '1' || user.timer_taxable === true,
-        allow_referral_system: user.allow_referral_system === '1' || user.allow_referral_system === true,
-        allow_view_times: user.allow_view_times === '1' || user.allow_view_times === true,
-        allow_postpaid: user.allow_postpaid === '1' || user.allow_postpaid === true,
+        subscription_force: user.subscription_force || false,
+        client_taxable: user.client_taxable || false,
+        invoice_taxable: user.invoice_taxable || false,
+        timer_taxable: user.timer_taxable || false,
+        allow_referral_system: user.allow_referral_system || false,
+        allow_view_times: user.allow_view_times || false,
+        allow_postpaid: user.allow_postpaid || false,
         kyc_verified: user.kyc_verified || false,
         kyc_notes: user.kyc_notes || '',
-        affiliate_commission_percentage: user.affiliate_commission_percentage || 1.00,
-        add_commission_to_total: user.add_commission_to_total === '1' || user.add_commission_to_total === true,
+        affiliate_commission_percentage: user.affiliate_commission_percentage ?? 1.00,
+        add_commission_to_total: user.add_commission_to_total || false,
         ref_user_id: user.ref_user_id || '',
         slug: user.slug || '',
         role: user.role || 'client',
         account_status: user.account_status || 'active',
         block_reason: user.block_reason || '',
-        max_devices: user.max_devices ?? '',
+        max_devices: user.max_devices || '',
     });
 
     const handleSubmit = (e) => {
@@ -61,38 +63,39 @@ export default function Edit({ user, currencies = [], plans = [] }) {
 
     return (
         <AdminSidebarLayout>
-            <Head title={`Edit Account: ${user.name}`} />
+            <Head title={`${__('general.edit_account')}: ${user.name}`} />
 
-            <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center mb-8">
                     <div>
-                        <p className="text-sm text-gray-500 font-medium tracking-wider uppercase">System</p>
+                        <p className="text-sm text-gray-500 font-medium tracking-wider uppercase">{__('whatsapp.ui.system')}</p>
                         <h1 className="text-3xl font-bold text-gray-900">{__('general.edit_account')}</h1>
                         <p className="text-gray-500 mt-1">{user.name}</p>
                     </div>
                     <Link href={`/admin/users/${user.id}`}>
                         <Button variant="outline">
                             <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back
+                            {__('general.back')}
                         </Button>
                     </Link>
                 </div>
 
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-10">
+                    <form onSubmit={handleSubmit} className="p-6 md:p-8">
                         
                         {/* User Details */}
-                        <section>
-                            <h2 className="text-lg font-bold text-blue-600 mb-4 pb-2 border-b">{__('general.user_details')}</h2>
+                        <div className="mb-10">
+                            <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.user_details')}</h5>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <Label htmlFor="name">Name <span className="text-red-500">*</span></Label>
-                                    <Input id="name" value={data.name} onChange={e => setData('name', e.target.value)} placeholder="Name" required />
+                                    <Label htmlFor="name">{__('general.name')} <span className="text-red-500">*</span></Label>
+                                    <Input id="name" value={data.name} onChange={e => setData('name', e.target.value)} placeholder={__('general.name')} required />
                                     {errors.name && <p className="text-sm text-red-600">{errors.name}</p>}
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="full_name">{__('general.full_name')}</Label>
                                     <Input id="full_name" value={data.full_name} onChange={e => setData('full_name', e.target.value)} placeholder={__('general.full_name')} />
+                                    {errors.full_name && <p className="text-sm text-red-600">{errors.full_name}</p>}
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="email">{__('general.email_address')}<span className="text-red-500">*</span></Label>
@@ -100,23 +103,45 @@ export default function Edit({ user, currencies = [], plans = [] }) {
                                     {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="password">Password</Label>
-                                    <Input id="password" type="password" value={data.password} onChange={e => setData('password', e.target.value)} placeholder={__('general.leave_blank_to_keep_current')} />
-                                    {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
+                                    <Label>{__('general.password')}</Label>
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button type="button" variant="outline" className="w-full justify-start text-left font-normal text-muted-foreground">
+                                                {data.password ? __('general.password_entered_ready_to_save') : __('general.leave_blank_to_keep_current')}
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle>{__('general.update_password')}</DialogTitle>
+                                                <DialogDescription>
+                                                    {__('general.enter_a_new_password_for_this_user_leave_it_empty_to_keep_the_current_password')}
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <div className="space-y-4 py-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="password">{__('general.new_password')}</Label>
+                                                    <Input id="password" type="password" value={data.password} onChange={e => setData('password', e.target.value)} placeholder={__('general.leave_blank_to_keep_current')} />
+                                                    {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
+                                                </div>
+                                            </div>
+                                            <DialogFooter showCloseButton={true}>
+                                            </DialogFooter>
+                                        </DialogContent>
+                                    </Dialog>
                                 </div>
                             </div>
-                        </section>
+                        </div>
 
                         {/* Connection */}
-                        <section>
-                            <h2 className="text-lg font-bold text-blue-600 mb-4 pb-2 border-b">Connection</h2>
+                        <div className="mb-10">
+                            <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.connection')}</h5>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="facebook">Facebook</Label>
+                                    <Label htmlFor="facebook">{__('general.facebook')}</Label>
                                     <Input id="facebook" value={data.facebook} onChange={e => setData('facebook', e.target.value)} placeholder={__('general.facebook_profile')} />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="skype">Skype</Label>
+                                    <Label htmlFor="skype">{__('general.skype')}</Label>
                                     <Input id="skype" value={data.skype} onChange={e => setData('skype', e.target.value)} placeholder={__('general.skype_id')} />
                                 </div>
                                 <div className="space-y-2">
@@ -124,69 +149,75 @@ export default function Edit({ user, currencies = [], plans = [] }) {
                                     <Input id="phone_number" value={data.phone_number} onChange={e => setData('phone_number', e.target.value)} placeholder={__('general.phone_number')} />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="phone_number2">Phone Number 2</Label>
+                                    <Label htmlFor="phone_number2">{__('general.phone_number_2')}</Label>
                                     <Input id="phone_number2" value={data.phone_number2} onChange={e => setData('phone_number2', e.target.value)} placeholder={__('general.secondary_phone_number')} />
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
                                     <Label htmlFor="whatsapp_number">{__('general.whatsapp_number')}</Label>
                                     <Input id="whatsapp_number" value={data.whatsapp_number} onChange={e => setData('whatsapp_number', e.target.value)} placeholder={__('general.whatsapp_number')} />
-                                    <p className="text-xs text-gray-500">You can enter multiple numbers separated by commas (e.g., 2010..., 2012...)</p>
+                                    <p className="text-xs text-gray-500">{__('general.you_can_enter_multiple_numbers_separated_by_commas_e_g_2010_2012')}</p>
                                 </div>
                             </div>
                             <div className="flex items-start space-x-3 mt-4">
                                 <input type="checkbox" id="disable_unpaid_balance_whatsapp" name="disable_unpaid_balance_whatsapp" checked={data.disable_unpaid_balance_whatsapp} onChange={handleCheckboxChange} className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
                                 <div>
-                                    <Label htmlFor="disable_unpaid_balance_whatsapp" className="font-bold cursor-pointer">{__('general.disable_unpaid_balance_whatsapp_notifications')}</Label>
+                                    <Label htmlFor="disable_unpaid_balance_whatsapp" className="font-bold cursor-pointer text-gray-900">{__('general.disable_unpaid_balance_whatsapp_notifications')}</Label>
                                     <p className="text-sm text-gray-500">{__('general.if_checked_this_user_will_not_receive_whatsapp_notifications_for_unpaid_balances')}</p>
                                 </div>
                             </div>
-                        </section>
+                        </div>
 
                         {/* Info */}
-                        <section>
-                            <h2 className="text-lg font-bold text-blue-600 mb-4 pb-2 border-b">Info</h2>
+                        <div className="mb-10">
+                            <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.info')}</h5>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <Label htmlFor="job">Job</Label>
+                                    <Label htmlFor="job">{__('general.job')}</Label>
                                     <Input id="job" value={data.job} onChange={e => setData('job', e.target.value)} placeholder={__('general.job_title')} />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="address">Address</Label>
-                                    <Input id="address" value={data.address} onChange={e => setData('address', e.target.value)} placeholder="Address" />
+                                    <Label htmlFor="address">{__('general.address')}</Label>
+                                    <Input id="address" value={data.address} onChange={e => setData('address', e.target.value)} placeholder={__('general.address')} />
                                 </div>
                             </div>
-                        </section>
+                        </div>
 
                         {/* Financial / Rates */}
-                        <section>
-                            <h2 className="text-lg font-bold text-blue-600 mb-4 pb-2 border-b">{__('general.rates_finance')}</h2>
+                        <div className="mb-10 border-t pt-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div className="space-y-2">
                                     <Label htmlFor="hour_rate_currency">{__('general.hour_rate_currency')}<span className="text-red-500">*</span></Label>
-                                    <select id="hour_rate_currency" value={data.hour_rate_currency} onChange={e => setData('hour_rate_currency', e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                        <option value="">-- select --</option>
-                                        {currencies.map(c => (
-                                            <option key={c.id} value={c.id}>{c.currency}</option>
-                                        ))}
-                                    </select>
+                                    <CurrencySelect
+                                        id="hour_rate_currency"
+                                        currencies={currencies}
+                                        value={data.hour_rate_currency}
+                                        onChange={val => setData('hour_rate_currency', val)}
+                                        valueKey="id"
+                                    />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="hour_rate">{__('general.hour_rate')}</Label>
+                                    <Label htmlFor="hour_rate">
+                                        {__('general.hour_rate')} {user.hour_rate_cur ? `(${user.hour_rate_cur})` : '(—)'}
+                                    </Label>
                                     <Input id="hour_rate" type="number" step="0.01" value={data.hour_rate} onChange={e => setData('hour_rate', e.target.value)} placeholder="0.00" />
                                     <p className="text-xs text-gray-500">{__('general.for_invoices_and_timers_only')}</p>
                                 </div>
                             </div>
 
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Task booking rate (focus page)</p>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div className="mb-4 pt-4 border-t border-gray-100">
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.task_booking_rate')} ({__('general.focus_page')})</label>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                                 <div className="space-y-2">
                                     <Label htmlFor="booking_rate_currency">{__('general.booking_rate_currency')}</Label>
-                                    <select id="booking_rate_currency" value={data.booking_rate_currency} onChange={e => setData('booking_rate_currency', e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                        <option value="">-- select --</option>
-                                        {currencies.map(c => (
-                                            <option key={c.id} value={c.id}>{c.currency}</option>
-                                        ))}
-                                    </select>
+                                    <CurrencySelect
+                                        id="booking_rate_currency"
+                                        currencies={currencies}
+                                        value={data.booking_rate_currency}
+                                        onChange={val => setData('booking_rate_currency', val)}
+                                        valueKey="id"
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="booking_rate">{__('general.booking_rate')}</Label>
@@ -196,17 +227,18 @@ export default function Edit({ user, currencies = [], plans = [] }) {
                                 <div className="space-y-2">
                                     <Label htmlFor="booking_rate_expires_at">{__('general.booking_rate_valid_until')}</Label>
                                     <Input id="booking_rate_expires_at" type="date" value={data.booking_rate_expires_at} onChange={e => setData('booking_rate_expires_at', e.target.value)} />
+                                    <p className="text-xs text-gray-500">{__('general.optional_after_this_date_standard_rate_plan_discount_applies')}</p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="space-y-2">
-                                    <Label htmlFor="salary">Salary (Monthly)</Label>
+                                    <Label htmlFor="salary">{__('general.salary_monthly')}</Label>
                                     <Input id="salary" type="number" step="0.01" value={data.salary} onChange={e => setData('salary', e.target.value)} placeholder={__('general.employee_salary')} />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="usd_type">Hour Rate USD Type (EGP) <span className="text-red-500">*</span></Label>
-                                    <select id="usd_type" value={data.usd_type} onChange={e => setData('usd_type', e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                                    <Label htmlFor="usd_type">{__('general.hour_rate_usd_type_egp')} <span className="text-red-500">*</span></Label>
+                                    <select id="usd_type" value={data.usd_type} onChange={e => setData('usd_type', e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" required>
                                         <option value="bank_usd">{__('general.min_usd')}</option>
                                         <option value="mix_usd">{__('general.mid_usd')}</option>
                                         <option value="gold_usd">{__('general.max_usd')}</option>
@@ -214,19 +246,19 @@ export default function Edit({ user, currencies = [], plans = [] }) {
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="currency">{__('general.client_default_currency')}<span className="text-red-500">*</span></Label>
-                                    <select id="currency" value={data.currency} onChange={e => setData('currency', e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                        <option value="">-- select --</option>
-                                        {currencies.map(c => (
-                                            <option key={c.id} value={c.id}>{c.currency}</option>
-                                        ))}
-                                    </select>
+                                    <CurrencySelect
+                                        id="currency"
+                                        currencies={currencies}
+                                        value={data.currency}
+                                        onChange={val => setData('currency', val)}
+                                        valueKey="id"
+                                    />
                                 </div>
                             </div>
-                        </section>
+                        </div>
 
                         {/* Subscription */}
-                        <section>
-                            <h2 className="text-lg font-bold text-blue-600 mb-4 pb-2 border-b">Subscription</h2>
+                        <div className="mb-10">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="subscription_date">{__('general.subscription_date')}</Label>
@@ -235,7 +267,7 @@ export default function Edit({ user, currencies = [], plans = [] }) {
                                 <div className="space-y-2">
                                     <Label htmlFor="subscription_plan">{__('general.subscription_plan')}</Label>
                                     <select id="subscription_plan" value={data.subscription_plan} onChange={e => setData('subscription_plan', e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                        <option value="">-- select --</option>
+                                        <option value="">-- {__('general.select')} --</option>
                                         {plans.map(p => (
                                             <option key={p.id} value={p.id}>{p.plan_name}</option>
                                         ))}
@@ -245,114 +277,142 @@ export default function Edit({ user, currencies = [], plans = [] }) {
                                     <Label htmlFor="postpaid_limit">{__('general.postpaid_limit')}</Label>
                                     <Input id="postpaid_limit" type="number" step="0.01" value={data.postpaid_limit} onChange={e => setData('postpaid_limit', e.target.value)} placeholder={__('general.postpaid_limit')} />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="max_devices">{__('general.max_devices_limit')}</Label>
-                                    <Input id="max_devices" type="number" step="1" min="0" value={data.max_devices} onChange={e => setData('max_devices', e.target.value)} placeholder={__('general.leave_blank_for_default')} />
-                                </div>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-2 mt-4">
                                 <input type="checkbox" id="subscription_force" name="subscription_force" checked={data.subscription_force} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
-                                <Label htmlFor="subscription_force" className="font-bold cursor-pointer">{__('general.force_subscription')}</Label>
+                                <Label htmlFor="subscription_force" className="font-bold cursor-pointer text-gray-900">{__('general.force_subscription')}</Label>
                             </div>
-                        </section>
+                        </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
                             {/* Tax Settings */}
-                            <section>
-                                <h2 className="text-lg font-bold text-blue-600 mb-4 pb-2 border-b">{__('general.tax_settings')}</h2>
+                            <div>
+                                <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.tax_settings')}</h5>
                                 <div className="space-y-4">
                                     <div className="flex items-center space-x-3">
                                         <input type="checkbox" id="client_taxable" name="client_taxable" checked={data.client_taxable} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
-                                        <Label htmlFor="client_taxable" className="cursor-pointer">{__('general.client_taxable')}</Label>
+                                        <Label htmlFor="client_taxable" className="cursor-pointer font-medium">{__('general.client_taxable')}</Label>
                                     </div>
                                     <div className="flex items-center space-x-3">
                                         <input type="checkbox" id="invoice_taxable" name="invoice_taxable" checked={data.invoice_taxable} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
-                                        <Label htmlFor="invoice_taxable" className="cursor-pointer">{__('general.invoice_taxable')}</Label>
+                                        <Label htmlFor="invoice_taxable" className="cursor-pointer font-medium">{__('general.invoice_taxable')}</Label>
                                     </div>
                                     <div className="flex items-center space-x-3">
                                         <input type="checkbox" id="timer_taxable" name="timer_taxable" checked={data.timer_taxable} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
-                                        <Label htmlFor="timer_taxable" className="cursor-pointer">{__('general.timer_taxable')}</Label>
+                                        <Label htmlFor="timer_taxable" className="cursor-pointer font-medium">{__('general.timer_taxable')}</Label>
                                     </div>
                                 </div>
-                            </section>
+                            </div>
 
                             {/* General Settings */}
-                            <section>
-                                <h2 className="text-lg font-bold text-blue-600 mb-4 pb-2 border-b">{__('general.general_settings')}</h2>
+                            <div>
+                                <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.general_settings')}</h5>
                                 <div className="space-y-4">
                                     <div className="flex items-center space-x-3">
                                         <input type="checkbox" id="allow_referral_system" name="allow_referral_system" checked={data.allow_referral_system} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
-                                        <Label htmlFor="allow_referral_system" className="cursor-pointer">{__('general.allow_referral_system')}</Label>
+                                        <Label htmlFor="allow_referral_system" className="cursor-pointer font-medium">{__('general.allow_referral_system')}</Label>
                                     </div>
                                     <div className="flex items-center space-x-3">
                                         <input type="checkbox" id="allow_view_times" name="allow_view_times" checked={data.allow_view_times} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
-                                        <Label htmlFor="allow_view_times" className="cursor-pointer">{__('general.allow_view_work_times')}</Label>
+                                        <Label htmlFor="allow_view_times" className="cursor-pointer font-medium">{__('general.allow_view_work_times')}</Label>
                                     </div>
                                     <div className="flex items-center space-x-3">
                                         <input type="checkbox" id="allow_postpaid" name="allow_postpaid" checked={data.allow_postpaid} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
-                                        <Label htmlFor="allow_postpaid" className="cursor-pointer">{__('general.allow_postpaid')}</Label>
+                                        <Label htmlFor="allow_postpaid" className="cursor-pointer font-medium">{__('general.allow_postpaid')}</Label>
                                     </div>
                                 </div>
-                            </section>
+                            </div>
                         </div>
 
                         {/* KYC Verification */}
-                        <section>
-                            <h2 className="text-lg font-bold text-blue-600 mb-4 pb-2 border-b">{__('general.kyc_verification')}</h2>
-                            <div className="space-y-6">
-                                <div className="flex items-start space-x-3">
-                                    <input type="checkbox" id="kyc_verified" name="kyc_verified" checked={data.kyc_verified} onChange={handleCheckboxChange} className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600" />
-                                    <div>
-                                        <Label htmlFor="kyc_verified" className="font-bold cursor-pointer">{__('general.kyc_verified')}</Label>
-                                        <p className="text-sm text-gray-500">{__('general.check_this_to_manually_verify_the_user_s_kyc_status')}</p>
+                        <div className="mb-10">
+                            <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.kyc_verification')}</h5>
+                            <div className="grid grid-cols-1 gap-6">
+                                <div>
+                                    <div className="flex items-start space-x-3 mb-2">
+                                        <input type="checkbox" id="kyc_verified" name="kyc_verified" checked={data.kyc_verified} onChange={handleCheckboxChange} className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600" />
+                                        <div>
+                                            <Label htmlFor="kyc_verified" className="font-bold cursor-pointer text-gray-900">{__('general.kyc_verified')}</Label>
+                                            <p className="text-sm text-gray-500">{__('general.check_this_to_manually_verify_the_user_s_kyc_status')}</p>
+                                        </div>
                                     </div>
+                                    {user.kyc_verified_at && (
+                                        <div className="ml-7 mt-2 text-sm text-green-600 font-medium flex items-center">
+                                            <CheckCircle className="h-4 w-4 mr-1.5" />
+                                            {__('general.verified_on')} {user.kyc_verified_at}
+                                            {user.kyc_verifier && ` ${__('general.by')} ${user.kyc_verifier.name}`}
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="kyc_notes">{__('general.kyc_admin_notes')}</Label>
                                     <textarea id="kyc_notes" name="kyc_notes" value={data.kyc_notes} onChange={e => setData('kyc_notes', e.target.value)} rows="3" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" placeholder={__('general.internal_notes_about_kyc_verification_not_visible_to_user')}></textarea>
                                 </div>
+                                
+                                <div className="mt-2">
+                                    {user.kyc_documents_count > 0 ? (
+                                        <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                            <div className="flex items-start">
+                                                <Info className="h-5 w-5 mr-2 text-blue-600 shrink-0 mt-0.5" />
+                                                <div>
+                                                    <strong className="font-bold">{__('general.kyc_documents')}:</strong> {__('general.this_user_has_n_kyc_documents', { count: user.kyc_documents_count })}
+                                                </div>
+                                            </div>
+                                            <a href={`/admin/users/${user.id}/kyc/documents`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 h-9 px-4 py-2 shrink-0">
+                                                {__('general.view_documents')}
+                                            </a>
+                                        </div>
+                                    ) : (
+                                        <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 flex items-start">
+                                            <AlertTriangle className="h-5 w-5 mr-2 text-amber-600 shrink-0 mt-0.5" />
+                                            <div>
+                                                {__('general.this_user_has_not_uploaded_any_kyc_documents_yet')}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </section>
+                        </div>
 
                         {/* Affiliate & Permissions */}
-                        <section>
-                            <h2 className="text-lg font-bold text-blue-600 mb-4 pb-2 border-b">{__('general.affiliate_permissions')}</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div className="mb-10">
+                            <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.affiliate_commission_settings')}</h5>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                                 <div className="space-y-2">
-                                    <Label htmlFor="affiliate_commission_percentage">Commission Percentage (%)</Label>
+                                    <Label htmlFor="affiliate_commission_percentage">{__('general.commission_percentage_percent')}</Label>
                                     <Input id="affiliate_commission_percentage" type="number" step="0.01" min="0" max="100" value={data.affiliate_commission_percentage} onChange={e => setData('affiliate_commission_percentage', e.target.value)} placeholder="1.00" />
+                                    <p className="text-xs text-gray-500">{__('general.enter_the_commission_percentage_e_g_1_00_for_1_percent')}</p>
                                 </div>
                                 <div className="flex items-start space-x-3 md:pt-8">
                                     <input type="checkbox" id="add_commission_to_total" name="add_commission_to_total" checked={data.add_commission_to_total} onChange={handleCheckboxChange} className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600" />
                                     <div>
-                                        <Label htmlFor="add_commission_to_total" className="font-bold cursor-pointer">{__('general.add_commission_to_invoice_total')}</Label>
+                                        <Label htmlFor="add_commission_to_total" className="font-bold cursor-pointer text-gray-900">{__('general.add_commission_to_invoice_total')}</Label>
                                         <p className="text-sm text-gray-500">{__('general.if_checked_commission_will_be_added_to_invoice_total_instead_of_deducted')}</p>
                                     </div>
                                 </div>
+                            </div>
+
+                            <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.referral_and_permissions')}</h5>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <Label htmlFor="ref_user_id">{__('general.referral_user_id')}</Label>
                                     <Input id="ref_user_id" value={data.ref_user_id} onChange={e => setData('ref_user_id', e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="slug">Custom Referral Code (Slug)</Label>
-                                    <Input id="slug" value={data.slug} onChange={e => setData('slug', e.target.value)} placeholder={__('general.leave_blank_for_default')} />
-                                    {errors.slug && <p className="text-sm text-red-600">{errors.slug}</p>}
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="role">{__('general.permission_role')}</Label>
+                                    <Label htmlFor="role">{__('general.permission')}</Label>
                                     <select id="role" value={data.role} onChange={e => setData('role', e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                        <option value="client">Client</option>
-                                        <option value="admin">Admin</option>
-                                        <option value="manager">Manager</option>
-                                        <option value="employee">Employee</option>
-                                        <option value="moderator">Moderator</option>
+                                        <option value="client">{__('general.client')}</option>
+                                        <option value="user">{__('general.user')}</option>
+                                        <option value="admin">{__('general.admin')}</option>
+                                        <option value="manager">{__('general.manager')}</option>
+                                        <option value="employee">{__('general.employee')}</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="account_status">{__('general.account_status')}</Label>
                                     <select id="account_status" value={data.account_status} onChange={e => setData('account_status', e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                        <option value="active">Active</option>
-                                        <option value="blocked">Blocked</option>
+                                        <option value="active">{__('general.active')}</option>
+                                        <option value="blocked">{__('general.blocked')}</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
@@ -360,11 +420,12 @@ export default function Edit({ user, currencies = [], plans = [] }) {
                                     <textarea id="block_reason" name="block_reason" value={data.block_reason} onChange={e => setData('block_reason', e.target.value)} rows="2" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"></textarea>
                                 </div>
                             </div>
-                        </section>
+                        </div>
 
                         <div className="flex justify-end pt-6 border-t">
                             <Button type="submit" disabled={processing} className="w-full md:w-auto">
-                                <Save className="mr-2 h-4 w-4" />{__('general.save_changes')}</Button>
+                                <Save className="mr-2 h-4 w-4" />{__('general.save_changes')}
+                            </Button>
                         </div>
                     </form>
                 </div>

@@ -74,6 +74,7 @@ import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { AsyncCombobox } from '@/Components/ui/AsyncCombobox';
 import { useERPMenu } from '@/hooks/useERPMenu';
+import { CurrencySelect } from '@/Components/CurrencySelect';
 import { __ } from '@/lib/i18n';
 
 const __ = (key: string) => key;
@@ -2845,17 +2846,12 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">{__('general.business_base_currency')}</label>
-                                                <select 
-                                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
+                                                <CurrencySelect 
+                                                    currencies={currencies}
                                                     value={settingsForm.defaultCurrency}
-                                                    onChange={(e) => setSettingsForm(prev => ({ ...prev, defaultCurrency: e.target.value }))}
-                                                >
-                                                    {currencies.map((c) => (
-                                                        <option key={c.id} value={c.currency}>
-                                                            {c.currency} ({c.symbol})
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                                    onChange={(val) => setSettingsForm(prev => ({ ...prev, defaultCurrency: val }))}
+                                                    valueKey="currency"
+                                                />
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Standard VAT / Tax Rate (%)</label>

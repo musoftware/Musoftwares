@@ -7,12 +7,12 @@ import { emptyPackage } from '../Create';
 import { __ } from '@/lib/i18n';
 
 const CURRENCIES = [
-    { id: 1, code: 'USD' },
-    { id: 2, code: 'EGP' },
-    { id: 3, code: 'EUR' },
-    { id: 4, code: 'GBP' },
-    { id: 5, code: 'AED' },
-    { id: 6, code: 'SAR' },
+    { id: 1, currency: 'USD' },
+    { id: 2, currency: 'EGP' },
+    { id: 3, currency: 'EUR' },
+    { id: 4, currency: 'GBP' },
+    { id: 5, currency: 'AED' },
+    { id: 6, currency: 'SAR' },
 ];
 const PKG_LABELS = ['Basic', 'Standard', 'Premium'];
 
@@ -125,7 +125,7 @@ export default function PricingStep({ data, setData, errors }: any) {
                                         onChange={e => setPackageField(idx, 'currency_id', Number(e.target.value))}
                                         className="h-12 pl-4 pr-2 bg-slate-50 text-sm font-bold text-slate-600 border-none outline-none appearance-none cursor-pointer"
                                     >
-                                        {CURRENCIES.map(c => <option key={c.id} value={c.id}>{c.code}</option>)}
+                                        {CURRENCIES.map(c => <option key={c.id} value={c.id}>{c.currency}</option>)}
                                     </select>
                                     <div className="w-[1px] h-6 bg-slate-200 mx-1"></div>
                                     <input

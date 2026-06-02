@@ -26,8 +26,9 @@ import {
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { CurrencySelect } from '@/Components/CurrencySelect';
 
-export default function Index({ paymentLinks, currencies }) {
+export default function Index({ paymentLinks, currencies }: { paymentLinks: any, currencies: any }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         amount: '',
@@ -36,7 +37,7 @@ export default function Index({ paymentLinks, currencies }) {
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-    const handleCreate = (e) => {
+    const handleCreate = (e: React.FormEvent) => {
         e.preventDefault();
         post(route('admin.payment-links.store'), {
             onSuccess: () => {
@@ -46,13 +47,13 @@ export default function Index({ paymentLinks, currencies }) {
         });
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = (id: number | string) => {
         if (confirm(__('admin.confirm_delete_payment_link', { default: 'Are you sure you want to delete this payment link?' }))) {
             router.delete(route('admin.payment-links.destroy', id));
         }
     };
 
-    const copyToClipboard = (uuid) => {
+    const copyToClipboard = (uuid: string) => {
         const url = route('guest.payment-links.show', uuid);
         navigator.clipboard.writeText(url);
         alert(__('admin.copied_to_clipboard', { default: 'Copied to clipboard' }));
@@ -60,7 +61,7 @@ export default function Index({ paymentLinks, currencies }) {
 
     const paginationLinks = paymentLinks.meta?.links || paymentLinks.links;
 
-    const getStatusBadge = (status) => {
+    const getStatusBadge = (status: string) => {
         switch (status) {
             case 'paid':
                 return <StatusBadge status="paid" label={__('admin.paid')} className="bg-emerald-50 text-emerald-700 border-emerald-100" />;
@@ -98,7 +99,7 @@ export default function Index({ paymentLinks, currencies }) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {paymentLinks.data.map((link) => (
+                                {paymentLinks.data.map((link: any) => (
                                     <TableRow key={link.id}>
                                         <TableCell data-label="ID" className="font-medium">
                                             #{link.id}
@@ -206,20 +207,13 @@ export default function Index({ paymentLinks, currencies }) {
                                 />
                                 {errors.amount && <span className="text-red-500 text-sm">{errors.amount}</span>}
                             </div>
-                            <div>
-                                <Label>{__('general.currency')}</Label>
-                                <Select value={data.currency_id} onValueChange={(val) => setData('currency_id', val)}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder={__('general.select_currency')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {currencies.map(c => (
-                                            <SelectItem key={c.id} value={String(c.id)}>{c.currency}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {errors.currency_id && <span className="text-red-500 text-sm">{errors.currency_id}</span>}
-                            </div>
+                            <CurrencySelect 
+                                label={__('general.currency')}
+                                currencies={currencies} 
+                                value={data.currency_id} 
+                                onChange={(val) => setData('currency_id', val)}
+                                error={errors.currency_id}
+                            />
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>

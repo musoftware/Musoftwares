@@ -22,7 +22,7 @@ interface Timer {
 
 interface Currency {
     id: number;
-    code: string;
+    currency: string;
     symbol: string | null;
 }
 
@@ -237,7 +237,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
 
         setIsSaving(true);
         router.post(route('admin.invoices.timer-details.store', item.id), {
-            sessions: newSessions,
+            sessions: newSessions as any,
             reason: reason
         }, {
             onSuccess: () => setIsSaving(false),
@@ -411,7 +411,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                         <th className="px-4 py-2 text-left font-semibold text-gray-600 w-1/4">Start</th>
                                         <th className="px-4 py-2 text-left font-semibold text-gray-600 w-1/4">End</th>
                                         <th className="px-4 py-2 text-left font-semibold text-gray-600 w-1/4">Duration</th>
-                                        <th className="px-4 py-2 text-left font-semibold text-gray-600">{invoice_currency?.code || 'Amount'}</th>
+                                        <th className="px-4 py-2 text-left font-semibold text-gray-600">{invoice_currency?.currency || 'Amount'}</th>
                                         <th className="px-4 py-2 w-12"></th>
                                     </tr>
                                 </thead>
@@ -424,7 +424,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                                 {formatDurationMS(timer.duration_seconds)}
                                                 {timer.isNew && <span className="ml-2 text-[9px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">New</span>}
                                             </td>
-                                            <td className="px-4 py-2.5 font-bold text-gray-900">{formatCurrency(timer.amount, invoice_currency?.code)}</td>
+                                            <td className="px-4 py-2.5 font-bold text-gray-900">{formatCurrency(timer.amount, invoice_currency?.currency)}</td>
                                             <td className="px-4 py-2.5 text-center">
                                                 {item.invoice_status === 'unpaid' && (
                                                     <button onClick={() => handleDelete(index)} className="text-gray-400 hover:text-red-500 transition-colors">
@@ -453,7 +453,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                     <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></div>
                                     <span className="font-semibold uppercase tracking-wider text-xs">Timer running —</span>
                                     <span className="font-bold text-base">{formatDurationMS(liveSeconds)}</span>
-                                    <span className="ml-auto font-bold">{formatCurrency((liveSeconds / 3600) * rate, invoice_currency?.code)}</span>
+                                    <span className="ml-auto font-bold">{formatCurrency((liveSeconds / 3600) * rate, invoice_currency?.currency)}</span>
                                 </div>
                             )}
 
@@ -521,8 +521,8 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                 <div className="font-mono text-lg font-bold text-blue-700">{formatDurationMS(currentTotalSeconds)}</div>
                             </div>
                             <div className="flex-1 min-w-[120px]">
-                                <span className="block text-[10px] font-bold text-green-600 uppercase tracking-wider mb-1">{invoice_currency?.code || 'Amount'}</span>
-                                <div className="text-lg font-black text-green-700">{formatCurrency(currentTotalBillable, invoice_currency?.code)}</div>
+                                <span className="block text-[10px] font-bold text-green-600 uppercase tracking-wider mb-1">{invoice_currency?.currency || 'Amount'}</span>
+                                <div className="text-lg font-black text-green-700">{formatCurrency(currentTotalBillable, invoice_currency?.currency)}</div>
                             </div>
                         </div>
 

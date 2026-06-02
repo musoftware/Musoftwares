@@ -8,8 +8,7 @@ class PointPackage extends Model
 {
     protected $guarded = [];
 
-    public function currency()
-    {
-        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
-    }
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 }

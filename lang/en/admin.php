@@ -133,4 +133,40 @@ return [
     'paid' => 'Paid',
     'base_system_rate' => 'Base System Rate',
     'client_rate' => 'Client Rate',
+    
+    // Subscription Assignment
+    'add_subscription' => 'Add Subscription',
+    'select_user' => 'Select User',
+    'select_user_to_assign_subscription' => 'Select the user you want to assign the subscription to.',
+    'search_users_placeholder' => 'Search users by name, email, or phone...',
+    'select_service' => 'Select Service',
+    'select_service_to_assign' => 'Select the service, addon, or tool to assign.',
+    'subscription_duration' => 'Subscription Duration',
+    'user_has_active_subscription' => 'This user already has an active subscription expiring on :date.',
+    'extend_expiration_date' => 'Extend Expiration Date',
+    'replace_expiration_date' => 'Replace Expiration Date',
+    '1_month' => '1 Month',
+    '6_months' => '6 Months',
+    '1_year' => '1 Year',
+    'lifetime' => 'Lifetime',
+    'expiration_date' => 'Expiration Date',
+    'subscription_assigned_successfully' => 'Subscription assigned successfully.',
+
+    // Point Packages
+    'point_packages' => 'Point Packages',
+    'create_point_package' => 'Create Point Package',
+    'edit_point_package' => 'Edit Point Package',
+    'package_name' => 'Package Name',
+    'points_amount' => 'Points Amount',
+    'point_package_created' => 'Point Package created successfully.',
+    'point_package_updated' => 'Point Package updated successfully.',
+    'point_package_deleted' => 'Point Package deleted successfully.',
+    'manage_point_packages' => 'Manage and create packages of points that users can purchase.',
+    
+    // Reschedule Invoice
+    'reschedule_invoice' => 'Reschedule Invoice',
+    'new_invoice_date' => 'New Invoice Date',
+    'notify_client' => 'Notify Client via WhatsApp',
+    'invoice_rescheduled_successfully' => 'Invoice rescheduled successfully.',
+    'only_unpaid_can_be_rescheduled' => 'Only unpaid or partially paid invoices can be rescheduled.',
 ];

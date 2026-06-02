@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { Input } from '@/Components/ui/input';
 import { ArrowLeft, Edit2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { CurrencySelect } from '@/Components/CurrencySelect';
 import { __ } from '@/lib/i18n';
 
 export default function EditClient({ client, currencies }: { client: any, currencies: any[] }) {
@@ -91,18 +92,12 @@ export default function EditClient({ client, currencies }: { client: any, curren
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-700">{__('general.billing_currency')}<span className="text-red-500">*</span></label>
-                                    <Select value={form.currency} onValueChange={(val) => setForm({...form, currency: val})}>
-                                        <SelectTrigger className="bg-white border-slate-200 text-slate-900">
-                                            <SelectValue placeholder={__('general.select_currency_1')} />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-white border-slate-200 text-slate-900">
-                                            {currencies.map(c => (
-                                                <SelectItem key={c.currency} value={c.currency}>
-                                                    {c.currency} - {c.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <CurrencySelect 
+                                        currencies={currencies}
+                                        value={form.currency}
+                                        onChange={(val) => setForm({...form, currency: val})}
+                                        valueKey="currency"
+                                    />
                                     {errors.currency && <p className="text-xs text-red-500">{errors.currency}</p>}
                                 </div>
                                 <div className="space-y-2 md:col-span-2">

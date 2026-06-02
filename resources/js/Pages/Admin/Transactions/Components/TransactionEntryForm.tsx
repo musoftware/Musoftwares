@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/Components/ui/switch';
 import { Plus, Trash2, Calculator, ArrowRightLeft, Percent, Layers, MinusCircle } from 'lucide-react';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
+import { CurrencySelect } from '@/Components/CurrencySelect';
 import { __ } from '@/lib/i18n';
 
 interface Project {
@@ -185,18 +186,12 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                             <div className="md:col-span-5 space-y-1">
                                 <Label className="text-xs text-muted-foreground uppercase tracking-wider font-bold">{__('general.from_currency')}</Label>
-                                <Select value={exchangeFromCurrency} onValueChange={setExchangeFromCurrency}>
-                                    <SelectTrigger className="bg-white">
-                                        <SelectValue placeholder={__('general.select_currency')}>
-                                            {exchangeFromCurrency ? currencies.find(c => c.id.toString() === exchangeFromCurrency)?.currency : "Select currency..."}
-                                        </SelectValue>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {currencies.map(c => (
-                                            <SelectItem key={c.id} value={c.id.toString()}>{c.currency}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <CurrencySelect 
+                                    currencies={currencies}
+                                    value={exchangeFromCurrency}
+                                    onChange={setExchangeFromCurrency}
+                                    triggerClassName="bg-white"
+                                />
                             </div>
                             <div className="md:col-span-5 space-y-1">
                                 <Label className="text-xs text-muted-foreground uppercase tracking-wider font-bold">

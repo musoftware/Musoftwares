@@ -13,6 +13,7 @@ import {
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Tag, Plus, Pencil, Trash2, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { CurrencySelect } from '@/Components/CurrencySelect';
 import { __ } from '@/lib/i18n';
 
 const emptyForm = {
@@ -208,18 +209,11 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 )}
                 <div>
                     <Label htmlFor="currency">Currency <span className="text-red-500">*</span></Label>
-                    <select
-                        id="currency"
-                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black"
+                    <CurrencySelect 
+                        currencies={currencies}
                         value={formData.currency}
-                        onChange={(e) => set('currency', e.target.value)}
-                        required
-                    >
-                        <option value="">-- Select --</option>
-                        {currencies.map((c) => (
-                            <option key={c.id} value={c.id}>{c.currency}</option>
-                        ))}
-                    </select>
+                        onChange={(val) => set('currency', val)}
+                    />
                 </div>
             </div>
 

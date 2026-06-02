@@ -4724,4 +4724,7 @@ return [
   'payment_successful' => 'عملية الدفع ناجحة',
   'payment_failed' => 'فشلت عملية الدفع',
   'return_to_home' => 'العودة إلى الرئيسية',
+  'password_entered_ready_to_save' => 'تم إدخال كلمة المرور (انقر للتغيير)',
+  'click_to_change_password' => 'انقر لتغيير كلمة المرور',
+  'enter_a_new_password_for_this_user_leave_it_empty_to_keep_the_current_password' => 'أدخل كلمة مرور جديدة لهذا المستخدم. اترك الحقل فارغاً للاحتفاظ بكلمة المرور الحالية.',
 ];

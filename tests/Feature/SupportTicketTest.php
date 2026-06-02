@@ -21,12 +21,14 @@ class SupportTicketTest extends TestCase
         parent::setUp();
 
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         $this->client = User::factory()->create();
         $this->client->assignRole('client');
 
         $this->admin = User::factory()->create();
         $this->admin->assignRole('admin');
+        $this->admin->load('roles');
     }
 
     public function test_client_can_view_own_tickets(): void

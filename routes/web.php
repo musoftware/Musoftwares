@@ -364,7 +364,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/projects/{project}/restore', [\App\Http\Controllers\Admin\ProjectController::class, 'restore'])->name('projects.restore');
 
     // ── Admin Plans ───────────────────────────────────────────────
-    Route::resource('/plans', \App\Http\Controllers\Admin\PlanController::class)->except(['create', 'edit', 'show']);
+    Route::get('/plans/search-users', [\App\Http\Controllers\Admin\PlanController::class, 'searchUsers'])->name('plans.search-users');
+    Route::resource('/plans', \App\Http\Controllers\Admin\PlanController::class)->except(['edit', 'show']);
 
     // ── Admin Invoices (Platform Billing) ─────────────────────────
     Route::get('/invoices', [\App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
@@ -390,6 +391,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/invoices/{invoice}/pay-service/calculate', [\App\Http\Controllers\Admin\InvoiceController::class, 'calculatePayService'])->name('invoices.pay-service.calculate');
     Route::post('/invoices/{invoice}/pay-service/store', [\App\Http\Controllers\Admin\InvoiceController::class, 'storePayService'])->name('invoices.pay-service.store');
     Route::post('/invoices/{invoice}/share-link', [\App\Http\Controllers\Admin\InvoiceController::class, 'shareLink'])->name('invoices.share-link');
+    Route::post('/invoices/{invoice}/reschedule', [\App\Http\Controllers\Admin\InvoiceController::class, 'reschedule'])->name('invoices.reschedule');
 
 
 
@@ -536,6 +538,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/points_controller', [\App\Http\Controllers\Admin\AdminPointsController::class, 'index'])->name('points.index');
     Route::post('/points_controller/{user}/adjust', [\App\Http\Controllers\Admin\AdminPointsController::class, 'adjustPoints'])->name('points.adjust');
     Route::get('/points_controller/{user}/history', [\App\Http\Controllers\Admin\AdminPointsController::class, 'history'])->name('points.history');
+    
+    // ── Admin Point Packages ───────────────────────────────────────
+    Route::resource('point-packages', \App\Http\Controllers\Admin\AdminPointPackageController::class)->except(['show']);
 
     // ── Charity Counter ──────────────────────────────────────────────
     Route::get('/charity-counter', [\App\Http\Controllers\Admin\CharityCounterController::class, 'index'])->name('charity-counter.index');

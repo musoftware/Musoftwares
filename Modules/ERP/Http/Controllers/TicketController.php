@@ -61,7 +61,7 @@ class TicketController extends Controller
         SupportTicket::create([
             'tenant_id' => $tenant->id,
             'client_id' => $validated['client_id'] ?? null,
-            'title' => $validated['title'],
+            'subject' => $validated['title'],
             'description' => $validated['description'] ?? '',
             'priority' => $validated['priority'],
             'status' => 'open',

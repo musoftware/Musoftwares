@@ -85,4 +85,72 @@ class PlanController extends Controller
             'business_currency' => $businessCurrency,
         ]);
     }
+
+    public function searchUsers(Request $request)
+    {
+        $search = $request->input('q');
+        
+        $users = User::with(['subscriptions' => function($q) {
+                $q->where('status', 'active')->where('expires_at', '>', now());
+            }])
+            ->when($search, function ($query, $search) {
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%");
+                });
+            })
+            ->limit(20)
+            ->get(['id', 'name', 'email', 'avatar_url'])
+            ->map(function ($user) {
+                $user->original_name = $user->name;
+                $user->name = $user->name . ' (' . $user->email . ')';
+                return $user;
+            });
+            
+        return response()->json($users);
+    }
+
+    public function create()
+    {
+        $items = $this->pricingService->getServiceItems();
+        
+        return Inertia::render('Admin/Plans/Create', [
+            'services' => $items,
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'object' => 'required|string',
+            'expires_at' => 'required|date',
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+        
+        $existingSub = $user->subscriptions()
+            ->where('object', $request->object)
+            ->where('status', 'active')
+            ->first();
+
+        $expiresAt = \Carbon\Carbon::parse($request->expires_at);
+
+        if ($existingSub) {
+            $existingSub->expires_at = $expiresAt;
+            $existingSub->save();
+        } else {
+            \App\Models\UserSubscription::create([
+                'user_id' => $user->id,
+                'object' => $request->object,
+                'status' => 'active',
+                'started_at' => now(),
+                'expires_at' => $expiresAt,
+                'auto_renew' => false,
+            ]);
+        }
+
+        return redirect()->route('admin.plans.index')->with('success', __('admin.subscription_assigned_successfully'));
+    }
 }

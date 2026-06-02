@@ -14,11 +14,21 @@ import { formatMoney } from '@/lib/utils';
 import { Eye, Calendar, DollarSign, Package } from 'lucide-react';
 import Pagination from '@/Components/Pagination';
 
-export default function Index({ users, business_currency }) {
-    const [selectedUser, setSelectedUser] = useState(null);
+export default function Index({ users, business_currency }: { users: any, business_currency: any }) {
+    const [selectedUser, setSelectedUser] = useState<any>(null);
 
     return (
-        <AdminSidebarLayout title={__('admin.subscribers')} header={__('admin.subscribers')}>
+        <AdminSidebarLayout 
+            title={__('admin.subscribers')} 
+            header={
+                <div className="flex items-center justify-between w-full">
+                    <h1 className="text-lg font-semibold text-slate-800">{__('admin.subscribers')}</h1>
+                    <Button onClick={() => window.location.href = route('admin.plans.create')}>
+                        {__('admin.add_subscription')}
+                    </Button>
+                </div>
+            }
+        >
             <Head title={__('admin.subscribers')} />
 
             <div className="overflow-hidden rounded-lg bg-white shadow">
@@ -33,7 +43,7 @@ export default function Index({ users, business_currency }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {users.data.map((user) => (
+                            {users.data.map((user: any) => (
                                 <tr key={user.id} className="border-b hover:bg-gray-50">
                                     <td className="p-4">
                                         <div className="flex items-center gap-3">
@@ -79,7 +89,7 @@ export default function Index({ users, business_currency }) {
                                                     <DialogTitle>{__('admin.user_services', { name: selectedUser?.name })}</DialogTitle>
                                                 </DialogHeader>
                                                 <div className="space-y-4 py-4">
-                                                    {selectedUser?.services.map((service) => (
+                                                    {selectedUser?.services.map((service: any) => (
                                                         <div key={service.id} className="flex items-center justify-between p-3 border rounded-lg bg-gray-50">
                                                             <div className="flex items-center gap-3">
                                                                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white border text-blue-600">

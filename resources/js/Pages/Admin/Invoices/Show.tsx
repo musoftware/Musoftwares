@@ -32,7 +32,7 @@ export default function Show({ invoice }: { invoice: any }) {
 
     const handleShareLink = async (duration: string) => {
         try {
-            const response = await axios.post(route('admin.invoices.share-link', invoice.id), { duration });
+            const response = await axios.post(route('admin.invoices.share-link', { invoice: String(invoice.id) }), { duration });
             if (response.data?.url) {
                 navigator.clipboard.writeText(response.data.url);
                 alert(__('admin.link_copied') + '\n' + __('admin.expires_at') + ': ' + response.data.expires_at);
@@ -56,7 +56,7 @@ export default function Show({ invoice }: { invoice: any }) {
         service_pay_dest: 'cib_swype',
         service_revenue: '0'
     });
-    const [payServicePreview, setPayServicePreview] = useState<{ cost: number, total: number, total_usd: number } | null>(null);
+    const [payServicePreview, setPayServicePreview] = useState<{ cost: number, total: number, total_usd: number, invoice_currency?: string } | null>(null);
     const [isCalculatingPayService, setIsCalculatingPayService] = useState(false);
     const [isSubmittingPayService, setIsSubmittingPayService] = useState(false);
 
@@ -76,6 +76,12 @@ export default function Show({ invoice }: { invoice: any }) {
 
     const [transferModal, setTransferModal] = useState(false);
     const [transferProjectId, setTransferProjectId] = useState<string | number | null>(invoice.project?.id || null);
+
+    const [rescheduleModal, setRescheduleModal] = useState(false);
+    const [rescheduleForm, setRescheduleForm] = useState({
+        new_date: invoice.created_at ? new Date(invoice.created_at).toISOString().split('T')[0] : '',
+        notify_client: true
+    });
 
     const resetState = () => {
         if (invoice && invoice.items) {
@@ -142,7 +148,7 @@ export default function Show({ invoice }: { invoice: any }) {
                 return;
             }
         }
-        router.post(route('admin.invoices.create-timer', invoice.id));
+        router.post(route('admin.invoices.create-timer', { invoice: String(invoice.id) }));
     };
 
     const handleDeleteItem = (index: number) => {
@@ -201,7 +207,7 @@ export default function Show({ invoice }: { invoice: any }) {
         
         const timeoutId = setTimeout(() => {
             setIsCalculatingPayService(true);
-            window.axios.post(route('admin.invoices.pay-service.calculate', invoice.id), payServiceForm)
+            window.axios.post(route('admin.invoices.pay-service.calculate', { invoice: String(invoice.id) }), payServiceForm)
                 .then(res => {
                     setPayServicePreview(res.data);
                 })
@@ -219,7 +225,7 @@ export default function Show({ invoice }: { invoice: any }) {
     const handlePayServiceSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmittingPayService(true);
-        router.post(route('admin.invoices.pay-service.store', invoice.id), payServiceForm as any, {
+        router.post(route('admin.invoices.pay-service.store', { invoice: String(invoice.id) }), payServiceForm as any, {
             preserveScroll: true,
             onSuccess: () => {
                 setShowPayServiceModal(false);
@@ -254,20 +260,20 @@ export default function Show({ invoice }: { invoice: any }) {
             cost_lines: costLines.map(line => ({
                 id: line.isNew ? null : line.id,
                 line_type: line.line_type,
-                amount: line.amount,
+                amount: String(line.amount),
                 description: line.description,
                 credit_user_id: line.credit_user_id
             })),
             items: items.map(item => ({
                 id: item.isNew ? null : item.id,
                 item_title: item.item_title,
-                amount: item.amount,
+                amount: String(item.amount),
                 qty: item.qty,
                 item_type: item.item_type
             }))
         };
 
-        router.put(route('admin.invoices.update', invoice.id), payload, {
+        router.put(route('admin.invoices.update', { invoice: String(invoice.id) }), payload, {
             preserveScroll: true,
             onSuccess: () => {
                 setIsEditing(false);
@@ -281,6 +287,16 @@ export default function Show({ invoice }: { invoice: any }) {
 
     const handleCancel = () => {
         resetState();
+    };
+
+    const handleRescheduleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.post(route('admin.invoices.reschedule', { invoice: String(invoice.id) }), rescheduleForm as any, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setRescheduleModal(false);
+            }
+        });
     };
 
     const getStatusBadge = (status: string) => {
@@ -306,7 +322,7 @@ export default function Show({ invoice }: { invoice: any }) {
         if (item.item_type === 'timer') return acc + (parseFloat(item.total_amount) || 0);
         return acc + (parseFloat(item.amount) * parseInt(item.qty || 1) || 0);
     }, 0);
-    const currentTotal = currentSubtotal + parseFloat(invoice.tax || 0) - parseFloat(discount || 0);
+    const currentTotal = currentSubtotal + parseFloat(String(invoice.tax || 0)) - parseFloat(String(discount || 0));
 
     return (
         <AdminSidebarLayout title={`Invoice #${invoice.invoice_number}`} header="Invoice Management">
@@ -333,13 +349,22 @@ export default function Show({ invoice }: { invoice: any }) {
                 </div>
                 <div className="flex flex-wrap items-center gap-2 md:justify-end">
                     <div className="flex bg-gray-100 rounded-md p-1">
-                        <Button variant="ghost" size="sm" className="h-8 hover:bg-white" onClick={() => window.open(route('admin.invoices.print-pdf', invoice.id), '_blank')}>
+                        <Button variant="ghost" size="sm" className="h-8 hover:bg-white" onClick={() => window.open(route('admin.invoices.print-pdf', { invoice: String(invoice.id) }), '_blank')}>
                             <Printer className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-8 hover:bg-white" onClick={() => window.location.href = route('admin.invoices.download-pdf', invoice.id)}>
+                        <Button variant="ghost" size="sm" className="h-8 hover:bg-white" onClick={() => window.location.href = route('admin.invoices.download-pdf', { invoice: String(invoice.id) })}>
                             <Download className="w-4 h-4" />
                         </Button>
                     </div>
+                    {(isUnpaid || invoice.status === 'partially_paid') && (
+                        <Button 
+                            variant="outline" 
+                            className="h-10 px-4 bg-white"
+                            onClick={() => setRescheduleModal(true)}
+                        >
+                            <Clock className="w-4 h-4 mr-2" /> {__('admin.reschedule_invoice')}
+                        </Button>
+                    )}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button className="bg-blue-600 hover:bg-blue-700 h-10 px-4">
@@ -348,13 +373,13 @@ export default function Show({ invoice }: { invoice: any }) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleShareLink('24_hours')}>
-                                {__('admin.share_24_hours', 'Share (24 Hours)')}
+                                {__('admin.share_24_hours')}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleShareLink('3_days')}>
-                                {__('admin.share_3_days', 'Share (3 Days)')}
+                                {__('admin.share_3_days')}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleShareLink('1_month')}>
-                                {__('admin.share_1_month', 'Share (1 Month)')}
+                                {__('admin.share_1_month')}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -556,7 +581,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 <Clock className="w-4 h-4 mr-2" />{__('general.log_time')}</Button>
                         </div>
                     </div>
-                    <Button onClick={() => { if(confirm('Mark invoice as paid?')) router.post(route('admin.invoices.mark-paid', invoice.id)); }} variant="outline" size="sm" className="w-full md:w-auto border-dashed border-green-300 text-green-700 hover:bg-green-50">
+                    <Button onClick={() => { if(confirm('Mark invoice as paid?')) router.post(route('admin.invoices.mark-paid', { invoice: String(invoice.id) })); }} variant="outline" size="sm" className="w-full md:w-auto border-dashed border-green-300 text-green-700 hover:bg-green-50">
                         <CreditCard className="w-4 h-4 mr-2" />{__('general.mark_as_paid')}</Button>
                 </div>
             )}
@@ -748,7 +773,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                 className="rounded-l-none h-10 shadow-none focus-visible:ring-blue-500"
                                                 value={discount}
                                                 onChange={(e) => {
-                                                    setDiscount(e.target.value);
+                                                    setDiscount(Number(e.target.value));
                                                     setDiscountPercentage(0);
                                                 }}
                                                 disabled={!isUnpaid}
@@ -765,8 +790,8 @@ export default function Show({ invoice }: { invoice: any }) {
                                                 onChange={(e) => {
                                                     const pct = parseFloat(e.target.value) || 0;
                                                     setDiscountPercentage(pct);
-                                                    const base = parseFloat(invoice.sub_total) + parseFloat(invoice.tax || 0);
-                                                    setDiscount((base * pct / 100).toFixed(2));
+                                                    const base = parseFloat(invoice.sub_total) + parseFloat(String(invoice.tax || 0));
+                                                    setDiscount(Number((base * pct / 100).toFixed(2)));
                                                 }}
                                                 disabled={!isUnpaid}
                                                 placeholder="%"
@@ -781,7 +806,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                     )}
                                 </div>
                                 <div className="text-xs text-gray-400 mt-2">
-                                    Base amount before discount: {formatCurrency(parseFloat(invoice.sub_total) + parseFloat(invoice.tax || 0), invoice.currency)}
+                                    Base amount before discount: {formatCurrency(parseFloat(invoice.sub_total) + parseFloat(String(invoice.tax || 0)), invoice.currency)}
                                 </div>
                             </CardContent>
                         </Card>
@@ -1048,7 +1073,7 @@ export default function Show({ invoice }: { invoice: any }) {
                         )}
 
                         {invoice.status !== 'cancelled' && !invoice.is_published && (
-                            <Link href={route('admin.invoices.notify', invoice.id)}>
+                            <Link href={route('admin.invoices.notify', { invoice: String(invoice.id) })}>
                                 <Button variant="outline" title={__('general.notify_client')}>
                                     <Share2 className="w-4 h-4" />
                                 </Button>
@@ -1082,7 +1107,7 @@ export default function Show({ invoice }: { invoice: any }) {
                         <Button 
                             variant="outline"
                             className="border-red-300 text-red-600 hover:bg-red-100 w-full sm:w-auto justify-center"
-                            onClick={() => { if(confirm('Are you sure you want to cancel this invoice? This action is irreversible.')) router.post(route('admin.invoices.cancel', invoice.id)); }}
+                            onClick={() => { if(confirm('Are you sure you want to cancel this invoice? This action is irreversible.')) router.post(route('admin.invoices.cancel', { invoice: String(invoice.id) })); }}
                         >
                             <X className="w-4 h-4 mr-2" />{__('general.cancel_invoice')}</Button>
                         <Button 
@@ -1260,11 +1285,11 @@ export default function Show({ invoice }: { invoice: any }) {
                             className="bg-blue-600 hover:bg-blue-700 text-white"
                             onClick={() => {
                                 if (actionModal.type === 'bill_balance') {
-                                    router.post(route('admin.invoices.mark-paid', invoice.id));
+                                    router.post(route('admin.invoices.mark-paid', { invoice: String(invoice.id) }));
                                 } else if (actionModal.type === 'partial_pay') {
                                     const amt = parseFloat(actionModal.amount);
                                     if (amt > 0) {
-                                        router.post(route('admin.invoices.partial-pay', invoice.id), { amount: amt });
+                                        router.post(route('admin.invoices.partial-pay', { invoice: String(invoice.id) }), { amount: amt });
                                     }
                                 }
                                 setActionModal(prev => ({ ...prev, isOpen: false }));
@@ -1275,6 +1300,51 @@ export default function Show({ invoice }: { invoice: any }) {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* Reschedule Modal */}
+            <Dialog open={rescheduleModal} onOpenChange={setRescheduleModal}>
+                <DialogContent>
+                    <form onSubmit={handleRescheduleSubmit}>
+                        <DialogHeader>
+                            <DialogTitle>{__('admin.reschedule_invoice')}</DialogTitle>
+                            <DialogDescription>{__('general.enter_new_date')}</DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4 space-y-4">
+                            <div>
+                                <Label htmlFor="new_date" className="mb-2 block">{__('admin.new_invoice_date')}</Label>
+                                <Input
+                                    id="new_date"
+                                    type="date"
+                                    required
+                                    value={rescheduleForm.new_date}
+                                    onChange={(e) => setRescheduleForm(prev => ({ ...prev, new_date: e.target.value }))}
+                                />
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <input 
+                                    type="checkbox" 
+                                    id="notify_client" 
+                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    checked={rescheduleForm.notify_client}
+                                    onChange={(e) => setRescheduleForm(prev => ({ ...prev, notify_client: e.target.checked }))}
+                                />
+                                <Label htmlFor="notify_client" className="font-normal cursor-pointer">
+                                    {__('admin.notify_client')}
+                                </Label>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setRescheduleModal(false)}>
+                                {__('general.cancel')}
+                            </Button>
+                            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
+                                {__('general.confirm')}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
 
             <Dialog open={jobStatusModal} onOpenChange={setJobStatusModal}>
                 <DialogContent>
@@ -1297,7 +1367,7 @@ export default function Show({ invoice }: { invoice: any }) {
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setJobStatusModal(false)}>{__('general.cancel') || 'Cancel'}</Button>
                         <Button onClick={() => {
-                            router.post(route('admin.invoices.change-job-status', invoice.id), { job_status: jobStatusForm }, {
+                            router.post(route('admin.invoices.change-job-status', { invoice: String(invoice.id) }), { job_status: jobStatusForm }, {
                                 onSuccess: () => setJobStatusModal(false),
                                 preserveScroll: true
                             });
