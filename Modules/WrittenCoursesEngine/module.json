@@ -5,8 +5,8 @@
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\WrittenCoursesEngine\\App\\Providers\\WrittenCoursesEngineServiceProvider",
-        "Modules\\WrittenCoursesEngine\\App\\Providers\\RouteServiceProvider"
+        "Modules\\WrittenCoursesEngine\\app\\Providers\\WrittenCoursesEngineServiceProvider",
+        "Modules\\WrittenCoursesEngine\\app\\Providers\\RouteServiceProvider"
     ],
     "aliases": {},
     "files": [],

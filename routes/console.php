@@ -8,7 +8,7 @@ use Modules\ERP\Console\ProcessRecurringEntries;
 
 use App\Console\Commands\RenewSubscriptions;
 use App\Console\Commands\ProcessEarningsClearing;
-use Modules\fbmb\Console\CleanupExpiredFbmbResults;
+use Modules\Fbmb\Console\CleanupExpiredFbmbResults;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());

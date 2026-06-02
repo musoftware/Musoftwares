@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-use Modules\WrittenCoursesEngine\App\Http\Controllers\CourseApiController;
-use Modules\WrittenCoursesEngine\App\Http\Controllers\AdminCourseApiController;
+use Modules\WrittenCoursesEngine\app\Http\Controllers\CourseApiController;
+use Modules\WrittenCoursesEngine\app\Http\Controllers\AdminCourseApiController;
 
 Route::prefix('written-courses')->group(function() {
     Route::get('/', [CourseApiController::class, 'index']);

@@ -1,9 +1,9 @@
 <?php
 
-namespace Modules\fbmb\Console;
+namespace Modules\Fbmb\Console;
 
 use Illuminate\Console\Command;
-use Modules\fbmb\Models\FbmbLookupResult;
+use Modules\Fbmb\Models\FbmbLookupResult;
 
 class CleanupExpiredFbmbResults extends Command
 {
