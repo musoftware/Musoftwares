@@ -558,6 +558,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/users/{userId}/files/upload', [\App\Http\Controllers\Admin\UserFileController::class, 'upload'])->name('users.files.upload');
     Route::post('/users/{userId}/files/folder', [\App\Http\Controllers\Admin\UserFileController::class, 'newFolder'])->name('users.files.folder');
     Route::get('/users/{userId}/files/download', [\App\Http\Controllers\Admin\UserFileController::class, 'download'])->name('users.files.download');
+    Route::get('/users/{userId}/files/edit', [\App\Http\Controllers\Admin\UserFileController::class, 'edit'])->name('users.files.edit');
+    Route::post('/users/{userId}/files/edit', [\App\Http\Controllers\Admin\UserFileController::class, 'updateContent'])->name('users.files.updateContent');
     Route::post('/users/{userId}/files/rename', [\App\Http\Controllers\Admin\UserFileController::class, 'rename'])->name('users.files.rename');
     Route::post('/users/{userId}/files/move', [\App\Http\Controllers\Admin\UserFileController::class, 'move'])->name('users.files.move');
     Route::delete('/users/{userId}/files', [\App\Http\Controllers\Admin\UserFileController::class, 'delete'])->name('users.files.delete');

@@ -640,11 +640,17 @@ class InvoiceController extends Controller
         }
 
         $request->validate([
-            'sessions' => 'required|array',
+            'reason' => 'nullable|string|max:255',
+            'sessions' => 'present|array',
             'sessions.*.start_date' => 'required|date',
             'sessions.*.end_date' => 'required|date',
             'sessions.*.amount' => 'required|numeric',
         ]);
+
+        if ($request->filled('reason')) {
+            $item->item_title = $request->reason;
+            $item->save();
+        }
 
         foreach ($request->sessions as $session) {
             \App\Models\InvoiceItemTimer::create([
