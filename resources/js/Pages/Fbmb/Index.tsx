@@ -1,6 +1,6 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import axios from 'axios';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
@@ -193,6 +193,68 @@ export default function ISaasIndex() {
         setActiveTab('lookup');
     };
 
+    // Polling active lookup status
+    useEffect(() => {
+        if (phase !== 'results' || !result || (result.status !== 'pending' && result.status !== 'processing')) {
+            return;
+        }
+
+        let intervalId = setInterval(async () => {
+            try {
+                const response = await axios.get(route('fbmb.status', { token: result.download_token }));
+                const currentStatus = response.data.status;
+                
+                // Update our active result state
+                setResult(response.data);
+
+                if (currentStatus === 'completed' || currentStatus === 'failed') {
+                    clearInterval(intervalId);
+                    
+                    // Reload page props to refresh user points balance & history list
+                    router.reload({
+                        only: ['pointsBalance', 'history'],
+                        onSuccess: () => {
+                            if (currentStatus === 'completed') {
+                                toast({
+                                    title: __('general.lookup_complete'),
+                                    description: response.data.found_count > 0 
+                                        ? `Found ${response.data.found_count} matches from ${response.data.total_ids} IDs.`
+                                        : __('general.no_matches_were_found_no_points_were_deducted')
+                                });
+                            } else {
+                                toast({
+                                    title: __('general.failed_to_process'),
+                                    description: response.data.error_message || 'An error occurred.',
+                                    variant: "destructive"
+                                });
+                            }
+                        }
+                    });
+                }
+            } catch (err: any) {
+                console.error("Polling status failed:", err);
+            }
+        }, 3000);
+
+        return () => clearInterval(intervalId);
+    }, [phase, result?.download_token, result?.status, toast]);
+
+    // Polling background scan items in history tab
+    useEffect(() => {
+        const hasPendingHistory = history.some((h: HistoryRecord) => h.status === 'pending' || h.status === 'processing');
+        if (!hasPendingHistory) {
+            return;
+        }
+
+        const intervalId = setInterval(() => {
+            router.reload({
+                only: ['pointsBalance', 'history']
+            });
+        }, 4000);
+
+        return () => clearInterval(intervalId);
+    }, [history]);
+
     // -- Format helpers -----------------------------------------------------
     const formatFileSize = (bytes: number) => {
         if (bytes < 1024) return `${bytes} B`;
@@ -203,7 +265,7 @@ export default function ISaasIndex() {
     const formatDate = (iso: string) => {
         const d = new Date(iso);
         return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-            + ' · '
+            + ' Â· '
             + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     };
 
@@ -296,7 +358,7 @@ export default function ISaasIndex() {
                             )}
                         >
                             <History className="w-4 h-4" />
-                            History
+                            {__('general.history')}
                             {history.length > 0 && (
                                 <span className={cn(
                                     "text-[10px] font-semibold px-1.5 py-0.5 rounded-full",
@@ -491,23 +553,40 @@ export default function ISaasIndex() {
                                         )}
 
                                         {/* RESULTS PHASE */}
-                                        {phase === 'results' && result && result.status === 'pending' ? (
-                                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 text-center py-6">
-                                                <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 mx-auto mb-4 relative">
-                                                    <div className="absolute inset-0 rounded-2xl bg-indigo-500/10 animate-pulse" />
-                                                    <Clock className="w-8 h-8 text-indigo-600" />
+                                        {phase === 'results' && result && (result.status === 'pending' || result.status === 'processing') ? (
+                                            <div className="flex flex-col items-center justify-center py-12 animate-in fade-in duration-500">
+                                                <div className="relative mb-6">
+                                                    <div className="absolute inset-0 rounded-full bg-indigo-500/10 animate-ping duration-1000" />
+                                                    <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 shadow-md">
+                                                        <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
+                                                    </div>
                                                 </div>
-                                                <h3 className="text-lg font-bold text-slate-800 mb-2">{__('general.lookup_queued')}</h3>
-                                                <p className="text-sm text-slate-500 max-w-sm mx-auto mb-6">
-                                                    {__('general.lookup_queued_successfully')}
+                                                <h3 className="text-xl font-bold text-slate-800 tracking-tight">
+                                                    {__('general.scanning_in_progress')}
+                                                </h3>
+                                                <p className="mt-2 text-sm text-slate-600 font-medium bg-indigo-50 text-indigo-700 px-3.5 py-1 rounded-full border border-indigo-100">
+                                                    {__('general.processing_ids_count', { count: (result.total_ids || estimatedIds || 0).toLocaleString() })}
                                                 </p>
-                                                <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
-                                                    <Button onClick={() => setActiveTab('history')} className="flex-1 h-11 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold">
+                                                <p className="mt-3 text-xs text-slate-500 text-center max-w-sm leading-relaxed">
+                                                    {__('general.scanning_database_desc')}
+                                                </p>
+
+                                                <div className="mt-8 flex flex-col sm:flex-row gap-3 w-full max-w-md">
+                                                    <Button 
+                                                        onClick={() => setActiveTab('history')} 
+                                                        className="flex-1 h-11 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold shadow-sm hover:shadow animate-in fade-in slide-in-from-bottom-2 duration-350"
+                                                    >
                                                         <History className="w-4 h-4 mr-2" />
-                                                        View History
+                                                        {__('general.view_history')}
                                                     </Button>
-                                                    <Button onClick={startNewLookup} variant="outline" className="flex-1 h-11 rounded-xl">
-                                                        <ArrowRight className="w-4 h-4 mr-2" />{__('general.new_lookup')}</Button>
+                                                    <Button 
+                                                        onClick={startNewLookup} 
+                                                        variant="outline" 
+                                                        className="flex-1 h-11 rounded-xl"
+                                                    >
+                                                        <ArrowRight className="w-4 h-4 mr-2" />
+                                                        {__('general.new_lookup')}
+                                                    </Button>
                                                 </div>
                                             </div>
                                         ) : phase === 'results' && result && (
@@ -648,17 +727,18 @@ export default function ISaasIndex() {
                                                                     {__('general.failed')}
                                                                     <span className="font-normal text-slate-400"> / {record.total_ids.toLocaleString()} IDs</span>
                                                                 </span>
-                                                            )}
-                                                            {isCompleted && (
+                                                            )}                                                            {isCompleted && (
                                                                 <span className="text-sm font-semibold text-slate-800">
-                                                                    {record.found_count.toLocaleString()} matches
-                                                                    <span className="font-normal text-slate-400"> / {record.total_ids.toLocaleString()} IDs</span>
+                                                                    {__('general.matches_out_of_ids', {
+                                                                        found: record.found_count.toLocaleString(),
+                                                                        total: record.total_ids.toLocaleString()
+                                                                    })}
                                                                 </span>
                                                             )}
                                                             
                                                             {!isPending && !isFailed && (record.expired ? (
                                                                 <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-200 text-slate-500">
-                                                                    Expired
+                                                                    {__('general.expired')}
                                                                 </span>
                                                             ) : (
                                                                 <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 flex items-center gap-1">
@@ -667,18 +747,18 @@ export default function ISaasIndex() {
                                                                 </span>
                                                             ))}
                                                         </div>
-
+ 
                                                         {/* Stats row */}
                                                         <div className="flex items-center gap-4 text-xs text-slate-500 flex-wrap">
                                                             {!isPending && !isFailed && (
                                                                 <>
                                                                     <span className="flex items-center gap-1">
                                                                         <Zap className="w-3 h-3 text-indigo-400" />
-                                                                        {record.credits_used.toLocaleString()} pts used
+                                                                        {__('general.pts_used', { count: record.credits_used.toLocaleString() })}
                                                                     </span>
                                                                     <span className="flex items-center gap-1">
                                                                         <Wallet className="w-3 h-3 text-emerald-400" />
-                                                                        {record.remaining_balance.toLocaleString()} pts remaining
+                                                                        {__('general.pts_remaining', { count: record.remaining_balance.toLocaleString() })}
                                                                     </span>
                                                                 </>
                                                             )}
@@ -716,7 +796,7 @@ export default function ISaasIndex() {
                                                                 className="h-9 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-semibold shadow-sm hover:shadow-md hover:-translate-y-px transition-all"
                                                             >
                                                                 <Download className="w-3.5 h-3.5 mr-1.5" />
-                                                                Download
+                                                                {__('general.download')}
                                                             </Button>
                                                         ) : (
                                                             <div className={cn(
@@ -730,7 +810,7 @@ export default function ISaasIndex() {
                                                                 {record.found_count === 0 ? (
                                                                     <><AlertCircle className="w-3 h-3" />{__('general.no_matches')}</>
                                                                 ) : (
-                                                                    <><X className="w-3 h-3" /> Expired</>
+                                                                    <><X className="w-3 h-3" /> {__('general.expired')}</>
                                                                 )}
                                                             </div>
                                                         ))}
@@ -757,3 +837,4 @@ export default function ISaasIndex() {
         </AuthenticatedLayout>
     );
 }
+

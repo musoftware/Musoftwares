@@ -3,7 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\User;
-use App\Models\UserNote;
+use App\Models\UserCredential;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -54,17 +54,17 @@ class UserNoteControllerTest extends TestCase
         ]);
 
         $response->assertStatus(200)->assertJson(['success' => true]);
-        $this->assertDatabaseHas('user_notes', [
+        $this->assertDatabaseHas('user_credentials', [
             'user_id' => $this->clientUser->id,
             'title' => 'Test Note',
-            'content' => 'This is a test note.',
+            'note' => 'This is a test note.',
             'category' => 'notes'
         ]);
     }
 
     public function test_admin_can_delete_user_note()
     {
-        $note = UserNote::create([
+        $note = UserCredential::create([
             'user_id' => $this->clientUser->id,
             'title' => 'Test Note',
             'category' => 'notes',
@@ -74,14 +74,14 @@ class UserNoteControllerTest extends TestCase
         $response = $this->actingAs($this->admin)->deleteJson("/admin/users/{$this->clientUser->id}/notes/{$note->id}");
 
         $response->assertStatus(200)->assertJson(['success' => true]);
-        $this->assertDatabaseMissing('user_notes', [
+        $this->assertDatabaseMissing('user_credentials', [
             'id' => $note->id
         ]);
     }
 
     public function test_admin_can_archive_user_note()
     {
-        $note = UserNote::create([
+        $note = UserCredential::create([
             'user_id' => $this->clientUser->id,
             'title' => 'Test Note',
             'category' => 'notes',
@@ -91,7 +91,7 @@ class UserNoteControllerTest extends TestCase
         $response = $this->actingAs($this->admin)->postJson("/admin/users/{$this->clientUser->id}/notes/{$note->id}/archive");
 
         $response->assertStatus(200)->assertJson(['success' => true]);
-        $this->assertDatabaseHas('user_notes', [
+        $this->assertDatabaseHas('user_credentials', [
             'id' => $note->id,
             'category' => 'archived',
             'original_category' => 'notes'
@@ -100,7 +100,7 @@ class UserNoteControllerTest extends TestCase
 
     public function test_admin_can_unarchive_user_note()
     {
-        $note = UserNote::create([
+        $note = UserCredential::create([
             'user_id' => $this->clientUser->id,
             'title' => 'Test Note',
             'category' => 'archived',
@@ -112,7 +112,7 @@ class UserNoteControllerTest extends TestCase
         $response = $this->actingAs($this->admin)->postJson("/admin/users/{$this->clientUser->id}/notes/{$note->id}/unarchive");
 
         $response->assertStatus(200)->assertJson(['success' => true]);
-        $this->assertDatabaseHas('user_notes', [
+        $this->assertDatabaseHas('user_credentials', [
             'id' => $note->id,
             'category' => 'notes',
             'original_category' => null
@@ -121,7 +121,7 @@ class UserNoteControllerTest extends TestCase
 
     public function test_admin_can_toggle_pin_user_note()
     {
-        $note = UserNote::create([
+        $note = UserCredential::create([
             'user_id' => $this->clientUser->id,
             'title' => 'Test Note',
             'category' => 'notes',
@@ -133,7 +133,7 @@ class UserNoteControllerTest extends TestCase
         $response = $this->actingAs($this->admin)->postJson("/admin/users/{$this->clientUser->id}/notes/{$note->id}/toggle-pin");
 
         $response->assertStatus(200)->assertJson(['success' => true, 'is_pinned' => true]);
-        $this->assertDatabaseHas('user_notes', [
+        $this->assertDatabaseHas('user_credentials', [
             'id' => $note->id,
             'is_pinned' => true
         ]);

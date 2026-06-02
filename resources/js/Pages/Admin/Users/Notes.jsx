@@ -5,7 +5,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import SimpleCrypto from 'simple-crypto-js';
+import SimpleCrypto from '@/lib/SimpleCrypto';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 

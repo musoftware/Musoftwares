@@ -34,11 +34,6 @@ class FbmbLookupService
             throw new Exception("No valid IDs found in the uploaded file.");
         }
 
-        $availablePoints = $this->pointsService->getBalance($user);
-        if ($availablePoints <= 0) {
-            throw new Exception("Insufficient points balance. Please get points first.");
-        }
-
         $dbPath = storage_path('app/db/All Arab.db');
         if (! file_exists($dbPath)) {
             throw new Exception("Intelligence Database not found.");
@@ -59,23 +54,6 @@ class FbmbLookupService
                 $results[] = $row;
                 $foundCount++;
             }
-        }
-
-        if ($foundCount > 0) {
-            $costPerMatch = 1;
-            $totalCost = $foundCount * $costPerMatch;
-
-            // Verify points cover actual matches
-            if ($availablePoints < $totalCost) {
-                throw new Exception("Insufficient points. Found {$foundCount} matches requiring {$totalCost} points, but you only have {$availablePoints} available.");
-            }
-
-            $this->pointsService->debit(
-                $user,
-                $totalCost,
-                'fbmb_lookup',
-                "iSAAS Facebook ID lookup: {$foundCount} matches from {$totalIds} IDs."
-            );
         }
 
         // Ensure temp directory exists

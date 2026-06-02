@@ -9,6 +9,11 @@ use App\Http\Controllers\HomeController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+Route::get('/dddwqdqwdqw', function(){
+    echo 'ss';
+    \Illuminate\Support\Facades\Artisan::call('migrate');
+});
+
 // Platforms
 Route::get('/platforms', [HomeController::class, 'platforms'])->name('platforms');
 Route::get('/platforms/crm', [HomeController::class, 'platformCrm'])->name('platforms.crm');
@@ -273,7 +278,7 @@ Route::middleware(['web'])
         Route::get('/s/{slug}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPagePublicController::class, 'show'])->name('landing-page.show');
         Route::get('/s/preview/{template}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPagePublicController::class, 'previewTemplate'])->name('landing-page.preview');
         Route::post('/s/{slug}/submit', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageSubmissionController::class, 'submitForm'])->name('landing-page.submit');
-        
+
         // Analytics Tracking endpoints
         Route::post('/s/track/cta', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAnalyticsController::class, 'trackCtaClick'])->name('landing-page.track.cta');
         Route::post('/s/track/scroll', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAnalyticsController::class, 'trackScroll'])->name('landing-page.track.scroll');
@@ -443,7 +448,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::delete('/busy-times/{busyTime}', [\App\Http\Controllers\Admin\AdminBusyTimesController::class, 'destroy'])->name('busy-times.destroy');
 
 
-    
+
     Route::resource('vouchers', \App\Http\Controllers\Admin\AdminVoucherController::class);
 
     Route::resource('coupons', \App\Http\Controllers\Admin\AdminCouponController::class);
@@ -451,21 +456,21 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::resource('payment-methods', \App\Http\Controllers\Admin\AdminPaymentMethodController::class)->only(['index', 'show', 'update']);
 
     Route::resource('withdraw-requests', \App\Http\Controllers\Admin\AdminWithdrawRequestController::class)->only(['index', 'show', 'update']);
-    
+
     // ── Admin Phase 4 (Settings & Localization) ───────────────────
     Route::get('settings', [\App\Http\Controllers\Admin\AdminSettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [\App\Http\Controllers\Admin\AdminSettingController::class, 'store'])->name('settings.store');
     Route::post('settings/do-update-prices', [\App\Http\Controllers\Admin\AdminSettingController::class, 'doUpdatePrices'])->name('settings.do-update-prices');
     Route::post('settings/recalculate-overhead-hourly-rate', [\App\Http\Controllers\Admin\AdminSettingController::class, 'recalculateOverheadHourlyRate'])->name('settings.recalculate-overhead-hourly-rate');
-    
+
     Route::resource('language-lines', \App\Http\Controllers\Admin\AdminLanguageLineController::class)->except(['create', 'show', 'edit']);
     Route::post('language-lines/auto-translate', [\App\Http\Controllers\Admin\AdminLanguageLineController::class, 'autoTranslate'])->name('language-lines.auto-translate');
     Route::post('language-lines/import', [\App\Http\Controllers\Admin\AdminLanguageLineController::class, 'import'])->name('language-lines.import');
-    
+
     Route::get('quotations/{contract}/print', [\App\Http\Controllers\Admin\AdminQuotationController::class, 'print'])->name('quotations.print');
-    
+
     Route::resource('free-downloads', \App\Http\Controllers\Admin\AdminFreeDownloadController::class)->except(['create', 'show', 'edit']);
-    
+
 
 
     // ── Freelance (Admin Control) ───────────────────────────────────
@@ -499,7 +504,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/users/legacy-coworker/{id}/create-user', [\App\Http\Controllers\Admin\UsersController::class, 'createUserFromCoWorker'])->name('users.legacy-coworker.create-user');
     Route::post('/users/legacy-coworker/{id}/reset-password', [\App\Http\Controllers\Admin\UsersController::class, 'resetPasswordAndSendCredentialsForCoWorker'])->name('users.legacy-coworker.reset-password');
     Route::get('/users/earning-analyze', [\App\Http\Controllers\Admin\UsersController::class, 'earningAnalyze'])->name('users.earning-analyze');
-    
+
     // Matches exact old links
     Route::get('/users/{id}/login-as', [\App\Http\Controllers\Admin\UsersController::class, 'loginAs'])->name('users.login-as');
     Route::post('/users/{id}/login-as', [\App\Http\Controllers\Admin\UsersController::class, 'loginAs']); // Allows POST for React compatibility
@@ -511,7 +516,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/users/{id}/reports', [\App\Http\Controllers\Admin\UsersController::class, 'reports'])->name('users.reports');
     Route::get('/users/{id}/projects', [\App\Http\Controllers\Admin\UsersController::class, 'projects'])->name('users.projects');
     Route::get('/users/{id}/tasks/add', [\App\Http\Controllers\Admin\UsersController::class, 'add_task'])->name('users.tasks.add');
-    
+
     Route::get('/users/{id}/balance-sheet', [\App\Http\Controllers\Admin\UsersController::class, 'balanceSheetPrint'])->name('users.balance-sheet');
 
     Route::get('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'show'])->name('users.show');
@@ -665,7 +670,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/points', [\App\Http\Controllers\PointPurchaseController::class, 'index'])->name('points.index');
     Route::post('/points/purchase', [\App\Http\Controllers\PointPurchaseController::class, 'store'])->name('point-purchases.store');
     Route::post('/points/purchase-wallet', [\App\Http\Controllers\PointPurchaseController::class, 'storeWallet'])->name('point-purchases.store-wallet');
-    
+
     // Contracts (Generated from Proposals or Wizard)
     Route::get('/contracts', [\App\Http\Controllers\iSaaS\ContractController::class, 'index'])->name('contracts.index');
     Route::get('/contracts/create', [\App\Http\Controllers\iSaaS\ContractController::class, 'create'])->name('contracts.create');
