@@ -118,5 +118,17 @@ return [
     'mo' => 'mo',
     'no_active_services' => 'No active services.',
     'no_subscribers_found' => 'No subscribers found.',
-    'service_payment_added_successfully' => 'Service payment added successfully.'
+    'service_payment_added_successfully' => 'Service payment added successfully.',
+    
+    // Payment Links
+    'payment_links' => 'Payment Links',
+    'create_payment_link' => 'Create Payment Link',
+    'copy_link' => 'Copy Link',
+    'view_link' => 'View Link',
+    'no_payment_links_found' => 'No payment links found.',
+    'payment_link_title_placeholder' => 'e.g. Website Maintenance',
+    'confirm_delete_payment_link' => 'Are you sure you want to delete this payment link?',
+    'copied_to_clipboard' => 'Copied to clipboard',
+    'created_by' => 'Created By',
+    'paid' => 'Paid',
 ];

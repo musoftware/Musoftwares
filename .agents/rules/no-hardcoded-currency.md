@@ -27,8 +27,8 @@ Hardcoding currency codes (e.g., `'USD'`, `'EGP'`, `'SAR'`) or symbols (e.g., `'
 
 ### 3. Frontend & UI Display
 - **Never** prefix or suffix amounts with hardcoded symbols or codes (e.g., `value + " EGP"` or `"$ " + value`).
-- Always pass the currency object (containing `code` and `symbol`) from the backend to the frontend.
-- Format all monetary values dynamically using currency formatters/helpers that accept the currency model/code as an argument:
+- Always pass the currency object (containing `currency` and `symbol`) from the backend to the frontend.
+- Format all monetary values dynamically using currency formatters/helpers that accept the currency model/property as an argument:
   ```jsx
   // ❌ INCORRECT (Hardcoded)
   <span>$ {amount}</span>
@@ -55,7 +55,7 @@ Hardcoding currency codes (e.g., `'USD'`, `'EGP'`, `'SAR'`) or symbols (e.g., `'
 - Never write code like:
   ```php
   // ❌ INCORRECT (Silent Fallback)
-  $currencyCode = $transaction->currency?->code ?? 'USD';
+  $currencyName = $transaction->currency?->currency ?? 'USD';
   ```
   Instead, ensure the relation is required or explicitly handle the missing state:
   ```php
@@ -63,6 +63,6 @@ Hardcoding currency codes (e.g., `'USD'`, `'EGP'`, `'SAR'`) or symbols (e.g., `'
   if (!$transaction->currency) {
       throw new \Exception("Transaction {$transaction->id} is missing an associated currency relation.");
   }
-  $currencyCode = $transaction->currency->code;
+  $currencyName = $transaction->currency->currency;
   ```
 
