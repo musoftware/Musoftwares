@@ -19,11 +19,34 @@ class FbmbLookupResult extends Model
         'remaining_balance',
         'result_path',
         'expires_at',
+        'status',
+        'input_path',
+        'error_message',
     ];
 
     protected $casts = [
         'expires_at' => 'datetime',
     ];
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    public function isProcessing(): bool
+    {
+        return $this->status === 'processing';
+    }
+
+    public function isFailed(): bool
+    {
+        return $this->status === 'failed';
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === 'completed';
+    }
 
     public function user(): BelongsTo
     {

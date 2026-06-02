@@ -9,7 +9,7 @@ import { Plus, Download, Trash, FileText, Database } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
 import { MoreHorizontal } from 'lucide-react';
-import UpgradeOverlay from '@/Components/ERP/UpgradeOverlay';
+import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 
 interface FileRecord {
     id: number;

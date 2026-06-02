@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Modules\Fbmb\Services\FbmbLookupService;
 use Modules\Fbmb\Console\CleanupExpiredFbmbResults;
+use Modules\Fbmb\Console\ProcessPendingFbmbLookups;
 
 class FbmbServiceProvider extends ServiceProvider
 {
@@ -23,6 +24,7 @@ class FbmbServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 CleanupExpiredFbmbResults::class,
+                ProcessPendingFbmbLookups::class,
             ]);
         }
 
