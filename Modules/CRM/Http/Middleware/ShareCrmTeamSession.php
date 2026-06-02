@@ -5,6 +5,7 @@ namespace Modules\CRM\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 
 class ShareCrmTeamSession
@@ -15,7 +16,7 @@ class ShareCrmTeamSession
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::guard('crm_team')->check()) {
+        if (Schema::hasTable('crm_team_members') && Auth::guard('crm_team')->check()) {
             $member = Auth::guard('crm_team')->user();
 
             if ($member && $member->isActive()) {

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Support\Facades\Schema;
+
 class ShareTeamMemberSession
 {
     /**
@@ -14,8 +16,8 @@ class ShareTeamMemberSession
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // If the user has an active session under the erp_team guard
-        if (Auth::guard('erp_team')->check()) {
+        // If the user has an active session under the erp_team guard and the table exists
+        if (Schema::hasTable('erp_team_members') && Auth::guard('erp_team')->check()) {
             $member = Auth::guard('erp_team')->user();
 
             if ($member && $member->isActive()) {

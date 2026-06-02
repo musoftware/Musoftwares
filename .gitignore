@@ -49,6 +49,7 @@ server*.log
 
 # Scratch / temp
 /scratch/
+/dev_scripts/
 /routes.txt
 
 ###############################################################################

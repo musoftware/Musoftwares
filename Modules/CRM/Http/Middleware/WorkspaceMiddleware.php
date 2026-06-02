@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Modules\CRM\Models\Workspace;
 use Modules\CRM\Infrastructure\Context\TenantContext;
+use Illuminate\Support\Facades\Schema;
 
 class WorkspaceMiddleware
 {
@@ -19,6 +20,11 @@ class WorkspaceMiddleware
 
         if (!$user) {
             return redirect()->route('login');
+        }
+
+        // Guard against missing table (e.g. during migrations/installation)
+        if (!Schema::hasTable('crm_workspaces')) {
+            return $next($request);
         }
 
         // Check if there is an active workspace in session
