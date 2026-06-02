@@ -592,19 +592,19 @@ class InvoiceController extends Controller
             $spanSeconds = abs(\Carbon\Carbon::parse($last_end)->diffInSeconds(\Carbon\Carbon::parse($first_start)));
         }
 
-        $hour_rate = 0;
+        $baseRate = \App\Helpers\FinanceHelper::calculateOverheadHourlyRate();
+        $system_base_rate = \App\Models\CurrenciesExchange::RateToday(
+            $baseRate,
+            \App\Models\AdminSettings::GetValue('business_currency', 2),
+            $item->invoice->currency_id
+        );
+
+        $client_rate = 0;
         $user = $item->invoice->user;
         if ($user && (float) ($user->booking_rate ?? 0) > 0) {
-            $hour_rate = \App\Models\CurrenciesExchange::RateToday(
+            $client_rate = \App\Models\CurrenciesExchange::RateToday(
                 $user->booking_rate,
                 $user->booking_rate_currency_id ?? $user->currency_id ?? 1,
-                $item->invoice->currency_id
-            );
-        } else {
-            $baseRate = \App\Helpers\FinanceHelper::calculateOverheadHourlyRate();
-            $hour_rate = \App\Models\CurrenciesExchange::RateToday(
-                $baseRate,
-                \App\Models\AdminSettings::GetValue('business_currency', 2),
                 $item->invoice->currency_id
             );
         }
@@ -617,6 +617,10 @@ class InvoiceController extends Controller
                 'invoice_number' => $item->invoice->invoice_number,
                 'invoice_status' => $item->invoice->status,
                 'client_name' => $item->invoice->user ? $item->invoice->user->name : null,
+                'client_id' => $item->invoice->user_id,
+                'project_id' => $item->invoice->project_id,
+                'project_name' => $item->invoice->project ? $item->invoice->project->name : null,
+                'date' => $item->invoice->date ?? null,
             ],
             'invoice_currency' => $item->invoice->relationLoaded('currency') && $item->invoice->getRelation('currency') ? [
                 'id' => $item->invoice->getRelation('currency')->id,
@@ -627,7 +631,9 @@ class InvoiceController extends Controller
             'total_seconds' => $totalSeconds,
             'total_billable' => $totalBillable,
             'span_seconds' => $spanSeconds,
-            'hour_rate' => round($hour_rate, 2),
+            'system_base_rate' => round($system_base_rate, 2),
+            'client_rate' => round($client_rate, 2),
+            'hour_rate' => round($client_rate > 0 ? $client_rate : $system_base_rate, 2),
         ]);
     }
 

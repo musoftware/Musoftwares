@@ -37,7 +37,7 @@ return [
 
     'kashier' => [
         'merchant_id' => env('KASHIER_MERCHANT_ID', 'MID-12345'),
-        'secret_key' => env('KASHIER_SECRET_KEY', 'secret'),
+        'secret_key' => env('KASHIER_SECRET', env('KASHIER_SECRET_KEY', 'secret')),
         'mode' => env('KASHIER_MODE', 'live'),
     ],
 

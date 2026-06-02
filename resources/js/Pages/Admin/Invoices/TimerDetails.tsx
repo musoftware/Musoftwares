@@ -44,6 +44,8 @@ interface Props {
     total_seconds: number;
     total_billable: number;
     span_seconds: number;
+    system_base_rate: number;
+    client_rate: number;
     hour_rate: number;
 }
 
@@ -68,7 +70,7 @@ function parseDateTime(dateStr: string | null) {
     };
 }
 
-export default function TimerDetails({ item, invoice_currency, timers: initialTimers, total_seconds, total_billable, span_seconds, hour_rate }: Props) {
+export default function TimerDetails({ item, invoice_currency, timers: initialTimers, total_seconds, total_billable, span_seconds, system_base_rate, client_rate, hour_rate }: Props) {
     const [timers, setTimers] = useState<Timer[]>(initialTimers || []);
     const [isRunning, setIsRunning] = useState(false);
     const [activeSessionStart, setActiveSessionStart] = useState<Date | null>(null);
@@ -323,12 +325,41 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                         {/* Top Controls */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Hour Rate</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">{__('general.hour_rate')}</label>
+                                
+                                <div className="flex flex-col gap-2 mb-2.5">
+                                    <div className="flex items-center gap-4 text-xs font-medium">
+                                        <label className="flex items-center gap-1.5 cursor-pointer text-gray-700">
+                                            <input 
+                                                type="radio" 
+                                                name="rateType" 
+                                                checked={rate === system_base_rate}
+                                                onChange={() => setRate(system_base_rate)}
+                                                className="w-3.5 h-3.5 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                                disabled={item.invoice_status !== 'unpaid'}
+                                            />
+                                            {__('admin.base_system_rate')} ({system_base_rate})
+                                        </label>
+                                        <label className={`flex items-center gap-1.5 cursor-pointer ${client_rate > 0 ? 'text-gray-700' : 'text-gray-400'}`}>
+                                            <input 
+                                                type="radio" 
+                                                name="rateType" 
+                                                checked={rate === client_rate}
+                                                onChange={() => setRate(client_rate)}
+                                                className="w-3.5 h-3.5 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                                disabled={item.invoice_status !== 'unpaid' || client_rate <= 0}
+                                            />
+                                            {__('admin.client_rate')} ({client_rate > 0 ? client_rate : __('general.not_set')})
+                                        </label>
+                                    </div>
+                                </div>
+
                                 <div className="flex shadow-sm rounded-md">
                                     <Input 
                                         type={rateVisible ? 'number' : 'password'} 
                                         value={rate} 
-                                        readOnly 
+                                        onChange={e => setRate(parseFloat(e.target.value) || 0)}
+                                        disabled={item.invoice_status !== 'unpaid'}
                                         className="font-mono font-bold tracking-widest rounded-r-none border-r-0 focus-visible:ring-0 bg-gray-50"
                                     />
                                     <Button type="button" variant="outline" className="rounded-none border-l-0 px-3 hover:bg-gray-100" onClick={() => setRateVisible(!rateVisible)}>
@@ -343,7 +374,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Reason / Description</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">{__('general.reason_description')}</label>
                                 <Input 
                                     type="text" 
                                     value={reason} 

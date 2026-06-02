@@ -131,4 +131,6 @@ return [
     'copied_to_clipboard' => 'Copied to clipboard',
     'created_by' => 'Created By',
     'paid' => 'Paid',
+    'base_system_rate' => 'Base System Rate',
+    'client_rate' => 'Client Rate',
 ];
