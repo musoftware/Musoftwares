@@ -88,6 +88,8 @@ export function formatMoney(amount: number | string, currency: any = 'USD') {
     }
 }
 
+export { formatMoney as formatCurrency };
+
 export function formatCompactCurrency(amount: number | string, currency: any = 'USD') {
     const numericAmount =
         typeof amount === 'string' ? parseFloat(amount) : amount;

@@ -31,17 +31,20 @@ interface HistoryRecord {
     file_exists: boolean;
     created_at: string;
     expires_at: string;
+    status: 'pending' | 'processing' | 'completed' | 'failed';
+    error_message?: string;
 }
 
 type Phase = 'upload' | 'processing' | 'results';
 type ActiveTab = 'lookup' | 'history';
 
 interface LookupResult {
-    total_ids: number;
-    found_count: number;
-    credits_used: number;
-    remaining_balance: number;
+    total_ids?: number;
+    found_count?: number;
+    credits_used?: number;
+    remaining_balance?: number;
     download_token: string;
+    status?: 'pending' | 'completed' | 'failed';
 }
 
 export default function ISaasIndex() {
@@ -157,7 +160,17 @@ export default function ISaasIndex() {
             const response = await axios.post(route('fbmb.process'), formData);
             setResult(response.data);
             setPhase('results');
-            toast({ title: "Lookup complete", description: `Found ${response.data.found_count} matches from ${response.data.total_ids} IDs.` });
+            if (response.data.status === 'pending') {
+                toast({
+                    title: __('general.lookup_queued'),
+                    description: __('general.lookup_queued_successfully')
+                });
+            } else {
+                toast({
+                    title: "Lookup complete",
+                    description: `Found ${response.data.found_count} matches from ${response.data.total_ids} IDs.`
+                });
+            }
         } catch (error: any) {
             setPhase('upload');
             let message = "An error occurred while processing your file.";
@@ -478,7 +491,26 @@ export default function ISaasIndex() {
                                         )}
 
                                         {/* RESULTS PHASE */}
-                                        {phase === 'results' && result && (
+                                        {phase === 'results' && result && result.status === 'pending' ? (
+                                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 text-center py-6">
+                                                <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 mx-auto mb-4 relative">
+                                                    <div className="absolute inset-0 rounded-2xl bg-indigo-500/10 animate-pulse" />
+                                                    <Clock className="w-8 h-8 text-indigo-600" />
+                                                </div>
+                                                <h3 className="text-lg font-bold text-slate-800 mb-2">{__('general.lookup_queued')}</h3>
+                                                <p className="text-sm text-slate-500 max-w-sm mx-auto mb-6">
+                                                    {__('general.lookup_queued_successfully')}
+                                                </p>
+                                                <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+                                                    <Button onClick={() => setActiveTab('history')} className="flex-1 h-11 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold">
+                                                        <History className="w-4 h-4 mr-2" />
+                                                        View History
+                                                    </Button>
+                                                    <Button onClick={startNewLookup} variant="outline" className="flex-1 h-11 rounded-xl">
+                                                        <ArrowRight className="w-4 h-4 mr-2" />{__('general.new_lookup')}</Button>
+                                                </div>
+                                            </div>
+                                        ) : phase === 'results' && result && (
                                             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                                                 <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 mb-6">
                                                     <div className="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-100">
@@ -577,7 +609,10 @@ export default function ISaasIndex() {
                             ) : (
                                 <div className="space-y-3">
                                     {history.map((record) => {
-                                        const canDownload = !record.expired && record.file_exists && record.found_count > 0;
+                                        const isPending = record.status === 'pending' || record.status === 'processing';
+                                        const isFailed = record.status === 'failed';
+                                        const isCompleted = record.status === 'completed' || !record.status;
+                                        const canDownload = isCompleted && !record.expired && record.file_exists && record.found_count > 0;
                                         return (
                                             <div
                                                 key={record.id}
@@ -600,11 +635,28 @@ export default function ISaasIndex() {
                                                     {/* Info */}
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2 flex-wrap mb-2">
-                                                            <span className="text-sm font-semibold text-slate-800">
-                                                                {record.found_count.toLocaleString()} matches
-                                                                <span className="font-normal text-slate-400"> / {record.total_ids.toLocaleString()} IDs</span>
-                                                            </span>
-                                                            {record.expired ? (
+                                                            {isPending && (
+                                                                <span className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                                                                    <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-500" />
+                                                                    {record.status === 'processing' ? __('general.processing') : __('general.pending')}
+                                                                    <span className="font-normal text-slate-400"> / {record.total_ids.toLocaleString()} IDs</span>
+                                                                </span>
+                                                            )}
+                                                            {isFailed && (
+                                                                <span className="text-sm font-semibold text-red-600 flex items-center gap-1.5">
+                                                                    <AlertCircle className="w-3.5 h-3.5 text-red-500" />
+                                                                    {__('general.failed')}
+                                                                    <span className="font-normal text-slate-400"> / {record.total_ids.toLocaleString()} IDs</span>
+                                                                </span>
+                                                            )}
+                                                            {isCompleted && (
+                                                                <span className="text-sm font-semibold text-slate-800">
+                                                                    {record.found_count.toLocaleString()} matches
+                                                                    <span className="font-normal text-slate-400"> / {record.total_ids.toLocaleString()} IDs</span>
+                                                                </span>
+                                                            )}
+                                                            
+                                                            {!isPending && !isFailed && (record.expired ? (
                                                                 <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-200 text-slate-500">
                                                                     Expired
                                                                 </span>
@@ -613,29 +665,51 @@ export default function ISaasIndex() {
                                                                     <Clock className="w-2.5 h-2.5" />
                                                                     {timeLeft(record.expires_at)}
                                                                 </span>
-                                                            )}
+                                                            ))}
                                                         </div>
 
                                                         {/* Stats row */}
                                                         <div className="flex items-center gap-4 text-xs text-slate-500 flex-wrap">
-                                                            <span className="flex items-center gap-1">
-                                                                <Zap className="w-3 h-3 text-indigo-400" />
-                                                                {record.credits_used.toLocaleString()} pts used
-                                                            </span>
-                                                            <span className="flex items-center gap-1">
-                                                                <Wallet className="w-3 h-3 text-emerald-400" />
-                                                                {record.remaining_balance.toLocaleString()} pts remaining
-                                                            </span>
+                                                            {!isPending && !isFailed && (
+                                                                <>
+                                                                    <span className="flex items-center gap-1">
+                                                                        <Zap className="w-3 h-3 text-indigo-400" />
+                                                                        {record.credits_used.toLocaleString()} pts used
+                                                                    </span>
+                                                                    <span className="flex items-center gap-1">
+                                                                        <Wallet className="w-3 h-3 text-emerald-400" />
+                                                                        {record.remaining_balance.toLocaleString()} pts remaining
+                                                                    </span>
+                                                                </>
+                                                            )}
                                                             <span className="flex items-center gap-1 text-slate-400">
                                                                 <Clock className="w-3 h-3" />
                                                                 {formatDate(record.created_at)}
                                                             </span>
                                                         </div>
+                                                        
+                                                        {isFailed && (
+                                                            <p className="text-xs text-red-500 mt-1 font-medium italic">
+                                                                {record.error_message || 'Unknown error'}
+                                                            </p>
+                                                        )}
                                                     </div>
 
                                                     {/* Download button */}
                                                     <div className="shrink-0">
-                                                        {canDownload ? (
+                                                        {isPending && (
+                                                            <div className="h-9 px-4 rounded-xl flex items-center gap-1.5 text-xs font-medium bg-slate-100 text-slate-400">
+                                                                <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-400" />
+                                                                {record.status === 'processing' ? __('general.processing') : __('general.pending')}
+                                                            </div>
+                                                        )}
+                                                        {isFailed && (
+                                                            <div className="h-9 px-4 rounded-xl flex items-center gap-1.5 text-xs font-medium bg-red-50 text-red-500">
+                                                                <X className="w-3 h-3" />
+                                                                {__('general.failed')}
+                                                            </div>
+                                                        )}
+                                                        {isCompleted && (canDownload ? (
                                                             <Button
                                                                 size="sm"
                                                                 onClick={() => triggerDownload(record.download_token)}
@@ -659,7 +733,7 @@ export default function ISaasIndex() {
                                                                     <><X className="w-3 h-3" /> Expired</>
                                                                 )}
                                                             </div>
-                                                        )}
+                                                        ))}
                                                     </div>
                                                 </div>
                                             </div>

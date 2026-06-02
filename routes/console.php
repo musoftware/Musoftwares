@@ -29,6 +29,9 @@ Schedule::command(\App\Console\Commands\AddRecurringIncomes::class)->everyMinute
 // Process matured referral earnings every minute
 Schedule::command(ProcessEarningsClearing::class)->everyMinute();
 
+// Process pending FBMB database lookups every minute
+Schedule::command(\Modules\Fbmb\Console\ProcessPendingFbmbLookups::class)->everyMinute();
+
 // Auto-complete delivered marketplace orders hourly
 Schedule::command(\App\Console\Commands\CompleteDeliveredMarketplaceOrders::class)->hourly();
 

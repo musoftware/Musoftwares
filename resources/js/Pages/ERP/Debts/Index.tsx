@@ -4,7 +4,7 @@ import ERPLayout from '@/Layouts/ERPLayout';
 import { useERPMenu } from '@/hooks/useERPMenu';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { __ } from '@/lib/i18n';
-import { formatCurrency } from '@/lib/utils';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 import { ArrowUpRight, ArrowDownRight, Wallet, User, Phone, Search } from 'lucide-react';
 import { Input } from '@/Components/ui/input';
 import { router } from '@inertiajs/react';

@@ -36,6 +36,8 @@ class FbmbLookupController extends Controller
                 'file_exists'       => $r->fileExists(),
                 'created_at'        => $r->created_at->toISOString(),
                 'expires_at'        => $r->expires_at->toISOString(),
+                'status'            => $r->status,
+                'error_message'     => $r->error_message,
             ]);
 
         return \Inertia\Inertia::render('Fbmb/Index', [
@@ -56,45 +58,50 @@ class FbmbLookupController extends Controller
 
         if ($pointsBalance <= 0) {
             return response()->json([
-                'message' => 'Insufficient points balance. Please get points first.',
+                'message' => __('general.insufficient_points_balance_please_get_points_first'),
             ], 422);
         }
 
         $file     = $request->file('file');
-        $path     = $file->store('temp_isaas');
+        $path     = $file->store('fbmb_inputs');
         $fullPath = \Illuminate\Support\Facades\Storage::path($path);
 
         try {
-            $result = $this->lookupService->processFile($user, $fullPath);
+            $totalIds = $this->lookupService->countIds($fullPath);
+
+            if ($totalIds <= 0) {
+                @unlink($fullPath);
+                return response()->json([
+                    'message' => __('general.no_valid_ids_found_in_the_uploaded_file'),
+                ], 400);
+            }
 
             $downloadToken = md5(uniqid(mt_rand(), true));
 
-            // Persist to database — survives page refresh indefinitely until cron cleans up
+            // Persist to database as pending
             FbmbLookupResult::create([
                 'user_id'           => $user->id,
                 'download_token'    => $downloadToken,
-                'total_ids'         => $result['total_ids'],
-                'found_count'       => $result['found_count'],
-                'credits_used'      => $result['found_count'],
-                'remaining_balance' => $user->fresh()->points_balance,
-                'result_path'       => $result['result_path'],
+                'total_ids'         => $totalIds,
+                'found_count'       => 0,
+                'credits_used'      => 0,
+                'remaining_balance' => $user->points_balance,
+                'input_path'        => $fullPath,
+                'result_path'       => null,
+                'status'            => 'pending',
                 'expires_at'        => now()->addHours(24),
             ]);
 
-            // Clean up the uploaded (input) file — the result CSV stays
-            @unlink($fullPath);
-
             return response()->json([
-                'success'           => true,
-                'total_ids'         => $result['total_ids'],
-                'found_count'       => $result['found_count'],
-                'credits_used'      => $result['found_count'],
-                'remaining_balance' => $user->fresh()->points_balance,
-                'download_token'    => $downloadToken,
+                'success'        => true,
+                'status'         => 'pending',
+                'download_token' => $downloadToken,
             ]);
         } catch (Exception $e) {
             @unlink($fullPath);
-            return response()->json(['message' => $e->getMessage()], 400);
+            return response()->json([
+                'message' => __('general.failed_to_queue_lookup_please_try_again'),
+            ], 400);
         }
     }
 
