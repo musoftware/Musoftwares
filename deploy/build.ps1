@@ -30,7 +30,7 @@ $SSH_PASSWORD = $config['SSH_PASSWORD']
 
 $PROJECT_ROOT = (Resolve-Path "$PSScriptRoot\..").Path
 $BUILD_DIR = "$PROJECT_ROOT\public\build"
-$ZIP_PATH = "$PROJECT_ROOT\build.zip"
+$ZIP_PATH = "$PROJECT_ROOT\build.tar.gz"
 
 Write-Host ""
 Write-Host "=== Deploy Build (Local to Remote) ===" -ForegroundColor Cyan
@@ -46,37 +46,41 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# 2. Zip Files
-Write-Host "[2/4] Zipping build files..." -ForegroundColor Yellow
+# 2. Archive Files (Using tar.exe which is faster and avoids lock bugs)
+Write-Host "[2/4] Archiving build files..." -ForegroundColor Yellow
 if (Test-Path $ZIP_PATH) { Remove-Item $ZIP_PATH -Force }
-Compress-Archive -Path "$BUILD_DIR\*" -DestinationPath $ZIP_PATH -Force
+# Compress contents of public/build into a tar.gz file
+cmd.exe /c "tar.exe -czf build.tar.gz -C public/build ."
 
-# 3. Upload Zip
-Write-Host "[3/4] Uploading build.zip to server..." -ForegroundColor Yellow
-$remoteZip = "$REMOTE_PATH/public/build.zip"
+# 3 & 4. Upload & Extract
+$remoteZip = "$REMOTE_PATH/public/build.tar.gz"
+$unzipCmd = "cd $REMOTE_PATH/public && rm -rf build/* && mkdir -p build && tar -xzf build.tar.gz -C build/ && rm build.tar.gz"
 
-$hasSshpass = $null -ne (Get-Command sshpass -ErrorAction SilentlyContinue)
-if ($hasSshpass -and $SSH_PASSWORD -and -not $NoPassword) {
-    $env:SSHPASS = $SSH_PASSWORD
-    & sshpass -e scp -P $SSH_PORT -o StrictHostKeyChecking=no $ZIP_PATH "$SSH_USER@$SSH_HOST`:$remoteZip"
+$hasPutty = $null -ne (Get-Command plink -ErrorAction SilentlyContinue) -and $null -ne (Get-Command pscp -ErrorAction SilentlyContinue)
+
+if ($hasPutty -and $SSH_PASSWORD -and -not $NoPassword) {
+    Write-Host "[3/4] Uploading via PuTTY (pscp) automatically..." -ForegroundColor Yellow
+    # Accept host key automatically if not cached (no -batch here to allow echo y)
+    cmd.exe /c "echo y | plink.exe -T -P $SSH_PORT -pw ""$SSH_PASSWORD"" $SSH_USER@$SSH_HOST exit 2>nul"
+    
+    # Upload (using -sftp for safer binary transfer)
+    & pscp.exe -sftp -batch -P $SSH_PORT -pw $SSH_PASSWORD $ZIP_PATH "$SSH_USER@$SSH_HOST`:$remoteZip"
+    
+    Write-Host "[4/4] Extracting via PuTTY (plink) automatically..." -ForegroundColor Yellow
+    # Use -batch and -T to disable interactive prompts and pseudo-terminal allocation
+    $plinkCommand = "echo. | plink.exe -batch -T -P $SSH_PORT -pw ""$SSH_PASSWORD"" $SSH_USER@$SSH_HOST ""$unzipCmd"""
+    cmd.exe /c $plinkCommand
 } else {
+    Write-Host "[3/4] Uploading build.tar.gz to server..." -ForegroundColor Yellow
     & scp -P $SSH_PORT -o StrictHostKeyChecking=no $ZIP_PATH "$SSH_USER@$SSH_HOST`:$remoteZip"
-}
-
-# 4. Extract on Server
-Write-Host "[4/4] Extracting on server..." -ForegroundColor Yellow
-$unzipCmd = "cd $REMOTE_PATH/public && rm -rf build/* && unzip -o build.zip -d build/ && rm build.zip"
-
-if ($hasSshpass -and $SSH_PASSWORD -and -not $NoPassword) {
-    & sshpass -e ssh -p $SSH_PORT -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" $unzipCmd
-    if ($env:SSHPASS) { Remove-Item env:SSHPASS -ErrorAction SilentlyContinue }
-} else {
+    
+    Write-Host "[4/4] Extracting on server..." -ForegroundColor Yellow
     & ssh -p $SSH_PORT -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" $unzipCmd
 }
 
-# Clean local zip
+# Clean local archive
 if (Test-Path $ZIP_PATH) { Remove-Item $ZIP_PATH -Force }
 
 Write-Host ""
 Write-Host "=== SUCCESS ===" -ForegroundColor Green
-Write-Host "Build and upload completed successfully!" -ForegroundColor Green
+Write-Host "Build and upload completed successfully without prompts!" -ForegroundColor Green
