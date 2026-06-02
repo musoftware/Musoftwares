@@ -11,14 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('freelance_skills', function (Blueprint $table) {
-            $table->string('status')->default('approved'); // approved, pending, rejected
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-        });
+        if (Schema::hasTable('freelance_skills')) {
+            Schema::table('freelance_skills', function (Blueprint $table) {
+                if (!Schema::hasColumn('freelance_skills', 'status')) {
+                    $table->string('status')->default('approved'); // approved, pending, rejected
+                }
+                if (!Schema::hasColumn('freelance_skills', 'created_by')) {
+                    $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+                }
+            });
+        }
 
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('can_add_freelance_skills')->default(true);
-        });
+        if (Schema::hasTable('users')) {
+            Schema::table('users', function (Blueprint $table) {
+                if (!Schema::hasColumn('users', 'can_add_freelance_skills')) {
+                    $table->boolean('can_add_freelance_skills')->default(true);
+                }
+            });
+        }
     }
 
     /**
@@ -26,14 +36,24 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('freelance_skills', function (Blueprint $table) {
-            $table->dropForeign(['created_by']);
-            $table->dropColumn('created_by');
-            $table->dropColumn('status');
-        });
+        if (Schema::hasTable('freelance_skills')) {
+            Schema::table('freelance_skills', function (Blueprint $table) {
+                if (Schema::hasColumn('freelance_skills', 'created_by')) {
+                    $table->dropForeign(['created_by']);
+                    $table->dropColumn('created_by');
+                }
+                if (Schema::hasColumn('freelance_skills', 'status')) {
+                    $table->dropColumn('status');
+                }
+            });
+        }
 
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('can_add_freelance_skills');
-        });
+        if (Schema::hasTable('users')) {
+            Schema::table('users', function (Blueprint $table) {
+                if (Schema::hasColumn('users', 'can_add_freelance_skills')) {
+                    $table->dropColumn('can_add_freelance_skills');
+                }
+            });
+        }
     }
 };
