@@ -4847,4 +4847,36 @@ return [
     'download_runtime' => 'Download Runtime',
     'download_the_desktop_runtime_to_use_local_plugins_and_integrations' => 'Download the desktop runtime to use local plugins and integrations.',
     'direct_messages_support_only' => 'Direct messages can only be sent to support or admin accounts.',
+    // Landing Page
+    'landing_hero_title' => 'Build software solutions that elevate your business.',
+    'landing_hero_subtitle' => 'We design and develop integrated systems that scale with your operations, offering you full control.',
+    'landing_hero_cta' => 'Start Your Project',
+    'landing_hero_secondary_cta' => 'Explore Platforms',
+    
+    'landing_services_badge' => 'Our Services',
+    'landing_services_title' => 'What We Build For You',
+    'landing_services_desc' => 'Core capabilities designed to digitize and manage your operations efficiently.',
+    'landing_services_web' => 'Custom Web Apps',
+    'landing_services_web_desc' => 'Scalable web applications built to your exact business process with modern architecture.',
+    'landing_services_erp' => 'Enterprise ERPs',
+    'landing_services_erp_desc' => 'Full enterprise resource planning systems with role-based access and live dashboards.',
+    'landing_services_mobile' => 'Mobile Apps',
+    'landing_services_mobile_desc' => 'Native and cross-platform mobile applications that provide a seamless user experience.',
+    
+    'landing_saas_badge' => 'Our Workspace',
+    'landing_saas_title' => 'The Ultimate Management Tool',
+    'landing_saas_desc' => 'We don\'t just build your software; we give you the tools to manage it. Our SaaS ecosystem is your central hub for project tracking, invoicing, and support.',
+    'landing_saas_feature_1' => 'Real-time Project Tracking',
+    'landing_saas_feature_2' => 'Integrated Billing & Invoices',
+    'landing_saas_feature_3' => 'Direct Support & Ticketing',
+
+    'landing_portfolio_badge' => 'Case Studies',
+    'landing_portfolio_title' => 'Proven Results',
+    'landing_portfolio_desc' => 'See how we have helped businesses transform their operations through custom software.',
+    'landing_portfolio_view_all' => 'View All Projects',
+
+    'landing_contact_title' => 'Ready to Upgrade Your Systems?',
+    'landing_contact_desc' => 'Contact our team to discuss your software requirements and get a technical consultation.',
+    'landing_contact_cta' => 'Contact Solutions Team',
+
 ];

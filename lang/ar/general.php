@@ -4846,4 +4846,37 @@ return [
     'musoftware_runtime' => 'برنامج موسوفتوير (Runtime)',
     'download_runtime' => 'تحميل البرنامج',
     'download_the_desktop_runtime_to_use_local_plugins_and_integrations' => 'قم بتحميل برنامج سطح المكتب لتشغيل الإضافات والربط المحلي.',
+    // Landing Page
+    'landing_hero_title' => 'نبني حلولاً برمجية ترتقي بعملك.',
+    'landing_hero_subtitle' => 'نصمم ونطور أنظمة متكاملة تتوسع مع عملياتك، لتمنحك تحكماً كاملاً.',
+    'landing_hero_cta' => 'ابدأ مشروعك',
+    'landing_hero_secondary_cta' => 'استكشف منصاتنا',
+    
+    'landing_services_badge' => 'خدماتنا',
+    'landing_services_title' => 'ماذا نبني لك',
+    'landing_services_desc' => 'قدرات أساسية مصممة لرقمنة وإدارة عملياتك بكفاءة عالية.',
+    'landing_services_web' => 'تطبيقات ويب مخصصة',
+    'landing_services_web_desc' => 'تطبيقات ويب قابلة للتوسع مبنية لتناسب إجراءات عملك بدقة وببنية حديثة.',
+    'landing_services_erp' => 'أنظمة تخطيط موارد المؤسسات (ERP)',
+    'landing_services_erp_desc' => 'أنظمة متكاملة لإدارة الموارد مع صلاحيات مخصصة ولوحات تحكم حية.',
+    'landing_services_mobile' => 'تطبيقات الجوال',
+    'landing_services_mobile_desc' => 'تطبيقات جوال توفر تجربة مستخدم سلسة واحترافية.',
+    
+    'landing_saas_badge' => 'بيئة العمل الخاصة بنا',
+    'landing_saas_title' => 'أداتك الأقوى للإدارة',
+    'landing_saas_desc' => 'نحن لا نبني برمجياتك فقط، بل نمنحك الأدوات لإدارتها. نظام الـ SaaS الخاص بنا هو مركزك الأساسي لمتابعة المشاريع، الفواتير، والدعم الفني.',
+    'landing_saas_feature_1' => 'متابعة حية للمشاريع',
+    'landing_saas_feature_2' => 'فواتير ومدفوعات متكاملة',
+    'landing_saas_feature_3' => 'دعم فني وتذاكر مباشرة',
+
+    'landing_portfolio_badge' => 'دراسات حالة',
+    'landing_portfolio_title' => 'نتائج مثبتة',
+    'landing_portfolio_desc' => 'شاهد كيف ساعدنا الشركات في تحويل وتطوير عملياتها من خلال برمجيات مخصصة.',
+    'landing_portfolio_view_all' => 'عرض جميع المشاريع',
+
+    'landing_contact_title' => 'هل أنت مستعد لتحديث أنظمتك؟',
+    'landing_contact_desc' => 'تواصل مع فريقنا لمناقشة متطلباتك البرمجية والحصول على استشارة فنية.',
+    'landing_contact_cta' => 'تواصل مع فريق الحلول',
+
+    'direct_messages_support_only' => 'يمكن إرسال الرسائل المباشرة فقط لحسابات الدعم الفني أو الإدارة.',
 ];
