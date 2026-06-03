@@ -336,7 +336,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                         <div key={idx} className="flex items-center gap-2">
                                             <Select value={split.projectId} onValueChange={(val) => {
                                                 const newS = [...projectSplits];
-                                                newS[idx].projectId = val;
+                                                newS[idx].projectId = val || '';
                                                 setProjectSplits(newS);
                                             }}>
                                                 <SelectTrigger className="flex-1">

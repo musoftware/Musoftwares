@@ -51,12 +51,12 @@ export default function AffiliateOrdersIndex({ orders, filters }: any) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {orders.data.length === 0 ? (
+                            {(orders.data as any).length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={5} className="h-32 text-center text-gray-500">{__('general.no_conversions_found')}</TableCell>
                                 </TableRow>
                             ) : (
-                                orders.data.map((order: any) => (
+                                (orders.data as any).map((order: any) => (
                                     <TableRow key={order.id}>
                                         <TableCell className="font-mono text-sm">#{order.unique_id}</TableCell>
                                         <TableCell>

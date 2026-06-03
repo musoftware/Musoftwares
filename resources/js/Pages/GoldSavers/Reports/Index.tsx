@@ -5,7 +5,7 @@ import { __ } from '@/lib/i18n';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import { FileText, Download } from 'lucide-react';
+import { FileText, Download, TrendingUp } from 'lucide-react';
 import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 import GoldSaversTabs from '../Components/GoldSaversTabs';
 
@@ -50,6 +50,8 @@ export default function ReportsIndex({ hasReports, wallets }: ReportsProps) {
                                 module="gold-investment-reports"
                                 title={__('Investment Reports Locked')}
                                 description={__('Unlock the ability to download comprehensive PDF reports of your gold investments, performance metrics, and historical growth.')}
+                                icon={TrendingUp}
+                                priceText={__('general.upgrade_now')}
                             />
                         )}
                         
@@ -70,7 +72,7 @@ export default function ReportsIndex({ hasReports, wallets }: ReportsProps) {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium">{__('Select Wallet')}</label>
-                                                <Select value={data.wallet_id} onValueChange={(val) => setData('wallet_id', val)}>
+                                                <Select value={data.wallet_id} onValueChange={(val) => setData('wallet_id', val || '')}>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder={__('Select Wallet')} />
                                                     </SelectTrigger>
@@ -87,7 +89,7 @@ export default function ReportsIndex({ hasReports, wallets }: ReportsProps) {
 
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium">{__('Select Period')}</label>
-                                                <Select value={data.period} onValueChange={(val) => setData('period', val)}>
+                                                <Select value={data.period} onValueChange={(val) => setData('period', val || '')}>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder={__('Select Period')} />
                                                     </SelectTrigger>

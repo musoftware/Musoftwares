@@ -80,7 +80,7 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Provider</Label>
-                                        <Select onValueChange={(value) => setData('booking_provider_id', value)} value={data.booking_provider_id}>
+                                        <Select onValueChange={(value) => setData('booking_provider_id', String(value))} value={data.booking_provider_id}>
                                             <SelectTrigger>
                                                 <SelectValue placeholder={__('general.select_provider')} />
                                             </SelectTrigger>

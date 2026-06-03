@@ -165,7 +165,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
                     </div>
                 </div>
 
-                {bookings.data.length === 0 ? (
+                {(bookings.data as any).length === 0 ? (
                     <EmptyState 
                         icon={Calendar}
                         title={__('general.no_appointments_yet')}
@@ -186,7 +186,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
                     />
                 ) : (
                     <div className="space-y-4">
-                        {bookings.data.map((booking: any) => (
+                        {(bookings.data as any).map((booking: any) => (
                             <Card key={booking.id} className="overflow-hidden border-slate-200/60 shadow-sm transition-shadow hover:shadow-md">
                                 <div className="flex flex-col md:flex-row">
                                     {/* Left Status Bar */}

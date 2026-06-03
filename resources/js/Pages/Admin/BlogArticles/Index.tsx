@@ -51,7 +51,7 @@ export default function Index({ articles, filters }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {articles.data.map((article) => (
+                            {(articles.data as any).map((article) => (
                                 <tr key={article.id} className="border-b hover:bg-gray-50 transition-colors">
                                     <td className="p-4 font-medium text-gray-900">#{article.id}</td>
                                     <td className="p-4">
@@ -122,7 +122,7 @@ export default function Index({ articles, filters }) {
                                     </td>
                                 </tr>
                             ))}
-                            {articles.data.length === 0 && (
+                            {(articles.data as any).length === 0 && (
                                 <tr>
                                     <td colSpan={7} className="p-12 text-center text-gray-500">
                                         <div className="flex flex-col items-center justify-center">

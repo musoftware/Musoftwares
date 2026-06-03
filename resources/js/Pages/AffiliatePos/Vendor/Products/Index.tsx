@@ -51,12 +51,12 @@ export default function VendorProductsIndex({ products }: any) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {products.data.length === 0 ? (
+                            {(products.data as any).length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={5} className="h-32 text-center text-gray-500">{__('general.no_products_found_start_by_adding_one')}</TableCell>
                                 </TableRow>
                             ) : (
-                                products.data.map((product: any) => (
+                                (products.data as any).map((product: any) => (
                                     <TableRow key={product.id}>
                                         <TableCell>
                                             <div className="font-medium text-gray-900">{product.name}</div>

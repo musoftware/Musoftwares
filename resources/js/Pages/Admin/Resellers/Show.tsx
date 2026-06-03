@@ -212,7 +212,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/40">
-                                        {subUsers.data.map((u: any) => (
+                                        {(subUsers.data as any).map((u: any) => (
                                             <tr key={u.id} className="hover:bg-surface-raised/50 transition-colors">
                                                 <td className="px-4 py-3.5">
                                                     <p className="font-semibold text-text-primary">{u.user?.name}</p>
@@ -333,7 +333,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/40">
-                                        {transactions.data.map((t: any) => {
+                                        {(transactions.data as any).map((t: any) => {
                                             const style = txTypeStyle[t.type] || { icon: DollarSign, color: 'text-text-muted' };
                                             const Icon = style.icon;
                                             return (

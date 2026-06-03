@@ -40,7 +40,7 @@ export function ManageCategoriesModal() {
         try {
             const response = await axios.get(route('erp.inventory.categories.index'));
             setCategories(response.data);
-        } catch (error) {
+        } catch (error: any) {
             toast.error(t('erp.error_fetching_categories', 'Error fetching categories'));
         } finally {
             setLoading(false);
@@ -60,7 +60,7 @@ export function ManageCategoriesModal() {
             setNewCategoryName('');
             toast.success(response.data.message);
         } catch (error: any) {
-            toast.error(error.response?.data?.message || t('erp.error_creating_category', 'Error creating category'));
+            toast.error((error as any).response?.data?.message || t('erp.error_creating_category', 'Error creating category'));
         } finally {
             setIsSubmitting(false);
         }
@@ -74,7 +74,7 @@ export function ManageCategoriesModal() {
             setCategories(categories.filter(c => c.id !== id));
             toast.success(response.data.message);
         } catch (error: any) {
-            toast.error(error.response?.data?.message || t('erp.error_deleting_category', 'Error deleting category'));
+            toast.error((error as any).response?.data?.message || t('erp.error_deleting_category', 'Error deleting category'));
         }
     };
 

@@ -9,7 +9,7 @@ import { Textarea } from '@/Components/ui/textarea';
 import { LoadingButton } from '@/Components/ui/LoadingButton';
 import { Switch } from '@/Components/ui/switch';
 import { __ } from '@/lib/i18n';
-
+import { Calendar, Clock, Users, CalendarOff } from 'lucide-react';
 export default function Create() {
     const { wallet, settings } = usePage<any>().props;
     const baseCurrency = wallet?.currency || settings?.base_currency || 'USD';

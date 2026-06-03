@@ -65,9 +65,9 @@ export default function DebtsShow({ client, transactions, baseCurrency }) {
                 <div>
                     <h3 className="text-lg font-medium text-slate-900 mb-4">{__('erp.debt_transactions_history')}</h3>
                     <div className="bg-white rounded-lg border shadow-sm">
-                        {transactions.data.length > 0 ? (
+                        {(transactions.data as any).length > 0 ? (
                             <div className="divide-y">
-                                {transactions.data.map((trx: any) => (
+                                {(transactions.data as any).map((trx: any) => (
                                     <div key={trx.id} className="p-4 flex items-start justify-between hover:bg-slate-50 transition-colors">
                                         <div className="flex gap-4">
                                             <div className={`mt-1 p-2 rounded-full ${trx.type === 'given' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>

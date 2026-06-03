@@ -15,7 +15,7 @@ export default function PayoutsIndex({ payouts, filters }: any) {
     const handleProcess = (id: number, status: 'approved' | 'declined') => {
         if (confirm(`Are you sure you want to ${status} this payout request?`)) {
             post(route('affiliate_pos.admin.payouts.process', { paymentRequest: id }), {
-                data: { status },
+                //data: { status },
                 preserveScroll: true,
             });
         }
@@ -49,12 +49,12 @@ export default function PayoutsIndex({ payouts, filters }: any) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {payouts.data.length === 0 ? (
+                            {(payouts.data as any).length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={6} className="h-24 text-center text-gray-500">{__('general.no_payout_requests_found')}</TableCell>
                                 </TableRow>
                             ) : (
-                                payouts.data.map((payout: any) => (
+                                (payouts.data as any).map((payout: any) => (
                                     <TableRow key={payout.id} className="group">
                                         <TableCell>
                                             <div className="font-medium text-gray-900">{payout.user.name}</div>

@@ -38,12 +38,12 @@ export default function AffiliatePayoutsIndex({ payouts }: any) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {payouts.data.length === 0 ? (
+                            {(payouts.data as any).length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={6} className="h-24 text-center text-gray-500">{__('general.no_payout_requests_found')}</TableCell>
                                 </TableRow>
                             ) : (
-                                payouts.data.map((payout: any) => (
+                                (payouts.data as any).map((payout: any) => (
                                     <TableRow key={payout.id}>
                                         <TableCell className="font-mono text-sm">#{payout.id}</TableCell>
                                         <TableCell>

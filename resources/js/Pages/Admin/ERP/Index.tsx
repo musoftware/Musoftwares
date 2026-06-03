@@ -168,7 +168,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {tenants.data.length === 0 ? (
+                                {(tenants.data as any).length === 0 ? (
                                     <tr>
                                         <td colSpan={8} className="p-0">
                                             <div className="flex flex-col items-center justify-center p-12 text-center">
@@ -179,7 +179,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                         </td>
                                     </tr>
                                 ) : (
-                                    tenants.data.map((tenant) => (
+                                    (tenants.data as any).map((tenant) => (
                                         <tr key={tenant.id} className="hover:bg-slate-50 transition text-[13px] text-slate-700">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2.5">

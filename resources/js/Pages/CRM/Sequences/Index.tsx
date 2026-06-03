@@ -85,7 +85,7 @@ export default function Index({ sequences }: { sequences: any }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sequences.data.map((seq: any) => (
+                {(sequences.data as any).map((seq: any) => (
                     <div key={seq.id} className="bg-white rounded-lg shadow border overflow-hidden flex flex-col">
                         <div className="p-5 flex-1">
                             <div className="flex justify-between items-start mb-4">
@@ -128,7 +128,7 @@ export default function Index({ sequences }: { sequences: any }) {
                     </div>
                 ))}
 
-                {sequences.data.length === 0 && (
+                {(sequences.data as any).length === 0 && (
                     <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-lg border shadow-sm">
                         <GitMerge className="w-12 h-12 mx-auto text-gray-300 mb-3" />
                         <h3 className="text-lg font-medium text-gray-900">{__('general.no_sequences_found')}</h3>

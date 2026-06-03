@@ -49,7 +49,7 @@ import {
     Sliders,
     AlertCircle,
     User,
-    Cloud, Database, Link as LinkIcon, HardDrive, Key, CheckCircle, SearchCode, Lock, Layers,
+    Cloud, Database, Link as LinkIcon, HardDrive, Key, CheckCircle, SearchCode, Lock, Layers, Building2,
     MoreHorizontal, Wallet, RotateCcw, ArrowDownLeft, ArrowUpDown, ArrowDown, ArrowUp, ArrowRight
 } from 'lucide-react';
 import {
@@ -77,7 +77,7 @@ import { useERPMenu } from '@/hooks/useERPMenu';
 import { CurrencySelect } from '@/Components/CurrencySelect';
 import { __ } from '@/lib/i18n';
 
-const __ = (key: string) => key;
+
 
 // FinancialAmount now uses CurrencyDisplay from the component library
 export function FinancialAmount({ amount, currency = 'USD', colorize = false }: { amount: number; currency?: string; colorize?: boolean }) {
@@ -2153,7 +2153,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                                         <Link href={route('erp.expenses.edit', exp.id)} className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), "h-8 w-8 text-slate-400 hover:text-indigo-600")}>
                                                                             <Edit2 className="h-4 w-4" />
                                                                         </Link>
-                                                                        <Button variant="ghost" size="icon" onClick={() => handleDeleteExpense(exp)} className="h-8 w-8 text-slate-400 hover:text-rose-600">
+                                                                        <Button variant="ghost" size="icon" onClick={() => setDeleteExpenseConfirm({ open: true, expense: exp })} className="h-8 w-8 text-slate-400 hover:text-rose-600">
                                                                             <Trash2 className="h-4 w-4" />
                                                                         </Button>
                                                                     </div>
@@ -2387,7 +2387,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                             const startOffset = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
                             const prevMonthDaysTotal = new Date(calendarYear, calendarMonth, 0).getDate();
 
-                            const calendarCells = [];
+                            const calendarCells: Array<{ day: number, month: 'prev' | 'current' | 'next', dateString: string, isToday: boolean }> = [];
 
                             // Previous month padding
                             const prevMonth = calendarMonth === 0 ? 11 : calendarMonth - 1;

@@ -26,13 +26,13 @@ export default defineConfig({
                 manualChunks(id) {
                     if (id.includes('node_modules')) {
                         // Separate heavy UI libraries to prevent blocking the main vendor chunk
-                        if (id.includes('lucide-react')) return 'vendor-icons';
-                        if (id.includes('framer-motion')) return 'vendor-motion';
-                        if (id.includes('recharts') || id.includes('d3')) return 'vendor-charts';
-                        if (id.includes('monaco-editor')) return 'vendor-editor';
-                        if (id.includes('xlsx') || id.includes('exceljs')) return 'vendor-excel';
+                        if (id.includes('lucide-react')) return 'lib-icons';
+                        if (id.includes('framer-motion')) return 'lib-motion';
+                        if (id.includes('recharts') || id.includes('d3')) return 'lib-charts';
+                        if (id.includes('monaco-editor')) return 'lib-editor';
+                        if (id.includes('xlsx') || id.includes('exceljs')) return 'lib-excel';
                         // Let React and Inertia safely fall back to the default vendor chunk
-                        return 'vendor'; 
+                        return 'lib-core'; 
                     }
                     if (id.includes('resources/js/Pages/')) {
                         const parts = id.split('resources/js/Pages/')[1].split('/');

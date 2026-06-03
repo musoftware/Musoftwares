@@ -69,7 +69,7 @@ export default function CreateContract({ clients = [] }: { clients?: any[] }) {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-700">Client <span className="text-red-500">*</span></label>
-                                    <Select value={form.client} onValueChange={(val) => setForm({...form, client: val})}>
+                                    <Select value={form.client} onValueChange={(val) => setForm({...form, client: val || ''})}>
                                         <SelectTrigger className="bg-white border-slate-200 text-slate-900">
                                             <SelectValue placeholder={__('general.select_client')} />
                                         </SelectTrigger>

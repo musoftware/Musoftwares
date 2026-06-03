@@ -35,12 +35,12 @@ export default function AffiliateModeratorsIndex({ moderators }: any) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {moderators.data.length === 0 ? (
+                            {(moderators.data as any).length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={4} className="h-32 text-center text-gray-500">{__('general.no_moderators_found')}</TableCell>
                                 </TableRow>
                             ) : (
-                                moderators.data.map((mod: any) => (
+                                (moderators.data as any).map((mod: any) => (
                                     <TableRow key={mod.id}>
                                         <TableCell className="font-medium text-gray-900">{mod.name}</TableCell>
                                         <TableCell className="text-gray-600">{mod.email}</TableCell>

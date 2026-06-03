@@ -15,7 +15,7 @@ export default function Show({ sequence }) {
     const [isAiOpen, setIsAiOpen] = useState(false);
     const [aiForm, setAiForm] = useState({ context: '', num_steps: 3, tone: 'professional' });
     const [isGenerating, setIsGenerating] = useState(false);
-    const [generatedSteps, setGeneratedSteps] = useState(null);
+    const [generatedSteps, setGeneratedSteps] = useState<any[] | null>(null);
 
     const handleGenerateAI = async () => {
         setIsGenerating(true);
@@ -23,8 +23,8 @@ export default function Show({ sequence }) {
         try {
             const response = await window.axios.post(route('crm.sequences.generate-ai', sequence.id), aiForm);
             setGeneratedSteps(response.data.steps);
-        } catch (error) {
-            alert('Failed to generate steps: ' + (error.response?.data?.error || error.message));
+        } catch (error: any) {
+            alert('Failed to generate steps: ' + ((error as any).response?.data?.error || error.message));
         } finally {
             setIsGenerating(false);
         }

@@ -771,7 +771,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {entries.data.map((project: any) => (
+                                {(entries.data as any).map((project: any) => (
                                     <tr key={project.id} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{project.name}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.client?.name || '-'}</td>
@@ -781,7 +781,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                         <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold ${project.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(project.profit, stats.business_currency_code)}</td>
                                     </tr>
                                 ))}
-                                {entries.data.length === 0 && (
+                                {(entries.data as any).length === 0 && (
                                     <tr>
                                         <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                                             <h3 className="text-lg font-medium text-gray-900">No projects found</h3>
@@ -802,7 +802,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {entries.data.map((budget: any) => {
+                                {(entries.data as any).map((budget: any) => {
                                     const remaining = budget.amount - budget.spent;
                                     const percent = budget.amount > 0 ? (budget.spent / budget.amount) * 100 : 0;
                                     return (
@@ -818,7 +818,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                         </td>
                                     </tr>
                                 )})}
-                                {entries.data.length === 0 && (
+                                {(entries.data as any).length === 0 && (
                                     <tr>
                                         <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
                                             <h3 className="text-lg font-medium text-gray-900">No budgets found</h3>
@@ -853,7 +853,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {entries.data.map((entry: any) => (
+                            {(entries.data as any).map((entry: any) => (
                                 <tr key={entry.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap cursor-pointer" onClick={() => openDetails(entry)}>
                                         <div className="text-sm font-medium text-gray-900">{entry.title}</div>
@@ -911,7 +911,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     </td>
                                 </tr>
                             ))}
-                            {entries.data.length === 0 && (
+                            {(entries.data as any).length === 0 && (
                                 <tr>
                                     <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                                         <DollarSign className="w-12 h-12 mx-auto text-gray-300 mb-3" />

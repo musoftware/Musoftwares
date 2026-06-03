@@ -63,7 +63,7 @@ export default function Index({ widgets }: { widgets: any }) {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {widgets.data.map((widget: any) => (
+                                {(widgets.data as any).map((widget: any) => (
                                     <tr key={widget.id} className="hover:bg-slate-50/50 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="font-medium text-slate-900">{widget.name}</div>
@@ -113,7 +113,7 @@ export default function Index({ widgets }: { widgets: any }) {
                                     </tr>
                                 ))}
 
-                                {widgets.data.length === 0 && (
+                                {(widgets.data as any).length === 0 && (
                                     <tr>
                                         <td colSpan={6} className="px-6 py-12 text-center">
                                             <div className="flex flex-col items-center justify-center text-slate-500">

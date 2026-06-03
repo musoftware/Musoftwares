@@ -5,7 +5,7 @@ import { __ } from '@/lib/i18n';
 
 export default function Show({ service }: any) {
     const { auth } = usePage().props as any;
-    const displayBalance = userBalance;
+    const displayBalance = auth?.user?.wallet_balance || 0;
 
     const [activeTab, setActiveTab] = useState<'overview' | 'reviews'>(
         'overview',

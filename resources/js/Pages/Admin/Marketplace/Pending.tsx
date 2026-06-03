@@ -84,9 +84,9 @@ export default function Pending({ auth, services, filters }: any) {
                         </div>
                     </div>
 
-                    {services.data && services.data.length > 0 ? (
+                    {services.data && (services.data as any).length > 0 ? (
                         <div className="grid gap-6">
-                            {services.data.map((service: any) => (
+                            {(services.data as any).map((service: any) => (
                                 <div
                                     key={service.id}
                                     className="flex flex-col md:flex-row overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md"
@@ -117,7 +117,7 @@ export default function Pending({ auth, services, filters }: any) {
                                                     {service.category?.name || 'Uncategorized'}
                                                 </Badge>
                                                 <span className="text-xs text-slate-500 flex items-center gap-1">
-                                                    Submitted: <DateDisplay date={service.created_at} format="MMM D, YYYY" />
+                                                    Submitted: <DateDisplay date={service.created_at}  />
                                                 </span>
                                             </div>
                                             

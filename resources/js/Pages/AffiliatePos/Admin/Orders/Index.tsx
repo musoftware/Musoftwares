@@ -62,7 +62,7 @@ export default function OrdersIndex({ orders, filters }: any) {
                             <Input 
                                 placeholder={__('general.search_by_order_id_name_or_phone')} 
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => setSearch(String(e.target.value))}
                                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                 className="bg-white"
                             />
@@ -97,12 +97,12 @@ export default function OrdersIndex({ orders, filters }: any) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {orders.data.length === 0 ? (
+                            {(orders.data as any).length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={7} className="h-32 text-center text-gray-500">{__('general.no_orders_found')}</TableCell>
                                 </TableRow>
                             ) : (
-                                orders.data.map((order: any) => (
+                                (orders.data as any).map((order: any) => (
                                     <TableRow key={order.id} className="group">
                                         <TableCell>
                                             <div className="font-mono text-sm font-medium text-gray-900">#{order.unique_id}</div>
@@ -135,7 +135,7 @@ export default function OrdersIndex({ orders, filters }: any) {
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">
-                                                <Select onValueChange={(val) => handleStatusUpdate(order.id, val)}>
+                                                <Select onValueChange={(val) => handleStatusUpdate(order.id, String(val))}>
                                                     <SelectTrigger className="w-[130px] h-8 text-xs">
                                                         <SelectValue placeholder={__('general.update')} />
                                                     </SelectTrigger>

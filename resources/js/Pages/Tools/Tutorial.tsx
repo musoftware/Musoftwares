@@ -5,7 +5,6 @@ import { Button } from '@/Components/ui/button';
 import { __ } from '@/lib/i18n';
 import { 
     Download, 
-    Chrome, 
     BookOpen, 
     ArrowLeft, 
     Play, 

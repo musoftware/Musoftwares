@@ -37,7 +37,7 @@ export function LeadSlideOver({ leadId, isOpen, onClose }: LeadSlideOverProps) {
             const response = await axios.get(route('crm.leads.show', leadId));
             setLead(response.data.lead);
             setTimeline(response.data.timeline);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to fetch lead data", error);
         } finally {
             setLoading(false);

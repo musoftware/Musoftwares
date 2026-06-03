@@ -5,7 +5,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Card, CardContent } from '@/Components/ui/card';
-import { CalendarIcon, Clock, CreditCard, ChevronRight, ChevronLeft, Globe, User, Stethoscope, CheckCircle2, AlertCircle } from 'lucide-react';
+import { CalendarIcon, Clock, CreditCard, ChevronRight, ChevronLeft, Globe, Users, Stethoscope, CheckCircle2, AlertCircle } from 'lucide-react';
 import { format, addDays, startOfToday } from 'date-fns';
 import { __ } from '@/lib/i18n';
 

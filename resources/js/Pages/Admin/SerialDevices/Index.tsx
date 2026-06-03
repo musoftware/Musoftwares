@@ -181,13 +181,13 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
 
     /* ── Bulk actions ────────────────────────────────────────────── */
 
-    const allOnPageSelected = devices.data.length > 0 && devices.data.every(d => selectedIds.includes(d.id));
+    const allOnPageSelected = (devices.data as any).length > 0 && devices.data.every(d => selectedIds.includes(d.id));
 
     const toggleAll = () => {
         if (allOnPageSelected) {
             setSelectedIds(prev => prev.filter(id => !devices.data.some(d => d.id === id)));
         } else {
-            setSelectedIds(prev => [...new Set([...prev, ...devices.data.map(d => d.id)])]);
+            setSelectedIds(prev => [...new Set([...prev, ...(devices.data as any).map(d => d.id)])]);
         }
     };
 
@@ -480,14 +480,14 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {devices.data.length === 0 && (
+                                    {(devices.data as any).length === 0 && (
                                         <TableRow>
                                             <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
                                                 {__('general.no_devices_found')}
                                             </TableCell>
                                         </TableRow>
                                     )}
-                                    {devices.data.map(device => (
+                                    {(devices.data as any).map(device => (
                                         <TableRow
                                             key={device.id}
                                             className={`cursor-pointer transition-colors ${selectedIds.includes(device.id) ? 'bg-muted/40' : ''}`}
@@ -588,7 +588,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                 </span>
                                 <Separator orientation="vertical" className="h-5" />
                                 <div className="w-48">
-                                    <Select value={bulkAction} onValueChange={(val) => setBulkAction(val)}>
+                                    <Select value={bulkAction} onValueChange={(val) => setBulkAction(val || '')}>
                                         <SelectTrigger className="h-9">
                                             <SelectValue placeholder={__('general.bulk_actions')} />
                                         </SelectTrigger>

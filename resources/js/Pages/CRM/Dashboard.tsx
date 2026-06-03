@@ -45,7 +45,7 @@ export default function Dashboard({ stats }) {
                 title={__('general.crm_dashboard')}
                 description={__('general.overview_of_your_marketing_leads_and_automations')}
                 icon={BarChart3}
-                module="CRM"
+                
             />
 
             <div className="px-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">

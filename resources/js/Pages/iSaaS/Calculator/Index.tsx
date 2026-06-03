@@ -30,7 +30,7 @@ export default function Index({ proposals }) {
             
             setAiResult(response.data);
         } catch (error: any) {
-            alert('Failed to calculate: ' + (error.response?.data?.error || error.message));
+            alert('Failed to calculate: ' + ((error as any).response?.data?.error || error.message));
         } finally {
             setIsCalculating(false);
         }

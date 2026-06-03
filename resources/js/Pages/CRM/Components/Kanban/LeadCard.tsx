@@ -12,7 +12,7 @@ interface LeadCardProps {
 
 export default function LeadCard({ lead, index }: LeadCardProps) {
     const openDrawer = (id: number) => { 
-        router.visit(route('crm.leads.show', id));
+        (window as any).location.href = route('crm.leads.show', id);
     };
 
     // Dynamic SLA coloring

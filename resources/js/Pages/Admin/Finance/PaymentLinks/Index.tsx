@@ -99,7 +99,7 @@ export default function Index({ paymentLinks, currencies }: { paymentLinks: any,
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {paymentLinks.data.map((link: any) => (
+                                {(paymentLinks.data as any).map((link: any) => (
                                     <TableRow key={link.id}>
                                         <TableCell data-label="ID" className="font-medium">
                                             #{link.id}
@@ -149,7 +149,7 @@ export default function Index({ paymentLinks, currencies }: { paymentLinks: any,
                                         </TableCell>
                                     </TableRow>
                                 ))}
-                                {paymentLinks.data.length === 0 && (
+                                {(paymentLinks.data as any).length === 0 && (
                                     <TableRow>
                                         <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">{__('admin.no_payment_links_found', { default: 'No payment links found.' })}</TableCell>
                                     </TableRow>

@@ -448,7 +448,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                         </div>
                                         <div className="space-y-2">
                                             <Label>{__('general.contact_list')}</Label>
-                                            <Select value={campaignForm.list_id} onValueChange={v => setCampaignForm({...campaignForm, list_id: v})}>
+                                            <Select value={campaignForm.list_id} onValueChange={v => setCampaignForm({...campaignForm, list_id: v || ''})}>
                                                 <SelectTrigger><SelectValue placeholder={__('general.select_audience')} /></SelectTrigger>
                                                 <SelectContent>
                                                     {lists.map(l => <SelectItem key={l.id} value={l.id}>{l.name} ({l.contact_count})</SelectItem>)}
@@ -457,7 +457,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                         </div>
                                         <div className="space-y-2">
                                             <Label>Template</Label>
-                                            <Select value={campaignForm.template_id} onValueChange={v => setCampaignForm({...campaignForm, template_id: v})}>
+                                            <Select value={campaignForm.template_id} onValueChange={v => setCampaignForm({...campaignForm, template_id: v || ''})}>
                                                 <SelectTrigger><SelectValue placeholder={__('general.select_email_design')} /></SelectTrigger>
                                                 <SelectContent>
                                                     {templates.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
@@ -466,7 +466,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                         </div>
                                         <div className="space-y-2">
                                             <Label>{__('general.smtp_account')}</Label>
-                                            <Select value={campaignForm.smtp_account_id} onValueChange={v => setCampaignForm({...campaignForm, smtp_account_id: v})}>
+                                            <Select value={campaignForm.smtp_account_id} onValueChange={v => setCampaignForm({...campaignForm, smtp_account_id: v || ''})}>
                                                 <SelectTrigger><SelectValue placeholder={__('general.select_sender')} /></SelectTrigger>
                                                 <SelectContent>
                                                     {accounts.map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}
@@ -847,7 +847,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                         </div>
                                         <div className="space-y-2">
                                             <Label>Encryption</Label>
-                                            <Select value={accountForm.encryption} onValueChange={v => setAccountForm({...accountForm, encryption: v})}>
+                                            <Select value={accountForm.encryption} onValueChange={v => setAccountForm({...accountForm, encryption: v || ''})}>
                                                 <SelectTrigger><SelectValue /></SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="ssl">{__('general.ssl_tls')}</SelectItem>

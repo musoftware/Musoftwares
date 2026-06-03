@@ -5,7 +5,7 @@ import { MessageSquare, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 
 export default function SupportDashboard({ stats, priorityMessages }: { stats: any, priorityMessages?: any[] }) {
     return (

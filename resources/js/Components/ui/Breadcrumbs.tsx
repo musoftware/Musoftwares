@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
 
 export interface BreadcrumbItem {

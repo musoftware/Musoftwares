@@ -66,13 +66,13 @@ const bulkActionOptions = [
     { value: 'delete', label: 'Delete' }
 ];
 
-export default function Index({ invoices, currentTab, filters = {}, stats, projects = [] }) {
+export default function Index({ invoices, currentTab, filters = {}, stats, projects = [] }: any) {
     const [selectedClient, setSelectedClient] = React.useState(null);
     const paginationLinks = invoices.meta?.links || invoices.links;
 
-    const [searchTerm, setSearchTerm] = React.useState(filters.search || '');
-    const [filterBy, setFilterBy] = React.useState(filters.filter_by || 'all');
-    const [perPage, setPerPage] = React.useState(filters.per_page || '20');
+    const [searchTerm, setSearchTerm] = React.useState((filters as any).search || '');
+    const [filterBy, setFilterBy] = React.useState((filters as any).filter_by || 'all');
+    const [perPage, setPerPage] = React.useState((filters as any).per_page || '20');
 
     const [selectedInvoices, setSelectedInvoices] = useState({});
     const [selectAll, setSelectAll] = useState(false);
@@ -129,7 +129,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     const handleChangeJobStatus = () => {
         if (!jobStatusDialog || !newJobStatus) return;
         
-        router.post(route('admin.invoices.change-job-status', jobStatusDialog.id), {
+        router.post(route('admin.invoices.change-job-status', (jobStatusDialog as any).id), {
             job_status: newJobStatus
         }, {
             preserveScroll: true,
@@ -265,8 +265,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
             <Card className="mb-4 bg-white shadow-sm overflow-visible">
                 <CardContent className="p-4">
                     <div className="flex flex-col gap-4 md:flex-row md:items-end">
-                        {filters.client_id && (
-                            <Link href={`/admin/invoices?client_id=${filters.client_id}${filters.project_id ? `&project_id=${filters.project_id}` : ''}`}>
+                        {(filters as any).client_id && (
+                            <Link href={`/admin/invoices?client_id=${(filters as any).client_id}${(filters as any).project_id ? `&project_id=${(filters as any).project_id}` : ''}`}>
                                 <Button size="sm">
                                     <Plus className="mr-2 h-4 w-4" />{__('general.add_invoice')}</Button>
                             </Link>
@@ -338,7 +338,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {invoices.data.map((invoice) => (
+                                {(invoices.data as any).map((invoice) => (
                                     <TableRow key={invoice.id}>
                                         <TableCell className="hidden sm:table-cell text-center" data-label="">
                                             <input 
@@ -488,7 +488,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                     </TableRow>
                                 ))}
                                 
-                                {(filters.client_id || filters.search === 'unpaid_partial' || filters.search === 'archived') && invoices.data.length > 0 && (
+                                {((filters as any).client_id || (filters as any).search === 'unpaid_partial' || (filters as any).search === 'archived') && (invoices.data as any).length > 0 && (
                                     <TableRow className="bg-muted/30 font-semibold border-t">
                                         <TableCell colSpan={6} className="text-right hidden sm:table-cell pr-4" data-label="Total">
                                             Total
@@ -506,7 +506,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                     </TableRow>
                                 )}
 
-                                {invoices.data.length === 0 && (
+                                {(invoices.data as any).length === 0 && (
                                     <TableRow>
                                         <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">{__('general.no_invoices_found')}</TableCell>
                                     </TableRow>
@@ -523,7 +523,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     <div className="flex flex-col gap-4 md:flex-row md:items-center">
                         <div className="flex flex-wrap items-center gap-2">
                             <div className="w-48">
-                                <Select value={bulkAction} onValueChange={(val) => setBulkAction(val)}>
+                                <Select value={bulkAction} onValueChange={(val) => setBulkAction(val || '')}>
                                     <SelectTrigger>
                                         <SelectValue placeholder={__('general.bulk_actions')} />
                                     </SelectTrigger>
@@ -542,7 +542,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                     <PremiumCombobox
                                         value={bulkActionProject}
                                         onChange={(val) => setBulkActionProject(String(val || ''))}
-                                        options={projects.map(p => ({ value: String(p.id), label: p.project_name }))}
+                                        options={(projects as any[]).map(p => ({ value: String(p.id), label: p.project_name }))}
                                         placeholder={__('general.select_project')}
                                     />
                                 </div>
@@ -577,12 +577,13 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                 </CardContent>
             </Card>
 
-            <ClientActionsSheet
+            <ClientActionsSheet 
                 client={selectedClient}
                 isOpen={!!selectedClient}
                 onClose={() => setSelectedClient(null)}
                 onLoginAs={handleLoginAs}
                 onResetPassword={handleResetPassword}
+                onChangeRole={() => {}}
             />
 
             <Dialog open={!!jobStatusDialog} onOpenChange={(open) => !open && setJobStatusDialog(null)}>
@@ -592,7 +593,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     </DialogHeader>
                     <div className="py-4">
                         <Label>Status</Label>
-                        <Select value={newJobStatus} onValueChange={setNewJobStatus}>
+                        <Select value={newJobStatus} onValueChange={(val) => setNewJobStatus(val || '')}>
                             <SelectTrigger className="mt-2">
                                 <SelectValue placeholder={__('general.select_status')} />
                             </SelectTrigger>

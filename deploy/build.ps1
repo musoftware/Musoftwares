@@ -37,45 +37,61 @@ Write-Host "=== Deploy Build (Local to Remote) ===" -ForegroundColor Cyan
 Write-Host "Server: $SSH_USER@$SSH_HOST`:$SSH_PORT" -ForegroundColor Gray
 Write-Host ""
 
-# 1. Local Build
-Write-Host "[1/4] Running local npm build..." -ForegroundColor Yellow
+# 1. Static Analysis
+Write-Host "[1/5] Running static analysis..." -ForegroundColor Yellow
 Set-Location $PROJECT_ROOT
-cmd.exe /c "npm run build"
+
+Write-Host "-> Checking TypeScript..." -ForegroundColor DarkGray
+cmd.exe /c "npx tsc --noEmit"
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "Error in local build" -ForegroundColor Red
+    Write-Host "TypeScript check failed! Upload aborted." -ForegroundColor Red
     exit 1
 }
 
-# 2. Archive Files (Using tar.exe which is faster and avoids lock bugs)
-Write-Host "[2/4] Archiving build files..." -ForegroundColor Yellow
+Write-Host "-> Checking ESLint..." -ForegroundColor DarkGray
+cmd.exe /c "npm run lint"
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "ESLint check failed! But continuing upload..." -ForegroundColor Yellow
+}
+
+# 2. Local Build
+Write-Host "[2/5] Running local npm build..." -ForegroundColor Yellow
+cmd.exe /c "npm run build"
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Error in local build! Upload aborted." -ForegroundColor Red
+    exit 1
+}
+
+# 3. Archive Files (Using tar.exe which is faster and avoids lock bugs)
+Write-Host "[3/5] Archiving build files..." -ForegroundColor Yellow
 if (Test-Path $ZIP_PATH) { Remove-Item $ZIP_PATH -Force }
 # Compress contents of public/build into a tar.gz file
 cmd.exe /c "tar.exe -czf build.tar.gz -C public/build ."
 
-# 3 & 4. Upload & Extract
+# 4 & 5. Upload & Extract
 $remoteZip = "$REMOTE_PATH/public/build.tar.gz"
 $unzipCmd = "cd $REMOTE_PATH/public && rm -rf build/* && mkdir -p build && tar -xzf build.tar.gz -C build/ && rm build.tar.gz"
 
 $hasPutty = $null -ne (Get-Command plink -ErrorAction SilentlyContinue) -and $null -ne (Get-Command pscp -ErrorAction SilentlyContinue)
 
 if ($hasPutty -and $SSH_PASSWORD -and -not $NoPassword) {
-    Write-Host "[3/4] Uploading via PuTTY (pscp) automatically..." -ForegroundColor Yellow
+    Write-Host "[4/5] Uploading via PuTTY (pscp) automatically..." -ForegroundColor Yellow
     # Accept host key automatically if not cached (no -batch here to allow echo y)
     cmd.exe /c "echo y | plink.exe -T -P $SSH_PORT -pw ""$SSH_PASSWORD"" $SSH_USER@$SSH_HOST exit 2>nul"
     
     # Upload (using -sftp for safer binary transfer)
     & pscp.exe -sftp -batch -P $SSH_PORT -pw $SSH_PASSWORD $ZIP_PATH "$SSH_USER@$SSH_HOST`:$remoteZip"
     
-    Write-Host "[4/4] Extracting via PuTTY (plink) automatically..." -ForegroundColor Yellow
+    Write-Host "[5/5] Extracting via PuTTY (plink) automatically..." -ForegroundColor Yellow
     # Use -batch and -T to disable interactive prompts and pseudo-terminal allocation
     $plinkCommand = "echo. | plink.exe -batch -T -P $SSH_PORT -pw ""$SSH_PASSWORD"" $SSH_USER@$SSH_HOST ""$unzipCmd"""
     cmd.exe /c $plinkCommand
 }
 else {
-    Write-Host "[3/4] Uploading build.tar.gz to server..." -ForegroundColor Yellow
+    Write-Host "[4/5] Uploading build.tar.gz to server..." -ForegroundColor Yellow
     & scp -P $SSH_PORT -o StrictHostKeyChecking=no $ZIP_PATH "$SSH_USER@$SSH_HOST`:$remoteZip"
     
-    Write-Host "[4/4] Extracting on server..." -ForegroundColor Yellow
+    Write-Host "[5/5] Extracting on server..." -ForegroundColor Yellow
     & ssh -p $SSH_PORT -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" $unzipCmd
 }
 

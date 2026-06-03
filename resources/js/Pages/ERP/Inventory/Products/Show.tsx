@@ -116,7 +116,7 @@ export default function Show({ product, stockLogs }: { product: any, stockLogs: 
                                 <div className="p-6">
                                     <h4 className="text-lg font-medium text-gray-900 mb-4">{t('erp.stock_history', 'Stock History')}</h4>
                                     
-                                    {stockLogs && stockLogs.data && stockLogs.data.length > 0 ? (
+                                    {stockLogs && stockLogs.data && (stockLogs.data as any).length > 0 ? (
                                         <>
                                             <div className="overflow-x-auto">
                                                 <table className="min-w-full divide-y divide-gray-200">
@@ -130,7 +130,7 @@ export default function Show({ product, stockLogs }: { product: any, stockLogs: 
                                                         </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-gray-200 bg-white">
-                                                        {stockLogs.data.map((log: any) => (
+                                                        {(stockLogs.data as any).map((log: any) => (
                                                             <tr key={log.id}>
                                                                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                                                                     {new Date(log.created_at).toLocaleString()}

@@ -34,13 +34,13 @@ axios.interceptors.response.use(
             clearTimeout((error.config as any).__timeoutId);
         }
 
-        if (!error.response) {
+        if (!(error as any).response) {
             // Network error
             window.dispatchEvent(new Event('app:network-error'));
         } else {
-            const status = error.response.status;
+            const status = (error as any).response.status;
             if (status === 500 || status === 503) {
-                console.error("Server Error:", error.response);
+                console.error("Server Error:", (error as any).response);
                 window.dispatchEvent(new Event('app:server-error'));
             } else if (status === 401 || status === 419) {
                 window.dispatchEvent(new Event('app:session-expired'));

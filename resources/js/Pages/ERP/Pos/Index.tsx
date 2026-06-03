@@ -19,6 +19,7 @@ interface Product {
 }
 
 interface CartItem extends Product {
+    stock: number;
     quantity: number;
     unit_price: number;
     product_id: number;
@@ -97,7 +98,8 @@ export default function Index({ products, auth }: any) {
                 ...product, 
                 product_id: product.id,
                 unit_price: product.price,
-                quantity: 1 
+                quantity: 1,
+                stock: product.stock_quantity || 0 
             }];
         });
     };
@@ -140,7 +142,7 @@ export default function Index({ products, auth }: any) {
                 router.reload({ only: ['products'] });
             })
             .catch(error => {
-                toast.error(error.response?.data?.message || __('Checkout failed'));
+                toast.error((error as any).response?.data?.message || __('Checkout failed'));
             })
             .finally(() => {
                 setIsProcessing(false);

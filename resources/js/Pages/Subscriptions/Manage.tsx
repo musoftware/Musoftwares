@@ -12,7 +12,6 @@ import { DataTable } from '@/Components/ui/DataTable';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { cn } from '@/lib/utils';
-import { __ } from '@/lib/i18n';
 
 interface Subscription {
     id: number;

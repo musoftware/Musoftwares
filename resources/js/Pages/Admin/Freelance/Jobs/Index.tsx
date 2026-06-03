@@ -47,14 +47,14 @@ export default function Index({ jobs, filters }: any) {
         <AdminSidebarLayout 
             title={__('freelance.admin_jobs')} 
             header={__('freelance.manage_jobs')}
-            actions={
+            {...({ actions: (
                 <Link href={route('admin.freelance.jobs.create')}>
                     <Button size="sm" className="shadow-none">
                         <Plus className="mr-1.5 h-3.5 w-3.5" />
                         {__('freelance.create_job')}
                     </Button>
                 </Link>
-            }
+            ) }) as any}
         >
             <div className="mb-6 flex items-center justify-between">
                 <form onSubmit={handleSearch} className="flex space-x-2 w-full max-w-2xl">

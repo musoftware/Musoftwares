@@ -95,7 +95,7 @@ export default function ExcelMergerRunner({ tool, subscription }: any) {
 
             if (deduplicate) {
                 const seen = new Set();
-                const uniqueData = [];
+                const uniqueData: any[] = [];
                 for (const row of combinedData) {
                     const str = JSON.stringify(row);
                     if (!seen.has(str)) {

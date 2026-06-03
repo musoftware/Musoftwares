@@ -262,7 +262,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
             fetch('/api/bing-daily-images')
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.length > 0) {
+                    if (data && (data as any).length > 0) {
                         setWallpaperUrl(data[0]);
                     }
                 })

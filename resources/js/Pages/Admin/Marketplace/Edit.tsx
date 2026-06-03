@@ -122,7 +122,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                     <Input
                                         id="title"
                                         value={data.title}
-                                        onChange={(e) => setData('title', e.target.value)}
+                                        onChange={(e) => setData('title', e.target.value || '')}
                                         className={errors.title ? 'border-red-500' : ''}
                                         required
                                     />
@@ -131,7 +131,7 @@ export default function Edit({ auth, service, categories }: Props) {
 
                                 <div className="space-y-2">
                                     <Label htmlFor="status">Status <span className="text-red-500">*</span></Label>
-                                    <Select value={data.status} onValueChange={(val) => setData('status', val)}>
+                                    <Select value={data.status} onValueChange={(val) => setData('status', val || '')}>
                                         <SelectTrigger className={errors.status ? 'border-red-500' : ''}>
                                             <SelectValue placeholder={__('general.select_status')} />
                                         </SelectTrigger>
@@ -147,7 +147,7 @@ export default function Edit({ auth, service, categories }: Props) {
 
                                 <div className="space-y-2 md:col-span-2">
                                     <Label htmlFor="category_id">Category <span className="text-red-500">*</span></Label>
-                                    <Select value={data.category_id} onValueChange={(val) => setData('category_id', val)}>
+                                    <Select value={data.category_id} onValueChange={(val) => setData('category_id', val || '')}>
                                         <SelectTrigger className={errors.category_id ? 'border-red-500' : ''}>
                                             <SelectValue placeholder={__('general.select_category')} />
                                         </SelectTrigger>
@@ -165,7 +165,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                     <Textarea
                                         id="description"
                                         value={data.description}
-                                        onChange={(e) => setData('description', e.target.value)}
+                                        onChange={(e) => setData('description', e.target.value || '')}
                                         rows={6}
                                         className={errors.description ? 'border-red-500' : ''}
                                         required

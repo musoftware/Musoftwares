@@ -15,6 +15,7 @@ interface PaymentOrder {
     amount: string;
     status: string;
     created_at: string;
+    currency?: { symbol: string };
     metadata: {
         order_number?: string;
         customer_name?: string;
@@ -118,12 +119,12 @@ export default function PaymentLinks({ links }: Props) {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {links.data.length === 0 ? (
+                            {(links.data as any).length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-12 text-center text-gray-500">{__('general.no_previous_payment_links_create_your_first_link_now')}</td>
                                 </tr>
                             ) : (
-                                links.data.map((link) => {
+                                (links.data as any).map((link) => {
                                     const checkoutUrl = route('sms-payment-gateway.widget.show', { uuid: link.uuid });
                                     return (
                                         <tr key={link.id} className="hover:bg-gray-50">

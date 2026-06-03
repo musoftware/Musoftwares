@@ -51,7 +51,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
         } catch (error: any) {
             toast({
                 title: __('Error'),
-                description: error.response?.data?.message || __('general.failed_to_generate_qr_code'),
+                description: (error as any).response?.data?.message || __('general.failed_to_generate_qr_code'),
                 variant: 'destructive',
             });
             setIsAddModalOpen(false);

@@ -6,7 +6,7 @@ import {
     ArrowUpRight, Bell, CheckCircle2, ChevronRight,
     FileText
 } from 'lucide-react';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { __ } from '@/lib/i18n';
 
 interface User {

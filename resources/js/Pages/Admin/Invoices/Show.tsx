@@ -37,7 +37,7 @@ export default function Show({ invoice }: { invoice: any }) {
                 navigator.clipboard.writeText(response.data.url);
                 alert(__('admin.link_copied') + '\n' + __('admin.expires_at') + ': ' + response.data.expires_at);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to generate share link", error);
             alert(__('general.error_occurred'));
         }
@@ -178,7 +178,7 @@ export default function Show({ invoice }: { invoice: any }) {
         const itemsToMerge = items.filter((_, idx) => selectedItemsForMerge.includes(idx));
         const mergedTitle = itemsToMerge.map(i => i.item_title).join(' + ');
         const mergedAmount = itemsToMerge.reduce((acc, i) => acc + parseFloat(i.amount || 0), 0);
-        const mergedQty = itemsToMerge.reduce((acc, i) => acc + parseInt(i.qty || 1), 0);
+        const mergedQty = itemsToMerge.reduce((acc, i) => acc + Number(i.qty || 1), 0);
         
         const mergedItem = {
             id: 'new-' + Date.now(),
@@ -254,7 +254,7 @@ export default function Show({ invoice }: { invoice: any }) {
         
         // Format for backend
         const payload = {
-            discount: parseFloat(discount),
+            discount: parseFloat(String(discount)),
             deleted_items: deletedItems,
             deleted_cost_lines: deletedCostLines,
             cost_lines: costLines.map(line => ({
@@ -320,7 +320,7 @@ export default function Show({ invoice }: { invoice: any }) {
     // Derived local totals for UI while editing
     const currentSubtotal = items.reduce((acc, item) => {
         if (item.item_type === 'timer') return acc + (parseFloat(item.total_amount) || 0);
-        return acc + (parseFloat(item.amount) * parseInt(item.qty || 1) || 0);
+        return acc + (parseFloat(item.amount) * Number(item.qty || 1) || 0);
     }, 0);
     const currentTotal = currentSubtotal + parseFloat(String(invoice.tax || 0)) - parseFloat(String(discount || 0));
 
@@ -691,7 +691,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                         )}
                                     </td>
                                     <td className="px-4 py-3 text-right font-bold text-gray-900">
-                                        {formatCurrency(item.item_type === 'timer' ? (item.total_amount || 0) : (parseFloat(item.amount) || 0) * (parseInt(item.qty) || 1), item.currency)}
+                                        {formatCurrency(item.item_type === 'timer' ? (item.total_amount || 0) : (parseFloat(item.amount) || 0) * (Number(item.qty) || 1), item.currency)}
                                     </td>
                                     {isEditing && (
                                         <td className="px-4 py-3 text-center">

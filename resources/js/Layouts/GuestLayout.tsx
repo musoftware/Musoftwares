@@ -1,6 +1,6 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import AuthIllustration from '@/Components/AuthIllustration';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { PropsWithChildren } from 'react';
 import { __ } from '@/lib/i18n';
 

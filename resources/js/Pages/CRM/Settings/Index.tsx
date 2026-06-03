@@ -17,7 +17,7 @@ export default function SettingsIndex({ api_token, webhook_url }) {
                 title={__('general.crm_settings_integrations')}
                 description={__('general.manage_your_workspace_settings_and_integrations')}
                 icon={SettingsIcon}
-                module="CRM"
+                
             />
             <div className="flex-1 space-y-4 px-8 pb-8">
                 <Tabs defaultValue="integrations" className="space-y-4">

@@ -211,7 +211,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                 toast.success('Empty fields populated by AI.');
             }
         } catch (error: any) {
-            toast.error(error.response?.data?.error || 'Failed to generate content with AI');
+            toast.error((error as any).response?.data?.error || 'Failed to generate content with AI');
         } finally {
             setIsGenerating(false);
         }
@@ -237,7 +237,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                 });
             }
         } catch (error: any) {
-            toast.error(error.response?.data?.error || 'Failed to review content with AI');
+            toast.error((error as any).response?.data?.error || 'Failed to review content with AI');
         } finally {
             setIsReviewing(false);
         }

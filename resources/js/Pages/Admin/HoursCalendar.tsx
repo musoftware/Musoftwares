@@ -36,7 +36,7 @@ export default function HoursCalendar({ years, auth }: any) {
             const responseData = response.data;
             setData(responseData);
             generateCalendar(year, responseData);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to load hours calendar data', error);
         } finally {
             setIsLoading(false);
@@ -47,7 +47,7 @@ export default function HoursCalendar({ years, auth }: any) {
         const startDate = new Date(year, 0, 1);
         const endDate = new Date(year, 11, 31);
         
-        const days = [];
+        const days: any[] = [];
         const dataMap: {[key: string]: number} = {};
         
         if (Array.isArray(dateYearsData)) {
@@ -59,7 +59,7 @@ export default function HoursCalendar({ years, auth }: any) {
         const dayOfWeek = startDate.getDay();
         
         for (let i = 0; i < dayOfWeek; i++) {
-            days.push({ date: 'empty-' + i, count: 0, visible: false });
+            days.push({ date: 'empty-' + i, count: 0, visible: false } as any);
         }
         
         const currentDate = new Date(startDate);
@@ -72,7 +72,7 @@ export default function HoursCalendar({ years, auth }: any) {
                 date: dateString,
                 count: dataMap[dateString] || 0,
                 visible: true
-            });
+            } as any);
             currentDate.setDate(currentDate.getDate() + 1);
         }
         
@@ -84,8 +84,8 @@ export default function HoursCalendar({ years, auth }: any) {
         let total = 0;
         let active = 0;
         days.forEach(day => {
-            if (day.visible && day.count > 0) {
-                total += day.count;
+            if ((day as any).visible && (day as any).count > 0) {
+                total += (day as any).count;
                 active++;
             }
         });
@@ -96,7 +96,7 @@ export default function HoursCalendar({ years, auth }: any) {
     };
 
     const generateMonthLabels = (year: number, startDayOfWeek: number) => {
-        const months = [];
+        const months: any[] = [];
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         
         const startDate = new Date(year, 0, 1);
@@ -110,7 +110,7 @@ export default function HoursCalendar({ years, auth }: any) {
             months.push({
                 name: monthNames[month],
                 weekStart: weekStart
-            });
+            } as any);
         }
         
         setMonthLabels(months);

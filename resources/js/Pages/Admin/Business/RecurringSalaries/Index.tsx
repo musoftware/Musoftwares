@@ -288,7 +288,7 @@ export default function Index({ salaries, currencies, users }) {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {salaries.data.map((salary) => (
+                        {(salaries.data as any).map((salary) => (
                             <tr key={salary.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center">
@@ -336,7 +336,7 @@ export default function Index({ salaries, currencies, users }) {
                                 </td>
                             </tr>
                         ))}
-                        {salaries.data.length === 0 && (
+                        {(salaries.data as any).length === 0 && (
                             <tr>
                                 <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                                     <Calendar className="w-12 h-12 mx-auto text-gray-300 mb-3" />

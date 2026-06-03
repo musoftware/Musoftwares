@@ -40,8 +40,10 @@ import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
+type ConfirmActionType = 'approve' | 'reject' | 'suspend' | 'delete' | 'feature';
+
 type ConfirmAction = {
-    type: 'approve' | 'reject' | 'suspend' | 'delete' | 'feature';
+    type: ConfirmActionType;
     id: number;
     title: string;
 } | null;
@@ -161,7 +163,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
 
     // ── Confirm helpers ───────────────────────────────────────────────────────
 
-    const openConfirm = (type: ConfirmAction['type'], service: any) =>
+    const openConfirm = (type: ConfirmActionType, service: any) =>
         setConfirm({ type, id: service.id, title: service.title });
 
     const handleConfirm = () => {
@@ -410,8 +412,8 @@ export default function All({ auth, services, categories, filters, stats }: any)
                             </TableHeader>
 
                             <TableBody>
-                                {services.data.length > 0 ? (
-                                    services.data.map((service: any) => (
+                                {(services.data as any).length > 0 ? (
+                                    (services.data as any).map((service: any) => (
                                         <TableRow
                                             key={service.id}
                                             className="hover:bg-slate-50/70 transition-colors"
@@ -494,7 +496,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                             {/* Date */}
                                             <TableCell>
                                                 <span className="text-xs text-slate-500">
-                                                    <DateDisplay date={service.created_at} format="MMM D, YYYY" />
+                                                    <DateDisplay date={service.created_at}  />
                                                 </span>
                                             </TableCell>
 

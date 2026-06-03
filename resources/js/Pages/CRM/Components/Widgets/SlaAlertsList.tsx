@@ -3,7 +3,7 @@ import { __ } from '@/lib/i18n';
 import { AlertTriangle, Clock, UserX, ArrowRight } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 
 interface StaleLead {
     id: number;

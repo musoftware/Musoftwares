@@ -328,7 +328,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
 
     const advancedFilters = (
         <div className="flex items-center gap-2 flex-wrap">
-            <Select value={filters.recurring || 'all'} onValueChange={(val) => handleFilter('recurring', val === 'all' ? '' : val)}>
+            <Select value={filters.recurring || 'all'} onValueChange={(val) => handleFilter('recurring', val === 'all' ? '' : ((val as string) || ''))}>
                 <SelectTrigger className="w-[150px] bg-white h-11 rounded-xl">
                     <SelectValue placeholder={__('general.all_frequencies')} />
                 </SelectTrigger>
@@ -341,7 +341,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                 </SelectContent>
             </Select>
 
-            <Select value={filters.priority || 'all'} onValueChange={(val) => handleFilter('priority', val === 'all' ? '' : val)}>
+            <Select value={filters.priority || 'all'} onValueChange={(val) => handleFilter('priority', val === 'all' ? '' : ((val as string) || ''))}>
                 <SelectTrigger className="w-[140px] bg-white h-11 rounded-xl">
                     <SelectValue placeholder={__('general.all_priorities')} />
                 </SelectTrigger>
@@ -434,7 +434,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                             <Input
                                 id="et-title"
                                 value={data.title}
-                                onChange={(e) => setData('title', e.target.value)}
+                                onChange={(e) => setData('title', e.target.value || '')}
                                 placeholder={__('general.todo_title')}
                                 className="h-11 rounded-xl"
                                 required
@@ -448,7 +448,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                             <Textarea
                                 id="et-description"
                                 value={data.description}
-                                onChange={(e) => setData('description', e.target.value)}
+                                onChange={(e) => setData('description', e.target.value || '')}
                                 placeholder={__('general.additional_details')}
                                 className="rounded-xl"
                                 rows={3}
@@ -459,7 +459,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
                                 <Label htmlFor="et-priority">Priority</Label>
-                                <Select value={data.priority} onValueChange={(v) => setData('priority', v)}>
+                                <Select value={data.priority} onValueChange={(v) => setData('priority', (v as string) || '')}>
                                     <SelectTrigger className="w-full bg-white h-11 rounded-xl shadow-sm">
                                         <SelectValue placeholder={__('general.select_priority')} />
                                     </SelectTrigger>
@@ -474,7 +474,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
 
                             <div className="space-y-1">
                                 <Label htmlFor="et-recurring">{__('general.recurs_every')}</Label>
-                                <Select value={data.recurring} onValueChange={(v) => setData('recurring', v)}>
+                                <Select value={data.recurring} onValueChange={(v) => setData('recurring', (v as string) || '')}>
                                     <SelectTrigger className="w-full bg-white h-11 rounded-xl shadow-sm">
                                         <SelectValue placeholder={__('general.select_frequency')} />
                                     </SelectTrigger>
@@ -511,7 +511,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                     id="et-current_date"
                                     type="date"
                                     value={data.current_date}
-                                    onChange={(e) => setData('current_date', e.target.value)}
+                                    onChange={(e) => setData('current_date', e.target.value || '')}
                                     className="h-11 rounded-xl"
                                     required
                                 />
@@ -526,7 +526,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                 <Input
                                     id="et-week"
                                     value={data.recurring_times_week}
-                                    onChange={(e) => setData('recurring_times_week', e.target.value)}
+                                    onChange={(e) => setData('recurring_times_week', e.target.value || '')}
                                     placeholder={__('general.monday_wednesday_friday')}
                                     className="h-11 rounded-xl"
                                 />
@@ -539,7 +539,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                 <Input
                                     id="et-month"
                                     value={data.recurring_times_month}
-                                    onChange={(e) => setData('recurring_times_month', e.target.value)}
+                                    onChange={(e) => setData('recurring_times_month', e.target.value || '')}
                                     placeholder="1,15"
                                     className="h-11 rounded-xl"
                                 />
@@ -552,7 +552,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                 <Input
                                     id="et-year"
                                     value={data.recurring_times_year}
-                                    onChange={(e) => setData('recurring_times_year', e.target.value)}
+                                    onChange={(e) => setData('recurring_times_year', e.target.value || '')}
                                     placeholder="1-1,25-12"
                                     className="h-11 rounded-xl"
                                 />

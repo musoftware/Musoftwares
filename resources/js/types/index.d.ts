@@ -1,4 +1,7 @@
-export interface User {
+export export export interface User {
+    crm_features?: string[];
+    crm_features?: string[];
+    crm_features?: string[];
     id: number;
     name: string;
     email: string;

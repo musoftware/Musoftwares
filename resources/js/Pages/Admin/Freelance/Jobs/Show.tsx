@@ -131,7 +131,7 @@ export default function Show({ job }: any) {
                     <div className="bg-white shadow rounded-lg p-6 mt-6">
                         <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
                             <FileText className="h-5 w-5 mr-2 text-slate-500" />
-                            {__('freelance.job_contracts', 'Job Contracts')}
+                            {__('freelance.job_contracts', undefined, 'Job Contracts')}
                         </h3>
                         {job.contracts && job.contracts.length > 0 ? (
                             <div className="space-y-4">
@@ -150,7 +150,7 @@ export default function Show({ job }: any) {
                                             </div>
                                             <Link href={route('admin.freelance.contracts.show', contract.id)}>
                                                 <Button variant="outline" size="sm">
-                                                    {__('freelance.view_contract', 'View Contract')}
+                                                    {__('freelance.view_contract', undefined, 'View Contract')}
                                                 </Button>
                                             </Link>
                                         </div>
@@ -158,7 +158,7 @@ export default function Show({ job }: any) {
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-gray-500 text-sm">{__('freelance.no_contracts_yet', 'No contracts associated with this job yet.')}</div>
+                            <div className="text-gray-500 text-sm">{__('freelance.no_contracts_yet', undefined, 'No contracts associated with this job yet.')}</div>
                         )}
                     </div>
                 </div>

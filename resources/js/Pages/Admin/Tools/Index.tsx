@@ -90,7 +90,7 @@ export default function AdminToolsIndex({ tools, categories }: Props) {
                 />
 
                 <OperationalCard noPadding>
-                    {tools.data.length === 0 ? (
+                    {(tools.data as any).length === 0 ? (
                         <EmptyState
                             icon={Package}
                             title={__('general.no_tools_yet')}
@@ -114,7 +114,7 @@ export default function AdminToolsIndex({ tools, categories }: Props) {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/50">
-                                        {tools.data.map(tool => (
+                                        {(tools.data as any).map(tool => (
                                             <tr key={tool.id} className={`hover:bg-surface-raised/50 transition-colors ${tool.deleted_at ? 'opacity-50' : ''}`}>
                                                 {/* Tool */}
                                                 <td className="px-5 py-3.5">

@@ -4,7 +4,7 @@ import { Button } from '@/Components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Badge } from '@/Components/ui/badge';
 import { Plus, Settings, PlayCircle, AlertCircle } from 'lucide-react';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { __ } from '@/lib/i18n';
 
 export default function RulesDashboard({ rules, stats }) {

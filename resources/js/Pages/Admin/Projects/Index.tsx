@@ -21,11 +21,11 @@ import { __ } from '@/lib/i18n';
 export default function Index({ projects, clients, currentTab }) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
-    const [editingProject, setEditingProject] = useState(null);
+    const [editingProject, setEditingProject] = useState<any>(null);
     const [formData, setFormData] = useState({ project_name: '', project_balance: '', user_id: '' });
 
     const [isSheetOpen, setIsSheetOpen] = useState(false);
-    const [selectedProject, setSelectedProject] = useState(null);
+    const [selectedProject, setSelectedProject] = useState<any>(null);
 
     const openProjectSheet = (project) => {
         setSelectedProject(project);
@@ -44,7 +44,7 @@ export default function Index({ projects, clients, currentTab }) {
 
     const handleEditSubmit = (e) => {
         e.preventDefault();
-        router.put(route('admin.projects.update', editingProject.id), formData, {
+        router.put(route('admin.projects.update', editingProject?.id), formData, {
             onSuccess: () => {
                 setIsEditOpen(false);
                 setEditingProject(null);
@@ -221,7 +221,7 @@ export default function Index({ projects, clients, currentTab }) {
                         ))}
                         {projects.length === 0 && (
                             <tr>
-                                <td colSpan="5" className="p-4 text-center text-gray-500">{__('general.no_projects_found')}</td>
+                                <td colSpan={5} className="p-4 text-center text-gray-500">{__('general.no_projects_found')}</td>
                             </tr>
                         )}
                     </tbody>

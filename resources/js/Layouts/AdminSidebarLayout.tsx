@@ -12,9 +12,10 @@ interface AdminSidebarLayoutProps extends PropsWithChildren {
     title?: string;
     header?: ReactNode;
     user?: any;
+    actions?: ReactNode;
 }
 
-export default function AdminSidebarLayout({ title, header, user, children }: AdminSidebarLayoutProps) {
+export default function AdminSidebarLayout({ title, header, user, children, actions }: AdminSidebarLayoutProps) {
     const displayName = user?.name || 'Admin User';
     const displayEmail = user?.email || 'admin@example.com';
 
@@ -33,6 +34,11 @@ export default function AdminSidebarLayout({ title, header, user, children }: Ad
                             header
                         )}
                     </div>
+                    {actions && (
+                        <div className="flex items-center gap-2">
+                            {actions}
+                        </div>
+                    )}
                     
                     {/* User Profile Dropdown */}
                     <DropdownMenu>

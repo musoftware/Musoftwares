@@ -14,7 +14,7 @@ import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 
 export default function TagsIndex({ tags }: { tags: any[] }) {
     const { auth } = usePage().props;
-    const hasManagementFeature = auth?.crm_features?.includes('crm-sales-management') ?? false;
+    const hasManagementFeature = (auth as any)?.crm_features?.includes('crm-sales-management') ?? false;
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -51,7 +51,7 @@ export default function TagsIndex({ tags }: { tags: any[] }) {
                     title={__('general.tags_attributes')}
                     description={__('general.manage_tags_used_to_categorize_leads_and_contacts')}
                     icon={Tag}
-                    module="CRM"
+                    
                 />
                 <div className="px-8 pb-8">
                     <UpgradeOverlay 
@@ -72,8 +72,8 @@ export default function TagsIndex({ tags }: { tags: any[] }) {
                 title={__('general.tags_attributes')}
                 description={__('general.manage_tags_used_to_categorize_leads_and_contacts')}
                 icon={Tag}
-                module="CRM"
-                action={
+                
+                actions={
                     <Button onClick={() => setIsCreateModalOpen(true)} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
                         <Plus size={16} />
                         {__('general.create_tag')}

@@ -164,7 +164,7 @@ export default function ObfuscatorRunner({ tool }: any) {
 
                         <div>
                             <label className="text-xs font-bold text-slate-500 uppercase">{__('general.obfuscation_level')}</label>
-                            <Select value={level} onValueChange={setLevel}>
+                            <Select value={level} onValueChange={(val) => setLevel(val || '')}>
                                 <SelectTrigger className="mt-1">
                                     <SelectValue />
                                 </SelectTrigger>

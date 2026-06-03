@@ -68,7 +68,7 @@ export default function CreateTicket() {
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
                                     <label className="text-sm font-medium text-slate-700">{__('general.priority')}</label>
-                                    <Select value={form.priority} onValueChange={(val) => setForm({...form, priority: val})}>
+                                    <Select value={form.priority} onValueChange={(val) => setForm({...form, priority: val || ''})}>
                                         <SelectTrigger className="bg-white border-slate-200 text-slate-900 w-full">
                                             <SelectValue placeholder={__('general.select_priority_1')} />
                                         </SelectTrigger>

@@ -35,7 +35,7 @@ const emptyForm = {
 export default function Index({ vouchers }) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
-    const [editingVoucher, setEditingVoucher] = useState(null);
+    const [editingVoucher, setEditingVoucher] = useState<any>(null);
     const [formData, setFormData] = useState({ ...emptyForm });
 
     const set = (key: string, value: any) =>
@@ -55,7 +55,7 @@ export default function Index({ vouchers }) {
 
     const handleEditSubmit = (e) => {
         e.preventDefault();
-        router.put(route('admin.vouchers.update', editingVoucher.id), formData, {
+        router.put(route('admin.vouchers.update', editingVoucher?.id), formData, {
             onSuccess: () => {
                 setIsEditOpen(false);
                 setEditingVoucher(null);

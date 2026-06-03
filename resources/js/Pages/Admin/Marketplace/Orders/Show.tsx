@@ -20,7 +20,7 @@ export default function Show({ order }) {
         }
 
         post(`/admin/marketplace/orders/${order.id}/dispute`, {
-            data: { action: actionType },
+            
             preserveScroll: true,
         });
     };

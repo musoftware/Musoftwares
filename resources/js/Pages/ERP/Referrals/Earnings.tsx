@@ -32,7 +32,7 @@ export default function Earnings({ earnings }: { earnings: any }) {
                         <CardTitle className="text-slate-900 text-sm font-semibold">{__("Earnings History")}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
-                        {earnings && earnings.data && earnings.data.length > 0 ? (
+                        {earnings && earnings.data && (earnings.data as any).length > 0 ? (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left text-sm border-collapse">
                                     <thead>
@@ -45,7 +45,7 @@ export default function Earnings({ earnings }: { earnings: any }) {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100 text-[13px] text-slate-600">
-                                        {earnings.data.map((earning: any) => (
+                                        {(earnings.data as any).map((earning: any) => (
                                             <tr key={earning.id} className="hover:bg-slate-50/50 transition-colors">
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     {new Date(earning.created_at).toLocaleDateString()}

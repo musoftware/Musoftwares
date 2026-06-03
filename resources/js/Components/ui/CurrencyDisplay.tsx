@@ -2,6 +2,7 @@ import React from 'react';
 import { cn, formatMoney } from '@/lib/utils';
 
 export interface CurrencyDisplayProps {
+    hideSymbol?: boolean;
     amount: number | string;
     currency?: string | { id: number; currency: string; symbol?: string; string_format?: string } | any;
     businessAmount?: number | string;

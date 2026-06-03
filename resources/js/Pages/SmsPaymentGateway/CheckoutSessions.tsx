@@ -66,12 +66,12 @@ export default function CheckoutSessions({ sessions }: Props) {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-slate-100">
-                            {sessions.data.length === 0 ? (
+                            {(sessions.data as any).length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-12 text-center text-slate-500">{__('general.no_checkout_sessions_found_create_one_using_the_api')}</td>
                                 </tr>
                             ) : (
-                                sessions.data.map((session) => {
+                                (sessions.data as any).map((session) => {
                                     const checkoutUrl = route('sms-gateway.checkout.show', { sessionId: session.session_id });
                                     return (
                                         <tr key={session.id} className="hover:bg-slate-50 transition-colors">

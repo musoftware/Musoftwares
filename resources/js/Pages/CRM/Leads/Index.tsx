@@ -29,7 +29,7 @@ import { __ } from '@/lib/i18n';
 
 export default function Index({ leads, currentTab }) {
     const { auth } = usePage().props;
-    const hasSalesStaff = auth?.crm_features?.includes('crm-sales-staff') ?? false;
+    const hasSalesStaff = (auth as any)?.crm_features?.includes('crm-sales-staff') ?? false;
     const [selectedLeadId, setSelectedLeadId] = useState<number | null>(null);
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -88,7 +88,7 @@ export default function Index({ leads, currentTab }) {
                     title={__('general.leads_pipeline')}
                     description={__('general.manage_and_track_your_leads_pipeline_1')}
                     icon={Users}
-                    module="CRM"
+                    
                 />
                 <div className="px-8 pb-8">
                     <UpgradeOverlay 
@@ -109,7 +109,7 @@ export default function Index({ leads, currentTab }) {
                 title={__('general.leads_crm')}
                 description={__('general.manage_and_track_your_leads_pipeline_1')}
                 icon={Users}
-                module="CRM"
+                
                 actions={
                     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                         <DialogTrigger asChild>
@@ -251,7 +251,7 @@ export default function Index({ leads, currentTab }) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {leads.data.map((lead) => (
+                            {(leads.data as any).map((lead) => (
                                 <tr key={lead.id} className="hover:bg-slate-50/80 cursor-pointer transition-colors" onClick={() => openLead(lead.id)}>
                                     <td className="px-6 py-4 font-medium text-slate-900">{lead.name || __('general.unknown')}</td>
                                     <td className="px-6 py-4">
@@ -305,9 +305,9 @@ export default function Index({ leads, currentTab }) {
                                     </td>
                                 </tr>
                             ))}
-                            {leads.data.length === 0 && (
+                            {(leads.data as any).length === 0 && (
                                 <tr>
-                                    <td colSpan="6" className="px-6 py-12 text-center text-slate-500">
+                                    <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
                                         {__('general.no_leads_found_for_this_status')}
                                     </td>
                                 </tr>

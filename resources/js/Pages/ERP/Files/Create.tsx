@@ -77,7 +77,7 @@ export default function CreateFile() {
                             
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-700">{__('general.document_category')}</label>
-                                <Select value={form.type} onValueChange={(val) => setForm({...form, type: val})}>
+                                <Select value={form.type} onValueChange={(val) => setForm({...form, type: val || ''})}>
                                     <SelectTrigger className="bg-white border-slate-200 text-slate-900">
                                         <SelectValue placeholder={__('general.select_category')} />
                                     </SelectTrigger>

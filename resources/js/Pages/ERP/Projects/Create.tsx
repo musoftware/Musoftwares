@@ -80,7 +80,7 @@ export default function CreateProject({ clients = [] }: { clients?: any[] }) {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-700">Status</label>
-                                    <Select value={form.status} onValueChange={(val) => setForm({...form, status: val})}>
+                                    <Select value={form.status} onValueChange={(val) => setForm({...form, status: val || ''})}>
                                         <SelectTrigger className="bg-white border-slate-200 text-slate-900">
                                             <SelectValue placeholder={__('general.select_status_1')} />
                                         </SelectTrigger>

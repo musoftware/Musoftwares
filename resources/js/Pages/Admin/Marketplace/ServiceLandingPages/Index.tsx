@@ -79,8 +79,8 @@ export default function Index({ servicesWithLandingPages, filters, auth, transla
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {servicesWithLandingPages.data.length > 0 ? (
-                                        servicesWithLandingPages.data.map((service) => (
+                                    {(servicesWithLandingPages.data as any).length > 0 ? (
+                                        (servicesWithLandingPages.data as any).map((service) => (
                                             <TableRow key={service.id}>
                                                 <TableCell className="font-medium">
                                                     {service.title}

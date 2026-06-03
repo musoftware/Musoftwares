@@ -33,7 +33,7 @@ export function CommandPalette() {
                 <Command 
                     className="w-full flex flex-col h-full bg-white"
                     onKeyDown={(e) => {
-                        if (e.key === 'Escape' || (e.key === 'Backspace' && !e.currentTarget.value)) {
+                        if (e.key === 'Escape' || (e.key === 'Backspace' && !(e.target as HTMLInputElement).value)) {
                             e.preventDefault();
                             setOpen(false);
                         }

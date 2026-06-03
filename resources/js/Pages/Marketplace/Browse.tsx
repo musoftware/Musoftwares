@@ -128,7 +128,7 @@ export default function Browse({ services, categories, filters }: any) {
             <div className="min-h-screen bg-gray-50 py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                        {services.data.map((service: any) => {
+                        {(services.data as any).map((service: any) => {
                             // Determine starting price from packages
                             const startingPrice =
                                 service.packages && service.packages.length > 0
@@ -256,7 +256,7 @@ export default function Browse({ services, categories, filters }: any) {
                         })}
                     </div>
 
-                    {services.data.length === 0 && (
+                    {(services.data as any).length === 0 && (
                         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-12 text-center text-gray-500 shadow-sm">
                             <svg
                                 className="mx-auto mb-4 h-12 w-12 text-gray-400"

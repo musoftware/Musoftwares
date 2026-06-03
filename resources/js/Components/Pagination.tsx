@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 
 export default function Pagination({ links }: { links: any[] }) {
     if (!links || links.length <= 3) return null;

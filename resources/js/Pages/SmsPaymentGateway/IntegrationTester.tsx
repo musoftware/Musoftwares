@@ -45,7 +45,7 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
 
             const data = await response.json();
             setResult(data);
-        } catch (error) {
+        } catch (error: any) {
             setResult({ success: false, message: 'Network error or invalid response from server.' });
         } finally {
             setTesting(false);

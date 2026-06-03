@@ -46,8 +46,8 @@ export default function Show({ campaign }) {
             
             setIsAiOpen(false);
             alert('AI content generated successfully! Please review before saving.');
-        } catch (error) {
-            alert('Failed to generate content: ' + (error.response?.data?.error || error.message));
+        } catch (error: any) {
+            alert('Failed to generate content: ' + ((error as any).response?.data?.error || error.message));
         } finally {
             setIsGenerating(false);
         }

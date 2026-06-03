@@ -22,7 +22,7 @@ import { useFreelanceMode } from '@/Components/Freelance/FreelanceModeContext';
 import { __ } from '@/lib/i18n';
 import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 
-export default function FreelanceLayout({ children }) {
+export default function FreelanceLayout({ children, clean = false }) {
     useInertiaNotifications();
     const { auth, notifications } = usePage().props;
     const user = auth.user;

@@ -9,7 +9,7 @@ import {
 import { SearchInput } from './SearchInput';
 import { SkeletonTable } from './SkeletonLoaders';
 import { EmptyState } from './EmptyState';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { __ } from '@/lib/i18n';
 
 // ── Column format A: legacy {key, label, render?, sortable?}
@@ -95,7 +95,7 @@ export function DataTable({
 }: DataTableProps) {
     const normalized = columns.map(normalizeColumn);
 
-    if (loading && !data.length) {
+    if (loading && !(data as any).length) {
         return <SkeletonTable cols={normalized.length || 4} rows={5} className="" />;
     }
 
@@ -161,8 +161,8 @@ export function DataTable({
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-slate-100">
-                        {data.length > 0 ? (
-                            data.map((row, rowIndex) => (
+                        {(data as any).length > 0 ? (
+                            (data as any).map((row, rowIndex) => (
                                 <tr
                                     key={row.id ?? rowIndex}
                                     className="transition-colors duration-100 hover:bg-slate-50/70"
