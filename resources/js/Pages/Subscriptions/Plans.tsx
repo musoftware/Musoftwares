@@ -16,8 +16,8 @@ import {
     ShoppingCart, Truck, Warehouse, CheckSquare, Coins,
     Receipt, Files, ScanLine, Clock, Bell, UserCircle,
     Laptop, Smartphone, Lightbulb,
-    TrendingUp, Activity, Target, FileText, Trophy, 
-    UserPlus, Store, LineChart, Rss, WifiOff, Umbrella, 
+    TrendingUp, Activity, Target, FileText, Trophy,
+    UserPlus, Store, LineChart, Rss, WifiOff, Umbrella,
     RefreshCw, PieChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -58,7 +58,6 @@ interface PlansProps {
     walletBalance: number;
     currency: string;
     proratedRefund?: number;
-    isEligibleForTrial?: boolean;
 }
 
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -71,15 +70,15 @@ const ICON_MAP: Record<string, React.ElementType> = {
     ShoppingCart, Truck, Warehouse, CheckSquare, Coins,
     Receipt, Files, ScanLine, Clock, Bell, UserCircle,
     Laptop, Smartphone, Lightbulb,
-    TrendingUp, Activity, Target, FileText, Trophy, 
-    UserPlus, Store, LineChart, Rss, WifiOff, Umbrella, 
+    TrendingUp, Activity, Target, FileText, Trophy,
+    UserPlus, Store, LineChart, Rss, WifiOff, Umbrella,
     RefreshCw, PieChart
 };
 
-export default function Plans({ serviceItems, activeSubscription, walletBalance, currency, proratedRefund = 0, isEligibleForTrial = false }: PlansProps) {
+export default function Plans({ serviceItems, activeSubscription, walletBalance, currency, proratedRefund = 0 }: PlansProps) {
     const [billing, setBilling] = useState<'1_month' | '6_months' | '1_year'>('1_month');
     const [isNewSystem, setIsNewSystem] = useState<boolean>(!activeSubscription?.owned_features?.length);
-    
+
     return (
         <AuthenticatedLayout header={undefined}>
             <Head title={__('general.build_your_workspace')} />
@@ -114,9 +113,9 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
             )}
 
             <div className="max-w-7xl mx-auto px-4 pb-20">
-                <PricingBuilder 
-                    serviceItems={serviceItems} 
-                    currency={currency} 
+                <PricingBuilder
+                    serviceItems={serviceItems}
+                    currency={currency}
                     activeSubscription={activeSubscription}
                     isNewSystem={isNewSystem}
                     onSystemTypeChange={setIsNewSystem}
@@ -124,46 +123,23 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
                     renderActions={({ selectedItems, billing, total }) => {
                         const finalTotal = Math.max(0, total - (!isNewSystem ? proratedRefund : 0));
                         const canAfford = walletBalance >= finalTotal;
-                        
+
                         const handleSubscribeWallet = () => {
                             if (selectedItems.length === 0) return;
-                            const msg = isNewSystem 
+                            const msg = isNewSystem
                                 ? `Create a NEW workspace with these ${selectedItems.length} items?`
                                 : `Subscribe to these ${selectedItems.length} items using your wallet balance?`;
                             if (confirm(msg)) {
                                 router.post(route('subscriptions.subscribe'), { items: selectedItems, billing_cycle: billing, is_new_system: isNewSystem });
                             }
                         };
-                    
+
                         const handleSubscribeKashier = () => {
                             if (selectedItems.length === 0) return;
                             router.post(route('subscriptions.kashier.checkout'), { items: selectedItems, billing_cycle: billing, is_new_system: isNewSystem });
                         };
 
-                        const handleStartTrial = () => {
-                            if (selectedItems.length === 0) return;
-                            if (confirm(`Start your 14-day free trial for the selected ${selectedItems.length} items?`)) {
-                                router.post(route('subscriptions.trial'), { items: selectedItems, is_new_system: isNewSystem });
-                            }
-                        };
 
-                        const hasAnyTools = selectedItems.length > 0 && selectedItems.some(id => id.startsWith('tool-'));
-
-                        if (isEligibleForTrial && !hasAnyTools) {
-                            return (
-                                <Button
-                                    onClick={handleStartTrial}
-                                    disabled={selectedItems.length === 0}
-                                    className={cn(
-                                        'w-full h-12 rounded-xl text-sm font-medium gap-2 transition-all',
-                                        selectedItems.length > 0
-                                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm'
-                                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                                    )}
-                                >
-                                    <Sparkles className="h-4 w-4" />{__('general.start_14_day_free_trial')}</Button>
-                            );
-                        }
 
                         return (
                             <>
@@ -200,7 +176,7 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
                         );
                     }}
                 />
-                
+
                 <div className="mt-6 flex items-center justify-center gap-2 text-sm text-slate-400">
                     <Wallet className="h-3.5 w-3.5" />
                     <span>Wallet balance: <strong className="text-slate-600">{walletBalance} {currency}</strong></span>

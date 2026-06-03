@@ -43,19 +43,7 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $modules = config('saas.modules', []);
-        foreach ($modules as $slug => $price) {
-            if ($slug === 'tool') continue;
 
-            \App\Models\UserSubscription::create([
-                'user_id' => $user->id,
-                'object' => $slug,
-                'status' => 'active',
-                'started_at' => now(),
-                'expires_at' => now()->addDays(14),
-                'auto_renew' => false,
-            ]);
-        }
 
         event(new Registered($user));
 
