@@ -36,7 +36,73 @@ class ClientController extends Controller
     }
 
     /**
-     * Show the complete operational workflow for a specific client.
+     * Advanced index data table for clients.
+     */
+    public function index(Request $request)
+    {
+        $this->authorize('viewAny', TenantClient::class);
+        $tenantId = $this->resolveTenant()->id;
+
+        $query = TenantClient::where('tenant_id', $tenantId)->with('currency')->withCount('invoices');
+
+        if ($search = $request->get('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status = $request->get('status')) {
+            $query->where('status', $status);
+        }
+
+        $sortable  = ['name', 'email', 'created_at', 'id'];
+        $sort      = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'id';
+        $direction = $request->get('direction', 'desc') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sort, $direction);
+
+        $clients = $query->paginate(25)->withQueryString()->through(function ($client) {
+            $unpaid = Invoice::where('client_id', $client->id)
+                ->whereIn('status', ['sent', 'partial'])
+                ->sum('amount');
+            $totalPaid = Invoice::where('client_id', $client->id)
+                ->where('status', 'paid')
+                ->sum('amount');
+
+            return [
+                'id' => $client->id,
+                'name' => $client->name,
+                'email' => $client->email ?? '-',
+                'phone' => $client->phone ?? '-',
+                'address' => $client->address ?? '-',
+                'currency' => $client->currency?->currency ?? 'USD',
+                'balance' => round($client->balance(), 2),
+                'unpaid' => round($unpaid, 2),
+                'totalPaid' => round($totalPaid, 2),
+                'invoices_count' => $client->invoices_count,
+                'status' => $client->status,
+                'created_at' => $client->created_at?->format('Y-m-d'),
+                'avatar_url' => $client->avatar_url,
+            ];
+        });
+
+        $stats = [
+            'total'           => TenantClient::where('tenant_id', $tenantId)->count(),
+            'active'          => TenantClient::where('tenant_id', $tenantId)->whereIn('status', ['active', 'paying', 'retained'])->count(),
+            'leads'           => TenantClient::where('tenant_id', $tenantId)->where('status', 'lead')->count(),
+            'new_this_month'  => TenantClient::where('tenant_id', $tenantId)->where('created_at', '>=', now()->startOfMonth())->count(),
+        ];
+
+        return Inertia::render('ERP/Clients/Index', [
+            'clients' => $clients,
+            'filters' => $request->only(['search', 'status', 'sort', 'direction']),
+            'stats'   => $stats,
+        ]);
+    }
+
+    /**
+     * Show the overview tab for a specific client.
      */
     public function show(TenantClient $client)
     {
@@ -45,18 +111,89 @@ class ClientController extends Controller
         $user = Auth::user();
         $hasTickets = $user->hasModuleSubscription('erp-tickets');
 
-        $data = $this->clientService->getOperationalData($client, $hasTickets);
+        $baseData = $this->clientService->getClientBaseData($client, $hasTickets);
 
-        return Inertia::render('ERP/Clients/Show', [
-            'client' => $data['client'],
-            'projects' => $data['projects'],
-            'tickets' => $data['tickets'],
-            'invoices' => $data['invoices'],
-            'activities' => ActivityResource::collection($data['activities'])->resolve(),
-            'hasTickets' => $hasTickets,
-            'balance' => $data['balance'],
-            'lockedBalance' => $data['lockedBalance'],
-        ]);
+        $invoices = Invoice::where('client_id', $client->id)->latest()->get();
+        $projects = $client->projects;
+        $tickets = $hasTickets ? $client->tickets : [];
+        $activities = Activity::where('subject_type', TenantClient::class)
+            ->where('subject_id', $client->id)
+            ->with('causer')
+            ->latest()
+            ->get();
+
+        return Inertia::render('ERP/Clients/Show', array_merge($baseData, [
+            'invoices' => $invoices,
+            'projects' => $projects,
+            'tickets' => $tickets,
+            'activities' => ActivityResource::collection($activities)->resolve(),
+        ]));
+    }
+
+    /**
+     * Show the transactions tab for a specific client.
+     */
+    public function transactions(TenantClient $client)
+    {
+        $this->authorize('view', $client);
+
+        $user = Auth::user();
+        $hasTickets = $user->hasModuleSubscription('erp-tickets');
+
+        $baseData = $this->clientService->getClientBaseData($client, $hasTickets);
+
+        $transactions = \Modules\ERP\Models\WalletTransaction::where('client_id', $client->id)
+            ->with(['creator', 'currency'])
+            ->latest()
+            ->get();
+
+        return Inertia::render('ERP/Clients/Transactions', array_merge($baseData, [
+            'transactions' => $transactions,
+        ]));
+    }
+
+    /**
+     * Show the files tab for a specific client.
+     */
+    public function files(TenantClient $client)
+    {
+        $this->authorize('view', $client);
+
+        $user = Auth::user();
+        $hasTickets = $user->hasModuleSubscription('erp-tickets');
+
+        $baseData = $this->clientService->getClientBaseData($client, $hasTickets);
+
+        $files = \Modules\ERP\Models\TenantFile::where('tenant_id', $client->tenant_id)
+            ->where('folder', 'client_' . $client->id)
+            ->with('uploader')
+            ->latest()
+            ->get();
+
+        return Inertia::render('ERP/Clients/Files', array_merge($baseData, [
+            'files' => $files,
+        ]));
+    }
+
+    /**
+     * Show the notes tab for a specific client.
+     */
+    public function notes(TenantClient $client)
+    {
+        $this->authorize('view', $client);
+
+        $user = Auth::user();
+        $hasTickets = $user->hasModuleSubscription('erp-tickets');
+
+        $baseData = $this->clientService->getClientBaseData($client, $hasTickets);
+
+        $notes = \Modules\ERP\Models\ClientNote::where('client_id', $client->id)
+            ->latest()
+            ->get();
+
+        return Inertia::render('ERP/Clients/Notes', array_merge($baseData, [
+            'notes' => $notes,
+        ]));
     }
 
     /**

@@ -21,27 +21,17 @@ class BranchController extends Controller
         $this->branchService = $branchService;
         $this->analyticsAggregator = $analyticsAggregator;
     }
-
-    protected function getTenantAndCheckAccess() {
-        $user = Auth::user();
-        if (Auth::guard('erp_team')->check()) {
-            $tenant = Auth::guard('erp_team')->user()->tenant;
-            $ownerUser = $tenant?->user;
-        } else {
-            $tenant = Tenant::where('user_id', $user?->id)->first();
-            $ownerUser = $user;
-        }
-
-        if (!$ownerUser || !$ownerUser->hasModuleSubscription('erp-multi-branch')) {
+    protected function getTenantAndCheckAccess(Request $request) {
+        $user = $request->user();
+        if (!$user->hasModuleSubscription('erp-multi-branch')) {
             abort(403, __('erp.unauthorized_multi_branch'));
         }
-
-        return $tenant->id;
+        return $user->tenant->id;
     }
 
     public function dashboard(Request $request)
     {
-        $tenantId = $this->getTenantAndCheckAccess();
+        $tenantId = $this->getTenantAndCheckAccess($request);
         
         $activeBranchId = session('active_branch_id') ?: $request->query('branch_id');
         $branches = Branch::where('tenant_id', $tenantId)->get();
@@ -68,7 +58,7 @@ class BranchController extends Controller
 
     public function switchBranch(Request $request)
     {
-        $tenantId = $this->getTenantAndCheckAccess();
+        $tenantId = $this->getTenantAndCheckAccess($request);
         
         $request->validate([
             'branch_id' => 'nullable|exists:erp_branches,id'
@@ -86,7 +76,7 @@ class BranchController extends Controller
 
     public function index(Request $request)
     {
-        $tenantId = $this->getTenantAndCheckAccess();
+        $tenantId = $this->getTenantAndCheckAccess($request);
         $branches = Branch::where('tenant_id', $tenantId)->get();
         
         if ($request->wantsJson()) {
@@ -100,7 +90,7 @@ class BranchController extends Controller
 
     public function store(Request $request)
     {
-        $tenantId = $this->getTenantAndCheckAccess();
+        $tenantId = $this->getTenantAndCheckAccess($request);
 
         $validated = $request->validate([
             'name' => 'required|string',

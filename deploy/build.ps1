@@ -48,6 +48,13 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
+Write-Host "-> Checking Translations..." -ForegroundColor DarkGray
+cmd.exe /c "php artisan translations:check"
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Translation check failed! Upload aborted. Please complete all missing translations." -ForegroundColor Red
+    exit 1
+}
+
 Write-Host "-> Checking ESLint..." -ForegroundColor DarkGray
 cmd.exe /c "npm run lint"
 if ($LASTEXITCODE -ne 0) {

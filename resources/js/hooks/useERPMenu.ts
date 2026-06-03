@@ -22,6 +22,7 @@ import {
     Lock,
     Building2,
     MonitorSmartphone,
+    MonitorPlay,
 } from 'lucide-react';
 
 interface MenuItem {

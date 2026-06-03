@@ -20,6 +20,8 @@ class Service extends Model
         'suspended_at', 'suspended_by', 'is_featured'
     ];
 
+    protected $appends = ['cover_image'];
+
     protected $casts = [
         'is_featured'  => 'boolean',
         'tags'         => 'array',
@@ -56,5 +58,13 @@ class Service extends Model
     public function reviews()
     {
         return $this->hasMany(ServiceReview::class, 'service_id');
+    }
+
+    public function getCoverImageAttribute()
+    {
+        if (!empty($this->gallery) && is_array($this->gallery) && isset($this->gallery[0])) {
+            return asset('storage/' . $this->gallery[0]);
+        }
+        return null;
     }
 }

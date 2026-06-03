@@ -7,7 +7,6 @@ return [
     'share_1_month' => 'Share (1 Month)',
     'link_copied' => 'Link copied to clipboard!',
     'expires_at' => 'Expires at',
-
     'only_unpaid_invoices_can_be_edited' => 'only_unpaid_invoices_can_be_edited',
     'service_added_successfully' => 'service_added_successfully',
     'timer_session_deleted' => 'timer_session_deleted',
@@ -96,15 +95,15 @@ return [
     'of' => 'of',
     'services_count' => 'services',
     'approve_service' => 'Approve Service',
-    'approve_service_desc' => '\":title\" will become publicly visible on the marketplace immediately.',
+    'approve_service_desc' => '\\\":title\\\" will become publicly visible on the marketplace immediately.',
     'reject_service' => 'Reject Service',
-    'reject_service_desc' => '\":title\" will be marked as rejected. The seller will not be able to resubmit without changes.',
+    'reject_service_desc' => '\\\":title\\\" will be marked as rejected. The seller will not be able to resubmit without changes.',
     'suspend_service' => 'Suspend Service',
-    'suspend_service_desc' => '\":title\" will be hidden from the marketplace. Existing orders won\'t be affected.',
+    'suspend_service_desc' => '\\\":title\\\" will be hidden from the marketplace. Existing orders won\'t be affected.',
     'toggle_featured' => 'Toggle Featured',
-    'toggle_featured_desc' => 'Update the featured status for \":title\".',
+    'toggle_featured_desc' => 'Update the featured status for \\\":title\\\".',
     'delete_service' => 'Delete Service',
-    'delete_service_desc' => 'This will permanently delete \":title\" and all its packages. This action cannot be undone.',
+    'delete_service_desc' => 'This will permanently delete \\\":title\\\" and all its packages. This action cannot be undone.',
     'delete_permanently' => 'Delete Permanently',
     'confirm' => 'Confirm',
     'cost_line_recorded_success' => 'Cost line recorded as paid successfully.',
@@ -119,8 +118,6 @@ return [
     'no_active_services' => 'No active services.',
     'no_subscribers_found' => 'No subscribers found.',
     'service_payment_added_successfully' => 'Service payment added successfully.',
-    
-    // Payment Links
     'payment_links' => 'Payment Links',
     'create_payment_link' => 'Create Payment Link',
     'copy_link' => 'Copy Link',
@@ -133,8 +130,6 @@ return [
     'paid' => 'Paid',
     'base_system_rate' => 'Base System Rate',
     'client_rate' => 'Client Rate',
-    
-    // Subscription Assignment
     'add_subscription' => 'Add Subscription',
     'select_user' => 'Select User',
     'select_user_to_assign_subscription' => 'Select the user you want to assign the subscription to.',
@@ -151,8 +146,6 @@ return [
     'lifetime' => 'Lifetime',
     'expiration_date' => 'Expiration Date',
     'subscription_assigned_successfully' => 'Subscription assigned successfully.',
-
-    // Point Packages
     'point_packages' => 'Point Packages',
     'create_point_package' => 'Create Point Package',
     'edit_point_package' => 'Edit Point Package',
@@ -162,11 +155,11 @@ return [
     'point_package_updated' => 'Point Package updated successfully.',
     'point_package_deleted' => 'Point Package deleted successfully.',
     'manage_point_packages' => 'Manage and create packages of points that users can purchase.',
-    
-    // Reschedule Invoice
     'reschedule_invoice' => 'Reschedule Invoice',
     'new_invoice_date' => 'New Invoice Date',
     'notify_client' => 'Notify Client via WhatsApp',
     'invoice_rescheduled_successfully' => 'Invoice rescheduled successfully.',
     'only_unpaid_can_be_rescheduled' => 'Only unpaid or partially paid invoices can be rescheduled.',
+    'price' => 'Price',
+    'success' => 'Success'
 ];

@@ -91,6 +91,33 @@ class ClientService
         );
     }
 
+    public function getClientBaseData(TenantClient $client, bool $hasTickets): array
+    {
+        $client->load(['currency']);
+
+        $totalRevenue = Invoice::where('client_id', $client->id)
+            ->where('status', 'paid')
+            ->sum('total');
+
+        $unpaidRevenue = Invoice::where('client_id', $client->id)
+            ->whereIn('status', ['unpaid', 'due', 'sent', 'overdue'])
+            ->sum('total');
+
+        $projectsCount = $client->projects()->count();
+        $ticketsCount = $hasTickets ? $client->tickets()->count() : 0;
+
+        return [
+            'client' => $client,
+            'balance' => $client->balance(),
+            'lockedBalance' => $client->lockedBalance(),
+            'totalRevenue' => $totalRevenue,
+            'unpaidRevenue' => $unpaidRevenue,
+            'projectsCount' => $projectsCount,
+            'ticketsCount' => $ticketsCount,
+            'hasTickets' => $hasTickets,
+        ];
+    }
+
     public function getOperationalData(TenantClient $client, bool $hasTickets): array
     {
         $client->load(['projects', 'currency']);
@@ -107,12 +134,30 @@ class ClientService
             ->latest()
             ->get();
 
+        $transactions = \Modules\ERP\Models\WalletTransaction::where('client_id', $client->id)
+            ->with(['creator', 'currency'])
+            ->latest()
+            ->get();
+
+        $notes = \Modules\ERP\Models\ClientNote::where('client_id', $client->id)
+            ->latest()
+            ->get();
+            
+        $files = \Modules\ERP\Models\TenantFile::where('tenant_id', $client->tenant_id)
+            ->where('folder', 'client_' . $client->id)
+            ->with('uploader')
+            ->latest()
+            ->get();
+
         return [
             'client' => $client,
             'projects' => $client->projects,
             'tickets' => $hasTickets ? $client->tickets : [],
             'invoices' => $invoices,
             'activities' => $activities,
+            'transactions' => $transactions,
+            'notes' => $notes,
+            'files' => $files,
             'balance' => $client->balance(),
             'lockedBalance' => $client->lockedBalance(),
         ];

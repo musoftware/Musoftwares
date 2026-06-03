@@ -872,4 +872,39 @@ class FinanceHelper
             return 200; // Fallback default
         });
     }
+
+    /**
+     * Get the viewer's currency based on user preferences or IP geolocation.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \App\Models\Currency
+     */
+    public function getViewerCurrency(\Illuminate\Http\Request $request): \App\Models\Currency
+    {
+        // 1. Authenticated User Preference
+        if ($user = $request->user()) {
+            $currencyId = $user->currency_id;
+            if ($currencyId) {
+                $currency = \App\Models\Currency::find($currencyId);
+                if ($currency) {
+                    return $currency;
+                }
+            }
+        }
+
+        // 2. IP Geolocation (Guest or User with no preference)
+        $ipService = app(\App\Services\IpGeolocationService::class);
+        $currencyCode = $ipService->getCurrencyCodeForIp($request->ip());
+
+        if ($currencyCode) {
+            $currency = \App\Models\Currency::where('currency', $currencyCode)->first();
+            if ($currency) {
+                return $currency;
+            }
+        }
+
+        // 3. Fallback to System Default (Business Currency or USD)
+        $businessCurrencyId = \App\Models\CurrenciesExchange::BusinessCurrency();
+        return \App\Models\Currency::find($businessCurrencyId) ?? \App\Models\Currency::where('currency', 'USD')->first();
+    }
 }

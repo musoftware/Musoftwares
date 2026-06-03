@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -19,7 +19,8 @@ class RuntimeDownloadController extends Controller
         return Inertia::render('Runtime/Download', [
             'downloadUrl' => url('/downloads/runtime/windows/musoftware-runtime-win.zip'),
             'password' => 'musoftware2026',
-            'version' => '1.1.0',
+            'version' => '2026.06.03.0',
         ]);
     }
 }
+
