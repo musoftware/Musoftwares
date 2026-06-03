@@ -4846,4 +4846,5 @@ return [
     'musoftware_runtime' => 'Musoftware Runtime',
     'download_runtime' => 'Download Runtime',
     'download_the_desktop_runtime_to_use_local_plugins_and_integrations' => 'Download the desktop runtime to use local plugins and integrations.',
+    'direct_messages_support_only' => 'Direct messages can only be sent to support or admin accounts.',
 ];
