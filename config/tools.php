@@ -531,55 +531,55 @@ Not copying content — copying the psychology.
         ],
         'version' => '1.0.0',
     ],
-    '2d142935-58f5-4bc3-bfce-d0e1af658e32' => [
-        'guid' => '2d142935-58f5-4bc3-bfce-d0e1af658e32',
-        'title' => 'OpenSooq Data Extractor',
-        'slug' => 'opensooq',
-        'short_description' => 'Extract real buyer and seller leads from OpenSooq listings — by keyword, category, and country.',
-        'description' => 'OpenSooq Lead Extractor mines verified leads from OpenSooq.com, the largest classifieds marketplace in the Arab world.
+//     '2d142935-58f5-4bc3-bfce-d0e1af658e32' => [
+//         'guid' => '2d142935-58f5-4bc3-bfce-d0e1af658e32',
+//         'title' => 'OpenSooq Data Extractor',
+//         'slug' => 'opensooq',
+//         'short_description' => 'Extract real buyer and seller leads from OpenSooq listings — by keyword, category, and country.',
+//         'description' => 'OpenSooq Lead Extractor mines verified leads from OpenSooq.com, the largest classifieds marketplace in the Arab world.
 
-- Search any category, keyword, or country
-- Extract contact details, listing data, and phone numbers
-- Enrich leads with source, title, and region
-- Export to CSV or push directly into your CRM
-- 100% local execution — no cloud API costs',
-        'category' => 'intelligence',
-        'supported_os' => array (
-  0 => 'windows',
-  1 => 'mac',
-),
-        'is_featured' => true,
-        'is_active' => true,
-        'is_free' => false,
-        'runner_component' => 'opensooq',
-        'features' => array (
-  0 => 'Keyword & category search',
-  1 => 'Phone number extraction',
-  2 => 'Multi-country targeting',
-  3 => 'CRM-ready CSV export',
-  4 => 'Local SQLite storage',
-  5 => 'Anti-detection pacing',
-),
-        'requirements' => array (
-  0 => 'Musoftware Runtime Agent running locally',
-  1 => 'Internet connection',
-),
-        'plans' => [
-            '8107329a-d69b-4c9a-9ecb-a41fd56bbc60' => [
-                'guid' => '8107329a-d69b-4c9a-9ecb-a41fd56bbc60',
-                'name' => 'Free',
-                'price_monthly' => 100,
-                'price_yearly' => 1000,
-                'is_popular' => true,
-                'features' => array (
-  0 => 'Unlimited extractions',
-  1 => 'CSV export',
-  2 => 'Multi-country support',
-),
-            ],
-        ],
-        'version' => '1.0.0',
-    ],
+// - Search any category, keyword, or country
+// - Extract contact details, listing data, and phone numbers
+// - Enrich leads with source, title, and region
+// - Export to CSV or push directly into your CRM
+// - 100% local execution — no cloud API costs',
+//         'category' => 'intelligence',
+//         'supported_os' => array (
+//   0 => 'windows',
+//   1 => 'mac',
+// ),
+//         'is_featured' => true,
+//         'is_active' => true,
+//         'is_free' => false,
+//         'runner_component' => 'opensooq',
+//         'features' => array (
+//   0 => 'Keyword & category search',
+//   1 => 'Phone number extraction',
+//   2 => 'Multi-country targeting',
+//   3 => 'CRM-ready CSV export',
+//   4 => 'Local SQLite storage',
+//   5 => 'Anti-detection pacing',
+// ),
+//         'requirements' => array (
+//   0 => 'Musoftware Runtime Agent running locally',
+//   1 => 'Internet connection',
+// ),
+//         'plans' => [
+//             '8107329a-d69b-4c9a-9ecb-a41fd56bbc60' => [
+//                 'guid' => '8107329a-d69b-4c9a-9ecb-a41fd56bbc60',
+//                 'name' => 'Free',
+//                 'price_monthly' => 100,
+//                 'price_yearly' => 1000,
+//                 'is_popular' => true,
+//                 'features' => array (
+//   0 => 'Unlimited extractions',
+//   1 => 'CSV export',
+//   2 => 'Multi-country support',
+// ),
+//             ],
+//         ],
+//         'version' => '1.0.0',
+//     ],
     '123e4567-e89b-12d3-a456-426614174000' => [
         'guid' => '123e4567-e89b-12d3-a456-426614174000',
         'title' => 'Bulk Email Sender',
