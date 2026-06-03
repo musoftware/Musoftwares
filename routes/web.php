@@ -77,6 +77,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/product-tour/status', [\App\Http\Controllers\OnboardingController::class, 'updateTourStatus'])->name('product-tour.status');
     Route::get('/onboarding-wizard/cities/{countryName}', [\App\Http\Controllers\OnboardingController::class, 'getCities'])->name('onboarding.cities');
 
+    // Vouchers (Client Facing)
+    Route::get('/vouchers', [\App\Http\Controllers\VoucherController::class, 'index'])->name('vouchers.index');
+
     // Referral System
     Route::get('/referrals', [\App\Http\Controllers\ReferralController::class, 'index'])->name('referrals.index');
     Route::get('/referrals/earnings', [\App\Http\Controllers\ReferralController::class, 'earns'])->name('referrals.earns');
