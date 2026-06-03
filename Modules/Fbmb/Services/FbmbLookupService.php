@@ -27,6 +27,31 @@ class FbmbLookupService
         return count($this->extractIds($filePath));
     }
 
+    public function getPricingTiers(): array
+    {
+        return [
+            ['min' => 1, 'max' => 10000, 'cost' => 1.0],
+            ['min' => 10001, 'max' => 50000, 'cost' => 0.5],
+            ['min' => 50001, 'max' => 100000, 'cost' => 0.2],
+            ['min' => 100001, 'max' => null, 'cost' => 0.07],
+        ];
+    }
+
+    public function getCostPerId(int $totalIds): float
+    {
+        foreach (array_reverse($this->getPricingTiers()) as $tier) {
+            if ($totalIds >= $tier['min']) {
+                return $tier['cost'];
+            }
+        }
+        return 1.0;
+    }
+
+    public function calculateCost(int $count, int $totalIdsForTier): float
+    {
+        return $count * $this->getCostPerId($totalIdsForTier);
+    }
+
     public function processFile($user, string $filePath): array
     {
         $ids = $this->extractIds($filePath);

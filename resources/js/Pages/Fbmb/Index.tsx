@@ -14,10 +14,17 @@ import { useToast } from "@/Components/ui/use-toast";
 import { cn } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
+interface PricingTier {
+    min: number;
+    max: number | null;
+    cost: number;
+}
+
 interface PageProps {
     pointsBalance: number;
     currency: string;
     history: HistoryRecord[];
+    pricingTiers?: PricingTier[];
 }
 
 interface HistoryRecord {
@@ -49,7 +56,7 @@ interface LookupResult {
 
 export default function ISaasIndex() {
     const { toast } = useToast();
-    const { pointsBalance = 0, currency = 'USD', history = [] } = usePage<{ props: PageProps }>().props as any;
+    const { pointsBalance = 0, currency = 'USD', history = [], pricingTiers = [] } = usePage<{ props: PageProps }>().props as any;
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [activeTab, setActiveTab] = useState<ActiveTab>('lookup');
@@ -62,6 +69,18 @@ export default function ISaasIndex() {
     const [estimatedIds, setEstimatedIds] = useState<number>(0);
 
     const hasBalance = pointsBalance > 0;
+
+    const calculateEstimatedCost = useCallback((totalIds: number) => {
+        if (!pricingTiers || pricingTiers.length === 0) return totalIds;
+        for (let i = pricingTiers.length - 1; i >= 0; i--) {
+            if (totalIds >= pricingTiers[i].min) {
+                return totalIds * pricingTiers[i].cost;
+            }
+        }
+        return totalIds;
+    }, [pricingTiers]);
+
+    const estimatedCost = calculateEstimatedCost(estimatedIds);
 
     // -- File parsing to estimate ID count ----------------------------------
     const estimateIdCount = useCallback((f: File) => {
@@ -324,15 +343,22 @@ export default function ISaasIndex() {
                         </div>
 
                         <div className="relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-4">
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-2">
                                 <Zap className="w-4 h-4 text-indigo-500" />
-                                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">{__('general.cost_per_match')}</span>
+                                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Volume Pricing</span>
                             </div>
-                            <p className="text-2xl font-bold font-mono tracking-tight text-indigo-700">
-                                1 <span className="text-sm font-normal text-slate-400">Point</span>
-                            </p>
-                            <p className="text-xs text-slate-500 mt-1">{__('general.only_charged_for_successful_matches')}</p>
-                            <div className="absolute -right-2 -bottom-2 w-16 h-16 rounded-full bg-indigo-500 opacity-10" />
+                            <div className="space-y-1 relative z-10">
+                                {pricingTiers?.map((tier: PricingTier, i: number) => (
+                                    <div key={i} className="flex justify-between items-center text-xs">
+                                        <span className="text-slate-600 font-medium">
+                                            {tier.max ? `${tier.min.toLocaleString()} - ${tier.max.toLocaleString()}` : `${tier.min.toLocaleString()}+`} IDs
+                                        </span>
+                                        <span className="text-indigo-700 font-bold">{tier.cost} Pts/ID</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <p className="text-[10px] text-slate-500 mt-2">{__('general.only_charged_for_successful_matches')}</p>
+                            <div className="absolute -right-2 -bottom-2 w-24 h-24 rounded-full bg-indigo-500 opacity-5" />
                         </div>
                     </div>
 
@@ -499,10 +525,10 @@ export default function ISaasIndex() {
                                                                 <p><span className="font-medium text-slate-700">Estimated IDs:</span> {estimatedIds.toLocaleString()}</p>
                                                                 <p>
                                                                     <span className="font-medium text-slate-700">Max cost:</span>{' '}
-                                                                    <span className="font-mono">{estimatedIds.toLocaleString()}</span> points
+                                                                    <span className="font-mono">{estimatedCost.toLocaleString()}</span> points
                                                                     <span className="text-slate-400 ml-1">(only matched IDs are charged)</span>
                                                                 </p>
-                                                                {estimatedIds > pointsBalance && (
+                                                                {estimatedCost > pointsBalance && (
                                                                     <p className="text-amber-600 flex items-center gap-1 font-medium">
                                                                         <AlertCircle className="w-3 h-3" />{__('general.your_points_may_not_cover_all_matches_partial_results_may_be_available')}</p>
                                                                 )}
