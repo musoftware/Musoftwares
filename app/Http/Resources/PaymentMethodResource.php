@@ -29,7 +29,7 @@ class PaymentMethodResource extends JsonResource
             'payee_email'     => $this->payee_email,
             'ewallet_provider'=> $this->ewallet_provider,
             'id_number'       => $this->id_number,
-            'currency_id'     => $this->currency_id,
+            'currency'        => \App\Helpers\CurrencyHelper::getFrontendCurrency($this->currency_id),
 
             'user' => $this->whenLoaded('user', function () {
                 return $this->user ? [

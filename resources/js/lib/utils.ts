@@ -19,20 +19,22 @@ const CURRENCY_FORMATS: Record<string, string> = {
 
 export function formatMoney(amount: number | string, currency: any = 'USD') {
     const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-    
+
     let curCode = 'USD';
     if (typeof currency === 'string') {
         curCode = currency;
+    } else if (typeof currency === 'number') {
+        curCode = String(currency);
     } else if (currency && typeof currency === 'object' && typeof currency.currency === 'string') {
         curCode = currency.currency;
     }
     curCode = curCode.trim().toUpperCase();
 
     if (isNaN(numericAmount)) return `${curCode} 0.00`;
-    
+
     const isNegative = numericAmount < 0;
     const absoluteAmount = Math.abs(numericAmount);
-    
+
     const numberPart = new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
@@ -44,8 +46,8 @@ export function formatMoney(amount: number | string, currency: any = 'USD') {
     if (currency && typeof currency === 'object' && typeof currency.currency === 'string') {
         found = currency;
     } else if (Array.isArray(dynamicCurrencies)) {
-        found = dynamicCurrencies.find((c: any) => 
-            (c.currency && c.currency.toUpperCase() === curCode) || 
+        found = dynamicCurrencies.find((c: any) =>
+            (c.currency && c.currency.toUpperCase() === curCode) ||
             String(c.id) === curCode
         );
     }
@@ -77,7 +79,7 @@ export function formatMoney(amount: number | string, currency: any = 'USD') {
         const formatted = CURRENCY_FORMATS[curCode].replace('%v', numberPart);
         return isNegative ? `-${formatted}` : formatted;
     }
-    
+
     try {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -93,7 +95,7 @@ export { formatMoney as formatCurrency };
 export function formatCompactCurrency(amount: number | string, currency: any = 'USD') {
     const numericAmount =
         typeof amount === 'string' ? parseFloat(amount) : amount;
-    
+
     let curCode = 'USD';
     if (typeof currency === 'string') {
         curCode = currency;
@@ -103,7 +105,7 @@ export function formatCompactCurrency(amount: number | string, currency: any = '
     curCode = curCode.trim().toUpperCase();
 
     if (isNaN(numericAmount)) return `${curCode} 0`;
-    
+
     if (Math.abs(numericAmount) >= 1_000_000) {
         try {
             return new Intl.NumberFormat('en-US', {

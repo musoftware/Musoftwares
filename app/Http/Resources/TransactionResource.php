@@ -13,9 +13,9 @@ class TransactionResource extends JsonResource
             'id'              => $this->id,
             'type'            => $this->type,
             'amount'          => (float) $this->amount,
-            'currency_id'     => $this->currency,
+            'currency'        => \App\Helpers\CurrencyHelper::getFrontendCurrency($this->currency),
             'business_amount'      => (float) $this->business_amount,
-            'business_currency_id' => \App\Models\AdminSettings::business_currency(),
+            'business_currency' => \App\Helpers\CurrencyHelper::getBusinessCurrency(),
             'reason'          => $this->reason,
             'status'          => $this->status ?? 'completed', // fallback if status doesn't exist
             'is_reversed'     => $this->is_reversed ?? false,

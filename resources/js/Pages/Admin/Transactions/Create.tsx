@@ -122,7 +122,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                                 <div className="min-w-0">
                                     <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{__('general.user_balance')}</p>
                                     <p className="font-bold text-sm truncate">
-                                        <CurrencyDisplay amount={user.user_balance || 0} currency={currencies.find(c => c.id === (user.currency_id || businessCurrency.id))} />
+                                        <CurrencyDisplay amount={user.user_balance || 0} currency={user.currency_obj || businessCurrency} />
                                     </p>
                                 </div>
                             </CardContent>
@@ -135,7 +135,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                                 <div className="min-w-0">
                                     <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{__('general.pending_earns')}</p>
                                     <p className="font-bold text-sm truncate">
-                                        <CurrencyDisplay amount={user.pending_commission || 0} currency={currencies.find(c => c.id === (user.currency_id || businessCurrency.id))} />
+                                        <CurrencyDisplay amount={user.pending_commission || 0} currency={user.currency_obj || businessCurrency} />
                                     </p>
                                 </div>
                             </CardContent>
@@ -148,7 +148,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                                 <div className="min-w-0">
                                     <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{__('general.cleared_earns')}</p>
                                     <p className="font-bold text-sm truncate">
-                                        <CurrencyDisplay amount={user.available_commission || 0} currency={currencies.find(c => c.id === (user.currency_id || businessCurrency.id))} />
+                                        <CurrencyDisplay amount={user.available_commission || 0} currency={user.currency_obj || businessCurrency} />
                                     </p>
                                 </div>
                             </CardContent>
@@ -161,7 +161,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                                 <div className="min-w-0">
                                     <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Withdrawn</p>
                                     <p className="font-bold text-sm truncate">
-                                        <CurrencyDisplay amount={user.withdrawn_commission || 0} currency={currencies.find(c => c.id === (user.currency_id || businessCurrency.id))} />
+                                        <CurrencyDisplay amount={user.withdrawn_commission || 0} currency={user.currency_obj || businessCurrency} />
                                     </p>
                                 </div>
                             </CardContent>
@@ -230,13 +230,13 @@ export default function Create({ user, selectedProject, type, currencies, busine
                         <div className="flex items-center gap-4 text-sm bg-muted/30 px-4 py-2 rounded-full border">
                             <span className="font-semibold text-muted-foreground uppercase tracking-wider text-xs">Rates Info:</span>
                             {hourRate !== undefined && (
-                                <span className="flex items-center gap-1">Client Rate: <strong className="text-foreground"><CurrencyDisplay amount={hourRate} currency={currencies.find(c => c.id === (user.currency_id || businessCurrency.id))} /></strong></span>
+                                <span className="flex items-center gap-1">Client Rate: <strong className="text-foreground"><CurrencyDisplay amount={hourRate} currency={user.currency_obj || businessCurrency} /></strong></span>
                             )}
                             {hourRate !== undefined && recommendedHourRate !== undefined && (
                                 <span className="text-muted-foreground/50">|</span>
                             )}
                             {recommendedHourRate !== undefined && (
-                                <span className="flex items-center gap-1">Recommended: <strong className="text-foreground"><CurrencyDisplay amount={recommendedHourRate} currency={currencies.find(c => c.id === (user.currency_id || businessCurrency.id))} /></strong></span>
+                                <span className="flex items-center gap-1">Recommended: <strong className="text-foreground"><CurrencyDisplay amount={recommendedHourRate} currency={user.currency_obj || businessCurrency} /></strong></span>
                             )}
                         </div>
                     )}

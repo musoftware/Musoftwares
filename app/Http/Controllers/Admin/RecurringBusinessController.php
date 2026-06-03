@@ -22,20 +22,23 @@ class RecurringBusinessController extends Controller
     public function recurring_costs(Request $request)
     {
         $costs = RecurringCost::latest()->paginate(50);
+        $costs->getCollection()->transform(function ($cost) {
+            $cost->currency = \App\Helpers\CurrencyHelper::getFrontendCurrency($cost->currency_id);
+            return $cost;
+        });
         $currencies = Currency::all();
         
         $costReasons = CostTransaction::select('reason')->distinct()->pluck('reason');
         $recurringReasons = RecurringCost::select('reason')->distinct()->pluck('reason');
         $categories = $costReasons->concat($recurringReasons)->unique()->filter()->values();
 
-        $bCurrencyId = \App\Models\AdminSettings::business_currency();
-        $bCurrency = Currency::find($bCurrencyId);
+        $bCurrency = \App\Helpers\CurrencyHelper::getBusinessCurrency();
 
         $stats = [
             'monthly_total' => RecurringCost::monthly_str(),
             'annual_total' => RecurringCost::annual_str(),
-            'business_currency_code' => $bCurrency ? $bCurrency->currency : 'EGP',
-            'business_currency_symbol' => $bCurrency ? $bCurrency->symbol : 'e£',
+            'business_currency_code' => $bCurrency->currency,
+            'business_currency_symbol' => $bCurrency->symbol,
         ];
 
         return Inertia::render('Admin/Business/RecurringCosts/Index', [
@@ -54,12 +57,11 @@ class RecurringBusinessController extends Controller
         $recurringReasons = RecurringCost::select('reason')->distinct()->pluck('reason');
         $categories = $costReasons->concat($recurringReasons)->unique()->filter()->values();
 
-        $bCurrencyId = \App\Models\AdminSettings::business_currency();
-        $bCurrency = Currency::find($bCurrencyId);
+        $bCurrency = \App\Helpers\CurrencyHelper::getBusinessCurrency();
 
         $stats = [
-            'business_currency_code' => $bCurrency ? $bCurrency->currency : 'EGP',
-            'business_currency_symbol' => $bCurrency ? $bCurrency->symbol : 'e£',
+            'business_currency_code' => $bCurrency->currency,
+            'business_currency_symbol' => $bCurrency->symbol,
         ];
 
         return Inertia::render('Admin/Business/RecurringCosts/Create', [
@@ -198,7 +200,7 @@ class RecurringBusinessController extends Controller
                 'id' => $tx->id,
                 'created_at' => $tx->created_at,
                 'amount' => $tx->amount,
-                'currency' => Currency::find($tx->currency_id ?? $tx->currency)?->currency ?? 'EGP',
+                'currency' => \App\Helpers\CurrencyHelper::getFrontendCurrency($tx->currency_id ?? $tx->currency),
                 'reason' => $tx->reason,
             ];
         });
@@ -219,15 +221,14 @@ class RecurringBusinessController extends Controller
             }
         }
 
-        $currencyModel = Currency::find($rCost->currency_id);
+        $currencyModel = \App\Helpers\CurrencyHelper::getFrontendCurrency($rCost->currency_id);
 
         return Inertia::render('Admin/Business/RecurringCosts/View', [
             'cost' => [
                 'id' => $rCost->id,
                 'title' => $rCost->title,
                 'amount' => $rCost->amount,
-                'currency' => $currencyModel ? $currencyModel->currency : 'EGP',
-                'currency_symbol' => $currencyModel ? $currencyModel->symbol : 'e£',
+                'currency' => $currencyModel,
                 'reason' => $rCost->reason,
                 'start_date' => $rCost->start_date,
                 'current_date' => $rCost->current_date,
@@ -265,20 +266,23 @@ class RecurringBusinessController extends Controller
     public function recurring_income(Request $request)
     {
         $incomes = RecurringIncome::latest()->paginate(50);
+        $incomes->getCollection()->transform(function ($income) {
+            $income->currency = \App\Helpers\CurrencyHelper::getFrontendCurrency($income->currency_id);
+            return $income;
+        });
         $currencies = Currency::all();
         
         $incomeReasons = \App\Models\Transaction::whereIn('type', ['received', 'refunded', 'sent'])->select('reason')->distinct()->pluck('reason');
         $recurringReasons = RecurringIncome::select('reason')->distinct()->pluck('reason');
         $categories = $incomeReasons->concat($recurringReasons)->unique()->filter()->values();
 
-        $bCurrencyId = \App\Models\AdminSettings::business_currency();
-        $bCurrency = Currency::find($bCurrencyId);
+        $bCurrency = \App\Helpers\CurrencyHelper::getBusinessCurrency();
 
         $stats = [
             'monthly_total' => RecurringIncome::monthly_str(),
             'annual_total' => RecurringIncome::annual_str(),
-            'business_currency_code' => $bCurrency ? $bCurrency->currency : 'EGP',
-            'business_currency_symbol' => $bCurrency ? $bCurrency->symbol : 'e£',
+            'business_currency_code' => $bCurrency->currency,
+            'business_currency_symbol' => $bCurrency->symbol,
         ];
 
         return Inertia::render('Admin/Business/RecurringIncome/Index', [
@@ -418,7 +422,7 @@ class RecurringBusinessController extends Controller
                 'id' => $tx->id,
                 'created_at' => $tx->created_at,
                 'amount' => $tx->amount,
-                'currency' => Currency::find($tx->currency_id ?? $tx->currency)?->currency ?? 'EGP',
+                'currency' => \App\Helpers\CurrencyHelper::getFrontendCurrency($tx->currency_id ?? $tx->currency),
                 'reason' => $tx->reason,
             ];
         });
@@ -439,15 +443,14 @@ class RecurringBusinessController extends Controller
             }
         }
 
-        $currencyModel = Currency::find($rIncome->currency_id);
+        $currencyModel = \App\Helpers\CurrencyHelper::getFrontendCurrency($rIncome->currency_id);
 
         return Inertia::render('Admin/Business/RecurringIncome/View', [
             'income' => [
                 'id' => $rIncome->id,
                 'title' => $rIncome->title,
                 'amount' => $rIncome->amount,
-                'currency' => $currencyModel ? $currencyModel->currency : 'EGP',
-                'currency_symbol' => $currencyModel ? $currencyModel->symbol : 'e£',
+                'currency' => $currencyModel,
                 'reason' => $rIncome->reason,
                 'start_date' => $rIncome->start_date,
                 'current_date' => $rIncome->current_date,
@@ -485,6 +488,10 @@ class RecurringBusinessController extends Controller
     public function recurring_salaries(Request $request)
     {
         $salaries = RecurringSalary::with('user')->latest()->paginate(50);
+        $salaries->getCollection()->transform(function ($salary) {
+            $salary->currency = \App\Helpers\CurrencyHelper::getFrontendCurrency($salary->currency_id);
+            return $salary;
+        });
         $currencies = Currency::all();
         $users = User::select('id', 'name', 'email')->get();
 
@@ -616,7 +623,7 @@ class RecurringBusinessController extends Controller
                 'id' => $tx->id,
                 'created_at' => $tx->created_at,
                 'amount' => $tx->amount,
-                'currency' => Currency::find($tx->currency_id ?? $tx->currency)?->currency ?? 'EGP',
+                'currency' => \App\Helpers\CurrencyHelper::getFrontendCurrency($tx->currency_id ?? $tx->currency),
                 'reason' => $tx->reason,
             ];
         });
@@ -637,7 +644,7 @@ class RecurringBusinessController extends Controller
             }
         }
 
-        $currencyModel = Currency::find($salary->currency_id);
+        $currencyModel = \App\Helpers\CurrencyHelper::getFrontendCurrency($salary->currency_id);
 
         return Inertia::render('Admin/Business/RecurringSalaries/View', [
             'salary' => [
@@ -645,8 +652,7 @@ class RecurringBusinessController extends Controller
                 'user' => $salary->user ? ['id' => $salary->user->id, 'name' => $salary->user->name, 'email' => $salary->user->email] : null,
                 'title' => $salary->title,
                 'amount' => $salary->amount,
-                'currency' => $currencyModel ? $currencyModel->currency : 'EGP',
-                'currency_symbol' => $currencyModel ? $currencyModel->symbol : 'e£',
+                'currency' => $currencyModel,
                 'reason' => $salary->reason ?? '',
                 'start_date' => $salary->start_date,
                 'current_date' => $salary->current_date,
