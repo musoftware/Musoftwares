@@ -444,6 +444,7 @@ class FinancialOperationsController extends Controller
         $request->validate([
             'title' => 'required|string',
             'amount' => 'required|numeric|gt:0',
+            'currency_id' => 'required|integer|exists:currencies,id',
         ]);
 
         $category = $request->input('category_id');
@@ -456,7 +457,7 @@ class FinancialOperationsController extends Controller
             $category = 'salary';
         }
 
-        $currencyId = $request->input('currency_id', \App\Models\AdminSettings::business_currency());
+        $currencyId = $request->input('currency_id');
         $status = $request->input('status', 'completed');
         $dueDate = $request->input('due_date');
         $userId = $request->input('user_id');
@@ -530,10 +531,11 @@ class FinancialOperationsController extends Controller
             'title' => 'required|string',
             'amount' => 'required|numeric|gt:0',
             'type' => 'required|string',
+            'currency_id' => 'required|integer|exists:currencies,id',
         ]);
 
         $type = $request->input('type');
-        $currencyId = $request->input('currency_id', \App\Models\AdminSettings::business_currency());
+        $currencyId = $request->input('currency_id');
         $status = $request->input('status', 'completed');
         $dueDate = $request->input('due_date');
         $userId = $request->input('user_id');

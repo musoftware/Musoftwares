@@ -42,7 +42,7 @@ export default function Revenue({ income, cost, filters, businessCurrency }) {
             className: 'text-right',
             render: (tx) => (
                 <span className="font-medium font-mono text-green-600">
-                    {formatCurrency(tx.business_amount || 0, tx.business_currency_id || 1)}
+                    {formatCurrency(tx.business_amount || 0, tx.business_currency)}
                 </span>
             )
         }
@@ -65,7 +65,7 @@ export default function Revenue({ income, cost, filters, businessCurrency }) {
             className: 'text-right',
             render: (tx) => (
                 <span className="font-medium font-mono text-red-600">
-                    {formatCurrency(tx.business_amount || 0, tx.business_currency_id || 1)}
+                    {formatCurrency(tx.business_amount || 0, tx.business_currency)}
                 </span>
             )
         }

@@ -14,9 +14,9 @@ class VoucherResource extends JsonResource
             'name'                => $this->name,
             'description'         => $this->description,
             'spend_amount'        => (float) $this->spend_amount,
-            'spend_currency_id'   => $this->spend_currency,
+            'spend_currency'      => \App\Helpers\CurrencyHelper::getFrontendCurrency($this->spend_currency),
             'reward_amount'       => (float) $this->reward_amount,
-            'reward_currency_id'  => $this->reward_currency,
+            'reward_currency'     => \App\Helpers\CurrencyHelper::getFrontendCurrency($this->reward_currency),
             'type'                => $this->type,
             'reward_percentage'   => (float) $this->reward_percentage,
             'max_uses_per_user'   => $this->max_uses_per_user,
@@ -25,18 +25,6 @@ class VoucherResource extends JsonResource
             'expires_at'          => $this->expires_at?->toIso8601String(),
             'is_active'           => (bool) $this->is_active,
             'admin_notes'         => $this->admin_notes,
-            'spend_currency_rel'  => $this->whenLoaded('spendCurrency', function () {
-                return [
-                    'id'       => $this->spendCurrency->id,
-                    'currency' => $this->spendCurrency->currency,
-                ];
-            }),
-            'reward_currency_rel' => $this->whenLoaded('rewardCurrency', function () {
-                return [
-                    'id'       => $this->rewardCurrency->id,
-                    'currency' => $this->rewardCurrency->currency,
-                ];
-            }),
             'redemptions_count'   => $this->whenCounted('redemptions'),
             'created_at'          => $this->created_at?->toIso8601String(),
         ];

@@ -47,13 +47,17 @@ class AdminTransactionController extends Controller
         $hourRate = $user->hour_rate ?? 0;
         $recommendedHourRate = AdminSettings::GetRecommendedHourlyRate($user->currency);
 
+        $userCurrency = \App\Helpers\CurrencyHelper::getFrontendCurrency($user->currency_id);
+        $user->currency_obj = $userCurrency;
+        $businessCurrency = \App\Helpers\CurrencyHelper::getBusinessCurrency();
+
         return Inertia::render('Admin/Transactions/Create', [
             'user' => $user,
             'selectedProject' => $project,
             'activeProjects' => $user->projects()->whereNotIn('status', ['Completed', 'Cancelled'])->get(),
             'type' => $type,
             'currencies' => array_values(Currency::as_array()),
-            'businessCurrency' => Currency::find(AdminSettings::business_currency()),
+            'businessCurrency' => $businessCurrency,
             'exchanges' => $exchanges,
             'hourRate' => $hourRate,
             'recommendedHourRate' => $recommendedHourRate,
@@ -93,7 +97,7 @@ class AdminTransactionController extends Controller
                 'income' => $income->through(fn($t) => (new TransactionResource($t))->resolve()),
                 'cost' => $cost->through(fn($t) => (new TransactionResource($t))->resolve()),
                 'filters' => $filters,
-                'businessCurrency' => Currency::find(AdminSettings::business_currency()),
+                'businessCurrency' => \App\Helpers\CurrencyHelper::getBusinessCurrency(),
             ]);
         }
 

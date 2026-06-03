@@ -118,7 +118,7 @@ export default function Index({ costs, currencies, categories, stats }) {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
                                     <span className="text-sm font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded">
-                                        {formatCurrency(cost.amount, currenciesList.find(c => c.id === cost.currency_id) || 'EGP')}
+                                        {formatCurrency(cost.amount, cost.currency)}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">

@@ -246,7 +246,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                     <div className="bg-muted/30 rounded-xl p-4 space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
                             <div className="md:col-span-5 space-y-1">
-                                <Label className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Amount ({currencies.find(c => c.id === user.currency_id)?.symbol || '$'})</Label>
+                                <Label className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Amount ({(user.currency_obj || businessCurrency)?.symbol || '$'})</Label>
                                 <div className="flex">
                                     <Input 
                                         type="number" 
@@ -285,7 +285,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <Label className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Net ({currencies.find(c => c.id === user.currency_id)?.symbol || '$'})</Label>
+                                        <Label className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Net ({(user.currency_obj || businessCurrency)?.symbol || '$'})</Label>
                                         <Input 
                                             type="text" 
                                             value={netAmount} 
@@ -416,13 +416,13 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                                 </td>
                                             )}
                                             <td className="px-4 py-3 text-right font-semibold">
-                                                <CurrencyDisplay amount={item.amount} currency={currencies.find(c => c.id === user.currency_id)} />
+                                                <CurrencyDisplay amount={item.amount} currency={user.currency_obj || businessCurrency} />
                                             </td>
                                             <td className="px-4 py-3 text-right text-destructive">
-                                                {item.fee > 0 ? <CurrencyDisplay amount={item.fee} currency={currencies.find(c => c.id === user.currency_id)} /> : '-'}
+                                                {item.fee > 0 ? <CurrencyDisplay amount={item.fee} currency={user.currency_obj || businessCurrency} /> : '-'}
                                             </td>
                                             <td className="px-4 py-3 text-right text-success font-bold">
-                                                <CurrencyDisplay amount={item.amount - item.fee} currency={currencies.find(c => c.id === user.currency_id)} />
+                                                <CurrencyDisplay amount={item.amount - item.fee} currency={user.currency_obj || businessCurrency} />
                                             </td>
                                             <td className="px-4 py-3 text-right">
                                                 <Button type="button" variant="ghost" size="icon" className="text-destructive h-8 w-8 hover:bg-destructive/10" onClick={() => removeItem(idx)}>

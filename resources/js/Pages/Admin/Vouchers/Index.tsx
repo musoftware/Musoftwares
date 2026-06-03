@@ -70,9 +70,9 @@ export default function Index({ vouchers }) {
             name: voucher.name ?? '',
             description: voucher.description ?? '',
             spend_amount: voucher.spend_amount ?? '',
-            spend_currency: voucher.spend_currency_rel?.id ?? voucher.spend_currency_id ?? '',
+            spend_currency: voucher.spend_currency?.id ?? voucher.spend_currency ?? '',
             reward_amount: voucher.reward_amount ?? '',
-            reward_currency: voucher.reward_currency_rel?.id ?? voucher.reward_currency_id ?? '',
+            reward_currency: voucher.reward_currency?.id ?? voucher.reward_currency ?? '',
             type: voucher.type ?? 'fixed',
             reward_percentage: voucher.reward_percentage ?? '',
             max_uses_per_user: voucher.max_uses_per_user ?? '',
@@ -343,8 +343,8 @@ export default function Index({ vouchers }) {
                                 </td>
                                 <td className="p-4 text-sm text-gray-700">
                                     <span className="font-medium">{parseFloat(v.spend_amount).toFixed(2)}</span>
-                                    {v.spend_currency_rel && (
-                                        <span className="text-gray-400 ml-1">{v.spend_currency_rel.currency}</span>
+                                    {v.spend_currency && v.spend_currency.currency && (
+                                        <span className="text-gray-400 ml-1">{v.spend_currency.currency}</span>
                                     )}
                                     <span className="mx-2 text-gray-400">→</span>
                                     <span className="font-medium">
@@ -352,8 +352,8 @@ export default function Index({ vouchers }) {
                                             ? `${parseFloat(v.reward_percentage ?? 0).toFixed(2)}%`
                                             : parseFloat(v.reward_amount).toFixed(2)}
                                     </span>
-                                    {v.reward_currency_rel && v.type !== 'percentage' && (
-                                        <span className="text-gray-400 ml-1">{v.reward_currency_rel.currency}</span>
+                                    {v.reward_currency && v.type !== 'percentage' && v.reward_currency.currency && (
+                                        <span className="text-gray-400 ml-1">{v.reward_currency.currency}</span>
                                     )}
                                 </td>
                                 <td className="p-4 text-sm text-gray-700">

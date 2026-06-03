@@ -338,7 +338,7 @@ export default function Index({ incomes, currencies, categories, stats }) {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
                                     <span className="text-sm font-bold text-emerald-650 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded">
-                                        {formatCurrency(income.amount, currenciesList.find(c => c.id === income.currency_id) || 'EGP')}
+                                        {formatCurrency(income.amount, income.currency)}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">

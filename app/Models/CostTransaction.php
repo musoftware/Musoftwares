@@ -16,7 +16,10 @@ class CostTransaction extends Model
     protected static function booted(): void
     {
         static::saving(function ($costTransaction) {
-            $currency = $costTransaction->currency_id ?? \App\Models\AdminSettings::business_currency();
+            if (empty($costTransaction->currency_id)) {
+                throw new \Exception("CostTransaction is missing an associated currency relation (currency_id cannot be null).");
+            }
+            $currency = $costTransaction->currency_id;
             $businessCurrencyId = \App\Models\AdminSettings::business_currency();
             
             $date = $costTransaction->created_at ?? now();
@@ -75,7 +78,7 @@ class CostTransaction extends Model
         }
         $c->amount = $amount;
         $c->reason = $reason;
-        $c->currency = $currency;
+        $c->currency = $currency ?? optional($user)->currency_id;
 
         DB::transaction(function () use ($c, $project, $amount, $user) {
             $c->save();

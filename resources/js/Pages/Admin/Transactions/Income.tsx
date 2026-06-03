@@ -66,7 +66,7 @@ export default function Income({ transactions, filters }) {
             className: 'text-right',
             render: (tx) => (
                 <span className="font-medium font-mono text-slate-800">
-                    {formatCurrency(tx.amount || 0, tx.currency_id || 1)}
+                    {formatCurrency(tx.amount || 0, tx.currency)}
                 </span>
             )
         },
@@ -76,7 +76,7 @@ export default function Income({ transactions, filters }) {
             className: 'text-right',
             render: (tx) => (
                 <span className="font-medium font-mono text-green-600">
-                    {formatCurrency(tx.business_amount || 0, tx.business_currency_id || 1)}
+                    {formatCurrency(tx.business_amount || 0, tx.business_currency)}
                 </span>
             )
         },
