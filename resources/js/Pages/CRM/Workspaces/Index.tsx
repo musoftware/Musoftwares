@@ -18,7 +18,7 @@ interface ActionCenter {
 
 export default function WorkspaceIndex({ availableCenters }: { availableCenters: string[] }) {
     const { auth } = usePage().props;
-    const hasAdvancedOps = auth?.crm_features?.includes('crm-advanced-operations') ?? false;
+    const hasAdvancedOps = (auth as any)?.crm_features?.includes('crm-advanced-operations') ?? false;
     
     const allCenters: Record<string, ActionCenter> = {
         telesales: {
@@ -57,7 +57,7 @@ export default function WorkspaceIndex({ availableCenters }: { availableCenters:
                     title={__('general.workspaces')}
                     description={__('general.dedicated_hubs_for_telesales_managers_and_data_collectors')}
                     icon={Briefcase}
-                    module="CRM"
+                    
                 />
                 <div className="px-8 pb-8">
                     <UpgradeOverlay 
@@ -81,7 +81,7 @@ export default function WorkspaceIndex({ availableCenters }: { availableCenters:
                 title={__('general.select_your_workspace')}
                 description={__('general.you_have_access_to_multiple_action_centers_choose_the_workspace_that_matches_your_task_for_today')}
                 icon={Briefcase}
-                module="CRM"
+                
             />
             <div className="flex flex-col h-full max-w-5xl mx-auto w-full px-8 pb-8">
 

@@ -347,7 +347,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {softwares.data.length === 0 && (
+                                    {(softwares.data as any).length === 0 && (
                                         <TableRow>
                                             <TableCell colSpan={8} className="text-center py-16 text-muted-foreground">
                                                 <div className="flex flex-col items-center gap-2">
@@ -362,7 +362,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                             </TableCell>
                                         </TableRow>
                                     )}
-                                    {softwares.data.map(sw => (
+                                    {(softwares.data as any).map(sw => (
                                         <TableRow key={sw.id}>
                                             {/* Software Name - links to devices */}
                                             <TableCell>

@@ -10,7 +10,7 @@ export default function Index({ orders }) {
 
     const getStatusBadge = (status) => {
         switch (status) {
-            case 'completed': return <Badge variant="success" className="bg-green-100 text-green-800">Completed</Badge>;
+            case 'completed': return <Badge variant="default" className="bg-green-100 text-green-800">Completed</Badge>;
             case 'in_progress': return <Badge variant="secondary" className="bg-blue-100 text-blue-800">{__('general.in_progress')}</Badge>;
             case 'disputed': return <Badge variant="destructive" className="bg-red-100 text-red-800">Disputed</Badge>;
             case 'cancelled': return <Badge variant="outline" className="text-gray-500 border-gray-300">Cancelled</Badge>;
@@ -34,7 +34,7 @@ export default function Index({ orders }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.data.map((order) => (
+                        {(orders.data as any).map((order) => (
                             <tr key={order.id} className="border-b hover:bg-gray-50">
                                 <td className="p-4 text-gray-500">#{order.id}</td>
                                 <td className="p-4 font-medium text-gray-900">
@@ -58,9 +58,9 @@ export default function Index({ orders }) {
                                 </td>
                             </tr>
                         ))}
-                        {orders.data.length === 0 && (
+                        {(orders.data as any).length === 0 && (
                             <tr>
-                                <td colSpan="7" className="p-8 text-center text-gray-500">{__('general.no_marketplace_orders_found')}</td>
+                                <td colSpan={7} className="p-8 text-center text-gray-500">{__('general.no_marketplace_orders_found')}</td>
                             </tr>
                         )}
                     </tbody>

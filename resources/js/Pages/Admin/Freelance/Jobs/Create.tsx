@@ -43,7 +43,7 @@ export default function Create() {
                         <CardHeader className="bg-slate-50/50 border-b border-slate-100">
                             <CardTitle className="text-lg font-semibold">{__('freelance.job_details')}</CardTitle>
                             <CardDescription>
-                                {__('freelance.job_details_help', 'Fill in the basic information about the job.')}
+                                {__('freelance.job_details_help', undefined, 'Fill in the basic information about the job.')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6 pt-6">
@@ -56,16 +56,16 @@ export default function Create() {
                                 <AsyncCombobox
                                     endpoint={route('search-users')}
                                     value={clientIdStr}
-                                    initialLabel={__('freelance.search_client', 'Search for client...')}
+                                    initialLabel={__('freelance.search_client', undefined, 'Search for client...')}
                                     onChange={(val) => {
                                         setClientIdStr(val ? val.toString() : '');
                                         setData('client_id', val ? val.toString() : '');
                                     }}
-                                    placeholder={__('freelance.search_client_placeholder', 'Type name or email...')}
+                                    placeholder={__('freelance.search_client_placeholder', undefined, 'Type name or email...')}
                                     className="w-full bg-white"
                                 />
                                 {errors.client_id && <p className="text-[13px] text-rose-500 font-medium">{errors.client_id}</p>}
-                                <p className="text-xs text-slate-500">{__('freelance.client_search_hint', 'Type to search clients by name or email.')}</p>
+                                <p className="text-xs text-slate-500">{__('freelance.client_search_hint', undefined, 'Type to search clients by name or email.')}</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -77,7 +77,7 @@ export default function Create() {
                                         id="title"
                                         value={data.title}
                                         onChange={(e) => setData('title', e.target.value)}
-                                        placeholder={__('freelance.job_title_placeholder', 'e.g. Build an E-commerce Website')}
+                                        placeholder={__('freelance.job_title_placeholder', undefined, 'e.g. Build an E-commerce Website')}
                                         className="h-10 transition-shadow focus-visible:ring-indigo-500/20 focus-visible:border-indigo-500"
                                     />
                                     {errors.title && <p className="text-[13px] text-rose-500 font-medium">{errors.title}</p>}
@@ -124,7 +124,7 @@ export default function Create() {
                                         id="duration"
                                         value={data.duration}
                                         onChange={(e) => setData('duration', e.target.value)}
-                                        placeholder={__('freelance.duration_placeholder', 'e.g. 2-4 weeks, Less than 1 month')}
+                                        placeholder={__('freelance.duration_placeholder', undefined, 'e.g. 2-4 weeks, Less than 1 month')}
                                         className="h-10 transition-shadow focus-visible:ring-indigo-500/20 focus-visible:border-indigo-500"
                                     />
                                     {errors.duration && <p className="text-[13px] text-rose-500 font-medium">{errors.duration}</p>}
@@ -138,7 +138,7 @@ export default function Create() {
                                         id="description"
                                         value={data.description}
                                         onChange={(e) => setData('description', e.target.value)}
-                                        placeholder={__('freelance.job_description_placeholder', 'Describe the job requirements in detail...')}
+                                        placeholder={__('freelance.job_description_placeholder', undefined, 'Describe the job requirements in detail...')}
                                         rows={6}
                                         className="resize-none transition-shadow focus-visible:ring-indigo-500/20 focus-visible:border-indigo-500"
                                     />

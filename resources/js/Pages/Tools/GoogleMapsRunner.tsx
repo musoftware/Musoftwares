@@ -397,7 +397,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
     // ── Initial data fetch ────────────────────────────────────────────────────
     const fetchCampaigns = useCallback(async () => {
         try {
-            const list: any[] = await callRPC('gm.campaigns.list');
+            const list: any[] = (await callRPC('gm.campaigns.list')) as any[];
             setCampaigns(list || []);
             const running = new Set<string>(list.filter(c => c.status === 'running').map(c => c.id));
             setRunningIds(running);

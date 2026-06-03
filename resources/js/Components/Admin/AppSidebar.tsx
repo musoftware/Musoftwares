@@ -20,7 +20,14 @@ import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { __ } from '@/lib/i18n';
 
-const items = [
+type MenuItem = {
+  title: string;
+  url: string;
+  icon: any;
+  subItems?: { title: string; url: string; fullReload?: boolean }[];
+};
+
+const items: MenuItem[] = [
   { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
   { 
     title: "User & Content", 
@@ -155,7 +162,7 @@ export function AppSidebar() {
               {visibleItems.map((item) => {
                 const isActive = url === item.url || url.startsWith(item.url + '/');
                 const hasSubItems = item.subItems && item.subItems.length > 0;
-                const isGroupActive = isActive || (hasSubItems && item.subItems.some(subItem => url === subItem.url || url.startsWith(subItem.url + '/')));
+                const isGroupActive = isActive || (hasSubItems && item.subItems?.some(subItem => url === subItem.url || url.startsWith(subItem.url + '/')));
 
                 if (hasSubItems) {
                     return (
@@ -176,7 +183,7 @@ export function AppSidebar() {
                                 </CollapsibleTrigger>
                                 <CollapsibleContent>
                                     <SidebarMenuSub>
-                                        {item.subItems.map((subItem) => {
+                                        {item.subItems?.map((subItem) => {
                                             const isSubActive = url === subItem.url || url.startsWith(subItem.url + '/');
                                             return (
                                                 <SidebarMenuSubItem key={subItem.title}>

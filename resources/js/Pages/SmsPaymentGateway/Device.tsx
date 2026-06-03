@@ -234,7 +234,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                         <Label className="text-xs text-slate-500">{__('general.allowed_sender')}</Label>
                                                         <Select
                                                             value={conf.allowed_sender || ''}
-                                                            onValueChange={(val) => updateConfig('sim1_configs', idx, 'allowed_sender', val)}
+                                                            onValueChange={(val) => updateConfig('sim1_configs', idx, 'allowed_sender', String(val))}
                                                         >
                                                             <SelectTrigger className="h-8">
                                                                 <SelectValue placeholder={__('general.select_sender')} />
@@ -289,7 +289,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                         <Label className="text-xs text-slate-500">{__('general.allowed_sender')}</Label>
                                                         <Select
                                                             value={conf.allowed_sender || ''}
-                                                            onValueChange={(val) => updateConfig('sim2_configs', idx, 'allowed_sender', val)}
+                                                            onValueChange={(val) => updateConfig('sim2_configs', idx, 'allowed_sender', String(val))}
                                                         >
                                                             <SelectTrigger className="h-8">
                                                                 <SelectValue placeholder={__('general.select_sender')} />
@@ -351,7 +351,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y">
-                                            {transactions.data.map(tx => (
+                                            {(transactions.data as any).map(tx => (
                                                 <tr key={tx.id} className="hover:bg-slate-50 transition-colors">
                                                     <td className="px-4 py-3">
                                                         <div className="font-semibold text-slate-900">{new Date(tx.created_at).toLocaleDateString()}</div>

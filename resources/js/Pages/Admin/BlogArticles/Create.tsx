@@ -50,7 +50,7 @@ export default function Create({ services }) {
                             <Input
                                 id="title"
                                 value={data.title}
-                                onChange={(e) => setData('title', e.target.value)}
+                                onChange={(e) => setData('title', e.target.value || '')}
                                 placeholder={__('general.article_title')}
                                 required
                             />
@@ -62,7 +62,7 @@ export default function Create({ services }) {
                             <Input
                                 id="slug"
                                 value={data.slug}
-                                onChange={(e) => setData('slug', e.target.value)}
+                                onChange={(e) => setData('slug', e.target.value || '')}
                                 placeholder={__('general.leave_blank_to_auto_generate')}
                             />
                             {errors.slug && <p className="text-sm text-red-600">{errors.slug}</p>}
@@ -74,7 +74,7 @@ export default function Create({ services }) {
                         <Textarea
                             id="content"
                             value={data.content}
-                            onChange={(e) => setData('content', e.target.value)}
+                            onChange={(e) => setData('content', e.target.value || '')}
                             placeholder={__('general.article_content_goes_here')}
                             className="min-h-[200px]"
                             required
@@ -87,7 +87,7 @@ export default function Create({ services }) {
                         <Textarea
                             id="excerpt"
                             value={data.excerpt}
-                            onChange={(e) => setData('excerpt', e.target.value)}
+                            onChange={(e) => setData('excerpt', e.target.value || '')}
                             placeholder={__('general.short_summary_of_the_article')}
                             className="min-h-[80px]"
                         />
@@ -97,7 +97,7 @@ export default function Create({ services }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <Label htmlFor="language">Language *</Label>
-                            <Select value={data.language} onValueChange={(val) => setData('language', val)}>
+                            <Select value={data.language} onValueChange={(val) => setData('language', (val as string) || '')}>
                                 <SelectTrigger>
                                     <SelectValue placeholder={__('general.select_language')} />
                                 </SelectTrigger>
@@ -111,7 +111,7 @@ export default function Create({ services }) {
 
                         <div className="space-y-2">
                             <Label htmlFor="service_id">{__('general.related_service')}</Label>
-                            <Select value={data.service_id?.toString() || "none"} onValueChange={(val) => setData('service_id', val)}>
+                            <Select value={data.service_id?.toString() || "none"} onValueChange={(val) => setData('service_id', (val as string) || '')}>
                                 <SelectTrigger>
                                     <SelectValue placeholder={__('general.select_a_service_optional')} />
                                 </SelectTrigger>
@@ -134,7 +134,7 @@ export default function Create({ services }) {
                             <Input
                                 id="meta_title"
                                 value={data.meta_title}
-                                onChange={(e) => setData('meta_title', e.target.value)}
+                                onChange={(e) => setData('meta_title', e.target.value || '')}
                             />
                         </div>
 
@@ -143,7 +143,7 @@ export default function Create({ services }) {
                             <Input
                                 id="meta_description"
                                 value={data.meta_description}
-                                onChange={(e) => setData('meta_description', e.target.value)}
+                                onChange={(e) => setData('meta_description', e.target.value || '')}
                             />
                         </div>
                     </div>

@@ -36,7 +36,7 @@ export const usePipelineStore = create<PipelineState>((set, get) => ({
         try {
             const response = await axios.get('/crm/api/kanban');
             set({ stages: response.data, isLoading: false });
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to fetch pipeline", error);
             set({ isLoading: false });
         }

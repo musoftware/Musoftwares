@@ -74,8 +74,8 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
             console.error(error);
             setResult({
                 success: false,
-                error: error.response?.data?.message || error.message || __('general.an_error_occurred_while_simulating_the_message'),
-                details: error.response?.data,
+                error: (error as any).response?.data?.message || error.message || __('general.an_error_occurred_while_simulating_the_message'),
+                details: (error as any).response?.data,
             });
             toast.error(__('general.failed_to_simulate_message'));
         } finally {
@@ -108,7 +108,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                         <Label htmlFor="device">{__('Target Device')}</Label>
                                         <Select
                                             value={selectedDeviceToken}
-                                            onValueChange={setSelectedDeviceToken}
+                                            onValueChange={(val) => setSelectedDeviceToken(val || '')}
                                         >
                                             <SelectTrigger id="device">
                                                 <SelectValue placeholder={__('Select a connected device')} />

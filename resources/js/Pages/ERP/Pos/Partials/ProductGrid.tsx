@@ -53,7 +53,7 @@ export default function ProductGrid({ products, onAddToCart, currency }: Product
             
             <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {products.data.map((product) => (
+                    {(products.data as any).map((product) => (
                         <Card 
                             key={product.id} 
                             className={`cursor-pointer hover:border-primary transition-colors ${product.stock_quantity <= 0 ? 'opacity-50 pointer-events-none' : ''}`}
@@ -74,7 +74,7 @@ export default function ProductGrid({ products, onAddToCart, currency }: Product
                         </Card>
                     ))}
                 </div>
-                {products.data.length === 0 && (
+                {(products.data as any).length === 0 && (
                     <div className="flex flex-col items-center justify-center h-64 text-gray-500">
                         <p>{__('No products found.')}</p>
                     </div>

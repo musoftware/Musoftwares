@@ -7,7 +7,7 @@ import { __ } from '@/lib/i18n';
 
 export function CrmCommandPalette({ open, setOpen, onOpenLead }) {
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState([]);
+    const [results, setResults] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -33,7 +33,7 @@ export function CrmCommandPalette({ open, setOpen, onOpenLead }) {
             try {
                 const res = await axios.get(route('crm.search', { q: query }));
                 setResults(res.data);
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Search failed", error);
             } finally {
                 setLoading(false);

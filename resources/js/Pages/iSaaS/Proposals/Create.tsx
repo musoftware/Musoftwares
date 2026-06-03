@@ -97,9 +97,9 @@ export default function Create() {
                                 {errors.requirements && <p className="text-sm text-red-600 mt-1">{errors.requirements}</p>}
                             </div>
                             
-                            {errors.error && (
+                            {(errors as any).error && (
                                 <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
-                                    {errors.error}
+                                    {(errors as any).error}
                                 </div>
                             )}
                         </CardContent>

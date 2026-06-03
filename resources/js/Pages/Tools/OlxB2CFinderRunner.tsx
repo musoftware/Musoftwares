@@ -135,7 +135,7 @@ export default function OlxB2CFinderRunner({ auth, tool }: any) {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium">{__('general.target_country_platform')}</label>
-                                            <Select value={selectedCountry} onValueChange={setSelectedCountry} disabled={isRunning}>
+                                            <Select value={selectedCountry} onValueChange={(val) => setSelectedCountry(val || '')} disabled={isRunning}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder={__('general.select_platform')} />
                                                 </SelectTrigger>

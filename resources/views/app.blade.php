@@ -44,7 +44,7 @@
         @php
             $componentExt = file_exists(resource_path("js/Pages/{$page['component']}.jsx")) ? '.jsx' : '.tsx';
         @endphp
-        @vite('resources/js/app.tsx')
+        @vite(['resources/js/app.tsx', "resources/js/Pages/{$page['component']}{$componentExt}"])
         @inertiaHead
 
         <!-- Service Worker registration -->

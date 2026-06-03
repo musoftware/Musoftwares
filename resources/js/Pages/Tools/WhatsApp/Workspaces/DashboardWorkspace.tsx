@@ -253,7 +253,7 @@ export default function DashboardWorkspace({ t, locale, callRPC, daemonConnected
                             }
                         ].map((item, idx) => {
                             const total = Object.values(stats?.intents || {}).reduce((a: any, b: any) => a + b, 0) || 1;
-                            const percentage = Math.round((item.value / total) * 100);
+                            const percentage = Math.round((Number(item.value) / Number(total)) * 100);
                             return (
                                 <div key={idx} className="space-y-1.5 p-3 rounded-xl hover:bg-muted/40 transition-colors">
                                     <div className="flex items-center justify-between">
@@ -318,7 +318,7 @@ export default function DashboardWorkspace({ t, locale, callRPC, daemonConnected
                             }
                         ].map((item, idx) => {
                             const total = Object.values(stats?.sentiments || {}).reduce((a: any, b: any) => a + b, 0) || 1;
-                            const percentage = Math.round((item.value / total) * 100);
+                            const percentage = Math.round((Number(item.value) / Number(total)) * 100);
                             return (
                                 <div key={idx} className="flex items-center gap-4 p-3.5 rounded-xl hover:bg-muted/40 transition-colors">
                                     <div className="text-2xl shrink-0">{item.icon}</div>

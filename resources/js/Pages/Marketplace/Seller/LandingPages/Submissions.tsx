@@ -23,7 +23,7 @@ export default function Submissions({ service, landingPage, submissions }: any) 
                             </TableHeader>
                             <TableBody>
                                 {submissions?.data?.length > 0 ? (
-                                    submissions.data.map((sub: any) => (
+                                    (submissions.data as any).map((sub: any) => (
                                         <TableRow key={sub.id}>
                                             <TableCell>{new Date(sub.created_at).toLocaleDateString()}</TableCell>
                                             <TableCell>{sub.name || 'N/A'}</TableCell>

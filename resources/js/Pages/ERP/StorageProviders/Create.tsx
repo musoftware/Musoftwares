@@ -71,7 +71,7 @@ export default function CreateStorageProvider() {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-700">{__('general.driver')} <span className="text-red-500">*</span></label>
-                                    <Select value={form.driver} onValueChange={(val) => setForm({...form, driver: val})}>
+                                    <Select value={form.driver} onValueChange={(val) => setForm({...form, driver: val || ''})}>
                                         <SelectTrigger className="bg-white border-slate-200 text-slate-900">
                                             <SelectValue placeholder={__('general.select_driver')} />
                                         </SelectTrigger>

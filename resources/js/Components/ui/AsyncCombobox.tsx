@@ -4,7 +4,7 @@ import { Check, ChevronsUpDown, Loader2 } from "lucide-react"
 import axios from "axios"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/Components/ui/button"
+import { Button, buttonVariants } from "@/Components/ui/button"
 import {
   Command,
   CommandEmpty,
@@ -72,7 +72,7 @@ export function AsyncCombobox({
       // Handle standard Laravel pagination or direct arrays
       const data = response.data?.data || response.data
       setOptions(Array.isArray(data) ? data : [])
-    } catch (error) {
+    } catch (error: any) {
       console.error("AsyncCombobox fetch error:", error)
       setOptions([])
     } finally {
@@ -114,19 +114,16 @@ export function AsyncCombobox({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
+      <PopoverTrigger
           role="combobox"
           aria-expanded={open}
-          className={cn("w-full justify-between shadow-none font-normal", className)}
+          className={cn(buttonVariants({ variant: "outline" }), "w-full justify-between shadow-none font-normal", className)}
           disabled={disabled}
         >
           <span className="truncate">
             {value ? selectedLabel || "Selected" : placeholder}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
         <Command shouldFilter={false}>

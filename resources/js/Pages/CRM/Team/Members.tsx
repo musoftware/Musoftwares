@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { __ } from '@/lib/i18n';
+
 import CrmLayout from '@/Layouts/CrmLayout';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
@@ -227,7 +227,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                         {/* Login URL Info */}
                         <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-3 text-sm text-indigo-700 flex items-center gap-2">
                             <Key className="w-4 h-4 shrink-0" />
-                            <span>{t.team_login_info} <a href={loginUrl} target="_blank" className="font-bold hover:underline">{loginUrl}</a></span>
+                            <span>{t.team_login_info} <a href={loginUrl} target="_blank" className="font-bold hover:underline" rel="noreferrer">{loginUrl}</a></span>
                         </div>
 
                         {/* Members Table */}

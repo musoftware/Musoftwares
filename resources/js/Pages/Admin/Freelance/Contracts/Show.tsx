@@ -13,7 +13,7 @@ export default function Show({ contract }: any) {
         title: string,
         description: string,
         confirmLabel: string,
-        variant?: "danger" | "default" | "warning"
+        variant?: "danger" | "default"
     } | null>(null);
 
     const executeAction = () => {
@@ -49,7 +49,7 @@ export default function Show({ contract }: any) {
             title: __('freelance.confirm_resolve_dispute', undefined, 'Resolve Dispute?'),
             description: __('freelance.confirm_resolve_dispute_msg', { resolution }, `Are you sure you want to resolve the dispute by: ${resolution}?`),
             confirmLabel: __('general.confirm', undefined, 'Confirm'),
-            variant: 'warning'
+            variant: 'default'
         });
     };
 

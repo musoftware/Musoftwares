@@ -129,10 +129,10 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {userDevices.data.length === 0 && (
+                                    {(userDevices.data as any).length === 0 && (
                                         <tr><td colSpan={6} className="text-center py-12 text-zinc-500">{__('general.no_assignments_found')}</td></tr>
                                     )}
-                                    {userDevices.data.map(a => (
+                                    {(userDevices.data as any).map(a => (
                                         <tr key={a.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
                                             <td className="px-4 py-3 font-mono text-xs text-violet-300">{a.device_id}</td>
                                             <td className="px-4 py-3">

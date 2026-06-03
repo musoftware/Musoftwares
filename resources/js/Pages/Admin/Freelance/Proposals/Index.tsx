@@ -70,7 +70,7 @@ export default function Index({ proposals, filters }: any) {
                         </tr>
                     </thead>
                     <tbody>
-                        {proposals.data.map((proposal: any) => (
+                        {(proposals.data as any).map((proposal: any) => (
                             <tr key={proposal.id} className="border-b hover:bg-gray-50">
                                 <td className="p-4">
                                     {proposal.job ? (
@@ -123,7 +123,7 @@ export default function Index({ proposals, filters }: any) {
                                 </td>
                             </tr>
                         ))}
-                        {proposals.data.length === 0 && (
+                        {(proposals.data as any).length === 0 && (
                             <tr>
                                 <td colSpan={6} className="p-4 text-center text-gray-500">
                                     {__('freelance.no_proposals_found', undefined, 'No proposals found.')}

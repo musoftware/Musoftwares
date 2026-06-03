@@ -46,7 +46,7 @@ export default function OrderShow({ order }: any) {
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Select onValueChange={(val) => handleStatusUpdate(val)}>
+                    <Select onValueChange={(val) => handleStatusUpdate(String(val))}>
                         <SelectTrigger className="w-[180px] bg-white">
                             <SelectValue placeholder={__('general.update_status_1')} />
                         </SelectTrigger>

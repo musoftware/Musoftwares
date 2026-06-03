@@ -43,7 +43,7 @@ export default function Index({ users, business_currency }: { users: any, busine
                             </tr>
                         </thead>
                         <tbody>
-                            {users.data.map((user: any) => (
+                            {(users.data as any).map((user: any) => (
                                 <tr key={user.id} className="border-b hover:bg-gray-50">
                                     <td className="p-4">
                                         <div className="flex items-center gap-3">
@@ -119,7 +119,7 @@ export default function Index({ users, business_currency }: { users: any, busine
                                     </td>
                                 </tr>
                             ))}
-                            {users.data.length === 0 && (
+                            {(users.data as any).length === 0 && (
                                 <tr>
                                     <td colSpan={4} className="p-8 text-center text-gray-500">
                                         {__('admin.no_subscribers_found')}
@@ -131,7 +131,7 @@ export default function Index({ users, business_currency }: { users: any, busine
                 </div>
             </div>
 
-            {users.data.length > 0 && (
+            {(users.data as any).length > 0 && (
                 <div className="mt-4">
                     <Pagination links={users.links} />
                 </div>

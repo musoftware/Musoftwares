@@ -163,11 +163,11 @@ export default function Downloads({ availableTools, downloads }: Props) {
                 </section>
 
                 {/* Usage History */}
-                {downloads.data.length > 0 && (
+                {(downloads.data as any).length > 0 && (
                     <section className="space-y-4">
                         <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.recent_activity')}</h2>
                         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
-                            {downloads.data.map(d => (
+                            {(downloads.data as any).map(d => (
                                 <div key={d.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center flex-shrink-0">

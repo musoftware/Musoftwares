@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Lock, ArrowRight, LucideIcon } from 'lucide-react';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { __ } from '@/lib/i18n';
 
 interface FeatureItem {

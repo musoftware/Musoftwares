@@ -40,7 +40,7 @@ export function formatMoney(amount: number | string, currency: any = 'USD') {
 
     // Dynamic look up from window.currencies shared from database
     const dynamicCurrencies = (window as any).currencies;
-    let found = null;
+    let found: any = null;
     if (currency && typeof currency === 'object' && typeof currency.currency === 'string') {
         found = currency;
     } else if (Array.isArray(dynamicCurrencies)) {

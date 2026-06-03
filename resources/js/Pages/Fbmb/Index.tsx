@@ -51,12 +51,12 @@ interface LookupResult {
     credits_used?: number;
     remaining_balance?: number;
     download_token: string;
-    status?: 'pending' | 'completed' | 'failed';
+    status?: 'pending' | 'completed' | 'failed' | 'processing';
 }
 
 export default function ISaasIndex() {
     const { toast } = useToast();
-    const { pointsBalance = 0, currency = 'USD', history = [], pricingTiers = [] } = usePage<{ props: PageProps }>().props as any;
+    const { pointsBalance = 0, currency = 'USD', history = [], pricingTiers = [] } = usePage<any>().props;
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [activeTab, setActiveTab] = useState<ActiveTab>('lookup');
@@ -193,7 +193,7 @@ export default function ISaasIndex() {
         } catch (error: any) {
             setPhase('upload');
             let message = "An error occurred while processing your file.";
-            if (error.response?.data?.message) message = error.response.data.message;
+            if ((error as any).response?.data?.message) message = (error as any).response.data.message;
             setErrorMessage(message);
             toast({ title: "Processing failed", description: message, variant: "destructive" });
         } finally {
@@ -218,7 +218,7 @@ export default function ISaasIndex() {
             return;
         }
 
-        let intervalId = setInterval(async () => {
+        const intervalId = setInterval(async () => {
             try {
                 const response = await axios.get(route('fbmb.status', { token: result.download_token }));
                 const currentStatus = response.data.status;
@@ -630,15 +630,15 @@ export default function ISaasIndex() {
                                                 <div className="grid grid-cols-3 gap-3 mb-6">
                                                     <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
                                                         <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">{__('general.total_ids')}</p>
-                                                        <p className="text-2xl font-bold font-mono text-slate-800">{result.total_ids.toLocaleString()}</p>
+                                                        <p className="text-2xl font-bold font-mono text-slate-800">{(result.total_ids || 0).toLocaleString()}</p>
                                                     </div>
                                                     <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center">
                                                         <p className="text-xs text-emerald-600 font-medium uppercase tracking-wider mb-1">Matches</p>
-                                                        <p className="text-2xl font-bold font-mono text-emerald-700">{result.found_count.toLocaleString()}</p>
+                                                        <p className="text-2xl font-bold font-mono text-emerald-700">{(result.found_count || 0).toLocaleString()}</p>
                                                     </div>
                                                     <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-center">
                                                         <p className="text-xs text-indigo-600 font-medium uppercase tracking-wider mb-1">{__('general.points_used')}</p>
-                                                        <p className="text-2xl font-bold font-mono text-indigo-700">{result.credits_used.toLocaleString()}</p>
+                                                        <p className="text-2xl font-bold font-mono text-indigo-700">{(result.credits_used || 0).toLocaleString()}</p>
                                                     </div>
                                                 </div>
 
@@ -646,13 +646,13 @@ export default function ISaasIndex() {
                                                     <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
                                                         <span>{__('general.match_rate')}</span>
                                                         <span className="font-mono font-medium text-slate-700">
-                                                            {result.total_ids > 0 ? ((result.found_count / result.total_ids) * 100).toFixed(1) : 0}%
+                                                            {(result.total_ids || 0) > 0 ? (((result.found_count || 0) / (result.total_ids || 1)) * 100).toFixed(1) : 0}%
                                                         </span>
                                                     </div>
                                                     <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
                                                         <div
                                                             className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-1000 ease-out"
-                                                            style={{ width: `${result.total_ids > 0 ? (result.found_count / result.total_ids) * 100 : 0}%` }}
+                                                            style={{ width: `${(result.total_ids || 0) > 0 ? (((result.found_count || 0) / (result.total_ids || 1)) * 100) : 0}%` }}
                                                         />
                                                     </div>
                                                 </div>
@@ -661,12 +661,12 @@ export default function ISaasIndex() {
                                                     <div className="flex items-center justify-between text-sm">
                                                         <span className="text-slate-500 flex items-center gap-1.5">
                                                             <Wallet className="w-3.5 h-3.5" />{__('general.remaining_points')}</span>
-                                                        <span className="font-mono font-semibold text-slate-800">{result.remaining_balance.toLocaleString()} Pts</span>
+                                                        <span className="font-mono font-semibold text-slate-800">{(result.remaining_balance || 0).toLocaleString()} Pts</span>
                                                     </div>
                                                 </div>
 
                                                 <div className="flex flex-col sm:flex-row gap-3">
-                                                    {result.found_count > 0 && (
+                                                    {(result.found_count || 0) > 0 && (
                                                         <Button
                                                             onClick={() => triggerDownload(result.download_token)}
                                                             className="flex-1 h-11 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-px transition-all font-semibold"
@@ -679,7 +679,7 @@ export default function ISaasIndex() {
                                                         <ArrowRight className="w-4 h-4 mr-2" />{__('general.new_lookup')}</Button>
                                                 </div>
 
-                                                {result.found_count === 0 && (
+                                                {(result.found_count || 0) === 0 && (
                                                     <div className="mt-4 p-4 rounded-xl border border-amber-200 bg-amber-50">
                                                         <p className="text-sm text-amber-700 flex items-center gap-2">
                                                             <AlertCircle className="w-4 h-4 shrink-0" />{__('general.no_matches_were_found_no_points_were_deducted')}</p>

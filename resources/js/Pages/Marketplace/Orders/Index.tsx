@@ -69,7 +69,7 @@ export default function Index({ orders, tab }: any) {
 
                     {/* Orders List */}
                     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-                        {orders.data && orders.data.length > 0 ? (
+                        {orders.data && (orders.data as any).length > 0 ? (
                             <div className="overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
@@ -117,7 +117,7 @@ export default function Index({ orders, tab }: any) {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 bg-white">
-                                        {orders.data.map((order: any) => {
+                                        {(orders.data as any).map((order: any) => {
                                             const isBuyer =
                                                 tab === 'purchases' || !tab;
                                             const otherParty = isBuyer
@@ -127,7 +127,7 @@ export default function Index({ orders, tab }: any) {
                                             // Use actual deadline if available, else format as TBD
                                             const deliveryDays = order.package?.delivery_days;
                                             const orderDate = new Date(order.created_at);
-                                            let deadlineDate = null;
+                                            let deadlineDate: Date | null = null;
                                             if (deliveryDays) {
                                                 deadlineDate = new Date(orderDate);
                                                 deadlineDate.setDate(deadlineDate.getDate() + deliveryDays);

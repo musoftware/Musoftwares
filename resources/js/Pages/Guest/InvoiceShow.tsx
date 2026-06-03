@@ -6,7 +6,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
-import { CreditCard, Receipt, Clock, MapPin, User, FileText } from 'lucide-react';
+import { CreditCard, Receipt, Clock, MapPin, User, FileText, Folder } from 'lucide-react';
 import { useForm } from '@inertiajs/react';
 
 export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_url: string }) {

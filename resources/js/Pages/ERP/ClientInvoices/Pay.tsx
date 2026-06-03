@@ -83,7 +83,7 @@ export default function Pay({
             }
         } catch (error: any) {
             console.error('Payment Error:', error);
-            const msg = error.response?.data?.message || 'An error occurred during payment processing.';
+            const msg = (error as any).response?.data?.message || 'An error occurred during payment processing.';
             setErrorMessage(msg);
             toast({
                 title: 'Payment Failed',

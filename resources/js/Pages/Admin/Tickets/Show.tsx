@@ -150,7 +150,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
     const bottomRef = useRef<HTMLDivElement>(null);
 
     const rawMessages = ticket.conversation?.messages;
-    const messages = Array.isArray(rawMessages) ? rawMessages : (rawMessages?.data ?? []);
+    const messages = Array.isArray(rawMessages) ? rawMessages : ((rawMessages as any)?.data ?? []);
     const statusMeta   = STATUS_STYLES[ticket.ticket_status]  ?? STATUS_STYLES.open;
     const priorityMeta = PRIORITY_STYLES[ticket.priority]     ?? PRIORITY_STYLES.low;
     const isClosed = ticket.ticket_status === 'closed';
@@ -158,7 +158,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
     // HTTP Polling every 60 seconds
     useEffect(() => {
         const interval = setInterval(() => {
-            router.reload({ only: ['ticket'], preserveScroll: true, preserveState: true });
+            router.reload({ only: ['ticket'], preserveScroll: true, preserveState: true } as any);
         }, 60000);
         return () => clearInterval(interval);
     }, []);

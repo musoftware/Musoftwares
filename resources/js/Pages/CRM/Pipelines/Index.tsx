@@ -6,7 +6,7 @@ import { __ } from '@/lib/i18n';
 
 export default function PipelinesIndex({ pipelines }: { pipelines: any[] }) {
     return (
-        <ERPLayout>
+        <ERPLayout title="Pipelines">
             <Head title={__('crm.pipelines')} />
             <div className="p-6">
                 <div className="mb-6 flex justify-between items-center">

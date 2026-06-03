@@ -45,7 +45,7 @@ export default function Index({ proposals, auth }: Props) {
                     </Link>
                 </div>
 
-                {proposals.data.length === 0 ? (
+                {(proposals.data as any).length === 0 ? (
                     <Card className="text-center py-12">
                         <CardContent>
                             <div className="mx-auto w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -60,7 +60,7 @@ export default function Index({ proposals, auth }: Props) {
                     </Card>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {proposals.data.map((proposal) => (
+                        {(proposals.data as any).map((proposal) => (
                             <Card key={proposal.id} className="hover:shadow-md transition-shadow">
                                 <CardHeader className="pb-3">
                                     <div className="flex justify-between items-start">

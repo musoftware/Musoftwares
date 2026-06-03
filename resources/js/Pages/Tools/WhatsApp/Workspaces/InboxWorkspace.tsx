@@ -7,6 +7,7 @@ import {
 import { Card } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
 import { Badge } from '@/Components/ui/badge';
 import { __ } from '@/lib/i18n';
 

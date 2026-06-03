@@ -34,7 +34,7 @@ export default function Index({ files, storageProviders, hasFeature, hasProvider
     if (!hasFeature) {
         return (
             <ERPLayout title={__('general.document_storage')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
-                <UpgradeOverlay module="erp-document-storage" />
+                <UpgradeOverlay module="erp-document-storage" title={__('general.document_storage')} description={__('general.upgrade_document_storage_description', undefined, 'Upgrade to access document storage.')} icon={Database} priceText={__('general.upgrade_now')} />
             </ERPLayout>
         );
     }

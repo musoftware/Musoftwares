@@ -38,7 +38,7 @@ export default function Edit({ job }: any) {
                         <CardHeader className="bg-slate-50/50 border-b border-slate-100">
                             <CardTitle className="text-lg font-semibold">{__('freelance.job_details')}</CardTitle>
                             <CardDescription>
-                                {__('freelance.job_details_help', 'Update the basic information about the job.')}
+                                {__('freelance.job_details_help', undefined, 'Update the basic information about the job.')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6 pt-6">

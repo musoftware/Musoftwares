@@ -12,7 +12,7 @@ function getNestedValue(obj: any, path: string): any {
  * This reads from translations.json which is generated during build time
  * via `php artisan translations:export`.
  */
-export function __(key: string, replacements?: Record<string, string | number>): string {
+export function __(key: string, replacements?: Record<string, string | number>, fallback?: string): string {
     const locale = typeof document !== 'undefined' ? document.documentElement.lang || 'en' : 'en';
     const localeTranslations = translations[locale] || translations['en'] || {};
 
@@ -23,7 +23,7 @@ export function __(key: string, replacements?: Record<string, string | number>):
         if (localeTranslations[key] !== undefined) {
             result = localeTranslations[key];
         } else {
-            result = key; // Fallback to raw key
+            result = fallback || key; // Fallback to raw key or fallback
         }
     }
 

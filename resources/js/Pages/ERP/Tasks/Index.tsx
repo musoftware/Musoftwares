@@ -260,7 +260,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                 </Card>
 
                 {/* Grid of Task Boards */}
-                {tasks.data.length === 0 ? (
+                {(tasks.data as any).length === 0 ? (
                     <Card className="shadow-none border-dashed border-2 py-16 text-center">
                         <CardContent className="space-y-4">
                             <div className="h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
@@ -284,7 +284,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                     </Card>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {tasks.data.map((task) => (
+                        {(tasks.data as any).map((task) => (
                             <motion.div
                                 key={task.id}
                                 initial={{ opacity: 0, y: 10 }}

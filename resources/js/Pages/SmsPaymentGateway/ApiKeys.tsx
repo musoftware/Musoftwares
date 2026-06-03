@@ -63,7 +63,7 @@ interface FlashData {
 }
 
 export default function ApiKeys({ apiKeys }: Props) {
-    const { flash } = usePage().props as { flash: FlashData };
+    const { flash } = usePage<any>().props;
 
     // Create key dialog
     const [createOpen, setCreateOpen] = useState(false);

@@ -150,7 +150,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                             <span className="flex-shrink-0 h-2 w-2 rounded-full bg-red-500" title={__('general.needs_attention')} />
                         )}
                         {t.is_urgent && (
-                            <Zap className="flex-shrink-0 h-3 w-3 text-red-500" title="Urgent" />
+                            <Zap className="flex-shrink-0 h-3 w-3 text-red-500" />
                         )}
                         <span className="truncate">{t.ticket_subject}</span>
                     </Link>

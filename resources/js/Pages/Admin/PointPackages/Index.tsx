@@ -100,8 +100,8 @@ export default function Index({ pointPackages, search }: Props) {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {pointPackages.data.length > 0 ? (
-                                    pointPackages.data.map((pkg) => (
+                                {(pointPackages.data as any).length > 0 ? (
+                                    (pointPackages.data as any).map((pkg) => (
                                         <tr key={pkg.id} className="hover:bg-slate-50 transition-colors">
                                             <td className="px-4 py-3 font-medium text-slate-900">{pkg.name}</td>
                                             <td className="px-4 py-3 text-slate-600">{pkg.points.toLocaleString()}</td>

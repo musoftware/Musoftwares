@@ -10,7 +10,7 @@ import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 
 export default function SearchIndex() {
     const { auth } = usePage().props;
-    const hasSalesStaff = auth?.crm_features?.includes('crm-sales-staff') ?? false;
+    const hasSalesStaff = (auth as any)?.crm_features?.includes('crm-sales-staff') ?? false;
 
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<any[]>([]);
@@ -30,7 +30,7 @@ export default function SearchIndex() {
             try {
                 const res = await axios.get(route('crm.search', { q: query }));
                 setResults(res.data);
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Search failed", error);
             } finally {
                 setLoading(false);

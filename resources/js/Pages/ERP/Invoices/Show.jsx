@@ -195,12 +195,12 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
 
                         <div className="mt-16 flex justify-center gap-4 no-print">
                             <Button size="lg" className="px-12 shadow-none" asChild>
-                                <a href={route('erp.invoices.download', invoice.id) + '?paper=a4'} target="_blank">
+                                <a href={route('erp.invoices.download', invoice.id) + '?paper=a4'} target="_blank" rel="noreferrer">
                                     <Download className="mr-2 h-5 w-5" /> {__('Download A4 PDF')}
                                 </a>
                             </Button>
                             <Button size="lg" variant="outline" className="px-12 shadow-none" asChild>
-                                <a href={route('erp.invoices.download', invoice.id) + '?paper=thermal'} target="_blank">
+                                <a href={route('erp.invoices.download', invoice.id) + '?paper=thermal'} target="_blank" rel="noreferrer">
                                     <Download className="mr-2 h-5 w-5" /> {__('Download Thermal PDF')}
                                 </a>
                             </Button>
@@ -270,10 +270,10 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                     <Copy className="mr-2 h-4 w-4 text-slate-400" /> {__('Duplicate')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild className="cursor-pointer">
-                                    <a href={route('erp.invoices.download', invoice.id) + '?paper=a4'} target="_blank"><Download className="mr-2 h-4 w-4 text-slate-400" /> {__('Download A4 PDF')}</a>
+                                    <a href={route('erp.invoices.download', invoice.id) + '?paper=a4'} target="_blank" rel="noreferrer"><Download className="mr-2 h-4 w-4 text-slate-400" /> {__('Download A4 PDF')}</a>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild className="cursor-pointer">
-                                    <a href={route('erp.invoices.download', invoice.id) + '?paper=thermal'} target="_blank"><Download className="mr-2 h-4 w-4 text-slate-400" /> {__('Download Thermal PDF')}</a>
+                                    <a href={route('erp.invoices.download', invoice.id) + '?paper=thermal'} target="_blank" rel="noreferrer"><Download className="mr-2 h-4 w-4 text-slate-400" /> {__('Download Thermal PDF')}</a>
                                 </DropdownMenuItem>
                                 {(invoice.status === 'sent' || invoice.status === 'partial' || invoice.status === 'paid') && (
                                     <>

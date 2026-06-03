@@ -94,14 +94,14 @@ export default function Transactions({ transactions, filters }: TransactionsProp
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {transactions.data.length === 0 ? (
+                                        {(transactions.data as any).length === 0 ? (
                                             <TableRow>
                                                 <TableCell colSpan={6} className="text-center py-12 text-slate-500">
                                                     {__('general.no_transactions_found')}
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
-                                            transactions.data.map((tx) => (
+                                            (transactions.data as any).map((tx) => (
                                                 <TableRow key={tx.id}>
                                                     <TableCell className="whitespace-nowrap text-sm text-slate-600">
                                                         {formatDate(tx.transaction_date || tx.created_at)}

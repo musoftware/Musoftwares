@@ -65,10 +65,10 @@ export default function SerialUserDevicesByUser({ users, filters }: Props) {
 
                 {/* User Cards */}
                 <div className="space-y-3">
-                    {users.data.length === 0 && (
+                    {(users.data as any).length === 0 && (
                         <div className="text-center py-16 text-zinc-500">{__('general.no_users_with_device_assignments')}</div>
                     )}
-                    {users.data.map(user => (
+                    {(users.data as any).map(user => (
                         <Card key={user.id} className="bg-zinc-900 border-zinc-800">
                             <CardContent className="p-4 flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center shrink-0">

@@ -98,7 +98,7 @@ export default function Index({ contracts, currentTab }) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            {contracts.data.map((contract) => (
+                            {(contracts.data as any).map((contract) => (
                                 <tr key={contract.id} className="hover:bg-gray-50/30">
                                     <td className="p-4 font-medium text-gray-900">{contract.reference || `CTR-${contract.id}`}</td>
                                     <td className="p-4">
@@ -149,7 +149,7 @@ export default function Index({ contracts, currentTab }) {
                                     </td>
                                 </tr>
                             ))}
-                            {contracts.data.length === 0 && (
+                            {(contracts.data as any).length === 0 && (
                                 <tr>
                                     <td colSpan={7} className="p-8 text-center text-gray-500">{__('general.no_contracts_found')}</td>
                                 </tr>

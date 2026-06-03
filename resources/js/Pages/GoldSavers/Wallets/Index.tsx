@@ -90,7 +90,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
         }
     };
 
-    const itemVariants = {
+    const itemVariants: any = {
         hidden: { opacity: 0, y: 20 },
         show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
         exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } }
@@ -169,7 +169,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                             <div className="flex gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
                                 <div className="flex items-center gap-2">
                                     <LayoutGrid className="w-4 h-4 text-slate-400" />
-                                    <Select value={goalFilter} onValueChange={(value) => setGoalFilter(value)}>
+                                    <Select value={goalFilter} onValueChange={(value) => setGoalFilter(value as string)}>
                                         <SelectTrigger className="w-[180px] bg-slate-50 border-slate-200">
                                             <SelectValue placeholder={__('general.filter_by_goal')} />
                                         </SelectTrigger>
@@ -182,7 +182,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <ArrowUpDown className="w-4 h-4 text-slate-400" />
-                                    <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>
+                                    <Select value={sortBy} onValueChange={(value) => setSortBy(value as string)}>
                                         <SelectTrigger className="w-[180px] bg-slate-50 border-slate-200">
                                             <SelectValue placeholder={__('general.sort_by')} />
                                         </SelectTrigger>
@@ -227,7 +227,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                                 <label className="text-sm font-medium text-slate-700">{__('Goal Type')}</label>
                                                 <Select 
                                                     value={newWallet.goal_type} 
-                                                    onValueChange={value => setNewWallet({...newWallet, goal_type: value})}
+                                                    onValueChange={value => setNewWallet({...newWallet, goal_type: value as string})}
                                                 >
                                                     <SelectTrigger className="w-full bg-white">
                                                         <SelectValue placeholder={__('general.select_goal_type')} />

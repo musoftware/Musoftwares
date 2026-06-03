@@ -96,7 +96,7 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
                     </div>
 
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        {products.data.length === 0 ? (
+                        {(products.data as any).length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-12 text-gray-500">
                                 <Package className="h-12 w-12 text-gray-400 mb-4" />
                                 <p className="text-lg">{t('erp.no_products_found', 'No products found')}</p>
@@ -118,7 +118,7 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-200 bg-white">
-                                            {products.data.map((product: any) => (
+                                            {(products.data as any).map((product: any) => (
                                                 <tr key={product.id}>
                                                     <td className="whitespace-nowrap px-6 py-4">
                                                         {product.image_path ? (
@@ -191,7 +191,7 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
                                 </div>
                                 
                                 <div className="md:hidden divide-y divide-gray-200">
-                                    {products.data.map((product: any) => (
+                                    {(products.data as any).map((product: any) => (
                                         <div key={product.id} className="p-4 bg-white space-y-3">
                                             <div className="flex justify-between items-start">
                                                 <div>
@@ -250,7 +250,7 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
                                 </div>
                             </div>
                         )}
-                        {products.data.length > 0 && (
+                        {(products.data as any).length > 0 && (
                             <div className="p-4 border-t">
                                 <Pagination links={products.links} />
                             </div>

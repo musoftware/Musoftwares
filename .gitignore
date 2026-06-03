@@ -211,3 +211,7 @@ test-results/*
 debug_invoice.php
 composer.phar
 vendor.zip
+tsc_output_utf8.txt
+tsc_output.txt
+tsc_output2.txt
+tsc_output3.txt

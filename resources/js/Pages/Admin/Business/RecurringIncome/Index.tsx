@@ -323,7 +323,7 @@ export default function Index({ incomes, currencies, categories, stats }) {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {incomes.data.map((income) => (
+                        {(incomes.data as any).map((income) => (
                             <tr key={income.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4">
                                     <div className="text-sm font-semibold text-gray-900">{income.title}</div>
@@ -364,7 +364,7 @@ export default function Index({ incomes, currencies, categories, stats }) {
                                 </td>
                             </tr>
                         ))}
-                        {incomes.data.length === 0 && (
+                        {(incomes.data as any).length === 0 && (
                             <tr>
                                 <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                                     <Calendar className="w-12 h-12 mx-auto text-gray-300 mb-3" />

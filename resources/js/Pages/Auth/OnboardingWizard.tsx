@@ -108,7 +108,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                 newErrors.mobile_1 = 'Please enter a valid phone number.';
             }
         } else if (currentStep === 3) {
-            if (!formData.preferred_currency) newErrors.preferred_currency = 'Currency selection is required.';
+            if (!(formData as any).preferred_currency) (newErrors as any).preferred_currency = 'Currency selection is required.';
         }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;

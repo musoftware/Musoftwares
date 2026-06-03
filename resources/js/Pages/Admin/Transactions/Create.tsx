@@ -60,7 +60,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
     };
 
     const removeRow = (index: number) => {
-        if (data.data.length > 1) {
+        if ((data.data as any).length > 1) {
             const newData = [...data.data];
             newData.splice(index, 1);
             setData('data', newData);

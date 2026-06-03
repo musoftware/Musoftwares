@@ -9,13 +9,6 @@ import { Badge } from '@/Components/ui/badge';
 import { format } from 'date-fns';
 import { __ } from '@/lib/i18n';
 
-const __ = (key: string) => {
-    if (typeof window !== 'undefined' && typeof (window as any).__ === 'function') {
-        return (window as any).__(key);
-    }
-    return key;
-};
-
 interface Branch {
     id: number;
     name: string;

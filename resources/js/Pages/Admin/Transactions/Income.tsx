@@ -5,7 +5,7 @@ import { DataTable } from '@/Components/ui/DataTable';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
-import { useTranslation } from 'react-i18next'; // Example for translations if applicable
+ // Example for translations if applicable
 import { __ } from '@/lib/i18n';
 
 export default function Income({ transactions, filters }) {

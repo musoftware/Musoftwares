@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import axios from 'axios';
 import { cn } from '@/lib/utils';
 import { Button } from '@/Components/ui/button';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { __ } from '@/lib/i18n';
 import {
     Check, Layers, Crown, Sparkles, Building2, MessageSquare, Zap, Store, Wrench
@@ -69,7 +69,7 @@ export default function PricingBuilder({
     
     // Determine default selected items (e.g., ERP and CRM) plus any module passed via URL
     const activeItems = useMemo(() => {
-        const items = [];
+        const items: string[] = [];
         if (isNewSystem) {
             items.push(...serviceItems.filter(i => i.id === 'erp' || i.id === 'crm').map(i => i.id));
         }
@@ -333,7 +333,7 @@ export default function PricingBuilder({
                         )}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {tools.map(renderItemCard)}
+                        {tools.map(tool => renderItemCard(tool))}
                     </div>
                 </section>
             </div>

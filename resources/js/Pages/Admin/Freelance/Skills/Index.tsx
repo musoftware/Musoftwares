@@ -164,7 +164,7 @@ export default function Index({ skills, filters }: any) {
                         </tr>
                     </thead>
                     <tbody>
-                        {skills.data.map((skill: any) => (
+                        {(skills.data as any).map((skill: any) => (
                             <tr key={skill.id} className="border-b hover:bg-gray-50">
                                 <td className="p-4 font-medium text-gray-900">{skill.id}</td>
                                 <td className="p-4 font-medium text-gray-900">{skill.name}</td>
@@ -226,7 +226,7 @@ export default function Index({ skills, filters }: any) {
                                 </td>
                             </tr>
                         ))}
-                        {skills.data.length === 0 && (
+                        {(skills.data as any).length === 0 && (
                             <tr>
                                 <td colSpan={6} className="p-4 text-center text-gray-500">
                                     {__('freelance.no_skills_found', undefined, 'No skills found.')}

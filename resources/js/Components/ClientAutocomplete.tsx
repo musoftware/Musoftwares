@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
-import { Button } from '@/Components/ui/button';
+import { Button, buttonVariants } from '@/Components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/Components/ui/command';
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -82,20 +82,18 @@ export function ClientAutocomplete({
     return (
         <div className={cn("relative w-full", className)}>
             <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={open}
-                        className={cn(
-                            "w-full justify-between bg-white border-slate-200 text-slate-900 font-normal hover:bg-slate-50 transition-colors",
-                            error && "border-red-500 text-red-900"
-                        )}
-                    >
-                        {selectedName || "Select a Client"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
+                <PopoverTrigger
+                    type="button"
+                    role="combobox"
+                    aria-expanded={open}
+                    className={cn(
+                        buttonVariants({ variant: "outline" }),
+                        "w-full justify-between bg-white border-slate-200 text-slate-900 font-normal hover:bg-slate-50 transition-colors",
+                        error && "border-red-500 text-red-900"
+                    )}
+                >
+                    {selectedName || "Select a Client"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </PopoverTrigger>
                 <PopoverContent className="w-[300px] p-0 bg-white border border-slate-200 shadow-md">
                     <Command shouldFilter={false}>

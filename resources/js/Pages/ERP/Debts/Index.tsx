@@ -84,9 +84,9 @@ export default function DebtsIndex({ clients, filters, totalOwedToMe, totalIOwe,
 
                 {/* Clients List */}
                 <div className="bg-white rounded-lg border shadow-sm">
-                    {clients.data.length > 0 ? (
+                    {(clients.data as any).length > 0 ? (
                         <div className="divide-y">
-                            {clients.data.map((client: any) => (
+                            {(clients.data as any).map((client: any) => (
                                 <Link 
                                     key={client.id}
                                     href={route('erp.debts.show', client.id)}

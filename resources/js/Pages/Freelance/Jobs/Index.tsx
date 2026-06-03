@@ -40,7 +40,7 @@ export default function Index({ jobs }: any) {
                         )}
                         <h3 className="mb-4 text-lg font-bold">{__('Jobs')}</h3>
 
-                        {jobs.data.length > 0 ? (
+                        {(jobs.data as any).length > 0 ? (
                             <div className="overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
@@ -57,7 +57,7 @@ export default function Index({ jobs }: any) {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 bg-white">
-                                        {jobs.data.map((job: any) => (
+                                        {(jobs.data as any).map((job: any) => (
                                             <tr key={job.id}>
                                                 <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-gray-900">
                                                     {job.title}

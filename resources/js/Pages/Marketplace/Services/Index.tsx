@@ -35,9 +35,9 @@ export default function Index({ services }: any) {
                         )}
                         <h3 className="mb-4 text-lg font-bold">Services</h3>
 
-                        {services.data.length > 0 ? (
+                        {(services.data as any).length > 0 ? (
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                {services.data.map((service: any) => (
+                                {(services.data as any).map((service: any) => (
                                     <div
                                         key={service.id}
                                         className="rounded-lg border p-4 shadow-sm"

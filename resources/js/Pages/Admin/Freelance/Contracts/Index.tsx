@@ -70,7 +70,7 @@ export default function Index({ contracts, filters }: any) {
                         </tr>
                     </thead>
                     <tbody>
-                        {contracts.data.map((contract: any) => (
+                        {(contracts.data as any).map((contract: any) => (
                             <tr key={contract.id} className="border-b hover:bg-gray-50">
                                 <td className="p-4">
                                     {contract.job ? (
@@ -125,7 +125,7 @@ export default function Index({ contracts, filters }: any) {
                                 </td>
                             </tr>
                         ))}
-                        {contracts.data.length === 0 && (
+                        {(contracts.data as any).length === 0 && (
                             <tr>
                                 <td colSpan={7} className="p-4 text-center text-gray-500">
                                     {__('freelance.no_contracts_found', undefined, 'No contracts found.')}

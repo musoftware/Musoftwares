@@ -56,7 +56,7 @@ export default function Edit({ pointPackage }: Props) {
                             <Input
                                 id="name"
                                 value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
+                                onChange={(e) => setData('name', e.target.value || '')}
                                 className={errors.name ? 'border-red-500' : ''}
                             />
                             {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
@@ -69,7 +69,7 @@ export default function Edit({ pointPackage }: Props) {
                                     id="points"
                                     type="number"
                                     value={data.points}
-                                    onChange={(e) => setData('points', e.target.value)}
+                                    onChange={(e) => setData('points', Number(e.target.value) || 0)}
                                     className={errors.points ? 'border-red-500' : ''}
                                 />
                                 {errors.points && <p className="text-xs text-red-500">{errors.points}</p>}
@@ -82,7 +82,7 @@ export default function Edit({ pointPackage }: Props) {
                                     type="number"
                                     step="0.01"
                                     value={data.price}
-                                    onChange={(e) => setData('price', e.target.value)}
+                                    onChange={(e) => setData('price', Number(e.target.value) || 0)}
                                     className={errors.price ? 'border-red-500' : ''}
                                 />
                                 {errors.price && <p className="text-xs text-red-500">{errors.price}</p>}

@@ -5,7 +5,7 @@ import { __ } from '@/lib/i18n';
 
 export default function CustomersIndex({ customers }: { customers: any }) {
     return (
-        <ERPLayout>
+        <ERPLayout title="Customers">
             <Head title={__('crm.customers')} />
             <div className="p-6">
                 <div className="mb-6 flex justify-between items-center">
@@ -24,7 +24,7 @@ export default function CustomersIndex({ customers }: { customers: any }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {customers.data.map((customer: any) => (
+                            {(customers.data as any).map((customer: any) => (
                                 <tr key={customer.id} className="border-b hover:bg-gray-50">
                                     <td className="px-6 py-4 font-medium">{customer.name}</td>
                                     <td className="px-6 py-4">{customer.email}</td>

@@ -211,8 +211,8 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {charityCounters.data.length > 0 ? (
-                                        charityCounters.data.map((counter: any) => (
+                                    {(charityCounters.data as any).length > 0 ? (
+                                        (charityCounters.data as any).map((counter: any) => (
                                             <tr key={counter.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
                                                 <td className="py-3 px-4">
                                                     <div className="flex items-center gap-3">

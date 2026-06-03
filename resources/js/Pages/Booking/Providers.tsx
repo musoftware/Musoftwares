@@ -119,8 +119,8 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
     // Submit provider profile form
     const handleProfileSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (isEditing && profileForm.id) {
-            profileForm.put(route('booking.providers.update', profileForm.id), {
+        if (isEditing && profileForm.data.id) {
+            profileForm.put(route('booking.providers.update', profileForm.data.id), {
                 onSuccess: () => setIsFormOpen(false)
             });
         } else {
@@ -269,8 +269,8 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
         // 1. Gather recurring weekly rules
         Object.entries(weeklyRules).forEach(([dayStr, data]) => {
             const day = parseInt(dayStr);
-            if (data.is_enabled) {
-                data.shifts.forEach(shift => {
+            if ((data as any).is_enabled) {
+                (data as any).shifts.forEach(shift => {
                     formattedRules.push({
                         type: 'recurring',
                         weekday: day,
@@ -371,8 +371,8 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                 <Label htmlFor="name">{__('general.full_name')}</Label>
                                                 <Input
                                                     id="name"
-                                                    value={profileForm.name}
-                                                    onChange={e => profileForm.setData('name', e.target.value)}
+                                                    value={(profileForm.data as any).name}
+                                                    onChange={e => (profileForm.setData as any)('name', e.target.value)}
                                                     placeholder={__('general.dr_john_doe')}
                                                     required
                                                 />
@@ -383,8 +383,8 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                 <Label htmlFor="specialty">{__('general.specialty_title')}</Label>
                                                 <Input
                                                     id="specialty"
-                                                    value={profileForm.specialty}
-                                                    onChange={e => profileForm.setData('specialty', e.target.value)}
+                                                    value={(profileForm.data as any).specialty}
+                                                    onChange={e => (profileForm.setData as any)('specialty', e.target.value)}
                                                     placeholder={__('general.e_g_cardiologist_senior_consultant_math_tutor')}
                                                 />
                                                 {profileForm.errors.specialty && <p className="text-sm text-red-500">{profileForm.errors.specialty}</p>}
@@ -395,8 +395,8 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                 <Input
                                                     id="email"
                                                     type="email"
-                                                    value={profileForm.email}
-                                                    onChange={e => profileForm.setData('email', e.target.value)}
+                                                    value={(profileForm.data as any).email}
+                                                    onChange={e => (profileForm.setData as any)('email', e.target.value)}
                                                     placeholder={__('general.john_doe_hospital_com')}
                                                 />
                                                 {profileForm.errors.email && <p className="text-sm text-red-500">{profileForm.errors.email}</p>}
@@ -406,8 +406,8 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                 <Label htmlFor="phone">{__('general.phone_number')}</Label>
                                                 <Input
                                                     id="phone"
-                                                    value={profileForm.phone}
-                                                    onChange={e => profileForm.setData('phone', e.target.value)}
+                                                    value={(profileForm.data as any).phone}
+                                                    onChange={e => (profileForm.setData as any)('phone', e.target.value)}
                                                     placeholder="+1 (555) 123-4567"
                                                 />
                                                 {profileForm.errors.phone && <p className="text-sm text-red-500">{profileForm.errors.phone}</p>}
@@ -418,8 +418,8 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                             <Label htmlFor="description">{__('general.about_profile_summary')}</Label>
                                             <Textarea
                                                 id="description"
-                                                value={profileForm.description}
-                                                onChange={e => profileForm.setData('description', e.target.value)}
+                                                value={(profileForm.data as any).description}
+                                                onChange={e => (profileForm.setData as any)('description', e.target.value)}
                                                 placeholder={__('general.write_a_brief_professional_description_that_will_be_visible_to_booking_clients')}
                                                 rows={4}
                                             />
@@ -434,19 +434,19 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                             ) : (
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto p-3 border rounded-lg bg-slate-50">
                                                     {eventTypes.map(event => {
-                                                        const isChecked = profileForm.event_type_ids.includes(event.id);
+                                                        const isChecked = (profileForm.data as any).event_type_ids.includes(event.id);
                                                         return (
                                                             <label key={event.id} className="flex items-center space-x-3 p-2 bg-white rounded border border-slate-200/60 shadow-xs hover:bg-slate-50 cursor-pointer">
                                                                 <input
                                                                     type="checkbox"
                                                                     checked={isChecked}
                                                                     onChange={() => {
-                                                                        const ids = [...profileForm.event_type_ids];
+                                                                        const ids = [...(profileForm.data as any).event_type_ids];
                                                                         if (isChecked) {
-                                                                            profileForm.setData('event_type_ids', ids.filter(id => id !== event.id));
+                                                                            (profileForm.setData as any)('event_type_ids', ids.filter(id => id !== event.id));
                                                                         } else {
                                                                             ids.push(event.id);
-                                                                            profileForm.setData('event_type_ids', ids);
+                                                                            (profileForm.setData as any)('event_type_ids', ids);
                                                                         }
                                                                     }}
                                                                     className="rounded border-slate-300 text-slate-900 focus:ring-slate-500 h-4 w-4"
@@ -468,8 +468,8 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                 <p className="text-xs text-muted-foreground">{__('general.inactive_providers_cannot_be_selected_for_public_scheduling_slots')}</p>
                                             </div>
                                             <Switch
-                                                checked={profileForm.is_active}
-                                                onCheckedChange={checked => profileForm.setData('is_active', checked)}
+                                                checked={(profileForm.data as any).is_active}
+                                                onCheckedChange={checked => (profileForm.setData as any)('is_active', checked)}
                                             />
                                         </div>
                                     </CardContent>

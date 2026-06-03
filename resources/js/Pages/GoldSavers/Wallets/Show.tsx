@@ -96,7 +96,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
     const handleUpdateTransaction = (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingTx) return;
-        router.put(route('isaas.gold-savers.wallets.transactions.update', { wallet: wallet.id, transaction: editingTx.id }), editingTx, {
+        router.put(route('isaas.gold-savers.wallets.transactions.update', { wallet: wallet.id, transaction: editingTx.id }), editingTx as any, {
             onSuccess: () => setEditingTx(null)
         });
     };
@@ -175,7 +175,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                             <label className="text-sm font-medium">{__('Goal Type')}</label>
                                             <Select 
                                                 value={editWalletData.goal_type} 
-                                                onValueChange={value => setEditWalletData({...editWalletData, goal_type: value})}
+                                                onValueChange={value => setEditWalletData({...editWalletData, goal_type: value as string})}
                                             >
                                                 <SelectTrigger className="w-full">
                                                     <SelectValue placeholder={__('general.select_goal_type')} />
@@ -333,7 +333,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                             <label className="text-sm font-medium">{__('Karat')}</label>
                                             <Select 
                                                 value={String(newTx.karat)} 
-                                                onValueChange={value => setNewTx({...newTx, karat: value})}
+                                                onValueChange={value => setNewTx({...newTx, karat: value as string})}
                                             >
                                                 <SelectTrigger className="w-full">
                                                     <SelectValue placeholder={__('general.select_karat')} />

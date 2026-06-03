@@ -35,7 +35,7 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
             fetch('/api/bing-daily-images')
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.length > 0) {
+                    if (data && (data as any).length > 0) {
                         setWallpapers(data.slice(0, 5));
                     }
                 })

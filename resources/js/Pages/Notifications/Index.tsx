@@ -34,9 +34,9 @@ export default function Index({
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
-                            {notifications.data.length > 0 ? (
+                            {(notifications.data as any).length > 0 ? (
                                 <ul className="divide-y divide-gray-200">
-                                    {notifications.data.map(
+                                    {(notifications.data as any).map(
                                         (notification: any) => (
                                             <li
                                                 key={notification.id}
