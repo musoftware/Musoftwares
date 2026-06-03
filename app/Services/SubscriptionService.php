@@ -26,10 +26,7 @@ class SubscriptionService
      */
     public function hasActiveSubscription(User $user, string $module): bool
     {
-        // Admins and moderators have access to everything
-        if ($user->hasRole(['admin', 'Admin', 'moderator', 'Moderator'])) {
-            return true;
-        }
+        // Removed Admin bypass: Admins must subscribe to modules to access them.
 
         // Check specific module subscription in user_subscriptions
         if ($user->hasModuleSubscription($module)) {
@@ -94,9 +91,7 @@ class SubscriptionService
      */
     public function hasAnySubscription(User $user): bool
     {
-        if ($user->hasRole(['admin', 'Admin', 'moderator', 'Moderator'])) {
-            return true;
-        }
+        // Removed Admin bypass
 
         return $user->hasSubscription();
     }
@@ -127,16 +122,7 @@ class SubscriptionService
 
     public function getLimits(User $user, string $module): array
     {
-        if ($user->hasRole(['admin', 'Admin', 'moderator', 'Moderator'])) {
-            if (!in_array($module, ['freelance'])) {
-                return [
-                    'projects'     => -1,
-                    'invoices'     => -1,
-                    'tasks'        => -1,
-                    'team_members' => -1,
-                ];
-            }
-        }
+
 
         if (!$user->hasSubscription()) {
             if ($module === 'freelance') {
@@ -169,9 +155,7 @@ class SubscriptionService
      */
     public function isWithinLimit(User $user, string $module, string $limitKey, int $currentCount): bool
     {
-        if ($user->hasRole(['admin', 'Admin'])) {
-            return true;
-        }
+
 
         $limits = $this->getLimits($user, $module);
 

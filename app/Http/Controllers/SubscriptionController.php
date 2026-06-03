@@ -99,9 +99,6 @@ class SubscriptionController extends Controller
 
         $proratedRefund = 0;
 
-        $hasAnySubscription = \App\Models\UserSubscription::where('user_id', $user->id)->exists();
-        $isEligibleForTrial = !$hasAnySubscription;
-
         return Inertia::render('Subscriptions/Plans', [
             'plans' => [],
             'serviceItems' => $serviceItems,
@@ -109,7 +106,6 @@ class SubscriptionController extends Controller
             'walletBalance' => (float) $user->available_balance(),
             'currency' => $currencyCode,
             'proratedRefund' => (float) $proratedRefund,
-            'isEligibleForTrial' => $isEligibleForTrial,
         ]);
     }
 
@@ -356,75 +352,6 @@ class SubscriptionController extends Controller
         }
     }
 
-    public function startTrial(Request $request)
-    {
-        $user = Auth::user();
-
-        // Ensure they are eligible
-        $hasAnySubscription = \App\Models\UserSubscription::where('user_id', $user->id)->exists();
-        if ($hasAnySubscription) {
-            return back()->withErrors(['error' => 'You have already used your free trial.']);
-        }
-
-        $request->validate([
-            'items' => 'required|array',
-            'is_new_system' => 'nullable|boolean',
-        ]);
-
-        $this->validateAddonParents($request->items, $user);
-        $isNewSystem = $request->input('is_new_system', true);
-
-        try {
-            DB::transaction(function () use ($user, $isNewSystem, $request) {
-                $userTenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
-                if ($isNewSystem && !$userTenant) {
-                    $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
-                    $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
-
-                    $tenantName = explode(' ', $user->name)[0] . ' Workspace ' . substr(uniqid(), -4);
-                    $tenant = \Modules\ERP\Models\Tenant::create([
-                        'user_id' => $user->id,
-                        'name' => $tenantName,
-                        'status' => 'active',
-                        'base_currency_id' => $user->currency_id ?: $usdCurrencyId,
-                    ]);
-                    $userTenant = $tenant;
-                }
-
-                // Create subscriptions for each selected item
-                if (isset($request->items) && is_array($request->items)) {
-                    foreach ($request->items as $item) {
-                        if (str_starts_with($item, 'tool')) continue; // Tools are not eligible for free trial
-                        
-                        $expiry = \Carbon\Carbon::now()->addDays(14);
-
-                        \App\Models\UserSubscription::create([
-                            'user_id' => $user->id,
-                            'object' => $item,
-                            'status' => 'active',
-                            'started_at' => now(),
-                            'expires_at' => $expiry,
-                            'auto_renew' => false
-                        ]);
-
-                        if ($userTenant) {
-                            \App\Models\TenantFeature::create([
-                                'tenant_id' => $userTenant->id,
-                                'feature_key' => $item,
-                                'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : (str_starts_with($item, 'tool') ? 'tools' : 'booking')),
-                                'expires_at' => $expiry
-                            ]);
-                        }
-                    }
-                }
-            });
-
-            return redirect()->route('subscriptions.manage')->with('success', __('general.your_14_day_free_trial_has_started'));
-        } catch (\Exception $e) {
-            Log::error('Trial start failed: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'An error occurred: ' . $e->getMessage()]);
-        }
-    }
 
     public function subscribeCustom(Request $request)
     {
