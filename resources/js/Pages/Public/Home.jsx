@@ -185,75 +185,103 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {/* 1. ERP */}
-                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-300">
-                            <div className="w-14 h-14 bg-slate-50 group-hover:bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300">
-                                <Server className="w-7 h-7 text-slate-700 group-hover:text-emerald-600 transition-colors duration-300" />
+                        {/* 1. ERP - Spans 2 columns & 2 rows on large screens */}
+                        <div className="group bg-white rounded-3xl p-10 border border-slate-200 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-500 md:col-span-2 md:row-span-2 relative overflow-hidden">
+                            <div className="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-all duration-500"></div>
+                            <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
+                                <Server className="w-8 h-8 text-emerald-600" />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_erp_title')}</h3>
-                            <p className="text-slate-600 leading-relaxed text-sm">
+                            <h3 className="text-3xl font-bold text-slate-900 mb-4">{__('general.module_erp_title')}</h3>
+                            <p className="text-slate-600 leading-relaxed text-lg max-w-md">
                                 {__('general.module_erp_desc')}
                             </p>
+                            <div className="mt-8 pt-8 border-t border-slate-100 grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="font-semibold text-slate-900 mb-1">Invoicing & Billing</p>
+                                    <p className="text-sm text-slate-500">Multi-currency financial tracking</p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-slate-900 mb-1">Project Management</p>
+                                    <p className="text-sm text-slate-500">Timers, tasks, and team collaboration</p>
+                                </div>
+                            </div>
                         </div>
+
                         {/* 2. CRM */}
-                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-300">
-                            <div className="w-14 h-14 bg-slate-50 group-hover:bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300">
-                                <Users className="w-7 h-7 text-slate-700 group-hover:text-emerald-600 transition-colors duration-300" />
+                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-500 relative overflow-hidden">
+                            <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-all duration-500"></div>
+                            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                                <Users className="w-7 h-7 text-blue-600" />
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_crm_title')}</h3>
-                            <p className="text-slate-600 leading-relaxed text-sm">
+                            <p className="text-slate-600 leading-relaxed text-sm relative z-10">
                                 {__('general.module_crm_desc')}
                             </p>
                         </div>
+
                         {/* 3. SMS Gateway */}
-                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-300">
-                            <div className="w-14 h-14 bg-slate-50 group-hover:bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300">
-                                <MessageSquare className="w-7 h-7 text-slate-700 group-hover:text-emerald-600 transition-colors duration-300" />
+                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-indigo-500/50 hover:shadow-2xl hover:shadow-indigo-900/5 transition-all duration-500 relative overflow-hidden">
+                            <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all duration-500"></div>
+                            <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                                <MessageSquare className="w-7 h-7 text-indigo-600" />
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_sms_title')}</h3>
-                            <p className="text-slate-600 leading-relaxed text-sm">
+                            <p className="text-slate-600 leading-relaxed text-sm relative z-10">
                                 {__('general.module_sms_desc')}
                             </p>
                         </div>
+
                         {/* 4. Gold Saver */}
-                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-300">
-                            <div className="w-14 h-14 bg-slate-50 group-hover:bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300">
-                                <TrendingUp className="w-7 h-7 text-slate-700 group-hover:text-emerald-600 transition-colors duration-300" />
+                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-amber-500/50 hover:shadow-2xl hover:shadow-amber-900/5 transition-all duration-500 relative overflow-hidden xl:row-span-2">
+                            <div className="absolute top-0 right-0 w-full h-32 bg-gradient-to-b from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                                <TrendingUp className="w-7 h-7 text-amber-600" />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_gold_title')}</h3>
-                            <p className="text-slate-600 leading-relaxed text-sm">
+                            <h3 className="text-xl font-bold text-slate-900 mb-3 relative z-10">{__('general.module_gold_title')}</h3>
+                            <p className="text-slate-600 leading-relaxed text-sm relative z-10">
                                 {__('general.module_gold_desc')}
                             </p>
                         </div>
+
                         {/* 5. Booking */}
-                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-300">
-                            <div className="w-14 h-14 bg-slate-50 group-hover:bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300">
-                                <Calendar className="w-7 h-7 text-slate-700 group-hover:text-emerald-600 transition-colors duration-300" />
+                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-rose-500/50 hover:shadow-2xl hover:shadow-rose-900/5 transition-all duration-500 relative overflow-hidden">
+                            <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                                <Calendar className="w-7 h-7 text-rose-600" />
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_booking_title')}</h3>
                             <p className="text-slate-600 leading-relaxed text-sm">
                                 {__('general.module_booking_desc')}
                             </p>
                         </div>
+
                         {/* 6. POS */}
-                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-300">
-                            <div className="w-14 h-14 bg-slate-50 group-hover:bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300">
-                                <Store className="w-7 h-7 text-slate-700 group-hover:text-emerald-600 transition-colors duration-300" />
+                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-teal-500/50 hover:shadow-2xl hover:shadow-teal-900/5 transition-all duration-500 relative overflow-hidden">
+                            <div className="w-14 h-14 bg-teal-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                                <Store className="w-7 h-7 text-teal-600" />
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_pos_title')}</h3>
                             <p className="text-slate-600 leading-relaxed text-sm">
                                 {__('general.module_pos_desc')}
                             </p>
                         </div>
+
                         {/* 7. Tools & Addons */}
-                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-300 lg:col-span-2 xl:col-span-2">
-                            <div className="w-14 h-14 bg-slate-50 group-hover:bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300">
-                                <Wrench className="w-7 h-7 text-slate-700 group-hover:text-emerald-600 transition-colors duration-300" />
+                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-violet-500/50 hover:shadow-2xl hover:shadow-violet-900/5 transition-all duration-500 md:col-span-2 xl:col-span-3 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center gap-8">
+                            <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-violet-500/5 rounded-full blur-3xl group-hover:bg-violet-500/10 transition-all duration-500"></div>
+                            <div className="flex-1 relative z-10">
+                                <div className="w-14 h-14 bg-violet-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                                    <Wrench className="w-7 h-7 text-violet-600" />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_tools_title')}</h3>
+                                <p className="text-slate-600 leading-relaxed text-sm">
+                                    {__('general.module_tools_desc')}
+                                </p>
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_tools_title')}</h3>
-                            <p className="text-slate-600 leading-relaxed text-sm">
-                                {__('general.module_tools_desc')}
-                            </p>
+                            <div className="flex gap-4 opacity-50 group-hover:opacity-100 transition-opacity duration-500 relative z-10">
+                                <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center shadow-sm"><Download className="w-5 h-5 text-slate-500" /></div>
+                                <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center shadow-sm"><MessageCircle className="w-5 h-5 text-slate-500" /></div>
+                                <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center shadow-sm"><Search className="w-5 h-5 text-slate-500" /></div>
+                            </div>
                         </div>
                     </div>
                 </div>

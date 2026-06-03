@@ -42,7 +42,7 @@ export default function Portfolio() {
     return (
         <PublicLayout>
             <Head>
-                <title>{__('general.landing_portfolio_title')} | {__('general.musoftware_unified_workspace') || 'Musoftware'}</title>
+                <title>{`${__('general.landing_portfolio_title')} | ${__('general.musoftware_unified_workspace') || 'Musoftware'}`}</title>
                 <meta name="description" content={__('general.landing_portfolio_desc')} />
             </Head>
 
