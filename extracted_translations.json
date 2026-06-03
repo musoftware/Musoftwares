@@ -1,0 +1,226 @@
+{
+    "portfolio_kbdny_title": {
+        "en": "Kbdny Affiliate",
+        "ar": ""
+    },
+    "portfolio_kbdny_desc": {
+        "en": "Multi-vendor affiliate platform with real-time commission tracking and payouts.",
+        "ar": ""
+    },
+    "portfolio_stock_manager_title": {
+        "en": "Stock Manager",
+        "ar": ""
+    },
+    "portfolio_stock_manager_desc": {
+        "en": "Inventory and POS system with multi-location support and KPI reporting.",
+        "ar": ""
+    },
+    "portfolio_mini_fatora_title": {
+        "en": "Mini Fatora",
+        "ar": ""
+    },
+    "portfolio_mini_fatora_desc": {
+        "en": "Online invoicing and billing SaaS for freelancers and small businesses.",
+        "ar": ""
+    },
+    "portfolio_vodafone_crm_title": {
+        "en": "Vodafone CRM",
+        "ar": ""
+    },
+    "portfolio_vodafone_crm_desc": {
+        "en": "Custom CRM and operations management system for Vodafone Egypt distributor.",
+        "ar": ""
+    },
+    "portfolio_amc_academy_desc": {
+        "en": "Full e-learning platform with student portals, scheduling, and assessments.",
+        "ar": ""
+    },
+    "portfolio_project_manager_desc": {
+        "en": "Internal project and team management tool with task boards and timelines.",
+        "ar": ""
+    },
+    "portfolio_telecom_system_title": {
+        "en": "Telecom System",
+        "ar": ""
+    },
+    "portfolio_telecom_system_desc": {
+        "en": "B2B recharge and ISP management platform with automated billing.",
+        "ar": ""
+    },
+    "portfolio_altayaraa_title": {
+        "en": "Altayaraa",
+        "ar": ""
+    },
+    "portfolio_altayaraa_desc": {
+        "en": "Arabic e-commerce and product listing platform with vendor management.",
+        "ar": ""
+    },
+    "portfolio_forex_app_title": {
+        "en": "Forex App",
+        "ar": ""
+    },
+    "portfolio_forex_app_desc": {
+        "en": "Mobile companion for algorithmic trading with market signals and alerts.",
+        "ar": ""
+    },
+    "portfolio_amc_social_desc": {
+        "en": "Internal social platform for AMC Academy students with posts and events.",
+        "ar": ""
+    },
+    "portfolio_nokhpa_title": {
+        "en": "Nokhpa",
+        "ar": ""
+    },
+    "portfolio_nokhpa_desc": {
+        "en": "E-commerce mobile app with native checkout, order tracking, and product filtering.",
+        "ar": ""
+    },
+    "portfolio_duplicate_finder_title": {
+        "en": "Duplicate Finder",
+        "ar": ""
+    },
+    "portfolio_duplicate_finder_desc": {
+        "en": "File indexing and duplicate detection for Windows. Fast scan, SHA comparison.",
+        "ar": ""
+    },
+    "portfolio_map_extractor_title": {
+        "en": "Map Extractor",
+        "ar": ""
+    },
+    "portfolio_map_extractor_desc": {
+        "en": "Business leads extraction tool with filtering and export capabilities.",
+        "ar": ""
+    },
+    "portfolio_instagram_manager_title": {
+        "en": "Instagram Manager",
+        "ar": ""
+    },
+    "portfolio_instagram_manager_desc": {
+        "en": "Desktop automation suite for account management and content scheduling.",
+        "ar": ""
+    },
+    "portfolio_whatsapp_sender_title": {
+        "en": "WhatsApp Sender",
+        "ar": ""
+    },
+    "portfolio_whatsapp_sender_desc": {
+        "en": "Bulk WhatsApp messaging tool with scheduling, templates, and contact lists.",
+        "ar": ""
+    },
+    "portfolio_telegram_sender_title": {
+        "en": "Telegram Sender",
+        "ar": ""
+    },
+    "portfolio_telegram_sender_desc": {
+        "en": "Automated Telegram broadcast tool with group\/channel targeting and scheduling.",
+        "ar": ""
+    },
+    "portfolio_inbox_sender_title": {
+        "en": "Inbox Sender",
+        "ar": ""
+    },
+    "portfolio_inbox_sender_desc": {
+        "en": "Email bulk sending system with SMTP rotation and delivery rate optimization.",
+        "ar": ""
+    },
+    "portfolio_heic_converter_title": {
+        "en": "HEIC Converter",
+        "ar": ""
+    },
+    "portfolio_heic_converter_desc": {
+        "en": "Batch HEIC to JPG\/PNG converter for Windows with drag-and-drop interface.",
+        "ar": ""
+    },
+    "portfolio_text_studio_title": {
+        "en": "Text Studio",
+        "ar": ""
+    },
+    "portfolio_text_studio_desc": {
+        "en": "Advanced text editor with scripting, formatting, and automation tools.",
+        "ar": ""
+    },
+    "portfolio_amc_tasks_downloader_desc": {
+        "en": "Desktop companion for file and task synchronization with the AMC platform.",
+        "ar": ""
+    },
+    "portfolio_stocktalk_ai_title": {
+        "en": "StockTalk AI",
+        "ar": ""
+    },
+    "portfolio_stocktalk_ai_desc": {
+        "en": "WhatsApp-based AI customer support agent for automated stock and order queries.",
+        "ar": ""
+    },
+    "portfolio_forex_bot_title": {
+        "en": "Forex Bot",
+        "ar": ""
+    },
+    "portfolio_forex_bot_desc": {
+        "en": "Algorithmic trading bot with adaptive strategy, signal processing, and execution.",
+        "ar": ""
+    },
+    "portfolio_revflow_title": {
+        "en": "RevFlow",
+        "ar": ""
+    },
+    "portfolio_revflow_desc": {
+        "en": "Revenue automation system integrating payment gateways and subscription flows.",
+        "ar": ""
+    },
+    "portfolio_chartcash_title": {
+        "en": "ChartCash",
+        "ar": ""
+    },
+    "portfolio_chartcash_desc": {
+        "en": "Financial analytics dashboard with real-time charts, KPIs, and P&L tracking.",
+        "ar": ""
+    },
+    "portfolio_fb_id_extractor_title": {
+        "en": "FB ID Extractor",
+        "ar": ""
+    },
+    "portfolio_fb_id_extractor_desc": {
+        "en": "Chrome extension for bulk Facebook group member ID extraction and export.",
+        "ar": ""
+    },
+    "portfolio_khamsat_notifier_title": {
+        "en": "Khamsat Notifier",
+        "ar": ""
+    },
+    "portfolio_khamsat_notifier_desc": {
+        "en": "Browser extension for real-time order notifications on Khamsat marketplace.",
+        "ar": ""
+    },
+    "portfolio_am_email_controls_desc": {
+        "en": "Gmail\/Outlook extension for bulk email management and inbox automation.",
+        "ar": ""
+    },
+    "portfolio_amc_tasks_desc": {
+        "en": "Enterprise task management platform for academy operations. Laravel + Livewire.",
+        "ar": ""
+    },
+    "portfolio_amc_tasks": {
+        "en": "AMC Tasks",
+        "ar": ""
+    },
+    "portfolio_amc_academy": {
+        "en": "AMC Academy",
+        "ar": ""
+    },
+    "portfolio_amc_social": {
+        "en": "AMC Social",
+        "ar": ""
+    },
+    "portfolio_amc_tasks_downloader": {
+        "en": "AMC Tasks Downloader",
+        "ar": ""
+    },
+    "portfolio_am_email_controls": {
+        "en": "AM Email Controls",
+        "ar": ""
+    },
+    "portfolio_project_manager": {
+        "en": "Project Manager",
+        "ar": ""
+    }
+}
