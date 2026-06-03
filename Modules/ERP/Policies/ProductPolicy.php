@@ -14,20 +14,10 @@ class ProductPolicy
 
     protected function getTenant(User $user)
     {
-        $tenantUser = $user;
-        if (Auth::guard('erp_team')->check()) {
-            $tenantUser = Auth::guard('erp_team')->user()->tenant->user ?? $user;
-        }
-
-        if (!$tenantUser || !$tenantUser->hasModuleSubscription('erp-inventory')) {
+        $tenant = $user->tenant;
+        if (!$tenant || !$user->hasModuleSubscription('erp-inventory')) {
             return null;
         }
-
-        $tenant = Tenant::where('user_id', $tenantUser->id)->first();
-        if (!$tenant && Auth::guard('erp_team')->check()) {
-            $tenant = Auth::guard('erp_team')->user()->tenant;
-        }
-        
         return $tenant;
     }
 

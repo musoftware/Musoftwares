@@ -17,6 +17,8 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import { Button } from '@/Components/ui/button';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { ClientActionModal } from './Components/ClientActionModal';
+import { usePage } from '@inertiajs/react';
 
 interface Props {
     clients: any;
@@ -27,6 +29,14 @@ interface Props {
 
 export default function Index({ clients, filters, stats, tenant }: Props) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('clients', { tenantId: tenant?.id?.toString() });
+    const { auth } = usePage().props as any;
+    const [actionModalClient, setActionModalClient] = React.useState<any | null>(null);
+
+    const handleDeleteClient = (client: any) => {
+        if (confirm(__('general.are_you_sure_you_want_to_delete_this_client'))) {
+            router.delete(route('erp.clients.destroy', client.id), { preserveScroll: true });
+        }
+    };
 
     const handleSearch = (search: string) => {
         router.get(
@@ -125,29 +135,12 @@ export default function Index({ clients, filters, stats, tenant }: Props) {
             label: '',
             className: 'w-[80px] text-right',
             render: (client: any) => (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">{__('general.open_menu')}</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuGroup>
-                            <DropdownMenuLabel>{__('general.actions')}</DropdownMenuLabel>
-                            <DropdownMenuItem asChild>
-                                <Link href={route('erp.clients.show', client.id)}>
-                                    <Eye className="mr-2 h-4 w-4" />{__('general.view_profile')}
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href={route('erp.clients.edit', client.id)}>
-                                    <Edit className="mr-2 h-4 w-4" />{__('general.edit_client')}
-                                </Link>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <button
+                    onClick={() => setActionModalClient(client)}
+                    className="p-1.5 hover:bg-slate-100 rounded-md text-slate-500 transition"
+                >
+                    <MoreHorizontal className="h-4 w-4" />
+                </button>
             ),
         },
     ];
@@ -223,6 +216,14 @@ export default function Index({ clients, filters, stats, tenant }: Props) {
                     emptyDescription={__('general.try_adjusting_your_search_filters')}
                 />
             </div>
+
+            <ClientActionModal
+                client={actionModalClient}
+                isOpen={!!actionModalClient}
+                onClose={() => setActionModalClient(null)}
+                onDelete={handleDeleteClient}
+                auth={auth}
+            />
         </ERPLayout>
     );
 }

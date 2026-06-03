@@ -50,19 +50,11 @@ class TaskController extends Controller implements HasMiddleware
         ];
     }
 
-    private function resolveTenant(): Tenant
-    {
-        if (Auth::guard('erp_team')->check()) {
-            return Auth::guard('erp_team')->user()->tenant;
-        }
-        return Tenant::where('user_id', Auth::id())->firstOrFail();
-    }
-
     // ── Task Board CRUD ──────────────────────────────────────────────
 
     public function index(Request $request)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
 
         $query = ERPTask::where('tenant_id', $tenant->id)
             ->with(['client', 'project', 'creator'])
@@ -91,7 +83,7 @@ class TaskController extends Controller implements HasMiddleware
 
     public function asList(Request $request)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
 
         $todos = ERPTodoItem::query()
             ->where('tenant_id', $tenant->id)
@@ -156,7 +148,7 @@ class TaskController extends Controller implements HasMiddleware
 
     public function show(ERPTask $task)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
         if ($task->tenant_id !== $tenant->id) {
             abort(403, __('general.unauthorized_access_to_task'));
         }
@@ -193,7 +185,7 @@ class TaskController extends Controller implements HasMiddleware
             'due_date'        => 'nullable|date',
         ]);
         
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
 
         // Ensure the client and project belong to the tenant
         if (!empty($validated['client_id'])) {
@@ -229,7 +221,7 @@ class TaskController extends Controller implements HasMiddleware
 
     public function update(Request $request, ERPTask $task)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
         if ($task->tenant_id !== $tenant->id) {
             abort(403, __('general.unauthorized_access_to_task'));
         }
@@ -258,7 +250,7 @@ class TaskController extends Controller implements HasMiddleware
 
     public function archive(ERPTask $task)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
         if ($task->tenant_id !== $tenant->id) {
             abort(403, __('general.unauthorized_access_to_task'));
         }
@@ -269,7 +261,7 @@ class TaskController extends Controller implements HasMiddleware
 
     public function unarchive(ERPTask $task)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
         if ($task->tenant_id !== $tenant->id) {
             abort(403, __('general.unauthorized_access_to_task'));
         }
@@ -280,7 +272,7 @@ class TaskController extends Controller implements HasMiddleware
 
     public function destroy(ERPTask $task)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
         if ($task->tenant_id !== $tenant->id) {
             abort(403, __('general.unauthorized_access_to_task'));
         }
@@ -297,7 +289,7 @@ class TaskController extends Controller implements HasMiddleware
      */
     public function storeItem(Request $request, ERPTask $task)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
         if ($task->tenant_id !== $tenant->id) {
             abort(403, __('general.unauthorized_access_to_task'));
         }
@@ -338,7 +330,7 @@ class TaskController extends Controller implements HasMiddleware
      */
     public function updateItem(Request $request, ERPTask $task, ERPTodoItem $item)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
         if ($task->tenant_id !== $tenant->id || $item->task_id !== $task->id) {
             abort(403, __('general.unauthorized_access'));
         }
@@ -366,7 +358,7 @@ class TaskController extends Controller implements HasMiddleware
      */
     public function completeItem(Request $request, ERPTask $task, ERPTodoItem $item)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
         if ($task->tenant_id !== $tenant->id || $item->task_id !== $task->id) {
             abort(403, __('general.unauthorized_access'));
         }
@@ -392,7 +384,7 @@ class TaskController extends Controller implements HasMiddleware
      */
     public function sortItems(Request $request, ERPTask $task)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
         if ($task->tenant_id !== $tenant->id) {
             abort(403, __('general.unauthorized_access'));
         }
@@ -415,7 +407,7 @@ class TaskController extends Controller implements HasMiddleware
      */
     public function pauseItem(ERPTask $task, ERPTodoItem $item)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
         if ($task->tenant_id !== $tenant->id || $item->task_id !== $task->id) {
             abort(403, __('general.unauthorized_access'));
         }
@@ -430,7 +422,7 @@ class TaskController extends Controller implements HasMiddleware
      */
     public function resumeItem(ERPTask $task, ERPTodoItem $item)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
         if ($task->tenant_id !== $tenant->id || $item->task_id !== $task->id) {
             abort(403, __('general.unauthorized_access'));
         }
@@ -445,7 +437,7 @@ class TaskController extends Controller implements HasMiddleware
      */
     public function destroyItem(ERPTask $task, ERPTodoItem $item)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
         if ($task->tenant_id !== $tenant->id || $item->task_id !== $task->id) {
             abort(403, __('general.unauthorized_access'));
         }

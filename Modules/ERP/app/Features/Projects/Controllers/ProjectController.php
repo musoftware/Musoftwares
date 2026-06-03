@@ -49,9 +49,7 @@ class ProjectController extends Controller implements HasMiddleware
 
     public function store(Request $request)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->first();
-        
+        $tenant = $request->user()->tenant;
         if (!$tenant) {
             return back()->withErrors(['error' => __('errors.no_active_workspace')]);
         }
@@ -89,12 +87,7 @@ class ProjectController extends Controller implements HasMiddleware
 
     public function edit(Project $project)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
-
-        if ($project->tenant_id !== $tenant->id) {
-            abort(403, __('errors.unauthorized_project'));
-        }
+        $this->authorize('update', $project);
 
         // Only load the client associated with the project to pre-fill the combobox
         $clients = TenantClient::where('id', $project->client_id)->get(['id', 'name']);
@@ -110,13 +103,8 @@ class ProjectController extends Controller implements HasMiddleware
      */
     public function update(Request $request, Project $project)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->first();
-
-        // Ensure user owns this project via tenant
-        if (!$tenant || $project->tenant_id !== $tenant->id) {
-            abort(403, __('errors.unauthorized_project'));
-        }
+        $this->authorize('update', $project);
+        $tenant = $request->user()->tenant;
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -152,12 +140,7 @@ class ProjectController extends Controller implements HasMiddleware
      */
     public function destroy(Project $project)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->first();
-
-        if (!$tenant || $project->tenant_id !== $tenant->id) {
-            abort(403, __('errors.unauthorized_project'));
-        }
+        $this->authorize('delete', $project);
 
         $name = $project->name;
         $project->delete();
@@ -177,12 +160,7 @@ class ProjectController extends Controller implements HasMiddleware
      */
     public function show(Project $project)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
-
-        if ($project->tenant_id !== $tenant->id) {
-            abort(403, __('errors.unauthorized_project'));
-        }
+        $this->authorize('update', $project);
 
         // Get tenant base currency
         $currency = \App\Models\Currency::find($tenant->base_currency_id);

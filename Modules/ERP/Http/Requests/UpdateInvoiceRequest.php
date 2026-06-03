@@ -11,9 +11,7 @@ class UpdateInvoiceRequest extends FormRequest
 {
     public function authorize()
     {
-        $invoice = $this->route('invoice');
-        if (!$invoice) return false;
-        return $invoice->tenant_id === $this->user()->tenant->id ?? null;
+        return true;
     }
 
     public function rules()

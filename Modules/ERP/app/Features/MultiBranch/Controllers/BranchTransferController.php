@@ -18,27 +18,17 @@ class BranchTransferController extends Controller
     {
         $this->transferService = $transferService;
     }
-
-    protected function getTenantAndCheckAccess() {
-        $user = Auth::user();
-        if (Auth::guard('erp_team')->check()) {
-            $tenant = Auth::guard('erp_team')->user()->tenant;
-            $ownerUser = $tenant?->user;
-        } else {
-            $tenant = Tenant::where('user_id', $user?->id)->first();
-            $ownerUser = $user;
-        }
-
-        if (!$ownerUser || !$ownerUser->hasModuleSubscription('erp-multi-branch')) {
+    protected function getTenantAndCheckAccess(Request $request) {
+        $user = $request->user();
+        if (!$user->hasModuleSubscription('erp-multi-branch')) {
             abort(403, __('erp.unauthorized_multi_branch'));
         }
-
-        return $tenant->id;
+        return $user->tenant->id;
     }
 
     public function index(Request $request)
     {
-        $tenantId = $this->getTenantAndCheckAccess();
+        $tenantId = $this->getTenantAndCheckAccess($request);
         $transfers = BranchTransfer::where('tenant_id', $tenantId)->latest()->get();
 
         $branches = \Modules\ERP\Models\Branch::where('tenant_id', $tenantId)->get();
@@ -55,7 +45,7 @@ class BranchTransferController extends Controller
 
     public function store(Request $request, $branchId)
     {
-        $tenantId = $this->getTenantAndCheckAccess();
+        $tenantId = $this->getTenantAndCheckAccess($request);
 
         $validated = $request->validate([
             'to_branch_id' => 'required|exists:erp_branches,id',

@@ -2,6 +2,7 @@ import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { MouseEvent as ReactMouseEvent, useRef, useState } from 'react';
 import { __ } from '@/lib/i18n';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Browse({ services, categories, filters }: any) {
     const [search, setSearch] = useState(filters.search || '');
@@ -129,19 +130,15 @@ export default function Browse({ services, categories, filters }: any) {
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                         {(services.data as any).map((service: any) => {
-                            // Determine starting price from packages
-                            const startingPrice =
+                            // Determine starting price package
+                            const startingPackage =
                                 service.packages && service.packages.length > 0
-                                    ? Math.min(
-                                          ...service.packages.map((p: any) =>
-                                              Number(p.price),
-                                          ),
-                                      )
+                                    ? service.packages.reduce((min: any, p: any) => Number(p.price) < Number(min.price) ? p : min, service.packages[0])
                                     : null;
 
                             // Use actual rating
-                            const rating = service.average_rating ? Number(service.average_rating).toFixed(1) : '0.0';
-                            const reviewsCount = service.reviews_count || '0';
+                            const rating = service.avg_rating ? Number(service.avg_rating).toFixed(1) : '0.0';
+                            const reviewsCount = service.review_count || '0';
 
                             return (
                                 <Link
@@ -165,7 +162,9 @@ export default function Browse({ services, categories, filters }: any) {
                                                 />
                                             ) : (
                                                 <div className="flex h-full w-full items-center justify-center bg-gray-100 text-gray-400 transition-transform duration-500 group-hover:scale-105">
-                                                    [Cover Image]
+                                                    <svg className="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
                                                 </div>
                                             )}
                                             {service.is_featured && (
@@ -207,7 +206,7 @@ export default function Browse({ services, categories, filters }: any) {
                                             </h3>
 
                                             {/* Rating */}
-                                            {service.average_rating > 0 && (
+                                            {service.avg_rating > 0 && (
                                                 <div className="mt-3 flex items-center gap-1 text-amber-500">
                                                     <svg
                                                         className="h-4 w-4"
@@ -246,7 +245,7 @@ export default function Browse({ services, categories, filters }: any) {
                                             <div className="text-right">
                                                 <span className="text-xs font-medium tracking-wider text-gray-500 uppercase">{__('general.starting_at')}</span>
                                                 <span className="block text-lg font-bold text-gray-900">
-                                                    ${startingPrice || 25}
+                                                    {startingPackage ? formatCurrency(startingPackage.price, startingPackage.currency) : '--'}
                                                 </span>
                                             </div>
                                         </div>

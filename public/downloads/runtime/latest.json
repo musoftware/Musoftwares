@@ -1,31 +1,31 @@
-{
-  "version": "1.0.0",
-  "latest": "1.0.0",
-  "minimum_supported": "1.0.0",
-  "channel": "stable",
-  "released_at": "2026-05-25",
-  "downloads": {
-    "windows": "/downloads/runtime/windows/musoftware-runtime-win.exe",
-    "macos": "/downloads/runtime/macos/musoftware-runtime-mac",
-    "linux": "/downloads/runtime/linux/musoftware-runtime-linux"
-  },
-  "changelog": [
-    {
-      "version": "1.1.0",
-      "date": "2025-05-19",
-      "notes": [
-        "Plugin versioning + compatibility matrix",
-        "Improved crash recovery and auto-restart",
-        "SQLite task history with log persistence",
-        "Runtime update broadcast via WebSocket"
-      ]
-    },
-    {
-      "version": "1.0.0",
-      "date": "2025-05-19",
-      "notes": [
-        "Initial release — unified Node.js + Python runtime"
-      ]
-    }
-  ]
+﻿{
+    "version":  "2026.06.03.0",
+    "latest":  "2026.06.03.0",
+    "minimum_supported":  "1.0.0",
+    "channel":  "stable",
+    "released_at":  "2026-06-03",
+    "downloads":  {
+                      "windows":  "/downloads/runtime/windows/musoftware-runtime-win.exe",
+                      "macos":  "/downloads/runtime/macos/musoftware-runtime-mac",
+                      "linux":  "/downloads/runtime/linux/musoftware-runtime-linux"
+                  },
+    "changelog":  [
+                      {
+                          "version":  "1.1.0",
+                          "date":  "2025-05-19",
+                          "notes":  [
+                                        "Plugin versioning + compatibility matrix",
+                                        "Improved crash recovery and auto-restart",
+                                        "SQLite task history with log persistence",
+                                        "Runtime update broadcast via WebSocket"
+                                    ]
+                      },
+                      {
+                          "version":  "1.0.0",
+                          "date":  "2025-05-19",
+                          "notes":  [
+                                        "Initial release â€” unified Node.js + Python runtime"
+                                    ]
+                      }
+                  ]
 }

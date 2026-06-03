@@ -37,16 +37,11 @@ class CalendarController extends Controller implements HasMiddleware
 
     public function index(Request $request)
     {
-        $tenant = $this->resolveTenant();
+        $tenant = $request->user()->tenant;
 
         // Let's gather events from Tasks and Invoices
         $events = collect();
-
-        // If user also has tasks addon, fetch task deadlines
-        $user = Auth::user();
-        if (Auth::guard('erp_team')->check()) {
-            $user = Auth::guard('erp_team')->user()->tenant->user;
-        }
+        $user = $request->user();
 
         if ($user->hasModuleSubscription('erp-tasks')) {
             $tasks = ERPTask::where('tenant_id', $tenant->id)
@@ -108,13 +103,5 @@ class CalendarController extends Controller implements HasMiddleware
         return Inertia::render('ERP/Calendar/Index', [
             'events' => $events->values()->toArray(),
         ]);
-    }
-
-    private function resolveTenant(): Tenant
-    {
-        if (Auth::guard('erp_team')->check()) {
-            return Auth::guard('erp_team')->user()->tenant;
-        }
-        return Tenant::where('user_id', Auth::id())->firstOrFail();
     }
 }

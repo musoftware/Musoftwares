@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage, useForm } from '@inertiajs/react';
 import { 
     Wallet, FileText, ArrowUpRight, Clock, CheckCircle2, 
-    Sparkles, Plus, CreditCard, Inbox, Settings, Activity, ArrowRight, LayoutDashboard, History, Calendar, Layers
+    Sparkles, Plus, CreditCard, Inbox, Settings, Activity, ArrowRight, LayoutDashboard, History, Calendar, Layers, MonitorPlay
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { cn, formatMoney } from '@/lib/utils';
@@ -294,6 +294,25 @@ export default function Dashboard({
                                 <Link href={safeRoute('financial.transactions', undefined, '/financial/transactions')} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors group">
                                     <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Transactions</span>
                                     <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-900" />
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Action Card 4: Runtime App */}
+                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col h-full hover:shadow-md transition-shadow">
+                        <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center mb-4">
+                            <MonitorPlay className="w-5 h-5 text-indigo-700" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-slate-900 mb-1">{__('general.musoftware_runtime')}</h3>
+                            <p className="text-sm text-slate-500 leading-relaxed mb-4">{__('general.download_the_desktop_runtime_to_use_local_plugins_and_integrations')}</p>
+                        </div>
+                        <div className="mt-auto pt-4">
+                            <div className="flex flex-col gap-2">
+                                <Link href={safeRoute('runtime.download', undefined, '/runtime/download')} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-100 hover:border-indigo-500 hover:bg-indigo-50 transition-colors group">
+                                    <span className="text-sm font-medium text-slate-700 group-hover:text-indigo-700">{__('general.download_runtime')}</span>
+                                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-700" />
                                 </Link>
                             </div>
                         </div>

@@ -11,7 +11,7 @@ class StoreInvoiceRequest extends FormRequest
 {
     public function authorize()
     {
-        return true; // Handled by policy/controller
+        return true;
     }
 
     public function rules()

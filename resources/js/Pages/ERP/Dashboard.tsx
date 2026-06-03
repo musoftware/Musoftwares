@@ -67,6 +67,7 @@ import { DataTable } from '@/Components/ui/DataTable';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { MetricCard } from '@/Components/ui/MetricCard';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
+import { ClientActionModal } from './Clients/Components/ClientActionModal';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { ActivityTimeline } from '@/Components/ui/ActivityTimeline';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
@@ -1328,78 +1329,16 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                 </OperationalCard>
 
                                 {/* Client Action Modal */}
-                                <Dialog open={!!actionModalClient} onOpenChange={(open) => !open && setActionModalClient(null)}>
-                                    <DialogContent className="sm:max-w-lg">
-                                        <DialogHeader>
-                                            <DialogTitle className="flex items-center gap-3">
-                                                <div className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 text-slate-700 text-sm font-bold">
-                                                    {actionModalClient?.name?.substring(0, 2)?.toUpperCase()}
-                                                </div>
-                                                <div>
-                                                    <span className="block">{actionModalClient?.name}</span>
-                                                    <span className="text-xs font-normal text-slate-400">{actionModalClient?.email}</span>
-                                                </div>
-                                            </DialogTitle>
-                                        </DialogHeader>
-
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
-                                            {/* Finance Column */}
-                                            <div>
-                                                <h4 className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-3 px-1">Finance</h4>
-                                                <div className="space-y-0.5">
-                                                    {[
-                                                        { icon: FileText, label: 'New Invoice', color: 'text-slate-600', href: route('erp.invoices.create') + '?client_id=' + actionModalClient?.id },
-                                                        { icon: ArrowDownLeft, label: 'Receive Money', color: 'text-emerald-600', href: route('erp.clients.wallet.adjust', actionModalClient?.id || 0) + '?type=credit' },
-                                                        { icon: ArrowUpRight, label: 'Send Money', color: 'text-amber-600', href: route('erp.clients.wallet.adjust', actionModalClient?.id || 0) + '?type=debit' },
-                                                        { icon: RotateCcw, label: 'Refund', color: 'text-blue-600', href: route('erp.clients.wallet.adjust', actionModalClient?.id || 0) + '?type=refund' },
-                                                        { icon: Receipt, label: 'All Invoices', color: 'text-slate-600', href: route('erp.invoices.index') + '?search=' + encodeURIComponent(actionModalClient?.name || '') },
-                                                        { icon: Wallet, label: 'Transactions', color: 'text-slate-600', href: route('erp.clients.wallet.index', actionModalClient?.id || 0) },
-                                                    ].map((item) => (
-                                                        <Link
-                                                            key={item.label}
-                                                            href={item.href}
-                                                            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] text-slate-700 hover:bg-slate-50 transition-colors group"
-                                                        >
-                                                            <item.icon className={`h-4 w-4 ${item.color} shrink-0`} />
-                                                            <span className="group-hover:translate-x-0.5 transition-transform">{item.label}</span>
-                                                        </Link>
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            {/* Manage Column */}
-                                            <div>
-                                                <h4 className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-3 px-1">Account</h4>
-                                                <div className="space-y-0.5">
-                                                    {[
-                                                        { icon: Eye, label: 'View Profile', color: 'text-slate-600', href: route('erp.clients.show', actionModalClient?.id || 0) },
-                                                        { icon: Edit2, label: 'Edit Client', color: 'text-slate-600', href: route('erp.clients.edit', actionModalClient?.id || 0) },
-                                                    ].map((item) => (
-                                                        <Link
-                                                            key={item.label}
-                                                            href={item.href}
-                                                            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] text-slate-700 hover:bg-slate-50 transition-colors group"
-                                                        >
-                                                            <item.icon className={`h-4 w-4 ${item.color} shrink-0`} />
-                                                            <span className="group-hover:translate-x-0.5 transition-transform">{item.label}</span>
-                                                        </Link>
-                                                    ))}
-                                                    <div className="border-t border-slate-100 my-2" />
-                                                    <button
-                                                        onClick={() => {
-                                                            setActionModalClient(null);
-                                                            handleDeleteClient(actionModalClient);
-                                                        }}
-                                                        className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] text-rose-600 hover:bg-rose-50 transition-colors group w-full text-left"
-                                                    >
-                                                        <Trash2 className="h-4 w-4 shrink-0" />
-                                                        <span className="group-hover:translate-x-0.5 transition-transform">{__('general.delete_client')}</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </DialogContent>
-                                </Dialog>
+                                <ClientActionModal
+                                    client={actionModalClient}
+                                    isOpen={!!actionModalClient}
+                                    onClose={() => setActionModalClient(null)}
+                                    onDelete={(client) => {
+                                        setActionModalClient(null);
+                                        handleDeleteClient(client);
+                                    }}
+                                    auth={auth}
+                                />
                             </div>
                         )}
 

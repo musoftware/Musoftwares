@@ -22,5 +22,6 @@ return [
     'unauthorized_addon' => 'unauthorized_addon',
     'unauthorized_project' => 'unauthorized_project',
     'upgrade_to_inventory' => 'upgrade_to_inventory',
-    'cannot_change_own_role' => 'You cannot change your own role/permissions.'
+    'cannot_change_own_role' => 'You cannot change your own role/permissions.',
+    'configure_storage_provider' => 'Please configure your storage provider.'
 ];

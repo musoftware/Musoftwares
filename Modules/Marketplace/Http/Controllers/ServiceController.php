@@ -16,7 +16,7 @@ class ServiceController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Service::with(['seller', 'category'])->where('status', 'active');
+        $query = Service::with(['seller', 'category', 'packages.currency'])->where('status', 'active');
 
         if ($request->has('category_id')) {
             $query->where('category_id', $request->input('category_id'));
@@ -33,6 +33,24 @@ class ServiceController extends Controller
         $services = $query->latest()->paginate(15);
         $categories = ServiceCategory::all();
 
+        $viewerCurrency = \App\Helpers\FinanceHelper::instance()->getViewerCurrency($request);
+
+        $services->getCollection()->transform(function ($service) use ($viewerCurrency) {
+            $service->packages->transform(function ($package) use ($viewerCurrency) {
+                if ($package->currency_id && $package->currency_id != $viewerCurrency->id) {
+                    $package->price = \App\Models\CurrenciesExchange::RateToday(
+                        $package->price,
+                        $package->currency_id,
+                        $viewerCurrency->id
+                    );
+                    $package->currency_id = $viewerCurrency->id;
+                    $package->setRelation('currency', $viewerCurrency);
+                }
+                return $package;
+            });
+            return $service;
+        });
+
         return Inertia::render('Marketplace/Browse', [
             'services' => $services,
             'categories' => $categories,
@@ -40,9 +58,9 @@ class ServiceController extends Controller
         ]);
     }
 
-    public function show($id)
+    public function show($id, Request $request)
     {
-        $service = Service::with(['seller', 'category', 'packages'])->findOrFail($id);
+        $service = Service::with(['seller', 'category', 'packages.currency'])->findOrFail($id);
 
         if ($service->status !== 'active') {
             $user = auth()->user();
@@ -50,6 +68,21 @@ class ServiceController extends Controller
                 abort(404, __('general.service_not_found_or_not_active'));
             }
         }
+
+        $viewerCurrency = \App\Helpers\FinanceHelper::instance()->getViewerCurrency($request);
+
+        $service->packages->transform(function ($package) use ($viewerCurrency) {
+            if ($package->currency_id && $package->currency_id != $viewerCurrency->id) {
+                $package->price = \App\Models\CurrenciesExchange::RateToday(
+                    $package->price,
+                    $package->currency_id,
+                    $viewerCurrency->id
+                );
+                $package->currency_id = $viewerCurrency->id;
+                $package->setRelation('currency', $viewerCurrency);
+            }
+            return $package;
+        });
 
         return Inertia::render('Marketplace/Services/Show', [
             'service' => $service,

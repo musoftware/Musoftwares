@@ -16,6 +16,7 @@ Route::middleware(['web', 'auth:web,erp_team', 'tenant.active'])
         Route::put('settings/smtp', [\Modules\ERP\Http\Controllers\SmtpSettingController::class, 'update'])->name('settings.smtp.update');
 
         // ── Clients ──
+        Route::get('clients', [\Modules\ERP\Http\Controllers\ClientController::class, 'index'])->name('clients.index');
         Route::get('clients/search', [\Modules\ERP\Http\Controllers\ClientController::class, 'search'])->name('clients.search');
         Route::get('clients/create', [\Modules\ERP\Http\Controllers\ClientController::class, 'create'])->name('clients.create');
         Route::get('clients/{client}/edit', [\Modules\ERP\Http\Controllers\ClientController::class, 'edit'])->name('clients.edit');
@@ -23,6 +24,9 @@ Route::middleware(['web', 'auth:web,erp_team', 'tenant.active'])
         Route::put('clients/{client}', [\Modules\ERP\Http\Controllers\ClientController::class, 'update'])->name('clients.update');
         Route::delete('clients/{client}', [\Modules\ERP\Http\Controllers\ClientController::class, 'destroy'])->name('clients.destroy');
         Route::get('clients/{client}', [\Modules\ERP\Http\Controllers\ClientController::class, 'show'])->name('clients.show');
+        Route::get('clients/{client}/transactions', [\Modules\ERP\Http\Controllers\ClientController::class, 'transactions'])->name('clients.transactions');
+        Route::get('clients/{client}/files', [\Modules\ERP\Http\Controllers\ClientController::class, 'files'])->name('clients.files');
+        Route::get('clients/{client}/notes', [\Modules\ERP\Http\Controllers\ClientController::class, 'notes'])->name('clients.notes');
         
         // ── Client Transactions ──
         Route::get('clients/{client}/wallet/adjust', [\Modules\ERP\Http\Controllers\WalletController::class, 'adjust'])->name('clients.wallet.adjust');

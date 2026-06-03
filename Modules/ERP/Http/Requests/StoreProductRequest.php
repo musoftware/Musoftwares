@@ -9,7 +9,7 @@ class StoreProductRequest extends FormRequest
 {
     public function authorize()
     {
-        return true; // Controller handles addon checks
+        return true;
     }
 
     public function rules()

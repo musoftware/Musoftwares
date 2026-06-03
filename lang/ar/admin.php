@@ -7,7 +7,6 @@ return [
     'share_1_month' => '?????? (??? ????)',
     'link_copied' => '?? ??? ??????!',
     'expires_at' => '????? ??',
-
     'only_unpaid_invoices_can_be_edited' => 'only_unpaid_invoices_can_be_edited',
     'service_added_successfully' => 'service_added_successfully',
     'timer_session_deleted' => 'timer_session_deleted',
@@ -96,15 +95,15 @@ return [
     'of' => 'من',
     'services_count' => 'خدمات',
     'approve_service' => 'اعتماد الخدمة',
-    'approve_service_desc' => 'الخدمة \":title\" ستصبح مرئية للجميع في السوق فوراً.',
+    'approve_service_desc' => 'الخدمة \\\":title\\\" ستصبح مرئية للجميع في السوق فوراً.',
     'reject_service' => 'رفض الخدمة',
-    'reject_service_desc' => 'الخدمة \":title\" سيتم رفضها. لن يتمكن البائع من إعادة التقديم بدون تعديلات.',
+    'reject_service_desc' => 'الخدمة \\\":title\\\" سيتم رفضها. لن يتمكن البائع من إعادة التقديم بدون تعديلات.',
     'suspend_service' => 'إيقاف الخدمة',
-    'suspend_service_desc' => 'الخدمة \":title\" سيتم إخفاؤها من السوق. لن تتأثر الطلبات الحالية.',
+    'suspend_service_desc' => 'الخدمة \\\":title\\\" سيتم إخفاؤها من السوق. لن تتأثر الطلبات الحالية.',
     'toggle_featured' => 'تبديل التمييز',
-    'toggle_featured_desc' => 'تحديث حالة التمييز للخدمة \":title\".',
+    'toggle_featured_desc' => 'تحديث حالة التمييز للخدمة \\\":title\\\".',
     'delete_service' => 'حذف الخدمة',
-    'delete_service_desc' => 'سيتم حذف الخدمة \":title\" وجميع باقاتها نهائياً. لا يمكن التراجع عن هذا الإجراء.',
+    'delete_service_desc' => 'سيتم حذف الخدمة \\\":title\\\" وجميع باقاتها نهائياً. لا يمكن التراجع عن هذا الإجراء.',
     'delete_permanently' => 'حذف نهائي',
     'confirm' => 'تأكيد',
     'cost_line_recorded_success' => 'تم تسجيل سطر التكلفة كمدفوع بنجاح.',
@@ -119,8 +118,6 @@ return [
     'no_active_services' => 'لا توجد خدمات نشطة.',
     'no_subscribers_found' => 'لا يوجد مشتركون.',
     'service_payment_added_successfully' => 'تم إضافة تكلفة الخدمة بنجاح.',
-    
-    // Payment Links
     'payment_links' => 'روابط الدفع',
     'create_payment_link' => 'إنشاء رابط دفع',
     'copy_link' => 'نسخ الرابط',
@@ -133,8 +130,6 @@ return [
     'paid' => 'مدفوع',
     'base_system_rate' => 'سعر النظام الأساسي',
     'client_rate' => 'سعر المستخدم',
-    
-    // Subscription Assignment
     'add_subscription' => 'إضافة اشتراك',
     'select_user' => 'اختيار مستخدم',
     'select_user_to_assign_subscription' => 'اختر المستخدم الذي ترغب في تعيين الاشتراك له.',
@@ -151,8 +146,6 @@ return [
     'lifetime' => 'مدى الحياة',
     'expiration_date' => 'تاريخ الانتهاء',
     'subscription_assigned_successfully' => 'تم تعيين الاشتراك بنجاح.',
-
-    // Point Packages
     'point_packages' => 'باقات النقاط',
     'create_point_package' => 'إنشاء باقة نقاط',
     'edit_point_package' => 'تعديل باقة النقاط',
@@ -162,11 +155,11 @@ return [
     'point_package_updated' => 'تم تحديث باقة النقاط بنجاح.',
     'point_package_deleted' => 'تم حذف باقة النقاط بنجاح.',
     'manage_point_packages' => 'إدارة وإنشاء باقات النقاط التي يمكن للمستخدمين شراؤها.',
-    
-    // Reschedule Invoice
     'reschedule_invoice' => 'إعادة جدولة الفاتورة',
     'new_invoice_date' => 'تاريخ الفاتورة الجديد',
     'notify_client' => 'إشعار العميل عبر الواتساب',
     'invoice_rescheduled_successfully' => 'تمت إعادة جدولة الفاتورة بنجاح.',
     'only_unpaid_can_be_rescheduled' => 'يمكن فقط إعادة جدولة الفواتير غير المدفوعة أو المدفوعة جزئياً.',
+    'price' => 'السعر',
+    'success' => 'نجاح'
 ];

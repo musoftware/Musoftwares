@@ -22,5 +22,6 @@ return [
     'unauthorized_addon' => 'unauthorized_addon',
     'unauthorized_project' => 'unauthorized_project',
     'upgrade_to_inventory' => 'upgrade_to_inventory',
-    'cannot_change_own_role' => 'لا يمكنك تغيير الصلاحيات/الدور الخاص بحسابك.'
+    'cannot_change_own_role' => 'لا يمكنك تغيير الصلاحيات/الدور الخاص بحسابك.',
+    'configure_storage_provider' => 'الرجاء تكوين مزود التخزين الخاص بك.'
 ];

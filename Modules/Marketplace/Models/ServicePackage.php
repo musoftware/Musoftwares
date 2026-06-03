@@ -30,4 +30,9 @@ class ServicePackage extends Model
     {
         return $this->belongsTo(Service::class, 'service_id');
     }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
 }

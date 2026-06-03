@@ -14,11 +14,7 @@ class InvoicePolicy
 
     protected function getTenant(User $user)
     {
-        $tenant = Tenant::where('user_id', $user->id)->first();
-        if (!$tenant && Auth::guard('erp_team')->check()) {
-            $tenant = Auth::guard('erp_team')->user()->tenant;
-        }
-        return $tenant;
+        return $user->tenant;
     }
 
     public function viewAny(User $user)
