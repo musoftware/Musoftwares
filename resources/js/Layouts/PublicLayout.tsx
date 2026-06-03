@@ -2,7 +2,7 @@ import { __ } from '@/lib/i18n';
 import { Button } from '@/Components/ui/button';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, useEffect, useState } from 'react';
-import { Menu, X, ArrowRight, ChevronDown, Monitor, Box, Server, Activity } from 'lucide-react';
+import { Menu, X, ArrowRight, ChevronDown, Monitor, Box, Server, Activity, Phone, MessageCircle, Globe, MapPin } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 
 interface PublicLayoutProps extends PropsWithChildren {
@@ -251,6 +251,48 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             <p className="text-sm leading-relaxed text-slate-500 font-light pr-4">
                                 We build software infrastructure and systems for growing businesses.
                             </p>
+
+                            <div className="space-y-3 pt-4 border-t border-slate-200/60">
+                                <a href="tel:201015218548" className="flex items-center gap-3 text-sm text-slate-600 hover:text-slate-900 transition-colors group">
+                                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors shrink-0">
+                                        <Phone className="h-4 w-4" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.contact_mobile')}</span>
+                                        <span className="font-medium" dir="ltr">+20 101 521 8548</span>
+                                    </div>
+                                </a>
+
+                                <a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-slate-600 hover:text-slate-900 transition-colors group">
+                                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-[#25D366]/20 group-hover:text-[#25D366] transition-colors shrink-0">
+                                        <MessageCircle className="h-4 w-4" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.contact_whatsapp')}</span>
+                                        <span className="font-medium" dir="ltr">+201015218548</span>
+                                    </div>
+                                </a>
+
+                                <a href="https://www.facebook.com/musoftwares.com.page/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-slate-600 hover:text-slate-900 transition-colors group">
+                                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-[#1877F2]/20 group-hover:text-[#1877F2] transition-colors shrink-0">
+                                        <Globe className="h-4 w-4" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.contact_facebook')}</span>
+                                        <span className="font-medium">musoftware</span>
+                                    </div>
+                                </a>
+
+                                <div className="flex items-center gap-3 text-sm text-slate-600">
+                                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                                        <MapPin className="h-4 w-4" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.contact_location')}</span>
+                                        <span className="font-medium">Suez, Egypt</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Solutions */}

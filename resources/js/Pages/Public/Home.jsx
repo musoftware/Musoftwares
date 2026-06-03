@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { __ } from '@/lib/i18n';
 import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Button } from '@/Components/ui/button';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Monitor, Smartphone, Server, CheckCircle, 
-    ArrowRight, LayoutDashboard, Ticket, FolderKanban
+    ArrowRight, LayoutDashboard, Ticket, FolderKanban, X,
+    Users, MessageSquare, TrendingUp, Calendar, Store, Wrench
 } from 'lucide-react';
 
 const fadeUp = {
@@ -22,7 +23,48 @@ const staggerContainer = {
     }
 };
 
+const portfolioItems = [
+    { img: '/images/portfolio/kbdny.png', titleKey: 'portfolio_kbdny_title', descKey: 'portfolio_kbdny_desc', cat: 'Platform' },
+    { img: '/images/portfolio/stockmanager.png', titleKey: 'portfolio_stock_manager_title', descKey: 'portfolio_stock_manager_desc', cat: 'ERP' },
+    { img: '/images/portfolio/minifatora.png', titleKey: 'portfolio_mini_fatora_title', descKey: 'portfolio_mini_fatora_desc', cat: 'SaaS' },
+    { img: '/images/portfolio/vodafone-crm.jpg', titleKey: 'portfolio_vodafone_crm_title', descKey: 'portfolio_vodafone_crm_desc', cat: 'CRM' },
+    { img: '/images/portfolio/amcacademy.jpg', titleKey: 'portfolio_amc_academy', descKey: 'portfolio_amc_academy_desc', cat: 'E-Learning' },
+    { img: '/images/portfolio/projectmanager.png', titleKey: 'portfolio_project_manager', descKey: 'portfolio_project_manager_desc', cat: 'Management' },
+    { img: '/images/portfolio/telecom-system.png', titleKey: 'portfolio_telecom_system_title', descKey: 'portfolio_telecom_system_desc', cat: 'Platform' },
+    { img: '/images/portfolio/altayaraa.png', titleKey: 'portfolio_altayaraa_title', descKey: 'portfolio_altayaraa_desc', cat: 'E-Commerce' },
+    { img: '/images/portfolio/forex-app.png', titleKey: 'portfolio_forex_app_title', descKey: 'portfolio_forex_app_desc', cat: 'Mobile App' },
+    { img: '/images/portfolio/amcsocial.png', titleKey: 'portfolio_amc_social', descKey: 'portfolio_amc_social_desc', cat: 'Platform' },
+    { img: '/images/portfolio/nokhpa.png', titleKey: 'portfolio_nokhpa_title', descKey: 'portfolio_nokhpa_desc', cat: 'E-Commerce' },
+    { img: '/images/portfolio/duplicate-finder.jpg', titleKey: 'portfolio_duplicate_finder_title', descKey: 'portfolio_duplicate_finder_desc', cat: 'Desktop App' },
+    { img: '/images/portfolio/map-extractor.jpg', titleKey: 'portfolio_map_extractor_title', descKey: 'portfolio_map_extractor_desc', cat: 'Desktop App' },
+    { img: '/images/portfolio/instagram-manager.png', titleKey: 'portfolio_instagram_manager_title', descKey: 'portfolio_instagram_manager_desc', cat: 'Desktop App' },
+    { img: '/images/portfolio/whatsapp-sender.png', titleKey: 'portfolio_whatsapp_sender_title', descKey: 'portfolio_whatsapp_sender_desc', cat: 'Desktop App' },
+    { img: '/images/portfolio/telegram-sender.png', titleKey: 'portfolio_telegram_sender_title', descKey: 'portfolio_telegram_sender_desc', cat: 'Desktop App' },
+    { img: '/images/portfolio/inbox-sender.png', titleKey: 'portfolio_inbox_sender_title', descKey: 'portfolio_inbox_sender_desc', cat: 'Desktop App' },
+    { img: '/images/portfolio/heic-converter.png', titleKey: 'portfolio_heic_converter_title', descKey: 'portfolio_heic_converter_desc', cat: 'Desktop App' },
+    { img: '/images/portfolio/text-studio.jpg', titleKey: 'portfolio_text_studio_title', descKey: 'portfolio_text_studio_desc', cat: 'Desktop App' },
+    { img: '/images/portfolio/amctasks-downloader.png', titleKey: 'portfolio_amc_tasks_downloader', descKey: 'portfolio_amc_tasks_downloader_desc', cat: 'Desktop App' },
+    { img: '/images/portfolio/stocktalk.png', titleKey: 'portfolio_stocktalk_ai_title', descKey: 'portfolio_stocktalk_ai_desc', cat: 'AI & Bot' },
+    { img: '/images/portfolio/forex.png', titleKey: 'portfolio_forex_bot_title', descKey: 'portfolio_forex_bot_desc', cat: 'AI & Bot' },
+    { img: '/images/portfolio/revFlow.png', titleKey: 'portfolio_revflow_title', descKey: 'portfolio_revflow_desc', cat: 'SaaS' },
+    { img: '/images/portfolio/chartcash.png', titleKey: 'portfolio_chartcash_title', descKey: 'portfolio_chartcash_desc', cat: 'Dashboard' },
+    { img: '/images/portfolio/chrome-ext-fb-id.png', titleKey: 'portfolio_fb_id_extractor_title', descKey: 'portfolio_fb_id_extractor_desc', cat: 'Extension' },
+    { img: '/images/portfolio/khamsat-notifier.jpg', titleKey: 'portfolio_khamsat_notifier_title', descKey: 'portfolio_khamsat_notifier_desc', cat: 'Extension' },
+    { img: '/images/portfolio/amemailcontrols.png', titleKey: 'portfolio_am_email_controls', descKey: 'portfolio_am_email_controls_desc', cat: 'Extension' },
+    { img: '/images/portfolio/amctasks.jpg', titleKey: 'portfolio_amc_tasks', descKey: 'portfolio_amc_tasks_desc', cat: 'ERP' },
+];
+
 export default function Home({ serviceItems = [], currency = 'USD' }) {
+    const [selectedItem, setSelectedItem] = useState(null);
+    const carouselRef = useRef(null);
+    const [width, setWidth] = useState(0);
+
+    useEffect(() => {
+        if (carouselRef.current) {
+            setWidth(carouselRef.current.scrollWidth - carouselRef.current.offsetWidth);
+        }
+    }, []);
+
     return (
         <PublicLayout>
             <Head>
@@ -128,73 +170,97 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
             </section>
 
             {/* SAAS SECTION */}
-            <section className="py-24 lg:py-32 bg-white relative">
+            <section className="py-24 lg:py-32 bg-slate-50 relative border-t border-slate-200">
                 <div className="max-w-[90rem] mx-auto px-6 lg:px-8">
-                    <div className="flex flex-col lg:flex-row gap-16 items-center">
-                        <div className="lg:w-1/2">
-                            <p className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-4">
-                                {__('general.landing_saas_badge')}
-                            </p>
-                            <h2 className="text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight mb-6">
-                                {__('general.landing_saas_title')}
-                            </h2>
-                            <p className="text-xl text-slate-500 font-light mb-10 leading-relaxed">
-                                {__('general.landing_saas_desc')}
-                            </p>
+                    <div className="text-center max-w-3xl mx-auto mb-16">
+                        <p className="text-sm font-semibold text-emerald-600 uppercase tracking-widest mb-4">
+                            {__('general.landing_saas_badge')}
+                        </p>
+                        <h2 className="text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight mb-6">
+                            {__('general.landing_saas_title')}
+                        </h2>
+                        <p className="text-xl text-slate-600 font-light leading-relaxed">
+                            {__('general.landing_saas_desc')}
+                        </p>
+                    </div>
 
-                            <ul className="space-y-6">
-                                <li className="flex items-center gap-4">
-                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-900">
-                                        <FolderKanban className="w-5 h-5" />
-                                    </div>
-                                    <span className="text-lg font-medium text-slate-700">{__('general.landing_saas_feature_1')}</span>
-                                </li>
-                                <li className="flex items-center gap-4">
-                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-900">
-                                        <CheckCircle className="w-5 h-5" />
-                                    </div>
-                                    <span className="text-lg font-medium text-slate-700">{__('general.landing_saas_feature_2')}</span>
-                                </li>
-                                <li className="flex items-center gap-4">
-                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-900">
-                                        <Ticket className="w-5 h-5" />
-                                    </div>
-                                    <span className="text-lg font-medium text-slate-700">{__('general.landing_saas_feature_3')}</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div className="lg:w-1/2 w-full">
-                            {/* Dashboard Mockup (Apple-style Glassmorphism) */}
-                            <div className="relative rounded-2xl bg-slate-100 p-2 shadow-2xl border border-slate-200">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-slate-200 to-white opacity-50 rounded-2xl"></div>
-                                <div className="relative bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden aspect-[4/3] flex flex-col">
-                                    {/* Mock Header */}
-                                    <div className="h-12 border-b border-slate-100 flex items-center px-4 gap-2 bg-slate-50/50">
-                                        <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                                        <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-                                        <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
-                                    </div>
-                                    {/* Mock Content */}
-                                    <div className="flex-1 p-6 flex flex-col gap-4">
-                                        <div className="flex gap-4 mb-4">
-                                            <div className="w-1/3 h-24 bg-slate-50 rounded-xl border border-slate-100"></div>
-                                            <div className="w-1/3 h-24 bg-slate-50 rounded-xl border border-slate-100"></div>
-                                            <div className="w-1/3 h-24 bg-slate-50 rounded-xl border border-slate-100"></div>
-                                        </div>
-                                        <div className="w-full h-8 bg-slate-100 rounded-md w-1/3 mb-2"></div>
-                                        <div className="w-full h-12 bg-slate-50 rounded-lg border border-slate-100"></div>
-                                        <div className="w-full h-12 bg-slate-50 rounded-lg border border-slate-100"></div>
-                                        <div className="w-full h-12 bg-slate-50 rounded-lg border border-slate-100"></div>
-                                    </div>
-                                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {/* 1. ERP */}
+                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-300">
+                            <div className="w-14 h-14 bg-slate-50 group-hover:bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300">
+                                <Server className="w-7 h-7 text-slate-700 group-hover:text-emerald-600 transition-colors duration-300" />
                             </div>
+                            <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_erp_title')}</h3>
+                            <p className="text-slate-600 leading-relaxed text-sm">
+                                {__('general.module_erp_desc')}
+                            </p>
+                        </div>
+                        {/* 2. CRM */}
+                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-300">
+                            <div className="w-14 h-14 bg-slate-50 group-hover:bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300">
+                                <Users className="w-7 h-7 text-slate-700 group-hover:text-emerald-600 transition-colors duration-300" />
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_crm_title')}</h3>
+                            <p className="text-slate-600 leading-relaxed text-sm">
+                                {__('general.module_crm_desc')}
+                            </p>
+                        </div>
+                        {/* 3. SMS Gateway */}
+                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-300">
+                            <div className="w-14 h-14 bg-slate-50 group-hover:bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300">
+                                <MessageSquare className="w-7 h-7 text-slate-700 group-hover:text-emerald-600 transition-colors duration-300" />
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_sms_title')}</h3>
+                            <p className="text-slate-600 leading-relaxed text-sm">
+                                {__('general.module_sms_desc')}
+                            </p>
+                        </div>
+                        {/* 4. Gold Saver */}
+                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-300">
+                            <div className="w-14 h-14 bg-slate-50 group-hover:bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300">
+                                <TrendingUp className="w-7 h-7 text-slate-700 group-hover:text-emerald-600 transition-colors duration-300" />
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_gold_title')}</h3>
+                            <p className="text-slate-600 leading-relaxed text-sm">
+                                {__('general.module_gold_desc')}
+                            </p>
+                        </div>
+                        {/* 5. Booking */}
+                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-300">
+                            <div className="w-14 h-14 bg-slate-50 group-hover:bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300">
+                                <Calendar className="w-7 h-7 text-slate-700 group-hover:text-emerald-600 transition-colors duration-300" />
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_booking_title')}</h3>
+                            <p className="text-slate-600 leading-relaxed text-sm">
+                                {__('general.module_booking_desc')}
+                            </p>
+                        </div>
+                        {/* 6. POS */}
+                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-300">
+                            <div className="w-14 h-14 bg-slate-50 group-hover:bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300">
+                                <Store className="w-7 h-7 text-slate-700 group-hover:text-emerald-600 transition-colors duration-300" />
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_pos_title')}</h3>
+                            <p className="text-slate-600 leading-relaxed text-sm">
+                                {__('general.module_pos_desc')}
+                            </p>
+                        </div>
+                        {/* 7. Tools & Addons */}
+                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-300 lg:col-span-2 xl:col-span-2">
+                            <div className="w-14 h-14 bg-slate-50 group-hover:bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300">
+                                <Wrench className="w-7 h-7 text-slate-700 group-hover:text-emerald-600 transition-colors duration-300" />
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_tools_title')}</h3>
+                            <p className="text-slate-600 leading-relaxed text-sm">
+                                {__('general.module_tools_desc')}
+                            </p>
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* PORTFOLIO SECTION */}
-            <section className="py-24 lg:py-32 bg-slate-900 text-white relative border-y border-slate-800">
+            <section className="py-24 lg:py-32 bg-slate-900 text-white relative border-y border-slate-800 overflow-hidden">
                 <div className="max-w-[90rem] mx-auto px-6 lg:px-8 text-center">
                     <p className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-4">
                         {__('general.landing_portfolio_badge')}
@@ -206,21 +272,42 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
                         {__('general.landing_portfolio_desc')}
                     </p>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                        {/* Project 1 */}
-                        <div className="group rounded-3xl bg-slate-800 border border-slate-700 overflow-hidden aspect-[4/3] relative flex items-center justify-center text-slate-500 hover:text-white transition-all cursor-pointer">
-                            <span className="text-lg font-medium">Project Preview 1</span>
-                            {/* Insert actual image here later: <img src="..." className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" /> */}
-                        </div>
-                        {/* Project 2 */}
-                        <div className="group rounded-3xl bg-slate-800 border border-slate-700 overflow-hidden aspect-[4/3] relative flex items-center justify-center text-slate-500 hover:text-white transition-all cursor-pointer">
-                            <span className="text-lg font-medium">Project Preview 2</span>
-                        </div>
+                    <div className="mb-12 cursor-grab active:cursor-grabbing">
+                        <motion.div ref={carouselRef} className="overflow-hidden">
+                            <motion.div 
+                                drag="x" 
+                                dragConstraints={{ right: 0, left: -width }} 
+                                className="flex gap-8"
+                            >
+                                {portfolioItems.map((item, index) => (
+                                    <motion.div 
+                                        key={index} 
+                                        className="min-w-[300px] md:min-w-[400px] h-[250px] md:h-[300px] rounded-3xl overflow-hidden relative group cursor-pointer border border-slate-700 shadow-xl"
+                                        onClick={() => setSelectedItem(item)}
+                                    >
+                                        <img src={item.img} alt={`Portfolio ${index + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none" />
+                                        <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none flex flex-col justify-end p-6 text-left">
+                                            <span className="text-emerald-400 text-sm font-semibold tracking-wider uppercase mb-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                                {item.cat}
+                                            </span>
+                                            <h3 className="text-xl font-bold text-white mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                                                {__(`general.${item.titleKey}`)}
+                                            </h3>
+                                            <p className="text-slate-300 text-sm line-clamp-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">
+                                                {__(`general.${item.descKey}`)}
+                                            </p>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+                        </motion.div>
                     </div>
 
-                    <Button variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white rounded-full px-8 h-12">
-                        {__('general.landing_portfolio_view_all')} <ArrowRight className="ml-2 w-4 h-4" />
-                    </Button>
+                    <Link href={route('portfolio')}>
+                        <Button variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white rounded-full px-8 h-12">
+                            {__('general.landing_portfolio_view_all')} <ArrowRight className="ml-2 w-4 h-4" />
+                        </Button>
+                    </Link>
                 </div>
             </section>
 
@@ -240,6 +327,52 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
                     </a>
                 </div>
             </section>
+
+            <AnimatePresence>
+                {selectedItem && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 md:p-8 backdrop-blur-sm"
+                        onClick={() => setSelectedItem(null)}
+                    >
+                        <button 
+                            className="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors z-[60]"
+                            onClick={(e) => { e.stopPropagation(); setSelectedItem(null); }}
+                        >
+                            <X className="w-8 h-8" />
+                        </button>
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden max-w-5xl w-full max-h-full flex flex-col shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex-1 overflow-auto min-h-0 bg-slate-950 p-2 md:p-6 flex items-center justify-center relative">
+                                <img 
+                                    src={selectedItem.img} 
+                                    alt="Fullscreen Portfolio" 
+                                    className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-xl" 
+                                />
+                            </div>
+                            <div className="p-6 md:p-8 bg-slate-900 border-t border-slate-800 text-left">
+                                <span className="text-emerald-400 text-sm font-semibold tracking-wider uppercase mb-2 block">
+                                    {selectedItem.cat}
+                                </span>
+                                <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">
+                                    {__(`general.${selectedItem.titleKey}`)}
+                                </h3>
+                                <p className="text-slate-400 text-base md:text-lg max-w-3xl leading-relaxed">
+                                    {__(`general.${selectedItem.descKey}`)}
+                                </p>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
         </PublicLayout>
     );
