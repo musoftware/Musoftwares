@@ -129,7 +129,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{__('general.the_powerful_background_agent_that_executes_tools_directly_on_your_computer_required_for_heavy_automation_workflows')}</p>
                             </CardContent>
                             <CardFooter className="flex items-center gap-2 pt-0">
-                                <a href={route('tools.download.agent', 'node')}>
+                                <a href={route('runtime.download')} target="_blank" rel="noreferrer">
                                     <Button size="sm" variant="outline" className="text-xs h-8 bg-white dark:bg-slate-900">
                                         <Download className="h-3 w-3 mr-1.5" />{__('general.download_app')}</Button>
                                 </a>

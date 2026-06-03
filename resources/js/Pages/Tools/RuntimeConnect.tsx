@@ -97,7 +97,7 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
                             asChild
                             className="flex-1 bg-indigo-600 text-white hover:bg-indigo-500 gap-2"
                         >
-                            <a href={route('tools.download.agent', 'node')}>
+                            <a href={route('runtime.download')} target="_blank" rel="noreferrer">
                                 <Download className="w-4 h-4" />{__('general.get_runtime')}</a>
                         </Button>
                     </div>

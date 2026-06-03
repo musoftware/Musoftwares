@@ -99,8 +99,9 @@ export function RuntimeStatusBanner({ toolSlug }: Props) {
                         {' '}Install the runtime agent to execute tools locally on your machine.
                     </span>
                     <a
-                        href={route('tools.download.agent', 'node')}
-                        className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-white text-slate-900 rounded-lg text-xs font-semibold hover:bg-slate-100 transition-colors"
+                        href={route('runtime.download')}
+                        target="_blank"
+                        className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-white text-slate-900 rounded-lg text-xs font-semibold hover:bg-slate-100 transition-colors" rel="noreferrer"
                     >
                         <Download className="h-3.5 w-3.5" />{__('general.download_runtime')}</a>
                 </div>
@@ -141,8 +142,9 @@ export function RuntimeStatusBanner({ toolSlug }: Props) {
                         Runtime update available → <span className="font-mono font-semibold">v{updateAvail}</span>
                     </span>
                     <a
-                        href={route('tools.download.agent', 'node')}
-                        className="ml-auto text-violet-400 hover:text-violet-200 underline"
+                        href={route('runtime.download')}
+                        target="_blank"
+                        className="ml-auto text-violet-400 hover:text-violet-200 underline" rel="noreferrer"
                     >
                         Update
                     </a>
