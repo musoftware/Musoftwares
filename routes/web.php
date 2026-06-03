@@ -14,6 +14,18 @@ Route::get('/dddwqdqwdqw', function(){
     \Illuminate\Support\Facades\Artisan::call('migrate');
 });
 
+Route::get('/test-amc-api', function(\App\Services\AmcAcademyApiService $service) {
+    // Array of mock FBIDs to test bulk lookup and deduction
+    $testFbids = ['10000000000001', '10000000000002'];
+    $result = $service->searchFbidsBulk($testFbids);
+    
+    return response()->json([
+        'message' => 'API Test Completed',
+        'fbids_sent' => $testFbids,
+        'result' => $result,
+    ]);
+});
+
 // Platforms
 Route::get('/platforms', [HomeController::class, 'platforms'])->name('platforms');
 Route::get('/platforms/crm', [HomeController::class, 'platformCrm'])->name('platforms.crm');

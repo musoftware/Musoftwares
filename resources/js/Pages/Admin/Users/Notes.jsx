@@ -247,21 +247,21 @@ export default function Notes({ user, notes, stats }) {
                     <div className="space-y-4">
                         {filteredNotes.map(note => (
                             <div key={note.id} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm transition hover:shadow-md">
-                                <div className="flex justify-between items-start mb-3">
-                                    <div className="flex flex-col">
-                                        <div className="flex items-center gap-2 mb-1">
+                                <div className="flex justify-between items-start mb-3 gap-4">
+                                    <div className="flex flex-col flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                                             {note.is_pinned && <span className="bg-slate-800 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Pinned</span>}
-                                            <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium capitalize flex items-center gap-1 border border-slate-200">
+                                            <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium capitalize flex items-center gap-1 border border-slate-200 shrink-0">
                                                 {getCategoryIcon(note.category)}
                                                 {note.category}
                                             </span>
-                                            <span className="text-xs text-slate-400 font-medium">
+                                            <span className="text-xs text-slate-400 font-medium shrink-0">
                                                 {new Date(note.created_at).toLocaleString()}
                                             </span>
                                         </div>
-                                        {note.decryptedTitle && <h3 className="text-lg font-bold text-slate-900">{note.decryptedTitle}</h3>}
+                                        {note.decryptedTitle && <h3 className="text-lg font-bold text-slate-900 break-all">{note.decryptedTitle}</h3>}
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 shrink-0">
                                         <button onClick={() => handleTogglePin(note.id)} className={`p-1.5 rounded-md border transition ${note.is_pinned ? 'bg-slate-100 border-slate-300 text-slate-700' : 'border-slate-200 text-slate-400 hover:text-slate-700'}`} title={note.is_pinned ? "Unpin" : "Pin"}>
                                             <Pin size={14} />
                                         </button>

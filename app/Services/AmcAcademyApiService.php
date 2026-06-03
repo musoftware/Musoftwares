@@ -20,7 +20,7 @@ class AmcAcademyApiService
     public function __construct()
     {
         // For production, these should be moved to .env / config('services.amcacademy')
-        $this->baseUrl = 'https://amcacademy.me/api/musoftwares';
+        $this->baseUrl = 'https://amcacademy.net/api/musoftwares';
         $this->apiPassword = 'MusoftwaresAmcApi2024!';
     }
 
@@ -79,12 +79,13 @@ class AmcAcademyApiService
                     return $data['data'] ?? [];
                 }
             } else {
+                echo $response->body();
                 Log::error('AmcAcademy API Bulk Search Error: ' . $response->body());
             }
         } catch (\Exception $e) {
+            echo  $e->getMessage();
             Log::error('AmcAcademy API Bulk Search Exception: ' . $e->getMessage());
         }
-
         return null;
     }
 
