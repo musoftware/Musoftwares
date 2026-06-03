@@ -347,7 +347,7 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                             <HelpCircle className="w-6 h-6 text-rose-600" />
                             <h2 className="text-2xl font-bold text-slate-900">{__('Frequently Asked Questions')}</h2>
                         </div>
-                        <Accordion type="single" collapsible className="w-full bg-white rounded-lg shadow-sm border border-slate-100">
+                        <Accordion className="w-full bg-white rounded-lg shadow-sm border border-slate-100">
                             <AccordionItem value="item-1" className="px-4">
                                 <AccordionTrigger className="text-slate-800 hover:text-indigo-600 font-medium">
                                     {__('Is it secure?')}

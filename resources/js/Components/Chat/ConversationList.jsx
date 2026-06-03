@@ -87,6 +87,7 @@ export default function ConversationList({ onSelectConversation, selectedId }) {
                 window.Echo.leave(`user.${auth.user.id}`);
             }
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [auth.user.id, selectedId]);
 
     // Group conversations by type

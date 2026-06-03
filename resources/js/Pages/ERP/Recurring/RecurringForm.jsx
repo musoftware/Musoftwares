@@ -31,6 +31,7 @@ export default function RecurringForm({ entry = null, business_currency = 'USD' 
 
     useEffect(() => {
         calculateNextOccurrences();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data.frequency, data.frequency_day, data.frequency_month, data.starts_at]);
 
     const calculateNextOccurrences = () => {
@@ -79,6 +80,7 @@ export default function RecurringForm({ entry = null, business_currency = 'USD' 
             }
             setOccurrences(results);
         } catch (e) {
+            // Ignore error
         }
     };
 

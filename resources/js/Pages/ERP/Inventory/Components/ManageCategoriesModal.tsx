@@ -21,9 +21,7 @@ export function ManageCategoriesModal() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const t = (key: string, fallback: string) => {
-        // @ts-ignore
         if (typeof window !== 'undefined' && typeof window.__ === 'function') {
-            // @ts-ignore
             return window.__(key);
         }
         return fallback;
@@ -33,6 +31,7 @@ export function ManageCategoriesModal() {
         if (open) {
             fetchCategories();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open]);
 
     const fetchCategories = async () => {

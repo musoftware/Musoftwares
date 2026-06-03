@@ -41,6 +41,7 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
                 })
                 .catch(err => console.error("Failed to fetch bing images", err));
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen]);
 
     if (!isOpen) return null;

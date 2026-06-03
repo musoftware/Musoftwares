@@ -57,7 +57,7 @@ export default function FacebookExtractorRunner({ tool }: any) {
                     setError(msg.payload?.error || 'Unknown error');
                     setStatus('idle');
                 }
-            } catch (err) {}
+            } catch (err) { /* empty */ }
         };
         
         setWs(socket);
@@ -138,7 +138,7 @@ export default function FacebookExtractorRunner({ tool }: any) {
                     link.click();
                     document.body.removeChild(link);
                 }
-            } catch (err) {}
+            } catch (err) { /* empty */ }
         };
         
         ws.addEventListener('message', listener);

@@ -52,16 +52,18 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
             try {
                 await callRPC('syncTracker');
                 if (activeTab === 'dashboard' || activeTab === 'campaigns') fetchData();
-            } catch (err) { }
+            } catch (err) { /* empty */ }
         }, 60000); // Sync every minute
 
         return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connected, activeTab]);
 
     useEffect(() => {
         if (connected) {
             fetchData();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connected, activeTab]);
 
     const fetchData = async () => {
@@ -233,7 +235,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
             if (listForm.raw_contacts.trim().startsWith('[')) {
                 try {
                     parsedContacts = JSON.parse(listForm.raw_contacts);
-                } catch(e) {}
+                } catch(e) { /* empty */ }
             } else {
                 const lines = listForm.raw_contacts.split('\n').map(l => l.trim()).filter(Boolean);
                 parsedContacts = lines.map(line => {

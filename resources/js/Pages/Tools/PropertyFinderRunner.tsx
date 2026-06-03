@@ -295,12 +295,13 @@ export default function PropertyFinderRunner({ tool }: any) {
                             (ws as any)._pending?.delete(id);
                         }
                     }
-                } catch {}
+                } catch { /* empty */ }
             };
         };
 
         connect();
         return () => { clearTimeout(retry); ws?.close(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // ── Real-time polling fallback ──
@@ -331,7 +332,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                 if (res?.leads && res.leads.length > 0) {
                     setLeads(prev => res.leads.length > prev.length ? res.leads : prev);
                 }
-            } catch {}
+            } catch { /* empty */ }
         }, 4000);
 
         return () => clearInterval(poll);
@@ -388,7 +389,7 @@ export default function PropertyFinderRunner({ tool }: any) {
             try {
                 await callRPC('propertyfinder.extract.stop', { campaignId: cId });
             } catch (err: any) {
-                try { await callRPC('propertyfinder.extract.stop.all', {}); } catch {}
+                try { await callRPC('propertyfinder.extract.stop.all', { /* empty */ }); } catch { /* empty */ }
             }
         }
         setStatus('done');

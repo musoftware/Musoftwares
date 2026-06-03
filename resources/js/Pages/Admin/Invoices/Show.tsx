@@ -104,6 +104,7 @@ export default function Show({ invoice }: { invoice: any }) {
 
     useEffect(() => {
         resetState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [invoice]);
 
     const isUnpaid = invoice.status === 'unpaid';

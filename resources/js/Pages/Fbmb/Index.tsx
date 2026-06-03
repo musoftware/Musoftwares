@@ -256,6 +256,7 @@ export default function ISaasIndex() {
         }, 3000);
 
         return () => clearInterval(intervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [phase, result?.download_token, result?.status, toast]);
 
     // Polling background scan items in history tab

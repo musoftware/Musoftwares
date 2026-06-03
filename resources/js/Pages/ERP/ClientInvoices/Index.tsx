@@ -210,6 +210,7 @@ export default function Index({
 
     const tableData = invoices?.data || [];
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (

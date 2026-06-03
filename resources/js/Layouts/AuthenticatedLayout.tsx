@@ -7,6 +7,7 @@ import { useToast } from '@/Components/ui/use-toast';
 import { Button, buttonVariants } from '@/Components/ui/button';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/Components/ui/sheet';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/Components/ui/accordion';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -55,23 +56,19 @@ function AuthenticatedContent({
     // Safety checks for route existence
     const safeRoute = (name: string, params?: any, fallbackUrl?: string) => {
         try {
-            // @ts-ignore
             if (typeof route !== 'undefined' && route().has(name)) {
-                // @ts-ignore
                 return route(name, params);
             }
-        } catch (e) {}
+        } catch (e) { /* empty */ }
         return fallbackUrl || '#';
     };
 
     const isRouteActive = (name: string) => {
         try {
-            // @ts-ignore
             if (typeof route !== 'undefined') {
-                // @ts-ignore
                 return route().current(name) || route().current(`${name}.*`);
             }
-        } catch (e) {}
+        } catch (e) { /* empty */ }
         return false;
     };
 
@@ -126,14 +123,18 @@ function AuthenticatedContent({
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col">
             {isImpersonating && (
                 <div className="bg-gradient-to-r from-amber-500 via-orange-600 to-rose-600 text-white text-xs font-semibold px-4 shadow-md flex items-center justify-between z-[50] sticky top-0" style={{ height: '36px' }}>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
                         <Shield className="h-4 w-4 text-amber-100 animate-pulse shrink-0" />
-                        <span className="truncate">{__('general.you_are_currently_impersonating')}<strong className="underline">{user?.name}</strong> ({user?.email}). All actions performed will be under this account's scope.
+                        <span className="truncate">
+                            <span className="hidden sm:inline">{__('general.you_are_currently_impersonating')}</span>
+                            <span className="sm:hidden">{__('general.impersonating_user')}</span>
+                            <strong className="underline mx-1">{user?.name}</strong> 
+                            <span className="hidden md:inline">({user?.email}). {__('general.impersonation_scope_notice')}</span>
                         </span>
                     </div>
                     <Link
                         href={route('admin.stop-impersonate')}
-                        className="bg-white/20 hover:bg-white/30 text-white font-bold py-1 px-3 rounded-full border border-white/20 hover:border-white/40 transition-all text-[11px] shrink-0"
+                        className="bg-white/20 hover:bg-white/30 text-white font-bold py-1 px-3 rounded-full border border-white/20 hover:border-white/40 transition-all text-[11px] shrink-0 ml-2"
                     >{__('general.stop_impersonation')}</Link>
                 </div>
             )}
@@ -177,9 +178,101 @@ function AuthenticatedContent({
                                                             <Building2 className="w-5 h-5 text-slate-400" /> ERP
                                                         </Link>
                                                         <Link href={safeRoute('billing.invoices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
-                                                            <FileText className="w-5 h-5 text-slate-400" />{__('general.my_invoices')}</Link>
+                                                            <FileText className="w-5 h-5 text-slate-400" />{__('general.my_invoices')}
+                                                        </Link>
                                                         <Link href={safeRoute('financial.add-balance')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-emerald-50 text-emerald-700 font-medium">
-                                                            <Plus className="w-5 h-5 text-emerald-500" />{__('general.add_balance')}</Link>
+                                                            <Plus className="w-5 h-5 text-emerald-500" />{__('general.add_balance')}
+                                                        </Link>
+
+                                                        <div className="mt-4 pt-2 border-t border-slate-100">
+                                                            <Accordion className="w-full">
+                                                                <AccordionItem value="more" className="border-b-0">
+                                                                    <AccordionTrigger className="px-3 py-2 hover:bg-slate-50 rounded-lg text-slate-700 hover:no-underline">
+                                                                        <div className="flex items-center gap-3 font-medium">
+                                                                            <Settings className="w-5 h-5 text-slate-400" /> More
+                                                                        </div>
+                                                                    </AccordionTrigger>
+                                                                    <AccordionContent className="pb-1 px-2">
+                                                                        <div className="flex flex-col space-y-1 mt-1 border-l-2 border-slate-100 ml-5 pl-4">
+                                                                            <Link href={safeRoute('financial.transactions')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
+                                                                                <ArrowRightLeft className="w-4 h-4 text-slate-400" /> Transactions
+                                                                            </Link>
+                                                                            <Link href={safeRoute('financial.withdrawals')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
+                                                                                <ArrowUpRight className="w-4 h-4 text-slate-400" />{__('general.request_withdrawal')}
+                                                                            </Link>
+                                                                            <Link href={safeRoute('financial.payout-methods.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
+                                                                                <CreditCard className="w-4 h-4 text-slate-400" />{__('general.payout_methods')}
+                                                                            </Link>
+                                                                            <Link href={safeRoute('tickets.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
+                                                                                <LifeBuoy className="w-4 h-4 text-slate-400" />{__('general.support_tickets')}
+                                                                            </Link>
+                                                                            <Link href={safeRoute('messages.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
+                                                                                <MessageSquare className="w-4 h-4 text-slate-400" /> Messages
+                                                                            </Link>
+                                                                        </div>
+                                                                    </AccordionContent>
+                                                                </AccordionItem>
+
+                                                                <AccordionItem value="services" className="border-b-0">
+                                                                    <AccordionTrigger className="px-3 py-2 hover:bg-slate-50 rounded-lg text-emerald-700 hover:no-underline">
+                                                                        <div className="flex items-center gap-3 font-medium">
+                                                                            <Briefcase className="w-5 h-5 text-emerald-600" /> Services
+                                                                        </div>
+                                                                    </AccordionTrigger>
+                                                                    <AccordionContent className="pb-1 px-2">
+                                                                        <div className="flex flex-col space-y-1 mt-1 border-l-2 border-slate-100 ml-5 pl-4">
+                                                                            <Link href={safeRoute('freelance.dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-emerald-50/50 text-slate-600 font-medium">
+                                                                                <Briefcase className="w-4 h-4 text-emerald-500" /> {__('general.freelance_hub')}
+                                                                            </Link>
+                                                                            <Link href={safeRoute('marketplace.dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-violet-50/50 text-slate-600 font-medium">
+                                                                                <Megaphone className="w-4 h-4 text-violet-500" /> {__('general.marketing_suite')}
+                                                                            </Link>
+                                                                        </div>
+                                                                    </AccordionContent>
+                                                                </AccordionItem>
+
+                                                                <AccordionItem value="isaas" className="border-b-0">
+                                                                    <AccordionTrigger className="px-3 py-2 hover:bg-slate-50 rounded-lg text-indigo-700 hover:no-underline">
+                                                                        <div className="flex items-center gap-3 font-medium">
+                                                                            <Sparkles className="w-5 h-5 text-indigo-600" /> iSAAS
+                                                                        </div>
+                                                                    </AccordionTrigger>
+                                                                    <AccordionContent className="pb-1 px-2">
+                                                                        <div className="flex flex-col space-y-1 mt-1 border-l-2 border-slate-100 ml-5 pl-4">
+                                                                            <Link href={activeModules.crm ? safeRoute('crm.dashboard') : safeRoute('subscriptions.plans', { module: 'crm' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-indigo-50/50 text-slate-600 font-medium">
+                                                                                <div className="flex items-center gap-3">
+                                                                                    <Megaphone className="w-4 h-4 text-indigo-500" /> {__('general.lead_gen_crm')}
+                                                                                </div>
+                                                                                {!activeModules.crm && <Lock className="w-3 h-3 text-slate-400" />}
+                                                                            </Link>
+                                                                            <Link href={activeModules.booking ? safeRoute('booking.index') : safeRoute('subscriptions.plans', { module: 'booking' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-amber-50/50 text-slate-600 font-medium">
+                                                                                <div className="flex items-center gap-3">
+                                                                                    <Calendar className="w-4 h-4 text-amber-500" /> Booking
+                                                                                </div>
+                                                                                {!activeModules.booking && <Lock className="w-3 h-3 text-slate-400" />}
+                                                                            </Link>
+                                                                            <Link href={safeRoute('fbmb.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-teal-50/50 text-slate-600 font-medium">
+                                                                                <Activity className="w-4 h-4 text-teal-500" /> {__('general.isaas_fb_lookup')}
+                                                                            </Link>
+                                                                            <Link href={safeRoute('sms-payment-gateway.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-rose-50/50 text-slate-600 font-medium">
+                                                                                <MessageSquare className="w-4 h-4 text-rose-500" /> {__('general.payment_gateway')}
+                                                                            </Link>
+                                                                            <Link href={safeRoute('isaas.gold-savers.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-yellow-50/50 text-slate-600 font-medium">
+                                                                                <Coins className="w-4 h-4 text-yellow-500" /> {__('general.gold_savers')}
+                                                                            </Link>
+                                                                            <Link href={safeRoute('tools.explore')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-fuchsia-50/50 text-slate-600 font-medium">
+                                                                                <Wrench className="w-4 h-4 text-fuchsia-500" /> {__('general.tools_amp_plugins')}
+                                                                            </Link>
+                                                                        </div>
+                                                                    </AccordionContent>
+                                                                </AccordionItem>
+
+                                                            </Accordion>
+                                                        </div>
+
+                                                        <Link href={safeRoute('subscriptions.plans')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 mt-2 rounded-lg hover:bg-amber-50 text-amber-700 font-medium">
+                                                            <CreditCard className="w-5 h-5 text-amber-500" /> Subscription
+                                                        </Link>
                                                     </>
                                                 )}
                                             </div>

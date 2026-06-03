@@ -82,15 +82,19 @@ export default function Device({ device, transactions }: DeviceProps) {
 
         switch (type) {
             case 'phone':
+                // eslint-disable-next-line no-case-declarations
                 const digits = value.replace(/\D/g, '');
                 return digits.length > 6 ? digits.substring(0, 3) + '****' + digits.substring(digits.length - 3) : '******';
             case 'name':
+                // eslint-disable-next-line no-case-declarations
                 const name = value.trim();
                 return name.length > 2 ? name.charAt(0) + '*'.repeat(Math.min(name.length - 2, 8)) + name.charAt(name.length - 1) : '**';
             case 'sender':
                 return value.length > 4 ? value.substring(0, 3) + '***' : '***';
             case 'amount':
+                // eslint-disable-next-line no-case-declarations
                 const currencyMatch = value.match(/[A-Z]{3,4}$/);
+                // eslint-disable-next-line no-case-declarations
                 const currency = currencyMatch ? currencyMatch[0] : '';
                 return '•,•••.** ' + currency;
             default:

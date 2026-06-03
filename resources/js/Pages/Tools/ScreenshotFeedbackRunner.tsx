@@ -28,6 +28,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
         if (connected) {
             fetchProjects();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connected]);
 
     useEffect(() => {
@@ -35,12 +36,14 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
             fetchScreenshots();
             fetchActivities();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedProjectId, connected]);
 
     useEffect(() => {
         if (activeTab === 'review' && selectedScreenshotId && connected) {
             fetchPins();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeTab, selectedScreenshotId, connected]);
 
     const fetchPins = async () => {

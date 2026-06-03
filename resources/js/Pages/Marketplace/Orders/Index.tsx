@@ -16,6 +16,7 @@ export default function Index({ orders, tab }: any) {
         } else if (tab === 'purchases' && mode !== 'client') {
             setMode('client');
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tab]);
 
     useEffect(() => {
@@ -25,6 +26,7 @@ export default function Index({ orders, tab }: any) {
         } else if (mode === 'client' && tab === 'sales') {
             router.get(route('marketplace.orders.index'), { tab: 'purchases' }, { preserveState: true });
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mode]);
 
     const handleTabChange = (newTab: string) => {

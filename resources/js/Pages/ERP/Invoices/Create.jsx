@@ -61,6 +61,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
         } else {
             setData('project_id', '');
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data.client_id, clients, projects]);
 
     const filteredProjects = data.client_id

@@ -5,7 +5,7 @@ export function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, 
     const [connected, setConnected] = useState(false);
     const [installingPlugin, setInstallingPlugin] = useState<boolean>(false);
     const [loginRequired, setLoginRequired] = useState<boolean>(false);
-    const pending = useRef<Map<string, { resolve: Function; reject: Function }>>(new Map());
+    const pending = useRef<Map<string, { resolve: ((...args: any[]) => any); reject: ((...args: any[]) => any) }>>(new Map());
     const onBroadcastRef = useRef<((event: string, data: any) => void) | null>(null);
     
     useEffect(() => {
@@ -20,6 +20,7 @@ export function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, 
                     console.warn('Blocked RUNTIME_NOT_CONFIGURED alert:', message);
                     return;
                 }
+                // eslint-disable-next-line prefer-rest-params
                 return originalAlert.apply(this, arguments as any);
             };
         }
@@ -74,7 +75,7 @@ export function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, 
                 if (msg.event && onBroadcastRef.current) {
                     onBroadcastRef.current(msg.event, msg.data);
                 }
-            } catch (_) {}
+            } catch (_) { /* empty */ }
         };
 
         setWs(socket);

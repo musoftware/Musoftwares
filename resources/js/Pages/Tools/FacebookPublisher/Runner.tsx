@@ -20,6 +20,7 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
         if (isConnected) {
             refreshData();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isConnected]);
 
     const refreshData = async () => {

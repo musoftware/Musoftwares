@@ -7,8 +7,8 @@ const getWsUrl = () => `ws://${getRuntimeHost()}:18401/ws`;
 export function useRuntimeRPC(pluginSlug: string) {
     const [ws, setWs] = useState<WebSocket | null>(null);
     const [connected, setConnected] = useState(false);
-    const pendingRequests = useRef(new Map<string, { resolve: Function; reject: Function }>());
-    const onMessageCallbacks = useRef<Set<Function>>(new Set());
+    const pendingRequests = useRef(new Map<string, { resolve: ((...args: any[]) => any); reject: ((...args: any[]) => any) }>());
+    const onMessageCallbacks = useRef<Set<((...args: any[]) => any)>>(new Set());
 
     useEffect(() => {
         let socket: WebSocket;
@@ -46,7 +46,7 @@ export function useRuntimeRPC(pluginSlug: string) {
                         }
                     }
                     for (const cb of onMessageCallbacks.current) cb(msg);
-                } catch (_) {}
+                } catch (_) { /* empty */ }
             };
         };
 
@@ -82,7 +82,7 @@ export function useRuntimeRPC(pluginSlug: string) {
         });
     }, [ws, pluginSlug]);
 
-    const subscribeToEvents = useCallback((cb: Function) => {
+    const subscribeToEvents = useCallback((cb: ((...args: any[]) => any)) => {
         onMessageCallbacks.current.add(cb);
         return () => onMessageCallbacks.current.delete(cb);
     }, []);

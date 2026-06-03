@@ -61,6 +61,7 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected,
         return () => {
             if (validationCallbackRef) validationCallbackRef.current = null;
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [validationCallbackRef, isRtl]);
 
     const handleStartValidation = async () => {
@@ -131,18 +132,19 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected,
         try {
             const res: any = await callRPC('getTags', {});
             setTags(res.tags || []);
-        } catch (_) {}
+        } catch (_) { /* empty */ }
     };
 
     const fetchFolders = async () => {
         try {
             const res: any = await callRPC('getContactFolders', {});
             setFolders(res.folders || []);
-        } catch (_) {}
+        } catch (_) { /* empty */ }
     };
 
     useEffect(() => {
         if (daemonConnected) { fetchContacts(); fetchTags(); fetchFolders(); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [daemonConnected, page, search, activeTag, activeFolder]);
 
     // Debounce search

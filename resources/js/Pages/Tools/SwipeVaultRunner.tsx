@@ -144,12 +144,14 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
             fetchTags();
             fetchStats();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connected]);
 
     useEffect(() => {
         if (activeView === 'swipes') {
             fetchSwipes(selectedCollectionId, searchQuery, activeTag);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeView, selectedCollectionId, activeTag]);
 
     // Debounced search
@@ -160,6 +162,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
             fetchSwipes(selectedCollectionId, searchQuery, activeTag);
         }, 350);
         return () => { if (searchTimeout.current) clearTimeout(searchTimeout.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchQuery]);
 
     // ── Actions ──
@@ -888,6 +891,7 @@ function PreviewThumb({ fileUrl, callRPC }: { fileUrl: string; callRPC: any }) {
         callRPC('get_swipe_image', { file_url: fileUrl })
             .then((res: any) => setSrc(res.base64))
             .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fileUrl]);
 
     if (!src) return <div className="w-full h-full bg-white/[0.02]" />;

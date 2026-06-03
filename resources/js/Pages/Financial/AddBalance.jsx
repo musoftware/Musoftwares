@@ -23,7 +23,7 @@ export default function AddBalance({ wallet }) {
             if (typeof route !== 'undefined' && route().has(name)) {
                 return route(name, params);
             }
-        } catch (e) {}
+        } catch (e) { /* empty */ }
         return fallbackUrl || '#';
     };
 

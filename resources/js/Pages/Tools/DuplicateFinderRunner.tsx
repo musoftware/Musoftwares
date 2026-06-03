@@ -80,7 +80,7 @@ export default function DuplicateFinderRunner({ tool }: any) {
                             (ws as any)._pending?.delete(id);
                         }
                     }
-                } catch {}
+                } catch { /* empty */ }
             };
         };
 

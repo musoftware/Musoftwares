@@ -45,7 +45,7 @@ function useRPC(pluginId: string) {
                 if (msg.event) {
                     eventHandlersRef.current.forEach(h => h(msg.event, msg.data));
                 }
-            } catch {}
+            } catch { /* empty */ }
         };
         wsRef.current = socket;
         return () => socket.close();
@@ -106,6 +106,7 @@ export default function FbInboxSenderRunner({ tool }: any) {
     // Load profiles on mount
     useEffect(() => {
         if (connected) loadProfiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connected]);
 
     const loadProfiles = async () => {
@@ -113,7 +114,7 @@ export default function FbInboxSenderRunner({ tool }: any) {
             const res = await call('getProfiles');
             setProfiles(res.profiles || []);
             if (res.profiles?.length && !selectedProfileId) setSelectedProfileId(res.profiles[0].id);
-        } catch {}
+        } catch { /* empty */ }
     };
 
     const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
@@ -208,6 +209,7 @@ function InboxTab({ call, onEvent, profileId, profiles, onProfilesChange }: any)
     const [blockPatterns, setBlockPatterns] = useState('');
     const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { if (profileId) loadUsers(); }, [profileId]);
 
     useEffect(() => {
@@ -226,6 +228,7 @@ function InboxTab({ call, onEvent, profileId, profiles, onProfilesChange }: any)
                 loadUsers();
             }
         });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [profileId, onEvent]);
 
     const loadUsers = async () => {
@@ -234,7 +237,7 @@ function InboxTab({ call, onEvent, profileId, profiles, onProfilesChange }: any)
             const res = await call('getInboxUsers', { profileId });
             setUsers(res.users || []);
             setCount(res.count || 0);
-        } catch {}
+        } catch { /* empty */ }
     };
 
     const handleStartLoading = async () => {
@@ -248,7 +251,7 @@ function InboxTab({ call, onEvent, profileId, profiles, onProfilesChange }: any)
 
     const handleStopLoading = async () => {
         if (!profileId) return;
-        try { await call('stopLoading', { profileId }); } catch {}
+        try { await call('stopLoading', { profileId }); } catch { /* empty */ }
         setLoadingInbox(false);
     };
 
@@ -270,7 +273,7 @@ function InboxTab({ call, onEvent, profileId, profiles, onProfilesChange }: any)
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        } catch {}
+        } catch { /* empty */ }
     };
 
     const handleAddProfile = async () => {
@@ -487,6 +490,7 @@ function CampaignsTab({ call, onEvent, profileId }: any) {
     const [messages, setMessages] = useState<string[]>(['']);
     const [liveProgress, setLiveProgress] = useState<Record<number, { sent: number; failed: number; percent: number }>>({});
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { if (profileId) loadCampaigns(); }, [profileId]);
 
     useEffect(() => {
@@ -498,13 +502,14 @@ function CampaignsTab({ call, onEvent, profileId }: any) {
                 loadCampaigns();
             }
         });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [onEvent]);
 
     const loadCampaigns = async () => {
         try {
             const res = await call('getCampaigns', { profileId });
             setCampaigns(res.campaigns || []);
-        } catch {}
+        } catch { /* empty */ }
     };
 
     const handleCreate = async () => {
@@ -522,7 +527,7 @@ function CampaignsTab({ call, onEvent, profileId }: any) {
     };
 
     const handleAction = async (campaignId: number, action: string) => {
-        try { await call(action, { id: campaignId }); loadCampaigns(); } catch {}
+        try { await call(action, { id: campaignId }); loadCampaigns(); } catch { /* empty */ }
     };
 
     const statusColor = (s: string) => {
@@ -654,6 +659,7 @@ function WatchTab({ call, onEvent, profileId }: any) {
     const [intervalSec, setIntervalSec] = useState(300);
     const [maxCount, setMaxCount] = useState(100);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { if (profileId) loadSessions(); }, [profileId]);
 
     useEffect(() => {
@@ -668,7 +674,7 @@ function WatchTab({ call, onEvent, profileId }: any) {
         try {
             const res = await call('getWatchSessions', { profileId });
             setSessions(res.sessions || []);
-        } catch {}
+        } catch { /* empty */ }
     };
 
     const handleStartWatch = async () => {
@@ -677,16 +683,16 @@ function WatchTab({ call, onEvent, profileId }: any) {
             const res = await call('startWatch', { profile_id: profileId, webhook_url: webhookUrl, interval_sec: intervalSec, max_count: maxCount });
             setActiveSessionId(res.sessionId);
             loadSessions();
-        } catch {}
+        } catch { /* empty */ }
     };
 
     const handleStopWatch = async (sessionId: number) => {
-        try { await call('stopWatch', { sessionId }); loadSessions(); } catch {}
+        try { await call('stopWatch', { sessionId }); loadSessions(); } catch { /* empty */ }
     };
 
     const loadResults = async (sessionId: number) => {
         setActiveSessionId(sessionId);
-        try { const res = await call('getWatchResults', { sessionId }); setResults(res.results || []); } catch {}
+        try { const res = await call('getWatchResults', { sessionId }); setResults(res.results || []); } catch { /* empty */ }
     };
 
     return (
@@ -769,13 +775,14 @@ function LogsTab({ call, profileId }: any) {
     const [selectedCampaign, setSelectedCampaign] = useState<number | null>(null);
     const [logs, setLogs] = useState<CampaignLog[]>([]);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { if (profileId) loadCampaigns(); }, [profileId]);
 
     const loadCampaigns = async () => {
         try {
             const res = await call('getCampaigns', { profileId });
             setCampaigns(res.campaigns || []);
-        } catch {}
+        } catch { /* empty */ }
     };
 
     const loadLogs = async (campaignId: number) => {
@@ -783,7 +790,7 @@ function LogsTab({ call, profileId }: any) {
         try {
             const res = await call('getCampaignLogs', { campaignId });
             setLogs(res.logs || []);
-        } catch {}
+        } catch { /* empty */ }
     };
 
     return (
@@ -845,14 +852,15 @@ function LogsTab({ call, profileId }: any) {
 function SettingsTab({ call, profiles, onProfilesChange }: any) {
     const [stats, setStats] = useState<any>(null);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { loadStats(); }, []);
 
     const loadStats = async () => {
-        try { const res = await call('getGlobalStats'); setStats(res.stats); } catch {}
+        try { const res = await call('getGlobalStats'); setStats(res.stats); } catch { /* empty */ }
     };
 
     const handleDeleteProfile = async (id: number) => {
-        try { await call('deleteProfile', { id }); onProfilesChange(); } catch {}
+        try { await call('deleteProfile', { id }); onProfilesChange(); } catch { /* empty */ }
     };
 
     return (
@@ -904,9 +912,9 @@ function SettingsTab({ call, profiles, onProfilesChange }: any) {
                                         <DialogContent className="bg-[#1a1a2e] border-white/10 text-white sm:max-w-xs">
                                             <DialogHeader><DialogTitle className="text-sm">{__('general.profile_actions')}</DialogTitle></DialogHeader>
                                             <div className="flex flex-col gap-2 py-2">
-                                                <Button variant="outline" className="justify-start border-white/10 text-white/70" onClick={async () => { try { await call('launchBrowser', { profileId: p.id }); } catch {} }}>
+                                                <Button variant="outline" className="justify-start border-white/10 text-white/70" onClick={async () => { try { await call('launchBrowser', { profileId: p.id }); } catch { /* empty */ } }}>
                                                     <Globe className="w-4 h-4 mr-2" />{__('general.launch_browser')}</Button>
-                                                <Button variant="outline" className="justify-start border-white/10 text-white/70" onClick={async () => { try { await call('closeBrowser', { profileId: p.id }); } catch {} }}>
+                                                <Button variant="outline" className="justify-start border-white/10 text-white/70" onClick={async () => { try { await call('closeBrowser', { profileId: p.id }); } catch { /* empty */ } }}>
                                                     <X className="w-4 h-4 mr-2" />{__('general.close_browser')}</Button>
                                                 <Button variant="destructive" className="justify-start" onClick={() => handleDeleteProfile(p.id)}>
                                                     <Trash2 className="w-4 h-4 mr-2" />{__('general.delete_profile')}</Button>

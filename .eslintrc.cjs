@@ -3,6 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
+  ignorePatterns: ['public/build', 'vendor', 'resources/js/ziggy.js'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',

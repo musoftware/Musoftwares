@@ -71,6 +71,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
         if (!formData.city && cities.length > 0) {
             setFormData(prev => ({ ...prev, city: cities[0] }));
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [formData.country, cities]);
 
     // Autosave functionality

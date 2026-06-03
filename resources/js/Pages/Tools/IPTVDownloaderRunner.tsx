@@ -23,7 +23,7 @@ function useRuntimeRPC(pluginSlug: string) {
     const [connected, setConnected] = useState(false);
     const [activeTasks, setActiveTasks] = useState<any[]>([]);
     const pendingRequests = useRef(new Map());
-    const onMessageCallbacks = useRef<Set<Function>>(new Set());
+    const onMessageCallbacks = useRef<Set<((...args: any[]) => any)>>(new Set());
 
     useEffect(() => {
         let socket: WebSocket;
@@ -72,7 +72,7 @@ function useRuntimeRPC(pluginSlug: string) {
                         cb(msg);
                     }
 
-                } catch (err) {}
+                } catch (err) { /* empty */ }
             };
         };
 
@@ -114,7 +114,7 @@ function useRuntimeRPC(pluginSlug: string) {
         });
     };
 
-    const subscribeToEvents = (cb: Function) => {
+    const subscribeToEvents = (cb: ((...args: any[]) => any)) => {
         onMessageCallbacks.current.add(cb);
         return () => {
             onMessageCallbacks.current.delete(cb);
@@ -170,6 +170,7 @@ export default function IPTVDownloaderRunner() {
             fetchPlaylists();
             fetchDownloads();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connected]);
 
     // Live WebSocket Event Subscriber
@@ -222,6 +223,7 @@ export default function IPTVDownloaderRunner() {
         });
 
         return () => unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [subscribeToEvents]);
 
     // Fetch lists helper
@@ -232,14 +234,14 @@ export default function IPTVDownloaderRunner() {
             if (res.playlists.length > 0 && !selectedPlaylistId) {
                 setSelectedPlaylistId(res.playlists[0].id);
             }
-        } catch (err) {}
+        } catch (err) { /* empty */ }
     };
 
     const fetchDownloads = async () => {
         try {
             const res: any = await callRPC('list_downloads');
             setDownloads(res.downloads);
-        } catch (err) {}
+        } catch (err) { /* empty */ }
     };
 
     // Load browser schema dynamically
@@ -249,13 +251,14 @@ export default function IPTVDownloaderRunner() {
             setCurrentPage(1);
             fetchChannels(1);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPlaylistId, selectedGroup, searchQuery, bookmarkedOnly, streamType, connected]);
 
     const fetchGroups = async () => {
         try {
             const res: any = await callRPC('list_groups', { playlistId: selectedPlaylistId });
             setGroups(res.groups);
-        } catch (err) {}
+        } catch (err) { /* empty */ }
     };
 
     const fetchChannels = async (page = currentPage) => {
@@ -272,7 +275,7 @@ export default function IPTVDownloaderRunner() {
             });
             setChannels(res.channels);
             setTotalChannelsCount(res.totalCount);
-        } catch (err) {}
+        } catch (err) { /* empty */ }
     };
 
     const handlePageChange = (newPage: number) => {
@@ -358,7 +361,7 @@ export default function IPTVDownloaderRunner() {
                 setChannels([]);
             }
             fetchPlaylists();
-        } catch (err) {}
+        } catch (err) { /* empty */ }
     };
 
     // ── Channel Actions ───────────────────────────────────────────────────────
@@ -367,7 +370,7 @@ export default function IPTVDownloaderRunner() {
             await callRPC('toggle_bookmark', { channelId });
             // local update to state to prevent fully reloading channels list
             setChannels(prev => prev.map(ch => ch.id === channelId ? { ...ch, bookmarked: ch.bookmarked === 1 ? 0 : 1 } : ch));
-        } catch (err) {}
+        } catch (err) { /* empty */ }
     };
 
     // ── Download Workers Controls ─────────────────────────────────────────────
@@ -427,14 +430,14 @@ export default function IPTVDownloaderRunner() {
                 return copy;
             });
             fetchDownloads();
-        } catch (err) {}
+        } catch (err) { /* empty */ }
     };
 
     const handleDeleteDownloadHistory = async (id: string) => {
         try {
             await callRPC('delete_download', { id });
             fetchDownloads();
-        } catch (err) {}
+        } catch (err) { /* empty */ }
     };
 
     // Derived quick metrics for dashboard
@@ -970,7 +973,7 @@ export default function IPTVDownloaderRunner() {
                                                 {/* Logs Terminal view */}
                                                 {showLogsTaskId === task.id && (
                                                     <div className="bg-slate-950 text-emerald-400 font-mono text-[9px] p-3 rounded-2xl max-h-48 overflow-y-auto space-y-0.5 mt-4 leading-relaxed animate-in slide-in-from-top duration-300">
-                                                        <p className="text-slate-500">// Stream worker terminal stdout capture</p>
+                                                        <p className="text-slate-500">{/* Stream worker terminal stdout capture */}</p>
                                                         {taskLogs[task.id]?.map((logLine, idx) => (
                                                             <p key={idx}>{logLine}</p>
                                                         )) || <p className="text-slate-500">{__('general.awaiting_stream_packets')}</p>}

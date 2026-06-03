@@ -54,7 +54,7 @@ export default function DomainIntelligenceRunner({ tool }: any) {
                 if (msg.event === 'task.error' && msg.data?.taskId === taskId) {
                     setError(msg.data.error ?? 'Unknown error'); setStatus('error');
                 }
-            } catch {}
+            } catch { /* empty */ }
         };
         return () => ws.close();
     }, [taskId]);

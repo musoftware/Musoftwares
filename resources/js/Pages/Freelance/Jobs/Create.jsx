@@ -49,7 +49,7 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                     setAvailableSkills(response.data);
                 }
             }).catch(() => {});
-        } catch (e) {}
+        } catch (e) { /* empty */ }
     }, []);
 
     const submit = (e) => {

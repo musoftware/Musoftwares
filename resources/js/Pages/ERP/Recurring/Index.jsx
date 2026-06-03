@@ -50,11 +50,13 @@ export default function Index({ income, expense, stats }) {
             case 'daily':
                 return { label: 'Daily', className: 'bg-blue-100 text-blue-800' };
             case 'weekly':
+                // eslint-disable-next-line no-case-declarations
                 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
                 return { label: `Every ${days[entry.frequency_day]}`, className: 'bg-purple-100 text-purple-800' };
             case 'monthly':
                 return { label: `${entry.frequency_day}${getOrdinal(entry.frequency_day)} of month`, className: 'bg-indigo-100 text-indigo-800' };
             case 'yearly':
+                // eslint-disable-next-line no-case-declarations
                 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                 return { label: `${months[entry.frequency_month - 1]} ${entry.frequency_day}`, className: 'bg-cyan-100 text-cyan-800' };
             default:

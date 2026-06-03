@@ -138,6 +138,7 @@ export default function DeliverabilityWorkspace({
 
     useEffect(() => {
         refreshStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [daemonConnected, globalSessions]);
 
     // Handle WebSocket live activity stream
@@ -154,6 +155,7 @@ export default function DeliverabilityWorkspace({
         return () => {
             if (onActivityRef) onActivityRef.current = null;
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [onActivityRef]);
 
     const handleToggleWarmup = async (accountId: string, active: boolean) => {

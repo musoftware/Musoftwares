@@ -120,6 +120,7 @@ export default function CampaignWorkspace({
             setContactsText(csv);
             clearFollowUpData?.();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [followUpData]);
 
     // ── Contacts DB functions ────────────────────────────────────────────
@@ -143,7 +144,7 @@ export default function CampaignWorkspace({
         try {
             const res: any = await callRPC('getContactTags', {});
             setDbTags(res.tags || []);
-        } catch { }
+        } catch { /* empty */ }
     };
 
     useEffect(() => {
@@ -151,6 +152,7 @@ export default function CampaignWorkspace({
             fetchDbContacts();
             fetchDbTags();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inputMethod, dbSearch, dbTagFilter]);
 
     const toggleContactSelection = (phone: string) => {

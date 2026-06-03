@@ -30,7 +30,7 @@ export function HistoryWorkspace({
 
     const handleClearHistory = async () => {
         try { await callRPC('clear_history', {}); setHistory([]); }
-        catch (_) {}
+        catch (_) { /* empty */ }
     };
 
     const handleOpenFolder = async (subdir?: string) => {

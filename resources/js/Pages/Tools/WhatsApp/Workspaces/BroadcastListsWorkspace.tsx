@@ -83,7 +83,7 @@ export default function BroadcastListsWorkspace({ t, locale, callRPC, daemonConn
         try {
             const res: any = await callRPC('getContactFolders', {});
             setFolders(res.folders || []);
-        } catch (_) {}
+        } catch (_) { /* empty */ }
     };
 
     const fetchSessions = async () => {
@@ -93,9 +93,10 @@ export default function BroadcastListsWorkspace({ t, locale, callRPC, daemonConn
             const connected = all.filter((s: any) => s.state === 'connected');
             setSessions(connected);
             if (connected.length > 0 && !selectedSession) setSelectedSession(connected[0].accountId);
-        } catch (_) {}
+        } catch (_) { /* empty */ }
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { if (daemonConnected) { fetchLists(); fetchSessions(); } }, [daemonConnected]);
 
     const resetForm = () => { setFormName(''); setFormDesc(''); setEditList(null); setShowForm(false); };

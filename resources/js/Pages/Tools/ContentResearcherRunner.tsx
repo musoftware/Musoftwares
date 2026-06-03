@@ -61,6 +61,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
             setStatus('error');
             setError(data?.error || 'Task failed unexpectedly.');
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [taskId]);
 
     const { connected: agentConnected, callRPC, installingPlugin, loginRequired, setLoginRequired } = useRuntimeWS('content-researcher', onBroadcast);
@@ -70,6 +71,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
         if (agentConnected) {
             loadCampaigns();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [agentConnected]);
 
     const loadCampaigns = async () => {
@@ -166,7 +168,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                 `"${(r.domain || '').replace(/"/g, '""')}"`,
                 `"${(r.url || '').replace(/"/g, '""')}"`,
                 `"${(m.title || '').replace(/"/g, '""')}"`,
-                `"${(Array.isArray(m.h1) ? m.h1.join(' | ') : (m.h1 || r.h1 || '')).replace(/[\[\]"]/g, '')}"`,
+                `"${(Array.isArray(m.h1) ? m.h1.join(' | ') : (m.h1 || r.h1 || '')).replace(/[[\]"]/g, '')}"`,
                 m.word_count || 0,
                 m.has_faq_schema ? 'Yes' : 'No',
                 `"${(r.snippet || m.meta_description || '').replace(/"/g, '""')}"`,
@@ -471,7 +473,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                                     </td>
                                                     <td className="px-4 py-3 align-top">
                                                         <p className="text-[11px] font-bold text-slate-700 line-clamp-1 mb-1">
-                                                            {(Array.isArray(metrics.h1) ? metrics.h1.join(' | ') : (metrics.h1 || r.h1 || '')).replace(/[\[\]"]/g, '') || 'No H1'}
+                                                            {(Array.isArray(metrics.h1) ? metrics.h1.join(' | ') : (metrics.h1 || r.h1 || '')).replace(/[[\]"]/g, '') || 'No H1'}
                                                         </p>
                                                         <p className="text-[10px] text-slate-500 line-clamp-2">{r.snippet || metrics.meta_description || '-'}</p>
                                                     </td>

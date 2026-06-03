@@ -73,7 +73,7 @@ export default function OlxB2CFinderRunner({ auth, tool }: any) {
                 } else if (msg.event === 'olx.search.started') {
                     setIsRunning(true);
                 }
-            } catch (_) {}
+            } catch (_) { /* empty */ }
         };
         
         return () => ws.close();

@@ -293,12 +293,13 @@ export default function InstagramRunner({ tool }: any) {
                             (ws as any)._pending?.delete(id);
                         }
                     }
-                } catch {}
+                } catch { /* empty */ }
             };
         };
 
         connect();
         return () => { clearTimeout(retry); ws?.close(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // ── Polling fallback: fetch users from DB every 4s while running ──
@@ -334,7 +335,7 @@ export default function InstagramRunner({ tool }: any) {
                         return prev;
                     });
                 }
-            } catch {}
+            } catch { /* empty */ }
         }, 4000);
 
         return () => clearInterval(poll);
@@ -372,7 +373,7 @@ export default function InstagramRunner({ tool }: any) {
                     setSelectedAccountId(data.sessions[0].id);
                 }
             }
-        } catch (e) {}
+        } catch (e) { /* empty */ }
         setLoadingAccounts(false);
     }, [callRPC, selectedAccountId]);
 
@@ -489,7 +490,7 @@ export default function InstagramRunner({ tool }: any) {
             try {
                 await callRPC('instagram.extract.stop', { campaignId: cId });
             } catch {
-                try { await callRPC('instagram.extract.stop.all', {}); } catch {}
+                try { await callRPC('instagram.extract.stop.all', { /* empty */ }); } catch { /* empty */ }
             }
         }
         setStatus('done');

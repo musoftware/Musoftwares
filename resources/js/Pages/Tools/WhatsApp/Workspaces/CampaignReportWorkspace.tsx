@@ -236,6 +236,7 @@ export default function CampaignReportWorkspace({ t, locale, callRPC, campaignId
         }, 3000);
 
         return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [campaignId, statusFilter, daemonConnected]);
 
     const totalContacts = stats.total || contacts.length;

@@ -90,6 +90,7 @@ export default function PricingBuilder({
 
     useEffect(() => {
         setSelectedItems(activeItems);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isNewSystem]); // Only reset when switching modes, not when activeItems changes (to allow URL param to be set once)
 
     const [selectedItems, setSelectedItems] = useState<string[]>(activeItems);

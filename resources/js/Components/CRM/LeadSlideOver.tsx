@@ -29,6 +29,7 @@ export function LeadSlideOver({ leadId, isOpen, onClose }: LeadSlideOverProps) {
             setLead(null);
             setTimeline([]);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen, leadId]);
 
     const fetchLeadData = async () => {

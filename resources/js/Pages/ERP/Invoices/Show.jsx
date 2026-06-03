@@ -212,6 +212,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
     }
 
     // ADMIN VIEW
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (

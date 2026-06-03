@@ -96,6 +96,7 @@ export function AsyncCombobox({
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, open, endpoint])
 
   // Reset options when opened without a search query to show default state
@@ -103,6 +104,7 @@ export function AsyncCombobox({
     if (open && !searchQuery && defaultOptions.length > 0) {
       setOptions(defaultOptions)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   // Support updating selectedLabel when initialLabel prop changes

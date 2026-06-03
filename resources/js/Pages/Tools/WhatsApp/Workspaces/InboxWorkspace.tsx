@@ -66,6 +66,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, sel
         if (showCopilot && selectedThread?.id) {
             fetchCopilotDraft();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedThread?.id, showCopilot]);
     const selectedThreadRef = useRef<any>(null);
     const callRPCRef = useRef(callRPC);
@@ -225,7 +226,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, sel
                     reconnectTimer = setTimeout(connect, backoff);
                 };
                 ws.onerror = () => ws?.close();
-            } catch {}
+            } catch { /* empty */ }
         };
 
         connect();
@@ -240,6 +241,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, sel
         if (daemonConnected) {
             fetchThreads();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [daemonConnected, selectedAccount]);
 
     // Fetch initial messages for active thread when it is selected
@@ -264,7 +266,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, sel
                 // Update unread count locally for instant responsiveness
                 setThreads(prev => prev.map(t => t.id === thread.id ? { ...t, unread_count: 0 } : t));
                 onUnreadReset?.();
-            } catch {}
+            } catch { /* empty */ }
         }
         fetchMessages(thread.id);
         setTimeout(() => inputRef.current?.focus(), 100);

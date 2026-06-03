@@ -108,8 +108,10 @@ export default function ChatWindow({
                 window.Echo.leave(`conversation.${conversationId}`);
             }
             // Clear all typing timeouts
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             Object.values(typingTimeoutsRef.current).forEach(clearTimeout);
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conversationId]);
 
     const handleFocus = () => {

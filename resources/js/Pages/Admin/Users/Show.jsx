@@ -166,15 +166,15 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                     <div role="button" className="inline-flex cursor-pointer items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-[8px] hover:bg-slate-800 transition shadow-sm text-sm font-semibold select-none">{__('general.quick_actions')}<ChevronDown size={16} />
                     </div>
                 </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-[750px] p-4">
-                        <div className="grid grid-cols-3 gap-6">
+                    <DropdownMenuContent align="end" className="w-[calc(100vw-2rem)] md:w-[750px] p-4 max-h-[85vh] overflow-y-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {/* Column 1: Profile & Security */}
                             <div className="space-y-1">
                                 <DropdownMenuLabel className="text-slate-500 uppercase tracking-wider text-xs mb-2">{__('general.profile_and_security') || 'Profile & Security'}</DropdownMenuLabel>
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem onClick={handleLoginAsUser} disabled={isLoginAsLoading}>
                                         <Briefcase className="mr-2 h-4 w-4" />
-                                        <span>{isLoginAsLoading ? 'Logging in...' : 'Login As'}</span>
+                                        <span>{isLoginAsLoading ? __('general.logging_in') : __('general.login_as')}</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/users/${client.id}/edit`} className="w-full cursor-pointer flex items-center">

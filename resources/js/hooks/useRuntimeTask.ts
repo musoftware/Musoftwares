@@ -77,7 +77,7 @@ export function useRuntimeTask(pluginSlug: string, options: UseRuntimeTaskOption
                         setStatus('error');
                         if (pollRef.current) clearInterval(pollRef.current);
                     }
-                } catch {}
+                } catch { /* empty */ }
             };
             wsRef.current = ws;
 
@@ -97,7 +97,7 @@ export function useRuntimeTask(pluginSlug: string, options: UseRuntimeTaskOption
                         setStatus('error');
                         clearInterval(pollRef.current);
                     }
-                } catch {}
+                } catch { /* empty */ }
             }, 1500);
 
         } catch (e) {
