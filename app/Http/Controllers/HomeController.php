@@ -18,6 +18,14 @@ class HomeController extends Controller
         ]);
     }
 
+    public function portfolio()
+    {
+        return Inertia::render('Public/Portfolio', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
     public function platforms()
     {
         return Inertia::render('Public/Platforms', [
