@@ -208,6 +208,7 @@ function SettingsPanel({ callRPC }: { callRPC: (a: string, d?: any) => Promise<a
             setSettings(s);
             setProxies((s.proxies || []).join('\n'));
         }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSave = async (e: React.FormEvent) => {
@@ -221,7 +222,7 @@ function SettingsPanel({ callRPC }: { callRPC: (a: string, d?: any) => Promise<a
             });
             setSaved(true);
             setTimeout(() => setSaved(false), 2500);
-        } catch (_) {} finally { setSaving(false); }
+        } catch (_) { /* empty */ } finally { setSaving(false); }
     };
 
     if (!settings) return (
@@ -390,6 +391,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
         if (event === 'gm.scraper.error') {
             addLog(`Error: ${data.error}`);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [resultsLimit]);
 
     const { connected, callRPC, installingPlugin, loginRequired, setLoginRequired } = useRuntimeWS('google-maps', onBroadcast);
@@ -411,7 +413,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
         try {
             const stats = await callRPC('gm.campaign.stats', { campaignId });
             setCampaignStats(prev => ({ ...prev, [campaignId]: stats }));
-        } catch (_) {}
+        } catch (_) { /* empty */ }
     }, [callRPC]);
 
     const fetchResults = useCallback(async () => {
@@ -434,10 +436,12 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
             fetchCampaigns();
             addLog('Connected. Ready to extract leads from Google Maps.');
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connected]);
 
     useEffect(() => {
         if (connected) fetchResults();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connected, filterCampaignId, resultsOffset, filterSearch, filterHasEmail, filterHasPhone]);
 
     // ── Actions ───────────────────────────────────────────────────────────────

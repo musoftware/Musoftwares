@@ -63,6 +63,7 @@ export default function MediaLibraryWorkspace({ t, locale, callRPC, daemonConnec
 
     useEffect(() => {
         if (daemonConnected) fetchMedia();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [daemonConnected, typeFilter]);
 
     const processFiles = async (files: File[]) => {

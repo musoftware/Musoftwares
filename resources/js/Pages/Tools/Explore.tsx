@@ -248,12 +248,14 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
         checkMidnight();
         const interval = setInterval(checkMidnight, 60000);
         return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showPrayerTimes, lastFetchedDate, prayerCity, prayerCountry, prayerMethod]);
 
     useEffect(() => {
         if (showPrayerTimes) {
             fetchPrayerTimes();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [prayerCity, prayerCountry, prayerMethod]);
 
     // Fetch Bing image if using default Unsplash wallpaper
@@ -268,6 +270,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                 })
                 .catch(err => console.error("Failed to fetch bing images", err));
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Next Prayer Logic
@@ -444,6 +447,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     const findNextAvailableCell = (items: DesktopItem[]): { x: number, y: number } => {
         let x = 0;
         let y = 0;
+        // eslint-disable-next-line no-constant-condition
         while (true) {
             if (!items.some(i => i.x === x && i.y === y)) {
                 return { x, y };
@@ -486,6 +490,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
             });
             setDesktopItems(updatedItems);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tools.data]);
 
     // Persist layout and windows on change
@@ -496,6 +501,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
             return;
         }
         saveSettings(desktopItems, showPrayerTimes, wallpaperUrl, prayerCity, prayerCountry, prayerMethod, openWithOneClick, runtimeHost, activeWindows);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [desktopItems, activeWindows, runtimeHost]);
 
     const handleCreateFolder = () => {

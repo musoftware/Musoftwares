@@ -606,11 +606,9 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
 // Helpers
 const safeRoute = (name: string, params?: any, fallbackUrl?: string) => {
     try {
-        // @ts-ignore
         if (typeof route !== 'undefined' && route().has(name)) {
-            // @ts-ignore
             return route(name, params);
         }
-    } catch (e) {}
+    } catch (e) { /* empty */ }
     return fallbackUrl || '#';
 };

@@ -74,6 +74,7 @@ export default function AutoReplyWorkspace({ t, locale, callRPC, selectedAccount
 
     useEffect(() => {
         if (daemonConnected) fetchRules();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [daemonConnected, selectedAccount]);
 
     const resetForm = () => {
@@ -445,7 +446,7 @@ export default function AutoReplyWorkspace({ t, locale, callRPC, selectedAccount
                             const tt = triggerTypeInfo(rule.trigger_type);
                             const childRules = rules.filter((r: any) => r.parent_rule_id === rule.id);
                             let pollOptions: string[] = [];
-                            try { pollOptions = JSON.parse((rule as any).response_poll_options || '[]'); } catch {}
+                            try { pollOptions = JSON.parse((rule as any).response_poll_options || '[]'); } catch { /* empty */ }
                             const isFlowExpanded = expandedFlows[rule.id];
                             return (
                                 <div

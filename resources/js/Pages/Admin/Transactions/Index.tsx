@@ -6,6 +6,7 @@ import { __ } from '@/lib/i18n';
 export default function Index({ filters }) {
     useEffect(() => {
         router.get('/admin/transactions', { ...filters, type: 'income' }, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

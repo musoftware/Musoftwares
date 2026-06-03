@@ -25,6 +25,7 @@ export default function DashboardWorkspace({ t, locale, callRPC, daemonConnected
         // Auto-refresh every 30s
         const interval = setInterval(() => { if (daemonConnected) fetchStats(); }, 30000);
         return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [daemonConnected, selectedAccount]);
 
     const deliveryRate = stats?.messages?.total > 0

@@ -166,7 +166,7 @@ export default function WaAiAgentRunner({ tool }: any) {
                         const r = (ws as any)._pending?.get(msg.requestId);
                         if (r) { r.resolve(msg.payload); (ws as any)._pending?.delete(msg.requestId); }
                     }
-                } catch {}
+                } catch { /* empty */ }
             };
         };
         connect();

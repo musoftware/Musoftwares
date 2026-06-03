@@ -18,7 +18,7 @@ const getWsUrl       = () => `ws://${getRuntimeHost()}:18401/ws`;
 
 /* ── RPC helper ─────────────────────────────────────────────────── */
 let rpcCounter = 0;
-const pendingRPC = new Map<number, { resolve: Function; reject: Function }>();
+const pendingRPC = new Map<number, { resolve: ((...args: any[]) => any); reject: ((...args: any[]) => any) }>();
 
 function sendRPC(ws: WebSocket | null, action: string, params: any = {}): Promise<any> {
     return new Promise((resolve, reject) => {
@@ -278,7 +278,7 @@ export default function TelegramToolRunner({ tool }: any) {
                             setSendStatus('done');
                         }
                     }
-                } catch {}
+                } catch { /* empty */ }
             };
         };
 
@@ -294,7 +294,7 @@ export default function TelegramToolRunner({ tool }: any) {
         try {
             const res = await rpc('telegram-tool.sessions.list');
             if (res?.ok) setSessions(res.sessions || []);
-        } catch {}
+        } catch { /* empty */ }
     }, [rpc]);
 
     useEffect(() => {
@@ -422,7 +422,7 @@ export default function TelegramToolRunner({ tool }: any) {
         try {
             const res = await rpc('telegram-tool.members.list', { campaignId: campaign.id, limit: 500 });
             if (res?.ok) setCampaignMembers(res.members || []);
-        } catch {}
+        } catch { /* empty */ }
     };
 
     /* ── Toggle group selection ── */

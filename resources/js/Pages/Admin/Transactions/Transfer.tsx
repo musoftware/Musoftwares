@@ -73,10 +73,12 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
 
     useEffect(() => {
         if (sourceProject) fetchBalance(sourceProject, setSourceBalance, setMaxAmount);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sourceProject, currencyId]);
 
     useEffect(() => {
         if (targetProject) fetchBalance(targetProject, setTargetBalance);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [targetProject, currencyId]);
 
     const fetchBalance = async (projectId: number, setBalance: (val: number) => void, setMax?: (val: number) => void) => {

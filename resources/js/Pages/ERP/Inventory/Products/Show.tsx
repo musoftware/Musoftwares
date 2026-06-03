@@ -9,9 +9,7 @@ export default function Show({ product, stockLogs }: { product: any, stockLogs: 
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('inventory');
 
     const t = (key: string, fallback: string) => {
-        // @ts-ignore
         if (typeof window !== 'undefined' && typeof window.__ === 'function') {
-            // @ts-ignore
             return window.__(key);
         }
         return fallback;

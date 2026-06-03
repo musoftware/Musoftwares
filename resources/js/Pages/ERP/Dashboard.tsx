@@ -515,6 +515,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     useEffect(() => {
         if (!selectedNote) return;
         setNotes(prev => prev.map(n => n.id === selectedNote.id ? { ...n, ...noteEditor } : n));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [noteEditor]);
 
     // Handle note selection

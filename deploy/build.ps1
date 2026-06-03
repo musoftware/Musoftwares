@@ -56,9 +56,16 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "-> Checking ESLint..." -ForegroundColor DarkGray
-cmd.exe /c "npm run lint"
+cmd.exe /c "npm run lint -- --fix"
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "ESLint check failed! But continuing upload..." -ForegroundColor Yellow
+    Write-Host "ESLint check failed! Attempting auto-fix script..." -ForegroundColor Yellow
+    cmd.exe /c "npm run lint -- --format json -o lint-results.json"
+    cmd.exe /c "node fix_lint.cjs"
+    Write-Host "-> Re-checking ESLint after auto-fix..." -ForegroundColor DarkGray
+    cmd.exe /c "npm run lint -- --fix"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "ESLint check still failed after auto-fix! But continuing upload..." -ForegroundColor Red
+    }
 }
 
 # 2. Local Build

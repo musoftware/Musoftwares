@@ -180,7 +180,7 @@ export default function HookAnalyzerRunner({ tool }: any) {
                 if (msg.event === 'task.error' && msg.data?.taskId === taskId) {
                     setError(msg.data.error ?? 'Unknown error'); setStatus('error');
                 }
-            } catch {}
+            } catch { /* empty */ }
         };
         return () => ws.close();
     }, [taskId]);
@@ -194,7 +194,7 @@ export default function HookAnalyzerRunner({ tool }: any) {
                 if (d.result) { setResult(d.result); setStatus('done'); clearInterval(iv); }
                 if (d.status === 'failed') { setError(d.error ?? 'Failed'); setStatus('error'); clearInterval(iv); }
                 if (typeof d.progress === 'number') setProgress(d.progress);
-            } catch {}
+            } catch { /* empty */ }
         }, 2000);
         return () => clearInterval(iv);
     }, [taskId, status]);

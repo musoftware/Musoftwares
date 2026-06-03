@@ -47,7 +47,7 @@ export default function LaragonManagerRunner({ tool }: any) {
                             (ws as any)._pending?.delete(id);
                         }
                     }
-                } catch {}
+                } catch { /* empty */ }
             };
         };
 

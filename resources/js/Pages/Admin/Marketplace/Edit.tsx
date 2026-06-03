@@ -212,8 +212,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                                     placeholder={__('general.e_g_basic_logo')}
                                                     required
                                                 />
-                                                {/* @ts-ignore */}
-                                                {errors[`packages.${index}.name`] && <p className="text-xs text-red-500">{errors[`packages.${index}.name`]}</p>}
+                                                {errors[`packages.${index}.name` as keyof typeof errors] && <p className="text-xs text-red-500">{errors[`packages.${index}.name` as keyof typeof errors] as string}</p>}
                                             </div>
                                             
                                             <div className="space-y-2">
@@ -229,8 +228,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                                         required
                                                     />
                                                 </div>
-                                                {/* @ts-ignore */}
-                                                {errors[`packages.${index}.price`] && <p className="text-xs text-red-500">{errors[`packages.${index}.price`]}</p>}
+                                                {errors[`packages.${index}.price` as keyof typeof errors] && <p className="text-xs text-red-500">{errors[`packages.${index}.price` as keyof typeof errors] as string}</p>}
                                             </div>
 
                                             <div className="space-y-2">
@@ -242,8 +240,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                                     onChange={(e) => updatePackage(index, 'delivery_days', e.target.value)} 
                                                     required
                                                 />
-                                                {/* @ts-ignore */}
-                                                {errors[`packages.${index}.delivery_days`] && <p className="text-xs text-red-500">{errors[`packages.${index}.delivery_days`]}</p>}
+                                                {errors[`packages.${index}.delivery_days` as keyof typeof errors] && <p className="text-xs text-red-500">{errors[`packages.${index}.delivery_days` as keyof typeof errors] as string}</p>}
                                             </div>
 
                                             <div className="space-y-2 md:col-span-2">
@@ -254,8 +251,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                                     rows={2}
                                                     required
                                                 />
-                                                {/* @ts-ignore */}
-                                                {errors[`packages.${index}.description`] && <p className="text-xs text-red-500">{errors[`packages.${index}.description`]}</p>}
+                                                {errors[`packages.${index}.description` as keyof typeof errors] && <p className="text-xs text-red-500">{errors[`packages.${index}.description` as keyof typeof errors] as string}</p>}
                                             </div>
                                         </div>
                                     </div>

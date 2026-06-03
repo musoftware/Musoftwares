@@ -171,6 +171,7 @@ export default function CampaignsListWorkspace({ t, locale, callRPC, onViewRepor
         if (daemonConnected) {
             fetchCampaigns();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [daemonConnected]);
 
     // Auto-refresh running campaigns
@@ -180,6 +181,7 @@ export default function CampaignsListWorkspace({ t, locale, callRPC, onViewRepor
         if (!hasRunning) return;
         const interval = setInterval(fetchCampaigns, 5000);
         return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [campaigns, daemonConnected]);
 
     // Merge live progress from activeCampaigns

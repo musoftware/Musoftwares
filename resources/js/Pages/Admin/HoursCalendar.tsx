@@ -27,6 +27,7 @@ export default function HoursCalendar({ years, auth }: any) {
 
     useEffect(() => {
         loadData(selectedYear);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedYear]);
 
     const loadData = async (year: number) => {

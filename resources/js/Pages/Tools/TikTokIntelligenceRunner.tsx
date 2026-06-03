@@ -109,7 +109,7 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                             (ws as any)._pending?.delete(msg.requestId);
                         }
                     }
-                } catch {}
+                } catch { /* empty */ }
             };
         };
         connect();

@@ -101,7 +101,7 @@ class MusoftwareRuntimeSDK {
             try {
                 const msg = JSON.parse(e.data) as RuntimeEvent;
                 this._dispatch(msg);
-            } catch (_) {}
+            } catch (_) { /* empty */ }
         };
 
         this.ws.onclose = () => {
@@ -178,7 +178,7 @@ class MusoftwareRuntimeSDK {
     async stopTask(taskId: string): Promise<void> {
         try {
             await fetch(`${this.runtimeHttp}/tasks/${taskId}/stop`, { method: 'POST' });
-        } catch (_) {}
+        } catch (_) { /* empty */ }
     }
 
     async getTask(taskId: string): Promise<Record<string, unknown> | null> {
@@ -221,7 +221,7 @@ class MusoftwareRuntimeSDK {
 
     private _dispatch(event: RuntimeEvent) {
         for (const h of this.handlers) {
-            try { h(event); } catch (_) {}
+            try { h(event); } catch (_) { /* empty */ }
         }
     }
 

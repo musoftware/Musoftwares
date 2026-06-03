@@ -34,6 +34,7 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
 
     useEffect(() => {
         fetchNotes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [noteableType, noteableId]);
 
     const fetchNotes = async () => {

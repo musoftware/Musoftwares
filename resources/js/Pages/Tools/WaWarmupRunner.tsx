@@ -173,11 +173,12 @@ export default function WaWarmupRunner({ tool }: any) {
                         const r = (ws as any)._pending?.get(msg.requestId);
                         if (r) { msg.type === 'plugin_rpc_error' ? r.reject(new Error(msg.payload?.error)) : r.resolve(msg.payload); (ws as any)._pending?.delete(msg.requestId); }
                     }
-                } catch {}
+                } catch { /* empty */ }
             };
         };
         connect();
         return () => { clearTimeout(retry); ws?.close(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const callRPC = (ws: WebSocket, action: string, data: any = {}): Promise<any> => new Promise((resolve, reject) => {

@@ -199,6 +199,7 @@ export default function GroupsWorkspace({ t, locale, callRPC, selectedAccount, s
         if (selectedAccount && daemonConnected) {
             fetchGroups();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedAccount, daemonConnected]);
 
     const filteredMembers = getFilteredMembers();

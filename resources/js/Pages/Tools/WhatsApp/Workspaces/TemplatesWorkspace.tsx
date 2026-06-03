@@ -169,6 +169,7 @@ function MediaLibrarySelectorModal({ onClose, onSelect, activeType, callRPC, dae
 
     useEffect(() => {
         fetchMedia();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [daemonConnected, typeFilter]);
 
     const filtered = media.filter(m => {
@@ -905,6 +906,7 @@ export default function TemplatesWorkspace({
         if (daemonConnected) {
             fetch();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [daemonConnected]);
 
     useEffect(() => {

@@ -312,7 +312,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                             (ws as any)._pending?.delete(id);
                         }
                     }
-                } catch {}
+                } catch { /* empty */ }
             };
         };
 
@@ -364,7 +364,7 @@ export default function ArticleMakerRunner({ tool }: any) {
     const handleStopDiscover = async () => {
         const cId = campaignIdRef.current;
         if (cId) {
-            try { await callRPC('article-maker.keywords.stop', { campaignId: cId }); } catch {}
+            try { await callRPC('article-maker.keywords.stop', { campaignId: cId }); } catch { /* empty */ }
         }
         setDiscoverStatus('done');
         setProgressMsg(`Stopped — ${keywords.length} keywords captured.`);
@@ -423,7 +423,7 @@ export default function ArticleMakerRunner({ tool }: any) {
         try {
             const res = await callRPC('article-maker.campaigns.list');
             if (res?.campaigns) setCampaigns(res.campaigns);
-        } catch {}
+        } catch { /* empty */ }
         setLoadingCampaigns(false);
     }, [connected, callRPC]);
 
@@ -435,7 +435,7 @@ export default function ArticleMakerRunner({ tool }: any) {
         try {
             const res = await callRPC('article-maker.campaign.detail', { campaignId: campaign.id });
             if (res?.keywords) setCampaignKeywords(res.keywords);
-        } catch {}
+        } catch { /* empty */ }
         setLoadingDetail(false);
     };
 

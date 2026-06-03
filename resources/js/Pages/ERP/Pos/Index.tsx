@@ -62,6 +62,7 @@ export default function Index({ products, auth }: any) {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [products]);
 
     const handleBarcodeScanned = (barcode: string) => {

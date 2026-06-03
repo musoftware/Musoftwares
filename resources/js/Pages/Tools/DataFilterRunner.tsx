@@ -44,21 +44,21 @@ export default function DataFilterRunner({ tool }: any) {
                     setFilePath(res.paths[0]);
                 }
             }
-        } catch (e) {}
+        } catch (e) { /* empty */ }
     };
 
     const handleBrowseOutputFolder = async () => {
         try {
             const res: any = await callRPC('browse_folder', { title: "Select Output Folder" });
             if (res.path) setTargetFolder(res.path);
-        } catch (e) {}
+        } catch (e) { /* empty */ }
     };
 
     const handleBrowseOutput = async () => {
         try {
             const res: any = await callRPC('browse_save_file', { title: "Save Output CSV" });
             if (res.path) setTargetPath(res.path);
-        } catch (e) {}
+        } catch (e) { /* empty */ }
     };
 
     // History
@@ -90,6 +90,7 @@ export default function DataFilterRunner({ tool }: any) {
         if (activeTab === 'history') {
             fetchHistory();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeTab]);
 
     const addRealtimeLog = (message: string) => {
@@ -135,6 +136,7 @@ export default function DataFilterRunner({ tool }: any) {
         }, 1500);
 
         return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [jobId, status]);
 
     const handleRun = async () => {

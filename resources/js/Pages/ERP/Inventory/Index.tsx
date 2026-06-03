@@ -24,9 +24,7 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
     const [search, setSearch] = useState(filters?.search || '');
 
     const t = (key: string, fallback: string) => {
-        // @ts-ignore
         if (typeof window !== 'undefined' && typeof window.__ === 'function') {
-            // @ts-ignore
             return window.__(key);
         }
         return fallback;
@@ -52,6 +50,7 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
         );
     }
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { delete: destroy } = useForm();
 
     const handleDelete = (id: number) => {

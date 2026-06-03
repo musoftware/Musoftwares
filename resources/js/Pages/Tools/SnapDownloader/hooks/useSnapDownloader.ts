@@ -29,14 +29,14 @@ export function useSnapDownloader() {
             setQueue(queueRes.queue || []);
             setHistory(histRes.history || []);
             setAutomations(autoRes.automations || []);
-        } catch (_) {}
+        } catch (_) { /* empty */ }
     }, [callRPC]);
 
     const loadFolders = useCallback(async () => {
         try {
             const res = await callRPC('get_folders', {});
             setFolders(res.folders || []);
-        } catch (_) {}
+        } catch (_) { /* empty */ }
     }, [callRPC]);
 
     useEffect(() => {

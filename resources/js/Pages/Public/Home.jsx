@@ -7,7 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Monitor, Smartphone, Server, CheckCircle, 
     ArrowRight, LayoutDashboard, Ticket, FolderKanban, X,
-    Users, MessageSquare, TrendingUp, Calendar, Store, Wrench
+    Users, MessageSquare, TrendingUp, Calendar, Store, Wrench,
+    Download, MessageCircle, Search
 } from 'lucide-react';
 
 const fadeUp = {

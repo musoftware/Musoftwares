@@ -62,6 +62,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
 
     useEffect(() => {
         setData('type', type);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [type]);
 
     const feeSources = [

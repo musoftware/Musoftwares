@@ -730,6 +730,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
             // Fetch initial unread count
             callRPC('getUnreadCount', {}).then((res: any) => setUnreadInboxCount(res?.count || 0)).catch(() => {});
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [daemonConnected]);
 
     // Poll unread inbox count
@@ -739,12 +740,14 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
             callRPC('getUnreadCount', {}).then((res: any) => setUnreadInboxCount(res?.count || 0)).catch(() => {});
         }, 5000);
         return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [daemonConnected]);
 
     useEffect(() => {
         if (daemonConnected && (activeTab === 'campaign' || activeTab === 'templates')) {
             fetchTemplates();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeTab, daemonConnected]);
 
     const fetchTemplates = async () => {

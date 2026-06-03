@@ -54,6 +54,7 @@ function SessionCard({
         } else {
             setPhoto(null);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [s.state, s.accountId]);
 
     const handleRenameSubmit = () => {

@@ -620,6 +620,7 @@ return [
     'displays_the_mobile_sidebar' => 'Displays the mobile sidebar.',
     'toggle_sidebar' => 'Toggle Sidebar',
     'you_are_currently_impersonating' => 'You are currently impersonating',
+    'impersonation_scope_notice' => 'All actions performed will be under this account\'s scope.',
     'stop_impersonation' => 'Stop Impersonation',
     'my_invoices' => 'My Invoices',
     'request_withdrawal' => 'Request Withdrawal',

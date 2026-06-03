@@ -269,12 +269,13 @@ export default function OpensooqRunner({ tool }: any) {
                             (ws as any)._pending?.delete(id);
                         }
                     }
-                } catch {}
+                } catch { /* empty */ }
             };
         };
 
         connect();
         return () => { clearTimeout(retry); ws?.close(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // ── Real-time polling fallback: fetch leads from DB every 4s while running ──
@@ -314,7 +315,7 @@ export default function OpensooqRunner({ tool }: any) {
                         return prev;
                     });
                 }
-            } catch {}
+            } catch { /* empty */ }
         }, 4000);
 
         return () => clearInterval(poll);
@@ -371,7 +372,7 @@ export default function OpensooqRunner({ tool }: any) {
             try {
                 await callRPC('opensooq.extract.stop', { campaignId: cId });
             } catch (err: any) {
-                try { await callRPC('opensooq.extract.stop.all', {}); } catch {}
+                try { await callRPC('opensooq.extract.stop.all', { /* empty */ }); } catch { /* empty */ }
             }
         }
         setStatus('done');
