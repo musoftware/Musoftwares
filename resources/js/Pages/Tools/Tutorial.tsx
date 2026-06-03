@@ -140,7 +140,7 @@ export default function Tutorial({ tool }: Props) {
                                         <h3 className="text-sm font-bold text-slate-900">{__('general.download_the_desktop_runtime_agent')}</h3>
                                         <p className="text-xs text-slate-500 leading-relaxed max-w-xl">{__('general.this_tool_executes_tasks_locally_on_your_operating_system_make_sure_you_have_the_musoftware_runtime_running')}</p>
                                         <div className="pt-1">
-                                            <a href={route('tools.download.agent', 'node')}>
+                                            <a href={route('runtime.download')} target="_blank" rel="noreferrer">
                                                 <Button size="sm" className="bg-slate-900 hover:bg-slate-800 text-white gap-2">
                                                     <Download className="h-3.5 w-3.5" />{__('general.download_agent_installer')}</Button>
                                             </a>
