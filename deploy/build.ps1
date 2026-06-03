@@ -70,7 +70,8 @@ if ($hasPutty -and $SSH_PASSWORD -and -not $NoPassword) {
     # Use -batch and -T to disable interactive prompts and pseudo-terminal allocation
     $plinkCommand = "echo. | plink.exe -batch -T -P $SSH_PORT -pw ""$SSH_PASSWORD"" $SSH_USER@$SSH_HOST ""$unzipCmd"""
     cmd.exe /c $plinkCommand
-} else {
+}
+else {
     Write-Host "[3/4] Uploading build.tar.gz to server..." -ForegroundColor Yellow
     & scp -P $SSH_PORT -o StrictHostKeyChecking=no $ZIP_PATH "$SSH_USER@$SSH_HOST`:$remoteZip"
     
