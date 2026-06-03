@@ -3,17 +3,19 @@
 namespace Modules\Fbmb\Services;
 
 use App\Services\PointsService;
+use App\Services\AmcAcademyApiService;
 use App\Models\User;
 use Exception;
-use PDO;
 
 class FbmbLookupService
 {
     protected PointsService $pointsService;
+    protected AmcAcademyApiService $amcApiService;
 
-    public function __construct(PointsService $pointsService)
+    public function __construct(PointsService $pointsService, AmcAcademyApiService $amcApiService)
     {
         $this->pointsService = $pointsService;
+        $this->amcApiService = $amcApiService;
     }
 
     /**
@@ -34,27 +36,24 @@ class FbmbLookupService
             throw new Exception("No valid IDs found in the uploaded file.");
         }
 
-        $dbPath = storage_path('app/db/All Arab.db');
-        if (! file_exists($dbPath)) {
-            throw new Exception("Intelligence Database not found.");
-        }
-
-        $pdo = new PDO("sqlite:{$dbPath}");
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
         $results = [];
         $foundCount = 0;
         $chunks = array_chunk($ids, 500);
         foreach ($chunks as $chunk) {
-            $placeholders = implode(',', array_fill(0, count($chunk), '?'));
-            $sql = "SELECT FBID, Phone FROM data WHERE FBID IN ($placeholders) GROUP BY FBID";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute($chunk);
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $results[] = $row;
-                $foundCount++;
+            $chunkResults = $this->amcApiService->searchFbidsBulk($chunk);
+            if (!empty($chunkResults)) {
+                foreach ($chunkResults as $fbid => $phone) {
+                    $results[] = [
+                        'FBID' => $fbid,
+                        'Phone' => $phone
+                    ];
+                    $foundCount++;
+                }
             }
         }
+        // if ($foundCount < 10) {
+        //     throw new Exception("نتائج غير مقبولة وتم استرجاع النقاط");
+        // }
 
         // Ensure temp directory exists
         $tempDir = storage_path('app/temp_isaas');
@@ -64,9 +63,9 @@ class FbmbLookupService
 
         $resultCsvPath = $tempDir . '/result_' . uniqid() . '.csv';
         $fp = fopen($resultCsvPath, 'w');
-        fputcsv($fp, ['FBID', 'Phone']);
+        fputcsv($fp, ['Phone']);
         foreach ($results as $result) {
-            fputcsv($fp, [$result['FBID'], $result['Phone']]);
+            fputcsv($fp, [$result['Phone']]);
         }
         fclose($fp);
 
