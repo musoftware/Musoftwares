@@ -4,8 +4,9 @@ import { Head, router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
-import { Smartphone, Webhook, Key, Activity, CreditCard, ArrowRight, ShieldCheck, Download, ExternalLink } from 'lucide-react';
+import { Smartphone, Webhook, Key, Activity, CreditCard, ArrowRight, ShieldCheck, Download, ExternalLink, HelpCircle, CheckCircle, ListOrdered } from 'lucide-react';
 import { Badge } from '@/Components/ui/badge';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/Components/ui/accordion";
 import { formatMoney } from '@/lib/utils';
 
 interface DashboardProps {
@@ -275,6 +276,134 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                             )}
                         </CardContent>
                     </Card>
+
+                    {/* Quick Setup Guide */}
+                    <div className="mt-12 space-y-6">
+                        <div className="flex items-center gap-2 mb-6">
+                            <ListOrdered className="w-6 h-6 text-indigo-600" />
+                            <h2 className="text-2xl font-bold text-slate-900">{__('Quick Setup Guide')}</h2>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <Card className="border-none shadow-sm bg-white hover:shadow-md transition-shadow">
+                                <CardContent className="p-6 flex flex-col items-start gap-4">
+                                    <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">1</div>
+                                    <div>
+                                        <h4 className="font-semibold text-slate-900">{__('Download & Install')}</h4>
+                                        <p className="text-sm text-slate-500 mt-1 leading-relaxed">{__('Download the Android APK and install it on your device.')}</p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            <Card className="border-none shadow-sm bg-white hover:shadow-md transition-shadow">
+                                <CardContent className="p-6 flex flex-col items-start gap-4">
+                                    <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">2</div>
+                                    <div>
+                                        <h4 className="font-semibold text-slate-900">{__('Link Your Device')}</h4>
+                                        <p className="text-sm text-slate-500 mt-1 leading-relaxed">{__('Go to Manage Devices, scan the QR code, and link your Android phone.')}</p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            <Card className="border-none shadow-sm bg-white hover:shadow-md transition-shadow">
+                                <CardContent className="p-6 flex flex-col items-start gap-4">
+                                    <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">3</div>
+                                    <div>
+                                        <h4 className="font-semibold text-slate-900">{__('Add Wallet Numbers')}</h4>
+                                        <p className="text-sm text-slate-500 mt-1 leading-relaxed">{__('In Gateway Settings, add the mobile numbers (e.g., Vodafone Cash) that will receive funds.')}</p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            <Card className="border-none shadow-sm bg-white hover:shadow-md transition-shadow">
+                                <CardContent className="p-6 flex flex-col items-start gap-4">
+                                    <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">4</div>
+                                    <div>
+                                        <h4 className="font-semibold text-slate-900">{__('Create API Keys')}</h4>
+                                        <p className="text-sm text-slate-500 mt-1 leading-relaxed">{__('Generate your publishable and secret keys from the API Keys tab.')}</p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            <Card className="border-none shadow-sm bg-white hover:shadow-md transition-shadow">
+                                <CardContent className="p-6 flex flex-col items-start gap-4">
+                                    <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">5</div>
+                                    <div>
+                                        <h4 className="font-semibold text-slate-900">{__('Read Integration Docs')}</h4>
+                                        <p className="text-sm text-slate-500 mt-1 leading-relaxed">{__('Have your developer read the documentation to implement the checkout flow.')}</p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            <Card className="border-none shadow-sm bg-white hover:shadow-md transition-shadow">
+                                <CardContent className="p-6 flex flex-col items-start gap-4">
+                                    <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">6</div>
+                                    <div>
+                                        <h4 className="font-semibold text-slate-900">{__('Configure Webhooks')}</h4>
+                                        <p className="text-sm text-slate-500 mt-1 leading-relaxed">{__('Set up your webhook endpoint to receive real-time payment success notifications.')}</p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+
+                    {/* FAQs Section */}
+                    <div className="mt-16 mb-8 space-y-6">
+                        <div className="flex items-center gap-2 mb-6">
+                            <HelpCircle className="w-6 h-6 text-rose-600" />
+                            <h2 className="text-2xl font-bold text-slate-900">{__('Frequently Asked Questions')}</h2>
+                        </div>
+                        <Accordion type="single" collapsible className="w-full bg-white rounded-lg shadow-sm border border-slate-100">
+                            <AccordionItem value="item-1" className="px-4">
+                                <AccordionTrigger className="text-slate-800 hover:text-indigo-600 font-medium">
+                                    {__('Is it secure?')}
+                                </AccordionTrigger>
+                                <AccordionContent className="text-slate-600 leading-relaxed">
+                                    {__('Yes, the Android app only reads SMS messages from authorized payment providers (like Vodafone Cash) and never accesses your other personal messages.')}
+                                </AccordionContent>
+                            </AccordionItem>
+                            
+                            <AccordionItem value="item-2" className="px-4">
+                                <AccordionTrigger className="text-slate-800 hover:text-indigo-600 font-medium">
+                                    {__("What happens if a payment isn't matched automatically?")}
+                                </AccordionTrigger>
+                                <AccordionContent className="text-slate-600 leading-relaxed">
+                                    {__("You can manually review and match 'Pending' or 'Ignored' SMS messages from your dashboard to any unfulfilled checkout session.")}
+                                </AccordionContent>
+                            </AccordionItem>
+                            
+                            <AccordionItem value="item-3" className="px-4">
+                                <AccordionTrigger className="text-slate-800 hover:text-indigo-600 font-medium">
+                                    {__('How are payments verified?')}
+                                </AccordionTrigger>
+                                <AccordionContent className="text-slate-600 leading-relaxed">
+                                    {__('The app reads incoming SMS messages from local payment providers like Vodafone Cash or Instapay, extracts the amount and sender, and matches them to your API checkout sessions.')}
+                                </AccordionContent>
+                            </AccordionItem>
+                            
+                            <AccordionItem value="item-4" className="px-4">
+                                <AccordionTrigger className="text-slate-800 hover:text-indigo-600 font-medium">
+                                    {__('Can I test without real money?')}
+                                </AccordionTrigger>
+                                <AccordionContent className="text-slate-600 leading-relaxed">
+                                    {__('Yes, you can use the Test Mode and the SMS Simulator to verify webhooks and test your API checkout integration without making real transactions.')}
+                                </AccordionContent>
+                            </AccordionItem>
+
+                            <AccordionItem value="item-5" className="px-4">
+                                <AccordionTrigger className="text-slate-800 hover:text-indigo-600 font-medium">
+                                    {__('Do I need a specific Android phone?')}
+                                </AccordionTrigger>
+                                <AccordionContent className="text-slate-600 leading-relaxed">
+                                    {__('Any Android 8.0+ device works perfectly, as long as it has permission to read SMS notifications and has a stable internet connection.')}
+                                </AccordionContent>
+                            </AccordionItem>
+
+                            <AccordionItem value="item-6" className="px-4 border-b-0">
+                                <AccordionTrigger className="text-slate-800 hover:text-indigo-600 font-medium">
+                                    {__('How to allow SMS permission on Vivo phone?')}
+                                </AccordionTrigger>
+                                <AccordionContent className="text-slate-600 leading-relaxed whitespace-pre-wrap">
+                                    {__('Open Settings -> Apps -> App Manager -> Find SMS Payment Gateway -> Permissions -> Allow SMS permission.')}
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </div>
+
                 </div>
             </div>
         </AuthenticatedLayout>

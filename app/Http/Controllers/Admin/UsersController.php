@@ -219,9 +219,9 @@ class UsersController extends Controller
                 'city'                 => $user->city ?? '',
                 'currency'             => $user->currency_id ?? $user->currency ?? '',
                 
-                'hour_rate_currency'   => $user->hour_rate_currency ?? '',
+                'hour_rate_currency'   => $user->hour_rate_currency_id ?? $user->hour_rate_currency ?? '',
                 'hour_rate'            => $user->hour_rate ?? '',
-                'booking_rate_currency'=> $user->booking_rate_currency ?? '',
+                'booking_rate_currency'=> $user->booking_rate_currency_id ?? $user->booking_rate_currency ?? '',
                 'booking_rate'         => $user->booking_rate ?? '',
                 'booking_rate_expires_at' => $user->booking_rate_expires_at ? $user->booking_rate_expires_at->format('Y-m-d') : '',
                 'salary'               => $user->salary ?? '',
@@ -702,12 +702,23 @@ class UsersController extends Controller
         ]);
     }
 
+    public function create_task($id)
+    {
+        $user = User::findOrFail($id);
+        return Inertia::render('Admin/Users/AssignTask', [
+            'client' => [
+                'id' => $user->id,
+                'name' => $user->name,
+            ]
+        ]);
+    }
+
     public function add_task(AddTaskRequest $request, $id)
     {
         $user = User::findOrFail($id);
         $this->adminUserService->addTask($user, $request->input('title'), $request->input('description'));
 
-        return back()->with('success', __('general.task_created_successfully'));
+        return redirect()->route('admin.users.show', $user->id)->with('success', __('general.task_created_successfully'));
     }
 
     public function activateMembership(Request $request, $id)

@@ -418,7 +418,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/transactions', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'index'])->name('transactions.index');
     Route::get('/transactions/create', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'create'])->name('transactions.create');
     Route::post('/transactions', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'store'])->name('transactions.store');
-
+    Route::get('/transactions/transfer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'transfer'])->name('transactions.transfer');
+    Route::post('/transactions/transfer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'start_transfer'])->name('transactions.start_transfer');
+    Route::post('/project/current_timer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'current_timer'])->name('project.current_timer');
     // ── Admin Payment Links ───────────────────────────────────────
     Route::resource('payment-links', \App\Http\Controllers\Admin\PaymentLinkController::class)->except(['create', 'edit', 'show', 'update']);
 
@@ -537,8 +539,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/users/files/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'files'])->name('users.files');
     Route::get('/users/{id}/reports', [\App\Http\Controllers\Admin\UsersController::class, 'reports'])->name('users.reports');
     Route::get('/users/{id}/projects', [\App\Http\Controllers\Admin\UsersController::class, 'projects'])->name('users.projects');
-    Route::get('/users/{id}/tasks/add', [\App\Http\Controllers\Admin\UsersController::class, 'add_task'])->name('users.tasks.add');
-
+    Route::get('/users/{id}/tasks/add', [\App\Http\Controllers\Admin\UsersController::class, 'create_task'])->name('users.tasks.add');
+    Route::post('/users/{id}/tasks/add', [\App\Http\Controllers\Admin\UsersController::class, 'add_task'])->name('users.tasks.store');
     Route::get('/users/{id}/balance-sheet', [\App\Http\Controllers\Admin\UsersController::class, 'balanceSheetPrint'])->name('users.balance-sheet');
 
     Route::get('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'show'])->name('users.show');

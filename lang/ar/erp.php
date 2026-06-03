@@ -206,4 +206,5 @@ return [
     'debt_received_from_client' => 'دين تم استلامه من العميل',
     'no_debt_transactions_found' => 'لا توجد حركات ديون.',
     'deleted_successfully' => 'تم الحذف بنجاح.',
+    'transfer_completed_successfully' => 'تم التحويل بنجاح',
 ];

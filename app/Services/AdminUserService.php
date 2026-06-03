@@ -61,9 +61,16 @@ class AdminUserService
         if ($request->has('job')) $user->job = $request->input('job');
         if ($request->has('address')) $user->address = $request->input('address');
         
-        if ($request->has('hour_rate_currency')) $user->hour_rate_currency = $request->input('hour_rate_currency');
+        if ($request->has('hour_rate_currency')) {
+            $val = $request->input('hour_rate_currency');
+            $user->hour_rate_currency_id = $val ?: ($user->currency_id ?? 1);
+        }
         if ($request->has('hour_rate')) $user->hour_rate = $request->input('hour_rate');
-        if ($request->has('booking_rate_currency')) $user->booking_rate_currency = $request->input('booking_rate_currency');
+        
+        if ($request->has('booking_rate_currency')) {
+            $val2 = $request->input('booking_rate_currency');
+            $user->booking_rate_currency_id = $val2 ?: null;
+        }
         if ($request->has('booking_rate')) $user->booking_rate = $request->input('booking_rate');
         if ($request->has('booking_rate_expires_at')) $user->booking_rate_expires_at = $request->input('booking_rate_expires_at');
         if ($request->has('salary')) $user->salary = $request->input('salary');

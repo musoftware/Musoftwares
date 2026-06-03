@@ -4959,4 +4959,5 @@ return [
     'portfolio_amc_tasks_downloader' => 'AMC Tasks Downloader',
     'portfolio_am_email_controls' => 'AM Email Controls',
     'portfolio_project_manager' => 'Project Manager',
+    'swap_projects_budget' => 'تبديل ميزانية المشاريع',
 ];
