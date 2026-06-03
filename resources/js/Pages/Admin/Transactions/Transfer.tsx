@@ -6,7 +6,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import { ArrowDownLeft, Trash2, Lightbulb, Save, Repeat } from 'lucide-react';
+import { ArrowDownLeft, Trash2, Lightbulb, Save, Repeat, ArrowRightLeft } from 'lucide-react';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
@@ -196,15 +196,15 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                     return;
                 }
 
-                let newItems: TransferItem[] = [];
+                const newItems: TransferItem[] = [];
                 let currentId = itemIdCounter;
 
                 timers.forEach((tim: any) => {
                     if (tim.timer < 0) {
-                        let negAmount = Math.abs(tim.timer);
+                        const negAmount = Math.abs(tim.timer);
 
                         if (negAmount < 2) {
-                            for (let timS of timers) {
+                            for (const timS of timers) {
                                 if (timS.timer > negAmount) {
                                     const sourceInfo = activeProjects.find(p => p.id === timS.id);
                                     const targetInfo = activeProjects.find(p => p.id === tim.id);
@@ -229,8 +229,8 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                         } else {
                             timers.forEach((timS: any) => {
                                 if (timS.timer > 0) {
-                                    let sourceOfAllPercentage = timS.timer * 100 / sumPos;
-                                    let amount = Math.floor(Math.abs(tim.timer * sourceOfAllPercentage / 100) * 1000) / 1000;
+                                    const sourceOfAllPercentage = timS.timer * 100 / sumPos;
+                                    const amount = Math.floor(Math.abs(tim.timer * sourceOfAllPercentage / 100) * 1000) / 1000;
 
                                     if (amount > 0) {
                                         const sourceInfo = activeProjects.find(p => p.id === timS.id);

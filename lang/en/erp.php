@@ -206,4 +206,5 @@ return [
     'debt_received_from_client' => 'Debt received from client',
     'no_debt_transactions_found' => 'No debt transactions found.',
     'deleted_successfully' => 'Deleted successfully.',
+    'transfer_completed_successfully' => 'Transfer completed successfully',
 ];

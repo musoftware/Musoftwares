@@ -38,15 +38,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
     const [isSwapBudgetOpen, setIsSwapBudgetOpen] = useState(false);
     const [isActivateMembershipOpen, setIsActivateMembershipOpen] = useState(false);
 
-    const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
-    const [walletTxForm, setWalletTxForm] = useState({
-        wallet_id: wallets.length > 0 ? wallets[0].id : '',
-        type: 'credit',
-        amount: '',
-        fee: '',
-        is_used: false,
-        description: ''
-    });
+
 
     const handleLoginAsUser = async () => {
         setIsLoginAsLoading(true);
@@ -79,16 +71,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
         });
     };
 
-    const submitWalletTx = (e) => {
-        e.preventDefault();
-        router.post(`/admin/users/${client.id}/wallet-transaction`, walletTxForm, {
-            onSuccess: () => {
-                setIsWalletModalOpen(false);
-                setWalletTxForm({ ...walletTxForm, amount: '', description: '' });
-                alert("Wallet transaction successful!");
-            }
-        });
-    };
+
 
     const [taskForm, setTaskForm] = useState({ title: '', description: '' });
     const submitAssignTask = (e) => {
@@ -222,9 +205,11 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                             <div className="space-y-1">
                                 <DropdownMenuLabel className="text-slate-500 uppercase tracking-wider text-xs mb-2">{__('general.workspace_and_tools') || 'Workspace & Tools'}</DropdownMenuLabel>
                                 <DropdownMenuGroup>
-                                    <DropdownMenuItem onClick={() => setIsAssignTaskOpen(true)}>
-                                        <Briefcase className="mr-2 h-4 w-4" />
-                                        <span>{__('general.assign_task')}</span>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/users/${client.id}/tasks/add`} className="w-full cursor-pointer flex items-center">
+                                            <Briefcase className="mr-2 h-4 w-4" />
+                                            <span>{__('general.assign_task')}</span>
+                                        </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/users/${client.id}/files`} className="w-full cursor-pointer flex items-center">
@@ -283,44 +268,41 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                 
                                 <div className="pt-2 mt-2 border-t border-slate-100"></div>
                                 <DropdownMenuGroup>
-                                    <DropdownMenuItem onClick={() => {
-                                        setWalletTxForm({ ...walletTxForm, type: 'receive' });
-                                        setIsWalletModalOpen(true);
-                                    }}>
-                                        <Wallet className="mr-2 h-4 w-4" />
-                                        <span>{__('general.receive_money')}</span>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/transactions/create?type=receive&user=${client.id}`} className="w-full cursor-pointer flex items-center">
+                                            <Wallet className="mr-2 h-4 w-4" />
+                                            <span>{__('general.receive_money')}</span>
+                                        </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => {
-                                        setWalletTxForm({ ...walletTxForm, type: 'send-money' });
-                                        setIsWalletModalOpen(true);
-                                    }}>
-                                        <Wallet className="mr-2 h-4 w-4" />
-                                        <span>{__('general.send_money')}</span>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/transactions/create?type=send-money&user=${client.id}`} className="w-full cursor-pointer flex items-center">
+                                            <Wallet className="mr-2 h-4 w-4" />
+                                            <span>{__('general.send_money')}</span>
+                                        </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => {
-                                        setWalletTxForm({ ...walletTxForm, type: 'earn' });
-                                        setIsWalletModalOpen(true);
-                                    }}>
-                                        <Wallet className="mr-2 h-4 w-4" />
-                                        <span>{__('general.earned_money')}</span>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/transactions/create?type=earn&user=${client.id}`} className="w-full cursor-pointer flex items-center">
+                                            <Wallet className="mr-2 h-4 w-4" />
+                                            <span>{__('general.earned_money')}</span>
+                                        </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => {
-                                        setWalletTxForm({ ...walletTxForm, type: 'charge' });
-                                        setIsWalletModalOpen(true);
-                                    }}>
-                                        <Wallet className="mr-2 h-4 w-4" />
-                                        <span>{__('general.charge_account')}</span>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/transactions/create?type=charge&user=${client.id}`} className="w-full cursor-pointer flex items-center">
+                                            <Wallet className="mr-2 h-4 w-4" />
+                                            <span>{__('general.charge_account')}</span>
+                                        </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => {
-                                        setWalletTxForm({ ...walletTxForm, type: 'refund' });
-                                        setIsWalletModalOpen(true);
-                                    }}>
-                                        <Wallet className="mr-2 h-4 w-4" />
-                                        <span>{__('general.refund_money')}</span>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/transactions/create?type=refund&user=${client.id}`} className="w-full cursor-pointer flex items-center">
+                                            <Wallet className="mr-2 h-4 w-4" />
+                                            <span>{__('general.refund_money')}</span>
+                                        </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setIsSwapBudgetOpen(true)}>
-                                        <Wallet className="mr-2 h-4 w-4" />
-                                        <span>{__('general.swap_budgets')}</span>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/transactions/transfer?user=${client.id}`} className="w-full cursor-pointer flex items-center">
+                                            <Wallet className="mr-2 h-4 w-4" />
+                                            <span>{__('general.swap_projects_budget')}</span>
+                                        </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <a href={`/admin/users/${client.id}/balance-sheet`} target="_blank" rel="noopener noreferrer" className="w-full cursor-pointer flex items-center">
@@ -476,83 +458,6 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={isWalletModalOpen} onOpenChange={setIsWalletModalOpen}>
-                <DialogContent>
-                    <form onSubmit={submitWalletTx}>
-                        <DialogHeader>
-                            <DialogTitle>
-                                {walletTxForm.type === 'credit' ? 'Receive Money' : 'Send Money'}
-                            </DialogTitle>
-                            <DialogDescription>{__('general.add_or_remove_funds_directly_from_the_user_s_platform_wallet')}</DialogDescription>
-                        </DialogHeader>
-                        <div className="py-4 space-y-4">
-                            <div>
-                                <Label>{__('general.select_wallet')}</Label>
-                                <select 
-                                    className="w-full mt-1 rounded-md border-gray-300"
-                                    value={walletTxForm.wallet_id}
-                                    onChange={(e) => setWalletTxForm({ ...walletTxForm, wallet_id: e.target.value })}
-                                    required
-                                >
-                                    {wallets.map(w => (
-                                        <option key={w.id} value={w.id}>{w.context} ({w.currency}) - Balance: {w.balance}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <Label>Amount</Label>
-                                <Input 
-                                    type="number" 
-                                    step="0.01"
-                                    value={walletTxForm.amount}
-                                    onChange={(e) => setWalletTxForm({ ...walletTxForm, amount: e.target.value })}
-                                    required
-                                />
-                            </div>
-                            
-                            {(walletTxForm.type === 'credit' || walletTxForm.type === 'refund') && (
-                                <div className="flex gap-4">
-                                    <div className="flex-1">
-                                        <Label>Gateway Fee (optional)</Label>
-                                        <Input 
-                                            type="number" 
-                                            step="0.01"
-                                            value={walletTxForm.fee}
-                                            onChange={(e) => setWalletTxForm({ ...walletTxForm, fee: e.target.value })}
-                                            placeholder="0.00"
-                                        />
-                                    </div>
-                                    {walletTxForm.type === 'credit' && (
-                                        <div className="flex items-center space-x-2 pt-6">
-                                            <input 
-                                                type="checkbox" 
-                                                id="is_used" 
-                                                checked={walletTxForm.is_used}
-                                                onChange={(e) => setWalletTxForm({ ...walletTxForm, is_used: e.target.checked })}
-                                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                            />
-                                            <Label htmlFor="is_used" className="font-normal cursor-pointer text-gray-700">{__('general.mark_as_used')}</Label>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            <div>
-                                <Label>{__('general.description_reason')}</Label>
-                                <Input 
-                                    value={walletTxForm.description}
-                                    onChange={(e) => setWalletTxForm({ ...walletTxForm, description: e.target.value })}
-                                    placeholder={__('general.optional_note')}
-                                />
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setIsWalletModalOpen(false)}>Cancel</Button>
-                            <Button type="submit">{__('general.confirm_transaction')}</Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
 
 
             <Dialog open={isEditMembershipOpen} onOpenChange={setIsEditMembershipOpen}>

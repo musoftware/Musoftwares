@@ -145,4 +145,127 @@ class AdminTransactionController extends Controller
 
         return redirect()->back()->with('success', __('general.balances_recalculated_successfully'));
     }
+
+    public function transfer(Request $request)
+    {
+        $userId = $request->query('user');
+        if (!$userId) {
+            return redirect()->route('admin.transactions.index')->with('danger', __('general.please_select_a_user_to_add_a_transaction'));
+        }
+
+        $user = User::with('projects')->findOrFail($userId);
+        
+        $exchanges = CurrenciesExchange::Today();
+        if (count($exchanges) == 0) {
+            $exchanges = CurrenciesExchange::whereIn('id', function ($query) {
+                $query->select(\Illuminate\Support\Facades\DB::raw('MAX(id)'))
+                      ->from('currencies_exchanges')
+                      ->groupBy('currency1', 'currency2');
+            })->get();
+        }
+
+        return Inertia::render('Admin/Transactions/Transfer', [
+            'user' => $user,
+            'activeProjects' => $user->projects()->whereNotIn('status', ['Completed', 'Cancelled'])->get(),
+            'currencies' => array_values(Currency::as_array()),
+            'exchanges' => $exchanges,
+        ]);
+    }
+
+    public function start_transfer(Request $request)
+    {
+        $request->validate([
+            'user' => 'required|exists:users,id',
+            'data' => 'required|array',
+        ]);
+
+        $user = User::findOrFail($request->input('user'));
+        $data = $request->input('data');
+
+        foreach ($data as $item) {
+            if (empty($item['amount']) || $item['amount'] == 0) continue;
+
+            $this->transfer_function($user, $item, $item['source_project_id'], 'refunded');
+            $this->transfer_function($user, $item, $item['target_project_id'], 'received');
+        }
+        
+        // Optionally update balances
+        $this->transactionService->recalculateUserBalance($user);
+
+        return redirect()->back()->with('success', __('erp.transfer_completed_successfully'));
+    }
+
+    private function transfer_function($client, $item, $projectId, $type)
+    {
+        $transaction = new Transaction();
+
+        if ($type == 'refunded') {
+            $transaction->amount = -1 * abs($item['amount']);
+        } else {
+            $transaction->amount = abs($item['amount']);
+        }
+
+        if (!empty($item['reason'])) {
+            $transaction->reason = $item['reason'];
+        }
+
+        $transaction->type = $type;
+        $transaction->currency_id = $item['currency'];
+
+        $exist_project = Project::find($projectId);
+        if ($exist_project !== null) {
+            $transaction->project_id = $exist_project->id;
+            // Removed date_start setting as it's not strictly necessary for transfer logic alone
+        }
+
+        $client->client_balance()->save($transaction);
+    }
+
+    public function current_timer(Request $request)
+    {
+        $client = User::find($request->input('user'));
+        if (!$client) {
+            return response()->json(['status' => false]);
+        }
+        $project_id = $request->input('project');
+        $currency = $request->input('currency');
+
+        if (!empty($project_id)) {
+            $project = $client->projects()->find($project_id);
+            if (!$project) {
+                return response()->json(['status' => false]);
+            }
+
+            $amount = Transaction::where('project_id', $project->id)
+                ->where('currency_id', $currency)
+                ->sum('amount');
+
+            return response()->json([
+                'status' => true,
+                'timer' => round($amount , 3)
+            ]);
+
+        } else {
+            $projects = $client->projects()->get();
+            $proj = array();
+
+            foreach ($projects as $project) {
+                $amount = Transaction::where('project_id', $project->id)
+                    ->where('currency_id', $currency)
+                    ->sum('amount');
+
+                if (round($amount, 3) == 0) {
+                    continue;
+                }
+
+                $proj[] = [
+                    'id' => $project->id,
+                    'name' => $project->project_name,
+                    'timer' => round($amount, 3)
+                ];
+            }
+
+            return response()->json(['status' => true, 'timers' => $proj]);
+        }
+    }
 }
