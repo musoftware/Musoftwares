@@ -57,21 +57,17 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                         </div>
 
                         {/* Simple Download Button */}
-                        {androidAppUrl && (
-                            <a
-                                href={androidAppUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-3 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition-all shadow-sm hover:shadow-md flex-shrink-0 border border-slate-700 group"
-                            >
-                                <Smartphone className="w-6 h-6 text-emerald-400" />
-                                <div className="flex flex-col items-start text-left">
-                                    <span className="text-[10px] font-medium text-slate-300 uppercase tracking-wider leading-none">{__('Download App')}</span>
-                                    <span className="text-sm font-bold leading-tight">{__('Android APK')}</span>
-                                </div>
-                                <Download className="w-4 h-4 ml-2 opacity-50 group-hover:opacity-100 transition-opacity rtl:mr-2 rtl:ml-0" />
-                            </a>
-                        )}
+                        <Link
+                            href={route('sms-payment-gateway.install')}
+                            className="inline-flex items-center gap-3 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition-all shadow-sm hover:shadow-md flex-shrink-0 border border-slate-700 group"
+                        >
+                            <Smartphone className="w-6 h-6 text-emerald-400" />
+                            <div className="flex flex-col items-start text-left">
+                                <span className="text-[10px] font-medium text-slate-300 uppercase tracking-wider leading-none">{__('admin.install_app')}</span>
+                                <span className="text-sm font-bold leading-tight">{__('admin.setup_guide')}</span>
+                            </div>
+                            <Download className="w-4 h-4 ml-2 opacity-50 group-hover:opacity-100 transition-opacity rtl:mr-2 rtl:ml-0" />
+                        </Link>
                     </div>
 
                     {/* Stats Grid */}

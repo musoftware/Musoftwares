@@ -156,6 +156,31 @@ class SmsPaymentGatewayController extends Controller
     }
 
     /**
+     * Show the installation guide and MacroDroid alternative setup
+     */
+    public function install(Request $request)
+    {
+        $user = $request->user();
+        $settings = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewaySetting::firstOrCreate(
+            ['user_id' => $user->id],
+            ['tenant_id' => $user->tenant_id]
+        );
+
+        if (empty($settings->macrodroid_token)) {
+            $settings->macrodroid_token = \Illuminate\Support\Str::random(40);
+            $settings->save();
+        }
+
+        $macrodroidUrl = url('/api/v1/sms-payment-gateway/macrodroid/' . $settings->macrodroid_token);
+
+        return \Inertia\Inertia::render('SmsPaymentGateway/Install', [
+            'androidAppUrl' => config('sms-payment-gateway.android_app_url'),
+            'macrodroidUrl' => $macrodroidUrl,
+            'macrodroidToken' => $settings->macrodroid_token,
+        ]);
+    }
+
+    /**
      * Show device details and transactions
      */
     public function showDevice($id)
