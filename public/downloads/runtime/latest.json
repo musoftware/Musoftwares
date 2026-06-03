@@ -1,31 +1,45 @@
-﻿{
-    "version":  "2026.06.03.1",
-    "latest":  "2026.06.03.1",
-    "minimum_supported":  "1.0.0",
-    "channel":  "stable",
-    "released_at":  "2026-06-03",
-    "downloads":  {
-                      "windows":  "/downloads/runtime/windows/musoftware-runtime-win.exe",
-                      "macos":  "/downloads/runtime/macos/musoftware-runtime-mac",
-                      "linux":  "/downloads/runtime/linux/musoftware-runtime-linux"
-                  },
-    "changelog":  [
-                      {
-                          "version":  "1.1.0",
-                          "date":  "2025-05-19",
-                          "notes":  [
-                                        "Plugin versioning + compatibility matrix",
-                                        "Improved crash recovery and auto-restart",
-                                        "SQLite task history with log persistence",
-                                        "Runtime update broadcast via WebSocket"
-                                    ]
-                      },
-                      {
-                          "version":  "1.0.0",
-                          "date":  "2025-05-19",
-                          "notes":  [
-                                        "Initial release â€” unified Node.js + Python runtime"
-                                    ]
-                      }
-                  ]
+{
+  "version": "2026.06.03.4",
+  "latest": "2026.06.03.4",
+  "minimum_supported": "1.0.0",
+  "channel": "stable",
+  "released_at": "2026-06-03",
+  "downloads": {
+    "windows": "/downloads/runtime/windows/musoftware-runtime-win.exe",
+    "macos": "/downloads/runtime/macos/musoftware-runtime-mac",
+    "linux": "/downloads/runtime/linux/musoftware-runtime-linux"
+  },
+  "changelog": [
+    {
+      "version": "2026.06.03.4",
+      "date": "2026-06-03",
+      "notes": [
+        "Auto-generated release"
+      ]
+    },
+    {
+      "version": "2026.06.03.3",
+      "date": "2026-06-03",
+      "notes": [
+        "Auto-generated release"
+      ]
+    },
+    {
+      "version": "1.1.0",
+      "date": "2025-05-19",
+      "notes": [
+        "Plugin versioning + compatibility matrix",
+        "Improved crash recovery and auto-restart",
+        "SQLite task history with log persistence",
+        "Runtime update broadcast via WebSocket"
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "date": "2025-05-19",
+      "notes": [
+        "Initial release â€” unified Node.js + Python runtime"
+      ]
+    }
+  ]
 }

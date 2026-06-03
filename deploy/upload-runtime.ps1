@@ -10,60 +10,21 @@ $JSON_PATH = "$PROJECT_ROOT\public\downloads\runtime\latest.json"
 $CONTROLLER_PATH = "$PROJECT_ROOT\app\Http\Controllers\RuntimeDownloadController.php"
 $ZIP_PATH = "$PROJECT_ROOT\public\downloads\runtime\windows\musoftware-runtime-win.zip"
 
-$datePrefix = Get-Date -Format "yyyy.MM.dd"
-$currentVersion = "$datePrefix.0"
-
 if (Test-Path $JSON_PATH) {
     $json = Get-Content $JSON_PATH | ConvertFrom-Json
-    $lastVersion = $json.version
-    
-    # Extract date prefix and minor count
-    if ($lastVersion -match "^(\d{4}\.\d{2}\.\d{2})\.(\d+)$") {
-        $lastPrefix = $matches[1]
-        $lastMinor = [int]$matches[2]
-        
-        if ($lastPrefix -eq $datePrefix) {
-            $nextMinor = $lastMinor + 1
-            $currentVersion = "$datePrefix.$nextMinor"
-        }
-    }
+    $currentVersion = $json.version
+} else {
+    Write-Host "Warning: latest.json not found at $JSON_PATH" -ForegroundColor Yellow
 }
 
-$newVersion = $currentVersion
-
 Write-Host "=== Deploy Musoftware Runtime ===" -ForegroundColor Cyan
-Write-Host "Auto-generated Version: $newVersion" -ForegroundColor Yellow
+Write-Host "Version being uploaded: $currentVersion" -ForegroundColor Yellow
 
 # Check if ZIP exists
 if (-not (Test-Path $ZIP_PATH)) {
     Write-Host "Error: Runtime ZIP not found at $ZIP_PATH" -ForegroundColor Red
     Write-Host "Please build the runtime first using build-runtime.bat!" -ForegroundColor Red
     exit 1
-}
-
-# 2. Update Version Metadata
-if (-not [string]::IsNullOrWhiteSpace($newVersion)) {
-    # Update latest.json
-    if (Test-Path $JSON_PATH) {
-        Write-Host "-> Updating latest.json..." -ForegroundColor DarkGray
-        $json = Get-Content $JSON_PATH | ConvertFrom-Json
-        $json.version = $newVersion
-        $json.latest = $newVersion
-        $json.released_at = (Get-Date -Format "yyyy-MM-dd")
-        $json | ConvertTo-Json -Depth 10 | Set-Content $JSON_PATH -Encoding UTF8
-    } else {
-        Write-Host "Warning: latest.json not found at $JSON_PATH" -ForegroundColor Yellow
-    }
-
-    # Update Controller
-    if (Test-Path $CONTROLLER_PATH) {
-        Write-Host "-> Updating RuntimeDownloadController.php..." -ForegroundColor DarkGray
-        $controllerContent = Get-Content $CONTROLLER_PATH -Raw
-        $controllerContent = $controllerContent -replace "'version'\s*=>\s*'[0-9\.]+'", "'version' => '$newVersion'"
-        Set-Content -Path $CONTROLLER_PATH -Value $controllerContent -Encoding UTF8
-    } else {
-        Write-Host "Warning: RuntimeDownloadController.php not found." -ForegroundColor Yellow
-    }
 }
 
 # 3. Read config
