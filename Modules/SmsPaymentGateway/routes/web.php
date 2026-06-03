@@ -30,6 +30,7 @@ Route::middleware(['web'])->group(function () {
 // ─── Authenticated Dashboard Routes ────────────────
 Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:sms-payment-gateway'])->prefix('sms-payment-gateway')->name('sms-payment-gateway.')->group(function () {
     Route::get('/', [SmsPaymentGatewayController::class, 'index'])->name('index');
+    Route::get('install', [SmsPaymentGatewayController::class, 'install'])->name('install');
     Route::get('devices', [SmsPaymentGatewayController::class, 'devices'])->name('devices');
     Route::get('transactions', [SmsPaymentGatewayController::class, 'transactions'])->name('transactions');
     Route::get('webhooks', [SmsPaymentGatewayController::class, 'webhooks'])->name('webhooks');

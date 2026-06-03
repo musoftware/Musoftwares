@@ -35,6 +35,9 @@ $apiRoutes = function () {
     // Receive SMS (public, uses device token)
     Route::post('/sms', [SmsPaymentGatewayPaymentHubController::class, 'receiveSms']);
 
+    // Receive SMS via MacroDroid (public, uses unique macrodroid_token)
+    Route::post('/macrodroid/{token}', [SmsPaymentGatewayPaymentHubController::class, 'receiveMacrodroidSms']);
+
     // Debug endpoint (public, for testing parser)
     Route::get('/debug/empty-phone-numbers', [SmsPaymentGatewayPaymentHubController::class, 'debugEmptyPhoneNumbers']);
 

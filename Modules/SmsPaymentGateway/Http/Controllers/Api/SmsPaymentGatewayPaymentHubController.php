@@ -249,6 +249,81 @@ class SmsPaymentGatewayPaymentHubController extends Controller
     }
 
     /**
+     * Receive SMS message from MacroDroid via secure token
+     * POST /api/sms-payment-gateway/macrodroid/{token}
+     * Public endpoint (no auth required, uses secure token)
+     */
+    public function receiveMacrodroidSms(Request $request, $token)
+    {
+        // Find setting by token
+        $setting = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewaySetting::where('macrodroid_token', $token)->first();
+
+        if (!$setting) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or unauthorized secure token'
+            ], 401);
+        }
+
+        // Sanitize input to ensure valid UTF-8
+        $input = $request->all();
+        array_walk_recursive($input, function (&$item) {
+            if (is_string($item)) {
+                if (!mb_check_encoding($item, 'UTF-8')) {
+                    $item = mb_convert_encoding($item, 'UTF-8', 'UTF-8');
+                }
+                $item = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/u', '', $item);
+            }
+        });
+        $request->merge($input);
+
+        // Map MacroDroid form-data to standard keys if necessary
+        $sender = $request->input('sender') ?? $request->input('sms_number') ?? $request->input('from');
+        $message = $request->input('message') ?? $request->input('sms_message') ?? $request->input('text');
+        $timestamp = $request->input('timestamp', time() * 1000);
+
+        if (!$sender || !$message) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Missing required fields (sender, message)'
+            ], 400);
+        }
+
+        // Add mapped values back to request for consistency
+        $request->merge([
+            'sender' => $sender,
+            'message' => $message,
+            'timestamp' => $timestamp,
+        ]);
+
+        // Find or create a virtual MacroDroid device for this user
+        $device = SmsPaymentGatewayDevice::firstOrCreate(
+            [
+                'user_id' => $setting->user_id,
+                'device_name' => 'MacroDroid (Virtual)',
+            ],
+            [
+                'device_token' => 'macrodroid_' . $setting->user_id,
+                'status' => 'connected',
+                'connected_at' => now(),
+                'last_seen_at' => now(),
+            ]
+        );
+
+        $device->updateLastSeen();
+
+        $senderName = $request->name ?? $sender;
+
+        // Delegate entire ingestion and processing logic to the dedicated service
+        $ingestionService = app(\Modules\SmsPaymentGateway\Services\TransactionIngestionService::class);
+        $response = $ingestionService->ingestSms($device, $request->all(), $senderName);
+
+        $response = $this->sanitizeForJson($response);
+
+        return response()->json($response);
+    }
+
+    /**
      * Recursive helper to sanitize array/string for JSON encoding
      * Removes non-UTF-8 characters and control characters
      */

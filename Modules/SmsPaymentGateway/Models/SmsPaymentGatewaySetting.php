@@ -17,6 +17,7 @@ class SmsPaymentGatewaySetting extends Model
         'is_instapay_enabled',
         'is_vodafone_cash_enabled',
         'whitelist_senders',
+        'macrodroid_token',
     ];
 
     protected $casts = [
