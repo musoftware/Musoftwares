@@ -57,7 +57,10 @@ class ProcessPendingFbmbLookups extends Command
 
                 $foundCount = $result['found_count'];
                 $totalIds = $record->total_ids;
-                $refund = $totalIds - $foundCount;
+
+                $estimatedCost = $this->lookupService->calculateCost($totalIds, $totalIds);
+                $actualCost = $this->lookupService->calculateCost($foundCount, $totalIds);
+                $refund = $estimatedCost - $actualCost;
 
                 if ($refund > 0) {
                     $this->pointsService->credit(
@@ -75,7 +78,7 @@ class ProcessPendingFbmbLookups extends Command
                 // Update the database record on completion
                 $record->update([
                     'found_count'       => $foundCount,
-                    'credits_used'      => $foundCount,
+                    'credits_used'      => $actualCost,
                     'remaining_balance' => $user->fresh()->points_balance,
                     'result_path'       => $result['result_path'],
                     'status'            => 'completed',
@@ -94,7 +97,7 @@ class ProcessPendingFbmbLookups extends Command
 
                 // Refund full points on failure
                 try {
-                    $refund = $record->total_ids;
+                    $refund = $record->credits_used;
                     $this->pointsService->credit(
                         $user,
                         $refund,

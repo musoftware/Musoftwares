@@ -46,6 +46,7 @@ class FbmbLookupController extends Controller
             'pointsBalance' => $user->points_balance,
             'currency'      => $user->preferred_currency ?? 'USD',
             'history'       => $history,
+            'pricingTiers'  => $this->lookupService->getPricingTiers(),
         ]);
     }
 
@@ -78,11 +79,13 @@ class FbmbLookupController extends Controller
                 ], 400);
             }
 
-            if ($pointsBalance < $totalIds) {
+            $estimatedCost = $this->lookupService->calculateCost($totalIds, $totalIds);
+
+            if ($pointsBalance < $estimatedCost) {
                 @unlink($fullPath);
                 return response()->json([
                     'message' => __('general.insufficient_points_for_lookup', [
-                        'required'  => $totalIds,
+                        'required'  => $estimatedCost,
                         'available' => $pointsBalance,
                         'total'     => $totalIds,
                     ]),
@@ -92,7 +95,7 @@ class FbmbLookupController extends Controller
             // Debit points up-front
             $this->pointsService->debit(
                 $user,
-                $totalIds,
+                $estimatedCost,
                 'fbmb_lookup_reserve',
                 __('general.fbmb_lookup_reserve_points', ['total' => $totalIds])
             );
@@ -105,7 +108,7 @@ class FbmbLookupController extends Controller
                 'download_token'    => $downloadToken,
                 'total_ids'         => $totalIds,
                 'found_count'       => 0,
-                'credits_used'      => $totalIds,
+                'credits_used'      => $estimatedCost,
                 'remaining_balance' => $user->fresh()->points_balance,
                 'input_path'        => $fullPath,
                 'result_path'       => null,
