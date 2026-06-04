@@ -178,8 +178,9 @@
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
         .method-card:hover { opacity: 0.85; }
-        .method-card img { height: 28px; object-fit: contain; margin-bottom: 6px; border-radius: 4px; }
-        .method-card span { font-size: 11px; font-weight: 700; color: var(--text-secondary); }
+        .method-icons { display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 6px; }
+        .method-card img { height: 28px; object-fit: contain; border-radius: 4px; }
+        .method-card span { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-align: center; }
 
         /* ── Wallet Number Box ─────────────────── */
         .wallet-box {
@@ -372,7 +373,7 @@
         <div class="success-title">{{ __('sms_gateway.payment_successful') }}</div>
         <div class="success-subtitle">{{ __('sms_gateway.payment_confirmed_message') }}</div>
         @if($session->success_url)
-        <a href="{{ $session->getSuccessRedirectUrl() }}" class="success-btn">{{ __('sms_gateway.return_to_merchant') }}</a>
+        <a href="{{ $session->getSuccessRedirectUrl() }}" class="success-btn" target="_top">{{ __('sms_gateway.return_to_merchant') }}</a>
         @endif
     </div>
 
@@ -422,7 +423,14 @@
                 <label class="method-option">
                     <input type="radio" name="method" value="{{ $method['id'] }}" data-phone="{{ $method['phone'] }}" data-is-etisalat="{{ isset($method['is_etisalat']) && $method['is_etisalat'] ? 'true' : 'false' }}" {{ $i === 0 ? 'checked' : '' }}>
                     <div class="method-card">
-                        <img src="{{ $method['icon'] }}" alt="{{ $method['name'] }}">
+                        <div class="method-icons">
+                            <img src="{{ $method['icon'] }}" alt="{{ $method['name'] }}">
+                            @if(isset($method['additional_icons']))
+                                @foreach($method['additional_icons'] as $icon)
+                                    <img src="{{ $icon }}" alt="wallet">
+                                @endforeach
+                            @endif
+                        </div>
                         <span>{{ $method['name'] }}</span>
                     </div>
                 </label>
@@ -467,7 +475,7 @@
         </div>
         <div class="success-title">{{ __('sms_gateway.payment_successful') }}</div>
         <div class="success-subtitle">{{ __('sms_gateway.payment_confirmed_message') }}</div>
-        <a href="javascript:void(0)" class="success-btn" id="success-redirect" style="display:none">{{ __('sms_gateway.return_to_merchant') }}</a>
+        <a href="javascript:void(0)" class="success-btn" id="success-redirect" style="display:none" target="_top">{{ __('sms_gateway.return_to_merchant') }}</a>
     </div>
 
     <div class="checkout-footer">
@@ -597,7 +605,7 @@
                     redirectBtn.href = data.redirect_url;
                     redirectBtn.style.display = 'inline-block';
                     // Auto-redirect after 3 seconds
-                    setTimeout(() => { window.location.href = data.redirect_url; }, 3000);
+                    setTimeout(() => { window.top.location.href = data.redirect_url; }, 3000);
                 }
             } else {
                 showError(data.message || '{{ __("sms_gateway.payment_not_found_yet") }}');
@@ -625,7 +633,7 @@
             const res = await fetch(STATUS_URL);
             const data = await res.json();
             if (data.status === 'complete' && data.redirect_url) {
-                window.location.href = data.redirect_url;
+                window.top.location.href = data.redirect_url;
             }
         } catch (e) { /* silent */ }
     }, 5000);

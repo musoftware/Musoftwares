@@ -26,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'subscriptions/kashier/webhook',
             'api/serial/device',   // Serial license check-in — called by client software, no browser session
             'crm/whatsapp/webhook/*', // WhatsApp provider webhooks — external POST requests
+            'sms-pay/*/verify', // Hosted checkout embedded via iframe across domains
         ]);
 
 
