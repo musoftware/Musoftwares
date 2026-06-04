@@ -1530,11 +1530,12 @@
             "no_agent_data_available_for_this_branch": "No agent data available for this branch.",
             "no_checkout_sessions_found_create_one_using_the_api": "No checkout sessions found. Create one using the API.",
             "no_data_available": "No Data Available",
-            "no_devices_found": "No devices found.",
-            "no_leads_found_for_this_status": "No leads found for this status.",
-            "no_new_notifications": "No new notifications",
-            "no_previous_payment_links_create_your_first_link_now": "No previous payment links. Create your first link now!",
-            "no_priority_messages_at_the_moment": "No priority messages at the moment.",
+            "no_devices_found": "لم يتم العثور على أجهزة.",
+            "no_leads_found_for_this_status": "لم يتم العثور على عملاء محتملين لهذه الحالة.",
+            "no_new_notifications": "لا توجد إشعارات جديدة",
+            "new_notification": "إشعار جديد",
+            "no_previous_payment_links_create_your_first_link_now": "لا توجد روابط دفع سابقة. قم بإنشاء الرابط الأول الآن!",
+            "no_priority_messages_at_the_moment": "لا توجد رسائل ذات أولوية في الوقت الحالي.",
             "no_recent_activities": "No recent activities.",
             "no_recent_imports_available": "No recent imports available.",
             "no_results_found_for": "No results found for",
@@ -6794,7 +6795,9 @@
             "tagline": "الوصف المختصر",
             "upload_image": "رفع صورة",
             "validity_days": "الصلاحية (أيام)",
-            "instapay_logo": "لوجو انستا باي"
+            "instapay_logo": "لوجو انستا باي",
+            "login": "تسجيل الدخول",
+            "register": "حساب جديد"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -8905,6 +8908,7 @@
             "no_devices_found": "No devices found.",
             "no_leads_found_for_this_status": "No leads found for this status.",
             "no_new_notifications": "No new notifications",
+            "new_notification": "New Notification",
             "no_previous_payment_links_create_your_first_link_now": "No previous payment links. Create your first link now!",
             "no_priority_messages_at_the_moment": "No priority messages at the moment.",
             "no_recent_activities": "No recent activities.",
@@ -14166,7 +14170,9 @@
             "tagline": "Tagline",
             "upload_image": "Upload Image",
             "validity_days": "Validity (Days)",
-            "instapay_logo": "Instapay Logo"
+            "instapay_logo": "Instapay Logo",
+            "login": "Log in",
+            "register": "Register"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",

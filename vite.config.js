@@ -37,19 +37,22 @@ export default defineConfig({
                     if (id.includes('resources/js/Pages/')) {
                         const parts = id.split('resources/js/Pages/')[1].split('/');
                         
-                        // Break down tools specifically into their own chunks
-                        if (parts[0] === 'Tools' && parts.length > 1) {
-                            if (parts.length > 2) {
-                                return 'tool-' + parts[1].toLowerCase();
-                            }
-                            const fileName = parts[1].replace(/\.(tsx|jsx|ts|js)$/, '').toLowerCase();
-                            return 'tool-' + fileName;
+                        // Group all tools into ONE chunk to avoid massive concurrent requests
+                        if (parts[0] === 'Tools') {
+                            return 'app-tools';
                         }
 
-                        // Group other pages by their main module folder (e.g. page-frontend, page-admin)
-                        if (parts.length > 1) {
-                            return 'page-' + parts[0].toLowerCase();
-                        }
+                        // Group major modules to prevent 503 rate limits on shared hosting
+                        const coreModules = ['Admin', 'Auth', 'Core', 'Dashboard.tsx', 'Error.tsx', 'Welcome.tsx', 'Profile', 'Settings', 'Activity', 'Notifications', 'Support'];
+                        const erpModules = ['ERP', 'CRM', 'Billing', 'Client', 'Financial', 'Messages', 'Vouchers'];
+                        const freelanceModules = ['Freelance', 'Marketplace', 'iSaaS', 'Public', 'Guest'];
+                        
+                        if (coreModules.includes(parts[0])) return 'app-pages-core';
+                        if (erpModules.includes(parts[0])) return 'app-pages-erp';
+                        if (freelanceModules.includes(parts[0])) return 'app-pages-freelance';
+                        
+                        // Everything else
+                        return 'app-pages-other';
                     }
                 }
             }

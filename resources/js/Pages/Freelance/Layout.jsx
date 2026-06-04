@@ -24,7 +24,7 @@ import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 
 export default function FreelanceLayout({ children, clean = false }) {
     useInertiaNotifications();
-    const { auth, notifications } = usePage().props;
+    const { auth, notifications, is_lance_domain } = usePage().props;
     const user = auth.user;
     
     const freelanceModeContext = useFreelanceMode();
@@ -179,12 +179,14 @@ export default function FreelanceLayout({ children, clean = false }) {
                                     </div>
                                     
                                     <DropdownMenuGroup>
-                                        <DropdownMenuItem 
-                                            className="cursor-pointer rounded-lg text-sm mb-1"
-                                            render={<Link href="/dashboard" className="flex items-center w-full font-medium" />}
-                                        >
-                                            <ArrowLeft className="mr-2 h-4 w-4 text-slate-400" /> {__('general.exit_to_main_hub')}
-                                        </DropdownMenuItem>
+                                        {!is_lance_domain && (
+                                            <DropdownMenuItem 
+                                                className="cursor-pointer rounded-lg text-sm mb-1"
+                                                render={<Link href="/dashboard" className="flex items-center w-full font-medium" />}
+                                            >
+                                                <ArrowLeft className="mr-2 h-4 w-4 text-slate-400" /> {__('general.exit_to_main_hub')}
+                                            </DropdownMenuItem>
+                                        )}
                                         <DropdownMenuItem 
                                             className="cursor-pointer rounded-lg text-sm"
                                             render={<Link href="/profile" className="flex items-center w-full" />}

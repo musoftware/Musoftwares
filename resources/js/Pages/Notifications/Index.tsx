@@ -42,28 +42,31 @@ export default function Index({
                                                 key={notification.id}
                                                 className={`py-4 ${!notification.read_at ? 'bg-gray-50' : ''}`}
                                             >
-                                                <div className="flex items-center space-x-4 px-4">
+                                                <div className="flex items-center justify-between space-x-4 px-4">
                                                     <div className="min-w-0 flex-1">
-                                                        <p className="truncate text-sm font-medium text-gray-900">
-                                                            {notification.data
-                                                                ?.message ||
-                                                                'Notification'}
-                                                        </p>
-                                                        <p className="truncate text-sm text-gray-500">
-                                                            {new Date(
-                                                                notification.created_at,
-                                                            ).toLocaleString()}
-                                                        </p>
+                                                        <Link
+                                                            href={route('notifications.mark-read', { id: notification.id })} 
+                                                            method="post" 
+                                                            as="button" 
+                                                            className="flex-1 text-left outline-none"
+                                                        >
+                                                            <p className="text-sm font-medium text-gray-900 leading-tight">
+                                                                {notification.data?.title || notification.data?.message || __('general.new_notification')}
+                                                            </p>
+                                                            {(notification.data?.body || (notification.data?.title && notification.data?.message)) && (
+                                                                <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">
+                                                                    {notification.data?.body || notification.data?.message}
+                                                                </p>
+                                                            )}
+                                                            <p className="text-xs text-gray-400 mt-1">
+                                                                {new Date(notification.created_at).toLocaleString()}
+                                                            </p>
+                                                        </Link>
                                                     </div>
                                                     <div>
                                                         {!notification.read_at && (
                                                             <Link
-                                                                href={route(
-                                                                    'notifications.mark-read',
-                                                                    {
-                                                                        id: notification.id,
-                                                                    },
-                                                                )}
+                                                                href={route('notifications.mark-read', { id: notification.id, no_redirect: 1 })}
                                                                 method="post"
                                                                 as="button"
                                                                 className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-900"

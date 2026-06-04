@@ -10,8 +10,15 @@ use Inertia\Inertia;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
+        if ($request->getHost() === 'lance.musoftwares.com') {
+            return Inertia::render('Freelance/Landing', [
+                'canLogin' => Route::has('login'),
+                'canRegister' => Route::has('register'),
+            ]);
+        }
+
         return Inertia::render('Public/Home', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),

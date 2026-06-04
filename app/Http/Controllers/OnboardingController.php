@@ -13,6 +13,9 @@ class OnboardingController extends Controller
         $user = $request->user();
 
         if ($user->onboarding_completed) {
+            if ($request->getHost() === 'lance.musoftwares.com') {
+                return redirect()->intended(route('freelance.dashboard', absolute: false));
+            }
             return redirect()->intended(route('dashboard', absolute: false));
         }
 
@@ -126,6 +129,9 @@ class OnboardingController extends Controller
         }
 
         if ($action === 'complete') {
+            if ($request->getHost() === 'lance.musoftwares.com') {
+                return redirect()->intended(route('freelance.dashboard', absolute: false));
+            }
             return redirect()->intended(route('dashboard', absolute: false));
         }
 

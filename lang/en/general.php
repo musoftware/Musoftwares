@@ -272,6 +272,7 @@ return [
   'no_devices_found' => 'No devices found.',
   'no_leads_found_for_this_status' => 'No leads found for this status.',
   'no_new_notifications' => 'No new notifications',
+  'new_notification' => 'New Notification',
   'no_previous_payment_links_create_your_first_link_now' => 'No previous payment links. Create your first link now!',
   'no_priority_messages_at_the_moment' => 'No priority messages at the moment.',
   'no_recent_activities' => 'No recent activities.',
@@ -5534,4 +5535,6 @@ return [
   'upload_image' => 'Upload Image',
   'validity_days' => 'Validity (Days)',
   'instapay_logo' => 'Instapay Logo',
+  'login' => 'Log in',
+  'register' => 'Register',
 ];

@@ -20,6 +20,15 @@ class NotificationController extends Controller
         $notification = $request->user()->notifications()->find($id);
         if ($notification) {
             $notification->markAsRead();
+            
+            // If the request expects JSON or doesn't want to redirect, just return back
+            if ($request->wantsJson() || $request->has('no_redirect')) {
+                return back();
+            }
+
+            if (isset($notification->data['url'])) {
+                return redirect($notification->data['url']);
+            }
         }
         return back();
     }

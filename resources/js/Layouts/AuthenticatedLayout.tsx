@@ -691,16 +691,24 @@ function AuthenticatedContent({
                                     <div className="max-h-[300px] overflow-y-auto p-2">
                                         {notifications?.recent && notifications.recent.length > 0 ? (
                                             notifications.recent.map((n: any) => (
-                                                <div key={n.id} className="p-2 hover:bg-slate-50 rounded-lg text-xs flex justify-between items-start gap-2 border-b border-slate-50 last:border-0">
-                                                    <div className="flex-1">
-                                                        <p className="text-slate-800 font-medium">{n.data?.message || n.data?.title || 'New Notification'}</p>
-                                                        <span className="text-[10px] text-slate-400">{n.created_at ? new Date(n.created_at).toLocaleDateString() : ''}</span>
-                                                    </div>
+                                                <div key={n.id} className="p-1 hover:bg-slate-50 rounded-lg text-xs flex justify-between items-start gap-1 border-b border-slate-50 last:border-0 relative group">
                                                     <Link 
                                                         href={safeRoute('notifications.mark-read', { id: n.id })} 
                                                         method="post" 
                                                         as="button" 
-                                                        className="text-[10px] text-indigo-600 hover:underline shrink-0 bg-transparent border-0 cursor-pointer"
+                                                        className="flex-1 text-left p-1.5 rounded-md outline-none hover:bg-slate-100/50 transition-colors"
+                                                    >
+                                                        <p className="text-slate-800 font-medium leading-tight">{n.data?.title || n.data?.message || __('general.new_notification')}</p>
+                                                        {(n.data?.body || (n.data?.title && n.data?.message)) && (
+                                                            <p className="text-slate-500 text-[10px] mt-0.5 line-clamp-2">{n.data?.body || n.data?.message}</p>
+                                                        )}
+                                                        <span className="text-[10px] text-slate-400 block mt-1">{n.created_at ? new Date(n.created_at).toLocaleDateString() : ''}</span>
+                                                    </Link>
+                                                    <Link 
+                                                        href={safeRoute('notifications.mark-read', { id: n.id, no_redirect: 1 })} 
+                                                        method="post" 
+                                                        as="button" 
+                                                        className="text-[10px] text-indigo-600 hover:underline shrink-0 bg-transparent border-0 cursor-pointer p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
                                                     >{__('general.mark_read')}</Link>
                                                 </div>
                                             ))

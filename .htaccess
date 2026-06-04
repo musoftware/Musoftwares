@@ -24,6 +24,11 @@
     RewriteCond %{REQUEST_URI} !^/api/
     RewriteRule ^ https://www.musoftwares.com%{REQUEST_URI} [R=301,L]
 
+    # Enforce HTTPS for lance domain
+    RewriteCond %{HTTP_HOST} ^lance\.musoftwares\.com$ [NC]
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://lance.musoftwares.com%{REQUEST_URI} [R=301,L]
+
     # Allow direct access to .well-known directory (for things like Let's Encrypt)
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteCond %{REQUEST_URI} ^/.well-known/
