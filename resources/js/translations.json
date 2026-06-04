@@ -1548,7 +1548,7 @@
             "no_wallets_match_your_filters": "No wallets match your filters.",
             "not_scheduled": "Not Scheduled",
             "not_set": "Not Set",
-            "notifications": "Notifications",
+            "notifications": "الإشعارات",
             "os_version": "OS Version",
             "only_match_transactions_from_this_specific_sender": "Only match transactions from this specific sender.",
             "open_tickets": "Open Tickets",
@@ -6797,7 +6797,10 @@
             "validity_days": "الصلاحية (أيام)",
             "instapay_logo": "لوجو انستا باي",
             "login": "تسجيل الدخول",
-            "register": "حساب جديد"
+            "register": "حساب جديد",
+            "notifications_disabled_message": "يرجى تفعيل الإشعارات لتلقي التحديثات والتنبيهات في الخلفية.",
+            "enable_notifications": "تفعيل الإشعارات",
+            "notifications_enabled_successfully": "تم تفعيل الإشعارات بنجاح."
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -14172,7 +14175,10 @@
             "validity_days": "Validity (Days)",
             "instapay_logo": "Instapay Logo",
             "login": "Log in",
-            "register": "Register"
+            "register": "Register",
+            "notifications_disabled_message": "Please enable push notifications to receive background updates and alerts.",
+            "enable_notifications": "Enable Notifications",
+            "notifications_enabled_successfully": "Push notifications have been enabled successfully."
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",

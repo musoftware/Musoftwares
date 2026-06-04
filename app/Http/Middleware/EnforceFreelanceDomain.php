@@ -40,7 +40,10 @@ class EnforceFreelanceDomain
                 'sanctum',
                 '_ignition',
                 'livewire',
-                'broadcasting'
+                'broadcasting',
+                'device-tokens',
+                'notifications',
+                'build'
             ];
 
             $isAllowed = false;

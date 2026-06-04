@@ -69,6 +69,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markRead'])->name('notifications.mark-read');
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+    
+    // FCM Device Token
+    Route::post('/device-tokens', [\App\Http\Controllers\DeviceTokenController::class, 'store'])->name('device-tokens.store');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -355,6 +358,10 @@ Route::middleware(['auth', 'verified', 'onboarding', 'moderator'])->prefix('admi
 // Admin Routes
 Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+
+    // Broadcast Notifications
+    Route::get('/notifications/broadcast', [\App\Http\Controllers\Admin\BroadcastNotificationController::class, 'index'])->name('notifications.broadcast');
+    Route::post('/notifications/broadcast/send', [\App\Http\Controllers\Admin\BroadcastNotificationController::class, 'send'])->name('notifications.broadcast.send');
 
     // Reports
     Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');

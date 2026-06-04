@@ -10,6 +10,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:freelance'])-
     // Skills
     Route::resource('skills', \Modules\Freelance\Http\Controllers\SkillController::class)->except(['create', 'show', 'edit']);
 
+    // Profile & Settings
+    Route::get('/profile', [\Modules\Freelance\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [\Modules\Freelance\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    
+    Route::get('/settings/notifications', [\Modules\Freelance\Http\Controllers\SettingsController::class, 'notifications'])->name('settings.notifications');
+    Route::put('/settings/notifications', [\Modules\Freelance\Http\Controllers\SettingsController::class, 'updateNotifications'])->name('settings.notifications.update');
+
     // User Skills
     Route::post('/user-skills', [\Modules\Freelance\Http\Controllers\UserSkillController::class, 'store'])->name('user-skills.store');
     Route::delete('/user-skills/{skill_id}', [\Modules\Freelance\Http\Controllers\UserSkillController::class, 'destroy'])->name('user-skills.destroy');

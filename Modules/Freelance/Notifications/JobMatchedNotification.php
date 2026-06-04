@@ -41,9 +41,9 @@ class JobMatchedNotification extends Notification implements ShouldQueue
     public function toFcm($notifiable): FcmMessage
     {
         return (new FcmMessage(notification: new FcmNotification(
-                title: 'New Job Matched Your Skills!',
-                body: 'A new job matching your skills has just been posted: ' . $this->job->title,
-                image: 'https://example.com/icon.png' // Optional: path to your app icon
+                title: __('freelance.new_job_matched_skills'),
+                body: __('freelance.new_job_matched_body', ['title' => $this->job->title]),
+                image: 'https://musoftwares.com/icon.png' // Optional: path to your app icon
             )))
             ->data([
                 'job_id' => (string) $this->job->id,
@@ -73,8 +73,8 @@ class JobMatchedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->subject('New Job Matched Your Skills!')
-                    ->line('A new job matching your skills has just been posted: ' . $this->job->title)
+                    ->subject(__('freelance.new_job_matched_skills'))
+                    ->line(__('freelance.new_job_matched_body', ['title' => $this->job->title]))
                     ->action('View Job', route('freelance.jobs.show', $this->job->id))
                     ->line(__('general.submit_your_proposal_to_win_this_job'));
     }
@@ -91,7 +91,7 @@ class JobMatchedNotification extends Notification implements ShouldQueue
             'title' => $this->job->title,
             'budget' => $this->job->budget,
             'currency_id' => $this->job->currency_id,
-            'message' => 'A new job matched your skills: ' . $this->job->title,
+            'message' => __('freelance.new_job_matched_body', ['title' => $this->job->title]),
         ];
     }
 }

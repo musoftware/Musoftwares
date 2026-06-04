@@ -15,15 +15,17 @@ import {
 import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
 import {
     Bell, ChevronDown, Menu, Plus, Coins, LogOut,
-    User, History, Shield, Briefcase, Search, Clock, ArrowLeft
+    User, History, Shield, Briefcase, Search, Clock, ArrowLeft, Settings
 } from 'lucide-react';
 import FreelanceModeToggle from '@/Components/Freelance/FreelanceModeToggle';
 import { useFreelanceMode } from '@/Components/Freelance/FreelanceModeContext';
 import { __ } from '@/lib/i18n';
 import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
+import { useFCM } from '@/hooks/useFCM';
 
 export default function FreelanceLayout({ children, clean = false }) {
     useInertiaNotifications();
+    const { permission, requestPermission } = useFCM();
     const { auth, notifications, is_lance_domain } = usePage().props;
     const user = auth.user;
     
@@ -143,6 +145,9 @@ export default function FreelanceLayout({ children, clean = false }) {
                                 <DropdownMenuContent align="end" className="w-80 p-0 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
                                     <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center">
                                         <span className="font-semibold text-slate-900 text-sm">{__('general.notifications')}</span>
+                                        <Link href="/freelance/settings/notifications" className="text-slate-400 hover:text-slate-600 transition-colors">
+                                            <Settings className="w-4 h-4" />
+                                        </Link>
                                     </div>
                                     <div className="max-h-[300px] overflow-y-auto p-2">
                                         {notifications?.recent && notifications.recent.length > 0 ? (
@@ -189,7 +194,7 @@ export default function FreelanceLayout({ children, clean = false }) {
                                         )}
                                         <DropdownMenuItem 
                                             className="cursor-pointer rounded-lg text-sm"
-                                            render={<Link href="/profile" className="flex items-center w-full" />}
+                                            render={<Link href="/freelance/profile" className="flex items-center w-full" />}
                                         >
                                             <User className="mr-2 h-4 w-4 text-slate-400" /> {__('general.my_profile')}
                                         </DropdownMenuItem>
@@ -213,6 +218,25 @@ export default function FreelanceLayout({ children, clean = false }) {
                     </div>
                 </div>
             </header>
+
+            {/* Notification Permission Banner */}
+            {permission === 'default' && (
+                <div className="bg-emerald-600 px-4 py-3 text-white sm:px-6 lg:px-8">
+                    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 max-w-7xl mx-auto">
+                        <p className="text-sm leading-6">
+                            <strong className="font-semibold">{__('general.notifications')}</strong>
+                            <svg viewBox="0 0 2 2" className="mx-2 inline h-0.5 w-0.5 fill-current" aria-hidden="true"><circle cx="1" cy="1" r="1" /></svg>
+                            {__('general.notifications_disabled_message')}
+                        </p>
+                        <button
+                            onClick={requestPermission}
+                            className="flex-none rounded-full bg-emerald-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-900 transition-colors"
+                        >
+                            {__('general.enable_notifications')} <span aria-hidden="true">&rarr;</span>
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {children}
