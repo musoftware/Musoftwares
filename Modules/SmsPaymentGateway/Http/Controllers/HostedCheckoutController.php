@@ -100,6 +100,11 @@ class HostedCheckoutController extends Controller
                 'id' => 'vodafone_cash',
                 'name' => __('sms_gateway.vodafone_cash'),
                 'icon' => asset('assets/images/gateways/vodafone-cash.svg'),
+                'additional_icons' => [
+                    asset('assets/images/gateways/orange-cash.svg'),
+                    asset('assets/images/gateways/etisalat-cash.svg'),
+                    asset('assets/images/gateways/we-pay.svg'),
+                ],
                 'phone' => $walletNumbers['vodafone_cash'],
                 'is_etisalat' => $isEtisalatVodafone,
             ];

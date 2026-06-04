@@ -147,8 +147,16 @@ export default function Settings({ settings, devices }: Props) {
 
                                 <div className="space-y-3 pt-4">
                                     <div className="flex items-center justify-between max-w-md p-4 border rounded-lg bg-gray-50/50">
-                                        <div className="space-y-0.5">
-                                            <Label className="text-base">{__('erp.vodafone_cash_wallets')}</Label>
+                                        <div className="space-y-2">
+                                            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                                <Label className="text-base">{__('erp.vodafone_cash_wallets')}</Label>
+                                                <div className="flex items-center gap-1.5">
+                                                    <img src="/assets/images/gateways/vodafone-cash.svg" alt="Vodafone" className="h-5 object-contain" />
+                                                    <img src="/assets/images/gateways/orange-cash.svg" alt="Orange" className="h-5 rounded-sm object-contain" />
+                                                    <img src="/assets/images/gateways/etisalat-cash.svg" alt="Etisalat" className="h-5 rounded-sm object-contain" />
+                                                    <img src="/assets/images/gateways/we-pay.svg" alt="WE" className="h-5 rounded-sm object-contain" />
+                                                </div>
+                                            </div>
                                             <p className="text-sm text-gray-500">{__('general.allow_selecting_electronic_wallets')}</p>
                                         </div>
                                         <Switch
