@@ -34,7 +34,8 @@ class BroadcastNotificationController extends Controller
             
             $notification = Notification::create($validated['title'], $validated['body']);
             
-            $message = CloudMessage::withTarget('topic', 'global')
+            $message = CloudMessage::new()
+                ->withTopic('global')
                 ->withNotification($notification);
                 
             if (!empty($validated['url'])) {

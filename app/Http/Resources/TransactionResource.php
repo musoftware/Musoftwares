@@ -13,7 +13,7 @@ class TransactionResource extends JsonResource
             'id'              => $this->id,
             'type'            => $this->type,
             'amount'          => (float) $this->amount,
-            'currency'        => \App\Helpers\CurrencyHelper::getFrontendCurrency($this->currency),
+            'currency'        => \App\Helpers\CurrencyHelper::getFrontendCurrency($this->currency_id),
             'business_amount'      => (float) $this->business_amount,
             'business_currency' => \App\Helpers\CurrencyHelper::getBusinessCurrency(),
             'reason'          => $this->reason,

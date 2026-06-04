@@ -1,6 +1,7 @@
 <?php
 
 return [
+  'enable_notifications' => 'Enable Notifications',
   'payment_successful_thank_you' => 'Payment successful. Thank you!',
   'payment_failed_please_try_again' => 'Payment failed. Please try again.',
   'return_to_home' => 'Return to Home',
