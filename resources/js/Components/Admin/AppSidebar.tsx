@@ -65,6 +65,7 @@ const items: MenuItem[] = [
     url: "/admin/operations", 
     icon: Briefcase,
     subItems: [
+        { title: "Broadcast Notifications", url: "/admin/notifications/broadcast" },
         { title: "Tickets", url: "/admin/tickets" },
         { title: "Tasks List", url: "/admin/tasks/as_list" },
         { title: "Task Calendar", url: "/admin/tasks/calendar" },

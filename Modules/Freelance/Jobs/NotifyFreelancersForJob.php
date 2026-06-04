@@ -45,8 +45,12 @@ class NotifyFreelancersForJob implements ShouldQueue
         })->chunk(100, function ($matchingUsers) {
             // Send a notification to each matching user
             foreach ($matchingUsers as $user) {
-                $user->notify(new \Modules\Freelance\Notifications\JobMatchedNotification($this->freelanceJob));
-                \Log::info("Notification dispatched to user {$user->id} for job {$this->freelanceJob->id}");
+                try {
+                    $user->notify(new \Modules\Freelance\Notifications\JobMatchedNotification($this->freelanceJob));
+                    \Log::info("Notification dispatched to user {$user->id} for job {$this->freelanceJob->id}");
+                } catch (\Exception $e) {
+                    \Log::error("Failed to notify user {$user->id} for job {$this->freelanceJob->id}: " . $e->getMessage());
+                }
             }
         });
     }

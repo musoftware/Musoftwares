@@ -5537,4 +5537,8 @@ return [
   'instapay_logo' => 'لوجو انستا باي',
   'login' => 'تسجيل الدخول',
   'register' => 'حساب جديد',
+  'notifications' => 'الإشعارات',
+  'notifications_disabled_message' => 'يرجى تفعيل الإشعارات لتلقي التحديثات والتنبيهات في الخلفية.',
+  'enable_notifications' => 'تفعيل الإشعارات',
+  'notifications_enabled_successfully' => 'تم تفعيل الإشعارات بنجاح.',
 ];

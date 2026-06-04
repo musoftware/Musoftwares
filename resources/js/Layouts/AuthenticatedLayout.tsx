@@ -31,6 +31,7 @@ import axios from 'axios';
 import FreelanceModeToggle from '@/Components/Freelance/FreelanceModeToggle';
 import MarketplaceModeToggle from '@/Components/Marketplace/MarketplaceModeToggle';
 import { __ } from '@/lib/i18n';
+import { useFCM } from '@/hooks/useFCM';
 
 export default function Authenticated(props: PropsWithChildren<{ header?: ReactNode }>) {
     return (
@@ -44,6 +45,7 @@ function AuthenticatedContent({
 }: PropsWithChildren<{ header?: ReactNode }>) {
     const { auth, notifications, flash, wallet } = usePage().props as any;
     useInertiaNotifications();
+    const { permission, requestPermission } = useFCM();
     const user = auth.user;
     const { toast } = useToast();
 
@@ -812,6 +814,25 @@ function AuthenticatedContent({
                     </div>
                 </div>
             </header>
+
+            {/* Notification Permission Banner */}
+            {permission === 'default' && (
+                <div className="bg-indigo-600 px-4 py-3 text-white sm:px-6 lg:px-8">
+                    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                        <p className="text-sm leading-6">
+                            <strong className="font-semibold">{__('general.notifications')}</strong>
+                            <svg viewBox="0 0 2 2" className="mx-2 inline h-0.5 w-0.5 fill-current" aria-hidden="true"><circle cx="1" cy="1" r="1" /></svg>
+                            {__('general.notifications_disabled_message')}
+                        </p>
+                        <button
+                            onClick={requestPermission}
+                            className="flex-none rounded-full bg-indigo-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-900 transition-colors"
+                        >
+                            {__('general.enable_notifications')} <span aria-hidden="true">&rarr;</span>
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Optional Header for context */}
             {header && (

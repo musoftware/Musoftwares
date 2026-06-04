@@ -1,6 +1,8 @@
 <?php
 
 return [
+  'new_job_matched_skills' => 'New Job Matched Your Skills!',
+  'new_job_matched_body' => 'A new job matching your skills has just been posted: :title',
   'expected_duration' => 'expected_duration',
   'job_description' => 'job_description',
   'unknown_job' => 'Unknown Job',

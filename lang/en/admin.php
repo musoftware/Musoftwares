@@ -1,6 +1,15 @@
 <?php
 
 return [
+  'notification_sent_successfully' => 'Global notification sent successfully.',
+  'notification_failed' => 'Failed to send notification',
+  'broadcast_notification' => 'Broadcast Notification',
+  'broadcast_notification_description' => 'Send a push notification to all users who have allowed notifications on their devices.',
+  'broadcast_info_message' => 'This notification will be pushed to user devices immediately. It will not be saved in their notification history.',
+  'notification_title_placeholder' => 'Enter notification title',
+  'message' => 'Message',
+  'notification_body_placeholder' => 'Enter the notification content',
+  'link_optional' => 'Link (Optional)',
   'share' => 'Share',
   'share_24_hours' => 'Share (24 Hours)',
   'share_3_days' => 'Share (3 Days)',

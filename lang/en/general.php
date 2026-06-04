@@ -5537,4 +5537,8 @@ return [
   'instapay_logo' => 'Instapay Logo',
   'login' => 'Log in',
   'register' => 'Register',
+  'notifications' => 'Notifications',
+  'notifications_disabled_message' => 'Please enable push notifications to receive background updates and alerts.',
+  'enable_notifications' => 'Enable Notifications',
+  'notifications_enabled_successfully' => 'Push notifications have been enabled successfully.',
 ];

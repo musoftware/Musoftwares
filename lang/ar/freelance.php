@@ -1,6 +1,8 @@
 <?php
 
 return [
+  'new_job_matched_skills' => 'هناك مشروع جديد يطابق مهاراتك!',
+  'new_job_matched_body' => 'تم نشر مشروع جديد يطابق مهاراتك: :title',
   'expected_duration' => 'expected_duration',
   'job_description' => 'job_description',
   'unknown_job' => 'Unknown Job',

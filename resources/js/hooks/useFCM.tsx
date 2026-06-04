@@ -7,7 +7,12 @@ import { __ } from '@/lib/i18n';
 import { router } from '@inertiajs/react';
 
 export function useFCM() {
-    const [permission, setPermission] = useState<NotificationPermission>('default');
+    const [permission, setPermission] = useState<NotificationPermission>(() => {
+        if (typeof window !== 'undefined' && 'Notification' in window) {
+            return Notification.permission;
+        }
+        return 'default';
+    });
     const { toast } = useToast();
 
     useEffect(() => {
@@ -32,7 +37,11 @@ export function useFCM() {
                     action: payload.data?.url ? (
                         <button 
                             className="text-xs text-indigo-600 hover:text-indigo-800"
-                            onClick={() => router.visit(payload.data.url)}
+                            onClick={() => {
+                                if (payload.data?.url) {
+                                    router.visit(payload.data.url);
+                                }
+                            }}
                         >
                             {__('general.view')}
                         </button>
@@ -45,7 +54,7 @@ export function useFCM() {
 
             return () => unsubscribe();
         }
-    }, []);
+    }, [toast]);
 
     const registerFCMToken = async () => {
         if (!messaging) return;
