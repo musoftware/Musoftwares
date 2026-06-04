@@ -7311,7 +7311,10 @@
             "brand_name": "اسم العلامة التجارية",
             "brand_name_hint": "سيتم استخدام اسمك الشخصي إذا تركته فارغاً.",
             "hide_method_name": "إخفاء أسماء طرق الدفع",
-            "hide_method_name_desc": "عدم إظهار أسماء مثل \"فودافون كاش\" أسفل لوجوهات المحافظ."
+            "hide_method_name_desc": "عدم إظهار أسماء مثل \"فودافون كاش\" أسفل لوجوهات المحافظ.",
+            "checkout_language": "لغة صفحة الدفع الافتراضية",
+            "language_arabic": "العربية",
+            "language_english": "الإنجليزية (English)"
         },
         "tools": {
             "monthly_only_restriction": "هذه الأداة تسمح بالاشتراك الشهري فقط.",
@@ -14680,7 +14683,10 @@
             "brand_name": "Brand Name",
             "brand_name_hint": "Defaults to your user name if left blank.",
             "hide_method_name": "Hide Payment Method Names",
-            "hide_method_name_desc": "Do not show names like \"Vodafone Cash\" below the wallet logos."
+            "hide_method_name_desc": "Do not show names like \"Vodafone Cash\" below the wallet logos.",
+            "checkout_language": "Default Checkout Language",
+            "language_arabic": "Arabic (العربية)",
+            "language_english": "English"
         },
         "tools": {
             "monthly_only_restriction": "This tool only allows monthly subscriptions.",

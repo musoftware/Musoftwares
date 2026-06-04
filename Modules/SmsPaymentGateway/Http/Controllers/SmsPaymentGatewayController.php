@@ -727,6 +727,7 @@ class SmsPaymentGatewayController extends Controller
             'instapay_allowed_sender' => 'nullable|string|max:100',
             'brand_name' => 'nullable|string|max:255',
             'hide_method_name' => 'boolean',
+            'checkout_language' => 'required|string|in:ar,en',
             'custom_logos' => 'nullable|array',
             'custom_logos.vodafone' => 'nullable|url|max:500',
             'custom_logos.orange' => 'nullable|url|max:500',
@@ -752,6 +753,7 @@ class SmsPaymentGatewayController extends Controller
             'instapay_allowed_sender' => $request->instapay_allowed_sender,
             'brand_name' => $request->brand_name,
             'hide_method_name' => $request->has('hide_method_name') ? $request->hide_method_name : false,
+            'checkout_language' => $request->checkout_language,
             'custom_logos' => $request->custom_logos,
         ]);
 

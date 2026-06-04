@@ -23,6 +23,7 @@ interface Props {
         instapay_allowed_sender: string | null;
         brand_name: string | null;
         hide_method_name: boolean;
+        checkout_language: string;
         custom_logos?: {
             vodafone?: string;
             orange?: string;
@@ -51,6 +52,7 @@ export default function Settings({ settings, devices }: Props) {
         instapay_allowed_sender: settings?.instapay_allowed_sender || '',
         brand_name: settings?.brand_name || '',
         hide_method_name: settings?.hide_method_name ?? false,
+        checkout_language: settings?.checkout_language || 'ar',
         custom_logos: settings?.custom_logos || {
             vodafone: '',
             orange: '',
@@ -116,6 +118,19 @@ export default function Settings({ settings, devices }: Props) {
                                         placeholder={__('sms_gateway.brand_name_hint')}
                                     />
                                     {errors.brand_name && <p className="text-sm text-red-600">{errors.brand_name}</p>}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="checkout_language">{__('sms_gateway.checkout_language')}</Label>
+                                    <select
+                                        id="checkout_language"
+                                        className="flex h-10 w-full max-w-md items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        value={data.checkout_language}
+                                        onChange={(e) => setData('checkout_language', e.target.value)}
+                                    >
+                                        <option value="ar">{__('sms_gateway.language_arabic')}</option>
+                                        <option value="en">{__('sms_gateway.language_english')}</option>
+                                    </select>
+                                    {errors.checkout_language && <p className="text-sm text-red-600">{errors.checkout_language}</p>}
                                 </div>
                                 <div className="flex items-center justify-between max-w-md p-4 border rounded-lg bg-gray-50/50 mt-4">
                                     <div className="space-y-0.5">

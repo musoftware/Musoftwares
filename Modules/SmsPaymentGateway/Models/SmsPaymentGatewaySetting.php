@@ -21,6 +21,7 @@ class SmsPaymentGatewaySetting extends Model
         'custom_logos',
         'brand_name',
         'hide_method_name',
+        'checkout_language',
     ];
 
     protected $casts = [

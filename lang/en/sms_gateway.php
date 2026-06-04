@@ -103,4 +103,7 @@ return [
   'brand_name_hint' => 'Defaults to your user name if left blank.',
   'hide_method_name' => 'Hide Payment Method Names',
   'hide_method_name_desc' => 'Do not show names like "Vodafone Cash" below the wallet logos.',
+  'checkout_language' => 'Default Checkout Language',
+  'language_arabic' => 'Arabic (العربية)',
+  'language_english' => 'English',
 ];
