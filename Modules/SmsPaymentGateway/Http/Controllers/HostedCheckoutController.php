@@ -115,8 +115,8 @@ class HostedCheckoutController extends Controller
             'paymentMethods' => $paymentMethods,
             'sessionId' => $session->session_id,
             'cancelUrl' => $session->cancel_url,
-            'verifyUrl' => url('/pay/' . $session->session_id . '/verify'),
-            'statusUrl' => url('/pay/' . $session->session_id . '/status'),
+            'verifyUrl' => url('/sms-pay/' . $session->session_id . '/verify'),
+            'statusUrl' => url('/sms-pay/' . $session->session_id . '/status'),
             'expiresAt' => $session->expires_at?->toIso8601String(),
         ]);
     }

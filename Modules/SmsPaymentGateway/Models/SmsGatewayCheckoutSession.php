@@ -134,7 +134,7 @@ class SmsGatewayCheckoutSession extends Model
      */
     public function getCheckoutUrl(): string
     {
-        return url('/pay/' . $this->session_id);
+        return url('/sms-pay/' . $this->session_id);
     }
 
     /**

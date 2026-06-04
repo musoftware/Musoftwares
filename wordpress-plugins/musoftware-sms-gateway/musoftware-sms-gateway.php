@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Musoftware SMS Payment Gateway
  * Description:       Integrates WordPress with the Musoftware SMS Payment Gateway. Provides shortcodes for payment forms and handles webhook callbacks.
- * Version:           2.0.4
+ * Version:           2.0.6
  * Author:            Musoftware
  * Text Domain:       musoftware-sms-gateway
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-define( 'MUSOFTWARE_SMS_GATEWAY_VERSION', '2.0.4' );
+define( 'MUSOFTWARE_SMS_GATEWAY_VERSION', '2.0.6' );
 define( 'MUSOFTWARE_SMS_GATEWAY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MUSOFTWARE_SMS_GATEWAY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 

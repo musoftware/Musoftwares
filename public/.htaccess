@@ -1,3 +1,9 @@
+<IfModule mod_headers.c>
+    SetEnvIf Request_URI "^/sms-pay/.*$" ALLOW_FRAMING
+    Header always unset X-Frame-Options env=ALLOW_FRAMING
+    Header unset X-Frame-Options env=ALLOW_FRAMING
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
