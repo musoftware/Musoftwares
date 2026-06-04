@@ -48,6 +48,7 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:sms-pa
     Route::get('device/{deviceId}/transactions', [SmsPaymentGatewayController::class, 'getTransactions'])->name('device.transactions');
     Route::get('verification-secret', [SmsPaymentGatewayController::class, 'getVerificationSecret'])->name('verification-secret');
     Route::post('verification-secret/regenerate', [SmsPaymentGatewayController::class, 'regenerateVerificationSecret'])->name('verification-secret.regenerate');
+    Route::get('webhooks/failed', [SmsPaymentGatewayController::class, 'failedWebhooks'])->name('webhooks.failed');
     Route::post('webhook', [SmsPaymentGatewayController::class, 'updateWebhook'])->name('webhook.update');
     Route::delete('webhook/{id}', [SmsPaymentGatewayController::class, 'deleteWebhook'])->name('webhook.delete');
     Route::post('webhook/test', [SmsPaymentGatewayController::class, 'testWebhook'])->name('webhook.test');

@@ -424,11 +424,33 @@ class SmsPaymentGatewayController extends Controller
                     ->with('success', __('messages.test_webhook_sent_success'));
             } else {
                 $webhook->increment('failure_count');
+                $responseBody = substr((string) $response->getBody(), 0, 1000);
+                $errorMessage = 'Endpoint returned status code: ' . $statusCode;
+                if (!empty($responseBody)) {
+                    $errorMessage .= "\n\nResponse Body:\n" . $responseBody;
+                }
+
+                \Modules\SmsPaymentGateway\Models\SmsPaymentGatewayFailedWebhook::create([
+                    'tenant_id' => $webhook->tenant_id ?? null,
+                    'user_id' => $user->id,
+                    'webhook_id' => $webhook->id,
+                    'payload' => $testPayload,
+                    'error_message' => $errorMessage,
+                    'failed_at' => now(),
+                ]);
                 return redirect()->route('sms-payment-gateway.index')
                     ->with('error', __('messages.webhook_endpoint_returned_error') . ': ' . $statusCode);
             }
         } catch (\Exception $e) {
             $webhook->increment('failure_count');
+            \Modules\SmsPaymentGateway\Models\SmsPaymentGatewayFailedWebhook::create([
+                'tenant_id' => $webhook->tenant_id ?? null,
+                'user_id' => $user->id,
+                'webhook_id' => $webhook->id,
+                'payload' => $testPayload ?? [],
+                'error_message' => $e->getMessage(),
+                'failed_at' => now(),
+            ]);
             return redirect()->route('sms-payment-gateway.index')
                 ->with('error', __('messages.failed_to_send_test_webhook') . ': ' . $e->getMessage());
         }
@@ -508,6 +530,24 @@ class SmsPaymentGatewayController extends Controller
             ->first();
 
         return \Inertia\Inertia::render('SmsPaymentGateway/Webhooks', compact('webhook'));
+    }
+
+    /**
+     * Display failed webhooks logs
+     * GET /client/sms-payment-gateway/webhooks/failed
+     */
+    public function failedWebhooks()
+    {
+        $user = Auth::user();
+
+        $failedWebhooks = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewayFailedWebhook::with('webhook')
+            ->where('user_id', $user->id)
+            ->orderBy('failed_at', 'desc')
+            ->paginate(15);
+
+        return \Inertia\Inertia::render('SmsPaymentGateway/FailedWebhooks', [
+            'failedWebhooks' => $failedWebhooks
+        ]);
     }
 
     /**

@@ -34,21 +34,35 @@ export default function EditService({ categories, service }: Props) {
     const { data, setData, post, processing, errors } = useForm({
         _method: 'put',
         title: service.title || '',
+        title_translations: service.title_translations || { en: '', ar: '' },
+        tagline: service.tagline || '',
+        tagline_translations: service.tagline_translations || { en: '', ar: '' },
         category_id: service.category_id || '',
         tags: service.tags || [],
         description: service.description || '',
+        description_translations: service.description_translations || { en: '', ar: '' },
+        auto_reply: service.auto_reply || '',
+        auto_reply_translations: service.auto_reply_translations || { en: '', ar: '' },
         faq: service.faq || [],
         requirements: service.requirements || [],
+        extras: service.extras || [],
         gallery: [] as File[],
         kept_gallery: service.gallery || [],
         video_url: service.video_url || '',
         packages: service.packages?.length > 0 ? service.packages : [emptyPackage()],
+        is_free: service.is_free || false,
+        service_link: service.service_link || '',
+        generate_serials: service.generate_serials || false,
+        allow_random_serial: service.allow_random_serial || false,
+        validity_days: service.validity_days || '',
+        referral_commission_from: service.referral_commission_from || 'fee',
+        referral_commission_percentage: service.referral_commission_percentage || '',
     });
 
     const canNext = () => {
         if (step === 1) return data.title.trim().length >= 10 && data.category_id;
-        if (step === 2) return data.packages.every(p => p.name && p.price && Number(p.price) >= 1 && p.delivery_days >= 1);
-        if (step === 3) return data.description.trim().length >= 100;
+        if (step === 2) return data.packages.every((p: any) => p.name && p.price && Number(p.price) >= 1 && p.delivery_days >= 1);
+        if (step === 3) return data.description.trim().length >= 10;
         if (step === 4) return data.gallery.length > 0 || data.kept_gallery.length > 0;
         return true;
     };
