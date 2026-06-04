@@ -19,7 +19,7 @@ Route::get('/test-amc-api', function(\App\Services\AmcAcademyApiService $service
     // Array of mock FBIDs to test bulk lookup and deduction
     $testFbids = ['10000000000001', '10000000000002'];
     $result = $service->searchFbidsBulk($testFbids);
-    
+
     return response()->json([
         'message' => 'API Test Completed',
         'fbids_sent' => $testFbids,
@@ -557,7 +557,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/points_controller', [\App\Http\Controllers\Admin\AdminPointsController::class, 'index'])->name('points.index');
     Route::post('/points_controller/{user}/adjust', [\App\Http\Controllers\Admin\AdminPointsController::class, 'adjustPoints'])->name('points.adjust');
     Route::get('/points_controller/{user}/history', [\App\Http\Controllers\Admin\AdminPointsController::class, 'history'])->name('points.history');
-    
+
     // ── Admin Point Packages ───────────────────────────────────────
     Route::resource('point-packages', \App\Http\Controllers\Admin\AdminPointPackageController::class)->except(['show']);
 
@@ -859,10 +859,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // ── Guest Payment Links ────────────────────────────────────────────────────────
 Route::prefix('pay')->name('guest.payment-links.')->group(function () {
+    Route::get('/{uuid}', [\App\Http\Controllers\GuestPaymentLinkController::class, 'show'])->name('show');
+    Route::post('/{uuid}/initiate', [\App\Http\Controllers\GuestPaymentLinkController::class, 'initiatePay'])->name('pay');
+
     Route::get('/success', [\App\Http\Controllers\GuestPaymentLinkController::class, 'paymentSuccess'])->name('success');
     Route::get('/failure', [\App\Http\Controllers\GuestPaymentLinkController::class, 'paymentFailure'])->name('failure');
     Route::post('/webhook', [\App\Http\Controllers\GuestPaymentLinkController::class, 'paymentWebhook'])->name('webhook')->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::get('/{uuid}', [\App\Http\Controllers\GuestPaymentLinkController::class, 'show'])->name('show');
-    Route::post('/{uuid}/initiate', [\App\Http\Controllers\GuestPaymentLinkController::class, 'initiatePay'])->name('pay');
 });
 

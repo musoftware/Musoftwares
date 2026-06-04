@@ -81,6 +81,15 @@ class Musoftware_Sms_Gateway_API {
         }
 
         $error_message = isset( $data['error']['message'] ) ? $data['error']['message'] : __( 'Unknown API Error', 'musoftware-sms-gateway' );
+        
+        if ( isset( $data['error']['errors'] ) && is_array( $data['error']['errors'] ) ) {
+            $error_details = array();
+            foreach ( $data['error']['errors'] as $field => $messages ) {
+                $error_details[] = $field . ': ' . implode( ', ', $messages );
+            }
+            $error_message .= ' (' . implode( ' | ', $error_details ) . ')';
+        }
+
         return new WP_Error( 'api_error', $error_message, $data );
     }
 }

@@ -13,10 +13,10 @@ Route::middleware(['web'])->prefix('sms-payment-gateway')->name('sms-payment-gat
 });
 
 // ─── Hosted Checkout (Stripe-like, public) ─────────
-Route::middleware(['web'])->group(function () {
-    Route::get('/pay/{sessionId}', [HostedCheckoutController::class, 'show'])->name('sms-gateway.checkout.show');
-    Route::post('/pay/{sessionId}/verify', [HostedCheckoutController::class, 'verify'])->name('sms-gateway.checkout.verify');
-    Route::get('/pay/{sessionId}/status', [HostedCheckoutController::class, 'status'])->name('sms-gateway.checkout.status');
+Route::middleware(['web'])->withoutMiddleware([\Illuminate\Http\Middleware\FrameGuard::class])->group(function () {
+    Route::get('/sms-pay/{sessionId}', [HostedCheckoutController::class, 'show'])->name('sms-gateway.checkout.show');
+    Route::post('/sms-pay/{sessionId}/verify', [HostedCheckoutController::class, 'verify'])->name('sms-gateway.checkout.verify');
+    Route::get('/sms-pay/{sessionId}/status', [HostedCheckoutController::class, 'status'])->name('sms-gateway.checkout.status');
     
     Route::get('/js/smspay.js', function () {
         $path = module_path('SmsPaymentGateway', 'resources/assets/js/smspay.js');

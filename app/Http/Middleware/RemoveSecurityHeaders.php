@@ -17,6 +17,11 @@ class RemoveSecurityHeaders
             $response->header('X-Powered-By', '');
             $response->headers->remove('X-Powered-By');
         }
+
+        // Allow iframes for SMS Gateway checkout pages
+        if ($request->is('pay/*') || $request->is('sms-pay/*') || $request->is('sms-payment-gateway/checkout/*')) {
+            $response->headers->remove('X-Frame-Options');
+        }
         
         return $response;
     }

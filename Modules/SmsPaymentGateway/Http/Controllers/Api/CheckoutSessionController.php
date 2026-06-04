@@ -23,9 +23,9 @@ class CheckoutSessionController extends Controller
         $validator = Validator::make($request->all(), [
             'amount' => 'required|numeric|min:1|max:1000000',
             'currency' => 'nullable|string|max:5',
-            'success_url' => 'required|url|max:1000',
-            'cancel_url' => 'nullable|url|max:1000',
-            'webhook_url' => 'nullable|url|max:1000',
+            'success_url' => 'required|string|max:1000',
+            'cancel_url' => 'nullable|string|max:1000',
+            'webhook_url' => 'nullable|string|max:1000',
             'customer_name' => 'nullable|string|max:255',
             'customer_email' => 'nullable|email|max:255',
             'customer_phone' => 'nullable|string|max:30',
@@ -36,6 +36,7 @@ class CheckoutSessionController extends Controller
         ]);
 
         if ($validator->fails()) {
+            Log::error('Checkout Session Validation Failed', $validator->errors()->toArray());
             return response()->json([
                 'error' => [
                     'type' => 'invalid_request_error',
