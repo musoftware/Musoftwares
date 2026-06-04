@@ -175,6 +175,7 @@ return [
     'download_macrodroid_desc' => 'Download the MacroDroid automation app',
     'install_app' => 'Install App',
     'installation_steps' => 'Installation Steps',
+    'installation_video' => 'Installation Video',
     'macrodroid_alternative' => 'MacroDroid Alternative',
     'macrodroid_alternative_desc' => 'Use MacroDroid as an alternative automation method',
     'official_android_app' => 'Official Android App',
