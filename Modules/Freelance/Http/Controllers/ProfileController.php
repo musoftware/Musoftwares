@@ -25,7 +25,7 @@ class ProfileController extends Controller
         );
 
         $userSkills = $user->freelanceSkills()->withPivot('id')->get();
-        $availableSkills = Skill::where('is_active', true)->get();
+        $availableSkills = Skill::where('status', 'approved')->get();
 
         return Inertia::render('Freelance/Profile/Edit', [
             'profile' => $profile,

@@ -42,6 +42,10 @@ class BroadcastNotificationController extends Controller
                 $message = $message->withData([
                     'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
                     'url' => $validated['url']
+                ])->withWebPushConfig([
+                    'fcm_options' => [
+                        'link' => $validated['url']
+                    ]
                 ]);
             }
 

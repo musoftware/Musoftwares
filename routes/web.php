@@ -510,6 +510,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // ── Freelance (Admin Control) ───────────────────────────────────
     Route::prefix('freelance')->name('freelance.')->group(function () {
+        Route::post('skills/bulk', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'bulkStore'])->name('skills.bulkStore');
         Route::post('skills/{skill}/approve', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'approve'])->name('skills.approve');
         Route::post('skills/{skill}/reject', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'reject'])->name('skills.reject');
         Route::post('skills/block-user/{user}', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'blockUser'])->name('skills.block-user');

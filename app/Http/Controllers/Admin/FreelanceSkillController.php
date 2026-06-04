@@ -48,6 +48,32 @@ class FreelanceSkillController extends Controller
         return redirect()->route('admin.freelance.skills.index')->with('success', __('freelance.skill_created'));
     }
 
+    public function bulkStore(Request $request)
+    {
+        $validated = $request->validate([
+            'skills' => 'required|string'
+        ]);
+
+        $skillsText = trim($validated['skills']);
+        $skillsArray = array_filter(array_map('trim', explode("\n", $skillsText)));
+
+        $addedCount = 0;
+        foreach ($skillsArray as $skillName) {
+            if (!empty($skillName) && mb_strlen($skillName) <= 255) {
+                if (!Skill::where('name', $skillName)->exists()) {
+                    Skill::create([
+                        'name' => $skillName,
+                        'status' => 'approved',
+                        'created_by' => auth()->id()
+                    ]);
+                    $addedCount++;
+                }
+            }
+        }
+
+        return redirect()->route('admin.freelance.skills.index')->with('success', __('freelance.bulk_skills_created', ['count' => $addedCount]));
+    }
+
     public function update(Request $request, Skill $skill)
     {
         $validated = $request->validate([
