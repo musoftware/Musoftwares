@@ -116,12 +116,14 @@ class UsersController extends Controller
             'kyc_docs_count' => $user->kycDocuments()->count(),
         ];
 
-        // Fetch ERP stats using User model relations directly (IsPlatformClient trait)
+        // Fetch stats using User model relations
         try {
             $stats['invoices_total'] = $user->invoices()->count();
             $stats['invoices_paid']  = $user->invoices()->where('status', 'paid')->count();
-            $stats['invoices_unpaid_sum'] = $user->invoices()->where('status', 'unpaid')->sum('amount');
-        } catch (\Throwable $e) {}
+            $stats['invoices_unpaid_sum'] = $user->unpaid_invoices_amount(true);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Error fetching user stats: ' . $e->getMessage());
+        }
 
         // Try Marketplace stats
         try {
