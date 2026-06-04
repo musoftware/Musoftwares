@@ -175,6 +175,7 @@ return [
     'download_macrodroid_desc' => 'تحميل تطبيق الأتمتة MacroDroid',
     'install_app' => 'تثبيت التطبيق',
     'installation_steps' => 'خطوات التثبيت',
+    'installation_video' => 'فيديو التثبيت',
     'macrodroid_alternative' => 'البديل: MacroDroid',
     'macrodroid_alternative_desc' => 'استخدم MacroDroid كطريقة أتمتة بديلة',
     'official_android_app' => 'تطبيق الأندرويد الرسمي',

@@ -64,6 +64,18 @@ export default function Install({ androidAppUrl, macrodroidUrl, macrodroidToken 
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6">
+                                <div className="aspect-video w-full rounded-xl overflow-hidden border bg-muted shadow-sm">
+                                    <iframe 
+                                        width="100%" 
+                                        height="100%" 
+                                        src="https://www.youtube.com/embed/TfwTupWceeo" 
+                                        title={__('admin.installation_video')} 
+                                        frameBorder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowFullScreen
+                                    ></iframe>
+                                </div>
+
                                 <div className="p-6 bg-primary/5 rounded-xl border flex flex-col items-center text-center space-y-4">
                                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
                                         <Download className="w-8 h-8 text-primary" />
