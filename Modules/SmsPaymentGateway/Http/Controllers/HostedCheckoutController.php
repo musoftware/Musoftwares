@@ -29,6 +29,11 @@ class HostedCheckoutController extends Controller
             abort(404);
         }
 
+        // Load merchant settings to determine the checkout language
+        $settings = SmsPaymentGatewaySetting::where('user_id', $session->user_id)->first();
+        $lang = request('lang', $settings->checkout_language ?? 'ar');
+        \Illuminate\Support\Facades\App::setLocale($lang);
+
         // Auto-expire if past expiry
         if ($session->status === 'open' && $session->isExpired()) {
             $session->markExpired();

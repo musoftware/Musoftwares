@@ -111,4 +111,7 @@ return [
   'brand_name_hint' => 'سيتم استخدام اسمك الشخصي إذا تركته فارغاً.',
   'hide_method_name' => 'إخفاء أسماء طرق الدفع',
   'hide_method_name_desc' => 'عدم إظهار أسماء مثل "فودافون كاش" أسفل لوجوهات المحافظ.',
+  'checkout_language' => 'لغة صفحة الدفع الافتراضية',
+  'language_arabic' => 'العربية',
+  'language_english' => 'الإنجليزية (English)',
 ];
