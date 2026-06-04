@@ -59,6 +59,7 @@ class Musoftware_Sms_Gateway_Settings {
         register_setting( 'musoftware_sms_gateway_settings', 'musoftware_sms_gateway_base_url' );
         register_setting( 'musoftware_sms_gateway_settings', 'musoftware_sms_gateway_secret_key' );
         register_setting( 'musoftware_sms_gateway_settings', 'musoftware_sms_gateway_publishable_key' );
+        register_setting( 'musoftware_sms_gateway_settings', 'musoftware_sms_gateway_webhook_secret' );
         register_setting( 'musoftware_sms_gateway_settings', 'musoftware_sms_gateway_target_role' );
     }
 
@@ -73,6 +74,7 @@ class Musoftware_Sms_Gateway_Settings {
         $base_url = get_option( 'musoftware_sms_gateway_base_url', 'https://musoftwares.com' );
         $secret_key = get_option( 'musoftware_sms_gateway_secret_key', '' );
         $publishable_key = get_option( 'musoftware_sms_gateway_publishable_key', '' );
+        $webhook_secret  = get_option( 'musoftware_sms_gateway_webhook_secret', '' );
         $target_role = get_option( 'musoftware_sms_gateway_target_role', '' );
         
         // Get all WP roles
@@ -107,6 +109,13 @@ class Musoftware_Sms_Gateway_Settings {
                         <th scope="row"><label for="musoftware_sms_gateway_publishable_key"><?php _e( 'Publishable Key', 'musoftware-sms-gateway' ); ?></label></th>
                         <td>
                             <input type="text" name="musoftware_sms_gateway_publishable_key" id="musoftware_sms_gateway_publishable_key" value="<?php echo esc_attr( $publishable_key ); ?>" class="regular-text" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="musoftware_sms_gateway_webhook_secret"><?php _e( 'Webhook Secret Token', 'musoftware-sms-gateway' ); ?></label></th>
+                        <td>
+                            <input type="password" name="musoftware_sms_gateway_webhook_secret" id="musoftware_sms_gateway_webhook_secret" value="<?php echo esc_attr( $webhook_secret ); ?>" class="regular-text" />
+                            <p class="description"><?php _e( 'Paste the Webhook Secret from your Musoftwares dashboard here to secure your webhooks.', 'musoftware-sms-gateway' ); ?></p>
                         </td>
                     </tr>
                     <tr>

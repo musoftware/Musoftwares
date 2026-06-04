@@ -30,6 +30,25 @@ class Musoftware_Sms_Gateway_Webhook {
      * Handle the incoming webhook.
      */
     public static function handle_webhook( WP_REST_Request $request ) {
+        $raw_body = $request->get_body();
+        $secret   = get_option( 'musoftware_sms_gateway_webhook_secret', '' );
+
+        // Require signature validation if a secret key is configured.
+        if ( ! empty( $secret ) ) {
+            // WordPress converts HTTP header names: 'X-Musoftware-Signature' becomes 'x_musoftware_signature'
+            $signature = $request->get_header( 'x_musoftware_signature' );
+            
+            if ( empty( $signature ) ) {
+                return new WP_REST_Response( array( 'error' => 'Missing Signature Header' ), 401 );
+            }
+
+            $expected_signature = hash_hmac( 'sha256', $raw_body, $secret );
+
+            if ( ! hash_equals( $expected_signature, $signature ) ) {
+                return new WP_REST_Response( array( 'error' => 'Invalid Signature' ), 401 );
+            }
+        }
+
         $payload = $request->get_json_params();
 
         // The webhook payload from the Laravel backend needs to contain the session_id

@@ -53,6 +53,8 @@ const items: MenuItem[] = [
         { title: "Payment Links", url: "/admin/payment-links" },
         { title: "Hours Calendar", url: "/admin/hours-calendar" },
         { title: "Reports", url: "/admin/reports" },
+        { title: "Transactions", url: "/admin/transactions?type=income" },
+        { title: "Cost Transactions", url: "/admin/transactions?type=cost" },
         { title: "Recurring Costs", url: "/admin/business/recurring/costs" },
         { title: "Recurring Income", url: "/admin/business/recurring/income" },
         { title: "Recurring Salaries", url: "/admin/business/recurring/salaries" },

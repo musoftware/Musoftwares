@@ -94,9 +94,20 @@ export default function Cost({ transactions, filters }) {
                     <h2 className="text-lg font-semibold text-slate-900">{__('Cost Transactions')}</h2>
                     <p className="text-sm text-slate-500">{__('View all cost transactions.')}</p>
                 </div>
-                <Button asChild>
-                    <Link href="/admin/transactions/create">{__('Create Transaction')}</Link>
-                </Button>
+                <div className="flex gap-2">
+                    <Button variant="default" asChild>
+                        <Link href="/admin/transactions/create?type=receive">{__('Receive')}</Link>
+                    </Button>
+                    <Button variant="outline" asChild>
+                        <Link href="/admin/transactions/create?type=earn">{__('Earn')}</Link>
+                    </Button>
+                    <Button variant="outline" asChild>
+                        <Link href="/admin/transactions/create?type=refund">{__('Refund')}</Link>
+                    </Button>
+                    <Button variant="outline" asChild>
+                        <Link href="/admin/transactions/create?type=send">{__('Send')}</Link>
+                    </Button>
+                </div>
             </div>
 
             <div className="mb-6">

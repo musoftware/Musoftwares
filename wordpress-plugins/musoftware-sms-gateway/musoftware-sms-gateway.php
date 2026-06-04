@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-define( 'MUSOFTWARE_SMS_GATEWAY_VERSION', '1.0.0' );
+define( 'MUSOFTWARE_SMS_GATEWAY_VERSION', '2.0.0' );
 define( 'MUSOFTWARE_SMS_GATEWAY_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MUSOFTWARE_SMS_GATEWAY_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 

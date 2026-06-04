@@ -76,6 +76,16 @@ return [
     'sdks' => 'SDKs & Libraries',
     'code_examples' => 'Code Examples',
 
-    // ─── Back button ───────────────────────────────────
+    // -----------------------------------------------------------------------------------------
     'back_to_dashboard' => 'Back to Dashboard',
+    
+    // WordPress Plugin
+    'wordpress_integration' => 'WordPress Plugin Integration',
+    'wordpress_integration_desc' => 'Integrate the SMS payment gateway directly into your WooCommerce or WordPress site.',
+    'wordpress_plugin' => 'WordPress Plugin',
+    'wordpress_plugin_desc' => 'Download the WordPress plugin to accept payments via shortcodes.',
+    'download_wp_plugin' => 'Download Plugin',
+    'setup_instructions' => 'Setup Instructions',
+    'setup_instructions_step1' => 'Install and activate the plugin in your WordPress admin panel, then configure your API keys in the settings.',
+    'setup_instructions_step2' => 'Use the shortcode [sms_payment_gateway] to display the payment form anywhere on your site.',
 ];
