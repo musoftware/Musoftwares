@@ -972,11 +972,11 @@ export default function IPTVDownloaderRunner() {
 
                                                 {/* Logs Terminal view */}
                                                 {showLogsTaskId === task.id && (
-                                                    <div className="bg-slate-950 text-emerald-400 font-mono text-[9px] p-3 rounded-2xl max-h-48 overflow-y-auto space-y-0.5 mt-4 leading-relaxed animate-in slide-in-from-top duration-300">
-                                                        <p className="text-slate-500">{/* Stream worker terminal stdout capture */}</p>
-                                                        {taskLogs[task.id]?.map((logLine, idx) => (
+                                                    <div className="mt-4 p-3 bg-slate-900 rounded-xl max-h-48 overflow-y-auto font-mono text-[10px] text-slate-300 shadow-inner space-y-1">
+                                                        <div className="text-slate-500 select-none">Stream worker terminal stdout capture</div>
+                                                        {(task.logs && task.logs.length > 0) ? task.logs.map((logLine: string, idx: number) => (
                                                             <p key={idx}>{logLine}</p>
-                                                        )) || <p className="text-slate-500">{__('general.awaiting_stream_packets')}</p>}
+                                                        )) : <p className="text-slate-500">{__('general.awaiting_stream_packets')}</p>}
                                                     </div>
                                                 )}
                                             </div>
