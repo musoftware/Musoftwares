@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router, useForm, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
@@ -129,7 +129,13 @@ export default function Webhooks({ webhook }: WebhooksProps) {
                                     </div>
                                     <div className="flex justify-between items-center py-2 border-b">
                                         <span className="text-sm font-medium text-slate-500">{__('general.failed_deliveries')}</span>
-                                        <span className="font-bold text-rose-600">{webhook.failure_count}</span>
+                                        {webhook.failure_count > 0 ? (
+                                            <Link href={route('sms-payment-gateway.webhooks.failed')} className="font-bold text-rose-600 hover:text-rose-700 hover:underline">
+                                                {webhook.failure_count}
+                                            </Link>
+                                        ) : (
+                                            <span className="font-bold text-slate-400">0</span>
+                                        )}
                                     </div>
                                     <div className="flex justify-between items-center py-2">
                                         <span className="text-sm font-medium text-slate-500">{__('general.last_triggered')}</span>

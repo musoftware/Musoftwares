@@ -57,6 +57,11 @@ class Musoftware_Sms_Gateway_Webhook {
         
         // Let's defensively parse it based on expected structures
         $event      = isset( $payload['event'] ) ? $payload['event'] : '';
+        
+        if ( $event === 'test' ) {
+            return new WP_REST_Response( array( 'success' => true, 'message' => 'Test webhook received successfully' ), 200 );
+        }
+
         $session_id = isset( $payload['data']['id'] ) ? $payload['data']['id'] : ( isset( $payload['session_id'] ) ? $payload['session_id'] : '' );
         $status     = isset( $payload['data']['status'] ) ? $payload['data']['status'] : ( isset( $payload['status'] ) ? $payload['status'] : '' );
         

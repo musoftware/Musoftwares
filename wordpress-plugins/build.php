@@ -51,13 +51,8 @@ $command = sprintf('tar -a -c -f "%s" "musoftware-sms-gateway"', $zipPath);
 exec($command, $output, $returnVar);
 
 if ($returnVar === 0) {
-    // Optionally create a versioned copy
-    $versionedZip = $outputDir . '/musoftware-sms-gateway-v' . $newVersion . '.zip';
-    copy($zipPath, $versionedZip);
-    
     echo "Done! Generated:\n";
     echo "- {$zipPath}\n";
-    echo "- {$versionedZip}\n";
 } else {
     echo "Failed to create ZIP file.\n";
     exit(1);
