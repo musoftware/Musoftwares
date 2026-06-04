@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \Modules\ERP\Http\Middleware\ShareTeamMemberSession::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
+            \App\Http\Middleware\EnforceFreelanceDomain::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 

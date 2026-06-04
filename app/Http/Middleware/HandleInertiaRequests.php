@@ -165,6 +165,7 @@ class HandleInertiaRequests extends Middleware
                 'new_publishable_key' => fn () => $request->session()->get('new_publishable_key'),
                 'new_secret_key' => fn () => $request->session()->get('new_secret_key'),
             ],
+            'is_lance_domain' => $request->getHost() === 'lance.musoftwares.com',
         ];
     }
 }

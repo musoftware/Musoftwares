@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import FreelanceLayout from '@/Pages/Freelance/Layout';
 import { PageProps } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
@@ -9,8 +10,11 @@ export default function Edit({
     mustVerifyEmail,
     status,
 }: PageProps<{ mustVerifyEmail: boolean; status?: string }>) {
+    const { is_lance_domain } = usePage().props as any;
+    const Layout = is_lance_domain ? FreelanceLayout : AuthenticatedLayout;
+
     return (
-        <AuthenticatedLayout
+        <Layout
             header={
                 <h2 className="text-xl leading-tight font-semibold text-gray-800">
                     Profile
@@ -38,6 +42,6 @@ export default function Edit({
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </Layout>
     );
 }

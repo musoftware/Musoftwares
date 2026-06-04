@@ -713,6 +713,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/freelance/points/purchase', [\App\Http\Controllers\PointPurchaseController::class, 'store'])->name('freelance.point-purchases.store');
     Route::post('/freelance/points/purchase-wallet', [\App\Http\Controllers\PointPurchaseController::class, 'storeWallet'])->name('freelance.point-purchases.store-wallet');
+    Route::get('/freelance/points/purchase-success', [\App\Http\Controllers\PointPurchaseController::class, 'success'])->name('freelance.point-purchases.success');
+    Route::get('/freelance/points/purchase-failure', [\App\Http\Controllers\PointPurchaseController::class, 'failure'])->name('freelance.point-purchases.failure');
 
     Route::get('/subscriptions/plans', [\App\Http\Controllers\SubscriptionController::class, 'plans'])->name('subscriptions.plans');
     Route::post('/subscriptions/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'subscribe'])->name('subscriptions.subscribe');

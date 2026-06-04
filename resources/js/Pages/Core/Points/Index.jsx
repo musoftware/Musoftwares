@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import FreelanceLayout from '@/Pages/Freelance/Layout';
 import { router, usePage } from '@inertiajs/react';
 import { formatMoney, formatNumber, formatDate } from '../../../lib/utils';
 import { CreditCard, Wallet, ArrowRight, CheckCircle2, History, Zap, TrendingUp, RefreshCcw, Sparkles, BadgePercent, ChevronRight, Info } from 'lucide-react';
@@ -14,8 +15,9 @@ import { AppPage } from '@/Components/ui/AppPage';
 import { PageHeader } from '@/Components/ui/PageHeader';
 
 export default function PointsIndex({ auth, tiers = [], quickPackages = [], transactions, egpToPreferredRate = 0.10, currency = 'USD' }) {
-    const { wallet, flash } = usePage().props;
+    const { wallet, flash, is_lance_domain } = usePage().props;
     const wallet_balance = wallet ? Number(wallet.balance) : 0;
+    const Layout = is_lance_domain ? FreelanceLayout : AuthenticatedLayout;
     const [customPoints, setCustomPoints] = useState('');
     const globalCurrency = currency || wallet?.currency || auth?.user?.preferred_currency || 'USD';
 
@@ -63,7 +65,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
     };
 
     return (
-        <AuthenticatedLayout header="Buy Points">
+        <Layout header="Buy Points">
             <AppPage>
                 <PageHeader 
                     title={__('general.buy_points')} 
@@ -357,6 +359,6 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                     </Card>
                 </div>
             </AppPage>
-        </AuthenticatedLayout>
+        </Layout>
     );
 }

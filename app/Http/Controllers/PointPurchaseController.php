@@ -8,6 +8,7 @@ use App\Models\PointPackage;
 use App\Services\PointPurchaseService;
 use App\Http\Requests\StoreCustomPointPurchaseRequest;
 use App\Http\Requests\StorePackagePointPurchaseRequest;
+use App\Helpers\KashierHelper;
 
 class PointPurchaseController extends Controller
 {
@@ -68,7 +69,17 @@ class PointPurchaseController extends Controller
             return back()->with('success', __('general.points_purchased_successfully_using_wallet_balance'));
         } catch (\Exception $e) {
             if ($e->getMessage() === 'INSUFFICIENT_FUNDS') {
-                return Inertia::location('https://payments.kashier.io');
+                $paymentDetails = $this->getUserAmountAndCurrency($user, $costInEgp);
+                $paymentUrl = KashierHelper::buildPointPurchasePaymentUrl(
+                    $paymentDetails['amount'],
+                    $user->id,
+                    $user->name,
+                    $user->email,
+                    null,
+                    $points,
+                    $paymentDetails['currency']
+                );
+                return Inertia::location($paymentUrl);
             }
             
             return back()->withErrors(['error' => 'An error occurred during payment processing.']);
@@ -85,11 +96,31 @@ class PointPurchaseController extends Controller
             return back()->with('success', __('general.points_purchased_successfully_using_wallet_balance'));
         } catch (\Exception $e) {
             if ($e->getMessage() === 'INSUFFICIENT_FUNDS') {
-                return Inertia::location('https://payments.kashier.io');
+                $paymentDetails = $this->getUserAmountAndCurrency($user, $package->price);
+                $paymentUrl = KashierHelper::buildPointPurchasePaymentUrl(
+                    $paymentDetails['amount'],
+                    $user->id,
+                    $user->name,
+                    $user->email,
+                    $package->id,
+                    $package->points,
+                    $paymentDetails['currency']
+                );
+                return Inertia::location($paymentUrl);
             }
             
             return back()->withErrors(['error' => 'An error occurred during payment processing.']);
         }
+    }
+
+    public function success(Request $request)
+    {
+        return redirect()->route('points.index')->with('success', __('general.payment_successful_thank_you'));
+    }
+
+    public function failure(Request $request)
+    {
+        return redirect()->route('points.index')->withErrors(['error' => __('general.payment_failed_please_try_again')]);
     }
 
     public function webhook(Request $request)
@@ -155,5 +186,24 @@ class PointPurchaseController extends Controller
         }
 
         return response()->json(['error' => 'Invalid webhook signature'], 400);
+    }
+
+    private function getUserAmountAndCurrency($user, $amountInEgp)
+    {
+        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
+        $userCurrencyId = $user->currency;
+        $userCurrency = \App\Models\Currency::find($userCurrencyId);
+        
+        $currencyCode = $userCurrency ? $userCurrency->currency : 'EGP';
+        $rate = 1.0;
+        
+        if ($egpCurrency && $userCurrencyId && $egpCurrency->id != $userCurrencyId) {
+            $rate = \App\Models\CurrenciesExchange::RateToday(1, $egpCurrency->id, $userCurrencyId);
+        }
+        
+        return [
+            'amount' => round($amountInEgp * $rate, 2),
+            'currency' => $currencyCode,
+        ];
     }
 }
