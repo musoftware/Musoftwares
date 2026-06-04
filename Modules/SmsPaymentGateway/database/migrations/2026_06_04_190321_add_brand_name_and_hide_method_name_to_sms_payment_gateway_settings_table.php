@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sms_payment_gateway_settings', function (Blueprint $table) {
-            $table->string('brand_name')->nullable()->after('wallet_phone_number');
-            $table->boolean('hide_method_name')->default(false)->after('brand_name');
+            if (!Schema::hasColumn('sms_payment_gateway_settings', 'brand_name')) {
+                $table->string('brand_name')->nullable()->after('wallet_phone_number');
+            }
+            if (!Schema::hasColumn('sms_payment_gateway_settings', 'hide_method_name')) {
+                $table->boolean('hide_method_name')->default(false)->after('brand_name');
+            }
         });
     }
 

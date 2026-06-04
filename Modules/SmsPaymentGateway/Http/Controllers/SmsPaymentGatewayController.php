@@ -725,6 +725,14 @@ class SmsPaymentGatewayController extends Controller
             'vodafone_cash_allowed_sender' => 'nullable|string|max:100',
             'instapay_device_id' => 'nullable|integer|exists:sms_payment_gateway_devices,id',
             'instapay_allowed_sender' => 'nullable|string|max:100',
+            'brand_name' => 'nullable|string|max:255',
+            'hide_method_name' => 'boolean',
+            'custom_logos' => 'nullable|array',
+            'custom_logos.vodafone' => 'nullable|url|max:500',
+            'custom_logos.orange' => 'nullable|url|max:500',
+            'custom_logos.etisalat' => 'nullable|url|max:500',
+            'custom_logos.we' => 'nullable|url|max:500',
+            'custom_logos.instapay' => 'nullable|url|max:500',
         ]);
 
         $settings = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewaySetting::firstOrCreate(
@@ -742,6 +750,9 @@ class SmsPaymentGatewayController extends Controller
             'vodafone_cash_allowed_sender' => $request->vodafone_cash_allowed_sender,
             'instapay_device_id' => $request->instapay_device_id,
             'instapay_allowed_sender' => $request->instapay_allowed_sender,
+            'brand_name' => $request->brand_name,
+            'hide_method_name' => $request->has('hide_method_name') ? $request->hide_method_name : false,
+            'custom_logos' => $request->custom_logos,
         ]);
 
         return redirect()->back()->with('success', __('erp.settings_saved_success'));

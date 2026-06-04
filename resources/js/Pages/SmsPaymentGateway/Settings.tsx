@@ -21,6 +21,15 @@ interface Props {
         vodafone_cash_allowed_sender: string | null;
         instapay_device_id: number | null;
         instapay_allowed_sender: string | null;
+        brand_name: string | null;
+        hide_method_name: boolean;
+        custom_logos?: {
+            vodafone?: string;
+            orange?: string;
+            etisalat?: string;
+            we?: string;
+            instapay?: string;
+        } | null;
     };
     devices: {
         id: number;
@@ -40,6 +49,15 @@ export default function Settings({ settings, devices }: Props) {
         vodafone_cash_allowed_sender: settings?.vodafone_cash_allowed_sender || '',
         instapay_device_id: settings?.instapay_device_id || '',
         instapay_allowed_sender: settings?.instapay_allowed_sender || '',
+        brand_name: settings?.brand_name || '',
+        hide_method_name: settings?.hide_method_name ?? false,
+        custom_logos: settings?.custom_logos || {
+            vodafone: '',
+            orange: '',
+            etisalat: '',
+            we: '',
+            instapay: '',
+        },
     });
 
     const submit = (e: React.FormEvent) => {
@@ -81,6 +99,34 @@ export default function Settings({ settings, devices }: Props) {
                                 />
                                 <p className="text-xs text-gray-500 max-w-md">{__('general.this_number_is_used_by_default_if_a_specific_number_is_not_set_for_each_payment_method')}</p>
                                 {errors.wallet_phone_number && <p className="text-sm text-red-600">{errors.wallet_phone_number}</p>}
+                            </div>
+
+                            <hr className="my-6" />
+
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-medium">{__('sms_gateway.checkout_page_customization')}</h3>
+                                <div className="space-y-2">
+                                    <Label htmlFor="brand_name">{__('sms_gateway.brand_name')}</Label>
+                                    <Input
+                                        id="brand_name"
+                                        type="text"
+                                        className="max-w-md"
+                                        value={data.brand_name}
+                                        onChange={(e) => setData('brand_name', e.target.value)}
+                                        placeholder={__('sms_gateway.brand_name_hint')}
+                                    />
+                                    {errors.brand_name && <p className="text-sm text-red-600">{errors.brand_name}</p>}
+                                </div>
+                                <div className="flex items-center justify-between max-w-md p-4 border rounded-lg bg-gray-50/50 mt-4">
+                                    <div className="space-y-0.5">
+                                        <Label className="text-base">{__('sms_gateway.hide_method_name')}</Label>
+                                        <p className="text-sm text-gray-500">{__('sms_gateway.hide_method_name_desc')}</p>
+                                    </div>
+                                    <Switch
+                                        checked={data.hide_method_name}
+                                        onCheckedChange={(checked) => setData('hide_method_name', checked)}
+                                    />
+                                </div>
                             </div>
 
                             <hr className="my-6" />
@@ -227,6 +273,77 @@ export default function Settings({ settings, devices }: Props) {
                                     />
                                     <p className="text-xs text-gray-500 max-w-md">{__('general.enter_the_names_of_the_senders_you_want_to_allow_to_process_incoming_messages_from_separated_by_commas_if_left_empty_all_default_senders_will_be_allowed')}</p>
                                     {errors.whitelist_senders && <p className="text-sm text-red-600">{errors.whitelist_senders}</p>}
+                                </div>
+                            </div>
+                            
+                            <hr className="my-6" />
+
+                            <div className="space-y-4">
+                                <div>
+                                    <h3 className="text-lg font-medium">{__('sms_gateway.custom_wallet_logos')}</h3>
+                                    <p className="text-sm text-gray-500 mt-1">{__('sms_gateway.custom_wallet_logos_hint')}</p>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <Label>{__('sms_gateway.vodafone_cash_logo')}</Label>
+                                        <Input
+                                            type="url"
+                                            dir="ltr"
+                                            className="text-left font-mono"
+                                            value={data.custom_logos?.vodafone || ''}
+                                            onChange={(e) => setData('custom_logos', { ...data.custom_logos, vodafone: e.target.value })}
+                                            placeholder="https://example.com/logo.png"
+                                        />
+                                        {errors['custom_logos.vodafone'] && <p className="text-sm text-red-600">{errors['custom_logos.vodafone']}</p>}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>{__('sms_gateway.orange_cash_logo')}</Label>
+                                        <Input
+                                            type="url"
+                                            dir="ltr"
+                                            className="text-left font-mono"
+                                            value={data.custom_logos?.orange || ''}
+                                            onChange={(e) => setData('custom_logos', { ...data.custom_logos, orange: e.target.value })}
+                                            placeholder="https://example.com/logo.png"
+                                        />
+                                        {errors['custom_logos.orange'] && <p className="text-sm text-red-600">{errors['custom_logos.orange']}</p>}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>{__('sms_gateway.etisalat_cash_logo')}</Label>
+                                        <Input
+                                            type="url"
+                                            dir="ltr"
+                                            className="text-left font-mono"
+                                            value={data.custom_logos?.etisalat || ''}
+                                            onChange={(e) => setData('custom_logos', { ...data.custom_logos, etisalat: e.target.value })}
+                                            placeholder="https://example.com/logo.png"
+                                        />
+                                        {errors['custom_logos.etisalat'] && <p className="text-sm text-red-600">{errors['custom_logos.etisalat']}</p>}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>{__('sms_gateway.we_pay_logo')}</Label>
+                                        <Input
+                                            type="url"
+                                            dir="ltr"
+                                            className="text-left font-mono"
+                                            value={data.custom_logos?.we || ''}
+                                            onChange={(e) => setData('custom_logos', { ...data.custom_logos, we: e.target.value })}
+                                            placeholder="https://example.com/logo.png"
+                                        />
+                                        {errors['custom_logos.we'] && <p className="text-sm text-red-600">{errors['custom_logos.we']}</p>}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>{__('general.instapay_logo')}</Label>
+                                        <Input
+                                            type="url"
+                                            dir="ltr"
+                                            className="text-left font-mono"
+                                            value={data.custom_logos?.instapay || ''}
+                                            onChange={(e) => setData('custom_logos', { ...data.custom_logos, instapay: e.target.value })}
+                                            placeholder="https://example.com/logo.png"
+                                        />
+                                        {errors['custom_logos.instapay'] && <p className="text-sm text-red-600">{errors['custom_logos.instapay']}</p>}
+                                    </div>
                                 </div>
                             </div>
 

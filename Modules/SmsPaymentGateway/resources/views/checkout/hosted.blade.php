@@ -179,7 +179,7 @@
         }
         .method-card:hover { opacity: 0.85; }
         .method-icons { display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 6px; }
-        .method-card img { height: 28px; object-fit: contain; border-radius: 4px; }
+        .method-card img { height: 38px; object-fit: contain; border-radius: 4px; }
         .method-card span { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-align: center; }
 
         /* ── Wallet Number Box ─────────────────── */
@@ -431,7 +431,9 @@
                                 @endforeach
                             @endif
                         </div>
+                        @if(!($hideMethodName ?? false))
                         <span>{{ $method['name'] }}</span>
+                        @endif
                     </div>
                 </label>
                 @endforeach

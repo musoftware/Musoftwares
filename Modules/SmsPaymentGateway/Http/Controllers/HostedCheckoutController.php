@@ -66,6 +66,7 @@ class HostedCheckoutController extends Controller
 
         $walletNumbers = [];
         $paymentMethods = [];
+        $customLogos = $settings->custom_logos ?? [];
 
         $defaultPhone = $settings->wallet_phone_number ?? '';
 
@@ -81,7 +82,7 @@ class HostedCheckoutController extends Controller
             $paymentMethods[] = [
                 'id' => 'instapay',
                 'name' => 'InstaPay',
-                'icon' => asset('assets/images/gateways/instapay.png'),
+                'icon' => !empty($customLogos['instapay']) ? $customLogos['instapay'] : asset('assets/images/gateways/instapay.png'),
                 'phone' => $walletNumbers['instapay'],
                 'is_etisalat' => $isEtisalatInstapay,
             ];
@@ -99,21 +100,24 @@ class HostedCheckoutController extends Controller
             $paymentMethods[] = [
                 'id' => 'vodafone_cash',
                 'name' => __('sms_gateway.vodafone_cash'),
-                'icon' => asset('assets/images/gateways/vodafone-cash.svg'),
+                'icon' => !empty($customLogos['vodafone']) ? $customLogos['vodafone'] : asset('assets/images/gateways/vodafone-cash.svg'),
                 'additional_icons' => [
-                    asset('assets/images/gateways/orange-cash.svg'),
-                    asset('assets/images/gateways/etisalat-cash.svg'),
-                    asset('assets/images/gateways/we-pay.svg'),
+                    !empty($customLogos['orange']) ? $customLogos['orange'] : asset('assets/images/gateways/orange-cash.svg'),
+                    !empty($customLogos['etisalat']) ? $customLogos['etisalat'] : asset('assets/images/gateways/etisalat-cash.svg'),
+                    !empty($customLogos['we']) ? $customLogos['we'] : asset('assets/images/gateways/we-pay.svg'),
                 ],
                 'phone' => $walletNumbers['vodafone_cash'],
                 'is_etisalat' => $isEtisalatVodafone,
             ];
         }
 
+        $brandName = $settings->brand_name ?: ($session->user->name ?? '');
+
         return view('sms-payment-gateway::checkout.hosted', [
             'session' => $session,
             'state' => 'open',
-            'merchantName' => $session->user->name ?? '',
+            'merchantName' => $brandName,
+            'hideMethodName' => $settings->hide_method_name ?? false,
             'amount' => $session->amount,
             'currency' => $session->currency->code ?? 'EGP',
             'walletNumbers' => $walletNumbers,

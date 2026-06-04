@@ -58,7 +58,7 @@ class KashierHelper
             'interactionSource' => 'Ecommerce',
             'enable3DS' => 'true',
             'allowedMethods' => 'card,wallet',
-            'CustomerReference' => $userId,
+            'CustomerReference' => 'user_' . $userId,
             'metaData' => json_encode([
                 'user_id' => $userId,
                 'source' => 'balance-recharge',
@@ -112,7 +112,7 @@ class KashierHelper
             'interactionSource' => 'Ecommerce',
             'enable3DS' => 'true',
             'allowedMethods' => 'card,wallet',
-            'CustomerReference' => $userId,
+            'CustomerReference' => 'user_' . $userId,
             'metaData' => json_encode([
                 'user_id' => $userId,
                 'source' => 'points-purchase',
@@ -171,7 +171,7 @@ class KashierHelper
             'interactionSource' => 'Ecommerce',
             'enable3DS' => 'true',
             'allowedMethods' => 'card,wallet',
-            'CustomerReference' => $userId,
+            'CustomerReference' => 'user_' . $userId,
             'metaData' => json_encode([
                 'user_id' => $userId,
                 'source' => 'subscription-purchase',
@@ -230,7 +230,7 @@ class KashierHelper
             'interactionSource' => 'Ecommerce',
             'enable3DS' => 'true',
             'allowedMethods' => 'card,wallet',
-            'CustomerReference' => $userId,
+            'CustomerReference' => 'user_' . $userId,
             'metaData' => json_encode([
                 'user_id' => $userId,
                 'source' => 'booking-purchase',
@@ -284,7 +284,7 @@ class KashierHelper
             'interactionSource' => 'Ecommerce',
             'enable3DS' => 'true',
             'allowedMethods' => 'card,wallet',
-            'CustomerReference' => $userId,
+            'CustomerReference' => 'user_' . $userId,
             'metaData' => json_encode([
                 'user_id' => $userId,
                 'source' => 'guest-invoice-payment',
@@ -338,7 +338,7 @@ class KashierHelper
             'interactionSource' => 'Ecommerce',
             'enable3DS' => 'true',
             'allowedMethods' => 'card,wallet',
-            'CustomerReference' => $userId,
+            'CustomerReference' => 'user_' . $userId,
             'metaData' => json_encode([
                 'user_id' => $userId,
                 'source' => 'payment-link',

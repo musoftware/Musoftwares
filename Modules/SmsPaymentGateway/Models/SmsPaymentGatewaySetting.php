@@ -18,11 +18,16 @@ class SmsPaymentGatewaySetting extends Model
         'is_vodafone_cash_enabled',
         'whitelist_senders',
         'macrodroid_token',
+        'custom_logos',
+        'brand_name',
+        'hide_method_name',
     ];
 
     protected $casts = [
         'is_instapay_enabled' => 'boolean',
         'is_vodafone_cash_enabled' => 'boolean',
+        'hide_method_name' => 'boolean',
         'whitelist_senders' => 'array',
+        'custom_logos' => 'array',
     ];
 }

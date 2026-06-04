@@ -6793,7 +6793,8 @@
             "service_link": "رابط الخدمة",
             "tagline": "الوصف المختصر",
             "upload_image": "رفع صورة",
-            "validity_days": "الصلاحية (أيام)"
+            "validity_days": "الصلاحية (أيام)",
+            "instapay_logo": "لوجو انستا باي"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -7299,7 +7300,18 @@
             "the_app_reads_incoming_sms": "The app reads incoming SMS messages from local payment providers like Vodafone Cash or Instapay, extracts the amount and sender, and matches them to your API checkout sessions.",
             "yes_the_android_app_only": "Yes, the Android app only reads SMS messages from authorized payment providers (like Vodafone Cash) and never accesses your other personal messages.",
             "how_to_allow_sms_permission": "كيفية السماح بإذن الرسائل النصية في هواتف Vivo؟",
-            "open_settings_apps_app_manager": "افتح الإعدادات (Settings) في موبايل Vivo.\n\nاضغط على التطبيقات (Apps) أو إدارة التطبيقات (Apps & Permissions).\n\nاختر إدارة التطبيقات (App Manager) وابحث عن تطبيق SMS Payment Gateway.\n\nاضغط على الأذونات (Permissions).\n\nابحث عن إذن الرسائل (SMS) واضغط عليه، ثم اختر سماح (Allow). من هناك هتشتغل معاك بدون مشاكل."
+            "open_settings_apps_app_manager": "افتح الإعدادات (Settings) في موبايل Vivo.\n\nاضغط على التطبيقات (Apps) أو إدارة التطبيقات (Apps & Permissions).\n\nاختر إدارة التطبيقات (App Manager) وابحث عن تطبيق SMS Payment Gateway.\n\nاضغط على الأذونات (Permissions).\n\nابحث عن إذن الرسائل (SMS) واضغط عليه، ثم اختر سماح (Allow). من هناك هتشتغل معاك بدون مشاكل.",
+            "custom_wallet_logos": "لوجوهات المحافظ المخصصة",
+            "custom_wallet_logos_hint": "يمكنك استخدام صورك الخاصة للمحافظ بدلا من الصور الافتراضية",
+            "etisalat_cash_logo": "لوجو اتصالات كاش",
+            "orange_cash_logo": "لوجو اورانج كاش",
+            "vodafone_cash_logo": "لوجو فودافون كاش",
+            "we_pay_logo": "لوجو وي باي",
+            "checkout_page_customization": "تخصيص صفحة الدفع",
+            "brand_name": "اسم العلامة التجارية",
+            "brand_name_hint": "سيتم استخدام اسمك الشخصي إذا تركته فارغاً.",
+            "hide_method_name": "إخفاء أسماء طرق الدفع",
+            "hide_method_name_desc": "عدم إظهار أسماء مثل \"فودافون كاش\" أسفل لوجوهات المحافظ."
         },
         "tools": {
             "monthly_only_restriction": "هذه الأداة تسمح بالاشتراك الشهري فقط.",
@@ -14150,7 +14162,8 @@
             "service_link": "Service Link",
             "tagline": "Tagline",
             "upload_image": "Upload Image",
-            "validity_days": "Validity (Days)"
+            "validity_days": "Validity (Days)",
+            "instapay_logo": "Instapay Logo"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -14656,7 +14669,18 @@
             "the_app_reads_incoming_sms": "The app reads incoming SMS messages from local payment providers like Vodafone Cash or Instapay, extracts the amount and sender, and matches them to your API checkout sessions.",
             "yes_the_android_app_only": "Yes, the Android app only reads SMS messages from authorized payment providers (like Vodafone Cash) and never accesses your other personal messages.",
             "how_to_allow_sms_permission": "How to allow SMS permission on Vivo phone?",
-            "open_settings_apps_app_manager": "Open Settings -> Apps -> App Manager -> Find SMS Payment Gateway -> Permissions -> Allow SMS permission."
+            "open_settings_apps_app_manager": "Open Settings -> Apps -> App Manager -> Find SMS Payment Gateway -> Permissions -> Allow SMS permission.",
+            "custom_wallet_logos": "Custom Wallet Logos",
+            "custom_wallet_logos_hint": "Custom Wallet Logos Hint",
+            "etisalat_cash_logo": "Etisalat Cash Logo",
+            "orange_cash_logo": "Orange Cash Logo",
+            "vodafone_cash_logo": "Vodafone Cash Logo",
+            "we_pay_logo": "We Pay Logo",
+            "checkout_page_customization": "Checkout Page Customization",
+            "brand_name": "Brand Name",
+            "brand_name_hint": "Defaults to your user name if left blank.",
+            "hide_method_name": "Hide Payment Method Names",
+            "hide_method_name_desc": "Do not show names like \"Vodafone Cash\" below the wallet logos."
         },
         "tools": {
             "monthly_only_restriction": "This tool only allows monthly subscriptions.",

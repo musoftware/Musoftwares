@@ -5533,4 +5533,5 @@ return [
   'tagline' => 'الوصف المختصر',
   'upload_image' => 'رفع صورة',
   'validity_days' => 'الصلاحية (أيام)',
+  'instapay_logo' => 'لوجو انستا باي',
 ];

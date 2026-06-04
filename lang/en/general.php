@@ -5533,4 +5533,5 @@ return [
   'tagline' => 'Tagline',
   'upload_image' => 'Upload Image',
   'validity_days' => 'Validity (Days)',
+  'instapay_logo' => 'Instapay Logo',
 ];
