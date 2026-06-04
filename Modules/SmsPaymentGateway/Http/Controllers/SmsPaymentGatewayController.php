@@ -403,12 +403,12 @@ class SmsPaymentGatewayController extends Controller
 
             $client = new \GuzzleHttp\Client();
             $response = $client->post($webhook->webhook_url, [
-                'json' => $testPayload,
+                'body' => $payloadJson,
                 'headers' => [
-                    'X-AutoSMS-Signature' => $signature,
-                    'X-AutoSMS-Event' => 'test',
+                    'X-Musoftware-Signature' => $signature,
+                    'X-Musoftware-Event' => 'test',
                     'Content-Type' => 'application/json',
-                    'User-Agent' => 'AutoSMS-Payment-Hub/1.0',
+                    'User-Agent' => 'Musoftware-SMS-Gateway/1.0',
                 ],
                 'timeout' => 10,
                 'http_errors' => false,

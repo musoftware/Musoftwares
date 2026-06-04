@@ -51,12 +51,12 @@ export function HistoryWorkspace({
         <div className="space-y-5 max-w-3xl mx-auto">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-xl sm:text-2xl font-black text-white">{__('History')}</h1>
-                    <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Past completed and stopped downloads')}</p>
+                    <h1 className="text-xl sm:text-2xl font-black text-white">{__('general.history')}</h1>
+                    <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.past_completed_and_stopped_downloads')}</p>
                 </div>
                 {history.length > 0 && (
                     <Button variant="ghost" onClick={handleClearHistory} className="gap-2 h-11 text-xs font-semibold" style={{ background: 'rgba(244,63,94,0.1)', color: '#f43f5e' }}>
-                        <Trash2 className="w-3.5 h-3.5" /> {__('Clear')}
+                        <Trash2 className="w-3.5 h-3.5" /> {__('general.clear')}
                     </Button>
                 )}
             </div>
@@ -64,8 +64,8 @@ export function HistoryWorkspace({
             {history.length === 0 ? (
                 <EmptyState
                     icon={<History className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.2)' }} />}
-                    title={__('No history yet')}
-                    sub={__('Completed downloads will appear here')}
+                    title={__('general.no_history_yet')}
+                    sub={__('general.completed_downloads_will_appear_here')}
                 />
             ) : (
                 <div className="space-y-3">
@@ -86,7 +86,7 @@ export function HistoryWorkspace({
                                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                                         <StatusBadge status={item.status} />
                                         {item.successCount !== undefined && (
-                                            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{item.successCount} {__('saved')}</span>
+                                            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{item.successCount} {__('general.saved')}</span>
                                         )}
                                         {item.endTime && (
                                             <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.25)' }}>{timeAgo(item.endTime)}</span>

@@ -51,7 +51,7 @@ export default function Show({ widget }: { widget: any }) {
                     <div className="flex gap-2">
                         <Button variant="outline" asChild>
                             <Link href={route('crm.widgets.edit', widget.id)}>
-                                {__('Edit Settings')}
+                                {__('admin.edit_settings')}
                             </Link>
                         </Button>
                         <Button asChild className="gap-2">
@@ -91,7 +91,7 @@ export default function Show({ widget }: { widget: any }) {
                                     </Button>
                                 </div>
                                 <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
-                                    <strong>{__('Note')}: </strong>
+                                    <strong>{__('general.note')}: </strong>
                                     {__('general.if_you_specified_allowed_domains_in_the_settings_this_form_will_only_load_when_embedded_on_those_specific_websites_if_it_appears_blank_on_your_site_verify_your_domain_settings')}
                                 </div>
                             </CardContent>
@@ -105,9 +105,9 @@ export default function Show({ widget }: { widget: any }) {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                                    <span className="text-slate-500">{__('Status')}</span>
+                                    <span className="text-slate-500">{__('general.status')}</span>
                                     <span className={`font-medium ${widget.is_active ? 'text-emerald-600' : 'text-slate-500'}`}>
-                                        {widget.is_active ? __('Active') : __('Inactive')}
+                                        {widget.is_active ? __('general.active') : __('general.inactive')}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center py-2 border-b border-slate-100">

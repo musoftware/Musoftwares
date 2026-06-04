@@ -242,12 +242,12 @@ export default function Index({ leads, currentTab }) {
                     <table className="w-full text-left text-sm">
                         <thead className="border-b border-slate-200 bg-slate-50/50">
                             <tr>
-                                <th className="px-6 py-4 font-semibold text-slate-600">{__('Name')}</th>
+                                <th className="px-6 py-4 font-semibold text-slate-600">{__('general.name')}</th>
                                 <th className="px-6 py-4 font-semibold text-slate-600">{__('general.contact')}</th>
                                 <th className="px-6 py-4 font-semibold text-slate-600">{__('general.company')}</th>
                                 <th className="px-6 py-4 font-semibold text-slate-600">{__('general.message_snippet')}</th>
-                                <th className="px-6 py-4 font-semibold text-slate-600 text-center">{__('Status')}</th>
-                                <th className="px-6 py-4 font-semibold text-slate-600 text-right">{__('Actions')}</th>
+                                <th className="px-6 py-4 font-semibold text-slate-600 text-center">{__('general.status')}</th>
+                                <th className="px-6 py-4 font-semibold text-slate-600 text-right">{__('general.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -278,11 +278,11 @@ export default function Index({ leads, currentTab }) {
                                     <td className="px-6 py-4 text-right">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger render={<Button variant="ghost" className="h-8 w-8 p-0 text-slate-400 hover:text-slate-900" />} onClick={(e) => e.stopPropagation()}>
-                                                <span className="sr-only">{__('Open menu')}</span>
+                                                <span className="sr-only">{__('general.open_menu')}</span>
                                                 <MoreHorizontal className="h-4 w-4" />
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="w-48">
-                                                <DropdownMenuLabel>{__('Actions')}</DropdownMenuLabel>
+                                                <DropdownMenuLabel>{__('general.actions')}</DropdownMenuLabel>
                                                 <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openLead(lead.id); }}>
                                                     <Edit2 className="mr-2 h-4 w-4 text-slate-500" />
                                                     {__('general.view_edit')}

@@ -47,7 +47,7 @@ export default function ProposalsIndex({ proposals, stats }: any) {
         : allProposals.filter((p: any) => p.status === filter);
 
     const handleWithdraw = (proposalId: number) => {
-        if (!confirm(__('Withdraw this proposal? This cannot be undone.'))) return;
+        if (!confirm(__('freelance.withdraw_this_proposal_this_cannot'))) return;
         setWithd(proposalId);
         router.delete(`/freelance/proposals/${proposalId}/withdraw`, {
             preserveScroll: true,
@@ -64,10 +64,10 @@ export default function ProposalsIndex({ proposals, stats }: any) {
 
     return (
         <AppLayout>
-            <Head title={`${__('My Proposals')} - ${__('Freelance')}`} />
+            <Head title={`${__('freelance.my_proposals')} - ${__('freelance.freelance')}`} />
             <AppPage>
                 <PageHeader
-                    title={__('My Proposals')}
+                    title={__('freelance.my_proposals')}
                     subtitle={__('Track the status of every bid you\'ve submitted across all jobs.')}
                     icon={FileText}
                     actions={
@@ -75,7 +75,7 @@ export default function ProposalsIndex({ proposals, stats }: any) {
                             href="/freelance/jobs/browse"
                             className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-sm"
                         >
-                            <Search className="h-4 w-4" /> {__('Browse Jobs')}
+                            <Search className="h-4 w-4" /> {__('freelance.browse_jobs')}
                         </Link>
                     }
                 />
@@ -111,7 +111,7 @@ export default function ProposalsIndex({ proposals, stats }: any) {
                                     : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
                             )}
                         >
-                            {f === 'all' ? `${__('All')} (${stats?.total ?? 0})` : `${__(STATUS_CONFIG[f]?.label)} (${stats?.[f] ?? 0})`}
+                            {f === 'all' ? `${__('general.all')} (${stats?.total ?? 0})` : `${__(STATUS_CONFIG[f]?.label)} (${stats?.[f] ?? 0})`}
                         </button>
                     ))}
                 </div>
@@ -121,12 +121,12 @@ export default function ProposalsIndex({ proposals, stats }: any) {
                     <FreelanceCard>
                         <EmptyState
                             icon={Briefcase}
-                            title={__("No proposals yet")}
+                            title={__("freelance.no_proposals_yet")}
                             description={filter === 'all'
                                 ? __("You haven't submitted any proposals. Browse open jobs to get started.")
-                                : `${__("No")} ${__(filter)} ${__("proposals to display.")}`}
+                                : `${__("general.no")} ${__(filter)} ${__("freelance.proposals_to_display")}`}
                             action="/freelance/jobs/browse"
-                            actionLabel={__("Browse Jobs")}
+                            actionLabel={__("freelance.browse_jobs")}
                         />
                     </FreelanceCard>
                 ) : (
@@ -142,16 +142,16 @@ export default function ProposalsIndex({ proposals, stats }: any) {
                                             href={`/freelance/jobs/${proposal.job?.id}`}
                                             className="text-sm font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors truncate block"
                                         >
-                                            {proposal.job?.title ?? __('Unknown Job')}
+                                            {proposal.job?.title ?? __('freelance.unknown_job')}
                                         </Link>
                                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500">
                                             <span className="flex items-center gap-1">
                                                 <Clock className="h-3 w-3 text-slate-400" />
-                                                {__('Submitted')} {formatDate(proposal.created_at)}
+                                                {__('general.submitted')} {formatDate(proposal.created_at)}
                                             </span>
                                             <span className="flex items-center gap-1">
                                                 <Briefcase className="h-3 w-3 text-slate-400" />
-                                                {proposal.job?.type === 'hourly' ? __('Hourly') : __('Fixed Price')}
+                                                {proposal.job?.type === 'hourly' ? __('general.hourly') : __('general.fixed_price')}
                                             </span>
                                         </div>
                                         <p className="text-xs text-slate-600 line-clamp-1 mt-1">
@@ -166,7 +166,7 @@ export default function ProposalsIndex({ proposals, stats }: any) {
                                                 currency={proposal.currency_id}
                                                 className="text-base font-black text-slate-900"
                                             />
-                                            <p className="text-[10px] text-slate-400">{__('Your Bid')}</p>
+                                            <p className="text-[10px] text-slate-400">{__('freelance.your_bid')}</p>
                                         </div>
 
                                         <FreelanceStatusPill status={proposal.status} />
@@ -178,7 +178,7 @@ export default function ProposalsIndex({ proposals, stats }: any) {
                                                 onClick={() => handleWithdraw(proposal.id)}
                                                 disabled={withdrawing === proposal.id}
                                                 className="text-red-400 hover:text-red-600 hover:bg-red-50 p-1.5 h-auto rounded-md shadow-none transition-colors"
-                                                title={__("Withdraw proposal")}
+                                                title={__("freelance.withdraw_proposal")}
                                             >
                                                 {withdrawing === proposal.id
                                                     ? <Loader2 className="h-4 w-4 animate-spin" />
@@ -191,7 +191,7 @@ export default function ProposalsIndex({ proposals, stats }: any) {
                                             <Link
                                                 href="/freelance/contracts"
                                                 className="text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-md transition-colors"
-                                                title={__("View Contract")}
+                                                title={__("freelance.view_contract")}
                                             >
                                                 <ChevronRight className="h-4 w-4" />
                                             </Link>

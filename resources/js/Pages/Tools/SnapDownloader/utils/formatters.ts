@@ -9,7 +9,7 @@ export function formatBytes(b: number) {
 
 export function timeAgo(iso: string) {
     const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-    if (diff < 60) return `${diff} ${__('s ago')}`;
-    if (diff < 3600) return `${Math.floor(diff / 60)} ${__('m ago')}`;
-    return `${Math.floor(diff / 3600)} ${__('h ago')}`;
+    if (diff < 60) return `${diff} ${__('general.s_ago')}`;
+    if (diff < 3600) return `${Math.floor(diff / 60)} ${__('general.m_ago')}`;
+    return `${Math.floor(diff / 3600)} ${__('general.h_ago')}`;
 }

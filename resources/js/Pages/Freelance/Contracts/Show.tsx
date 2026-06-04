@@ -35,13 +35,13 @@ function ShowContractContent({ auth, contract }: any) {
     };
 
     const handleMarkCompleted = () => {
-        if(confirm(__('Are you sure you want to mark this contract as completed and release funds?'))) {
+        if(confirm(__('freelance.are_you_sure_you_want'))) {
             router.post(route('freelance.contracts.complete', contract.id));
         }
     };
 
     const handleRaiseDispute = () => {
-        if(confirm(__('Are you sure you want to raise a dispute? This will freeze the contract.'))) {
+        if(confirm(__('freelance.are_you_sure_you_want_2'))) {
             router.post(route('freelance.contracts.dispute', contract.id));
         }
     };
@@ -55,7 +55,7 @@ function ShowContractContent({ auth, contract }: any) {
 
     return (
         <>
-            <Head title={`${__('Contract')}: ${contract.title}`} />
+            <Head title={`${__('freelance.contract')}: ${contract.title}`} />
 
             <div className="w-full space-y-6 pb-12">
                 
@@ -72,21 +72,21 @@ function ShowContractContent({ auth, contract }: any) {
                                 {__(contract.status)}
                             </Badge>
                         </div>
-                        <p className="text-sm text-slate-500">{__('Contract Workspace & Messages')}</p>
+                        <p className="text-sm text-slate-500">{__('freelance.contract_workspace_messages')}</p>
                     </div>
                     
                     <div className="flex items-center gap-6">
                         <div className="text-right">
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-0.5">{__('Contract Value')}</p>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-0.5">{__('freelance.contract_value')}</p>
                             <p className="text-xl font-bold text-slate-900 font-mono">
                                 <FinancialAmount amount={contract.agreed_price} currency={globalCurrency} />
                             </p>
                         </div>
                         <div className="h-10 w-px bg-slate-200 hidden sm:block"></div>
                         <div className="text-right hidden sm:block">
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-0.5">{__('Deadline')}</p>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-0.5">{__('general.deadline')}</p>
                             <p className={`text-lg font-bold ${daysRemaining <= 2 ? 'text-red-600' : 'text-slate-900'}`}>
-                                {daysRemaining} {__('days left')}
+                                {daysRemaining} {__('general.days_left')}
                             </p>
                         </div>
                     </div>
@@ -104,7 +104,7 @@ function ShowContractContent({ auth, contract }: any) {
                                         {contract.client.avatar}
                                     </div>
                                     <div>
-                                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{__('Client')}</p>
+                                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{__('erp.client')}</p>
                                         <p className="font-semibold text-slate-900">{contract.client.name}</p>
                                     </div>
                                 </div>
@@ -113,7 +113,7 @@ function ShowContractContent({ auth, contract }: any) {
                                         {contract.freelancer.avatar}
                                     </div>
                                     <div>
-                                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{__('Freelancer')}</p>
+                                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{__('general.freelancer')}</p>
                                         <p className="font-semibold text-slate-900">{contract.freelancer.name}</p>
                                     </div>
                                 </div>
@@ -128,7 +128,7 @@ function ShowContractContent({ auth, contract }: any) {
                                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                       <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                                     </span>
-                                    {__('Live Chat')}
+                                    {__('general.live_chat')}
                                 </CardTitle>
                             </CardHeader>
 
@@ -161,11 +161,11 @@ function ShowContractContent({ auth, contract }: any) {
                                             type="text"
                                             value={messageInput}
                                             onChange={(e) => setMessageInput(e.target.value)}
-                                            placeholder={__('Type your message...')}
+                                            placeholder={__('general.type_your_message')}
                                             className="flex-1 h-11 rounded-full px-5 bg-slate-50 border-slate-200 focus-visible:ring-indigo-500"
                                         />
                                         <Button type="submit" className="shrink-0 h-11 px-6 rounded-full bg-indigo-600 hover:bg-indigo-700 font-bold">
-                                            <Send className="h-4 w-4 mr-2" /> {__('Send')}
+                                            <Send className="h-4 w-4 mr-2" /> {__('general.send')}
                                         </Button>
                                     </form>
                                 </div>
@@ -178,16 +178,16 @@ function ShowContractContent({ auth, contract }: any) {
                         {contract.status === 'active' && (
                             <Card className="shadow-sm border-slate-200/60 sticky top-6">
                                 <CardHeader className="border-b border-slate-100 bg-slate-50/50 pb-5">
-                                    <CardTitle className="text-base font-semibold text-slate-900">{__('Contract Actions')}</CardTitle>
+                                    <CardTitle className="text-base font-semibold text-slate-900">{__('freelance.contract_actions')}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-5">
                                     {isClient ? (
                                         <div className="space-y-4">
                                             <Alert className="bg-indigo-50 border-indigo-100 text-indigo-800">
                                                 <FileCheck className="h-4 w-4 text-indigo-600" />
-                                                <AlertTitle className="text-indigo-900 font-bold">{__('Review & Approve')}</AlertTitle>
+                                                <AlertTitle className="text-indigo-900 font-bold">{__('general.review_approve')}</AlertTitle>
                                                 <AlertDescription className="text-indigo-700 text-xs">
-                                                    {__('Review the work delivered in the chat. Mark as completed to release funds from Escrow safely.')}
+                                                    {__('general.review_the_work_delivered_in')}
                                                 </AlertDescription>
                                             </Alert>
 
@@ -196,14 +196,14 @@ function ShowContractContent({ auth, contract }: any) {
                                                     onClick={handleMarkCompleted}
                                                     className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12"
                                                 >
-                                                    <CheckCircle2 className="mr-2 h-5 w-5" /> {__('Approve & Release Payment')}
+                                                    <CheckCircle2 className="mr-2 h-5 w-5" /> {__('payment.approve_release_payment')}
                                                 </Button>
                                                 <Button
                                                     onClick={handleRaiseDispute}
                                                     variant="outline"
                                                     className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 h-12 font-bold"
                                                 >
-                                                    <AlertCircle className="mr-2 h-4 w-4" /> {__('Raise Dispute')}
+                                                    <AlertCircle className="mr-2 h-4 w-4" /> {__('general.raise_dispute')}
                                                 </Button>
                                             </div>
                                         </div>
@@ -211,29 +211,29 @@ function ShowContractContent({ auth, contract }: any) {
                                         <form onSubmit={handleSubmitDelivery} className="space-y-4">
                                             <Alert className="bg-indigo-50 border-indigo-100 text-indigo-800 mb-2">
                                                 <UploadCloud className="h-4 w-4 text-indigo-600" />
-                                                <AlertTitle className="text-indigo-900 font-bold">{__('Submit Work')}</AlertTitle>
+                                                <AlertTitle className="text-indigo-900 font-bold">{__('general.submit_work')}</AlertTitle>
                                                 <AlertDescription className="text-indigo-700 text-xs">
-                                                    {__('Ready to submit your final delivery? Add notes and attach files.')}
+                                                    {__('general.ready_to_submit_your_final')}
                                                 </AlertDescription>
                                             </Alert>
 
                                             <div className="space-y-1.5">
-                                                <label className="text-sm font-bold text-slate-700">{__('Delivery Notes')}</label>
+                                                <label className="text-sm font-bold text-slate-700">{__('general.delivery_notes')}</label>
                                                 <Textarea
                                                     value={deliveryDescription}
                                                     onChange={(e) => setDeliveryDescription(e.target.value)}
                                                     className="resize-none h-24 focus-visible:ring-indigo-500"
-                                                    placeholder={__('Describe what you have completed...')}
+                                                    placeholder={__('general.describe_what_you_have_completed')}
                                                     required
                                                 />
                                             </div>
 
                                             <div className="space-y-1.5">
-                                                <label className="text-sm font-bold text-slate-700">{__('Attach Files')}</label>
+                                                <label className="text-sm font-bold text-slate-700">{__('general.attach_files')}</label>
                                                 <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 flex flex-col items-center justify-center text-center hover:bg-slate-50 hover:border-indigo-300 cursor-pointer transition-colors">
                                                     <UploadCloud className="h-8 w-8 text-slate-400 mb-2" />
-                                                    <p className="text-sm font-medium text-slate-600">{__('Click to upload or drag and drop')}</p>
-                                                    <p className="text-xs text-slate-400 mt-1">{__('SVG, PNG, JPG or PDF (max. 10MB)')}</p>
+                                                    <p className="text-sm font-medium text-slate-600">{__('general.click_to_upload_or_drag')}</p>
+                                                    <p className="text-xs text-slate-400 mt-1">{__('general.svg_png_jpg_or_pdf')}</p>
                                                 </div>
                                             </div>
 
@@ -241,7 +241,7 @@ function ShowContractContent({ auth, contract }: any) {
                                                 type="submit"
                                                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-12 mt-2"
                                             >
-                                                <CheckCircle2 className="mr-2 h-5 w-5" /> {__('Submit Delivery')}
+                                                <CheckCircle2 className="mr-2 h-5 w-5" /> {__('general.submit_delivery')}
                                             </Button>
                                         </form>
                                     )}
@@ -255,12 +255,12 @@ function ShowContractContent({ auth, contract }: any) {
                                     <div className="h-16 w-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
                                         <CheckCircle2 className="h-8 w-8 text-emerald-600" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-emerald-900 mb-2">{__('Contract Completed')}</h3>
-                                    <p className="text-sm text-emerald-700 mb-6 font-medium">{__('Funds have been released successfully.')}</p>
+                                    <h3 className="text-xl font-bold text-emerald-900 mb-2">{__('freelance.contract_completed')}</h3>
+                                    <p className="text-sm text-emerald-700 mb-6 font-medium">{__('general.funds_have_been_released_successfully')}</p>
                                     
                                     {isClient && (
                                         <Button variant="outline" className="border-emerald-300 text-emerald-700 hover:bg-emerald-100 font-bold w-full bg-white">
-                                            {__('Leave Feedback')}
+                                            {__('general.leave_feedback')}
                                         </Button>
                                     )}
                                 </CardContent>
@@ -273,8 +273,8 @@ function ShowContractContent({ auth, contract }: any) {
                                     <div className="h-16 w-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
                                         <AlertCircle className="h-8 w-8 text-red-600" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-red-900 mb-2">{__('Contract Disputed')}</h3>
-                                    <p className="text-sm text-red-700 font-medium">{__('An admin will review the dispute shortly.')}</p>
+                                    <h3 className="text-xl font-bold text-red-900 mb-2">{__('freelance.contract_disputed')}</h3>
+                                    <p className="text-sm text-red-700 font-medium">{__('admin.an_admin_will_review_the')}</p>
                                 </CardContent>
                             </Card>
                         )}
@@ -290,7 +290,7 @@ export default function ShowContract({ auth, contract }: any) {
         return (
             <FreelanceLayout clean={true}>
                 <div className="w-full py-12 text-center text-slate-500">
-                    {__('Contract not found.')}
+                    {__('freelance.contract_not_found')}
                 </div>
             </FreelanceLayout>
         );

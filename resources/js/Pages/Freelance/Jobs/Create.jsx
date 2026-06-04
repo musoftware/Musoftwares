@@ -66,7 +66,7 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
             currency: preferredCurrency
         }).format(cost);
 
-        const msg = `${__('You need')} ${neededPoints} ${__('more points to publish this job. Charge')} ${neededPoints} ${__('points for')} ${costFormatted}?`;
+        const msg = `${__('general.you_need')} ${neededPoints} ${__('freelance.more_points_to_publish_this')} ${neededPoints} ${__('general.points_for')} ${costFormatted}?`;
         if (confirm(msg)) {
             router.post(route('freelance.point-purchases.store-wallet'), { points: neededPoints });
         }
@@ -102,36 +102,36 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
         <FreelanceLayout>
             <div className="max-w-3xl mx-auto">
                 <div className="mb-8">
-                    <h2 className="text-3xl font-bold text-gray-900">{__('Post a New Job')}</h2>
-                    <p className="text-gray-600 mt-2">{__('Find the right talent for your project.')}</p>
+                    <h2 className="text-3xl font-bold text-gray-900">{__('freelance.post_a_new_job')}</h2>
+                    <p className="text-gray-600 mt-2">{__('erp.find_the_right_talent_for')}</p>
                 </div>
 
                 <form onSubmit={submit} className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm space-y-8">
 
                     {/* Basic Info */}
                     <div className="space-y-4">
-                        <h3 className="text-lg font-semibold border-b pb-2">{__('Basic Information')}</h3>
+                        <h3 className="text-lg font-semibold border-b pb-2">{__('general.basic_information')}</h3>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">{__('Job Title')}</label>
+                            <label className="block text-sm font-bold text-gray-700 mb-1">{__('freelance.job_title')}</label>
                             <input
                                 type="text"
                                 value={data.title}
                                 onChange={e => setData('title', e.target.value)}
-                                placeholder={__('e.g. Full Stack Developer needed for SaaS app')}
+                                placeholder={__('general.eg_full_stack_developer_needed')}
                                 className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                             />
                             {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">{__('Description')}</label>
+                            <label className="block text-sm font-bold text-gray-700 mb-1">{__('general.description')}</label>
                             <div className="border border-gray-300 rounded-lg shadow-sm overflow-hidden focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500">
                                 {/* Simple Textarea without mock toolbar */}
                                 <textarea
                                     value={data.description}
                                     onChange={e => setData('description', e.target.value)}
-                                    placeholder={__('Describe the project scope, deliverables, and any specific requirements...')}
+                                    placeholder={__('erp.describe_the_project_scope_deliverables')}
                                     className="w-full border-0 focus:ring-0 p-4 min-h-[200px] resize-y"
                                 ></textarea>
                             </div>
@@ -141,22 +141,22 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
 
                     {/* Budget & Duration */}
                     <div className="space-y-4">
-                        <h3 className="text-lg font-semibold border-b pb-2">{__('Budget & Duration')}</h3>
+                        <h3 className="text-lg font-semibold border-b pb-2">{__('erp.budget_duration')}</h3>
 
                         <div className="flex gap-4 mb-4">
                             <label className={`flex-1 flex items-center justify-center border-2 rounded-lg py-3 cursor-pointer transition ${data.type === 'fixed' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-200 hover:border-indigo-200'}`}>
                                 <input type="radio" className="sr-only" name="type" value="fixed" checked={data.type === 'fixed'} onChange={() => setData('type', 'fixed')} />
-                                <span className="font-bold">{__('Fixed Price')}</span>
+                                <span className="font-bold">{__('general.fixed_price')}</span>
                             </label>
                             <label className={`flex-1 flex items-center justify-center border-2 rounded-lg py-3 cursor-pointer transition ${data.type === 'hourly' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-200 hover:border-indigo-200'}`}>
                                 <input type="radio" className="sr-only" name="type" value="hourly" checked={data.type === 'hourly'} onChange={() => setData('type', 'hourly')} />
-                                <span className="font-bold">{__('Hourly Rate')}</span>
+                                <span className="font-bold">{__('general.hourly_rate')}</span>
                             </label>
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-4">
                             <div className="w-full sm:w-1/3">
-                                <label className="block text-sm font-bold text-gray-700 mb-1">{__('Currency')}</label>
+                                <label className="block text-sm font-bold text-gray-700 mb-1">{__('general.currency')}</label>
                                 <CurrencySelect
                                     currencies={currencies}
                                     value={data.currency_id}
@@ -165,23 +165,23 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                                 />
                             </div>
                             <div className="w-full sm:w-1/3">
-                                <label className="block text-sm font-bold text-gray-700 mb-1">{__('Project Budget')}</label>
+                                <label className="block text-sm font-bold text-gray-700 mb-1">{__('erp.project_budget')}</label>
                                 <input
                                     type="number"
                                     value={data.budget}
                                     onChange={e => setData('budget', e.target.value)}
-                                    placeholder={__('e.g. 500')}
+                                    placeholder={__('general.eg_500')}
                                     className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 />
                                 {errors.budget && <p className="text-red-500 text-xs mt-1">{errors.budget}</p>}
                             </div>
                             <div className="w-full sm:w-1/3">
-                                <label className="block text-sm font-bold text-gray-700 mb-1">{__('Min Proposal Bid (Points)')}</label>
+                                <label className="block text-sm font-bold text-gray-700 mb-1">{__('freelance.min_proposal_bid_points')}</label>
                                 <input
                                     type="number"
                                     value={data.min_proposal_points}
                                     onChange={e => setData('min_proposal_points', e.target.value)}
-                                    placeholder={__('e.g. 0')}
+                                    placeholder={__('general.eg')}
                                     className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 />
                                 {errors.min_proposal_points && <p className="text-red-500 text-xs mt-1">{errors.min_proposal_points}</p>}
@@ -189,12 +189,12 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">{__('Expected Duration')}</label>
+                            <label className="block text-sm font-bold text-gray-700 mb-1">{__('general.expected_duration')}</label>
                             <input
                                 type="text"
                                 value={data.duration}
                                 onChange={e => setData('duration', e.target.value)}
-                                placeholder={__('Expires in X days, or state project timeline (e.g. 2 weeks)')}
+                                placeholder={__('erp.expires_in_x_days_or')}
                                 className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                             />
                         </div>
@@ -202,8 +202,8 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
 
                     {/* Skills */}
                     <div className="space-y-4">
-                        <h3 className="text-lg font-semibold border-b pb-2">{__('Required Skills')}</h3>
-                        <p className="text-sm text-gray-500 mb-2">{__('These skills will trigger notifications to matching freelancers.')}</p>
+                        <h3 className="text-lg font-semibold border-b pb-2">{__('general.required_skills')}</h3>
+                        <p className="text-sm text-gray-500 mb-2">{__('general.these_skills_will_trigger_notifications')}</p>
 
                         {/* Selected Skills */}
                         {data.skills.length > 0 && (
@@ -213,7 +213,7 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                                         <span className="font-medium text-gray-800">{skill.name}</span>
                                         <div className="flex items-center gap-4">
                                             <label className="flex items-center gap-2 cursor-pointer">
-                                                <span className="text-sm text-gray-600">{__('Required')}</span>
+                                                <span className="text-sm text-gray-600">{__('general.required')}</span>
                                                 <input
                                                     type="checkbox"
                                                     checked={skill.required}
@@ -240,7 +240,7 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                                 type="text"
                                 value={skillSearch}
                                 onChange={e => setSkillSearch(e.target.value)}
-                                placeholder={__('Search to add skills...')}
+                                placeholder={__('general.search_to_add_skills')}
                                 className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                             />
                             {skillSearch && filteredSkills.length > 0 && (
@@ -275,15 +275,15 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                                 "text-lg font-medium mb-1",
                                 currentPoints < pointsCost ? "text-amber-900" : "text-indigo-900"
                             )}>
-                                {__('Publishing this job costs')} <strong>{pointsCost} {__('points')}</strong>
+                                {__('erp.publishing_this_job_costs')} <strong>{pointsCost} {__('general.points')}</strong>
                             </p>
                             {currentPoints < pointsCost ? (
                                 <p className="text-sm text-amber-700 font-semibold bg-amber-100/60 px-3 py-1 rounded-full inline-flex items-center gap-1.5 border border-amber-200/50">
-                                    {__('Insufficient balance:')} {currentPoints} {__('pts')} ({__('Need')} {pointsCost - currentPoints} {__('pts more')})
+                                    {__('general.insufficient_balance')} {currentPoints} {__('general.pts')} ({__('general.need')} {pointsCost - currentPoints} {__('general.pts_more')})
                                 </p>
                             ) : (
                                 <p className="text-sm text-indigo-700 flex items-center justify-center gap-2">
-                                    {__('Your balance:')} {currentPoints} {__('pts')} <span className="text-xl">&rarr;</span> {__('after:')} <span className="font-bold">{currentPoints - pointsCost} {__('pts')}</span>
+                                    {__('general.your_balance')} {currentPoints} {__('general.pts')} <span className="text-xl">&rarr;</span> {__('general.after')} <span className="font-bold">{currentPoints - pointsCost} {__('general.pts')}</span>
                                 </p>
                             )}
                         </div>
@@ -296,7 +296,7 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                                 onClick={handleBuyPointsToPublish}
                                 className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition text-lg w-full md:w-auto flex items-center justify-center gap-2 hover:scale-[1.02] transform duration-150"
                             >
-                                <Zap className="h-5 w-5 fill-amber-300 stroke-amber-100 animate-pulse" /> {__('Buy')} {pointsCost - currentPoints} {__('Points to Publish')}
+                                <Zap className="h-5 w-5 fill-amber-300 stroke-amber-100 animate-pulse" /> {__('general.buy')} {pointsCost - currentPoints} {__('general.points_to_publish')}
                             </button>
                         ) : (
                             <button
@@ -304,7 +304,7 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                                 disabled={processing}
                                 className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-sm transition text-lg w-full md:w-auto"
                             >
-                                {__('Publish Job')} — {pointsCost} {__('pts')}
+                                {__('freelance.publish_job')} — {pointsCost} {__('general.pts')}
                             </button>
                         )}
                     </div>

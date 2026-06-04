@@ -13,7 +13,7 @@ export default function Earnings({ earnings }: { earnings: any }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('overview');
 
     return (
-        <ERPLayout title={__("Referral Earnings")} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__("general.referral_earnings")} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6 dashboard-container at-mobile-scroll-fix">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
                     <div className="flex items-center gap-4">
@@ -21,15 +21,15 @@ export default function Earnings({ earnings }: { earnings: any }) {
                             <ArrowLeft className="w-5 h-5" />
                         </Link>
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900">{__("Referral Earnings")}</h1>
-                            <p className="text-slate-500 text-sm mt-1">{__("Track commissions earned from referrals.")}</p>
+                            <h1 className="text-2xl font-bold text-slate-900">{__("general.referral_earnings")}</h1>
+                            <p className="text-slate-500 text-sm mt-1">{__("general.track_commissions_earned_from_referrals")}</p>
                         </div>
                     </div>
                 </div>
 
                 <Card className="bg-white border border-slate-200 shadow-sm overflow-hidden">
                     <CardHeader className="bg-slate-50/50 border-b border-slate-100 pb-4">
-                        <CardTitle className="text-slate-900 text-sm font-semibold">{__("Earnings History")}</CardTitle>
+                        <CardTitle className="text-slate-900 text-sm font-semibold">{__("general.earnings_history")}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
                         {earnings && earnings.data && (earnings.data as any).length > 0 ? (
@@ -37,11 +37,11 @@ export default function Earnings({ earnings }: { earnings: any }) {
                                 <table className="w-full text-left text-sm border-collapse">
                                     <thead>
                                         <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                            <th className="px-6 py-3">{__("Date")}</th>
-                                            <th className="px-6 py-3">{__("Client (Earner)")}</th>
-                                            <th className="px-6 py-3">{__("Referred Client")}</th>
-                                            <th className="px-6 py-3 text-right">{__("Amount")}</th>
-                                            <th className="px-6 py-3 text-center">{__("Status")}</th>
+                                            <th className="px-6 py-3">{__("general.date")}</th>
+                                            <th className="px-6 py-3">{__("erp.client_earner")}</th>
+                                            <th className="px-6 py-3">{__("erp.referred_client")}</th>
+                                            <th className="px-6 py-3 text-right">{__("general.amount")}</th>
+                                            <th className="px-6 py-3 text-center">{__("general.status")}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100 text-[13px] text-slate-600">
@@ -75,8 +75,8 @@ export default function Earnings({ earnings }: { earnings: any }) {
                         ) : (
                             <EmptyState 
                                 icon={TrendingUp} 
-                                title={__("No earnings recorded")} 
-                                description={__("Commissions will appear here once referrals start paying invoices.")} 
+                                title={__("general.no_earnings_recorded")} 
+                                description={__("erp.commissions_will_appear_here_once")} 
                                 className="border-0 rounded-none py-12" 
                             />
                         )}

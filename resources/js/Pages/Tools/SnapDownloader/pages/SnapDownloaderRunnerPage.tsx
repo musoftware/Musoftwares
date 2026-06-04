@@ -42,7 +42,7 @@ export default function SnapDownloaderRunnerPage() {
                     <div>
                         <h3 className="font-bold text-white text-lg">{__('Connecting...')}</h3>
                         <p className="text-xs text-slate-500 mt-2 leading-relaxed mb-4">
-                            {__('Make sure the Musoftware desktop client is running on your computer.')}
+                            {__('erp.make_sure_the_musoftware_desktop')}
                         </p>
                         <a
                             href="musoftware://open"
@@ -50,7 +50,7 @@ export default function SnapDownloaderRunnerPage() {
                             style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.25)' }}
                         >
                             <Terminal className="w-4 h-4" />
-                            {__('Launch Runtime App')}
+                            {__('general.launch_runtime_app')}
                         </a>
                     </div>
                     <div className="h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>

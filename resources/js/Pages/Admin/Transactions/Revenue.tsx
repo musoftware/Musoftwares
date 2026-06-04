@@ -28,17 +28,17 @@ export default function Revenue({ income, cost, filters, businessCurrency }) {
     const incomeColumns = [
         {
             key: 'id',
-            label: __('ID'),
+            label: __('general.id'),
             render: (tx) => <span className="text-slate-500 font-mono text-xs">#{tx.id}</span>
         },
         {
             key: 'user',
-            label: __('User'),
+            label: __('general.user'),
             render: (tx) => tx.user ? tx.user.name : '—'
         },
         {
             key: 'business_amount',
-            label: __('Income'),
+            label: __('general.income'),
             className: 'text-right',
             render: (tx) => (
                 <span className="font-medium font-mono text-green-600">
@@ -51,17 +51,17 @@ export default function Revenue({ income, cost, filters, businessCurrency }) {
     const costColumns = [
         {
             key: 'id',
-            label: __('ID'),
+            label: __('general.id'),
             render: (tx) => <span className="text-slate-500 font-mono text-xs">#{tx.id}</span>
         },
         {
             key: 'user',
-            label: __('User'),
+            label: __('general.user'),
             render: (tx) => tx.user ? tx.user.name : '—'
         },
         {
             key: 'business_amount',
-            label: __('Cost'),
+            label: __('erp.cost'),
             className: 'text-right',
             render: (tx) => (
                 <span className="font-medium font-mono text-red-600">
@@ -72,20 +72,20 @@ export default function Revenue({ income, cost, filters, businessCurrency }) {
     ];
 
     return (
-        <AdminSidebarLayout title={__('Revenue')} header={__('Transactions')}>
+        <AdminSidebarLayout title={__('general.revenue')} header={__('erp.transactions')}>
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h2 className="text-lg font-semibold text-slate-900">{__('Revenue Summary')}</h2>
-                    <p className="text-sm text-slate-500">{__('View combined income and costs.')}</p>
+                    <h2 className="text-lg font-semibold text-slate-900">{__('general.revenue_summary')}</h2>
+                    <p className="text-sm text-slate-500">{__('erp.view_combined_income_and_costs')}</p>
                 </div>
                 <Button asChild>
-                    <Link href="/admin/transactions/create">{__('Create Transaction')}</Link>
+                    <Link href="/admin/transactions/create">{__('erp.create_transaction')}</Link>
                 </Button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div>
-                    <h3 className="text-md font-medium text-slate-800 mb-3">{__('Income')}</h3>
+                    <h3 className="text-md font-medium text-slate-800 mb-3">{__('general.income')}</h3>
                     <DataTable
                         columns={incomeColumns}
                         data={income.data}
@@ -93,11 +93,11 @@ export default function Revenue({ income, cost, filters, businessCurrency }) {
                         filters={filters}
                         onSearch={handleSearch}
                         onSort={handleSort}
-                        emptyTitle={__('No income found')}
+                        emptyTitle={__('general.no_income_found')}
                     />
                 </div>
                 <div>
-                    <h3 className="text-md font-medium text-slate-800 mb-3">{__('Costs')}</h3>
+                    <h3 className="text-md font-medium text-slate-800 mb-3">{__('erp.costs')}</h3>
                     <DataTable
                         columns={costColumns}
                         data={cost.data}
@@ -105,7 +105,7 @@ export default function Revenue({ income, cost, filters, businessCurrency }) {
                         filters={filters}
                         onSearch={handleSearch}
                         onSort={handleSort}
-                        emptyTitle={__('No costs found')}
+                        emptyTitle={__('erp.no_costs_found')}
                     />
                 </div>
             </div>

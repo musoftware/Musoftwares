@@ -228,8 +228,8 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="active">{__('Active')}</SelectItem>
-                                            <SelectItem value="inactive">{__('Inactive')}</SelectItem>
+                                            <SelectItem value="active">{__('general.active')}</SelectItem>
+                                            <SelectItem value="inactive">{__('general.inactive')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -247,7 +247,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                         <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-end">
                             {/* Search */}
                             <form onSubmit={handleSearch} className="flex-1 min-w-48 w-full sm:w-auto">
-                                <Label className="text-xs mb-1 block">{__('Search')}</Label>
+                                <Label className="text-xs mb-1 block">{__('general.search')}</Label>
                                 <div className="flex gap-2">
                                     <Input
                                         placeholder={__('general.search_by_software_name')}
@@ -272,9 +272,9 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">{__('All')}</SelectItem>
-                                        <SelectItem value="active">{__('Active')}</SelectItem>
-                                        <SelectItem value="inactive">{__('Inactive')}</SelectItem>
+                                        <SelectItem value="all">{__('general.all')}</SelectItem>
+                                        <SelectItem value="active">{__('general.active')}</SelectItem>
+                                        <SelectItem value="inactive">{__('general.inactive')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -311,7 +311,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                 {hasActiveFilters && (
                                     <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1 shrink-0">
                                         <X className="w-3 h-3" />
-                                        {__('Clear')}
+                                        {__('general.clear')}
                                     </Button>
                                 )}
                             </div>
@@ -330,12 +330,12 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                             <SortHeader column="name">{__('general.software')}</SortHeader>
                                         </TableHead>
                                         <TableHead className="text-center">
-                                            <SortHeader column="total_devices">{__('Total')}</SortHeader>
+                                            <SortHeader column="total_devices">{__('general.total')}</SortHeader>
                                         </TableHead>
                                         <TableHead className="text-center">
-                                            <SortHeader column="active_count">{__('Active')}</SortHeader>
+                                            <SortHeader column="active_count">{__('general.active')}</SortHeader>
                                         </TableHead>
-                                        <TableHead className="text-center hidden sm:table-cell">{__('Inactive')}</TableHead>
+                                        <TableHead className="text-center hidden sm:table-cell">{__('general.inactive')}</TableHead>
                                         <TableHead className="text-center hidden sm:table-cell">{__('general.blocked')}</TableHead>
                                         <TableHead className="hidden md:table-cell">
                                             <SortHeader column="default_status">{__('general.default_status')}</SortHeader>
@@ -409,8 +409,8 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                         <SelectValue />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="active">{__('Active')}</SelectItem>
-                                                        <SelectItem value="inactive">{__('Inactive')}</SelectItem>
+                                                        <SelectItem value="active">{__('general.active')}</SelectItem>
+                                                        <SelectItem value="inactive">{__('general.inactive')}</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </TableCell>
@@ -424,7 +424,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                             <TableCell>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger render={<Button variant="ghost" className="h-8 w-8 p-0" />}>
-                                                        <span className="sr-only">{__('Open menu')}</span>
+                                                        <span className="sr-only">{__('general.open_menu')}</span>
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" side="bottom">
@@ -446,8 +446,8 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                                     <SelectValue />
                                                                 </SelectTrigger>
                                                                 <SelectContent>
-                                                                    <SelectItem value="active">{__('Active')}</SelectItem>
-                                                                    <SelectItem value="inactive">{__('Inactive')}</SelectItem>
+                                                                    <SelectItem value="active">{__('general.active')}</SelectItem>
+                                                                    <SelectItem value="inactive">{__('general.inactive')}</SelectItem>
                                                                 </SelectContent>
                                                             </Select>
                                                         </div>
@@ -459,7 +459,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                             onClick={() => destroy(sw)}
                                                         >
                                                             <Trash2 className="w-4 h-4 mr-2" />
-                                                            {__('Delete')}
+                                                            {__('general.delete')}
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>

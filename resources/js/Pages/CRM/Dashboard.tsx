@@ -15,7 +15,7 @@ export default function Dashboard({ stats }) {
             description: __('general.manage_and_track_your_leads_pipeline'),
             icon: Users,
             href: route('crm.leads.index'),
-            stats: `${stats.total_leads} ${__('Total')} (${stats.new_leads} ${__('general.new_1')})`,
+            stats: `${stats.total_leads} ${__('general.total')} (${stats.new_leads} ${__('general.new_1')})`,
             color: 'text-blue-600',
             bg: 'bg-blue-100',
         },

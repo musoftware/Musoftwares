@@ -21,7 +21,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
     const [qrData, setQrData] = useState<{ qr_code: string; connection_code: string; expires_at: string } | null>(null);
 
     const handleDelete = (id: number) => {
-        if (confirm(__('Are you sure you want to disconnect and remove this device?'))) {
+        if (confirm(__('general.are_you_sure_you_want_4'))) {
             router.delete(route('sms-payment-gateway.delete-device', id));
         }
     };
@@ -42,7 +42,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                 setQrData(response.data);
             } else {
                 toast({
-                    title: __('Error'),
+                    title: __('general.error'),
                     description: __('general.failed_to_generate_connection_code'),
                     variant: 'destructive',
                 });
@@ -50,7 +50,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
             }
         } catch (error: any) {
             toast({
-                title: __('Error'),
+                title: __('general.error'),
                 description: (error as any).response?.data?.message || __('general.failed_to_generate_qr_code'),
                 variant: 'destructive',
             });
@@ -61,8 +61,8 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
     };
 
     return (
-        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('Android Devices')}</h2>}>
-            <Head title={__('Devices - Payment Gateway')} />
+        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('general.android_devices')}</h2>}>
+            <Head title={__('sms_gateway.devices_payment_gateway')} />
 
             <div className="py-8 md:py-12">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -70,18 +70,18 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                                 <Smartphone className="w-6 h-6 text-indigo-600" />
-                                {__('Android Devices')}
+                                {__('general.android_devices')}
                             </h1>
                             <p className="text-slate-500 mt-1">{__('general.manage_all_android_phones_connected_to_your_payment_gateway_to_read_sms_receipts')}</p>
                         </div>
                         <div className="flex gap-2">
                             <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                                 <ArrowLeft className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2 rtl:rotate-180" />
-                                {__('Back')}
+                                {__('general.back')}
                             </Button>
                             <Button onClick={handleAddDevice}>
                                 <Plus className="w-4 h-4 mr-2" />
-                                {__('Add Device')}
+                                {__('general.add_device')}
                             </Button>
                         </div>
                     </div>
@@ -94,7 +94,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                                     <Download className="w-5 h-5 text-indigo-600" />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="font-semibold text-slate-800 text-sm">{__('Need the Android app?')}</p>
+                                    <p className="font-semibold text-slate-800 text-sm">{__('general.need_the_android_app')}</p>
                                     <p className="text-xs text-slate-500 truncate">{__('general.download_and_install_the_companion_app_to_connect_your_phone')}</p>
                                 </div>
                             </div>
@@ -105,7 +105,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                                 className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors flex-shrink-0"
                             >
                                 <Download className="w-4 h-4" />
-                                {__('Download APK')}
+                                {__('general.download_apk')}
                                 <ExternalLink className="w-3.5 h-3.5 opacity-60" />
                             </a>
                         </div>
@@ -113,7 +113,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>{__('Connected Devices')}</CardTitle>
+                            <CardTitle>{__('general.connected_devices')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {devices.length === 0 ? (
@@ -122,7 +122,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                                     <p className="text-slate-500 mb-4">{__('general.no_android_devices_connected')}</p>
                                     <Button onClick={handleAddDevice}>
                                         <Plus className="w-4 h-4 mr-2" />
-                                        {__('Connect New Device')}
+                                        {__('freelance.connect_new_device')}
                                     </Button>
                                 </div>
                             ) : (
@@ -132,20 +132,20 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                                             <div className="flex items-start gap-4">
                                                 <div className={`mt-1 w-3 h-3 rounded-full flex-shrink-0 ${device.status === 'connected' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
                                                 <div>
-                                                    <h3 className="font-bold text-lg text-slate-800">{device.device_name || __('Generic Android')}</h3>
+                                                    <h3 className="font-bold text-lg text-slate-800">{device.device_name || __('general.generic_android')}</h3>
                                                     <div className="mt-1 space-y-1">
                                                         <p className="text-sm font-medium text-slate-700">SIM 1: <span className="font-mono text-slate-500">{device.sim1_number || __('general.not_set')}</span></p>
                                                         <p className="text-sm font-medium text-slate-700">SIM 2: <span className="font-mono text-slate-500">{device.sim2_number || __('general.not_set')}</span></p>
                                                     </div>
-                                                    <p className="text-xs text-slate-400 mt-2">{__('Added')}: {new Date(device.created_at).toLocaleDateString()}</p>
+                                                    <p className="text-xs text-slate-400 mt-2">{__('general.added')}: {new Date(device.created_at).toLocaleDateString()}</p>
                                                 </div>
                                             </div>
                                             <div className="flex sm:flex-col gap-2 mt-4 sm:mt-0 items-end">
                                                 <Button size="sm" variant="outline" className="w-full" onClick={() => router.visit(route('sms-payment-gateway.device', device.id))}>
-                                                    <Eye className="w-4 h-4 mr-2" /> {__('Inspect')}
+                                                    <Eye className="w-4 h-4 mr-2" /> {__('general.inspect')}
                                                 </Button>
                                                 <Button size="sm" variant="destructive" className="w-full" onClick={() => handleDelete(device.id)}>
-                                                    <Trash2 className="w-4 h-4 mr-2" /> {__('Remove')}
+                                                    <Trash2 className="w-4 h-4 mr-2" /> {__('general.remove')}
                                                 </Button>
                                             </div>
                                         </div>
@@ -162,7 +162,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                 <DialogContent className="sm:max-w-3xl">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
-                            <QrCode className="w-5 h-5 text-indigo-600" /> {__('Connect New Device')}
+                            <QrCode className="w-5 h-5 text-indigo-600" /> {__('freelance.connect_new_device')}
                         </DialogTitle>
                         <DialogDescription>
                             {__('general.scan_this_qr_code_from_the_musoftware_payment_gateway_android_app_to_link_your_device')}
@@ -178,16 +178,16 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                         ) : qrData ? (
                             <div className="flex flex-col items-center space-y-6 w-full">
                                 <div className="p-4 bg-white border-2 border-slate-100 rounded-2xl shadow-sm">
-                                    <img src={qrData.qr_code} alt={__('Connection QR Code')} className="w-64 h-64" />
+                                    <img src={qrData.qr_code} alt={__('general.connection_qr_code')} className="w-64 h-64" />
                                 </div>
                                 
                                 <div className="w-full text-center">
-                                    <p className="text-sm text-slate-500 mb-2">{__('Or enter this code manually:')}</p>
+                                    <p className="text-sm text-slate-500 mb-2">{__('general.or_enter_this_code_manually')}</p>
                                     <div className="bg-slate-100 p-3 rounded-lg font-mono text-2xl font-bold tracking-widest text-slate-800 break-all">
                                         {qrData.connection_code}
                                     </div>
                                     <p className="text-xs text-amber-600 mt-3 font-medium">
-                                        {__('Code expires at')}: {new Date(qrData.expires_at).toLocaleString()}
+                                        {__('general.code_expires_at')}: {new Date(qrData.expires_at).toLocaleString()}
                                     </p>
                                 </div>
 
@@ -200,12 +200,12 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                                         className="inline-flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
                                     >
                                         <Download className="w-4 h-4" />
-                                        {__("Don't have the app? Download it here")}
+                                        {__("general.dont_have_the_app_download")}
                                     </a>
                                 )}
                                 
                                 <Button variant="outline" className="w-full mt-4" onClick={() => setIsAddModalOpen(false)}>
-                                    {__('Close')}
+                                    {__('general.close')}
                                 </Button>
                             </div>
                         ) : null}

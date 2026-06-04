@@ -93,8 +93,8 @@ export default function TagsIndex({ tags }: { tags: any[] }) {
                                 <tr>
                                     <th className="px-6 py-4 font-medium">{__('general.tag_name')}</th>
                                     <th className="px-6 py-4 font-medium">{__('general.color')}</th>
-                                    <th className="px-6 py-4 font-medium">{__('Created At')}</th>
-                                    <th className="px-6 py-4 font-medium text-right">{__('Actions')}</th>
+                                    <th className="px-6 py-4 font-medium">{__('general.created_at')}</th>
+                                    <th className="px-6 py-4 font-medium text-right">{__('general.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -186,7 +186,7 @@ export default function TagsIndex({ tags }: { tags: any[] }) {
 
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>
-                                {__('Cancel')}
+                                {__('general.cancel')}
                             </Button>
                             <Button type="submit" disabled={processing} className="bg-indigo-600 hover:bg-indigo-700 text-white">
                                 {__('general.save_tag')}

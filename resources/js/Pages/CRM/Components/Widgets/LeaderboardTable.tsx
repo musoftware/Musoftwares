@@ -39,7 +39,7 @@ export default function LeaderboardTable({ leaderboard = [] }: { leaderboard: Le
                         <TableHead className="w-12 text-center">#</TableHead>
                         <TableHead>{__('general.agent')}</TableHead>
                         <TableHead className="text-center">{__('general.calls')}</TableHead>
-                        <TableHead className="text-center">{__('Closed')}</TableHead>
+                        <TableHead className="text-center">{__('general.closed')}</TableHead>
                         <TableHead className="text-right">{__('general.conversion')}</TableHead>
                     </TableRow>
                 </TableHeader>

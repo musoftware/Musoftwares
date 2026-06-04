@@ -24,15 +24,15 @@ export function QueueWorkspace({
     return (
         <div className="space-y-5 max-w-3xl mx-auto">
             <div>
-                <h1 className="text-xl sm:text-2xl font-black text-white">{__('Queue')}</h1>
-                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Jobs waiting to run — processed one at a time')}</p>
+                <h1 className="text-xl sm:text-2xl font-black text-white">{__('general.queue')}</h1>
+                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('freelance.jobs_waiting_to_run_processed')}</p>
             </div>
 
             {queue.length === 0 ? (
                 <EmptyState
                     icon={<List className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.2)' }} />}
-                    title={__('Queue is empty')}
-                    sub={__('Add profiles from the Download tab')}
+                    title={__('general.queue_is_empty')}
+                    sub={__('general.add_profiles_from_the_download')}
                 />
             ) : (
                 <div className="space-y-3">
@@ -49,7 +49,7 @@ export function QueueWorkspace({
                             <div className="flex-1 min-w-0">
                                 <div className="font-semibold text-white text-sm truncate">{job.target}</div>
                                 <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                    <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>{__('Added')} {timeAgo(job.addedAt)}</span>
+                                    <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>{__('general.added')} {timeAgo(job.addedAt)}</span>
                                     <StatusBadge status={job.status} />
                                     <div className="flex items-center gap-1">
                                         {Object.entries(job.filters || {}).filter(([, v]) => v).map(([k]) => (

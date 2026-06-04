@@ -418,17 +418,17 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                     onChange={e => setSelectedRole(e.target.value)}
                                     required
                                 >
-                                    <option value="client">{__("Client")}</option>
-                                    <option value="user">{__("User")}</option>
-                                    <option value="admin">{__("Admin")}</option>
+                                    <option value="client">{__("erp.client")}</option>
+                                    <option value="user">{__("general.user")}</option>
+                                    <option value="admin">{__("admin.admin")}</option>
                                     <option value="manager">{__("general.manager")}</option>
-                                    <option value="employee">{__("Employee")}</option>
+                                    <option value="employee">{__("general.employee")}</option>
                                     <option value="moderator">{__("general.moderator")}</option>
                                 </select>
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setIsChangeRoleOpen(false)}>{__("Cancel")}</Button>
+                            <Button type="button" variant="outline" onClick={() => setIsChangeRoleOpen(false)}>{__("general.cancel")}</Button>
                             <Button type="submit">{__("general.update_role")}</Button>
                         </DialogFooter>
                     </form>

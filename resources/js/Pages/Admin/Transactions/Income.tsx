@@ -29,14 +29,14 @@ export default function Income({ transactions, filters }) {
     const columns = [
         {
             key: 'id',
-            label: __('ID'),
+            label: __('general.id'),
             sortable: true,
             className: 'w-[60px]',
             render: (tx) => <span className="text-slate-500 font-mono text-xs">#{tx.id}</span>
         },
         {
             key: 'user',
-            label: __('User'),
+            label: __('general.user'),
             render: (tx) => tx.user ? (
                 <div className="flex flex-col">
                     <span className="font-medium text-slate-900">{tx.user.name}</span>
@@ -46,14 +46,14 @@ export default function Income({ transactions, filters }) {
         },
         {
             key: 'project',
-            label: __('Project'),
+            label: __('erp.project'),
             render: (tx) => tx.project ? (
                 <span className="text-slate-700">{tx.project.project_name}</span>
             ) : <span className="text-slate-400">—</span>
         },
         {
             key: 'type',
-            label: __('Type'),
+            label: __('general.type'),
             render: (tx) => (
                 <Badge variant={tx.type === 'refunded' || tx.type === 'send' ? 'destructive' : 'default'} className="uppercase">
                     {__(tx.type)}
@@ -62,7 +62,7 @@ export default function Income({ transactions, filters }) {
         },
         {
             key: 'amount',
-            label: __('Amount'),
+            label: __('general.amount'),
             className: 'text-right',
             render: (tx) => (
                 <span className="font-medium font-mono text-slate-800">
@@ -72,7 +72,7 @@ export default function Income({ transactions, filters }) {
         },
         {
             key: 'business_amount',
-            label: __('Business Amount'),
+            label: __('general.business_amount'),
             className: 'text-right',
             render: (tx) => (
                 <span className="font-medium font-mono text-green-600">
@@ -82,12 +82,12 @@ export default function Income({ transactions, filters }) {
         },
         {
             key: 'reason',
-            label: __('Reason'),
+            label: __('general.reason'),
             render: (tx) => <span className="text-slate-600 max-w-[250px] truncate block" title={tx.reason}>{tx.reason}</span>
         },
         {
             key: 'created_at',
-            label: __('Date'),
+            label: __('general.date'),
             sortable: true,
             render: (tx) => (
                 <span className="text-slate-600 whitespace-nowrap">
@@ -98,24 +98,24 @@ export default function Income({ transactions, filters }) {
     ];
 
     return (
-        <AdminSidebarLayout title={__('Income Transactions')} header={__('Transactions')}>
+        <AdminSidebarLayout title={__('erp.income_transactions')} header={__('erp.transactions')}>
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h2 className="text-lg font-semibold text-slate-900">{__('Income Transactions')}</h2>
-                    <p className="text-sm text-slate-500">{__('View all income and related transactions.')}</p>
+                    <h2 className="text-lg font-semibold text-slate-900">{__('erp.income_transactions')}</h2>
+                    <p className="text-sm text-slate-500">{__('erp.view_all_income_and_related')}</p>
                 </div>
                 <div className="flex gap-2">
                     <Button variant="default" asChild>
-                        <Link href="/admin/transactions/create?type=receive">{__('Receive')}</Link>
+                        <Link href="/admin/transactions/create?type=receive">{__('general.receive')}</Link>
                     </Button>
                     <Button variant="outline" asChild>
-                        <Link href="/admin/transactions/create?type=earn">{__('Earn')}</Link>
+                        <Link href="/admin/transactions/create?type=earn">{__('general.earn')}</Link>
                     </Button>
                     <Button variant="outline" asChild>
-                        <Link href="/admin/transactions/create?type=refund">{__('Refund')}</Link>
+                        <Link href="/admin/transactions/create?type=refund">{__('general.refund')}</Link>
                     </Button>
                     <Button variant="outline" asChild>
-                        <Link href="/admin/transactions/create?type=send">{__('Send')}</Link>
+                        <Link href="/admin/transactions/create?type=send">{__('general.send')}</Link>
                     </Button>
                 </div>
             </div>
@@ -128,8 +128,8 @@ export default function Income({ transactions, filters }) {
                     filters={filters}
                     onSearch={handleSearch}
                     onSort={handleSort}
-                    emptyTitle={__('No transactions found')}
-                    emptyDescription={__('Try adjusting your search filters.')}
+                    emptyTitle={__('erp.no_transactions_found')}
+                    emptyDescription={__('general.try_adjusting_your_search_filters')}
                 />
             </div>
         </AdminSidebarLayout>

@@ -102,7 +102,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
     };
 
     const handleDeleteTransaction = (txId: number) => {
-        if (confirm(__('Confirm Delete Transaction'))) {
+        if (confirm(__('erp.confirm_delete_transaction'))) {
             router.delete(route('isaas.gold-savers.wallets.transactions.destroy', { wallet: wallet.id, transaction: txId }));
         }
     };
@@ -115,7 +115,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
     };
 
     const handleDeleteWallet = () => {
-        if (confirm(__('Confirm Delete Wallet'))) {
+        if (confirm(__('erp.confirm_delete_wallet'))) {
             router.delete(route('isaas.gold-savers.wallets.destroy', wallet.id));
         }
     };
@@ -127,11 +127,11 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                     <Button variant="ghost" size="icon" onClick={() => router.get(route('isaas.gold-savers.wallets.index'))}>
                         <ArrowLeft className="w-5 h-5" />
                     </Button>
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('Wallet Details')}</h2>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('erp.wallet_details')}</h2>
                 </div>
             }
         >
-            <Head title={`${__('Wallet')}: ${wallet.name}`} />
+            <Head title={`${__('erp.wallet')}: ${wallet.name}`} />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
@@ -142,15 +142,15 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                 <Wallet className="text-indigo-600" />
                                 {wallet.name}
                             </h3>
-                            <p className="text-muted-foreground">{__(wallet.goal_type)} {__('Goal')}</p>
+                            <p className="text-muted-foreground">{__(wallet.goal_type)} {__('general.goal')}</p>
                         </div>
                         <div className="flex gap-2">
                             <Button onClick={() => setIsEditingWallet(!isEditingWallet)} variant="outline" className="flex items-center gap-2">
                                 <Settings className="w-4 h-4" />
-                                {__('Edit Settings')}
+                                {__('admin.edit_settings')}
                             </Button>
                             <Button onClick={() => setIsCreatingTx(!isCreatingTx)} className="bg-indigo-600 hover:bg-indigo-700 text-white">
-                                {isCreatingTx ? __('Cancel') : __('Add Transaction')}
+                                {isCreatingTx ? __('general.cancel') : __('erp.add_transaction')}
                             </Button>
                         </div>
                     </div>
@@ -158,13 +158,13 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                     {isEditingWallet && (
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-lg">{__('Edit Wallet Settings')}</CardTitle>
+                                <CardTitle className="text-lg">{__('erp.edit_wallet_settings')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <form onSubmit={handleUpdateWallet} className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">{__('Wallet Name')}</label>
+                                            <label className="text-sm font-medium">{__('erp.wallet_name')}</label>
                                             <Input 
                                                 required
                                                 value={editWalletData.name} 
@@ -172,7 +172,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">{__('Goal Type')}</label>
+                                            <label className="text-sm font-medium">{__('general.goal_type')}</label>
                                             <Select 
                                                 value={editWalletData.goal_type} 
                                                 onValueChange={value => setEditWalletData({...editWalletData, goal_type: value as string})}
@@ -181,17 +181,17 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                                     <SelectValue placeholder={__('general.select_goal_type')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="Investment">{__('Investment')}</SelectItem>
-                                                    <SelectItem value="Savings">{__('Savings')}</SelectItem>
-                                                    <SelectItem value="Trading">{__('Trading')}</SelectItem>
-                                                    <SelectItem value="Retirement">{__('Retirement')}</SelectItem>
+                                                    <SelectItem value="Investment">{__('general.investment')}</SelectItem>
+                                                    <SelectItem value="Savings">{__('general.savings')}</SelectItem>
+                                                    <SelectItem value="Trading">{__('general.trading')}</SelectItem>
+                                                    <SelectItem value="Retirement">{__('general.retirement')}</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
                                         {hasGoalTracking && (
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-2">
-                                                    <label className="text-sm font-medium">{__('Target Grams')}</label>
+                                                    <label className="text-sm font-medium">{__('gold_saver.target_grams')}</label>
                                                     <Input 
                                                         type="number" step="0.01"
                                                         value={editWalletData.target_grams} 
@@ -199,7 +199,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="text-sm font-medium">{__('Target Amount')}</label>
+                                                    <label className="text-sm font-medium">{__('general.target_amount')}</label>
                                                     <Input 
                                                         type="number" step="0.01"
                                                         value={editWalletData.target_amount} 
@@ -212,11 +212,11 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                     <div className="flex justify-between items-center pt-2">
                                         <Button type="button" variant="destructive" onClick={handleDeleteWallet}>
                                             <Trash className="w-4 h-4 mr-2" />
-                                            {__('Delete Wallet')}
+                                            {__('erp.delete_wallet')}
                                         </Button>
                                         <div className="flex gap-2">
-                                            <Button type="button" variant="outline" onClick={() => setIsEditingWallet(false)}>{__('Cancel')}</Button>
-                                            <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white">{__('Save Changes')}</Button>
+                                            <Button type="button" variant="outline" onClick={() => setIsEditingWallet(false)}>{__('general.cancel')}</Button>
+                                            <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white">{__('general.save_changes')}</Button>
                                         </div>
                                     </div>
                                 </form>
@@ -227,20 +227,20 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <Card className="bg-slate-50 border-slate-200 shadow-none">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-slate-500">{__('Total Grams')}</CardTitle>
+                                <CardTitle className="text-sm font-medium text-slate-500">{__('gold_saver.total_grams')}</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-bold text-slate-900">{wallet.balance_grams} {__('G')}</div>
+                                <div className="text-3xl font-bold text-slate-900">{wallet.balance_grams} {__('general.g')}</div>
                             </CardContent>
                         </Card>
                         <Card className="bg-slate-50 border-slate-200 shadow-none">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-slate-500">{__('Total Cost')}</CardTitle>
+                                <CardTitle className="text-sm font-medium text-slate-500">{__('erp.total_cost')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="text-3xl font-bold text-slate-900">{formatNumber(wallet.balance_amount)} <span className="text-lg text-slate-500">{wallet.currency}</span></div>
                                 {gamification && gamification.averageCost > 0 && (
-                                    <p className="text-xs text-slate-500 mt-1">{__('Avg. Cost')}: {formatNumber(gamification.averageCost)} / {__('G')}</p>
+                                    <p className="text-xs text-slate-500 mt-1">{__('erp.avg_cost')}: {formatNumber(gamification.averageCost)} / {__('general.g')}</p>
                                 )}
                             </CardContent>
                         </Card>
@@ -249,7 +249,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                             <Card className={gamification.isProfit ? "bg-green-50 border-green-200 shadow-none" : "bg-red-50 border-red-200 shadow-none"}>
                                 <CardHeader className="pb-2">
                                     <CardTitle className={`text-sm font-medium ${gamification.isProfit ? 'text-green-700' : 'text-red-700'}`}>
-                                        {__('Current Value')} (21k)
+                                        {__('general.current_value')} (21k)
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
@@ -265,28 +265,28 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                         ) : (
                             <Card className="bg-slate-50 border-slate-200 shadow-none">
                                 <CardHeader className="pb-2">
-                                    <CardTitle className="text-sm font-medium text-slate-500">{__('Current Value')}</CardTitle>
+                                    <CardTitle className="text-sm font-medium text-slate-500">{__('general.current_value')}</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="text-3xl font-bold text-slate-400">---</div>
-                                    <p className="text-xs text-slate-400 mt-1">{__('Requires Live Prices Addon')}</p>
+                                    <p className="text-xs text-slate-400 mt-1">{__('general.requires_live_prices_addon')}</p>
                                 </CardContent>
                             </Card>
                         )}
 
                         <Card className="bg-slate-50 border-slate-200 shadow-none">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-slate-500">{__('Goal Progress')}</CardTitle>
+                                <CardTitle className="text-sm font-medium text-slate-500">{__('general.goal_progress')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="text-3xl font-bold text-slate-900">
                                     {wallet.target_grams > 0 
                                         ? `${((wallet.balance_grams / wallet.target_grams) * 100).toFixed(1)}%` 
-                                        : __('Na')
+                                        : __('general.na')
                                     }
                                 </div>
                                 <p className="text-xs text-slate-500 mt-1">
-                                    {__('Target')}: {wallet.target_grams > 0 ? `${wallet.target_grams} ${__('G')}` : __('No Target Set')}
+                                    {__('general.target')}: {wallet.target_grams > 0 ? `${wallet.target_grams} ${__('general.g')}` : __('general.no_target_set')}
                                 </p>
                                 {gamification?.monthsToGoal && gamification.monthsToGoal > 0 && (
                                     <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-600">
@@ -301,13 +301,13 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                     {isCreatingTx && (
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-lg">{__('Add New Transaction')}</CardTitle>
+                                <CardTitle className="text-lg">{__('erp.add_new_transaction')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <form onSubmit={handleCreateTransaction} className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">{__('Type')}</label>
+                                            <label className="text-sm font-medium">{__('general.type')}</label>
                                             <Select 
                                                 value={newTx.type} 
                                                 onValueChange={(value) => setNewTx({...newTx, type: (value || 'buy') as 'buy' | 'sell'})}
@@ -316,13 +316,13 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                                     <SelectValue placeholder={__('general.select_type')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="buy">{__('Buy')}</SelectItem>
-                                                    <SelectItem value="sell">{__('Sell')}</SelectItem>
+                                                    <SelectItem value="buy">{__('general.buy')}</SelectItem>
+                                                    <SelectItem value="sell">{__('general.sell')}</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">{__('Grams')}</label>
+                                            <label className="text-sm font-medium">{__('gold_saver.grams')}</label>
                                             <Input 
                                                 type="number" step="0.01" min="0.01" required
                                                 value={newTx.grams} 
@@ -330,7 +330,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">{__('Karat')}</label>
+                                            <label className="text-sm font-medium">{__('gold_saver.karat')}</label>
                                             <Select 
                                                 value={String(newTx.karat)} 
                                                 onValueChange={value => setNewTx({...newTx, karat: value as string})}
@@ -347,7 +347,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">{__('Price Per Gram')} ({wallet.currency})</label>
+                                            <label className="text-sm font-medium">{__('gold_saver.price_per_gram')} ({wallet.currency})</label>
                                             <Input 
                                                 type="number" step="0.01" min="0.01" required
                                                 value={newTx.price_per_gram} 
@@ -355,7 +355,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">{__('Fees')} ({wallet.currency})</label>
+                                            <label className="text-sm font-medium">{__('general.fees')} ({wallet.currency})</label>
                                             <Input 
                                                 type="number" step="0.01" min="0"
                                                 value={newTx.fees} 
@@ -363,7 +363,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">{__('Date')}</label>
+                                            <label className="text-sm font-medium">{__('general.date')}</label>
                                             <Input 
                                                 type="date" required
                                                 value={newTx.transaction_date} 
@@ -372,15 +372,15 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium">{__('Notes')}</label>
+                                        <label className="text-sm font-medium">{__('general.notes')}</label>
                                         <Input 
                                             value={newTx.notes} 
                                             onChange={e => setNewTx({...newTx, notes: e.target.value})} 
                                         />
                                     </div>
                                     <div className="flex justify-end gap-2 pt-2">
-                                        <Button type="button" variant="outline" onClick={() => setIsCreatingTx(false)}>{__('Cancel')}</Button>
-                                        <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white">{__('Save Transaction')}</Button>
+                                        <Button type="button" variant="outline" onClick={() => setIsCreatingTx(false)}>{__('general.cancel')}</Button>
+                                        <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white">{__('erp.save_transaction')}</Button>
                                     </div>
                                 </form>
                             </CardContent>
@@ -389,7 +389,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>{__('Transaction History')}</CardTitle>
+                            <CardTitle>{__('erp.transaction_history')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {wallet.transactions.length > 0 ? (
@@ -397,14 +397,14 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                     <table className="w-full text-sm text-left">
                                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
                                             <tr>
-                                                <th className="px-4 py-3">{__('Date')}</th>
-                                                <th className="px-4 py-3">{__('Type')}</th>
-                                                <th className="px-4 py-3">{__('Karat')}</th>
-                                                <th className="px-4 py-3">{__('Grams')}</th>
-                                                <th className="px-4 py-3">{__('Price Per Gram')}</th>
-                                                <th className="px-4 py-3">{__('Fees')}</th>
-                                                <th className="px-4 py-3">{__('Total')}</th>
-                                                <th className="px-4 py-3">{__('Notes')}</th>
+                                                <th className="px-4 py-3">{__('general.date')}</th>
+                                                <th className="px-4 py-3">{__('general.type')}</th>
+                                                <th className="px-4 py-3">{__('gold_saver.karat')}</th>
+                                                <th className="px-4 py-3">{__('gold_saver.grams')}</th>
+                                                <th className="px-4 py-3">{__('gold_saver.price_per_gram')}</th>
+                                                <th className="px-4 py-3">{__('general.fees')}</th>
+                                                <th className="px-4 py-3">{__('general.total')}</th>
+                                                <th className="px-4 py-3">{__('general.notes')}</th>
                                                 <th className="px-4 py-3 w-10"></th>
                                             </tr>
                                         </thead>
@@ -417,16 +417,16 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                                     <td className="px-4 py-3">
                                                         {tx.type === 'buy' ? (
                                                             <span className="flex items-center text-green-600 font-medium gap-1">
-                                                                <TrendingUp className="w-4 h-4" /> {__('Buy')}
+                                                                <TrendingUp className="w-4 h-4" /> {__('general.buy')}
                                                             </span>
                                                         ) : (
                                                             <span className="flex items-center text-red-600 font-medium gap-1">
-                                                                <TrendingDown className="w-4 h-4" /> {__('Sell')}
+                                                                <TrendingDown className="w-4 h-4" /> {__('general.sell')}
                                                             </span>
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-3">{tx.karat}k</td>
-                                                    <td className="px-4 py-3">{tx.grams} {__('G')}</td>
+                                                    <td className="px-4 py-3">{tx.grams} {__('general.g')}</td>
                                                     <td className="px-4 py-3">{formatNumber(tx.price_per_gram)}</td>
                                                     <td className="px-4 py-3">{formatNumber(tx.fees)}</td>
                                                     <td className="px-4 py-3 font-semibold">{formatNumber(tx.total_amount)} {wallet.currency}</td>
@@ -441,18 +441,18 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                                             </DialogTrigger>
                                                             <DialogContent className="sm:max-w-xs">
                                                                 <DialogHeader>
-                                                                    <DialogTitle>{__('Actions')}</DialogTitle>
+                                                                    <DialogTitle>{__('general.actions')}</DialogTitle>
                                                                 </DialogHeader>
                                                                 <div className="flex flex-col gap-2 py-2">
                                                                     <Button variant="outline" className="justify-start" onClick={() => {
                                                                         setEditingTx(tx);
                                                                     }}>
                                                                         <Edit className="w-4 h-4 mr-2" />
-                                                                        {__('Edit')}
+                                                                        {__('general.edit')}
                                                                     </Button>
                                                                     <Button variant="destructive" className="justify-start" onClick={() => handleDeleteTransaction(tx.id)}>
                                                                         <Trash className="w-4 h-4 mr-2" />
-                                                                        {__('Delete')}
+                                                                        {__('general.delete')}
                                                                     </Button>
                                                                 </div>
                                                             </DialogContent>
@@ -465,7 +465,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                 </div>
                             ) : (
                                 <div className="text-center py-8 text-muted-foreground">
-                                    {__('No Transactions Yet')}
+                                    {__('erp.no_transactions_yet')}
                                 </div>
                             )}
                         </CardContent>
@@ -479,13 +479,13 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                     <Card className="w-full max-w-lg mx-4">
                         <CardHeader>
-                            <CardTitle>{__('Edit Transaction')}</CardTitle>
+                            <CardTitle>{__('erp.edit_transaction')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleUpdateTransaction} className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium">{__('Type')}</label>
+                                        <label className="text-sm font-medium">{__('general.type')}</label>
                                         <Select 
                                             value={editingTx.type} 
                                             onValueChange={(value) => setEditingTx({...editingTx, type: (value || 'buy') as 'buy' | 'sell'})}
@@ -494,13 +494,13 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                                 <SelectValue placeholder={__('general.select_type')} />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="buy">{__('Buy')}</SelectItem>
-                                                <SelectItem value="sell">{__('Sell')}</SelectItem>
+                                                <SelectItem value="buy">{__('general.buy')}</SelectItem>
+                                                <SelectItem value="sell">{__('general.sell')}</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium">{__('Grams')}</label>
+                                        <label className="text-sm font-medium">{__('gold_saver.grams')}</label>
                                         <Input 
                                             type="number" step="0.01" min="0.01" required
                                             value={editingTx.grams} 
@@ -508,7 +508,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium">{__('Karat')}</label>
+                                        <label className="text-sm font-medium">{__('gold_saver.karat')}</label>
                                         <Select 
                                             value={String(editingTx.karat)} 
                                             onValueChange={value => setEditingTx({...editingTx, karat: parseInt(value || '21')})}
@@ -525,7 +525,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                         </Select>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium">{__('Price Per Gram')} ({wallet.currency})</label>
+                                        <label className="text-sm font-medium">{__('gold_saver.price_per_gram')} ({wallet.currency})</label>
                                         <Input 
                                             type="number" step="0.01" min="0.01" required
                                             value={editingTx.price_per_gram} 
@@ -534,8 +534,8 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                     </div>
                                 </div>
                                 <div className="flex justify-end gap-2 pt-2">
-                                    <Button type="button" variant="outline" onClick={() => setEditingTx(null)}>{__('Cancel')}</Button>
-                                    <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white">{__('Save Changes')}</Button>
+                                    <Button type="button" variant="outline" onClick={() => setEditingTx(null)}>{__('general.cancel')}</Button>
+                                    <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white">{__('general.save_changes')}</Button>
                                 </div>
                             </form>
                         </CardContent>

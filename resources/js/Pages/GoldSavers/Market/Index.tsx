@@ -55,12 +55,12 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
         <AuthenticatedLayout
             header={
                 <div className="flex flex-col">
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight mb-4">{__('Live Gold Prices')}</h2>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight mb-4">{__('gold_saver.live_gold_prices')}</h2>
                     <GoldSaversTabs />
                 </div>
             }
         >
-            <Head title={__('Market Prices Latest')} />
+            <Head title={__('general.market_prices_latest')} />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
@@ -70,10 +70,10 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                         <CardHeader className="bg-slate-50 border-b border-slate-100">
                             <CardTitle className="flex items-center gap-2">
                                 <TrendingUp className="w-5 h-5 text-indigo-600" />
-                                {__('Market Prices Latest')}
-                                {!hasLivePrices && <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold uppercase">{__('Premium')}</span>}
+                                {__('general.market_prices_latest')}
+                                {!hasLivePrices && <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold uppercase">{__('general.premium')}</span>}
                             </CardTitle>
-                            <CardDescription>{__('Realtime Prices Charts')}</CardDescription>
+                            <CardDescription>{__('general.realtime_prices_charts')}</CardDescription>
                         </CardHeader>
                         <CardContent className="pt-6">
                             {!hasLivePrices ? (
@@ -82,10 +82,10 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                                         <Lock className="w-8 h-8" />
                                     </div>
                                     <div className="text-center">
-                                        <h3 className="font-bold text-slate-900 text-lg">{__('Live Prices Locked')}</h3>
-                                        <p className="text-sm text-slate-500 mb-4">{__('Upgrade To See Live Prices')}</p>
+                                        <h3 className="font-bold text-slate-900 text-lg">{__('general.live_prices_locked')}</h3>
+                                        <p className="text-sm text-slate-500 mb-4">{__('general.upgrade_to_see_live_prices')}</p>
                                         <Link href={route('subscriptions.manage')}>
-                                            <Button className="bg-indigo-600 hover:bg-indigo-700">{__('Upgrade Now')}</Button>
+                                            <Button className="bg-indigo-600 hover:bg-indigo-700">{__('general.upgrade_now')}</Button>
                                         </Link>
                                     </div>
                                 </div>
@@ -95,9 +95,9 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                                 {latestPrice || !hasLivePrices ? (
                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
                                         <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-sm relative">
-                                            <div className="text-slate-500 text-sm font-medium mb-2">24k {__('Purity')}</div>
+                                            <div className="text-slate-500 text-sm font-medium mb-2">24k {__('gold_saver.purity')}</div>
                                             <div className="font-bold text-3xl text-slate-900">{latestPrice?.price_gram_24k ?? '4,050'}</div>
-                                            <div className="text-xs text-slate-400 mt-2">{latestPrice?.currency ?? 'EGP'} / {__('G')}</div>
+                                            <div className="text-xs text-slate-400 mt-2">{latestPrice?.currency ?? 'EGP'} / {__('general.g')}</div>
                                             {priceChanges?.price_gram_24k !== undefined && (
                                                 <div className={`text-xs font-semibold mt-2 flex items-center justify-center gap-1 ${priceChanges.price_gram_24k >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                                                     <TrendingUp className={`w-3 h-3 ${priceChanges.price_gram_24k >= 0 ? '' : 'rotate-180'}`} />
@@ -107,9 +107,9 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                                         </div>
                                         <div className="p-6 rounded-xl bg-indigo-50 border border-indigo-100 shadow-sm relative overflow-hidden">
                                             <div className="absolute top-0 right-0 w-3 h-3 bg-indigo-500 rounded-bl-xl opacity-20"></div>
-                                            <div className="text-indigo-600 text-sm font-medium mb-2">21k {__('Purity')}</div>
+                                            <div className="text-indigo-600 text-sm font-medium mb-2">21k {__('gold_saver.purity')}</div>
                                             <div className="font-bold text-3xl text-indigo-700">{latestPrice?.price_gram_21k ?? '3,550'}</div>
-                                            <div className="text-xs text-indigo-400 mt-2">{latestPrice?.currency ?? 'EGP'} / {__('G')}</div>
+                                            <div className="text-xs text-indigo-400 mt-2">{latestPrice?.currency ?? 'EGP'} / {__('general.g')}</div>
                                             {priceChanges?.price_gram_21k !== undefined && (
                                                 <div className={`text-xs font-semibold mt-2 flex items-center justify-center gap-1 ${priceChanges.price_gram_21k >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                                                     <TrendingUp className={`w-3 h-3 ${priceChanges.price_gram_21k >= 0 ? '' : 'rotate-180'}`} />
@@ -118,9 +118,9 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                                             )}
                                         </div>
                                         <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-sm relative">
-                                            <div className="text-slate-500 text-sm font-medium mb-2">18k {__('Purity')}</div>
+                                            <div className="text-slate-500 text-sm font-medium mb-2">18k {__('gold_saver.purity')}</div>
                                             <div className="font-bold text-3xl text-slate-900">{latestPrice?.price_gram_18k ?? '3,040'}</div>
-                                            <div className="text-xs text-slate-400 mt-2">{latestPrice?.currency ?? 'EGP'} / {__('G')}</div>
+                                            <div className="text-xs text-slate-400 mt-2">{latestPrice?.currency ?? 'EGP'} / {__('general.g')}</div>
                                             {priceChanges?.price_gram_18k !== undefined && (
                                                 <div className={`text-xs font-semibold mt-2 flex items-center justify-center gap-1 ${priceChanges.price_gram_18k >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                                                     <TrendingUp className={`w-3 h-3 ${priceChanges.price_gram_18k >= 0 ? '' : 'rotate-180'}`} />
@@ -129,9 +129,9 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                                             )}
                                         </div>
                                         <div className="p-6 rounded-xl bg-slate-900 border border-slate-800 shadow-sm text-white relative">
-                                            <div className="text-slate-400 text-sm font-medium mb-2">{__('Global Ounce')}</div>
+                                            <div className="text-slate-400 text-sm font-medium mb-2">{__('gold_saver.global_ounce')}</div>
                                             <div className="font-bold text-3xl">{latestPrice?.price_ounce_usd ?? '2,350'}</div>
-                                            <div className="text-xs text-slate-500 mt-2">USD / {__('Ounce')}</div>
+                                            <div className="text-xs text-slate-500 mt-2">USD / {__('gold_saver.ounce')}</div>
                                             {priceChanges?.price_ounce_usd !== undefined && (
                                                 <div className={`text-xs font-semibold mt-2 flex items-center justify-center gap-1 ${priceChanges.price_ounce_usd >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                                                     <TrendingUp className={`w-3 h-3 ${priceChanges.price_ounce_usd >= 0 ? '' : 'rotate-180'}`} />
@@ -143,7 +143,7 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                                 ) : (
                                     <div className="py-12 text-center">
                                         <Activity className="w-12 h-12 text-slate-300 mx-auto mb-3 animate-pulse" />
-                                        <p className="text-slate-500 font-medium">{__('Fetching Live Prices')}</p>
+                                        <p className="text-slate-500 font-medium">{__('general.fetching_live_prices')}</p>
                                     </div>
                                 )}
                             </div>
@@ -155,10 +155,10 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                         <CardHeader className="bg-slate-50 border-b border-slate-100">
                             <CardTitle className="flex items-center gap-2">
                                 <Activity className="w-5 h-5 text-indigo-600" />
-                                {__('Historical Charts')}
-                                {!hasHistoricalCharts && <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold uppercase">{__('Premium')}</span>}
+                                {__('general.historical_charts')}
+                                {!hasHistoricalCharts && <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold uppercase">{__('general.premium')}</span>}
                             </CardTitle>
-                            <CardDescription>{__('Advanced Historical Price Data')}</CardDescription>
+                            <CardDescription>{__('general.advanced_historical_price_data')}</CardDescription>
                         </CardHeader>
                         <CardContent className="pt-6">
                             {!hasHistoricalCharts ? (
@@ -167,10 +167,10 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                                         <Lock className="w-8 h-8" />
                                     </div>
                                     <div className="text-center">
-                                        <h3 className="font-bold text-slate-900 text-lg">{__('Charts Locked')}</h3>
-                                        <p className="text-sm text-slate-500 mb-4">{__('Upgrade To See Charts')}</p>
+                                        <h3 className="font-bold text-slate-900 text-lg">{__('general.charts_locked')}</h3>
+                                        <p className="text-sm text-slate-500 mb-4">{__('general.upgrade_to_see_charts')}</p>
                                         <Link href={route('subscriptions.manage')}>
-                                            <Button className="bg-indigo-600 hover:bg-indigo-700">{__('Upgrade Now')}</Button>
+                                            <Button className="bg-indigo-600 hover:bg-indigo-700">{__('general.upgrade_now')}</Button>
                                         </Link>
                                     </div>
                                 </div>
@@ -250,7 +250,7 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                                             </ResponsiveContainer>
                                         ) : (
                                             <div className="flex items-center justify-center h-full border-2 border-dashed border-slate-200 rounded-xl">
-                                                <p className="text-slate-500">{__('No Historical Data')}</p>
+                                                <p className="text-slate-500">{__('general.no_historical_data')}</p>
                                             </div>
                                         )}
                                     </div>

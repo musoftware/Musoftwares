@@ -163,7 +163,7 @@ export default function ApiKeys({ apiKeys }: Props) {
 
     return (
         <AuthenticatedLayout>
-            <Head title={__('API Keys - Payment Gateway')} />
+            <Head title={__('sms_gateway.api_keys_payment_gateway')} />
 
             <div className="py-8 md:py-12">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -173,7 +173,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                                 <Key className="w-6 h-6 text-indigo-600" />
-                                {__('API Keys')}
+                                {__('general.api_keys')}
                             </h1>
                             <p className="text-slate-500 mt-1">
                                 {__('general.manage_your_publishable_and_secret_keys_for_api_integration')}
@@ -186,18 +186,18 @@ export default function ApiKeys({ apiKeys }: Props) {
                                     <Button className="bg-indigo-600 hover:bg-indigo-700 text-white" />
                                 }>
                                     <Plus className="w-4 h-4 mr-2" />
-                                    {__('Create Key')}
+                                    {__('general.create_key')}
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-md">
                                     <DialogHeader>
-                                        <DialogTitle>{__('Create API Key')}</DialogTitle>
+                                        <DialogTitle>{__('general.create_api_key')}</DialogTitle>
                                         <DialogDescription>
                                             {__('general.generate_a_new_pair_of_publishable_and_secret_keys_for_your_integration')}
                                         </DialogDescription>
                                     </DialogHeader>
                                     <form onSubmit={handleCreateSubmit} className="space-y-5">
                                         <div className="space-y-2">
-                                            <Label htmlFor="key-name">{__('Key Name')}</Label>
+                                            <Label htmlFor="key-name">{__('general.key_name')}</Label>
                                             <Input
                                                 id="key-name"
                                                 type="text"
@@ -213,7 +213,7 @@ export default function ApiKeys({ apiKeys }: Props) {
 
                                         <div className="flex items-center justify-between p-4 border rounded-lg bg-slate-50/50">
                                             <div className="space-y-0.5">
-                                                <Label className="text-base">{__('Test Mode')}</Label>
+                                                <Label className="text-base">{__('general.test_mode')}</Label>
                                                 <p className="text-sm text-slate-500">
                                                     {createForm.data.is_test
                                                         ? __('general.this_key_will_only_work_in_test_sandbox_environment')
@@ -238,7 +238,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                 ) : (
                                                     <Key className="w-4 h-4 mr-2" />
                                                 )}
-                                                {__('Generate Keys')}
+                                                {__('general.generate_keys')}
                                             </Button>
                                         </DialogFooter>
                                     </form>
@@ -247,7 +247,7 @@ export default function ApiKeys({ apiKeys }: Props) {
 
                             <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                                 <ArrowLeft className="w-4 h-4 mr-2" />
-                                {__('Back')}
+                                {__('general.back')}
                             </Button>
                         </div>
                     </div>
@@ -258,7 +258,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                             <DialogHeader>
                                 <DialogTitle className="flex items-center gap-2">
                                     <ShieldAlert className="w-5 h-5 text-amber-500" />
-                                    {__('Your API Keys')}
+                                    {__('general.your_api_keys')}
                                 </DialogTitle>
                                 <DialogDescription>
                                     {__('general.copy_your_keys_now_the_secret_key_will_only_be_shown_once')}
@@ -270,7 +270,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                 <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800">
                                     <AlertTriangle className="w-5 h-5 mt-0.5 shrink-0" />
                                     <div className="text-sm">
-                                        <p className="font-semibold">{__('Important')}</p>
+                                        <p className="font-semibold">{__('general.important')}</p>
                                         <p>{__('general.the_secret_key_will_only_be_shown_once_save_it_securely_you_will_not_be_able_to_see_it_again')}</p>
                                     </div>
                                 </div>
@@ -278,7 +278,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                 {/* Publishable Key */}
                                 <div className="space-y-1.5">
                                     <Label className="text-xs uppercase tracking-wide text-slate-500">
-                                        {__('Publishable Key')}
+                                        {__('general.publishable_key')}
                                     </Label>
                                     <div className="flex items-center gap-2">
                                         <div className="flex-1 rounded-lg bg-slate-900 text-emerald-400 px-4 py-3 font-mono text-sm break-all select-all">
@@ -302,7 +302,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                 {/* Secret Key */}
                                 <div className="space-y-1.5">
                                     <Label className="text-xs uppercase tracking-wide text-slate-500">
-                                        {__('Secret Key')}
+                                        {__('general.secret_key')}
                                     </Label>
                                     <div className="flex items-center gap-2">
                                         <div className="flex-1 rounded-lg bg-slate-900 text-rose-400 px-4 py-3 font-mono text-sm break-all select-all">
@@ -329,7 +329,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                     onClick={() => setRevealOpen(false)}
                                     className="w-full"
                                 >
-                                    {__('I have saved my keys')}
+                                    {__('general.i_have_saved_my_keys')}
                                 </Button>
                             </DialogFooter>
                         </DialogContent>
@@ -338,7 +338,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                     {/* API Keys List */}
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-lg">{__('Active Keys')}</CardTitle>
+                            <CardTitle className="text-lg">{__('general.active_keys')}</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0">
                             {apiKeys.length === 0 ? (
@@ -347,7 +347,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                         <Key className="w-7 h-7 text-slate-400" />
                                     </div>
                                     <h3 className="text-base font-semibold text-slate-800 mb-1">
-                                        {__('No API keys yet')}
+                                        {__('general.no_api_keys_yet')}
                                     </h3>
                                     <p className="text-sm text-slate-500 max-w-sm">
                                         {__('general.create_your_first_api_key_to_start_integrating_the_payment_gateway_into_your_application')}
@@ -360,12 +360,12 @@ export default function ApiKeys({ apiKeys }: Props) {
                                         <Table>
                                             <TableHeader>
                                                 <TableRow>
-                                                    <TableHead>{__('Name')}</TableHead>
-                                                    <TableHead>{__('Type')}</TableHead>
-                                                    <TableHead>{__('Publishable Key')}</TableHead>
-                                                    <TableHead>{__('Secret Key')}</TableHead>
-                                                    <TableHead>{__('Last Used')}</TableHead>
-                                                    <TableHead>{__('Created')}</TableHead>
+                                                    <TableHead>{__('general.name')}</TableHead>
+                                                    <TableHead>{__('general.type')}</TableHead>
+                                                    <TableHead>{__('general.publishable_key')}</TableHead>
+                                                    <TableHead>{__('general.secret_key')}</TableHead>
+                                                    <TableHead>{__('general.last_used')}</TableHead>
+                                                    <TableHead>{__('general.created')}</TableHead>
                                                     <TableHead className="w-10"></TableHead>
                                                 </TableRow>
                                             </TableHeader>
@@ -378,11 +378,11 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                         <TableCell>
                                                             {key.is_test ? (
                                                                 <Badge className="bg-amber-100 text-amber-800 border-amber-200">
-                                                                    🟡 {__('Test')}
+                                                                    🟡 {__('general.test')}
                                                                 </Badge>
                                                             ) : (
                                                                 <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200">
-                                                                    🟢 {__('Live')}
+                                                                    🟢 {__('general.live')}
                                                                 </Badge>
                                                             )}
                                                         </TableCell>
@@ -394,7 +394,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                                 <button
                                                                     onClick={() => handleCopy(key.publishable_key, `pk-${key.id}`)}
                                                                     className="p-1 rounded hover:bg-slate-100 transition-colors"
-                                                                    title={__('Copy')}
+                                                                    title={__('general.copy')}
                                                                 >
                                                                     {copiedField === `pk-${key.id}` ? (
                                                                         <Check className="w-3.5 h-3.5 text-emerald-500" />
@@ -429,12 +429,12 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                                         onClick={() => openActionMenu(key)}
                                                                     />
                                                                 }>
-                                                                    <span className="sr-only">{__('Open menu')}</span>
+                                                                    <span className="sr-only">{__('general.open_menu')}</span>
                                                                     <MoreHorizontal className="h-4 w-4" />
                                                                 </DialogTrigger>
                                                                 <DialogContent className="sm:max-w-xs">
                                                                     <DialogHeader>
-                                                                        <DialogTitle>{__('Actions')}</DialogTitle>
+                                                                        <DialogTitle>{__('general.actions')}</DialogTitle>
                                                                         <DialogDescription>
                                                                             {key.name}
                                                                         </DialogDescription>
@@ -449,7 +449,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                                             }}
                                                                         >
                                                                             <RefreshCw className="w-4 h-4 mr-2" />
-                                                                            {__('Roll Secret Key')}
+                                                                            {__('general.roll_secret_key')}
                                                                         </Button>
                                                                         <Button
                                                                             variant="destructive"
@@ -460,7 +460,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                                             }}
                                                                         >
                                                                             <Trash2 className="w-4 h-4 mr-2" />
-                                                                            {__('Delete Key')}
+                                                                            {__('general.delete_key')}
                                                                         </Button>
                                                                     </div>
                                                                 </DialogContent>
@@ -481,11 +481,11 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                         <span className="font-medium text-slate-900">{key.name}</span>
                                                         {key.is_test ? (
                                                             <Badge className="bg-amber-100 text-amber-800 border-amber-200 text-[10px]">
-                                                                🟡 {__('Test')}
+                                                                🟡 {__('general.test')}
                                                             </Badge>
                                                         ) : (
                                                             <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-[10px]">
-                                                                🟢 {__('Live')}
+                                                                🟢 {__('general.live')}
                                                             </Badge>
                                                         )}
                                                     </div>
@@ -506,7 +506,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                         </DialogTrigger>
                                                         <DialogContent className="sm:max-w-xs">
                                                             <DialogHeader>
-                                                                <DialogTitle>{__('Actions')}</DialogTitle>
+                                                                <DialogTitle>{__('general.actions')}</DialogTitle>
                                                                 <DialogDescription>
                                                                     {key.name}
                                                                 </DialogDescription>
@@ -521,7 +521,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                                     }}
                                                                 >
                                                                     <RefreshCw className="w-4 h-4 mr-2" />
-                                                                    {__('Roll Secret Key')}
+                                                                    {__('general.roll_secret_key')}
                                                                 </Button>
                                                                 <Button
                                                                     variant="destructive"
@@ -532,7 +532,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                                     }}
                                                                 >
                                                                     <Trash2 className="w-4 h-4 mr-2" />
-                                                                    {__('Delete Key')}
+                                                                    {__('general.delete_key')}
                                                                 </Button>
                                                             </div>
                                                         </DialogContent>
@@ -541,7 +541,7 @@ export default function ApiKeys({ apiKeys }: Props) {
 
                                                 {/* Publishable Key */}
                                                 <div className="space-y-1">
-                                                    <span className="text-xs text-slate-500 uppercase tracking-wide">{__('Publishable Key')}</span>
+                                                    <span className="text-xs text-slate-500 uppercase tracking-wide">{__('general.publishable_key')}</span>
                                                     <div className="flex items-center gap-1.5">
                                                         <code className="text-xs bg-slate-100 px-2 py-1.5 rounded font-mono text-slate-700 flex-1 truncate" dir="ltr">
                                                             {key.publishable_key}
@@ -561,7 +561,7 @@ export default function ApiKeys({ apiKeys }: Props) {
 
                                                 {/* Secret Key (masked) */}
                                                 <div className="space-y-1">
-                                                    <span className="text-xs text-slate-500 uppercase tracking-wide">{__('Secret Key')}</span>
+                                                    <span className="text-xs text-slate-500 uppercase tracking-wide">{__('general.secret_key')}</span>
                                                     <code className="block text-xs bg-slate-100 px-2 py-1.5 rounded font-mono text-slate-500" dir="ltr">
                                                         sk_{'••••'}{key.secret_key_last_four}
                                                     </code>
@@ -569,8 +569,8 @@ export default function ApiKeys({ apiKeys }: Props) {
 
                                                 {/* Meta */}
                                                 <div className="flex items-center gap-4 text-xs text-slate-400">
-                                                    <span>{__('Last used')}: {formatDate(key.last_used_at)}</span>
-                                                    <span>{__('Created')}: {formatDate(key.created_at)}</span>
+                                                    <span>{__('general.last_used_2')}: {formatDate(key.last_used_at)}</span>
+                                                    <span>{__('general.created')}: {formatDate(key.created_at)}</span>
                                                 </div>
                                             </div>
                                         ))}
@@ -588,7 +588,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <RefreshCw className="w-5 h-5 text-amber-500" />
-                            {__('Roll Secret Key')}
+                            {__('general.roll_secret_key')}
                         </DialogTitle>
                         <DialogDescription>
                             {__('general.this_will_generate_a_new_secret_key_and_immediately_invalidate_the_old_one_any_integrations_using_the_current_secret_key_will_stop_working')}
@@ -606,7 +606,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                             onClick={() => setRollConfirmOpen(false)}
                             disabled={rolling}
                         >
-                            {__('Cancel')}
+                            {__('general.cancel')}
                         </Button>
                         <Button
                             onClick={handleRollSecret}
@@ -618,7 +618,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                             ) : (
                                 <RefreshCw className="w-4 h-4 mr-2" />
                             )}
-                            {__('Roll Key')}
+                            {__('general.roll_key')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -630,7 +630,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-red-600">
                             <Trash2 className="w-5 h-5" />
-                            {__('Delete API Key')}
+                            {__('general.delete_api_key')}
                         </DialogTitle>
                         <DialogDescription>
                             {__('general.are_you_sure_you_want_to_permanently_delete_this_api_key_all_integrations_using_these_keys_will_immediately_stop_working')}
@@ -650,7 +650,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                             onClick={() => setDeleteConfirmOpen(false)}
                             disabled={deleting}
                         >
-                            {__('Cancel')}
+                            {__('general.cancel')}
                         </Button>
                         <Button
                             variant="destructive"
@@ -662,7 +662,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                             ) : (
                                 <Trash2 className="w-4 h-4 mr-2" />
                             )}
-                            {__('Delete')}
+                            {__('general.delete')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

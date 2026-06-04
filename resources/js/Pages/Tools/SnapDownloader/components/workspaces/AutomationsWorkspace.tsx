@@ -114,8 +114,8 @@ export function AutomationsWorkspace({
         <div className="max-w-3xl mx-auto space-y-5">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-xl sm:text-2xl font-black text-white">{__('Automations')}</h1>
-                    <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Recurring campaigns that run automatically in the background')}</p>
+                    <h1 className="text-xl sm:text-2xl font-black text-white">{__('general.automations')}</h1>
+                    <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.recurring_campaigns_that_run_automatically')}</p>
                 </div>
                 {!showAutoForm && (
                     <Button onClick={() => {
@@ -129,7 +129,7 @@ export function AutomationsWorkspace({
                         });
                         setShowAutoForm(true);
                     }} className="gap-2 h-11 text-xs font-bold" style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
-                        <Play className="w-3.5 h-3.5 fill-current" /> {__('New Campaign')}
+                        <Play className="w-3.5 h-3.5 fill-current" /> {__('general.new_campaign')}
                     </Button>
                 )}
             </div>
@@ -137,44 +137,44 @@ export function AutomationsWorkspace({
             {showAutoForm ? (
                 <div className="rounded-2xl border p-4 sm:p-6 space-y-5" style={{ background: '#13161f', borderColor: 'rgba(255,255,255,0.06)' }}>
                     <div className="flex items-center justify-between mb-4 border-b pb-4" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                        <h2 className="text-lg font-bold text-white">{editingAutoId ? __('Edit Automation Campaign') : __('Create Automation Campaign')}</h2>
-                        <Button variant="ghost" size="sm" onClick={() => { setShowAutoForm(false); setEditingAutoId(null); }} className="text-slate-400 hover:text-white">{__('Cancel')}</Button>
+                        <h2 className="text-lg font-bold text-white">{editingAutoId ? __('general.edit_automation_campaign') : __('general.create_automation_campaign')}</h2>
+                        <Button variant="ghost" size="sm" onClick={() => { setShowAutoForm(false); setEditingAutoId(null); }} className="text-slate-400 hover:text-white">{__('general.cancel')}</Button>
                     </div>
 
                     {/* Name & Frequency */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Campaign Name')}</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.campaign_name')}</label>
                             <Input
                                 value={autoForm.name}
                                 onChange={e => setAutoForm(p => ({ ...p, name: e.target.value }))}
-                                placeholder={__('e.g. Competitor Tracking')}
+                                placeholder={__('general.eg_competitor_tracking')}
                                 className="h-11 bg-transparent border-white/10 text-white"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Run Frequency')}</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.run_frequency')}</label>
                             <select 
                                 className="w-full h-11 rounded-md px-3 text-sm bg-transparent border outline-none"
                                 style={{ borderColor: 'rgba(255,255,255,0.1)', color: '#fff' }}
                                 value={autoForm.frequency}
                                 onChange={e => setAutoForm(p => ({ ...p, frequency: e.target.value }))}
                             >
-                                <option value="hourly" className="bg-slate-900">{__('Every Hour')}</option>
-                                <option value="every_6_hours" className="bg-slate-900">{__('Every 6 Hours')}</option>
-                                <option value="daily" className="bg-slate-900">{__('Daily')}</option>
-                                <option value="weekly" className="bg-slate-900">{__('Weekly')}</option>
+                                <option value="hourly" className="bg-slate-900">{__('general.every_hour')}</option>
+                                <option value="every_6_hours" className="bg-slate-900">{__('general.every_6_hours')}</option>
+                                <option value="daily" className="bg-slate-900">{__('general.daily')}</option>
+                                <option value="weekly" className="bg-slate-900">{__('general.weekly')}</option>
                             </select>
                         </div>
                     </div>
 
                     {/* Targets */}
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Target Profiles')}</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.target_profiles')}</label>
                         <Textarea
                             value={autoForm.targets}
                             onChange={e => setAutoForm(p => ({ ...p, targets: e.target.value }))}
-                            placeholder={__('Paste up to 1000 usernames (one per line)')}
+                            placeholder={__('general.paste_up_to_1000_usernames')}
                             className="w-full p-3 text-sm min-h-[120px] bg-transparent border-white/10 resize-y text-white"
                         />
                     </div>
@@ -182,27 +182,27 @@ export function AutomationsWorkspace({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Execution Rules */}
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Execution Rules')}</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.execution_rules')}</label>
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between p-3 rounded-lg border" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
                                     <div>
-                                        <div className="text-xs font-bold text-white">{__('Smart Sync')}</div>
-                                        <div className="text-[10px] text-slate-500 mt-0.5">{__('Only download new media')}</div>
+                                        <div className="text-xs font-bold text-white">{__('general.smart_sync')}</div>
+                                        <div className="text-[10px] text-slate-500 mt-0.5">{__('general.only_download_new_media')}</div>
                                     </div>
                                     <Switch checked={autoForm.smartSync} onCheckedChange={v => setAutoForm(p => ({ ...p, smartSync: v }))} />
                                 </div>
                                 <div className="flex items-center justify-between p-3 rounded-lg border" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
-                                    <span className="text-xs font-bold text-white">{__('Delay between Profiles')}</span>
+                                    <span className="text-xs font-bold text-white">{__('general.delay_between_profiles')}</span>
                                     <select 
                                         className="h-7 rounded text-xs bg-transparent border outline-none text-white text-right"
                                         style={{ borderColor: 'rgba(255,255,255,0.1)' }}
                                         value={autoForm.pacing}
                                         onChange={e => setAutoForm(p => ({ ...p, pacing: e.target.value }))}
                                     >
-                                        <option value="none" className="bg-slate-900">{__('No delay')}</option>
-                                        <option value="1_min" className="bg-slate-900">{__('1 Minute')}</option>
-                                        <option value="5_min" className="bg-slate-900">{__('5 Minutes')}</option>
-                                        <option value="random" className="bg-slate-900">{__('Random (1-5m)')}</option>
+                                        <option value="none" className="bg-slate-900">{__('general.no_delay')}</option>
+                                        <option value="1_min" className="bg-slate-900">{__('general.1_minute')}</option>
+                                        <option value="5_min" className="bg-slate-900">{__('general.5_minutes')}</option>
+                                        <option value="random" className="bg-slate-900">{__('general.random_15m')}</option>
                                     </select>
                                 </div>
                             </div>
@@ -210,19 +210,19 @@ export function AutomationsWorkspace({
 
                         {/* Pipeline Rules */}
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Pipeline Rules')}</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.pipeline_rules')}</label>
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between p-3 rounded-lg border" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
-                                    <span className="text-xs font-bold text-white">{__('Optimize / Compress')}</span>
+                                    <span className="text-xs font-bold text-white">{__('general.optimize_compress')}</span>
                                     <Switch checked={autoForm.ffmpegOptimize} onCheckedChange={v => setAutoForm(p => ({ ...p, ffmpegOptimize: v }))} />
                                 </div>
                                 <div className="flex items-center justify-between p-3 rounded-lg border" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
-                                    <span className="text-xs font-bold text-white">{__('Mute Audio')}</span>
+                                    <span className="text-xs font-bold text-white">{__('general.mute_audio')}</span>
                                     <Switch checked={autoForm.muteAudio} onCheckedChange={v => setAutoForm(p => ({ ...p, muteAudio: v }))} />
                                 </div>
                                 <div className="p-3 rounded-lg border space-y-3" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs font-bold text-white">{__('Add Watermark')}</span>
+                                        <span className="text-xs font-bold text-white">{__('general.add_watermark')}</span>
                                         <Switch checked={autoForm.ffmpegAddLogo} onCheckedChange={v => setAutoForm(p => ({ ...p, ffmpegAddLogo: v }))} />
                                     </div>
                                     {autoForm.ffmpegAddLogo && (
@@ -230,7 +230,7 @@ export function AutomationsWorkspace({
                                             <Input 
                                                 value={autoForm.watermarkPath} 
                                                 onChange={e => setAutoForm(p => ({ ...p, watermarkPath: e.target.value }))}
-                                                placeholder={__('Logo Path (e.g. C:\\logo.png)')}
+                                                placeholder={__('general.logo_path_eg_clogopng')}
                                                 className="h-8 text-xs bg-transparent border-white/10 text-white"
                                             />
                                             <select 
@@ -239,10 +239,10 @@ export function AutomationsWorkspace({
                                                 value={autoForm.watermarkPosition}
                                                 onChange={e => setAutoForm(p => ({ ...p, watermarkPosition: e.target.value }))}
                                             >
-                                                <option value="top_left" className="bg-slate-900">{__('Top Left')}</option>
-                                                <option value="top_right" className="bg-slate-900">{__('Top Right')}</option>
-                                                <option value="bottom_left" className="bg-slate-900">{__('Bottom Left')}</option>
-                                                <option value="bottom_right" className="bg-slate-900">{__('Bottom Right')}</option>
+                                                <option value="top_left" className="bg-slate-900">{__('general.top_left')}</option>
+                                                <option value="top_right" className="bg-slate-900">{__('general.top_right')}</option>
+                                                <option value="bottom_left" className="bg-slate-900">{__('general.bottom_left')}</option>
+                                                <option value="bottom_right" className="bg-slate-900">{__('general.bottom_right')}</option>
                                             </select>
                                         </div>
                                     )}
@@ -254,30 +254,30 @@ export function AutomationsWorkspace({
                     {/* Smart Filters & Data */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Smart Content Filters')}</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.smart_content_filters')}</label>
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between p-3 rounded-lg border" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
-                                    <span className="text-xs font-bold text-white">{__('Min Duration (sec)')}</span>
+                                    <span className="text-xs font-bold text-white">{__('general.min_duration_sec')}</span>
                                     <Input type="number" value={autoForm.minDuration} onChange={e => setAutoForm(p => ({ ...p, minDuration: parseInt(e.target.value) || 0 }))} className="w-16 h-7 text-xs text-right bg-transparent border-white/10 text-white" />
                                 </div>
                                 <div className="flex items-center justify-between p-3 rounded-lg border" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
-                                    <span className="text-xs font-bold text-white">{__('Max Duration (sec)')}</span>
+                                    <span className="text-xs font-bold text-white">{__('general.max_duration_sec')}</span>
                                     <Input type="number" value={autoForm.maxDuration} onChange={e => setAutoForm(p => ({ ...p, maxDuration: parseInt(e.target.value) || 0 }))} className="w-16 h-7 text-xs text-right bg-transparent border-white/10 text-white" />
                                 </div>
                                 <div className="flex items-center justify-between p-3 rounded-lg border" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
-                                    <span className="text-xs font-bold text-white">{__('Global Deduplication')}</span>
+                                    <span className="text-xs font-bold text-white">{__('general.global_deduplication')}</span>
                                     <Switch checked={autoForm.globalDeduplication} onCheckedChange={v => setAutoForm(p => ({ ...p, globalDeduplication: v }))} />
                                 </div>
                             </div>
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Data Mining')}</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.data_mining')}</label>
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between p-3 rounded-lg border" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
                                     <div>
-                                        <div className="text-xs font-bold text-white">{__('Export Metadata CSV')}</div>
-                                        <div className="text-[10px] text-slate-500 mt-0.5">{__('Saves urls, timestamps, and details')}</div>
+                                        <div className="text-xs font-bold text-white">{__('general.export_metadata_csv')}</div>
+                                        <div className="text-[10px] text-slate-500 mt-0.5">{__('general.saves_urls_timestamps_and_details')}</div>
                                     </div>
                                     <Switch checked={autoForm.exportMetadata} onCheckedChange={v => setAutoForm(p => ({ ...p, exportMetadata: v }))} />
                                 </div>
@@ -287,7 +287,7 @@ export function AutomationsWorkspace({
 
                     {/* Media Filters */}
                     <div className="space-y-3 pt-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Media Types')}</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.media_types')}</label>
                         <div className="flex flex-wrap gap-2">
                             {['stories', 'spotlights', 'highlights', 'episodes'].map(f => {
                                 const active = (autoForm.filters as any)[f];
@@ -317,7 +317,7 @@ export function AutomationsWorkspace({
                         style={{ background: 'linear-gradient(135deg, #f59e0b, #b45309)', color: '#000' }}
                     >
                         {isCreatingAuto ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-current" />}
-                        {__('Save & Schedule Campaign')}
+                        {__('general.save_schedule_campaign')}
                     </Button>
                 </div>
             ) : (
@@ -327,12 +327,12 @@ export function AutomationsWorkspace({
                             <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(255,255,255,0.05)' }}>
                                 <Clock className="w-6 h-6 text-slate-400" />
                             </div>
-                            <h3 className="text-white font-bold mb-2">{__('No automations running')}</h3>
+                            <h3 className="text-white font-bold mb-2">{__('general.no_automations_running')}</h3>
                             <p className="text-xs text-slate-400 max-w-sm mx-auto mb-6">
-                                {__('Create a campaign to automatically scrape profiles in the background.')}
+                                {__('general.create_a_campaign_to_automatically')}
                             </p>
                             <Button onClick={() => setShowAutoForm(true)} className="gap-2" style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
-                                <Play className="w-4 h-4 fill-current" /> {__('Create Campaign')}
+                                <Play className="w-4 h-4 fill-current" /> {__('general.create_campaign')}
                             </Button>
                         </div>
                     ) : (
@@ -348,11 +348,11 @@ export function AutomationsWorkspace({
                                                 </span>
                                                 <span>·</span>
                                                 <span className="flex items-center gap-1">
-                                                    <Users className="w-3 h-3" /> {auto.targets?.length || 0} {__('Targets')}
+                                                    <Users className="w-3 h-3" /> {auto.targets?.length || 0} {__('general.targets')}
                                                 </span>
                                                 <span>·</span>
                                                 <span className={`flex items-center gap-1 font-semibold ${auto.status === 'active' ? 'text-emerald-400' : 'text-slate-500'}`}>
-                                                    <Activity className="w-3 h-3" /> {auto.status === 'active' ? __('Running') : __('Paused')}
+                                                    <Activity className="w-3 h-3" /> {auto.status === 'active' ? __('general.running') : __('general.paused')}
                                                 </span>
                                             </div>
                                         </div>
@@ -363,19 +363,19 @@ export function AutomationsWorkspace({
                                             />
                                             <Dialog>
                                                 <DialogTrigger className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/10 ml-2 rounded-md inline-flex items-center justify-center transition-colors">
-                                                    <span className="sr-only">{__('Open menu')}</span>
+                                                    <span className="sr-only">{__('general.open_menu')}</span>
                                                     <MoreHorizontal className="h-4 w-4" />
                                                 </DialogTrigger>
                                                 <DialogContent className="sm:max-w-xs bg-slate-900 border-white/10">
                                                     <DialogHeader>
-                                                        <DialogTitle className="text-white">{__('Actions')}</DialogTitle>
+                                                        <DialogTitle className="text-white">{__('general.actions')}</DialogTitle>
                                                     </DialogHeader>
                                                     <div className="flex flex-col gap-2 py-2">
                                                         <Button variant="outline" className="justify-start border-white/10 text-white hover:bg-white/10" onClick={() => handleEditAutomation(auto)}>
-                                                            {__('Edit')}
+                                                            {__('general.edit')}
                                                         </Button>
                                                         <Button variant="destructive" className="justify-start" onClick={() => handleDeleteAutomation(auto.id)}>
-                                                            {__('Delete')}
+                                                            {__('general.delete')}
                                                         </Button>
                                                     </div>
                                                 </DialogContent>

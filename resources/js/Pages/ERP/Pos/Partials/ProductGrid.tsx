@@ -43,7 +43,7 @@ export default function ProductGrid({ products, onAddToCart, currency }: Product
                 <div className="relative">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
-                        placeholder={__('Search products by name or barcode...')}
+                        placeholder={__('general.search_products_by_name_or')}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className="pl-9"
@@ -64,19 +64,19 @@ export default function ProductGrid({ products, onAddToCart, currency }: Product
                                     <img src={product.image_url} alt={product.name} className="w-24 h-24 object-cover rounded-md mb-3" />
                                 ) : (
                                     <div className="w-24 h-24 bg-gray-200 rounded-md mb-3 flex items-center justify-center text-gray-400 text-xs">
-                                        {__('No Image')}
+                                        {__('general.no_image')}
                                     </div>
                                 )}
                                 <h4 className="font-medium text-sm line-clamp-2 mb-1">{product.name}</h4>
                                 <p className="text-primary font-bold">{formatCurrency(product.price, currency)}</p>
-                                <p className="text-xs text-gray-500 mt-2">{__('Stock:')} {product.stock_quantity}</p>
+                                <p className="text-xs text-gray-500 mt-2">{__('general.stock')} {product.stock_quantity}</p>
                             </CardContent>
                         </Card>
                     ))}
                 </div>
                 {(products.data as any).length === 0 && (
                     <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-                        <p>{__('No products found.')}</p>
+                        <p>{__('general.no_products_found')}</p>
                     </div>
                 )}
             </div>

@@ -50,26 +50,26 @@ export default function ContractsIndex({ contracts, stats }: any) {
         : allContracts.filter((c: any) => c.status === filter);
 
     const statCards = [
-        { label: __('Total Contracts'), value: stats?.total       ?? 0, icon: FileText,     color: 'text-indigo-600 bg-indigo-50'  },
-        { label: __('Active'),          value: stats?.active      ?? 0, icon: Activity,     color: 'text-emerald-600 bg-emerald-50' },
-        { label: __('Completed'),       value: stats?.completed   ?? 0, icon: CheckCircle2, color: 'text-blue-600    bg-blue-50'   },
-        { label: __('Total Earned'),    value: stats?.total_value ?? 0, icon: DollarSign,   color: 'text-amber-600  bg-amber-50',  isCurrency: true },
+        { label: __('freelance.total_contracts'), value: stats?.total       ?? 0, icon: FileText,     color: 'text-indigo-600 bg-indigo-50'  },
+        { label: __('general.active'),          value: stats?.active      ?? 0, icon: Activity,     color: 'text-emerald-600 bg-emerald-50' },
+        { label: __('general.completed'),       value: stats?.completed   ?? 0, icon: CheckCircle2, color: 'text-blue-600    bg-blue-50'   },
+        { label: __('general.total_earned'),    value: stats?.total_value ?? 0, icon: DollarSign,   color: 'text-amber-600  bg-amber-50',  isCurrency: true },
     ];
 
     return (
         <AppLayout>
-            <Head title={`${__('My Contracts')} - ${__('Freelance')}`} />
+            <Head title={`${__('freelance.my_contracts')} - ${__('freelance.freelance')}`} />
             <AppPage>
                 <PageHeader
-                    title={__('My Contracts')}
-                    subtitle={__('Monitor your active engagements, track progress, and manage payouts.')}
+                    title={__('freelance.my_contracts')}
+                    subtitle={__('general.monitor_your_active_engagements_track')}
                     icon={Briefcase}
                     actions={
                         <Link
                             href="/freelance/jobs/browse"
                             className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-sm"
                         >
-                            <Briefcase className="h-4 w-4" /> {__('Find More Work')}
+                            <Briefcase className="h-4 w-4" /> {__('general.find_more_work')}
                         </Link>
                     }
                 />
@@ -115,7 +115,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
                                         : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
                                 )}
                             >
-                                {f === 'all' ? `${__('All')} (${count})` : `${__(f)} (${count})`}
+                                {f === 'all' ? `${__('general.all')} (${count})` : `${__(f)} (${count})`}
                             </button>
                         );
                     })}
@@ -126,12 +126,12 @@ export default function ContractsIndex({ contracts, stats }: any) {
                     <FreelanceCard>
                         <EmptyState
                             icon={Briefcase}
-                            title={__('No contracts yet')}
+                            title={__('freelance.no_contracts_yet')}
                             description={filter === 'all'
                                 ? __('You don\'t have any contracts. Submit proposals on open jobs to start working.')
-                                : `${__('No')} ${filter} ${__('contracts to display.')}`}
+                                : `${__('general.no')} ${filter} ${__('freelance.contracts_to_display')}`}
                             action="/freelance/jobs/browse"
-                            actionLabel={__('Browse Jobs')}
+                            actionLabel={__('freelance.browse_jobs')}
                         />
                     </FreelanceCard>
                 ) : (
@@ -139,7 +139,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
                         {displayed.map((contract: any) => {
                             const isClient     = contract.client_id === userId;
                             const counterparty = isClient ? contract.freelancer : contract.client;
-                            const roleLabel    = isClient ? __('Hired') : __('Working for');
+                            const roleLabel    = isClient ? __('freelance.hired') : __('general.working_for');
                             const progress     = contract.status === 'completed' ? 100
                                               : contract.status === 'active'    ? 45
                                               : 0;
@@ -156,7 +156,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
                                                     href={`/freelance/contracts/${contract.id}`}
                                                     className="text-sm font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors truncate"
                                                 >
-                                                    {contract.job?.title ?? __('Unknown Job')}
+                                                    {contract.job?.title ?? __('freelance.unknown_job')}
                                                 </Link>
                                                 <Badge
                                                     variant="outline"
@@ -169,7 +169,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
                                             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500">
                                                 <span className="flex items-center gap-1">
                                                     <Clock className="h-3 w-3 text-slate-400" />
-                                                    {__('Started')} {formatDate(contract.started_at)}
+                                                    {__('general.started')} {formatDate(contract.started_at)}
                                                 </span>
                                                 {counterparty && (
                                                     <span className="flex items-center gap-1">
@@ -182,7 +182,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
                                             {contract.status === 'active' && (
                                                 <div className="flex items-center gap-2 pt-0.5">
                                                     <ProgressBar value={progress} />
-                                                    <span className="text-[10px] text-slate-400">{progress}% {__('complete')}</span>
+                                                    <span className="text-[10px] text-slate-400">{progress}% {__('general.complete')}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -194,7 +194,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
                                                     currency={contract.currency_id}
                                                     className="text-base font-black text-slate-900"
                                                 />
-                                                <p className="text-[10px] text-slate-400">{__('Contract Value')}</p>
+                                                <p className="text-[10px] text-slate-400">{__('freelance.contract_value')}</p>
                                             </div>
 
                                             <FreelanceStatusPill status={contract.status} />
@@ -202,7 +202,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
                                             <Link
                                                 href={`/freelance/contracts/${contract.id}`}
                                                 className="text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-md transition-colors opacity-0 group-hover:opacity-100"
-                                                title={__('View contract')}
+                                                title={__('freelance.view_contract_2')}
                                             >
                                                 <ChevronRight className="h-4 w-4" />
                                             </Link>

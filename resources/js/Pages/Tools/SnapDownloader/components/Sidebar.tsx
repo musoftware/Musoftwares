@@ -6,12 +6,12 @@ import { __ } from '@/lib/i18n';
 import { WorkspaceType } from '../types/snapdownloader.types';
 
 export const navItems: { id: WorkspaceType; icon: React.ReactNode; label: string; badge?: number }[] = [
-    { id: 'new',         icon: <Download className="w-5 h-5" />,    label: __('Download') },
-    { id: 'automations', icon: <Clock className="w-5 h-5" />,       label: __('Automations') },
-    { id: 'active',      icon: <Activity className="w-5 h-5" />,    label: __('Active') },
-    { id: 'queue',       icon: <List className="w-5 h-5" />,        label: __('Queue') },
-    { id: 'folders',     icon: <FolderOpen className="w-5 h-5" />,  label: __('Files') },
-    { id: 'history',     icon: <History className="w-5 h-5" />,     label: __('History') },
+    { id: 'new',         icon: <Download className="w-5 h-5" />,    label: __('general.download') },
+    { id: 'automations', icon: <Clock className="w-5 h-5" />,       label: __('general.automations') },
+    { id: 'active',      icon: <Activity className="w-5 h-5" />,    label: __('general.active') },
+    { id: 'queue',       icon: <List className="w-5 h-5" />,        label: __('general.queue') },
+    { id: 'folders',     icon: <FolderOpen className="w-5 h-5" />,  label: __('general.files') },
+    { id: 'history',     icon: <History className="w-5 h-5" />,     label: __('general.history') },
 ];
 
 export function Sidebar({
@@ -45,8 +45,8 @@ export function Sidebar({
                         <Film className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                        <div className="font-bold text-white text-sm leading-none">{__('SnapDownloader')}</div>
-                        <div className="text-[10px] mt-0.5" style={{ color: '#f59e0b' }}>{__('Media Saver')}</div>
+                        <div className="font-bold text-white text-sm leading-none">{__('general.snapdownloader')}</div>
+                        <div className="text-[10px] mt-0.5" style={{ color: '#f59e0b' }}>{__('general.media_saver')}</div>
                     </div>
                 </div>
             </div>
@@ -83,8 +83,8 @@ export function Sidebar({
                 <div className="flex items-center gap-2.5 px-2">
                     <span className={`w-2 h-2 rounded-full shrink-0 ${connected ? 'animate-pulse' : ''}`} style={{ background: connected ? '#10b981' : '#f43f5e', boxShadow: `0 0 6px ${connected ? '#10b981' : '#f43f5e'}` }} />
                     <div>
-                        <div className="text-[10px] font-bold text-white">{connected ? __('Connected') : __('Disconnected')}</div>
-                        <div className="text-[9px] mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>{connected ? __('Ready') : __('Offline')}</div>
+                        <div className="text-[10px] font-bold text-white">{connected ? __('general.connected') : __('general.disconnected')}</div>
+                        <div className="text-[9px] mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>{connected ? __('general.ready') : __('general.offline')}</div>
                     </div>
                 </div>
             </div>

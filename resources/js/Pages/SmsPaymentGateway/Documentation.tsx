@@ -9,8 +9,8 @@ import { ArrowLeft, BookOpen, Code, Terminal, Webhook, Download, AlertTriangle }
 
 export default function Documentation() {
     return (
-        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('sms_gateway.integration_docs')}</h2>}>
-            <Head title={__('sms_gateway.integration_docs')} />
+        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('general.smsgatewayintegrationdocs')}</h2>}>
+            <Head title={__('general.smsgatewayintegrationdocs')} />
 
             <div className="py-8 md:py-12">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -18,13 +18,13 @@ export default function Documentation() {
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                                 <BookOpen className="w-6 h-6 text-indigo-600" />
-                                {__('sms_gateway.integration_docs')}
+                                {__('general.smsgatewayintegrationdocs')}
                             </h1>
-                            <p className="text-slate-500 mt-1">{__('sms_gateway.docs_subtitle')}</p>
+                            <p className="text-slate-500 mt-1">{__('general.smsgatewaydocssubtitle')}</p>
                         </div>
                         <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                             <ArrowLeft className="w-4 h-4 mr-2" />
-                            {__('sms_gateway.back_to_dashboard')}
+                            {__('general.smsgatewaybacktodashboard')}
                         </Button>
                     </div>
 
@@ -103,7 +103,7 @@ export default function Documentation() {
                                                         <p className="text-slate-300 text-sm">{__('general.download_the_php_sdk_to_integrate_with_your_php_backend')}</p>
                                                     </div>
                                                     <Button variant="secondary" size="sm" asChild>
-                                                        <a href="/sdks/smspay-php.zip" download>
+                                                        <a href={`/sdks/smspay-php.zip?ts=${Date.now()}`} download>
                                                             <Download className="w-4 h-4 mr-2" />{__('general.download_php_sdk')}</a>
                                                     </Button>
                                                 </div>
@@ -113,7 +113,7 @@ export default function Documentation() {
                                                         <p className="text-slate-300 text-sm">{__('general.download_the_node_js_sdk_to_integrate_with_your_node_application')}</p>
                                                     </div>
                                                     <Button variant="secondary" size="sm" asChild>
-                                                        <a href="/sdks/smspay-node.zip" download>
+                                                        <a href={`/sdks/smspay-node.zip?ts=${Date.now()}`} download>
                                                             <Download className="w-4 h-4 mr-2" />{__('general.download_node_js_sdk')}</a>
                                                     </Button>
                                                 </div>
@@ -268,7 +268,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
                                                     <p className="text-slate-300 text-sm">{__('sms_gateway.wordpress_plugin_desc')}</p>
                                                 </div>
                                                 <Button variant="secondary" size="sm" asChild>
-                                                    <a href="/downloads/musoftware-sms-gateway.zip" download>
+                                                    <a href={`/downloads/musoftware-sms-gateway.zip?ts=${Date.now()}`} download>
                                                         <Download className="w-4 h-4 mr-2" />{__('sms_gateway.download_wp_plugin')}</a>
                                                 </Button>
                                             </div>

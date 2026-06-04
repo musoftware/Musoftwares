@@ -1,16 +1,8 @@
 @echo off
-echo Building WordPress Plugin...
+echo Building WordPress Plugin and Bumping Version...
 
-REM Ensure we are in the correct directory (the one containing the batch file)
+REM Ensure we are in the correct directory
 cd /d "%~dp0"
 
-REM Create the destination directory if it doesn't exist
-if not exist "..\public\downloads" mkdir "..\public\downloads"
-
-REM Remove the old zip if it exists
-if exist "..\public\downloads\musoftware-sms-gateway.zip" del /q "..\public\downloads\musoftware-sms-gateway.zip"
-
-REM Zip the plugin folder using PowerShell
-powershell -Command "Compress-Archive -Path musoftware-sms-gateway -DestinationPath ..\public\downloads\musoftware-sms-gateway.zip -Force"
-
-echo Done!
+REM Run the PHP build script which increments version and zips the file
+php build.php

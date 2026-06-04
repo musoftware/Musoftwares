@@ -11,32 +11,32 @@ import { __ } from '@/lib/i18n';
 
 const OPERATION_CONFIG = {
     receive: {
-        title: () => __('Receive Money'),
-        description: () => __('Record a payment received from this client.'),
+        title: () => __('general.receive_money'),
+        description: () => __('erp.record_a_payment_received_from'),
         route: 'erp.clients.wallet.receive',
         icon: ArrowDownLeft,
         iconColor: 'text-emerald-600',
         buttonClass: 'bg-emerald-600 hover:bg-emerald-700 text-white',
     },
     send: {
-        title: () => __('Send Money'),
-        description: () => __('Record money sent or deducted from this client.'),
+        title: () => __('general.send_money'),
+        description: () => __('erp.record_money_sent_or_deducted'),
         route: 'erp.clients.wallet.send',
         icon: ArrowUpRight,
         iconColor: 'text-amber-600',
         buttonClass: 'bg-amber-600 hover:bg-amber-700 text-white',
     },
     refund: {
-        title: () => __('Refund'),
-        description: () => __('Process a refund for this client.'),
+        title: () => __('general.refund'),
+        description: () => __('erp.process_a_refund_for_this'),
         route: 'erp.clients.wallet.refund',
         icon: RotateCcw,
         iconColor: 'text-blue-600',
         buttonClass: 'bg-blue-600 hover:bg-blue-700 text-white',
     },
     bonus: {
-        title: () => __('Earn (Bonus)'),
-        description: () => __('Add bonus or credit to client without affecting business income.'),
+        title: () => __('general.earn_bonus'),
+        description: () => __('erp.add_bonus_or_credit_to'),
         route: 'erp.clients.wallet.bonus',
         icon: ArrowDownLeft,
         iconColor: 'text-indigo-600',
@@ -136,14 +136,14 @@ export default function AdjustWallet({ client, wallet }: { client: any, wallet: 
                         <CardContent className="p-6">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div className="space-y-1">
-                                    <p className="text-sm font-medium text-slate-500">{__('Available Balance')}</p>
+                                    <p className="text-sm font-medium text-slate-500">{__('general.available_balance')}</p>
                                     <div className="text-3xl font-bold tracking-tight text-slate-900">
                                         <CurrencyDisplay amount={wallet?.balance !== undefined ? parseFloat(wallet.balance) : 0} currency={currencyCode} />
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-6 text-sm text-slate-500">
                                     <div className="text-center">
-                                        <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">{__('Locked')}</p>
+                                        <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">{__('general.locked')}</p>
                                         <p className="text-base font-semibold text-slate-700 mt-0.5">
                                             <CurrencyDisplay amount={wallet?.locked_balance ?? 0} currency={currencyCode} />
                                         </p>
@@ -167,7 +167,7 @@ export default function AdjustWallet({ client, wallet }: { client: any, wallet: 
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700">{__('Amount')} <span className="text-red-500">*</span></label>
+                                        <label className="text-sm font-medium text-slate-700">{__('general.amount')} <span className="text-red-500">*</span></label>
                                         <div className="relative">
                                             {currencyCode && (
                                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -188,12 +188,12 @@ export default function AdjustWallet({ client, wallet }: { client: any, wallet: 
                                         {errors.amount && <p className="text-xs text-red-500">{errors.amount}</p>}
                                     </div>
                                     <div className="space-y-2 md:col-span-1">
-                                        <label className="text-sm font-medium text-slate-700">{__('Note')} <span className="text-red-500">*</span></label>
+                                        <label className="text-sm font-medium text-slate-700">{__('general.note')} <span className="text-red-500">*</span></label>
                                         <Input 
                                             required
                                             value={form.note} 
                                             onChange={e => setForm({...form, note: e.target.value})} 
-                                            placeholder={__('Reason for this transaction...')}
+                                            placeholder={__('erp.reason_for_this_transaction')}
                                             className="bg-white border-slate-200 text-slate-900"
                                         />
                                         {errors.note && <p className="text-xs text-red-500">{errors.note}</p>}
@@ -203,7 +203,7 @@ export default function AdjustWallet({ client, wallet }: { client: any, wallet: 
                                 <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
                                     <Link href={backRoute}>
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-900 hover:bg-slate-100">
-                                            {__('Cancel')}
+                                            {__('general.cancel')}
                                         </Button>
                                     </Link>
                                     <Button type="submit" disabled={isSubmitting} className={config.buttonClass}>

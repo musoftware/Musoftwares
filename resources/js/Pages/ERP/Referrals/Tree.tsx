@@ -32,7 +32,7 @@ export default function Tree({ client }: { client: any }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('overview');
 
     return (
-        <ERPLayout title={__("Referral Tree") + ` — ${client.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__("general.referral_tree") + ` — ${client.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6 dashboard-container at-mobile-scroll-fix">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
                     <div className="flex items-center gap-4">
@@ -40,8 +40,8 @@ export default function Tree({ client }: { client: any }) {
                             <ArrowLeft className="w-5 h-5" />
                         </Link>
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900">{__("Referral Tree")}</h1>
-                            <p className="text-slate-500 text-sm mt-1">{__("Visualize the downstream referral network for")} <span className="font-semibold text-slate-700">{client.name}</span></p>
+                            <h1 className="text-2xl font-bold text-slate-900">{__("general.referral_tree")}</h1>
+                            <p className="text-slate-500 text-sm mt-1">{__("general.visualize_the_downstream_referral_network")} <span className="font-semibold text-slate-700">{client.name}</span></p>
                         </div>
                     </div>
                 </div>
@@ -73,7 +73,7 @@ export default function Tree({ client }: { client: any }) {
                                 </div>
                             ) : (
                                 <p className="mt-6 text-slate-500 italic text-sm ml-11">
-                                    {__("No referrals yet.")}
+                                    {__("general.no_referrals_yet")}
                                 </p>
                             )}
                         </div>

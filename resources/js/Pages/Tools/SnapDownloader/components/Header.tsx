@@ -25,12 +25,12 @@ export function Header({
                         <Film className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                        <div className="font-bold text-white text-sm leading-none">{__('SnapDownloader')}</div>
+                        <div className="font-bold text-white text-sm leading-none">{__('general.snapdownloader')}</div>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#10b981', boxShadow: '0 0 5px #10b981' }} />
-                    <span className="text-[10px] font-semibold" style={{ color: '#10b981' }}>{__('Live')}</span>
+                    <span className="text-[10px] font-semibold" style={{ color: '#10b981' }}>{__('general.live')}</span>
                     <Button variant="ghost" size="icon" onClick={loadAll} className="ml-1 h-8 w-8 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
                         <RefreshCw className="w-3.5 h-3.5" />
                     </Button>
@@ -43,11 +43,11 @@ export function Header({
                     <span className="font-bold text-white capitalize">{activeLabel}</span>
                     <ChevronRight className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.2)' }} />
                     <span style={{ color: 'rgba(255,255,255,0.35)' }}>
-                        {activeCount > 0 ? `${activeCount} ${__('active')}` : __('No active downloads')}
+                        {activeCount > 0 ? `${activeCount} ${__('general.active_2')}` : __('general.no_active_downloads')}
                     </span>
                 </div>
                 <Button variant="ghost" size="sm" onClick={loadAll} className="gap-1.5 h-7 text-[10px] font-semibold transition-all" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
-                    <RefreshCw className="w-3 h-3" /> {__('Refresh')}
+                    <RefreshCw className="w-3 h-3" /> {__('general.refresh')}
                 </Button>
             </header>
         </>

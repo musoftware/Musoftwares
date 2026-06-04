@@ -60,17 +60,17 @@ export default function FreelanceLayout({ children, clean = false }) {
     }, [isClient, currentPath]);
 
     const freelancerMenuItems = [
-        { id: 'dashboard',  label: __('Dashboard'),    icon: Briefcase, href: '/freelance/dashboard',              isActive: currentPath === '/freelance/dashboard' || currentPath === '/freelance/dashboard/' },
-        { id: 'jobs',       label: __('Find Work'),     icon: Search,    href: '/freelance/jobs/browse',  isActive: currentPath.startsWith('/freelance/jobs/browse') || currentPath.startsWith('/freelance/jobs/') && !currentPath.includes('/my-jobs') && !currentPath.includes('/create') },
-        { id: 'proposals',  label: __('My Proposals'),  icon: Clock,     href: '/freelance/proposals',    isActive: currentPath.startsWith('/freelance/proposals') },
-        { id: 'contracts',  label: __('My Contracts'),  icon: Clock,     href: '/freelance/contracts',    isActive: currentPath.startsWith('/freelance/contracts') },
+        { id: 'dashboard',  label: __('general.dashboard'),    icon: Briefcase, href: '/freelance/dashboard',              isActive: currentPath === '/freelance/dashboard' || currentPath === '/freelance/dashboard/' },
+        { id: 'jobs',       label: __('general.find_work'),     icon: Search,    href: '/freelance/jobs/browse',  isActive: currentPath.startsWith('/freelance/jobs/browse') || currentPath.startsWith('/freelance/jobs/') && !currentPath.includes('/my-jobs') && !currentPath.includes('/create') },
+        { id: 'proposals',  label: __('freelance.my_proposals'),  icon: Clock,     href: '/freelance/proposals',    isActive: currentPath.startsWith('/freelance/proposals') },
+        { id: 'contracts',  label: __('freelance.my_contracts'),  icon: Clock,     href: '/freelance/contracts',    isActive: currentPath.startsWith('/freelance/contracts') },
     ];
 
     const clientMenuItems = [
-        { id: 'dashboard',  label: __('Dashboard'),       icon: Briefcase, href: '/freelance/dashboard',              isActive: currentPath === '/freelance/dashboard' || currentPath === '/freelance/dashboard/' },
-        { id: 'post-job',   label: __('Post a Job'),      icon: Plus,      href: '/freelance/jobs/create',  isActive: currentPath.startsWith('/freelance/jobs/create') },
-        { id: 'my-jobs',    label: __('My Posted Jobs'),  icon: Briefcase, href: '/freelance/jobs/my-jobs', isActive: currentPath.startsWith('/freelance/jobs/my-jobs') },
-        { id: 'contracts',  label: __('My Contracts'),    icon: Clock,     href: '/freelance/contracts',    isActive: currentPath.startsWith('/freelance/contracts') },
+        { id: 'dashboard',  label: __('general.dashboard'),       icon: Briefcase, href: '/freelance/dashboard',              isActive: currentPath === '/freelance/dashboard' || currentPath === '/freelance/dashboard/' },
+        { id: 'post-job',   label: __('freelance.post_a_job'),      icon: Plus,      href: '/freelance/jobs/create',  isActive: currentPath.startsWith('/freelance/jobs/create') },
+        { id: 'my-jobs',    label: __('freelance.my_posted_jobs'),  icon: Briefcase, href: '/freelance/jobs/my-jobs', isActive: currentPath.startsWith('/freelance/jobs/my-jobs') },
+        { id: 'contracts',  label: __('freelance.my_contracts'),    icon: Clock,     href: '/freelance/contracts',    isActive: currentPath.startsWith('/freelance/contracts') },
     ];
 
     const menuItems = isClient ? clientMenuItems : freelancerMenuItems;
@@ -124,7 +124,7 @@ export default function FreelanceLayout({ children, clean = false }) {
                             <Link
                                 href="/points"
                                 className="hidden sm:inline-flex items-center gap-1.5 h-9 px-3.5 bg-amber-50 hover:bg-amber-100 border border-amber-200/60 rounded-full transition-colors duration-150 text-sm font-semibold text-amber-700 shadow-sm"
-                                title={__("Available Connects")}
+                                title={__("freelance.available_connects")}
                             >
                                 <Coins className="w-4 h-4 text-amber-500 shrink-0" />
                                 <span>{user?.points_balance !== undefined ? Number(user.points_balance).toLocaleString() : '0'}</span>

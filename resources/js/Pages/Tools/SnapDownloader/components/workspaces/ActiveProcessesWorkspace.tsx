@@ -52,18 +52,18 @@ export function ActiveProcessesWorkspace({
     return (
         <div className="space-y-5 max-w-3xl mx-auto">
             <div>
-                <h1 className="text-xl sm:text-2xl font-black text-white">{__('Active Downloads')}</h1>
-                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Monitor and control running jobs in real time')}</p>
+                <h1 className="text-xl sm:text-2xl font-black text-white">{__('general.active_downloads')}</h1>
+                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('freelance.monitor_and_control_running_jobs')}</p>
             </div>
 
             {activeProcesses.length === 0 && (
                 <EmptyState
                     icon={<Activity className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.2)' }} />}
-                    title={__('No active downloads')}
-                    sub={__('Start a download from the Download tab')}
+                    title={__('general.no_active_downloads')}
+                    sub={__('general.start_a_download_from_the')}
                     cta={
                         <Button onClick={() => setActiveWorkspace('new')} className="gap-2 h-11 text-xs font-bold" style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
-                            <Download className="w-3.5 h-3.5" /> {__('New Download')}
+                            <Download className="w-3.5 h-3.5" /> {__('general.new_download')}
                         </Button>
                     }
                 />
@@ -92,8 +92,8 @@ export function ActiveProcessesWorkspace({
                                         <StatusBadge status={proc.status} />
                                     </div>
                                     <div className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                                        {__('Started')} {timeAgo(proc.startTime)}
-                                        {proc.totalItems > 0 && ` · ${proc.successCount}/${proc.totalItems} ${__('items')}`}
+                                        {__('general.started')} {timeAgo(proc.startTime)}
+                                        {proc.totalItems > 0 && ` · ${proc.successCount}/${proc.totalItems} ${__('general.items')}`}
                                     </div>
 
                                     {/* Progress */}
@@ -120,7 +120,7 @@ export function ActiveProcessesWorkspace({
                                     className="gap-1.5 h-9 text-[11px] font-semibold transition-all"
                                     style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.6)' }}
                                 >
-                                    <Terminal className="w-3 h-3" /> {__('Logs')}
+                                    <Terminal className="w-3 h-3" /> {__('general.logs')}
                                 </Button>
                                 {proc.outputDir && (
                                     <Button
@@ -130,7 +130,7 @@ export function ActiveProcessesWorkspace({
                                         className="gap-1.5 h-9 text-[11px] font-semibold transition-all"
                                         style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.6)' }}
                                     >
-                                        <FolderOpen className="w-3 h-3" /> {__('Folder')}
+                                        <FolderOpen className="w-3 h-3" /> {__('general.folder')}
                                     </Button>
                                 )}
                                 {proc.status === 'running' && (
@@ -141,7 +141,7 @@ export function ActiveProcessesWorkspace({
                                         className="gap-1.5 h-9 text-[11px] font-bold transition-all ml-auto"
                                         style={{ background: 'rgba(244,63,94,0.15)', color: '#f43f5e', border: '1px solid rgba(244,63,94,0.25)' }}
                                     >
-                                        <StopCircle className="w-3 h-3" /> {__('Stop')}
+                                        <StopCircle className="w-3 h-3" /> {__('general.stop')}
                                     </Button>
                                 )}
                             </div>

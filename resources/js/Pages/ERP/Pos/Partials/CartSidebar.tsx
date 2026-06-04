@@ -27,13 +27,13 @@ export default function CartSidebar({ cart, updateQuantity, removeFromCart, onCh
     return (
         <div className="w-full h-full flex flex-col bg-white border-l">
             <div className="p-4 border-b">
-                <h2 className="text-lg font-semibold">{__('Current Order')}</h2>
+                <h2 className="text-lg font-semibold">{__('general.current_order')}</h2>
             </div>
             
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {cart.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                        <p>{__('Cart is empty')}</p>
+                        <p>{__('general.cart_is_empty')}</p>
                     </div>
                 ) : (
                     cart.map((item) => (
@@ -76,7 +76,7 @@ export default function CartSidebar({ cart, updateQuantity, removeFromCart, onCh
 
             <div className="p-4 border-t bg-gray-50">
                 <div className="flex justify-between items-center mb-4 text-lg font-bold">
-                    <span>{__('Total')}</span>
+                    <span>{__('general.total')}</span>
                     <span>{formatCurrency(subtotal, currency)}</span>
                 </div>
                 <Button 
@@ -85,7 +85,7 @@ export default function CartSidebar({ cart, updateQuantity, removeFromCart, onCh
                     onClick={onCheckout}
                     disabled={cart.length === 0}
                 >
-                    {__('Checkout')}
+                    {__('payment.checkout')}
                 </Button>
             </div>
         </div>

@@ -225,13 +225,13 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
 
     const handleSave = () => {
         if (!reason.trim()) {
-            alert(__('Reason is empty. You have to type reason.'));
+            alert(__('general.reason_is_empty_you_have'));
             return;
         }
 
         const newSessions = timers.filter(t => t.isNew);
 
-        if (!confirm(__('Save timer entries to this invoice?'))) return;
+        if (!confirm(__('erp.save_timer_entries_to_this'))) return;
 
         if (isRunning) handleStop();
 
@@ -257,27 +257,27 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
 
     return (
         <AdminSidebarLayout>
-            <Head title={`${__('Timer Details')} - Invoice #${item.invoice_number}`} />
+            <Head title={`${__('general.timer_details')} - Invoice #${item.invoice_number}`} />
 
             <div className="max-w-6xl mx-auto pb-12">
                 <div className="mb-5">
                     <span className="text-xs font-bold tracking-widest text-indigo-600 uppercase bg-indigo-50 px-2 py-1 rounded mb-2 inline-block">
-                        {__('Billing')}
+                        {__('billing.billing')}
                     </span>
                     <div className="flex items-baseline flex-wrap gap-3">
                         <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.04em', marginBottom: 0 }} className="text-gray-900">
-                            {__('Start Timer')}
+                            {__('general.start_timer')}
                         </h1>
                         <div className="flex flex-wrap gap-2 items-center ml-auto">
                             <Link href={route('admin.invoices.show', item.invoice_id)}>
                                 <Button variant="ghost" className="hover:bg-gray-100 text-gray-600">
-                                    <ArrowLeft className="w-4 h-4 mr-2" /> {__('Back')}
+                                    <ArrowLeft className="w-4 h-4 mr-2" /> {__('general.back')}
                                 </Button>
                             </Link>
                         </div>
                     </div>
                     <p className="text-gray-500 mt-2 mb-0 font-medium text-base">
-                        {__('Invoice')} #{item.invoice_number} · {item.client_name}
+                        {__('erp.invoice_2')} #{item.invoice_number} · {item.client_name}
                     </p>
                 </div>
 
@@ -500,7 +500,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                         disabled={isSaving || item.invoice_status !== 'unpaid'} 
                                         className="bg-gray-900 hover:bg-gray-800 text-white shadow-sm px-6"
                                     >
-                                        <Save className="w-4 h-4 mr-2" /> {__('Save')}
+                                        <Save className="w-4 h-4 mr-2" /> {__('general.save')}
                                     </Button>
                                 </div>
                             </div>

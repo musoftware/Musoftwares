@@ -28,18 +28,18 @@ export default function MyJobs({ auth, jobs }) {
 
     return (
         <FreelanceLayout>
-            <Head title={`${__('My Posted Jobs')} - ${__('Freelance')}`} />
+            <Head title={`${__('freelance.my_posted_jobs')} - ${__('freelance.freelance')}`} />
 
             <PageHeader
-                title={__('My Posted Jobs')}
-                subtitle={__('Manage and track progress on every freelance opportunity you have published.')}
+                title={__('freelance.my_posted_jobs')}
+                subtitle={__('freelance.manage_and_track_progress_on')}
                 icon={Briefcase}
                 actions={
                     <Link 
                         href="/freelance/jobs/create" 
                         className={cn(buttonVariants({ variant: 'default' }), "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm")}
                     >
-                        <Plus className="h-4 w-4 mr-2" /> {__('Post New Job')}
+                        <Plus className="h-4 w-4 mr-2" /> {__('freelance.post_new_job')}
                     </Link>
                 }
             />
@@ -49,9 +49,9 @@ export default function MyJobs({ auth, jobs }) {
                     <EmptyState
                         icon={Briefcase}
                         title={__("You haven't posted any jobs yet")}
-                        description={__("Get started by publishing your first job opportunity to hire premium experts.")}
+                        description={__("freelance.get_started_by_publishing_your")}
                         action="/freelance/jobs/create"
-                        actionLabel={__("Post a Job")}
+                        actionLabel={__("freelance.post_a_job")}
                         actionIcon={Plus}
                     />
                 </FreelanceCard>
@@ -88,11 +88,11 @@ export default function MyJobs({ auth, jobs }) {
                                             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500">
                                                 <span className="flex items-center gap-1 font-medium">
                                                     <Clock className="h-3.5 w-3.5 text-slate-400" /> 
-                                                    {__('Posted')} {formatDate(job.created_at)}
+                                                    {__('general.posted')} {formatDate(job.created_at)}
                                                 </span>
                                                 <span className="flex items-center gap-1 font-medium">
                                                     <FileText className="h-3.5 w-3.5 text-slate-400" />
-                                                    <strong className="text-slate-700 font-bold">{job.proposals_count || 0}</strong> {__('Proposals Received')}
+                                                    <strong className="text-slate-700 font-bold">{job.proposals_count || 0}</strong> {__('freelance.proposals_received')}
                                                 </span>
                                             </div>
                                         </div>
@@ -103,7 +103,7 @@ export default function MyJobs({ auth, jobs }) {
                                             </Badge>
                                             <div className="flex items-center gap-1.5">
                                                 <FinancialAmount amount={job.budget} currency={job.currency_id} size="sm" />
-                                                {job.type === 'hourly' && <span className="text-xs text-slate-500 font-medium">/ {__('hr')}</span>}
+                                                {job.type === 'hourly' && <span className="text-xs text-slate-500 font-medium">/ {__('general.hr')}</span>}
                                             </div>
                                         </div>
 

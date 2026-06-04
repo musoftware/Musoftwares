@@ -100,12 +100,12 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
         <AuthenticatedLayout
             header={
                 <div className="flex flex-col">
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight mb-4">{__('My Gold Wallets')}</h2>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight mb-4">{__('erp.my_gold_wallets')}</h2>
                     <GoldSaversTabs />
                 </div>
             }
         >
-            <Head title={__('Gold Wallets')} />
+            <Head title={__('erp.gold_wallets')} />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
@@ -119,7 +119,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                     <Scale className="w-4 h-4 text-muted-foreground" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold">{totalGrams.toFixed(2)} {__('G')}</div>
+                                    <div className="text-2xl font-bold">{totalGrams.toFixed(2)} {__('general.g')}</div>
                                 </CardContent>
                             </Card>
                             
@@ -143,10 +143,10 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
 
                             <Card className="flex flex-col items-center justify-center p-6 border-dashed">
                                 <div className="text-center">
-                                    <p className="text-muted-foreground mb-4">{__('Active Wallets')}: <span className="font-bold text-indigo-600">{wallets.length}</span></p>
+                                    <p className="text-muted-foreground mb-4">{__('erp.active_wallets')}: <span className="font-bold text-indigo-600">{wallets.length}</span></p>
                                     {(!wallets.length || hasMultiWallets) && (
                                         <Button onClick={() => setIsCreating(!isCreating)} variant="outline" className="gap-2">
-                                            <Plus className="w-4 h-4" /> {isCreating ? __('Cancel') : __('Create New Wallet')}
+                                            <Plus className="w-4 h-4" /> {isCreating ? __('general.cancel') : __('erp.create_new_wallet')}
                                         </Button>
                                     )}
                                 </div>
@@ -209,12 +209,12 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                             >
                                 <Card className="border-indigo-200 shadow-md bg-indigo-50/50">
                                     <CardHeader>
-                                        <CardTitle className="text-lg text-indigo-900">{__('Create New Wallet')}</CardTitle>
+                                        <CardTitle className="text-lg text-indigo-900">{__('erp.create_new_wallet')}</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <form onSubmit={handleCreateWallet} className="flex flex-col md:flex-row gap-4 items-end">
                                             <div className="space-y-2 flex-1 w-full">
-                                                <label className="text-sm font-medium text-slate-700">{__('Wallet Name')}</label>
+                                                <label className="text-sm font-medium text-slate-700">{__('erp.wallet_name')}</label>
                                                 <Input 
                                                     value={newWallet.name} 
                                                     onChange={e => setNewWallet({...newWallet, name: e.target.value})} 
@@ -224,7 +224,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                                 />
                                             </div>
                                             <div className="space-y-2 flex-1 w-full">
-                                                <label className="text-sm font-medium text-slate-700">{__('Goal Type')}</label>
+                                                <label className="text-sm font-medium text-slate-700">{__('general.goal_type')}</label>
                                                 <Select 
                                                     value={newWallet.goal_type} 
                                                     onValueChange={value => setNewWallet({...newWallet, goal_type: value as string})}
@@ -233,18 +233,18 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                                         <SelectValue placeholder={__('general.select_goal_type')} />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="Investment">{__('Investment')}</SelectItem>
-                                                        <SelectItem value="Wedding">{__('Wedding')}</SelectItem>
-                                                        <SelectItem value="Emergency">{__('Emergency')}</SelectItem>
-                                                        <SelectItem value="Kids">{__('Kids Savings')}</SelectItem>
+                                                        <SelectItem value="Investment">{__('general.investment')}</SelectItem>
+                                                        <SelectItem value="Wedding">{__('general.wedding')}</SelectItem>
+                                                        <SelectItem value="Emergency">{__('general.emergency')}</SelectItem>
+                                                        <SelectItem value="Kids">{__('general.kids_savings')}</SelectItem>
                                                         <SelectItem value="Hajj">{__('general.hajj_umrah')}</SelectItem>
-                                                        <SelectItem value="Retirement">{__('Retirement')}</SelectItem>
+                                                        <SelectItem value="Retirement">{__('general.retirement')}</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </div>
                                             {hasGoalTracking && (
                                                 <div className="space-y-2 flex-1 w-full">
-                                                    <label className="text-sm font-medium text-slate-700">{__('Target Grams')} ({__('Optional')})</label>
+                                                    <label className="text-sm font-medium text-slate-700">{__('gold_saver.target_grams')} ({__('general.optional')})</label>
                                                     <Input 
                                                         type="number"
                                                         step="0.01"
@@ -273,7 +273,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                             <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
                                 <Wallet className="w-10 h-10 text-indigo-400" />
                             </div>
-                            <h3 className="text-2xl font-bold text-slate-800 mb-2">{__('No Wallets Yet')}</h3>
+                            <h3 className="text-2xl font-bold text-slate-800 mb-2">{__('erp.no_wallets_yet')}</h3>
                             <p className="text-muted-foreground max-w-md mb-8">
                                 {__('general.start_your_gold_saving_journey_by_creating_your_first_wallet_you_can_organize_your_savings_by_goals_like_kids_emergency_or_long_term_investment')}
                             </p>
@@ -312,8 +312,8 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                         <CardContent className="space-y-4">
                                             <div className="flex justify-between items-end">
                                                 <div>
-                                                    <div className="text-sm font-medium text-muted-foreground mb-1">{__('Current Balance')}</div>
-                                                    <div className="text-2xl font-bold">{wallet.balance_grams} <span className="text-sm text-muted-foreground font-normal">{__('G')}</span></div>
+                                                    <div className="text-sm font-medium text-muted-foreground mb-1">{__('general.current_balance')}</div>
+                                                    <div className="text-2xl font-bold">{wallet.balance_grams} <span className="text-sm text-muted-foreground font-normal">{__('general.g')}</span></div>
                                                     <div className="text-sm text-muted-foreground mt-1">{formatNumber(wallet.balance_amount)} {wallet.currency}</div>
                                                 </div>
                                             </div>
@@ -322,7 +322,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                             {hasGoalTracking && wallet.target_grams > 0 && (
                                                 <div className="mt-4 pt-4 border-t">
                                                     <div className="flex justify-between text-sm mb-2">
-                                                        <span className="text-muted-foreground font-medium flex items-center gap-1"><Target className="w-4 h-4"/> {__('Goal')}</span>
+                                                        <span className="text-muted-foreground font-medium flex items-center gap-1"><Target className="w-4 h-4"/> {__('general.goal')}</span>
                                                         <span className="font-semibold">{((wallet.balance_grams / wallet.target_grams) * 100).toFixed(1)}%</span>
                                                     </div>
                                                     <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
@@ -331,7 +331,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                                             className="bg-indigo-600 h-full rounded-full" 
                                                         />
                                                     </div>
-                                                    <div className="text-xs text-right text-muted-foreground mt-1">{wallet.target_grams} {__('G')} {__('Target')}</div>
+                                                    <div className="text-xs text-right text-muted-foreground mt-1">{wallet.target_grams} {__('general.g')} {__('general.target')}</div>
                                                 </div>
                                             )}
                                         </CardContent>
@@ -346,7 +346,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                             <Search className="w-8 h-8 mx-auto text-slate-300 mb-3" />
                             <p>{__('general.no_wallets_match_your_filters')}</p>
                             <Button variant="link" onClick={() => { setSearchQuery(''); setGoalFilter('All'); }} className="mt-2">
-                                {__('Clear Filters')}
+                                {__('general.clear_filters')}
                             </Button>
                         </div>
                     )}

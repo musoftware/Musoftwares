@@ -197,34 +197,34 @@ export default function ProjectShow({
                     <div className="flex flex-wrap items-center gap-2">
                         <Link href={route('erp.invoices.create', { client_id: project.client?.id, project_id: project.id })}>
                             <Button size="sm" className="gap-1.5 shadow-none bg-slate-900 hover:bg-slate-800 text-white">
-                                <FileText className="w-3.5 h-3.5" /> {__("New Invoice")}
+                                <FileText className="w-3.5 h-3.5" /> {__("erp.new_invoice")}
                             </Button>
                         </Link>
                         {project.client && (
                             <>
                                 <Link href={route('erp.clients.wallet.adjust', project.client.id) + '?type=credit&project_id=' + project.id}>
                                     <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
-                                        <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-600" /> {__("Receive Money")}
+                                        <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-600" /> {__("general.receive_money")}
                                     </Button>
                                 </Link>
                                 <Link href={route('erp.clients.wallet.adjust', project.client.id) + '?type=debit&project_id=' + project.id}>
                                     <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
-                                        <ArrowUpRight className="w-3.5 h-3.5 text-amber-600" /> {__("Send Money")}
+                                        <ArrowUpRight className="w-3.5 h-3.5 text-amber-600" /> {__("general.send_money")}
                                     </Button>
                                 </Link>
                                 <Link href={route('erp.clients.wallet.adjust', project.client.id) + '?type=debit&project_id=' + project.id}>
                                     <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
-                                        <RotateCcw className="w-3.5 h-3.5 text-blue-600" /> {__("Refund")}
+                                        <RotateCcw className="w-3.5 h-3.5 text-blue-600" /> {__("general.refund")}
                                     </Button>
                                 </Link>
                             </>
                         )}
                         <Button size="sm" variant="outline" onClick={() => setIsCreateTaskOpen(true)} className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
-                            <Plus className="w-3.5 h-3.5 text-indigo-600" /> {__("New Task Board")}
+                            <Plus className="w-3.5 h-3.5 text-indigo-600" /> {__("general.new_task_board")}
                         </Button>
                         <Link href={route('erp.projects.edit', project.id)}>
                             <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
-                                <Edit2 className="w-3.5 h-3.5 text-slate-500" /> {__("Edit Project")}
+                                <Edit2 className="w-3.5 h-3.5 text-slate-500" /> {__("erp.edit_project")}
                             </Button>
                         </Link>
                     </div>
@@ -392,18 +392,18 @@ export default function ProjectShow({
                                 {/* 2. Transactions Tab */}
                                 {activeTab === 'transactions' && (
                                     transactions.length === 0 ? (
-                                        <EmptyState icon={Wallet} title={__("No transactions recorded")} description={__("Record manual credit or debit adjustments to log transactions.")} className="border-0 rounded-none py-10" />
+                                        <EmptyState icon={Wallet} title={__("erp.no_transactions_recorded")} description={__("erp.record_manual_credit_or_debit")} className="border-0 rounded-none py-10" />
                                     ) : (
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-left text-sm border-collapse">
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                                        <th className="px-6 py-3">{__("Reference")}</th>
-                                                        <th className="px-6 py-3">{__("Date")}</th>
-                                                        <th className="px-6 py-3">{__("Type")}</th>
-                                                        <th className="px-6 py-3">{__("Description")}</th>
-                                                        <th className="px-6 py-3 text-right">{__("Amount")}</th>
-                                                        <th className="px-6 py-3 text-right">{__("Value (Base)")}</th>
+                                                        <th className="px-6 py-3">{__("general.reference")}</th>
+                                                        <th className="px-6 py-3">{__("general.date")}</th>
+                                                        <th className="px-6 py-3">{__("general.type")}</th>
+                                                        <th className="px-6 py-3">{__("general.description")}</th>
+                                                        <th className="px-6 py-3 text-right">{__("general.amount")}</th>
+                                                        <th className="px-6 py-3 text-right">{__("general.value_base")}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-slate-100 text-[13px] text-slate-600">
@@ -640,22 +640,22 @@ export default function ProjectShow({
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Plus className="h-5 w-5 text-primary" />
-                            {__("Create Task Board")}
+                            {__("general.create_task_board")}
                         </DialogTitle>
                         <DialogDescription className="text-xs">
-                            {__("Set up a shared, dedicated board where you can add, organize, and check off todo list items for this project.")}
+                            {__("erp.set_up_a_shared_dedicated")}
                         </DialogDescription>
                     </DialogHeader>
 
                     <form onSubmit={handleCreateTaskSubmit} className="space-y-4 py-2 text-xs">
                         {/* Name */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="task_name" className="text-xs font-semibold text-foreground">{__("Task Board Title")}</Label>
+                            <Label htmlFor="task_name" className="text-xs font-semibold text-foreground">{__("general.task_board_title")}</Label>
                             <Input 
                                 id="task_name"
                                 value={taskForm.data.task_name}
                                 onChange={(e) => taskForm.setData('task_name', e.target.value)}
-                                placeholder={__("e.g. Phase 1 — UI Design & Prototypes")}
+                                placeholder={__("general.eg_phase_1_ui_design")}
                                 className="shadow-none h-9 text-xs"
                                 required
                             />
@@ -664,12 +664,12 @@ export default function ProjectShow({
 
                         {/* Description */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="task_description" className="text-xs font-semibold text-foreground">{__("Brief Description")}</Label>
+                            <Label htmlFor="task_description" className="text-xs font-semibold text-foreground">{__("general.brief_description")}</Label>
                             <Textarea 
                                 id="task_description"
                                 value={taskForm.data.task_description}
                                 onChange={(e) => taskForm.setData('task_description', e.target.value)}
-                                placeholder={__("Detail what this board represents for your client...")}
+                                placeholder={__("erp.detail_what_this_board_represents")}
                                 className="shadow-none text-xs min-h-[80px] resize-none"
                             />
                             {taskForm.errors.task_description && <p className="text-rose-500 text-[11px] font-medium">{taskForm.errors.task_description}</p>}
@@ -678,34 +678,34 @@ export default function ProjectShow({
                         <div className="grid grid-cols-2 gap-4">
                             {/* Priority */}
                             <div className="space-y-1.5">
-                                <Label htmlFor="priority" className="text-xs font-semibold text-foreground">{__("Priority Level")}</Label>
+                                <Label htmlFor="priority" className="text-xs font-semibold text-foreground">{__("general.priority_level")}</Label>
                                 <select
                                     id="priority"
                                     value={taskForm.data.priority}
                                     onChange={(e) => taskForm.setData('priority', e.target.value)}
                                     className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
                                 >
-                                    <option value="low">{__("Low")}</option>
-                                    <option value="normal">{__("Normal")}</option>
-                                    <option value="high">{__("High")}</option>
-                                    <option value="urgent">{__("Urgent")}</option>
+                                    <option value="low">{__("general.low")}</option>
+                                    <option value="normal">{__("general.normal")}</option>
+                                    <option value="high">{__("general.high")}</option>
+                                    <option value="urgent">{__("general.urgent")}</option>
                                 </select>
                                 {taskForm.errors.priority && <p className="text-rose-500 text-[11px] font-medium">{taskForm.errors.priority}</p>}
                             </div>
 
                             {/* Status */}
                             <div className="space-y-1.5">
-                                <Label htmlFor="status" className="text-xs font-semibold text-foreground">{__("Initial Status")}</Label>
+                                <Label htmlFor="status" className="text-xs font-semibold text-foreground">{__("general.initial_status")}</Label>
                                 <select
                                     id="status"
                                     value={taskForm.data.status}
                                     onChange={(e) => taskForm.setData('status', e.target.value)}
                                     className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
                                 >
-                                    <option value="open">{__("Open")}</option>
-                                    <option value="in_progress">{__("In Progress")}</option>
-                                    <option value="review">{__("Review")}</option>
-                                    <option value="completed">{__("Completed")}</option>
+                                    <option value="open">{__("general.open")}</option>
+                                    <option value="in_progress">{__("general.in_progress")}</option>
+                                    <option value="review">{__("general.review")}</option>
+                                    <option value="completed">{__("general.completed")}</option>
                                 </select>
                                 {taskForm.errors.status && <p className="text-rose-500 text-[11px] font-medium">{taskForm.errors.status}</p>}
                             </div>
@@ -713,7 +713,7 @@ export default function ProjectShow({
 
                         {/* Due Date */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="due_date" className="text-xs font-semibold text-foreground">{__("Target Due Date")}</Label>
+                            <Label htmlFor="due_date" className="text-xs font-semibold text-foreground">{__("general.target_due_date")}</Label>
                             <Input 
                                 id="due_date"
                                 type="date"
@@ -732,14 +732,14 @@ export default function ProjectShow({
                                 className="shadow-none text-xs"
                                 disabled={taskForm.processing}
                             >
-                                {__("Cancel")}
+                                {__("general.cancel")}
                             </Button>
                             <Button 
                                 type="submit" 
                                 className="shadow-none text-xs gap-2"
                                 disabled={taskForm.processing}
                             >
-                                {__("Create Board")}
+                                {__("general.create_board")}
                             </Button>
                         </DialogFooter>
                     </form>

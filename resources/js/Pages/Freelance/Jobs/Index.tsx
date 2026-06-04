@@ -23,11 +23,11 @@ export default function Index({ jobs }: any) {
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl leading-tight font-semibold text-gray-800">
-                    {__('Jobs Portal')}
+                    {__('freelance.jobs_portal')}
                 </h2>
             }
         >
-            <Head title={__('Freelance Jobs')} />
+            <Head title={__('freelance.freelance_jobs')} />
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="relative overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
@@ -38,7 +38,7 @@ export default function Index({ jobs }: any) {
                                 </div>
                             </div>
                         )}
-                        <h3 className="mb-4 text-lg font-bold">{__('Jobs')}</h3>
+                        <h3 className="mb-4 text-lg font-bold">{__('freelance.jobs')}</h3>
 
                         {(jobs.data as any).length > 0 ? (
                             <div className="overflow-x-auto">
@@ -46,13 +46,13 @@ export default function Index({ jobs }: any) {
                                     <thead className="bg-gray-50">
                                         <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                {__('Title')}
+                                                {__('general.title')}
                                             </th>
                                             <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                {__('Budget')}
+                                                {__('erp.budget')}
                                             </th>
                                             <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                {__('Created At')}
+                                                {__('general.created_at')}
                                             </th>
                                         </tr>
                                     </thead>
@@ -75,7 +75,7 @@ export default function Index({ jobs }: any) {
                             </div>
                         ) : (
                             <div className="py-12 text-center">
-                                <p className="text-gray-500">{__('No jobs found.')}</p>
+                                <p className="text-gray-500">{__('freelance.no_jobs_found_2')}</p>
                             </div>
                         )}
 

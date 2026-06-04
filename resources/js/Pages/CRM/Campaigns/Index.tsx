@@ -76,7 +76,7 @@ export default function Index({ campaigns }: Props) {
             <div className="mb-6 flex justify-end">
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
-                        <Button><Plus className="w-4 h-4 mr-2" /> {__('Create Campaign')}</Button>
+                        <Button><Plus className="w-4 h-4 mr-2" /> {__('general.create_campaign')}</Button>
                     </DialogTrigger>
                     <DialogContent>
                         <form onSubmit={handleCreate}>
@@ -86,7 +86,7 @@ export default function Index({ campaigns }: Props) {
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                                 <div className="space-y-2">
-                                    <Label>{__('Campaign Name')}</Label>
+                                    <Label>{__('general.campaign_name')}</Label>
                                     <Input 
                                         required 
                                         value={newCampaign.name} 
@@ -101,7 +101,7 @@ export default function Index({ campaigns }: Props) {
                                         value={newCampaign.type}
                                         onChange={(e) => setNewCampaign({...newCampaign, type: e.target.value})}
                                     >
-                                        <option value="email">{__('Email')}</option>
+                                        <option value="email">{__('general.email')}</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
@@ -118,7 +118,7 @@ export default function Index({ campaigns }: Props) {
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button type="submit">{__('Create Campaign')}</Button>
+                                <Button type="submit">{__('general.create_campaign')}</Button>
                             </DialogFooter>
                         </form>
                     </DialogContent>
