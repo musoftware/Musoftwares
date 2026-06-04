@@ -28,7 +28,8 @@ import {
     User,
     LogIn,
     Key,
-    ShieldCheck
+    ShieldCheck,
+    Briefcase
 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
@@ -159,7 +160,15 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                                     onClick={onClose}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
                                 >
-                                    <ClipboardEdit className="h-4 w-4 mr-3 text-slate-500" />{__('general.edit_profile')}</Link>
+                                    <ClipboardEdit className="h-4 w-4 mr-3 text-slate-500" />{__('general.edit_profile')}
+                                </Link>
+                                <Link 
+                                    href={`/admin/users/${client.id}#subscriptions`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <Briefcase className="h-4 w-4 mr-3 text-slate-500" />{__('general.user_subscriptions')}
+                                </Link>
                                 <button 
                                     onClick={() => { onClose(); onLoginAs(client.id); }}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium w-full text-left"

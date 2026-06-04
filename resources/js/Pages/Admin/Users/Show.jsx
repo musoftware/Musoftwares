@@ -760,7 +760,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                     )}
 
                     {/* User Subscriptions List */}
-                    <div className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200">
+                    <div id="subscriptions" className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200 scroll-mt-24">
                         <h2 className="text-lg font-bold font-sora text-slate-900 mb-4 border-b pb-2 flex items-center gap-2">
                             <Briefcase size={18} className="text-slate-400" />{__('general.user_subscriptions')}</h2>
                         {subscriptions && subscriptions.length > 0 ? (
