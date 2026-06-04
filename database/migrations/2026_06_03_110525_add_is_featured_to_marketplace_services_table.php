@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('marketplace_services', function (Blueprint $table) {
-            $table->boolean('is_featured')->default(false);
-        });
+        if (!Schema::hasColumn('marketplace_services', 'is_featured')) {
+            Schema::table('marketplace_services', function (Blueprint $table) {
+                $table->boolean('is_featured')->default(false);
+            });
+        }
     }
 
     /**
