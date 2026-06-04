@@ -35,11 +35,11 @@ class DispatchWebhookJob implements ShouldQueue
         $signature = hash_hmac('sha256', $payloadJson, $this->webhook->webhook_secret);
 
         $response = Http::withHeaders([
-            'X-AutoSMS-Signature' => $signature,
-            'X-AutoSMS-Event' => $this->payload['event'] ?? 'unknown',
+            'X-Musoftware-Signature' => $signature,
+            'X-Musoftware-Event' => $this->payload['event'] ?? 'unknown',
             'Content-Type' => 'application/json',
-            'User-Agent' => 'AutoSMS-Payment-Hub/1.0',
-        ])->timeout(10)->post($this->webhook->webhook_url, $this->payload);
+            'User-Agent' => 'Musoftware-SMS-Gateway/1.0',
+        ])->timeout(10)->withBody($payloadJson, 'application/json')->post($this->webhook->webhook_url);
 
         $statusCode = $response->status();
 

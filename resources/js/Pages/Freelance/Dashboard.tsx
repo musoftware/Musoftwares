@@ -94,16 +94,16 @@ export default function FreelanceDashboard({
     const freelancerSuggestedActions = [
         {
             id: 1,
-            title: __('Submit KYC verification'),
-            description: __('Required to secure high-value smart contract payouts.'),
+            title: __('general.submit_kyc_verification'),
+            description: __('freelance.required_to_secure_highvalue_smart'),
             href: '/kyc',
             icon: UserCheck,
             color: 'text-amber-600 bg-amber-50/80'
         },
         {
             id: 2,
-            title: __('Top up your balance'),
-            description: __('Purchase points to continue bidding on projects.'),
+            title: __('general.top_up_your_balance'),
+            description: __('erp.purchase_points_to_continue_bidding'),
             href: '/financial/add-balance',
             icon: Coins,
             color: 'text-indigo-600 bg-indigo-50/80'
@@ -113,16 +113,16 @@ export default function FreelanceDashboard({
     const clientSuggestedActions = [
         {
             id: 1,
-            title: __('Post a new job'),
-            description: __('Publish your project to find and hire verified industry experts.'),
+            title: __('freelance.post_a_new_job_2'),
+            description: __('erp.publish_your_project_to_find'),
             href: '/freelance/jobs/create',
             icon: Plus,
             color: 'text-indigo-600 bg-indigo-50/80'
         },
         {
             id: 2,
-            title: __('Manage payments'),
-            description: __('Top up your account balance or view your billing statements.'),
+            title: __('general.manage_payments'),
+            description: __('billing.top_up_your_account_balance'),
             href: '/financial/add-balance',
             icon: CreditCard,
             color: 'text-emerald-600 bg-emerald-50/80'
@@ -133,11 +133,11 @@ export default function FreelanceDashboard({
         <FreelanceLayout>
             <div className="space-y-8">
                 <ModulePageHeader 
-                    title={`${__('Welcome back')}, ${auth?.user?.name?.split(' ')[0] || __('Partner')}`}
+                    title={`${__('general.welcome_back')}, ${auth?.user?.name?.split(' ')[0] || __('general.partner')}`}
                     description={
                         isClient 
-                            ? __("Manage your job listings, hire elite talent, and track contract milestones in real-time.")
-                            : __("Monitor your active contracts, pending bids, and operational stats in real-time.")
+                            ? __("freelance.manage_your_job_listings_hire")
+                            : __("freelance.monitor_your_active_contracts_pending")
                     }
                     actions={
                         isClient ? (
@@ -145,14 +145,14 @@ export default function FreelanceDashboard({
                                 href="/freelance/jobs/create" 
                                 className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 transition-colors shadow-sm"
                             >
-                                <Plus className="w-4 h-4 mr-2 stroke-[1.5]" /> {__('Post a Job')}
+                                <Plus className="w-4 h-4 mr-2 stroke-[1.5]" /> {__('freelance.post_a_job')}
                             </Link>
                         ) : (
                             <Link 
                                 href="/freelance/jobs/browse" 
                                 className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 transition-colors shadow-sm"
                             >
-                                <Search className="w-4 h-4 mr-2 stroke-[1.5]" /> {__('Browse Jobs')}
+                                <Search className="w-4 h-4 mr-2 stroke-[1.5]" /> {__('freelance.browse_jobs')}
                             </Link>
                         )
                     }
@@ -162,27 +162,27 @@ export default function FreelanceDashboard({
                 {isClient ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                         <MetricCard 
-                            label={__('Contracted Value')}
+                            label={__('general.contracted_value')}
                             value={clientData.stats.totalContractedValue}
                             icon={DollarSign}
                         />
                         <MetricCard 
-                            label={__('Points Spent')}
+                            label={__('general.points_spent')}
                             value={clientData.stats.pointsSpent}
                             icon={Coins}
                         />
                         <MetricCard 
-                            label={__('Active Contracts')}
+                            label={__('freelance.active_contracts')}
                             value={clientData.stats.activeContracts}
                             icon={Briefcase}
                         />
                         <MetricCard 
-                            label={__('Open Job Posts')}
+                            label={__('freelance.open_job_posts')}
                             value={clientData.stats.activeJobs}
                             icon={Briefcase}
                         />
                         <MetricCard 
-                            label={__('Received Proposals')}
+                            label={__('freelance.received_proposals')}
                             value={clientData.stats.receivedProposals}
                             icon={Clock}
                         />
@@ -190,22 +190,22 @@ export default function FreelanceDashboard({
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <MetricCard 
-                            label={__('Total Earnings')}
+                            label={__('general.total_earnings')}
                             value={stats.totalEarnings}
                             icon={DollarSign}
                         />
                         <MetricCard 
-                            label={__('Active Contracts')}
+                            label={__('freelance.active_contracts')}
                             value={stats.activeContracts}
                             icon={Briefcase}
                         />
                         <MetricCard 
-                            label={__('Pending Proposals')}
+                            label={__('freelance.pending_proposals')}
                             value={stats.activeProposals}
                             icon={Clock}
                         />
                         <MetricCard 
-                            label={__('Available Connects')}
+                            label={__('freelance.available_connects')}
                             value={stats.pointsBalance}
                             icon={Activity}
                         />
@@ -217,14 +217,14 @@ export default function FreelanceDashboard({
                     <div className="lg:col-span-2 space-y-8">
                         {isClient ? (
                             <>
-                                <OperationalCard title={__('Open Job Posts')} description={__('Your recently published project briefs currently open for bids.')}>
+                                <OperationalCard title={__('freelance.open_job_posts')} description={__('erp.your_recently_published_project_briefs')}>
                                     {clientData.activeJobs.length === 0 ? (
                                         <EmptyState 
                                             icon={Briefcase}
-                                            title={__('No active job posts')}
-                                            description={__('Post a job to start receiving bids from verified industry experts.')}
+                                            title={__('freelance.no_active_job_posts')}
+                                            description={__('freelance.post_a_job_to_start')}
                                             action="/freelance/jobs/create"
-                                            actionLabel={__('Post a Job')}
+                                            actionLabel={__('freelance.post_a_job')}
                                         />
                                     ) : (
                                         <div className="divide-y divide-slate-100">
@@ -235,7 +235,7 @@ export default function FreelanceDashboard({
                                                             {job.title}
                                                         </Link>
                                                         <span className="text-xs text-slate-500 mt-1 block">
-                                                            {__('Budget')}: <FinancialAmount amount={job.budget} currency={job.currency} className="text-xs font-mono font-medium text-slate-600" /> &bull; {__('Posted')} {formatDate(job.createdAt)} &bull; {job.proposalsCount} {__('proposals')}
+                                                            {__('erp.budget')}: <FinancialAmount amount={job.budget} currency={job.currency} className="text-xs font-mono font-medium text-slate-600" /> &bull; {__('general.posted')} {formatDate(job.createdAt)} &bull; {job.proposalsCount} {__('freelance.proposals')}
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-4 shrink-0">
@@ -253,14 +253,14 @@ export default function FreelanceDashboard({
                                     )}
                                 </OperationalCard>
 
-                                <OperationalCard title={__('Active Contracts')} description={__('Your active freelancers and ongoing milestones.')}>
+                                <OperationalCard title={__('freelance.active_contracts')} description={__('general.your_active_freelancers_and_ongoing')}>
                                     {clientData.activeContracts.length === 0 ? (
                                         <EmptyState 
                                             icon={Briefcase}
-                                            title={__('No active contracts')}
-                                            description={__('Review proposals on your posted jobs to hire your next specialist.')}
+                                            title={__('freelance.no_active_contracts')}
+                                            description={__('freelance.review_proposals_on_your_posted')}
                                             action="/freelance/jobs/my-jobs"
-                                            actionLabel={__('View My Job Posts')}
+                                            actionLabel={__('freelance.view_my_job_posts')}
                                         />
                                     ) : (
                                         <div className="divide-y divide-slate-100">
@@ -269,7 +269,7 @@ export default function FreelanceDashboard({
                                                     <div className="min-w-0">
                                                         <span className="text-sm font-semibold text-slate-900 block truncate">{contract.title}</span>
                                                         <span className="text-xs text-slate-500 mt-1 block">
-                                                            {__('Freelancer')}: {contract.freelancerName} &bull; {__('Started')} {formatDate(contract.startDate)}
+                                                            {__('general.freelancer')}: {contract.freelancerName} &bull; {__('general.started')} {formatDate(contract.startDate)}
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-4 shrink-0">
@@ -289,14 +289,14 @@ export default function FreelanceDashboard({
                                     )}
                                 </OperationalCard>
 
-                                <OperationalCard title={__('Received Proposals')} description={__('Proposals awaiting your review from interested freelance professionals.')}>
+                                <OperationalCard title={__('freelance.received_proposals')} description={__('freelance.proposals_awaiting_your_review_from')}>
                                     {clientData.receivedProposals.length === 0 ? (
                                         <EmptyState 
                                             icon={Clock}
-                                            title={__('No pending proposals')}
-                                            description={__('Bids from interested experts will appear here once you post an open job.')}
+                                            title={__('freelance.no_pending_proposals')}
+                                            description={__('freelance.bids_from_interested_experts_will')}
                                             action="/freelance/jobs/my-jobs"
-                                            actionLabel={__('Manage Job Posts')}
+                                            actionLabel={__('freelance.manage_job_posts')}
                                         />
                                     ) : (
                                         <div className="divide-y divide-slate-100">
@@ -305,7 +305,7 @@ export default function FreelanceDashboard({
                                                     <div className="min-w-0">
                                                         <span className="text-sm font-semibold text-slate-900 block truncate">{proposal.title}</span>
                                                         <span className="text-xs text-slate-500 mt-1 block">
-                                                            {__('Freelancer')}: {proposal.freelancerName} &bull; {__('Bid')}: <FinancialAmount amount={proposal.budget} currency={clientData.stats.currency} className="text-xs font-mono font-medium text-slate-600" /> &bull; {__('Submitted')} {formatDate(proposal.submittedAt)}
+                                                            {__('general.freelancer')}: {proposal.freelancerName} &bull; {__('freelance.bid')}: <FinancialAmount amount={proposal.budget} currency={clientData.stats.currency} className="text-xs font-mono font-medium text-slate-600" /> &bull; {__('general.submitted')} {formatDate(proposal.submittedAt)}
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-4 shrink-0">
@@ -325,14 +325,14 @@ export default function FreelanceDashboard({
                             </>
                         ) : (
                             <>
-                                <OperationalCard title={__('Upcoming Appointments')} description={__('Your scheduled consultations and client meetings.')}>
+                                <OperationalCard title={__('general.upcoming_appointments')} description={__('erp.your_scheduled_consultations_and_client')}>
                                     {upcomingBookings.length === 0 ? (
                                         <EmptyState 
                                             icon={Clock}
-                                            title={__('No upcoming appointments')}
-                                            description={__('Share your booking link to start scheduling consultations.')}
+                                            title={__('general.no_upcoming_appointments')}
+                                            description={__('general.share_your_booking_link_to')}
                                             action="/booking"
-                                            actionLabel={__('Manage Availability')}
+                                            actionLabel={__('general.manage_availability')}
                                         />
                                     ) : (
                                         <div className="divide-y divide-slate-100">
@@ -365,14 +365,14 @@ export default function FreelanceDashboard({
                                     )}
                                 </OperationalCard>
 
-                                <OperationalCard title={__('Active Contracts')} description={__('Your currently running client engagements.')}>
+                                <OperationalCard title={__('freelance.active_contracts')} description={__('erp.your_currently_running_client_engagements')}>
                                     {activeContracts.length === 0 ? (
                                         <EmptyState 
                                             icon={Briefcase}
-                                            title={__('No active contracts yet')}
-                                            description={__('Start submitting proposals to begin working with clients.')}
+                                            title={__('freelance.no_active_contracts_yet')}
+                                            description={__('erp.start_submitting_proposals_to_begin')}
                                             action="/freelance/jobs/browse"
-                                            actionLabel={__('Browse Jobs')}
+                                            actionLabel={__('freelance.browse_jobs')}
                                         />
                                     ) : (
                                         <div className="divide-y divide-slate-100">
@@ -381,7 +381,7 @@ export default function FreelanceDashboard({
                                                     <div className="min-w-0">
                                                         <span className="text-sm font-semibold text-slate-900 block truncate">{contract.title}</span>
                                                         <span className="text-xs text-slate-500 mt-1 block">
-                                                            {contract.clientName} &bull; {__('Started')} {formatDate(contract.startDate)}
+                                                            {contract.clientName} &bull; {__('general.started')} {formatDate(contract.startDate)}
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-4 shrink-0">
@@ -401,14 +401,14 @@ export default function FreelanceDashboard({
                                     )}
                                 </OperationalCard>
 
-                                <OperationalCard title={__('Submitted Proposals')} description={__('Bids awaiting client review or response.')}>
+                                <OperationalCard title={__('freelance.submitted_proposals')} description={__('erp.bids_awaiting_client_review_or')}>
                                     {activeProposals.length === 0 ? (
                                         <EmptyState 
                                             icon={Clock}
-                                            title={__('No pending proposals')}
-                                            description={__('Start submitting bids to see active proposals here.')}
+                                            title={__('freelance.no_pending_proposals')}
+                                            description={__('freelance.start_submitting_bids_to_see')}
                                             action="/freelance/jobs/browse"
-                                            actionLabel={__('Browse Jobs')}
+                                            actionLabel={__('freelance.browse_jobs')}
                                         />
                                     ) : (
                                         <div className="divide-y divide-slate-100">
@@ -417,7 +417,7 @@ export default function FreelanceDashboard({
                                                     <div className="min-w-0">
                                                         <span className="text-sm font-semibold text-slate-900 block truncate">{proposal.title}</span>
                                                         <span className="text-xs text-slate-500 mt-1 block">
-                                                            {__('Bid')}: <FinancialAmount amount={proposal.budget} currency={stats.currency} className="text-xs font-mono font-medium text-slate-600" /> &bull; {__('Submitted')} {formatDate(proposal.submittedAt)}
+                                                            {__('freelance.bid')}: <FinancialAmount amount={proposal.budget} currency={stats.currency} className="text-xs font-mono font-medium text-slate-600" /> &bull; {__('general.submitted')} {formatDate(proposal.submittedAt)}
                                                         </span>
                                                     </div>
                                                     <div className="shrink-0">
@@ -435,12 +435,12 @@ export default function FreelanceDashboard({
                     {/* Right 1 Column: Activity & Actions */}
                     <div className="space-y-8">
                         <div className="space-y-4">
-                            <h4 className="text-[11px] uppercase font-bold text-slate-400 tracking-wider">{__('Recent Events')}</h4>
+                            <h4 className="text-[11px] uppercase font-bold text-slate-400 tracking-wider">{__('general.recent_events')}</h4>
                             <ActivityFeed items={isClient ? clientActivitiesMapped : freelancerActivitiesMapped} />
                         </div>
 
                         <div className="space-y-4 pt-2">
-                            <h4 className="text-[11px] uppercase font-bold text-slate-400 tracking-wider">{__('Suggested Actions')}</h4>
+                            <h4 className="text-[11px] uppercase font-bold text-slate-400 tracking-wider">{__('general.suggested_actions')}</h4>
                             <div className="space-y-3">
                                 {(isClient ? clientSuggestedActions : freelancerSuggestedActions).map(action => (
                                     <div key={action.id} className="group flex items-start gap-3.5 rounded-xl p-4 border border-slate-100 bg-white hover:border-slate-200 hover:shadow-sm transition-all duration-200">

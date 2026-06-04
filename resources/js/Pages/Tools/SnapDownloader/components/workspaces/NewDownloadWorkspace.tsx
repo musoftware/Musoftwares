@@ -41,21 +41,21 @@ export function NewDownloadWorkspace({
     return (
         <div className="max-w-2xl mx-auto space-y-5">
             <div>
-                <h1 className="text-xl sm:text-2xl font-black text-white">{__('New Download')}</h1>
-                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Queue a Snapchat profile for saving')}</p>
+                <h1 className="text-xl sm:text-2xl font-black text-white">{__('general.new_download')}</h1>
+                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.queue_a_snapchat_profile_for')}</p>
             </div>
 
             {/* Form Card */}
             <div className="rounded-2xl border p-4 sm:p-6 space-y-5" style={{ background: '#13161f', borderColor: 'rgba(255,255,255,0.06)' }}>
                 {/* URL Input */}
                 <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Target Profile')}</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.target_profile')}</label>
                     <div className="relative">
                         <Search className="absolute left-4 top-4 w-4 h-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
                         <Textarea
                             value={targetUrl}
                             onChange={e => { setTargetUrl(e.target.value); setFormError(''); }}
-                            placeholder={__('Usernames or Snapchat URLs (one per line)')}
+                            placeholder={__('general.usernames_or_snapchat_urls_one')}
                             className="w-full pl-11 py-3 text-sm font-medium min-h-[100px] resize-y"
                             style={{
                                 background: 'rgba(255,255,255,0.04)',
@@ -70,13 +70,13 @@ export function NewDownloadWorkspace({
 
                 {/* Media Filters */}
                 <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Media Types')}</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.media_types')}</label>
                     <div className="grid grid-cols-2 gap-2.5">
                         {[
-                            { id: 'stories',    label: __('Stories'),    icon: <Video className="w-4 h-4" /> },
-                            { id: 'spotlights', label: __('Spotlights'), icon: <Zap className="w-4 h-4" /> },
-                            { id: 'highlights', label: __('Highlights'), icon: <Film className="w-4 h-4" /> },
-                            { id: 'episodes',   label: __('Episodes'),   icon: <FileVideo className="w-4 h-4" /> },
+                            { id: 'stories',    label: __('general.stories'),    icon: <Video className="w-4 h-4" /> },
+                            { id: 'spotlights', label: __('general.spotlights'), icon: <Zap className="w-4 h-4" /> },
+                            { id: 'highlights', label: __('general.highlights'), icon: <Film className="w-4 h-4" /> },
+                            { id: 'episodes',   label: __('general.episodes'),   icon: <FileVideo className="w-4 h-4" /> },
                         ].map(f => {
                             const active = (filters as any)[f.id];
                             return (
@@ -108,7 +108,7 @@ export function NewDownloadWorkspace({
                     style={{ background: 'linear-gradient(135deg, #f59e0b, #b45309)', color: '#000' }}
                 >
                     {isQueuing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-current" />}
-                    {isQueuing ? __('Adding...') : __('Start Download')}
+                    {isQueuing ? __('Adding...') : __('general.start_download')}
                 </Button>
             </div>
 
@@ -118,9 +118,9 @@ export function NewDownloadWorkspace({
                     <Lock className="w-4 h-4" style={{ color: '#f59e0b' }} />
                 </div>
                 <div>
-                    <div className="font-bold text-white text-xs">{__('Fast & Private')}</div>
+                    <div className="font-bold text-white text-xs">{__('general.fast_private')}</div>
                     <p className="text-[11px] mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                        {__('Your files are saved directly to your chosen folder. Nothing leaves your computer.')}
+                        {__('general.your_files_are_saved_directly')}
                     </p>
                 </div>
             </div>

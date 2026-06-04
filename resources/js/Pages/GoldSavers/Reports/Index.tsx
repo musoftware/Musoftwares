@@ -33,13 +33,13 @@ export default function ReportsIndex({ hasReports, wallets }: ReportsProps) {
             header={
                 <div className="flex flex-col">
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight mb-4">
-                        {__('Investment Reports')}
+                        {__('general.investment_reports')}
                     </h2>
                     <GoldSaversTabs />
                 </div>
             }
         >
-            <Head title={__('Investment Reports')} />
+            <Head title={__('general.investment_reports')} />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -48,8 +48,8 @@ export default function ReportsIndex({ hasReports, wallets }: ReportsProps) {
                         {!hasReports && (
                             <UpgradeOverlay 
                                 module="gold-investment-reports"
-                                title={__('Investment Reports Locked')}
-                                description={__('Unlock the ability to download comprehensive PDF reports of your gold investments, performance metrics, and historical growth.')}
+                                title={__('general.investment_reports_locked')}
+                                description={__('gold_saver.unlock_the_ability_to_download')}
                                 icon={TrendingUp}
                                 priceText={__('general.upgrade_now')}
                             />
@@ -60,10 +60,10 @@ export default function ReportsIndex({ hasReports, wallets }: ReportsProps) {
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
                                         <FileText className="h-5 w-5 text-indigo-600" />
-                                        {__('Generate Report')}
+                                        {__('general.generate_report')}
                                     </CardTitle>
                                     <CardDescription>
-                                        {__('Download a PDF summary of your gold savings and performance.')}
+                                        {__('gold_saver.download_a_pdf_summary_of')}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
@@ -71,16 +71,16 @@ export default function ReportsIndex({ hasReports, wallets }: ReportsProps) {
                                         
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium">{__('Select Wallet')}</label>
+                                                <label className="text-sm font-medium">{__('erp.select_wallet')}</label>
                                                 <Select value={data.wallet_id} onValueChange={(val) => setData('wallet_id', val || '')}>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder={__('Select Wallet')} />
+                                                        <SelectValue placeholder={__('erp.select_wallet')} />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="all">{__('All Wallets')}</SelectItem>
+                                                        <SelectItem value="all">{__('erp.all_wallets')}</SelectItem>
                                                         {wallets.map((w: any) => (
                                                             <SelectItem key={w.id} value={w.id.toString()}>
-                                                                {w.name} ({w.balance_grams} {__('g')})
+                                                                {w.name} ({w.balance_grams} {__('general.g_2')})
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>
@@ -88,15 +88,15 @@ export default function ReportsIndex({ hasReports, wallets }: ReportsProps) {
                                             </div>
 
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium">{__('Select Period')}</label>
+                                                <label className="text-sm font-medium">{__('general.select_period')}</label>
                                                 <Select value={data.period} onValueChange={(val) => setData('period', val || '')}>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder={__('Select Period')} />
+                                                        <SelectValue placeholder={__('general.select_period')} />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="monthly">{__('Monthly')}</SelectItem>
-                                                        <SelectItem value="yearly">{__('Yearly')}</SelectItem>
-                                                        <SelectItem value="all_time">{__('All Time')}</SelectItem>
+                                                        <SelectItem value="monthly">{__('general.monthly')}</SelectItem>
+                                                        <SelectItem value="yearly">{__('general.yearly')}</SelectItem>
+                                                        <SelectItem value="all_time">{__('general.all_time')}</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </div>
@@ -104,7 +104,7 @@ export default function ReportsIndex({ hasReports, wallets }: ReportsProps) {
 
                                         <Button type="submit" disabled={processing} className="w-full md:w-auto">
                                             <Download className="h-4 w-4 mr-2" />
-                                            {__('Generate Report')}
+                                            {__('general.generate_report')}
                                         </Button>
 
                                     </form>

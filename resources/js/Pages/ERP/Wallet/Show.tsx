@@ -29,7 +29,7 @@ const TYPE_CONFIG: Record<string, { label: string; color: string; bgColor: strin
 };
 
 export default function Show({ wallet, transactions, client }: WalletShowProps) {
-    const activeClient = client || { id: 0, name: __('Unknown Client'), email: 'N/A', phone: '', address: '' };
+    const activeClient = client || { id: 0, name: __('erp.unknown_client'), email: 'N/A', phone: '', address: '' };
     const activeWallet = wallet || { balance: 0, locked_balance: 0, currency_id: 0, currency: undefined };
     const activeTransactions = transactions?.data || [];
     
@@ -38,33 +38,33 @@ export default function Show({ wallet, transactions, client }: WalletShowProps) 
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('clients');
 
     return (
-        <ERPLayout title={`${__('Transaction Ledger')} - ${activeClient.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={`${__('erp.transaction_ledger')} - ${activeClient.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-8">
                 {/* Header */}
                 <div className="space-y-2">
                     <Link href={route('erp.clients.show', activeClient.id)} className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                        <ArrowLeft className="mr-2 h-4 w-4" /> {__('Back to Client')}
+                        <ArrowLeft className="mr-2 h-4 w-4" /> {__('erp.back_to_client')}
                     </Link>
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
-                            <h1 className="text-2xl font-semibold tracking-tight">{activeClient.name} — {__('Transaction Ledger')}</h1>
-                            <p className="text-sm text-muted-foreground">{__('Complete record of all client transactions.')}</p>
+                            <h1 className="text-2xl font-semibold tracking-tight">{activeClient.name} — {__('erp.transaction_ledger')}</h1>
+                            <p className="text-sm text-muted-foreground">{__('erp.complete_record_of_all_client')}</p>
                         </div>
                         <div className="flex items-center gap-2">
                             <Link href={route('erp.clients.wallet.adjust', activeClient.id) + '?type=receive'}>
                                 <Button size="sm" className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white shadow-none">
-                                    <ArrowDownLeft className="w-3.5 h-3.5" /> {__('Receive')}
+                                    <ArrowDownLeft className="w-3.5 h-3.5" /> {__('general.receive')}
                                 </Button>
                             </Link>
                             <Link href={route('erp.clients.wallet.adjust', activeClient.id) + '?type=send'}>
                                 <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200">
-                                    <ArrowUpRight className="w-3.5 h-3.5 text-amber-600" /> {__('Send')}
+                                    <ArrowUpRight className="w-3.5 h-3.5 text-amber-600" /> {__('general.send')}
                                 </Button>
                             </Link>
                             <Link href={route('erp.clients.wallet.adjust', activeClient.id) + '?type=refund'}>
                                 <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200">
-                                    <RotateCcw className="w-3.5 h-3.5 text-blue-600" /> {__('Refund')}
+                                    <RotateCcw className="w-3.5 h-3.5 text-blue-600" /> {__('general.refund')}
                                 </Button>
                             </Link>
                         </div>
@@ -74,27 +74,27 @@ export default function Show({ wallet, transactions, client }: WalletShowProps) 
                 {/* Financial Summary */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
-                        <div className="text-sm font-medium text-slate-500 mb-1">{__('Available Balance')}</div>
+                        <div className="text-sm font-medium text-slate-500 mb-1">{__('general.available_balance')}</div>
                         <div className="text-3xl font-bold tracking-tight text-slate-900">
                             <CurrencyDisplay amount={activeWallet.balance} currency={currencyCode} />
                         </div>
-                        <p className="text-xs text-slate-400 mt-2">{__('Ready for use')}</p>
+                        <p className="text-xs text-slate-400 mt-2">{__('general.ready_for_use')}</p>
                     </div>
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
                         <div className="text-sm font-medium text-slate-500 mb-1 flex items-center gap-1.5">
-                            {__('Locked Balance')} <Lock className="h-3 w-3" />
+                            {__('general.locked_balance')} <Lock className="h-3 w-3" />
                         </div>
                         <div className="text-3xl font-bold tracking-tight text-slate-900">
                             <CurrencyDisplay amount={activeWallet.locked_balance ?? 0} currency={currencyCode} />
                         </div>
-                        <p className="text-xs text-slate-400 mt-2">{__('Reserved for unpaid invoices')}</p>
+                        <p className="text-xs text-slate-400 mt-2">{__('erp.reserved_for_unpaid_invoices')}</p>
                     </div>
                     <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
-                        <div className="text-sm font-medium text-slate-500 mb-1">{__('Total Ledger')}</div>
+                        <div className="text-sm font-medium text-slate-500 mb-1">{__('erp.total_ledger')}</div>
                         <div className="text-3xl font-bold tracking-tight text-slate-900">
                             <CurrencyDisplay amount={activeWallet.balance + (activeWallet.locked_balance ?? 0)} currency={currencyCode} />
                         </div>
-                        <p className="text-xs text-slate-400 mt-2">{__('Computed from all transactions')}</p>
+                        <p className="text-xs text-slate-400 mt-2">{__('erp.computed_from_all_transactions')}</p>
                     </div>
                 </div>
 
@@ -102,9 +102,9 @@ export default function Show({ wallet, transactions, client }: WalletShowProps) 
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                     <div className="p-6 flex flex-row items-center justify-between border-b border-slate-100">
                         <div>
-                            <h3 className="text-lg font-semibold text-slate-900">{__('Transaction History')}</h3>
+                            <h3 className="text-lg font-semibold text-slate-900">{__('erp.transaction_history')}</h3>
                             <p className="text-sm text-slate-500 mt-1">
-                                {transactions?.total ? `${transactions.total} ${__('transactions')}` : __('No transactions yet')}
+                                {transactions?.total ? `${transactions.total} ${__('erp.transactions_2')}` : __('erp.no_transactions_yet_2')}
                             </p>
                         </div>
                     </div>
@@ -113,11 +113,11 @@ export default function Show({ wallet, transactions, client }: WalletShowProps) 
                             <Table>
                                 <TableHeader>
                                     <TableRow className="hover:bg-transparent border-slate-100">
-                                        <TableHead className="pl-6 text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('Type')}</TableHead>
-                                        <TableHead className="text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('Amount')}</TableHead>
-                                        <TableHead className="text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('Project')}</TableHead>
-                                        <TableHead className="text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('Note')}</TableHead>
-                                        <TableHead className="pr-6 text-right text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('Date')}</TableHead>
+                                        <TableHead className="pl-6 text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('general.type')}</TableHead>
+                                        <TableHead className="text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('general.amount')}</TableHead>
+                                        <TableHead className="text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('erp.project')}</TableHead>
+                                        <TableHead className="text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('general.note')}</TableHead>
+                                        <TableHead className="pr-6 text-right text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('general.date')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -163,8 +163,8 @@ export default function Show({ wallet, transactions, client }: WalletShowProps) 
                         ) : (
                             <div className="py-16 text-center text-slate-500">
                                 <AlertCircle className="w-8 h-8 mx-auto text-slate-300 mb-3" />
-                                <p className="font-medium text-slate-900">{__('No transactions found')}</p>
-                                <p className="text-sm mt-1">{__('This client has no transaction history yet.')}</p>
+                                <p className="font-medium text-slate-900">{__('erp.no_transactions_found')}</p>
+                                <p className="text-sm mt-1">{__('erp.this_client_has_no_transaction')}</p>
                             </div>
                         )}
                     </div>
@@ -173,17 +173,17 @@ export default function Show({ wallet, transactions, client }: WalletShowProps) 
                     {transactions && transactions.last_page > 1 && (
                         <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100">
                             <p className="text-sm text-slate-500">
-                                {__('Page')} {transactions.current_page} / {transactions.last_page}
+                                {__('general.page')} {transactions.current_page} / {transactions.last_page}
                             </p>
                             <div className="flex gap-2">
                                 {transactions.current_page > 1 && (
                                     <Link href={`?page=${transactions.current_page - 1}`}>
-                                        <Button variant="outline" size="sm" className="shadow-none border-slate-200">{__('Previous')}</Button>
+                                        <Button variant="outline" size="sm" className="shadow-none border-slate-200">{__('general.previous')}</Button>
                                     </Link>
                                 )}
                                 {transactions.current_page < transactions.last_page && (
                                     <Link href={`?page=${transactions.current_page + 1}`}>
-                                        <Button variant="outline" size="sm" className="shadow-none border-slate-200">{__('Next')}</Button>
+                                        <Button variant="outline" size="sm" className="shadow-none border-slate-200">{__('general.next')}</Button>
                                     </Link>
                                 )}
                             </div>
@@ -194,23 +194,23 @@ export default function Show({ wallet, transactions, client }: WalletShowProps) 
                 {/* Client Overview Sidebar */}
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
                     <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <User className="h-4 w-4 text-slate-400" /> {__('Client Overview')}
+                        <User className="h-4 w-4 text-slate-400" /> {__('erp.client_overview')}
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 text-sm">
                         <div className="flex justify-between items-start sm:flex-col sm:gap-1">
-                            <span className="text-slate-500">{__('Name')}</span>
+                            <span className="text-slate-500">{__('general.name')}</span>
                             <span className="font-semibold text-slate-900">{activeClient.name}</span>
                         </div>
                         <div className="flex justify-between items-start sm:flex-col sm:gap-1">
-                            <span className="text-slate-500">{__('Email')}</span>
+                            <span className="text-slate-500">{__('general.email')}</span>
                             <span className="font-medium text-slate-700">{activeClient.email || '—'}</span>
                         </div>
                         <div className="flex justify-between items-start sm:flex-col sm:gap-1">
-                            <span className="text-slate-500">{__('Phone')}</span>
+                            <span className="text-slate-500">{__('general.phone')}</span>
                             <span className="font-medium text-slate-700">{activeClient.phone || '—'}</span>
                         </div>
                         <div className="flex justify-between items-start sm:flex-col sm:gap-1">
-                            <span className="text-slate-500">{__('Address')}</span>
+                            <span className="text-slate-500">{__('general.address')}</span>
                             <span className="font-medium text-slate-700 truncate max-w-[200px]" title={activeClient.address}>{activeClient.address || '—'}</span>
                         </div>
                     </div>

@@ -99,13 +99,13 @@ export default function Index({ clients, filters, stats }) {
                 setIsChangeRoleOpen(false);
                 setSelectedRoleUser(null);
                 toast({
-                    title: __("Success"),
+                    title: __("general.success"),
                     description: __("general.role_updated_successfully"),
                 });
             },
             onError: () => {
                 toast({
-                    title: __("Error"),
+                    title: __("general.error"),
                     description: __("general.failed_to_update_role"),
                     variant: "destructive"
                 });
@@ -174,7 +174,7 @@ export default function Index({ clients, filters, stats }) {
         },
         {
             key: 'wallet',
-            label: __('Wallet Balance'),
+            label: __('erp.wallet_balance'),
             render: (client) => {
                 const balance = client.available_balance || 0;
                 return (
@@ -363,17 +363,17 @@ export default function Index({ clients, filters, stats }) {
                                         onChange={e => setSelectedRole(e.target.value)}
                                         required
                                     >
-                                        <option value="client">{__("Client")}</option>
-                                        <option value="admin">{__("Admin")}</option>
+                                        <option value="client">{__("erp.client")}</option>
+                                        <option value="admin">{__("admin.admin")}</option>
                                         <option value="manager">{__("general.manager")}</option>
-                                        <option value="employee">{__("Employee")}</option>
+                                        <option value="employee">{__("general.employee")}</option>
                                         <option value="moderator">{__("general.moderator")}</option>
                                     </select>
                                 </div>
                             </div>
                         )}
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setIsChangeRoleOpen(false)}>{__("Cancel")}</Button>
+                            <Button type="button" variant="outline" onClick={() => setIsChangeRoleOpen(false)}>{__("general.cancel")}</Button>
                             <Button type="submit">{__("general.update_role")}</Button>
                         </DialogFooter>
                     </form>

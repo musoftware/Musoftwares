@@ -66,7 +66,7 @@ export default function Invoices({
     const columns = [
         {
             key: 'invoice_number',
-            label: __('Invoice No'),
+            label: __('erp.invoice_no'),
             render: (row: Invoice) => (
                 <Link
                     href={route('billing.invoices.pay', row.id)}
@@ -78,14 +78,14 @@ export default function Invoices({
         },
         {
             key: 'issued_at',
-            label: __('Issued'),
+            label: __('general.issued'),
             render: (row: Invoice) => (
                 <DateDisplay date={row.issued_at} className="text-slate-500 text-[13px]" />
             ),
         },
         {
             key: 'due_date',
-            label: __('Due Date'),
+            label: __('general.due_date'),
             render: (row: Invoice) => {
                 const isOverdue =
                     row.due_date &&
@@ -101,7 +101,7 @@ export default function Invoices({
         },
         {
             key: 'amount',
-            label: __('Amount'),
+            label: __('general.amount'),
             render: (row: Invoice) => (
                 <CurrencyDisplay
                     amount={row.amount}
@@ -112,7 +112,7 @@ export default function Invoices({
         },
         {
             key: 'paid_amount',
-            label: __('Paid'),
+            label: __('general.paid'),
             render: (row: Invoice) => (
                 <CurrencyDisplay
                     amount={row.paid_amount}
@@ -123,7 +123,7 @@ export default function Invoices({
         },
         {
             key: 'remaining',
-            label: __('Remaining'),
+            label: __('general.remaining'),
             render: (row: Invoice) => (
                 <CurrencyDisplay
                     amount={row.remaining}
@@ -134,7 +134,7 @@ export default function Invoices({
         },
         {
             key: 'status',
-            label: __('Status'),
+            label: __('general.status'),
             render: (row: Invoice) => <StatusBadge status={row.status} />,
         },
         {
@@ -152,7 +152,7 @@ export default function Invoices({
                                 className: 'bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs px-3 shadow-sm h-8 inline-flex items-center'
                             })}
                         >
-                            <CreditCard className="mr-1.5 h-3.5 w-3.5" /> {__('Pay')}
+                            <CreditCard className="mr-1.5 h-3.5 w-3.5" /> {__('payment.pay')}
                         </Link>
                     ) : (
                         <Link
@@ -175,14 +175,14 @@ export default function Invoices({
 
     return (
         <AuthenticatedLayout>
-            <Head title={__('Billing & Invoices')} />
+            <Head title={__('erp.billing_invoices')} />
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans space-y-8">
                 
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{__('Billing & Invoices')}</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{__('erp.billing_invoices')}</h1>
                     <p className="text-sm text-slate-500 mt-1">
-                        {__('View outstanding statements and settle balances securely using your wallet.')}
+                        {__('erp.view_outstanding_statements_and_settle')}
                     </p>
                 </div>
 
@@ -191,12 +191,12 @@ export default function Invoices({
                     {/* Wallet Balance */}
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
                         <div className="space-y-1.5">
-                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">{__('Wallet Balance')}</span>
+                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">{__('erp.wallet_balance')}</span>
                             <span className="text-3xl font-bold text-slate-900 tracking-tight">
                                 <CurrencyDisplay amount={client_balance} currency={wallet_currency} />
                             </span>
                             <p className="text-xs text-slate-400 leading-normal">
-                                {__('Your current available balance, which can be used to settle outstanding invoices and platform services.')}
+                                {__('erp.your_current_available_balance_which')}
                             </p>
                         </div>
                         <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -207,12 +207,12 @@ export default function Invoices({
                     {/* Outstanding Balance */}
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
                         <div className="space-y-1.5">
-                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">{__('Total Outstanding Invoices')}</span>
+                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">{__('erp.total_outstanding_invoices')}</span>
                             <span className="text-3xl font-bold text-slate-900 tracking-tight">
                                 <CurrencyDisplay amount={totalOutstanding} currency={wallet_currency} />
                             </span>
                             <p className="text-xs text-slate-400 leading-normal">
-                                {__('Settle outstanding payments instantly with your wallet balance.')}
+                                {__('erp.settle_outstanding_payments_instantly_with')}
                             </p>
                         </div>
                         <div className="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
@@ -224,7 +224,7 @@ export default function Invoices({
                 {/* Invoices List Table */}
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-6">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-semibold text-slate-900">{__('Billing History')}</h2>
+                        <h2 className="text-lg font-semibold text-slate-900">{__('billing.billing_history')}</h2>
                     </div>
 
                     <DataTable
@@ -244,8 +244,8 @@ export default function Invoices({
                                 : undefined
                         }
                         emptyIcon={FileText}
-                        emptyTitle={__('No invoices')}
-                        emptyDescription={__('There are currently no billing statements associated with your account.')}
+                        emptyTitle={__('erp.no_invoices')}
+                        emptyDescription={__('billing.there_are_currently_no_billing')}
                     />
                 </div>
             </div>

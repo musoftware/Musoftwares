@@ -68,24 +68,24 @@ export default function InvoicePay({
             );
 
             if (response.data.success) {
-                setSuccessMessage(__('Invoice payment successfully processed!'));
+                setSuccessMessage(__('erp.invoice_payment_successfully_processed'));
                 toast({
-                    title: __('Payment Successful'),
-                    description: response.data.message || __('Your invoice has been settled.'),
+                    title: __('payment.payment_successful'),
+                    description: response.data.message || __('erp.your_invoice_has_been_settled'),
                     variant: 'default',
                 });
                 setTimeout(() => {
                     router.visit(response.data.redirect_url);
                 }, 2000);
             } else {
-                setErrorMessage(response.data.message || __('Payment processing failed.'));
+                setErrorMessage(response.data.message || __('payment.payment_processing_failed'));
             }
         } catch (error: any) {
             console.error('Payment Error:', error);
-            const msg = (error as any).response?.data?.message || __('An error occurred during payment processing.');
+            const msg = (error as any).response?.data?.message || __('payment.an_error_occurred_during_payment');
             setErrorMessage(msg);
             toast({
-                title: __('Payment Failed'),
+                title: __('payment.payment_failed'),
                 description: msg,
                 variant: 'destructive',
             });
@@ -96,7 +96,7 @@ export default function InvoicePay({
 
     return (
         <AuthenticatedLayout>
-            <Head title={`${__('Invoice')} #${invoice.invoice_number}`} />
+            <Head title={`${__('erp.invoice_2')} #${invoice.invoice_number}`} />
             
             <div className="max-w-[1000px] mx-auto px-4 sm:px-6 py-10 font-sans space-y-6">
                 {/* Navigation Back */}
@@ -109,10 +109,10 @@ export default function InvoicePay({
                             className: 'text-slate-500 hover:text-slate-900 inline-flex items-center'
                         })}
                     >
-                        <ArrowLeft className="mr-1.5 h-4 w-4" /> {__('Back to Invoices')}
+                        <ArrowLeft className="mr-1.5 h-4 w-4" /> {__('erp.back_to_invoices')}
                     </Link>
                     <ChevronRight className="h-4 w-4 text-slate-300" />
-                    <span className="text-sm font-semibold text-slate-900 font-mono">{__('Invoice')} #{invoice.invoice_number}</span>
+                    <span className="text-sm font-semibold text-slate-900 font-mono">{__('erp.invoice_2')} #{invoice.invoice_number}</span>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -123,12 +123,12 @@ export default function InvoicePay({
                             <div className="p-6 sm:p-8 bg-slate-900 text-white flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                                 <div className="space-y-1.5">
                                     <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 text-xs font-medium border border-slate-700">
-                                        <FileText className="w-3.5 h-3.5" /> {__('Billing Statement')}
+                                        <FileText className="w-3.5 h-3.5" /> {__('billing.billing_statement')}
                                     </div>
                                     <h1 className="text-2xl font-bold font-mono tracking-tight">{invoice.invoice_number}</h1>
                                 </div>
                                 <div className="text-right sm:text-right space-y-1.5">
-                                    <span className="text-xs text-slate-400 block uppercase tracking-wider font-semibold">{__('Status')}</span>
+                                    <span className="text-xs text-slate-400 block uppercase tracking-wider font-semibold">{__('general.status')}</span>
                                     <StatusBadge status={invoice.status} />
                                 </div>
                             </div>
@@ -136,26 +136,26 @@ export default function InvoicePay({
                             {/* Dates Summary */}
                             <div className="grid grid-cols-2 border-b border-slate-100 bg-slate-50/50">
                                 <div className="p-4 sm:p-6 border-r border-slate-100 space-y-1">
-                                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">{__('Issued Date')}</span>
+                                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">{__('general.issued_date')}</span>
                                     <DateDisplay date={invoice.issued_at} className="text-sm font-medium text-slate-800" />
                                 </div>
                                 <div className="p-4 sm:p-6 space-y-1">
-                                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">{__('Due Date')}</span>
+                                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">{__('general.due_date')}</span>
                                     <DateDisplay date={invoice.due_date} className="text-sm font-semibold text-slate-900" />
                                 </div>
                             </div>
 
                             {/* Items List */}
                             <div className="p-6 sm:p-8 space-y-6">
-                                <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3">{__('Line Items')}</h3>
+                                <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3">{__('general.line_items')}</h3>
                                 <div className="overflow-x-auto">
                                     <table className="min-w-full divide-y divide-slate-100">
                                         <thead>
                                             <tr className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                                                <th className="pb-3 pr-4">{__('Description')}</th>
-                                                <th className="pb-3 px-4 text-center">{__('Qty')}</th>
-                                                <th className="pb-3 px-4 text-right">{__('Unit Price')}</th>
-                                                <th className="pb-3 pl-4 text-right">{__('Total')}</th>
+                                                <th className="pb-3 pr-4">{__('general.description')}</th>
+                                                <th className="pb-3 px-4 text-center">{__('general.qty')}</th>
+                                                <th className="pb-3 px-4 text-right">{__('general.unit_price')}</th>
+                                                <th className="pb-3 pl-4 text-right">{__('general.total')}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100 text-[13px] text-slate-700">
@@ -178,19 +178,19 @@ export default function InvoicePay({
                                 {/* Financial Summary */}
                                 <div className="border-t border-slate-100 pt-6 flex flex-col items-end space-y-2.5">
                                     <div className="flex justify-between w-64 text-sm text-slate-500">
-                                        <span>{__('Subtotal')}</span>
+                                        <span>{__('general.subtotal')}</span>
                                         <span className="font-mono font-medium">
                                             <CurrencyDisplay amount={invoice.amount} currency={invoice.currency} />
                                         </span>
                                     </div>
                                     <div className="flex justify-between w-64 text-sm text-slate-500">
-                                        <span>{__('Paid to Date')}</span>
+                                        <span>{__('general.paid_to_date')}</span>
                                         <span className="font-mono font-medium text-emerald-600">
                                             <CurrencyDisplay amount={invoice.paid_amount} currency={invoice.currency} />
                                         </span>
                                     </div>
                                     <div className="flex justify-between w-64 text-base font-bold text-slate-900 border-t border-slate-100 pt-3">
-                                        <span>{__('Total Outstanding')}</span>
+                                        <span>{__('general.total_outstanding')}</span>
                                         <span className="font-mono text-indigo-600">
                                             <CurrencyDisplay amount={invoice.remaining} currency={invoice.currency} />
                                         </span>
@@ -203,7 +203,7 @@ export default function InvoicePay({
                     {/* Checkout / Payment Section */}
                     <div className="space-y-6">
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-6">
-                            <h2 className="text-lg font-semibold text-slate-900">{__('Secure Payment')}</h2>
+                            <h2 className="text-lg font-semibold text-slate-900">{__('payment.secure_payment')}</h2>
                             
                             {/* Wallet Info Widget */}
                             <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex items-start gap-3">
@@ -211,12 +211,12 @@ export default function InvoicePay({
                                     <Wallet className="w-5 h-5" />
                                 </div>
                                 <div className="space-y-0.5 min-w-0">
-                                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">{__('Wallet Balance')}</span>
+                                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">{__('erp.wallet_balance')}</span>
                                     <span className="text-lg font-bold text-slate-900 tracking-tight block">
                                         <CurrencyDisplay amount={client_balance} currency={wallet_currency} />
                                     </span>
                                     <span className="text-[10px] text-slate-500 leading-normal block">
-                                        {__('Platform Wallet')}
+                                        {__('erp.platform_wallet')}
                                     </span>
                                 </div>
                             </div>
@@ -232,7 +232,7 @@ export default function InvoicePay({
                             {errorMessage && (
                                 <Alert variant="destructive">
                                     <ShieldAlert className="w-4 h-4" />
-                                    <AlertTitle>{__('Checkout Failed')}</AlertTitle>
+                                    <AlertTitle>{__('payment.checkout_failed')}</AlertTitle>
                                     <AlertDescription>{errorMessage}</AlertDescription>
                                 </Alert>
                             )}
@@ -241,8 +241,8 @@ export default function InvoicePay({
                             {invoice.status === 'paid' ? (
                                 <div className="bg-emerald-50 border border-emerald-100 text-emerald-800 p-4 rounded-xl flex flex-col items-center text-center space-y-2">
                                     <CheckCircle2 className="w-8 h-8 text-emerald-600" />
-                                    <span className="text-sm font-semibold">{__('Paid Statement Settled')}</span>
-                                    <span className="text-xs text-slate-500">{__('This invoice has been fully paid. No further action is required.')}</span>
+                                    <span className="text-sm font-semibold">{__('general.paid_statement_settled')}</span>
+                                    <span className="text-xs text-slate-500">{__('erp.this_invoice_has_been_fully')}</span>
                                 </div>
                             ) : (
                                 <div className="space-y-4">
@@ -250,8 +250,8 @@ export default function InvoicePay({
                                         <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl flex items-start gap-2.5">
                                             <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                                             <div className="text-xs leading-normal">
-                                                <span className="font-bold block mb-1">{__('Insufficient Funds')}</span>
-                                                {__('Your wallet balance is not sufficient to settle this invoice. Please top up your wallet balance.')}
+                                                <span className="font-bold block mb-1">{__('general.insufficient_funds')}</span>
+                                                {__('erp.your_wallet_balance_is_not')}
                                             </div>
                                         </div>
                                     )}
@@ -262,11 +262,11 @@ export default function InvoicePay({
                                         className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-sm transition-all duration-150 rounded-xl flex items-center justify-center gap-2"
                                     >
                                         <CreditCard className="w-4 h-4" />
-                                        {loading ? __('Processing Securely...') : __('Settle & Pay Outstanding')}
+                                        {loading ? __('general.processing_securely') : __('payment.settle_pay_outstanding')}
                                     </Button>
 
                                     <p className="text-[10px] text-slate-400 text-center leading-normal">
-                                        {__('By checking out, you authorize immediate debit of')} <span className="font-semibold">{invoice.remaining.toFixed(2)} {invoice.currency}</span> {__('from your platform wallet balance.')}
+                                        {__('general.by_checking_out_you_authorize')} <span className="font-semibold">{invoice.remaining.toFixed(2)} {invoice.currency}</span> {__('erp.from_your_platform_wallet_balance')}
                                     </p>
                                 </div>
                             )}

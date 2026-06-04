@@ -26,9 +26,9 @@ export default function CheckoutModal({ isOpen, onClose, subtotal, currency, onC
     const [isPaid, setIsPaid] = useState<boolean>(true);
 
     const paymentMethods = [
-        { id: 'cash', name: __('Cash'), icon: <Banknote className="w-6 h-6 mb-2" /> },
-        { id: 'card', name: __('Credit Card'), icon: <CreditCard className="w-6 h-6 mb-2" /> },
-        { id: 'wallet', name: __('Wallet / Transfer'), icon: <Wallet className="w-6 h-6 mb-2" /> },
+        { id: 'cash', name: __('general.cash'), icon: <Banknote className="w-6 h-6 mb-2" /> },
+        { id: 'card', name: __('general.credit_card'), icon: <CreditCard className="w-6 h-6 mb-2" /> },
+        { id: 'wallet', name: __('erp.wallet_transfer'), icon: <Wallet className="w-6 h-6 mb-2" /> },
     ];
 
     const total = Math.max(0, subtotal - discountAmount);
@@ -46,20 +46,20 @@ export default function CheckoutModal({ isOpen, onClose, subtotal, currency, onC
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>{__('Complete Payment')}</DialogTitle>
+                    <DialogTitle>{__('payment.complete_payment')}</DialogTitle>
                     <DialogDescription>
-                        {__('Configure checkout options and select payment method.')}
+                        {__('payment.configure_checkout_options_and_select')}
                     </DialogDescription>
                 </DialogHeader>
                 
                 <div className="grid gap-4 py-4">
                     <div className="flex flex-col space-y-1.5">
-                        <Label>{__('Client (Optional)')}</Label>
+                        <Label>{__('erp.client_optional')}</Label>
                         <ClientAutocomplete value={clientId} onChange={setClientId} />
                     </div>
 
                     <div className="flex flex-col space-y-1.5">
-                        <Label>{__('Discount Amount')}</Label>
+                        <Label>{__('general.discount_amount')}</Label>
                         <Input 
                             type="number" 
                             min="0" 
@@ -70,18 +70,18 @@ export default function CheckoutModal({ isOpen, onClose, subtotal, currency, onC
 
                     <div className="flex items-center space-x-2 pt-2">
                         <Switch id="is-paid" checked={isPaid} onCheckedChange={setIsPaid} />
-                        <Label htmlFor="is-paid">{__('Mark as Paid')}</Label>
+                        <Label htmlFor="is-paid">{__('general.mark_as_paid')}</Label>
                     </div>
                 </div>
 
                 <div className="py-4 flex flex-col items-center border-y border-dashed my-2">
-                    <span className="text-sm text-gray-500 mb-1">{__('Amount Due')}</span>
+                    <span className="text-sm text-gray-500 mb-1">{__('general.amount_due')}</span>
                     <span className="text-4xl font-bold text-gray-900">
                         {formatCurrency(total, currency)}
                     </span>
                     {discountAmount > 0 && (
                         <span className="text-sm text-emerald-600 mt-1">
-                            {__('Discount applied: ')} {formatCurrency(discountAmount, currency)}
+                            {__('general.discount_applied')} {formatCurrency(discountAmount, currency)}
                         </span>
                     )}
                 </div>
@@ -108,10 +108,10 @@ export default function CheckoutModal({ isOpen, onClose, subtotal, currency, onC
 
                 <DialogFooter>
                     <Button variant="outline" onClick={onClose} disabled={isProcessing}>
-                        {__('Cancel')}
+                        {__('general.cancel')}
                     </Button>
                     <Button onClick={handleConfirm} disabled={isProcessing}>
-                        {isProcessing ? __('Processing...') : __('Confirm Checkout')}
+                        {isProcessing ? __('Processing...') : __('payment.confirm_checkout')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

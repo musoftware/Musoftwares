@@ -55,11 +55,11 @@ export default function Index({ widgets }: { widgets: any }) {
                             <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
                                 <tr>
                                     <th className="px-6 py-4 font-medium">{__('general.form_name')}</th>
-                                    <th className="px-6 py-4 font-medium">{__('Status')}</th>
+                                    <th className="px-6 py-4 font-medium">{__('general.status')}</th>
                                     <th className="px-6 py-4 font-medium">{__('general.allowed_domains')}</th>
                                     <th className="px-6 py-4 font-medium">{__('general.leads_captured')}</th>
-                                    <th className="px-6 py-4 font-medium">{__('Created At')}</th>
-                                    <th className="px-6 py-4 font-medium text-right">{__('Actions')}</th>
+                                    <th className="px-6 py-4 font-medium">{__('general.created_at')}</th>
+                                    <th className="px-6 py-4 font-medium text-right">{__('general.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -75,11 +75,11 @@ export default function Index({ widgets }: { widgets: any }) {
                                         <td className="px-6 py-4">
                                             {widget.is_active ? (
                                                 <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
-                                                    {__('Active')}
+                                                    {__('general.active')}
                                                 </Badge>
                                             ) : (
                                                 <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">
-                                                    {__('Inactive')}
+                                                    {__('general.inactive')}
                                                 </Badge>
                                             )}
                                         </td>
@@ -105,7 +105,7 @@ export default function Index({ widgets }: { widgets: any }) {
                                                 <Link href={route('crm.widgets.show', widget.id)} title={__('general.get_embed_code')} className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'text-slate-500 hover:text-indigo-600' })}>
                                                     <Code className="w-4 h-4" />
                                                 </Link>
-                                                <Link href={route('crm.widgets.edit', widget.id)} title={__('Settings')} className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'text-slate-500 hover:text-indigo-600' })}>
+                                                <Link href={route('crm.widgets.edit', widget.id)} title={__('admin.settings')} className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'text-slate-500 hover:text-indigo-600' })}>
                                                     <Settings className="w-4 h-4" />
                                                 </Link>
                                             </div>

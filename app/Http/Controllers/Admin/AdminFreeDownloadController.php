@@ -60,7 +60,7 @@ class AdminFreeDownloadController extends Controller
             'order_column'         => (int) ($validated['order_column'] ?? 0),
         ]);
 
-        return redirect()->back()->with('success', __('Free download item created successfully.'));
+        return redirect()->back()->with('success', __('general.free_download_item_created_successfully'));
     }
 
     public function update(UpdateFreeDownloadRequest $request, FreeDownload $freeDownload)
@@ -93,7 +93,7 @@ class AdminFreeDownloadController extends Controller
 
         $freeDownload->update($data);
 
-        return redirect()->back()->with('success', __('Free download item updated successfully.'));
+        return redirect()->back()->with('success', __('general.free_download_item_updated_successfully'));
     }
 
     public function destroy(FreeDownload $freeDownload)
@@ -106,6 +106,6 @@ class AdminFreeDownloadController extends Controller
         }
         $freeDownload->delete();
 
-        return redirect()->back()->with('success', __('Free download item deleted successfully.'));
+        return redirect()->back()->with('success', __('general.free_download_item_deleted_successfully'));
     }
 }

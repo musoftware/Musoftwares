@@ -8,31 +8,31 @@ export default function GoldSaversTabs() {
 
     const tabs = [
         {
-            name: __('Dashboard'),
+            name: __('general.dashboard'),
             href: route('isaas.gold-savers.index'),
             active: url === '/isaas/gold-savers' || url.startsWith('/isaas/gold-savers?'),
             icon: LayoutDashboard
         },
         {
-            name: __('My Wallets'),
+            name: __('erp.my_wallets'),
             href: route('isaas.gold-savers.wallets.index'),
             active: url.startsWith('/isaas/gold-savers/wallets'),
             icon: Wallet
         },
         {
-            name: __('Market Prices'),
+            name: __('general.market_prices'),
             href: route('isaas.gold-savers.market.index'),
             active: url.startsWith('/isaas/gold-savers/market'),
             icon: TrendingUp
         },
         {
-            name: __('Analytics'),
+            name: __('general.analytics'),
             href: route('isaas.gold-savers.analytics.index'),
             active: url.startsWith('/isaas/gold-savers/analytics'),
             icon: PieChart
         },
         {
-            name: __('Reports'),
+            name: __('general.reports'),
             href: route('isaas.gold-savers.reports.index'),
             active: url.startsWith('/isaas/gold-savers/reports'),
             icon: FileText

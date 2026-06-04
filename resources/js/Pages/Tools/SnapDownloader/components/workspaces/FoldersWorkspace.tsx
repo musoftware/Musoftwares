@@ -22,19 +22,19 @@ export function FoldersWorkspace({
         <div className="space-y-5 max-w-3xl mx-auto">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-xl sm:text-2xl font-black text-white">{__('Saved Files')}</h1>
-                    <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('Saved media, organised by profile')}</p>
+                    <h1 className="text-xl sm:text-2xl font-black text-white">{__('general.saved_files')}</h1>
+                    <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.saved_media_organised_by_profile')}</p>
                 </div>
                 <Button variant="ghost" onClick={() => handleOpenFolder()} className="gap-1.5 h-11 text-xs font-bold" style={{ background: 'rgba(245,158,11,0.1)', color: '#f59e0b' }}>
-                    <FolderOpen className="w-3.5 h-3.5" /> {__('Open All')}
+                    <FolderOpen className="w-3.5 h-3.5" /> {__('general.open_all')}
                 </Button>
             </div>
 
             {folders.length === 0 ? (
                 <EmptyState
                     icon={<FolderOpen className="w-7 h-7" style={{ color: 'rgba(255,255,255,0.2)' }} />}
-                    title={__('No saved files yet')}
-                    sub={__('Files will appear here after your first download')}
+                    title={__('general.no_saved_files_yet')}
+                    sub={__('general.files_will_appear_here_after')}
                 />
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -53,7 +53,7 @@ export function FoldersWorkspace({
                                 <div className="flex-1 min-w-0">
                                     <div className="font-bold text-white text-sm truncate">{folder.name}</div>
                                     <div className="text-[11px] mt-0.5 font-normal" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                                        {folder.fileCount} {folder.fileCount !== 1 ? __('files') : __('file')} · {formatBytes(folder.totalSize)}
+                                        {folder.fileCount} {folder.fileCount !== 1 ? __('general.files_2') : __('general.file')} · {formatBytes(folder.totalSize)}
                                     </div>
                                 </div>
                                 <ChevronRight className="w-4 h-4 shrink-0 mt-1" style={{ color: 'rgba(255,255,255,0.2)' }} />

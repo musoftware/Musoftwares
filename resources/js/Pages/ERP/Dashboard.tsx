@@ -735,8 +735,8 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         if (!deleteProjectConfirm.project) return;
         router.delete(route('erp.projects.destroy', deleteProjectConfirm.project.id), {
             onSuccess: () => {
-                toast({ description: __('Project deleted successfully') });
-                prependActivity(__('Project Deleted'), `Deleted project ${deleteProjectConfirm.project.name}.`);
+                toast({ description: __('erp.project_deleted_successfully') });
+                prependActivity(__('erp.project_deleted'), `Deleted project ${deleteProjectConfirm.project.name}.`);
                 setDeleteProjectConfirm({ open: false, project: null });
             }
         });
@@ -746,8 +746,8 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         if (!deleteInvoiceConfirm.invoice) return;
         router.delete(route('erp.invoices.destroy', deleteInvoiceConfirm.invoice.id), {
             onSuccess: () => {
-                toast({ description: __('Invoice deleted successfully') });
-                prependActivity(__('Invoice Deleted'), `Deleted invoice ${deleteInvoiceConfirm.invoice.invoiceNumber}.`);
+                toast({ description: __('erp.invoice_deleted_successfully') });
+                prependActivity(__('erp.invoice_deleted'), `Deleted invoice ${deleteInvoiceConfirm.invoice.invoiceNumber}.`);
                 setDeleteInvoiceConfirm({ open: false, invoice: null });
             }
         });
@@ -987,9 +987,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
             {/* ConfirmModal for invoice deletion */}
             <ConfirmModal
                 isOpen={deleteInvoiceConfirm.open}
-                title={__('Delete Invoice')}
-                description={__('Are you sure you want to delete this invoice? This action cannot be undone.')}
-                confirmLabel={__('Delete Invoice')}
+                title={__('erp.delete_invoice')}
+                description={__('erp.are_you_sure_you_want')}
+                confirmLabel={__('erp.delete_invoice')}
                 variant="danger"
                 onConfirm={confirmDeleteInvoice}
                 onCancel={() => setDeleteInvoiceConfirm({ open: false, invoice: null })}
@@ -1063,12 +1063,12 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     {!isReadOnlyMember && (
                                         <>
                                             <MetricCard 
-                                                label={__('Total Revenue')}
+                                                label={__('general.total_revenue')}
                                                 value={formatMoney(stats.totalRevenue, currency)}
                                                 icon={DollarSign}
                                             />
                                             <MetricCard 
-                                                label={__('Outstanding')}
+                                                label={__('general.outstanding')}
                                                 value={formatMoney(stats.outstandingRevenue, currency)}
                                                 icon={Clock}
                                             />
@@ -1650,22 +1650,22 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'invoices' && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title={__('Invoices')} 
-                                    description={__('Track, manage, and send invoices to your clients')}
+                                    title={__('erp.invoices')} 
+                                    description={__('erp.track_manage_and_send_invoices')}
                                     actions={
                                         <div className="flex items-center gap-2">
                                             <Link 
                                                 href={route('erp.invoices.index')}
                                                 className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), "shadow-none")}
                                             >
-                                                <History className="mr-1.5 h-3.5 w-3.5" /> {__('All Invoices')}
+                                                <History className="mr-1.5 h-3.5 w-3.5" /> {__('erp.all_invoices')}
                                             </Link>
                                             {!isReadOnlyMember && (
                                                 <Link 
                                                     href={route('erp.invoices.create')}
                                                     className={cn(buttonVariants({ size: 'sm' }), "shadow-none")}
                                                 >
-                                                    <Plus className="mr-1.5 h-3.5 w-3.5" /> {__('New Invoice')}
+                                                    <Plus className="mr-1.5 h-3.5 w-3.5" /> {__('erp.new_invoice')}
                                                 </Link>
                                             )}
                                         </div>
@@ -1677,13 +1677,13 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         <table className="w-full text-left text-sm border-collapse">
                                             <thead>
                                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                                    <th className="px-6 py-3.5">{__('Invoice #')}</th>
-                                                    <th className="px-6 py-3.5">{__('Client')}</th>
-                                                    <th className="px-6 py-3.5">{__('Issued')}</th>
-                                                    <th className="px-6 py-3.5">{__('Due Date')}</th>
-                                                    <th className="px-6 py-3.5 text-right">{__('Amount')}</th>
-                                                    <th className="px-6 py-3.5 text-center">{__('Status')}</th>
-                                                    <th className="px-6 py-3.5 text-right">{__('Actions')}</th>
+                                                    <th className="px-6 py-3.5">{__('erp.invoice_3')}</th>
+                                                    <th className="px-6 py-3.5">{__('erp.client')}</th>
+                                                    <th className="px-6 py-3.5">{__('general.issued')}</th>
+                                                    <th className="px-6 py-3.5">{__('general.due_date')}</th>
+                                                    <th className="px-6 py-3.5 text-right">{__('general.amount')}</th>
+                                                    <th className="px-6 py-3.5 text-center">{__('general.status')}</th>
+                                                    <th className="px-6 py-3.5 text-right">{__('general.actions')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
@@ -1692,8 +1692,8 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                         <td colSpan={7} className="p-0">
                                                             <EmptyState 
                                                                 icon={FileText} 
-                                                                title={__('No invoices yet')} 
-                                                                description={__('Create your first invoice to start tracking payments')}
+                                                                title={__('erp.no_invoices_yet')} 
+                                                                description={__('erp.create_your_first_invoice_to')}
                                                             />
                                                         </td>
                                                     </tr>

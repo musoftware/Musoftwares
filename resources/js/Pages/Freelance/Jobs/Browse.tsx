@@ -28,15 +28,15 @@ function BrowseJobsContent({ jobs }: any) {
     const [sortBy, setSortBy] = useState(urlParams.get('sort') || 'newest');
 
     const typeLabels: Record<string, string> = {
-        all: __('All Types'),
-        fixed: __('Fixed Price'),
-        hourly: __('Hourly Rate')
+        all: __('general.all_types'),
+        fixed: __('general.fixed_price'),
+        hourly: __('general.hourly_rate')
     };
 
     const sortLabels: Record<string, string> = {
-        newest: __('Newest First'),
-        budget_high: __('Highest Budget'),
-        budget_low: __('Lowest Budget')
+        newest: __('general.newest_first'),
+        budget_high: __('erp.highest_budget'),
+        budget_low: __('erp.lowest_budget')
     };
 
     useEffect(() => {
@@ -79,15 +79,15 @@ function BrowseJobsContent({ jobs }: any) {
 
     return (
         <>
-            <Head title={`${__('Browse Jobs')} - ${__('Freelance')}`} />
+            <Head title={`${__('freelance.browse_jobs')} - ${__('freelance.freelance')}`} />
 
             <PageHeader
-                title={__('Find Work')}
-                subtitle={__('Discover the perfect project that matches your skills in our unified marketplace.')}
+                title={__('general.find_work')}
+                subtitle={__('erp.discover_the_perfect_project_that')}
                 icon={Briefcase}
                 actions={
                     <Link href="/freelance/jobs/my-jobs" className={cn(buttonVariants({ variant: 'outline' }), "shadow-sm bg-white")}>
-                        {__('My Saved Jobs')}
+                        {__('freelance.my_saved_jobs')}
                     </Link>
                 }
             />
@@ -101,7 +101,7 @@ function BrowseJobsContent({ jobs }: any) {
                     <Search className="h-5 w-5 text-slate-400 shrink-0" />
                     <input 
                         type="text"
-                        placeholder={__('Search for jobs, skills, or clients...')} 
+                        placeholder={__('erp.search_for_jobs_skills_or')} 
                         className="w-full bg-transparent border-0 ring-0 focus:ring-0 focus:outline-none pl-3 text-sm text-slate-900 placeholder:text-slate-400 h-11"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -116,14 +116,14 @@ function BrowseJobsContent({ jobs }: any) {
                             className="border-0 bg-transparent hover:bg-slate-50 text-slate-700 shadow-none w-full text-sm font-medium focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-0 rounded-lg px-3 py-2 cursor-pointer transition-colors"
                             style={{ height: '2.75rem' }}
                         >
-                            <SelectValue placeholder={__('Job Type')}>
-                                {typeLabels[typeFilter] || __('Job Type')}
+                            <SelectValue placeholder={__('freelance.job_type')}>
+                                {typeLabels[typeFilter] || __('freelance.job_type')}
                             </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">{__('All Types')}</SelectItem>
-                            <SelectItem value="fixed">{__('Fixed Price')}</SelectItem>
-                            <SelectItem value="hourly">{__('Hourly Rate')}</SelectItem>
+                            <SelectItem value="all">{__('general.all_types')}</SelectItem>
+                            <SelectItem value="fixed">{__('general.fixed_price')}</SelectItem>
+                            <SelectItem value="hourly">{__('general.hourly_rate')}</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -132,7 +132,7 @@ function BrowseJobsContent({ jobs }: any) {
                     type="submit" 
                     className="h-11 rounded-lg px-6 text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shrink-0"
                 >
-                    {__('Search')}
+                    {__('general.search')}
                 </Button>
             </form>
 
@@ -141,11 +141,11 @@ function BrowseJobsContent({ jobs }: any) {
                 <div className="space-y-6">
                     <FreelanceCard className="p-5">
                         <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                            <SlidersHorizontal className="h-4 w-4" /> {__('Filters')}
+                            <SlidersHorizontal className="h-4 w-4" /> {__('general.filters')}
                         </h3>
                         <div className="space-y-5">
                             <div className="space-y-3">
-                                <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('Experience Level')}</label>
+                                <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.experience_level')}</label>
                                 <div className="space-y-2.5">
                                     {['Entry Level', 'Intermediate', 'Expert'].map(level => (
                                         <label key={level} className="flex items-center gap-2.5 cursor-pointer group">
@@ -157,7 +157,7 @@ function BrowseJobsContent({ jobs }: any) {
                             </div>
                             <div className="w-full h-px bg-slate-100"></div>
                             <div className="space-y-3">
-                                <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('Client History')}</label>
+                                <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('erp.client_history')}</label>
                                 <div className="space-y-2.5">
                                     {['No hires', '1 to 9 hires', '10+ hires'].map(history => (
                                         <label key={history} className="flex items-center gap-2.5 cursor-pointer group">
@@ -175,18 +175,18 @@ function BrowseJobsContent({ jobs }: any) {
                 <div className="lg:col-span-3 space-y-4">
                     <div className="flex items-center justify-between mb-2">
                         <h2 className="text-sm font-semibold text-slate-900">
-                            {jobs?.total || 0} {__('Open Opportunities')}
+                            {jobs?.total || 0} {__('general.open_opportunities')}
                         </h2>
                         <Select value={sortBy} onValueChange={handleSortChange}>
                             <SelectTrigger className="w-[180px] text-sm shadow-sm border-slate-200" style={{ height: '2.25rem' }}>
-                                <SelectValue placeholder={__('Sort By')}>
-                                    {sortLabels[sortBy] || __('Sort By')}
+                                <SelectValue placeholder={__('general.sort_by')}>
+                                    {sortLabels[sortBy] || __('general.sort_by')}
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="newest">{__('Newest First')}</SelectItem>
-                                <SelectItem value="budget_high">{__('Highest Budget')}</SelectItem>
-                                <SelectItem value="budget_low">{__('Lowest Budget')}</SelectItem>
+                                <SelectItem value="newest">{__('general.newest_first')}</SelectItem>
+                                <SelectItem value="budget_high">{__('erp.highest_budget')}</SelectItem>
+                                <SelectItem value="budget_low">{__('erp.lowest_budget')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -195,9 +195,9 @@ function BrowseJobsContent({ jobs }: any) {
                         <FreelanceCard>
                             <EmptyState
                                 icon={Search}
-                                title={__('No jobs found')}
-                                description={__('Try adjusting your search or filter criteria to find more opportunities.')}
-                                actionLabel={__('Clear Filters')}
+                                title={__('freelance.no_jobs_found')}
+                                description={__('general.try_adjusting_your_search_or')}
+                                actionLabel={__('general.clear_filters')}
                                 actionIcon={Search}
                                 onClick={() => router.get('/freelance/jobs/browse')}
                             />
@@ -212,8 +212,8 @@ function BrowseJobsContent({ jobs }: any) {
                                                 {job.title}
                                             </h3>
                                             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500">
-                                                <span className="flex items-center gap-1 font-medium"><Clock className="h-3.5 w-3.5 text-slate-400" /> {__('Posted')} {formatDate(job.created_at)}</span>
-                                                <span className="flex items-center gap-1 font-medium"><MapPin className="h-3.5 w-3.5 text-slate-400" /> {__('Remote')}</span>
+                                                <span className="flex items-center gap-1 font-medium"><Clock className="h-3.5 w-3.5 text-slate-400" /> {__('general.posted')} {formatDate(job.created_at)}</span>
+                                                <span className="flex items-center gap-1 font-medium"><MapPin className="h-3.5 w-3.5 text-slate-400" /> {__('general.remote')}</span>
                                             </div>
                                         </div>
                                         
@@ -223,7 +223,7 @@ function BrowseJobsContent({ jobs }: any) {
                                             </Badge>
                                             <div className="flex items-center gap-1.5">
                                                 <FinancialAmount amount={job.budget} currency={globalCurrency} size="sm" />
-                                                {job.type === 'hourly' && <span className="text-xs text-slate-500 font-medium">/ {__('hr')}</span>}
+                                                {job.type === 'hourly' && <span className="text-xs text-slate-500 font-medium">/ {__('general.hr')}</span>}
                                             </div>
                                         </div>
 

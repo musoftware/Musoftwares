@@ -55,7 +55,7 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
 
     // Define grouped menu structure
     const allCoreItems = [
-        { id: 'dashboard', label: __('Dashboard'), icon: LayoutDashboard, href: route('crm.dashboard'), isActive: activeMenu === 'dashboard' },
+        { id: 'dashboard', label: __('general.dashboard'), icon: LayoutDashboard, href: route('crm.dashboard'), isActive: activeMenu === 'dashboard' },
         { id: 'workspaces', label: __('general.workspaces'), icon: Activity, href: route('crm.workspaces.index'), isActive: activeMenu === 'workspaces' },
         { id: 'leads', label: __('general.leads_pipeline'), icon: Users, href: route('crm.leads.index'), isActive: activeMenu === 'leads' },
         { id: 'tags', label: __('general.tags_attributes'), icon: Tag, href: route('crm.tags.index'), isActive: activeMenu === 'tags' },

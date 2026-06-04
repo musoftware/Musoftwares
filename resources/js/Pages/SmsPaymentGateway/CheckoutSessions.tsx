@@ -58,11 +58,11 @@ export default function CheckoutSessions({ sessions }: Props) {
                         <thead className="bg-slate-50">
                             <tr>
                                 <th scope="col" className="px-6 py-4 text-start text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.session_id')}</th>
-                                <th scope="col" className="px-6 py-4 text-start text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('Amount')}</th>
-                                <th scope="col" className="px-6 py-4 text-start text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('Customer')}</th>
-                                <th scope="col" className="px-6 py-4 text-start text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('Status')}</th>
-                                <th scope="col" className="px-6 py-4 text-start text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('Date')}</th>
-                                <th scope="col" className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('Actions')}</th>
+                                <th scope="col" className="px-6 py-4 text-start text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.amount')}</th>
+                                <th scope="col" className="px-6 py-4 text-start text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.customer')}</th>
+                                <th scope="col" className="px-6 py-4 text-start text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.status')}</th>
+                                <th scope="col" className="px-6 py-4 text-start text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.date')}</th>
+                                <th scope="col" className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-slate-100">
@@ -87,10 +87,10 @@ export default function CheckoutSessions({ sessions }: Props) {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {session.status === 'complete' && (
-                                                    <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200"><CheckCircle2 className="w-3 h-3 mr-1"/> {__('Paid')}</Badge>
+                                                    <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200"><CheckCircle2 className="w-3 h-3 mr-1"/> {__('general.paid')}</Badge>
                                                 )}
                                                 {session.status === 'open' && (
-                                                    <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"><Clock className="w-3 h-3 mr-1"/> {__('Open')}</Badge>
+                                                    <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"><Clock className="w-3 h-3 mr-1"/> {__('general.open')}</Badge>
                                                 )}
                                                 {session.status === 'expired' && (
                                                     <Badge className="bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200"><XCircle className="w-3 h-3 mr-1"/> {__('general.expired')}</Badge>

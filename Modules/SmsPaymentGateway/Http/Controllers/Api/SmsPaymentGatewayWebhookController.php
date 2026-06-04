@@ -294,11 +294,11 @@ class SmsPaymentGatewayWebhookController extends Controller
 
             // Send webhook
             $response = Http::withHeaders([
-                'X-AutoSMS-Signature' => $signature,
-                'X-AutoSMS-Event' => $payload['event'] ?? 'unknown',
+                'X-Musoftware-Signature' => $signature,
+                'X-Musoftware-Event' => $payload['event'] ?? 'unknown',
                 'Content-Type' => 'application/json',
-                'User-Agent' => 'AutoSMS-Payment-Hub/1.0',
-            ])->timeout(10)->post($webhook->webhook_url, $payload);
+                'User-Agent' => 'Musoftware-SMS-Gateway/1.0',
+            ])->timeout(10)->withBody($payloadJson, 'application/json')->post($webhook->webhook_url);
 
             $statusCode = $response->status();
             $responseBody = $response->body();

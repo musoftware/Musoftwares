@@ -265,13 +265,13 @@ export default function MarketplaceDashboard({
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-1.5 font-semibold text-emerald-900">
                                         <Wallet className="h-4 w-4 text-emerald-600" />
-                                        {__('Link verified payout source')}
+                                        {__('general.link_verified_payout_source')}
                                     </div>
                                     <Link href="/financial/payout-methods" className="text-emerald-700 hover:text-emerald-900 bg-emerald-100 hover:bg-emerald-200 px-3 py-1 rounded-full text-xs font-medium transition-colors">
-                                        {__('Setup Now')}
+                                        {__('general.setup_now')}
                                     </Link>
                                 </div>
-                                <p className="text-emerald-700">{__('Set up Direct Debit for automated settlement clearance and receive your escrow payouts instantly.')}</p>
+                                <p className="text-emerald-700">{__('general.set_up_direct_debit_for_2')}</p>
                             </div>
                         )}
                     </div>

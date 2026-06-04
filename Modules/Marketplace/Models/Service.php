@@ -14,20 +14,30 @@ class Service extends Model
     protected $table = 'marketplace_services';
 
     protected $fillable = [
-        'seller_id', 'category_id', 'title', 'description', 'status',
+        'seller_id', 'category_id', 'title', 'tagline', 'description', 'auto_reply', 'status',
+        'title_translations', 'tagline_translations', 'description_translations', 'auto_reply_translations',
         'tags', 'faq', 'requirements', 'gallery', 'video_url',
         'approved_at', 'approved_by', 'rejected_at', 'rejection_reason',
-        'suspended_at', 'suspended_by', 'is_featured'
+        'suspended_at', 'suspended_by', 'is_featured',
+        'service_link', 'generate_serials', 'allow_random_serial', 'validity_days',
+        'referral_commission_from', 'referral_commission_percentage', 'is_free'
     ];
 
     protected $appends = ['cover_image'];
 
     protected $casts = [
         'is_featured'  => 'boolean',
+        'is_free'      => 'boolean',
+        'generate_serials' => 'boolean',
+        'allow_random_serial' => 'boolean',
         'tags'         => 'array',
         'faq'          => 'array',
         'requirements' => 'array',
         'gallery'      => 'array',
+        'title_translations' => 'array',
+        'tagline_translations' => 'array',
+        'description_translations' => 'array',
+        'auto_reply_translations' => 'array',
     ];
 
     public function seller()
@@ -58,6 +68,21 @@ class Service extends Model
     public function reviews()
     {
         return $this->hasMany(ServiceReview::class, 'service_id');
+    }
+
+    public function extras()
+    {
+        return $this->hasMany(ServiceExtra::class, 'service_id');
+    }
+
+    public function discounts()
+    {
+        return $this->hasMany(ServiceDiscount::class, 'service_id');
+    }
+
+    public function serials()
+    {
+        return $this->hasMany(ServiceSerial::class, 'service_id');
     }
 
     public function getCoverImageAttribute()

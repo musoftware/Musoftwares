@@ -66,8 +66,8 @@ class AnalyticsController extends Controller implements HasMiddleware
                 $sellTotal = GoldTransaction::whereIn('wallet_id', $walletIds)->where('type', 'sell')->sum('total_amount');
 
                 $transactionBreakdown = [
-                    ['name' => __('Buy'), 'value' => (float) $buyTotal],
-                    ['name' => __('Sell'), 'value' => (float) $sellTotal],
+                    ['name' => __('general.buy'), 'value' => (float) $buyTotal],
+                    ['name' => __('general.sell'), 'value' => (float) $sellTotal],
                 ];
             }
 

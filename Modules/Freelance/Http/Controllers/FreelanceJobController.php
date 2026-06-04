@@ -164,7 +164,7 @@ class FreelanceJobController extends Controller
             return back()->withErrors(['points' => $e->getMessage()]);
         }
 
-        return redirect()->route('freelance.my-jobs')->with('success', __('Job posted successfully.'));
+        return redirect()->route('freelance.my-jobs')->with('success', __('freelance.job_posted_successfully'));
     }
 
     public function create(Request $request)

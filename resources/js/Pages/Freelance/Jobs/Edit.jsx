@@ -20,13 +20,13 @@ export default function EditJob({ auth, job }) {
         <FreelanceLayout>
             <div className="mx-auto max-w-2xl">
                 <h2 className="mb-6 text-2xl font-bold">
-                    {__('Edit Job')}: {job.title}
+                    {__('freelance.edit_job')}: {job.title}
                 </h2>
 
                 <form onSubmit={submit}>
                     <div className="mb-4">
                         <label className="mb-2 block text-sm font-bold text-gray-700">
-                            {__('Title')}
+                            {__('general.title')}
                         </label>
                         <input
                             type="text"
@@ -43,7 +43,7 @@ export default function EditJob({ auth, job }) {
 
                     <div className="mb-4">
                         <label className="mb-2 block text-sm font-bold text-gray-700">
-                            {__('Description')}
+                            {__('general.description')}
                         </label>
                         <textarea
                             value={data.description}
@@ -62,7 +62,7 @@ export default function EditJob({ auth, job }) {
                     <div className="mb-4 flex space-x-4">
                         <div className="w-1/2">
                             <label className="mb-2 block text-sm font-bold text-gray-700">
-                                {__('Type')}
+                                {__('general.type')}
                             </label>
                             <select
                                 value={data.type}
@@ -71,13 +71,13 @@ export default function EditJob({ auth, job }) {
                                 }
                                 className="w-full rounded border px-3 py-2 text-gray-700 shadow"
                             >
-                                <option value="fixed">{__('Fixed Price')}</option>
-                                <option value="hourly">{__('Hourly Rate')}</option>
+                                <option value="fixed">{__('general.fixed_price')}</option>
+                                <option value="hourly">{__('general.hourly_rate')}</option>
                             </select>
                         </div>
                         <div className="w-1/2">
                             <label className="mb-2 block text-sm font-bold text-gray-700">
-                                {__('Budget')}
+                                {__('erp.budget')}
                             </label>
                             <input
                                 type="number"
@@ -97,7 +97,7 @@ export default function EditJob({ auth, job }) {
 
                     <div className="mb-6">
                         <label className="mb-2 block text-sm font-bold text-gray-700">
-                            {__('Duration')} ({__('e.g. "2 weeks", "3 months"')})
+                            {__('general.duration')} ({__('e.g. "2 weeks", "3 months"')})
                         </label>
                         <input
                             type="text"
@@ -114,7 +114,7 @@ export default function EditJob({ auth, job }) {
                         disabled={processing}
                         className="focus:shadow-outline w-full rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
                     >
-                        {__('Update Job')}
+                        {__('freelance.update_job')}
                     </button>
                 </form>
             </div>

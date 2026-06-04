@@ -120,8 +120,14 @@ class ServiceController extends Controller
 
             $service = Service::create([
                 'seller_id'    => auth()->id(),
-                'title'        => $validated['title'],
-                'description'  => $validated['description'],
+                'title'        => $validated['title'] ?? null,
+                'title_translations' => $validated['title_translations'] ?? null,
+                'tagline'      => $validated['tagline'] ?? null,
+                'tagline_translations' => $validated['tagline_translations'] ?? null,
+                'description'  => $validated['description'] ?? null,
+                'description_translations' => $validated['description_translations'] ?? null,
+                'auto_reply'   => $validated['auto_reply'] ?? null,
+                'auto_reply_translations' => $validated['auto_reply_translations'] ?? null,
                 'category_id'  => $validated['category_id'],
                 'status'       => 'draft',
                 'tags'         => $validated['tags'] ?? [],
@@ -129,7 +135,25 @@ class ServiceController extends Controller
                 'requirements' => $validated['requirements'] ?? [],
                 'gallery'      => $galleryPaths,
                 'video_url'    => $validated['video_url'] ?? null,
+                'service_link' => $validated['service_link'] ?? null,
+                'is_free'      => $validated['is_free'] ?? false,
+                'generate_serials' => $validated['generate_serials'] ?? false,
+                'allow_random_serial' => $validated['allow_random_serial'] ?? false,
+                'validity_days' => $validated['validity_days'] ?? null,
+                'referral_commission_from' => $validated['referral_commission_from'] ?? 'fee',
+                'referral_commission_percentage' => $validated['referral_commission_percentage'] ?? null,
             ]);
+
+            if (isset($validated['extras'])) {
+                foreach ($validated['extras'] as $extra) {
+                    \Modules\Marketplace\Models\ServiceExtra::create([
+                        'service_id'    => $service->id,
+                        'title'         => $extra['title'],
+                        'price'         => $extra['price'],
+                        'duration_days' => $extra['duration_days'] ?? 0,
+                    ]);
+                }
+            }
 
             foreach ($validated['packages'] as $pkg) {
                 ServicePackage::create([
@@ -158,7 +182,7 @@ class ServiceController extends Controller
         }
 
         $categories = ServiceCategory::orderBy('name')->get(['id', 'name', 'slug']);
-        $service->load('packages');
+        $service->load(['packages', 'extras']);
 
         return Inertia::render('Marketplace/Services/Edit', [
             'categories' => $categories,
@@ -183,16 +207,51 @@ class ServiceController extends Controller
             }
 
             $service->update([
-                'title'        => $validated['title'],
-                'description'  => $validated['description'],
+                'title'        => $validated['title'] ?? null,
+                'title_translations' => $validated['title_translations'] ?? null,
+                'tagline'      => $validated['tagline'] ?? null,
+                'tagline_translations' => $validated['tagline_translations'] ?? null,
+                'description'  => $validated['description'] ?? null,
+                'description_translations' => $validated['description_translations'] ?? null,
+                'auto_reply'   => $validated['auto_reply'] ?? null,
+                'auto_reply_translations' => $validated['auto_reply_translations'] ?? null,
                 'category_id'  => $validated['category_id'],
                 'tags'         => $validated['tags'] ?? [],
                 'faq'          => $validated['faq'] ?? [],
                 'requirements' => $validated['requirements'] ?? [],
                 'gallery'      => $galleryPaths,
                 'video_url'    => $validated['video_url'] ?? null,
+                'service_link' => $validated['service_link'] ?? null,
+                'is_free'      => $validated['is_free'] ?? false,
+                'generate_serials' => $validated['generate_serials'] ?? false,
+                'allow_random_serial' => $validated['allow_random_serial'] ?? false,
+                'validity_days' => $validated['validity_days'] ?? null,
+                'referral_commission_from' => $validated['referral_commission_from'] ?? 'fee',
+                'referral_commission_percentage' => $validated['referral_commission_percentage'] ?? null,
                 'status'       => 'draft', // Requires re-approval
             ]);
+
+            $submittedExtraIds = collect($validated['extras'] ?? [])->pluck('id')->filter()->toArray();
+            $service->extras()->whereNotIn('id', $submittedExtraIds)->delete();
+
+            if (isset($validated['extras'])) {
+                foreach ($validated['extras'] as $extra) {
+                    if (!empty($extra['id'])) {
+                        $service->extras()->where('id', $extra['id'])->update([
+                            'title'         => $extra['title'],
+                            'price'         => $extra['price'],
+                            'duration_days' => $extra['duration_days'] ?? 0,
+                        ]);
+                    } else {
+                        \Modules\Marketplace\Models\ServiceExtra::create([
+                            'service_id'    => $service->id,
+                            'title'         => $extra['title'],
+                            'price'         => $extra['price'],
+                            'duration_days' => $extra['duration_days'] ?? 0,
+                        ]);
+                    }
+                }
+            }
 
             $submittedPackageIds = collect($validated['packages'])->pluck('id')->filter()->toArray();
 

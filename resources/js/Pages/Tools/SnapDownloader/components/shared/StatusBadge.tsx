@@ -4,11 +4,11 @@ import { __ } from '@/lib/i18n';
 
 export function StatusBadge({ status }: { status: string }) {
     const map: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
-        running:   { color: 'bg-blue-500/10 text-blue-400 border-blue-500/20',    icon: <RefreshCw className="w-3 h-3 animate-spin" />, label: __('Running') },
-        completed: { color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', icon: <CheckCircle className="w-3 h-3" />,   label: __('Done') },
-        error:     { color: 'bg-rose-500/10 text-rose-400 border-rose-500/20',    icon: <XCircle className="w-3 h-3" />,        label: __('Error') },
-        stopped:   { color: 'bg-slate-500/10 text-slate-400 border-slate-500/20', icon: <Square className="w-3 h-3" />,         label: __('Stopped') },
-        pending:   { color: 'bg-amber-500/10 text-amber-400 border-amber-500/20', icon: <Clock className="w-3 h-3" />,          label: __('Queued') },
+        running:   { color: 'bg-blue-500/10 text-blue-400 border-blue-500/20',    icon: <RefreshCw className="w-3 h-3 animate-spin" />, label: __('general.running') },
+        completed: { color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', icon: <CheckCircle className="w-3 h-3" />,   label: __('general.done') },
+        error:     { color: 'bg-rose-500/10 text-rose-400 border-rose-500/20',    icon: <XCircle className="w-3 h-3" />,        label: __('general.error') },
+        stopped:   { color: 'bg-slate-500/10 text-slate-400 border-slate-500/20', icon: <Square className="w-3 h-3" />,         label: __('general.stopped') },
+        pending:   { color: 'bg-amber-500/10 text-amber-400 border-amber-500/20', icon: <Clock className="w-3 h-3" />,          label: __('general.queued') },
     };
     const cfg = map[status] || map.pending;
     return (

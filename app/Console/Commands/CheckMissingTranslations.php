@@ -54,7 +54,7 @@ class CheckMissingTranslations extends Command
 
                 $content = file_get_contents($file->getPathname());
 
-                // Match __('key') or trans('key') or @lang('key')
+                // Match __('general.key') or trans('general.key') or @lang('key')
                 preg_match_all("/(?:__|trans|@lang)\(\s*['\"]([^'\"]+)['\"]\s*\)/U", $content, $matches);
 
                 if (!empty($matches[1])) {
@@ -110,7 +110,7 @@ class CheckMissingTranslations extends Command
             foreach ($foundKeys as $key) {
                 // If the key has no dot, it might be in JSON file or global
                 if (!isset($definedKeys[$key])) {
-                    // Sometimes keys are just plain text without group, like __('Hello')
+                    // Sometimes keys are just plain text without group, like __('general.hello')
                     $missing[$locale][] = $key;
                 }
             }

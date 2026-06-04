@@ -301,7 +301,7 @@ export default function PricingBuilder({
                                                     className="h-7 text-xs px-2 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
                                                     onClick={(e) => { e.stopPropagation(); handleSelectAllAddons(module.id); }}
                                                 >
-                                                    {moduleAddons.every(a => selectedItems.includes(a.id)) ? __('Deselect All') : __('Select All Add-ons')}
+                                                    {moduleAddons.every(a => selectedItems.includes(a.id)) ? __('general.deselect_all') : __('general.select_all_addons')}
                                                 </Button>
                                             </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -405,7 +405,7 @@ export default function PricingBuilder({
                                         onClick={() => setIsCartExpanded(!isCartExpanded)}
                                         className="text-xs text-indigo-600 hover:text-indigo-700 font-medium w-full text-left py-1"
                                     >
-                                        {isCartExpanded ? __('Show less') : `+${selectedItems.length - 5} ${__('more items')}`}
+                                        {isCartExpanded ? __('general.show_less') : `+${selectedItems.length - 5} ${__('general.more_items')}`}
                                     </button>
                                 )}
                                 

@@ -24,7 +24,7 @@ export default function MarketingDashboard({ stats, topCampaigns }: { stats: any
                         </Button>
                         <Button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
                             <Megaphone size={16} />
-                            {__('New Campaign')}
+                            {__('general.new_campaign')}
                         </Button>
                     </div>
                 </div>

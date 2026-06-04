@@ -30,7 +30,7 @@ export function LogTerminal({ logs, target, onClose }: {
             </div>
             <div className="h-48 sm:h-64 overflow-y-auto p-4 font-mono text-[11px] space-y-1">
                 {logs.length === 0 ? (
-                    <div style={{ color: 'rgba(255,255,255,0.2)' }}>{__('Awaiting output...')}</div>
+                    <div style={{ color: 'rgba(255,255,255,0.2)' }}>{__('general.awaiting_output')}</div>
                 ) : logs.map((log, i) => {
                     const color =
                         log.level === 'error' ? '#f43f5e' :

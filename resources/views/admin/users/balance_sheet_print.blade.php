@@ -271,12 +271,12 @@
             <table class="invoice-table">
                 <thead>
                     <tr>
-                        <th>{{ __('Invoice') }}</th>
-                        <th class="text-right">{{ __('Paid') }}</th>
-                        <th class="text-right">{{ __('Total') }}</th>
-                        <th class="text-right">{{ __('Discount') }}</th>
-                        <th class="text-right">{{ __('Remaining') }}</th>
-                        <th class="text-right">{{ __('Date') }}</th>
+                        <th>{{ __('erp.invoice_2') }}</th>
+                        <th class="text-right">{{ __('general.paid') }}</th>
+                        <th class="text-right">{{ __('general.total') }}</th>
+                        <th class="text-right">{{ __('general.discount') }}</th>
+                        <th class="text-right">{{ __('general.remaining') }}</th>
+                        <th class="text-right">{{ __('general.date') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -308,7 +308,7 @@
                     </tr>
                     @if ($user->user_balance < $unpaid)
                         <tr>
-                            <td class="summary-label">{{ __('Balance') }}</td>
+                            <td class="summary-label">{{ __('general.balance') }}</td>
                             <td class="summary-value">{{ App\Helpers\FinanceHelper::instance()->format_money($user->user_balance, $user->currency_id) }}</td>
                         </tr>
                         <tr class="total-row">
@@ -317,7 +317,7 @@
                         </tr>
                     @else
                         <tr>
-                            <td class="summary-label">{{ __('Balance') }}</td>
+                            <td class="summary-label">{{ __('general.balance') }}</td>
                             <td class="summary-value">{{ App\Helpers\FinanceHelper::instance()->format_money($user->user_balance, $user->currency_id) }}</td>
                         </tr>
                         <tr class="total-row">

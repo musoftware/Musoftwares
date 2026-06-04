@@ -56,12 +56,12 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
             items: payslipItems,
         })
         .then(res => {
-            toast.success(res.data.message || __('Payslip items updated'));
+            toast.success(res.data.message || __('general.payslip_items_updated'));
             setIsItemsModalOpen(false);
             router.reload({ only: ['payslips'] });
         })
         .catch(err => {
-            toast.error(err.response?.data?.message || __('Failed to update items'));
+            toast.error(err.response?.data?.message || __('general.failed_to_update_items'));
         })
         .finally(() => {
             setIsProcessing(false);
@@ -95,12 +95,12 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
             base_salary: baseSalary,
         })
         .then(res => {
-            toast.success(res.data.message || __('Contract updated'));
+            toast.success(res.data.message || __('freelance.contract_updated'));
             setIsContractModalOpen(false);
             router.reload({ only: ['members'] });
         })
         .catch(err => {
-            toast.error(err.response?.data?.message || __('Failed to update contract'));
+            toast.error(err.response?.data?.message || __('freelance.failed_to_update_contract'));
         })
         .finally(() => {
             setIsProcessing(false);
@@ -117,12 +117,12 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
             year: formData.get('year'),
         })
         .then(res => {
-            toast.success(res.data.message || __('Payroll generated'));
+            toast.success(res.data.message || __('general.payroll_generated'));
             setIsGenerateModalOpen(false);
             router.reload({ only: ['payslips'] });
         })
         .catch(err => {
-            toast.error(err.response?.data?.message || __('Generation failed'));
+            toast.error(err.response?.data?.message || __('general.generation_failed'));
         })
         .finally(() => {
             setIsProcessing(false);
@@ -131,7 +131,7 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
 
     const handleMarkPaid = () => {
         if (!paymentMethodId) {
-            toast.error(__('Please select a payment method'));
+            toast.error(__('payment.please_select_a_payment_method'));
             return;
         }
         setIsProcessing(true);
@@ -139,12 +139,12 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
             payment_method_id: paymentMethodId
         })
         .then(res => {
-            toast.success(res.data.message || __('Marked as paid'));
+            toast.success(res.data.message || __('general.marked_as_paid'));
             setIsPayModalOpen(false);
             router.reload({ only: ['payslips'] });
         })
         .catch(err => {
-            toast.error(err.response?.data?.message || __('Payment failed'));
+            toast.error(err.response?.data?.message || __('payment.payment_failed_2'));
         })
         .finally(() => {
             setIsProcessing(false);
@@ -153,50 +153,50 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
 
     return (
         <ERPLayout
-            title={__('Payroll System')}
+            title={__('general.payroll_system')}
             workspaceName={workspaceName}
             tenantId={tenantId}
             menuItems={menuItems}
             lockedAddons={lockedAddons}
         >
-            <Head title={__('Payroll System')} />
+            <Head title={__('general.payroll_system')} />
             
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-semibold text-slate-900">{__('Payroll System')}</h1>
+                <h1 className="text-2xl font-semibold text-slate-900">{__('general.payroll_system')}</h1>
                 <Button onClick={() => setIsGenerateModalOpen(true)}>
                     <Plus className="w-4 h-4 mr-2" />
-                    {__('Run Payroll')}
+                    {__('general.run_payroll')}
                 </Button>
             </div>
 
             <Tabs defaultValue="payslips" className="w-full">
                 <TabsList className="mb-4">
-                    <TabsTrigger value="payslips">{__('Payslips')}</TabsTrigger>
-                    <TabsTrigger value="contracts">{__('Employee Contracts')}</TabsTrigger>
+                    <TabsTrigger value="payslips">{__('general.payslips')}</TabsTrigger>
+                    <TabsTrigger value="contracts">{__('freelance.employee_contracts')}</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="payslips">
                     <Card>
                         <CardHeader>
-                            <CardTitle>{__('Monthly Payslips')}</CardTitle>
+                            <CardTitle>{__('general.monthly_payslips')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>{__('Employee')}</TableHead>
-                                        <TableHead>{__('Period')}</TableHead>
-                                        <TableHead>{__('Base')}</TableHead>
-                                        <TableHead>{__('Net Pay')}</TableHead>
-                                        <TableHead>{__('Status')}</TableHead>
-                                        <TableHead className="text-right">{__('Actions')}</TableHead>
+                                        <TableHead>{__('general.employee')}</TableHead>
+                                        <TableHead>{__('general.period')}</TableHead>
+                                        <TableHead>{__('general.base')}</TableHead>
+                                        <TableHead>{__('payment.net_pay')}</TableHead>
+                                        <TableHead>{__('general.status')}</TableHead>
+                                        <TableHead className="text-right">{__('general.actions')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {payslips.length === 0 ? (
                                         <TableRow>
                                             <TableCell colSpan={6} className="text-center text-slate-500 py-8">
-                                                {__('No payslips found for this period.')}
+                                                {__('general.no_payslips_found_for_this')}
                                             </TableCell>
                                         </TableRow>
                                     ) : (
@@ -214,11 +214,11 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                                                         <div className="flex items-center justify-end gap-2">
                                                             <Button size="sm" variant="outline" onClick={() => openItemsModal(payslip)} disabled={isProcessing}>
                                                                 <Edit className="w-4 h-4 mr-1" />
-                                                                {__('Edit')}
+                                                                {__('general.edit')}
                                                             </Button>
                                                             <Button size="sm" variant="default" onClick={() => openPayModal(payslip)} disabled={isProcessing}>
                                                                 <CheckCircle className="w-4 h-4 mr-1" />
-                                                                {__('Mark Paid')}
+                                                                {__('general.mark_paid')}
                                                             </Button>
                                                         </div>
                                                     )}
@@ -235,16 +235,16 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                 <TabsContent value="contracts">
                     <Card>
                         <CardHeader>
-                            <CardTitle>{__('Team Base Salaries')}</CardTitle>
+                            <CardTitle>{__('general.team_base_salaries')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>{__('Employee')}</TableHead>
-                                        <TableHead>{__('Role')}</TableHead>
-                                        <TableHead>{__('Base Salary')}</TableHead>
-                                        <TableHead className="text-right">{__('Actions')}</TableHead>
+                                        <TableHead>{__('general.employee')}</TableHead>
+                                        <TableHead>{__('general.role')}</TableHead>
+                                        <TableHead>{__('general.base_salary')}</TableHead>
+                                        <TableHead className="text-right">{__('general.actions')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -259,13 +259,13 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                                                 {member.contract ? (
                                                     <span className="font-semibold">{formatCurrency(member.contract.base_salary, member.contract.currency || currency)}</span>
                                                 ) : (
-                                                    <span className="text-slate-400 italic">{__('Not Set')}</span>
+                                                    <span className="text-slate-400 italic">{__('general.not_set')}</span>
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <Button size="sm" variant="ghost" onClick={() => openContractModal(member)}>
                                                     <Settings2 className="w-4 h-4 mr-2" />
-                                                    {__('Manage Contract')}
+                                                    {__('freelance.manage_contract')}
                                                 </Button>
                                             </TableCell>
                                         </TableRow>
@@ -281,12 +281,12 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
             <Dialog open={isContractModalOpen} onOpenChange={setIsContractModalOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{__('Manage Salary Contract')}</DialogTitle>
+                        <DialogTitle>{__('freelance.manage_salary_contract')}</DialogTitle>
                         <DialogDescription>{selectedMember?.name}</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label>{__('Base Salary (Monthly)')}</Label>
+                            <Label>{__('general.base_salary_monthly')}</Label>
                             <Input 
                                 type="number" 
                                 min="0" 
@@ -297,8 +297,8 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsContractModalOpen(false)}>{__('Cancel')}</Button>
-                        <Button onClick={handleSaveContract} disabled={isProcessing}>{__('Save Contract')}</Button>
+                        <Button variant="outline" onClick={() => setIsContractModalOpen(false)}>{__('general.cancel')}</Button>
+                        <Button onClick={handleSaveContract} disabled={isProcessing}>{__('freelance.save_contract')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -307,23 +307,23 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
             <Dialog open={isGenerateModalOpen} onOpenChange={setIsGenerateModalOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{__('Run Payroll')}</DialogTitle>
-                        <DialogDescription>{__('Generate draft payslips for all active team members.')}</DialogDescription>
+                        <DialogTitle>{__('general.run_payroll')}</DialogTitle>
+                        <DialogDescription>{__('general.generate_draft_payslips_for_all')}</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleGeneratePayroll}>
                         <div className="grid grid-cols-2 gap-4 py-4">
                             <div className="space-y-2">
-                                <Label>{__('Month')}</Label>
+                                <Label>{__('general.month')}</Label>
                                 <Input type="number" name="month" min="1" max="12" defaultValue={filters.month} required />
                             </div>
                             <div className="space-y-2">
-                                <Label>{__('Year')}</Label>
+                                <Label>{__('general.year')}</Label>
                                 <Input type="number" name="year" min="2000" max="2100" defaultValue={filters.year} required />
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setIsGenerateModalOpen(false)}>{__('Cancel')}</Button>
-                            <Button type="submit" disabled={isProcessing}>{__('Generate Payslips')}</Button>
+                            <Button type="button" variant="outline" onClick={() => setIsGenerateModalOpen(false)}>{__('general.cancel')}</Button>
+                            <Button type="submit" disabled={isProcessing}>{__('general.generate_payslips')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -333,31 +333,31 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
             <Dialog open={isItemsModalOpen} onOpenChange={setIsItemsModalOpen}>
                 <DialogContent className="max-w-2xl">
                     <DialogHeader>
-                        <DialogTitle>{__('Manage Payslip Items')}</DialogTitle>
+                        <DialogTitle>{__('general.manage_payslip_items')}</DialogTitle>
                         <DialogDescription>{selectedPayslip?.member?.name} - {selectedPayslip?.month}/{selectedPayslip?.year}</DialogDescription>
                     </DialogHeader>
                     
                     <div className="py-4 space-y-4 max-h-[60vh] overflow-y-auto">
                         <div className="grid grid-cols-2 gap-4 mb-4">
                             <div className="space-y-2">
-                                <Label>{__('Days Worked')}</Label>
+                                <Label>{__('general.days_worked')}</Label>
                                 <Input type="number" min="0" value={workedDays} onChange={(e) => setWorkedDays(Number(e.target.value))} />
                             </div>
                             <div className="space-y-2">
-                                <Label>{__('Days Absent')}</Label>
+                                <Label>{__('general.days_absent')}</Label>
                                 <Input type="number" min="0" value={absentDays} onChange={(e) => setAbsentDays(Number(e.target.value))} />
                             </div>
                         </div>
 
                         {payslipItems.length === 0 ? (
-                            <div className="text-center text-slate-500 py-4">{__('No bonuses or deductions.')}</div>
+                            <div className="text-center text-slate-500 py-4">{__('general.no_bonuses_or_deductions')}</div>
                         ) : (
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>{__('Type')}</TableHead>
-                                        <TableHead>{__('Description')}</TableHead>
-                                        <TableHead>{__('Amount')}</TableHead>
+                                        <TableHead>{__('general.type')}</TableHead>
+                                        <TableHead>{__('general.description')}</TableHead>
+                                        <TableHead>{__('general.amount')}</TableHead>
                                         <TableHead></TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -370,8 +370,8 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                                                     value={item.type} 
                                                     onChange={(e) => updatePayslipItem(index, 'type', e.target.value)}
                                                 >
-                                                    <option value="bonus">{__('Bonus')}</option>
-                                                    <option value="deduction">{__('Deduction')}</option>
+                                                    <option value="bonus">{__('general.bonus')}</option>
+                                                    <option value="deduction">{__('general.deduction')}</option>
                                                 </select>
                                             </TableCell>
                                             <TableCell>
@@ -379,7 +379,7 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                                                     type="text" 
                                                     value={item.description} 
                                                     onChange={(e) => updatePayslipItem(index, 'description', e.target.value)}
-                                                    placeholder={__('Reason')}
+                                                    placeholder={__('general.reason')}
                                                 />
                                             </TableCell>
                                             <TableCell>
@@ -392,7 +392,7 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                                                 />
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                <Button size="sm" variant="destructive" onClick={() => removePayslipItem(index)}>{__('Remove')}</Button>
+                                                <Button size="sm" variant="destructive" onClick={() => removePayslipItem(index)}>{__('general.remove')}</Button>
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -400,14 +400,14 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                             </Table>
                         )}
                         <div className="flex justify-end gap-2">
-                            <Button size="sm" variant="outline" onClick={() => addPayslipItem('bonus')}><Plus className="w-4 h-4 mr-1"/> {__('Add Bonus')}</Button>
-                            <Button size="sm" variant="outline" onClick={() => addPayslipItem('deduction')}><Plus className="w-4 h-4 mr-1"/> {__('Add Deduction')}</Button>
+                            <Button size="sm" variant="outline" onClick={() => addPayslipItem('bonus')}><Plus className="w-4 h-4 mr-1"/> {__('general.add_bonus')}</Button>
+                            <Button size="sm" variant="outline" onClick={() => addPayslipItem('deduction')}><Plus className="w-4 h-4 mr-1"/> {__('general.add_deduction')}</Button>
                         </div>
                     </div>
 
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsItemsModalOpen(false)}>{__('Cancel')}</Button>
-                        <Button onClick={handleSaveItems} disabled={isProcessing}>{__('Save Items')}</Button>
+                        <Button variant="outline" onClick={() => setIsItemsModalOpen(false)}>{__('general.cancel')}</Button>
+                        <Button onClick={handleSaveItems} disabled={isProcessing}>{__('general.save_items')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -416,24 +416,24 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
             <Dialog open={isPayModalOpen} onOpenChange={setIsPayModalOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{__('Mark Payslip as Paid')}</DialogTitle>
+                        <DialogTitle>{__('general.mark_payslip_as_paid')}</DialogTitle>
                         <DialogDescription>{selectedPayslip?.member?.name} - {selectedPayslip?.month}/{selectedPayslip?.year}</DialogDescription>
                     </DialogHeader>
                     
                     <div className="py-4 space-y-4">
                         <div className="bg-slate-50 p-4 rounded-lg flex justify-between items-center mb-4">
-                            <span className="font-medium">{__('Total Net Pay')}:</span>
+                            <span className="font-medium">{__('payment.total_net_pay')}:</span>
                             <span className="text-xl font-bold">{selectedPayslip && formatCurrency(selectedPayslip.net_amount, selectedPayslip.currency || currency)}</span>
                         </div>
                         
                         <div className="space-y-2">
-                            <Label>{__('Payment Method')}</Label>
+                            <Label>{__('payment.payment_method')}</Label>
                             <select 
                                 className="w-full text-sm border-slate-200 rounded-md p-2"
                                 value={paymentMethodId}
                                 onChange={(e) => setPaymentMethodId(e.target.value)}
                             >
-                                <option value="" disabled>{__('Select Payment Method')}</option>
+                                <option value="" disabled>{__('payment.select_payment_method')}</option>
                                 {paymentMethods?.map((pm: any) => (
                                     <option key={pm.id} value={pm.id}>{pm.name}</option>
                                 ))}
@@ -442,8 +442,8 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                     </div>
 
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsPayModalOpen(false)}>{__('Cancel')}</Button>
-                        <Button onClick={handleMarkPaid} disabled={isProcessing || !paymentMethodId}>{__('Confirm Payment')}</Button>
+                        <Button variant="outline" onClick={() => setIsPayModalOpen(false)}>{__('general.cancel')}</Button>
+                        <Button onClick={handleMarkPaid} disabled={isProcessing || !paymentMethodId}>{__('payment.confirm_payment')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

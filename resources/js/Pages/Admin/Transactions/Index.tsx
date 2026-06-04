@@ -10,9 +10,9 @@ export default function Index({ filters }) {
     }, []);
 
     return (
-        <AdminSidebarLayout title={__('Transactions')} header={__('Transactions')}>
+        <AdminSidebarLayout title={__('erp.transactions')} header={__('erp.transactions')}>
             <div className="flex items-center justify-center h-64">
-                <span className="text-slate-500">{__('Loading transactions...')}</span>
+                <span className="text-slate-500">{__('erp.loading_transactions')}</span>
             </div>
         </AdminSidebarLayout>
     );

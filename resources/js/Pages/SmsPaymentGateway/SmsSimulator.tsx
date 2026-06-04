@@ -85,11 +85,11 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
 
     return (
         <AuthenticatedLayout>
-            <Head title={__('SMS Simulator')} />
+            <Head title={__('sms_gateway.sms_simulator')} />
 
             <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">{__('SMS Simulator')}</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">{__('sms_gateway.sms_simulator')}</h1>
                     <p className="mt-2 text-sm text-gray-600">
                         {__('general.manually_simulate_receiving_an_sms_to_test_if_the_parser_and_webhook_are_working_correctly_this_is_exactly_what_the_android_app_does')}
                     </p>
@@ -99,19 +99,19 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                     <div className="md:col-span-2">
                         <Card className="shadow-sm">
                             <CardHeader>
-                                <CardTitle>{__('Simulate Incoming SMS')}</CardTitle>
+                                <CardTitle>{__('sms_gateway.simulate_incoming_sms')}</CardTitle>
                                 <CardDescription>{__('general.enter_the_details_of_the_sms_you_want_to_simulate')}</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <form onSubmit={handleSimulate} className="space-y-6">
                                     <div className="space-y-2">
-                                        <Label htmlFor="device">{__('Target Device')}</Label>
+                                        <Label htmlFor="device">{__('general.target_device')}</Label>
                                         <Select
                                             value={selectedDeviceToken}
                                             onValueChange={(val) => setSelectedDeviceToken(val || '')}
                                         >
                                             <SelectTrigger id="device">
-                                                <SelectValue placeholder={__('Select a connected device')} />
+                                                <SelectValue placeholder={__('general.select_a_connected_device')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {devices.map(device => (
@@ -121,7 +121,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                                 ))}
                                                 {devices.length === 0 && (
                                                     <SelectItem value="" disabled>
-                                                        {__('No connected devices found')}
+                                                        {__('general.no_connected_devices_found')}
                                                     </SelectItem>
                                                 )}
                                             </SelectContent>
@@ -132,7 +132,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="sender">{__('Sender Name / Phone Number')}</Label>
+                                        <Label htmlFor="sender">{__('general.sender_name_phone_number')}</Label>
                                         <Input
                                             id="sender"
                                             type="text"
@@ -144,7 +144,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="message">{__('Message Content')}</Label>
+                                        <Label htmlFor="message">{__('general.message_content')}</Label>
                                         <Textarea
                                             id="message"
                                             value={message}
@@ -156,10 +156,10 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                     </div>
 
                                     <Button type="submit" disabled={loading || devices.length === 0} className="w-full">
-                                        {loading ? __('Simulating...') : (
+                                        {loading ? __('general.simulating') : (
                                             <>
                                                 <Send className="w-4 h-4 mr-2" />
-                                                {__('Simulate Incoming SMS')}
+                                                {__('sms_gateway.simulate_incoming_sms')}
                                             </>
                                         )}
                                     </Button>
@@ -171,13 +171,13 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                     <div className="space-y-6">
                         <Card className="shadow-sm">
                             <CardHeader>
-                                <CardTitle>{__('System Status')}</CardTitle>
+                                <CardTitle>{__('general.system_status')}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex items-center justify-between p-3 border rounded-lg bg-gray-50/50">
                                     <div className="flex items-center gap-3">
                                         <div className={`w-2 h-2 rounded-full ${devices.length > 0 ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                                        <span className="font-medium text-sm">{__('Connected Devices')}</span>
+                                        <span className="font-medium text-sm">{__('general.connected_devices')}</span>
                                     </div>
                                     <span className="text-sm font-semibold">{devices.length}</span>
                                 </div>
@@ -186,9 +186,9 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className={`w-2 h-2 rounded-full ${webhook ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                                            <span className="font-medium text-sm">{__('Active Webhook')}</span>
+                                            <span className="font-medium text-sm">{__('general.active_webhook')}</span>
                                         </div>
-                                        <span className="text-sm font-semibold">{webhook ? __('Configured') : __('Not Configured')}</span>
+                                        <span className="text-sm font-semibold">{webhook ? __('general.configured') : __('general.not_configured')}</span>
                                     </div>
                                     {webhook && (
                                         <p className="text-xs text-muted-foreground truncate" dir="ltr" title={webhook.webhook_url}>
@@ -204,20 +204,20 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                 <CardHeader>
                                     <CardTitle className="text-blue-900 flex items-center gap-2">
                                         {result.success ? <CheckCircle2 className="w-5 h-5 text-green-600" /> : <XCircle className="w-5 h-5 text-red-600" />}
-                                        {__('Simulation Result')}
+                                        {__('general.simulation_result')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     {result.success ? (
                                         <div className="space-y-4">
                                             <div className="p-3 bg-white border border-blue-100 rounded-md">
-                                                <div className="text-sm font-medium text-gray-700 mb-1">{__('Status')}</div>
-                                                <div className="text-green-600 font-semibold">{result.data?.message || __('Success')}</div>
+                                                <div className="text-sm font-medium text-gray-700 mb-1">{__('general.status')}</div>
+                                                <div className="text-green-600 font-semibold">{result.data?.message || __('general.success')}</div>
                                             </div>
                                             
                                             {result.data?.transaction_detected && (
                                                 <div className="p-3 bg-green-50 border border-green-200 rounded-md text-sm">
-                                                    <div className="font-semibold text-green-800 mb-2">{__('Transaction Detected & Processed!')}</div>
+                                                    <div className="font-semibold text-green-800 mb-2">{__('erp.transaction_detected_processed')}</div>
                                                     <pre className="text-xs overflow-auto bg-white p-2 rounded border" dir="ltr">
                                                         {JSON.stringify(result.data?.transaction_data, null, 2)}
                                                     </pre>
@@ -226,7 +226,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                             
                                             {!result.data?.transaction_detected && (
                                                 <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm">
-                                                    <div className="font-semibold text-yellow-800">{__('No Transaction Detected')}</div>
+                                                    <div className="font-semibold text-yellow-800">{__('erp.no_transaction_detected')}</div>
                                                     <p className="text-yellow-700 mt-1">{__('general.the_system_received_the_sms_but_did_not_detect_a_valid_financial_transaction_in_it')}</p>
                                                     {result.data?.debug && (
                                                          <pre className="text-xs overflow-auto bg-white p-2 rounded border mt-2 text-gray-700" dir="ltr">
@@ -238,7 +238,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                         </div>
                                     ) : (
                                         <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm">
-                                            <div className="font-semibold text-red-800 mb-2">{__('Error')}</div>
+                                            <div className="font-semibold text-red-800 mb-2">{__('general.error')}</div>
                                             <p className="text-red-700 mb-2">{result.error}</p>
                                             {result.details && (
                                                 <pre className="text-xs overflow-auto bg-white p-2 rounded border" dir="ltr">

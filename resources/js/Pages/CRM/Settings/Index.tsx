@@ -39,7 +39,7 @@ export default function SettingsIndex({ api_token, webhook_url }) {
                                 </div>
                             </CardContent>
                             <CardFooter>
-                                <Button>{__('Save Changes')}</Button>
+                                <Button>{__('general.save_changes')}</Button>
                             </CardFooter>
                         </Card>
                     </TabsContent>
@@ -56,7 +56,7 @@ export default function SettingsIndex({ api_token, webhook_url }) {
                                     <div className="flex gap-2">
                                         <Input readOnly value={api_token} className="font-mono text-sm" />
                                         <Button variant="outline" onClick={() => navigator.clipboard.writeText(api_token)}>
-                                            {__('Copy')}
+                                            {__('general.copy')}
                                         </Button>
                                     </div>
                                 </div>
@@ -65,7 +65,7 @@ export default function SettingsIndex({ api_token, webhook_url }) {
                                     <div className="flex gap-2">
                                         <Input readOnly value={webhook_url} className="font-mono text-sm" />
                                         <Button variant="outline" onClick={() => navigator.clipboard.writeText(webhook_url)}>
-                                            {__('Copy')}
+                                            {__('general.copy')}
                                         </Button>
                                     </div>
                                     <p className="text-xs text-slate-500 mt-1">{__('general.send_post_requests_to_this_url_to_create_leads')}</p>

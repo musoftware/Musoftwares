@@ -319,7 +319,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                 </div>
                                 <div className="flex justify-end">
                                     <Button type="submit" disabled={processing}>
-                                        {processing ? __('Saving...') : __('general.save_configuration')}
+                                        {processing ? __('general.saving') : __('general.save_configuration')}
                                     </Button>
                                 </div>
                             </form>

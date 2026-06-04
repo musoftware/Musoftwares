@@ -34,12 +34,12 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
         <AuthenticatedLayout
             header={
                 <div className="flex flex-col">
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight mb-4">{__('Portfolio Analytics')}</h2>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight mb-4">{__('general.portfolio_analytics')}</h2>
                     <GoldSaversTabs />
                 </div>
             }
         >
-            <Head title={__('Portfolio Analytics')} />
+            <Head title={__('general.portfolio_analytics')} />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
@@ -51,13 +51,13 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                                 <div className="bg-white p-4 rounded-full shadow-lg border border-indigo-100 text-indigo-600 mb-6">
                                     <Lock className="w-10 h-10" />
                                 </div>
-                                <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">{__('Advanced Analytics Locked')}</h2>
+                                <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">{__('general.advanced_analytics_locked')}</h2>
                                 <p className="text-slate-600 text-lg mb-8 max-w-2xl mx-auto">
-                                    {__('Upgrade To See Analytics Desc')}
+                                    {__('general.upgrade_to_see_analytics_desc')}
                                 </p>
                                 <Link href={route('subscriptions.manage')}>
                                     <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700 text-lg px-8 py-6 h-auto shadow-md">
-                                        {__('Upgrade Now To Unlock')}
+                                        {__('general.upgrade_now_to_unlock')}
                                     </Button>
                                 </Link>
                             </CardContent>
@@ -72,9 +72,9 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                                 <CardHeader className="bg-slate-50 border-b border-slate-100">
                                     <CardTitle className="flex items-center gap-2">
                                         <PieChartIcon className="w-5 h-5 text-indigo-600" />
-                                        {__('Portfolio Distribution')}
+                                        {__('general.portfolio_distribution')}
                                     </CardTitle>
-                                    <CardDescription>{__('Grams Per Wallet')}</CardDescription>
+                                    <CardDescription>{__('erp.grams_per_wallet')}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="pt-6">
                                     <div className="h-[300px] w-full">
@@ -107,7 +107,7 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                                                         ))}
                                                     </Pie>
                                                     <RechartsTooltip 
-                                                        formatter={(value: any) => [`${value}`, __('Balance')] as any}
+                                                        formatter={(value: any) => [`${value}`, __('general.balance')] as any}
                                                         contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                                     />
                                                     <Legend />
@@ -115,7 +115,7 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                                             </ResponsiveContainer>
                                         ) : (
                                             <div className="flex items-center justify-center h-full text-slate-500 italic">
-                                                {__('No Data Available')}
+                                                {__('general.no_data_available')}
                                             </div>
                                         )}
                                     </div>
@@ -127,9 +127,9 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                                 <CardHeader className="bg-slate-50 border-b border-slate-100">
                                     <CardTitle className="flex items-center gap-2">
                                         <TrendingUp className="w-5 h-5 text-green-600" />
-                                        {__('Profit Loss Trends')}
+                                        {__('general.profit_loss_trends')}
                                     </CardTitle>
-                                    <CardDescription>{__('Monthly Profit Growth')}</CardDescription>
+                                    <CardDescription>{__('general.monthly_profit_growth')}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="pt-6">
                                     <div className="h-[300px] w-full">
@@ -144,13 +144,13 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                                                         contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                                     />
                                                     <Legend verticalAlign="top" height={36}/>
-                                                    <Bar dataKey="holding_profit" fill="#10b981" radius={[4, 4, 0, 0]} name={__('Holding Profit (Unrealized)')} />
-                                                    <Bar dataKey="sales_profit" fill="#3b82f6" radius={[4, 4, 0, 0]} name={__('Sales Profit (Realized)')} />
+                                                    <Bar dataKey="holding_profit" fill="#10b981" radius={[4, 4, 0, 0]} name={__('general.holding_profit_unrealized')} />
+                                                    <Bar dataKey="sales_profit" fill="#3b82f6" radius={[4, 4, 0, 0]} name={__('general.sales_profit_realized')} />
                                                 </BarChart>
                                             </ResponsiveContainer>
                                         ) : (
                                             <div className="flex items-center justify-center h-full text-slate-500 italic">
-                                                {__('No Data Available')}
+                                                {__('general.no_data_available')}
                                             </div>
                                         )}
                                     </div>
@@ -165,10 +165,10 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                         <CardHeader className="bg-slate-50 border-b border-slate-100">
                             <CardTitle className="flex items-center gap-2">
                                 <Activity className="w-5 h-5 text-indigo-600" />
-                                {__('Buy Sell Analytics')}
-                                {!hasBuySellAnalytics && <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold uppercase">{__('Premium')}</span>}
+                                {__('general.buy_sell_analytics')}
+                                {!hasBuySellAnalytics && <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold uppercase">{__('general.premium')}</span>}
                             </CardTitle>
-                            <CardDescription>{__('History Trade Performance')}</CardDescription>
+                            <CardDescription>{__('general.history_trade_performance')}</CardDescription>
                         </CardHeader>
                         <CardContent className="pt-6">
                             {!hasBuySellAnalytics ? (
@@ -177,10 +177,10 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                                         <Lock className="w-8 h-8" />
                                     </div>
                                     <div className="text-center">
-                                        <h3 className="font-bold text-slate-900 text-lg">{__('Buy Sell Analytics Locked')}</h3>
-                                        <p className="text-sm text-slate-500 mb-4">{__('Upgrade To See Buy Sell')}</p>
+                                        <h3 className="font-bold text-slate-900 text-lg">{__('general.buy_sell_analytics_locked')}</h3>
+                                        <p className="text-sm text-slate-500 mb-4">{__('general.upgrade_to_see_buy_sell')}</p>
                                         <Link href={route('subscriptions.manage')}>
-                                            <Button className="bg-indigo-600 hover:bg-indigo-700">{__('Upgrade Now')}</Button>
+                                            <Button className="bg-indigo-600 hover:bg-indigo-700">{__('general.upgrade_now')}</Button>
                                         </Link>
                                     </div>
                                 </div>
@@ -203,7 +203,7 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                                         </ResponsiveContainer>
                                     ) : (
                                         <div className="flex items-center justify-center h-full text-slate-500 italic border-2 border-dashed border-slate-200 rounded-xl">
-                                            {__('No Data Available')}
+                                            {__('general.no_data_available')}
                                         </div>
                                     )}
                                 </div>

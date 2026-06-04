@@ -46,30 +46,30 @@ export default function Settings({ settings, devices }: Props) {
         e.preventDefault();
         post(route('sms-payment-gateway.settings.store'), {
             preserveScroll: true,
-            onSuccess: () => toast.success(__('Settings saved successfully')),
+            onSuccess: () => toast.success(__('admin.settings_saved_successfully')),
         });
     };
 
     return (
         <AuthenticatedLayout>
-            <Head title={__('Payment Gateway Settings')} />
+            <Head title={__('sms_gateway.payment_gateway_settings')} />
 
             <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">{__('Payment Gateway Settings')}</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">{__('sms_gateway.payment_gateway_settings')}</h1>
                     <p className="mt-2 text-sm text-gray-600">{__('general.configure_transfer_number_and_available_payment_methods_for_your_customers')}</p>
                 </div>
 
                 <form onSubmit={submit}>
                     <Card className="shadow-sm">
                         <CardHeader>
-                            <CardTitle>{__('Transfer Details')}</CardTitle>
+                            <CardTitle>{__('general.transfer_details')}</CardTitle>
                             <CardDescription>{__('general.this_is_the_number_that_will_appear_to_the_buyer_to_transfer_the_amount_to')}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             
                             <div className="space-y-2">
-                                <Label htmlFor="wallet_phone_number">{__('Primary Number (for Wallets & Instapay)')}</Label>
+                                <Label htmlFor="wallet_phone_number">{__('erp.primary_number_for_wallets_instapay')}</Label>
                                 <Input
                                     id="wallet_phone_number"
                                     type="text"
@@ -77,7 +77,7 @@ export default function Settings({ settings, devices }: Props) {
                                     className="text-left font-mono max-w-md"
                                     value={data.wallet_phone_number}
                                     onChange={(e) => setData('wallet_phone_number', e.target.value)}
-                                    placeholder={__('Example: 01012345678')}
+                                    placeholder={__('general.example_01012345678')}
                                 />
                                 <p className="text-xs text-gray-500 max-w-md">{__('general.this_number_is_used_by_default_if_a_specific_number_is_not_set_for_each_payment_method')}</p>
                                 {errors.wallet_phone_number && <p className="text-sm text-red-600">{errors.wallet_phone_number}</p>}
@@ -86,12 +86,12 @@ export default function Settings({ settings, devices }: Props) {
                             <hr className="my-6" />
 
                             <div className="space-y-4">
-                                <h3 className="text-lg font-medium">{__('Available payment methods and dedicated numbers')}</h3>
+                                <h3 className="text-lg font-medium">{__('payment.available_payment_methods_and_dedicated')}</h3>
                                 
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between max-w-md p-4 border rounded-lg bg-gray-50/50">
                                         <div className="space-y-0.5">
-                                            <Label className="text-base">{__('Instapay')}</Label>
+                                            <Label className="text-base">{__('general.instapay')}</Label>
                                             <p className="text-sm text-gray-500">{__('general.allow_buyer_to_select_instapay_as_transfer_method')}</p>
                                         </div>
                                         <Switch
@@ -101,7 +101,7 @@ export default function Settings({ settings, devices }: Props) {
                                     </div>
                                     {data.is_instapay_enabled && (
                                         <div className="max-w-md p-4 border rounded-lg border-indigo-100 bg-indigo-50/30">
-                                            <Label htmlFor="instapay_phone_number">{__('Dedicated Instapay Number/Address (optional)')}</Label>
+                                            <Label htmlFor="instapay_phone_number">{__('general.dedicated_instapay_numberaddress_optional')}</Label>
                                             <Input
                                                 id="instapay_phone_number"
                                                 type="text"
@@ -109,7 +109,7 @@ export default function Settings({ settings, devices }: Props) {
                                                 className="text-left font-mono mt-2"
                                                 value={data.instapay_phone_number}
                                                 onChange={(e) => setData('instapay_phone_number', e.target.value)}
-                                                placeholder={__('Example: user@instapay')}
+                                                placeholder={__('general.example_userinstapay')}
                                             />
                                             {errors.instapay_phone_number && <p className="text-sm text-red-600 mt-1">{errors.instapay_phone_number}</p>}
                                             
@@ -148,7 +148,7 @@ export default function Settings({ settings, devices }: Props) {
                                 <div className="space-y-3 pt-4">
                                     <div className="flex items-center justify-between max-w-md p-4 border rounded-lg bg-gray-50/50">
                                         <div className="space-y-0.5">
-                                            <Label className="text-base">{__('Vodafone Cash / Wallets')}</Label>
+                                            <Label className="text-base">{__('erp.vodafone_cash_wallets')}</Label>
                                             <p className="text-sm text-gray-500">{__('general.allow_selecting_electronic_wallets')}</p>
                                         </div>
                                         <Switch
@@ -158,7 +158,7 @@ export default function Settings({ settings, devices }: Props) {
                                     </div>
                                     {data.is_vodafone_cash_enabled && (
                                         <div className="max-w-md p-4 border rounded-lg border-indigo-100 bg-indigo-50/30">
-                                            <Label htmlFor="vodafone_cash_phone_number">{__('Dedicated Wallet Number (optional)')}</Label>
+                                            <Label htmlFor="vodafone_cash_phone_number">{__('erp.dedicated_wallet_number_optional')}</Label>
                                             <Input
                                                 id="vodafone_cash_phone_number"
                                                 type="text"
@@ -166,7 +166,7 @@ export default function Settings({ settings, devices }: Props) {
                                                 className="text-left font-mono mt-2"
                                                 value={data.vodafone_cash_phone_number}
                                                 onChange={(e) => setData('vodafone_cash_phone_number', e.target.value)}
-                                                placeholder={__('Example: 01012345678')}
+                                                placeholder={__('general.example_01012345678')}
                                             />
                                             {errors.vodafone_cash_phone_number && <p className="text-sm text-red-600 mt-1">{errors.vodafone_cash_phone_number}</p>}
                                             
@@ -206,9 +206,9 @@ export default function Settings({ settings, devices }: Props) {
                             <hr className="my-6" />
                             
                             <div className="space-y-4">
-                                <h3 className="text-lg font-medium">{__('Allowed SMS Senders (Whitelist)')}</h3>
+                                <h3 className="text-lg font-medium">{__('sms_gateway.allowed_sms_senders_whitelist')}</h3>
                                 <div className="space-y-2">
-                                    <Label htmlFor="whitelist_senders">{__('Allowed Senders (Comma-separated)')}</Label>
+                                    <Label htmlFor="whitelist_senders">{__('general.allowed_senders_commaseparated')}</Label>
                                     <textarea
                                         id="whitelist_senders"
                                         className="w-full max-w-md min-h-[100px] flex rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -223,7 +223,7 @@ export default function Settings({ settings, devices }: Props) {
                             </div>
 
                             <div className="pt-6">
-                                <Button type="submit" disabled={processing} className="w-full sm:w-auto">{__('Save Settings')}</Button>
+                                <Button type="submit" disabled={processing} className="w-full sm:w-auto">{__('admin.save_settings')}</Button>
                             </div>
                         </CardContent>
                     </Card>

@@ -27,7 +27,7 @@ class FreeDownload extends Model
     public static function programmingLanguageOptions(): array
     {
         return [
-            '' => __('— Select language —'),
+            '' => __('general.select_language'),
             'PHP' => 'PHP',
             'JavaScript' => 'JavaScript',
             'TypeScript' => 'TypeScript',
@@ -44,7 +44,7 @@ class FreeDownload extends Model
             'VBA' => 'VBA',
             'SQL' => 'SQL',
             'HTML/CSS' => 'HTML/CSS',
-            'Other' => __('Other'),
+            'Other' => __('general.other'),
         ];
     }
 

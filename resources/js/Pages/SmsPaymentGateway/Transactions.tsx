@@ -41,19 +41,19 @@ export default function Transactions({ transactions, filters }: TransactionsProp
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'verified':
-                return <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-none">{__('Verified')}</Badge>;
+                return <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-none">{__('general.verified')}</Badge>;
             case 'pending':
-                return <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">{__('Pending')}</Badge>;
+                return <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">{__('general.pending')}</Badge>;
             case 'ignored':
-                return <Badge variant="outline" className="text-slate-500 border-slate-200 bg-slate-50">{__('Ignored')}</Badge>;
+                return <Badge variant="outline" className="text-slate-500 border-slate-200 bg-slate-50">{__('general.ignored')}</Badge>;
             default:
                 return <Badge variant="outline">{status}</Badge>;
         }
     };
 
     return (
-        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('Transactions')}</h2>}>
-            <Head title={__('Transactions - Payment Gateway')} />
+        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('erp.transactions')}</h2>}>
+            <Head title={__('erp.transactions_payment_gateway')} />
 
             <div className="py-8 md:py-12">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -61,23 +61,23 @@ export default function Transactions({ transactions, filters }: TransactionsProp
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                                 <Activity className="w-6 h-6 text-indigo-600" />
-                                {__('All Transactions')}
+                                {__('erp.all_transactions')}
                             </h1>
                             <p className="text-slate-500 mt-1">{__('general.view_all_sms_receipts_captured_from_your_connected_android_devices')}</p>
                         </div>
                         <div className="flex gap-2">
                             <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                                 <ArrowLeft className="w-4 h-4 mr-2" />
-                                {__('Back')}
+                                {__('general.back')}
                             </Button>
                         </div>
                     </div>
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>{__('Transactions History')}</CardTitle>
+                            <CardTitle>{__('erp.transactions_history')}</CardTitle>
                             <CardDescription>
-                                {__('Showing')} {transactions.from} {__('to')} {transactions.to} {__('of')} {transactions.total} {__('results')}
+                                {__('general.showing')} {transactions.from} {__('general.to')} {transactions.to} {__('general.of')} {transactions.total} {__('general.results')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -85,12 +85,12 @@ export default function Transactions({ transactions, filters }: TransactionsProp
                                 <Table>
                                     <TableHeader className="bg-slate-50">
                                         <TableRow>
-                                            <TableHead>{__('Date')}</TableHead>
-                                            <TableHead>{__('Sender')}</TableHead>
-                                            <TableHead>{__('Amount')}</TableHead>
-                                            <TableHead>{__('Reference')}</TableHead>
-                                            <TableHead>{__('Device')}</TableHead>
-                                            <TableHead>{__('Status')}</TableHead>
+                                            <TableHead>{__('general.date')}</TableHead>
+                                            <TableHead>{__('general.sender')}</TableHead>
+                                            <TableHead>{__('general.amount')}</TableHead>
+                                            <TableHead>{__('general.reference')}</TableHead>
+                                            <TableHead>{__('general.device')}</TableHead>
+                                            <TableHead>{__('general.status')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>

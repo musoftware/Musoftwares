@@ -70,9 +70,9 @@ export default function Index({ products, auth }: any) {
         const product = products.data.find((p: Product) => p.sku === barcode);
         if (product) {
             handleAddToCart(product);
-            toast.success(__('Product added via barcode'));
+            toast.success(__('general.product_added_via_barcode'));
         } else {
-            toast.error(__('Barcode not found'));
+            toast.error(__('general.barcode_not_found'));
             // Optionally, make an API request to search for the barcode globally
         }
     };
@@ -82,7 +82,7 @@ export default function Index({ products, auth }: any) {
             const existingItem = prevCart.find(item => item.product_id === product.id);
             if (existingItem) {
                 if (existingItem.quantity >= product.stock_quantity) {
-                    toast.error(__('Insufficient stock available.'));
+                    toast.error(__('general.insufficient_stock_available'));
                     return prevCart;
                 }
                 return prevCart.map(item => 
@@ -92,7 +92,7 @@ export default function Index({ products, auth }: any) {
                 );
             }
             if (product.stock_quantity <= 0) {
-                toast.error(__('Product is out of stock.'));
+                toast.error(__('general.product_is_out_of_stock'));
                 return prevCart;
             }
             return [...prevCart, { 
@@ -143,7 +143,7 @@ export default function Index({ products, auth }: any) {
                 router.reload({ only: ['products'] });
             })
             .catch(error => {
-                toast.error((error as any).response?.data?.message || __('Checkout failed'));
+                toast.error((error as any).response?.data?.message || __('payment.checkout_failed_2'));
             })
             .finally(() => {
                 setIsProcessing(false);
@@ -154,13 +154,13 @@ export default function Index({ products, auth }: any) {
 
     return (
         <ERPLayout
-            title={__('POS System')}
+            title={__('general.pos_system')}
             workspaceName={workspaceName}
             tenantId={tenantId}
             menuItems={menuItems}
             lockedAddons={lockedAddons}
         >
-            <Head title={__('POS System')} />
+            <Head title={__('general.pos_system')} />
             
             <div className="h-[calc(100vh-64px)] flex overflow-hidden">
                 <div className="flex-1 overflow-hidden">
