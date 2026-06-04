@@ -6411,7 +6411,15 @@
             "webhooks": "الويب هوك",
             "sdks": "المكتبات والأدوات",
             "code_examples": "أمثلة الكود",
-            "back_to_dashboard": "العودة للوحة التحكم"
+            "back_to_dashboard": "العودة للوحة التحكم",
+            "wordpress_integration": "إضافة ووردبريس",
+            "wordpress_integration_desc": "اربط بوابة الدفع عبر الرسائل مباشرة مع متجر ووكومرس أو موقع ووردبريس الخاص بك.",
+            "wordpress_plugin": "إضافة ووردبريس",
+            "wordpress_plugin_desc": "قم بتحميل إضافة ووردبريس لاستقبال المدفوعات عبر الرموز المختصرة (Shortcodes).",
+            "download_wp_plugin": "تحميل الإضافة",
+            "setup_instructions": "تعليمات التثبيت",
+            "setup_instructions_step1": "قم بتثبيت وتفعيل الإضافة من لوحة تحكم ووردبريس، ثم أضف مفاتيح الـ API في الإعدادات.",
+            "setup_instructions_step2": "استخدم الرمز [sms_payment_gateway] لعرض نموذج الدفع في أي مكان في موقعك."
         },
         "tools": {
             "monthly_only_restriction": "هذه الأداة تسمح بالاشتراك الشهري فقط.",
@@ -13902,7 +13910,15 @@
             "webhooks": "Webhooks",
             "sdks": "SDKs & Libraries",
             "code_examples": "Code Examples",
-            "back_to_dashboard": "Back to Dashboard"
+            "back_to_dashboard": "Back to Dashboard",
+            "wordpress_integration": "WordPress Plugin Integration",
+            "wordpress_integration_desc": "Integrate the SMS payment gateway directly into your WooCommerce or WordPress site.",
+            "wordpress_plugin": "WordPress Plugin",
+            "wordpress_plugin_desc": "Download the WordPress plugin to accept payments via shortcodes.",
+            "download_wp_plugin": "Download Plugin",
+            "setup_instructions": "Setup Instructions",
+            "setup_instructions_step1": "Install and activate the plugin in your WordPress admin panel, then configure your API keys in the settings.",
+            "setup_instructions_step2": "Use the shortcode [sms_payment_gateway] to display the payment form anywhere on your site."
         },
         "tools": {
             "monthly_only_restriction": "This tool only allows monthly subscriptions.",

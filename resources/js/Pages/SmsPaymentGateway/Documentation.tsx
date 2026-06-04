@@ -253,6 +253,33 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
                                         </Tabs>
                                     </CardContent>
                                 </Card>
+
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>{__('sms_gateway.wordpress_integration')}</CardTitle>
+                                        <CardDescription>{__('sms_gateway.wordpress_integration_desc')}</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-6">
+                                        <div className="space-y-4">
+                                            <h3 className="text-lg font-bold text-slate-800">1. Download the Plugin</h3>
+                                            <div className="bg-slate-900 rounded-lg p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                                <div>
+                                                    <div className="text-xs text-slate-400 font-bold mb-2">{__('sms_gateway.wordpress_plugin')}</div>
+                                                    <p className="text-slate-300 text-sm">{__('sms_gateway.wordpress_plugin_desc')}</p>
+                                                </div>
+                                                <Button variant="secondary" size="sm" asChild>
+                                                    <a href="/downloads/musoftware-sms-gateway.zip" download>
+                                                        <Download className="w-4 h-4 mr-2" />{__('sms_gateway.download_wp_plugin')}</a>
+                                                </Button>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <h3 className="text-lg font-bold text-slate-800">2. {__('sms_gateway.setup_instructions')}</h3>
+                                            <p className="text-slate-600 text-sm">{__('sms_gateway.setup_instructions_step1')}</p>
+                                            <p className="text-slate-600 text-sm">{__('sms_gateway.setup_instructions_step2')}</p>
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             </div>
                         </TabsContent>
                     </Tabs>
