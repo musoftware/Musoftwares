@@ -5541,4 +5541,6 @@ return [
   'notifications_disabled_message' => 'يرجى تفعيل الإشعارات لتلقي التحديثات والتنبيهات في الخلفية.',
   'enable_notifications' => 'تفعيل الإشعارات',
   'notifications_enabled_successfully' => 'تم تفعيل الإشعارات بنجاح.',
+  'saved_successfully' => 'تم الحفظ بنجاح',
+  'settings' => 'الإعدادات',
 ];
