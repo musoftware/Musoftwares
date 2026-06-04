@@ -69,7 +69,7 @@ class Musoftware_Sms_Gateway_Shortcode {
     private static function render_iframe( $url ) {
         ?>
         <div class="sms-gateway-iframe-container" style="width: 100%; max-width: 500px; margin: 0 auto;">
-            <iframe src="<?php echo esc_url( $url ); ?>" width="100%" height="700px" frameborder="0" style="border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);"></iframe>
+            <iframe src="<?php echo esc_url( $url ); ?>" width="100%" height="700px" frameborder="0" allow="clipboard-write" style="border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);"></iframe>
         </div>
         <?php
     }
@@ -123,7 +123,7 @@ class Musoftware_Sms_Gateway_Shortcode {
                     success: function(response) {
                         if (response.success && response.data.url) {
                             // Replace form with iframe
-                            var iframeHtml = '<div class="sms-gateway-iframe-container" style="width: 100%;"><iframe src="' + response.data.url + '" width="100%" height="700px" frameborder="0" style="border: none;"></iframe></div>';
+                            var iframeHtml = '<div class="sms-gateway-iframe-container" style="width: 100%;"><iframe src="' + response.data.url + '" width="100%" height="700px" frameborder="0" allow="clipboard-write" style="border: none;"></iframe></div>';
                             $wrapper.html(iframeHtml);
                             $wrapper.css({padding: 0, border: 'none'});
                         } else {

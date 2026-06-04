@@ -514,7 +514,21 @@
     // ── Copy wallet ─────────────────────────────
     function copyWallet() {
         const num = document.getElementById('wallet-display').textContent.trim();
-        navigator.clipboard.writeText(num);
+        
+        // Use hidden textarea for maximum compatibility (iOS, WebViews, iframes)
+        const textArea = document.createElement("textarea");
+        textArea.value = num;
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+        } catch (err) {}
+        document.body.removeChild(textArea);
+
         const btn = document.getElementById('copy-btn');
         btn.textContent = '{{ __("sms_gateway.copied") }}';
         btn.classList.add('copied');
