@@ -9,7 +9,6 @@ import { Textarea } from '@/Components/ui/textarea';
 import { Send, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
 import { __ } from '@/lib/i18n';
-import { route } from 'ziggy-js';
 
 export default function Broadcast() {
     const { data, setData, post, processing, errors, reset } = useForm({

@@ -29,12 +29,21 @@
             }
         },
         "admin": {
-            "share": "??????",
-            "share_24_hours": "?????? (24 ????)",
-            "share_3_days": "?????? (3 ????)",
-            "share_1_month": "?????? (??? ????)",
-            "link_copied": "?? ??? ??????!",
-            "expires_at": "????? ??",
+            "notification_sent_successfully": "تم إرسال الإشعار العام بنجاح.",
+            "notification_failed": "فشل في إرسال الإشعار",
+            "broadcast_notification": "إرسال إشعار عام",
+            "broadcast_notification_description": "إرسال إشعار فوري لجميع المستخدمين الذين سمحوا بالإشعارات على أجهزتهم.",
+            "broadcast_info_message": "سيتم إرسال هذا الإشعار إلى أجهزة المستخدمين على الفور. لن يتم حفظه في سجل الإشعارات الخاص بهم.",
+            "notification_title_placeholder": "أدخل عنوان الإشعار",
+            "message": "الرسالة",
+            "notification_body_placeholder": "أدخل محتوى الإشعار",
+            "link_optional": "الرابط (اختياري)",
+            "share": "مشاركة",
+            "share_24_hours": "مشاركة (24 ساعة)",
+            "share_3_days": "مشاركة (3 أيام)",
+            "share_1_month": "مشاركة (شهر واحد)",
+            "link_copied": "تم نسخ الرابط بنجاح!",
+            "expires_at": "تنتهي في",
             "only_unpaid_invoices_can_be_edited": "only_unpaid_invoices_can_be_edited",
             "service_added_successfully": "service_added_successfully",
             "timer_session_deleted": "timer_session_deleted",
@@ -814,6 +823,8 @@
             "configure_storage_provider": "الرجاء تكوين مزود التخزين الخاص بك."
         },
         "freelance": {
+            "new_job_matched_skills": "هناك مشروع جديد يطابق مهاراتك!",
+            "new_job_matched_body": "تم نشر مشروع جديد يطابق مهاراتك: :title",
             "expected_duration": "expected_duration",
             "job_description": "job_description",
             "unknown_job": "Unknown Job",
@@ -1071,7 +1082,29 @@
             "proposals_to_display": "proposals to display.",
             "connect_android_phone_to_read": "قم بتوصيل هاتف أندرويد لقراءة رسائل فودافون كاش وإنستاباي.",
             "connect_new_device": "توصيل جهاز جديد",
-            "learn_how_to_connect_your": "تعلم كيفية ربط تطبيقك ببوابة الدفع."
+            "learn_how_to_connect_your": "تعلم كيف تربط تطبيقك ببوابة الدفع.",
+            "add_skill": "إضافة مهارة",
+            "bio": "نبذة تعريفية",
+            "describe_your_experience_and_skills": "صف خبرتك ومهاراتك",
+            "dont_snooze": "عدم كتم الإشعارات",
+            "e_g_senior_laravel_developer": "مثال: مطور لارافل أول",
+            "manage_how_you_receive_notifications_about_new_jobs": "إدارة كيفية تلقي الإشعارات حول الوظائف الجديدة",
+            "mute_for_1_hour": "كتم لمدة ساعة واحدة",
+            "mute_for_1_week": "كتم لمدة أسبوع",
+            "mute_for_24_hours": "كتم لمدة 24 ساعة",
+            "mute_until_i_turn_it_back_on": "كتم حتى أقوم بإعادة تفعيلها",
+            "my_skills": "مهاراتي",
+            "no_skills_added_yet": "لم يتم إضافة أي مهارات بعد",
+            "notification_preferences": "تفضيلات الإشعارات",
+            "notification_preferences_updated": "تم تحديث تفضيلات الإشعارات",
+            "professional_title": "المسمى الوظيفي",
+            "profile_details": "تفاصيل الملف الشخصي",
+            "profile_updated": "تم تحديث الملف الشخصي بنجاح",
+            "receive_job_notifications": "تلقي إشعارات الوظائف",
+            "select_snooze_duration": "حدد مدة كتم الإشعارات",
+            "snooze_notifications": "كتم الإشعارات",
+            "temporarily_mute_notifications_without_turning_them_off": "كتم الإشعارات مؤقتاً دون إيقافها بالكامل",
+            "turn_off_to_completely_stop_receiving_job_matches": "إيقاف لتتوقف تماماً عن تلقي مطابقات الوظائف"
         },
         "frontend": {
             "pricing": {
@@ -6800,7 +6833,9 @@
             "register": "حساب جديد",
             "notifications_disabled_message": "يرجى تفعيل الإشعارات لتلقي التحديثات والتنبيهات في الخلفية.",
             "enable_notifications": "تفعيل الإشعارات",
-            "notifications_enabled_successfully": "تم تفعيل الإشعارات بنجاح."
+            "notifications_enabled_successfully": "تم تفعيل الإشعارات بنجاح.",
+            "saved_successfully": "تم الحفظ بنجاح",
+            "settings": "الإعدادات"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -7407,6 +7442,15 @@
             }
         },
         "admin": {
+            "notification_sent_successfully": "Global notification sent successfully.",
+            "notification_failed": "Failed to send notification",
+            "broadcast_notification": "Broadcast Notification",
+            "broadcast_notification_description": "Send a push notification to all users who have allowed notifications on their devices.",
+            "broadcast_info_message": "This notification will be pushed to user devices immediately. It will not be saved in their notification history.",
+            "notification_title_placeholder": "Enter notification title",
+            "message": "Message",
+            "notification_body_placeholder": "Enter the notification content",
+            "link_optional": "Link (Optional)",
             "share": "Share",
             "share_24_hours": "Share (24 Hours)",
             "share_3_days": "Share (3 Days)",
@@ -8192,6 +8236,8 @@
             "configure_storage_provider": "Please configure your storage provider."
         },
         "freelance": {
+            "new_job_matched_skills": "New Job Matched Your Skills!",
+            "new_job_matched_body": "A new job matching your skills has just been posted: :title",
             "expected_duration": "expected_duration",
             "job_description": "job_description",
             "unknown_job": "Unknown Job",
@@ -8449,7 +8495,29 @@
             "proposals_to_display": "proposals to display.",
             "connect_android_phone_to_read": "Connect Android phone to read Vodafone Cash and Instapay messages.",
             "connect_new_device": "Connect New Device",
-            "learn_how_to_connect_your": "Learn how to connect your application to the gateway."
+            "learn_how_to_connect_your": "Learn how to connect your application to the gateway.",
+            "add_skill": "Add Skill",
+            "bio": "Bio",
+            "describe_your_experience_and_skills": "Describe your experience and skills",
+            "dont_snooze": "Don't Snooze",
+            "e_g_senior_laravel_developer": "e.g. Senior Laravel Developer",
+            "manage_how_you_receive_notifications_about_new_jobs": "Manage how you receive notifications about new jobs",
+            "mute_for_1_hour": "Mute for 1 hour",
+            "mute_for_1_week": "Mute for 1 week",
+            "mute_for_24_hours": "Mute for 24 hours",
+            "mute_until_i_turn_it_back_on": "Mute until I turn it back on",
+            "my_skills": "My Skills",
+            "no_skills_added_yet": "No skills added yet",
+            "notification_preferences": "Notification Preferences",
+            "notification_preferences_updated": "Notification preferences updated",
+            "professional_title": "Professional Title",
+            "profile_details": "Profile Details",
+            "profile_updated": "Profile updated successfully",
+            "receive_job_notifications": "Receive Job Notifications",
+            "select_snooze_duration": "Select Snooze Duration",
+            "snooze_notifications": "Snooze Notifications",
+            "temporarily_mute_notifications_without_turning_them_off": "Temporarily mute notifications without turning them off",
+            "turn_off_to_completely_stop_receiving_job_matches": "Turn off to completely stop receiving job matches"
         },
         "frontend": {
             "pricing": {
@@ -8640,6 +8708,7 @@
             }
         },
         "general": {
+            "enable_notifications": "Enable Notifications",
             "payment_successful_thank_you": "Payment successful. Thank you!",
             "payment_failed_please_try_again": "Payment failed. Please try again.",
             "return_to_home": "Return to Home",
@@ -14176,9 +14245,10 @@
             "instapay_logo": "Instapay Logo",
             "login": "Log in",
             "register": "Register",
-            "notifications_disabled_message": "Please enable push notifications to receive background updates and alerts.",
-            "enable_notifications": "Enable Notifications",
-            "notifications_enabled_successfully": "Push notifications have been enabled successfully."
+            "notifications_disabled_message": "Please enable push notifications",
+            "notifications_enabled_successfully": "Push notifications have been enabled successfully.",
+            "saved_successfully": "Saved successfully",
+            "settings": "Settings"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",

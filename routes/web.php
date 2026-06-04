@@ -14,6 +14,10 @@ Route::get('/dddwqdqwdqw', function(){
     echo 'ss';
     \Illuminate\Support\Facades\Artisan::call('migrate');
 });
+Route::get('/php-check', function () {
+    return 'Active PHP Version: ' . phpversion();
+});
+
 
 Route::get('/test-amc-api', function(\App\Services\AmcAcademyApiService $service) {
     // Array of mock FBIDs to test bulk lookup and deduction
