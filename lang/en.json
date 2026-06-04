@@ -1021,5 +1021,6 @@
     "Yes, the Android app only reads SMS messages from authorized payment providers (like Vodafone Cash) and never accesses your other personal messages.": "Yes, the Android app only reads SMS messages from authorized payment providers (like Vodafone Cash) and never accesses your other personal messages.",
     "Yes, you can use the Test Mode and the SMS Simulator to verify webhooks and test your API checkout integration without making real transactions.": "Yes, you can use the Test Mode and the SMS Simulator to verify webhooks and test your API checkout integration without making real transactions.",
     "How to allow SMS permission on Vivo phone?": "How to allow SMS permission on Vivo phone?",
-    "Open Settings -> Apps -> App Manager -> Find SMS Payment Gateway -> Permissions -> Allow SMS permission.": "Open Settings -> Apps -> App Manager -> Find SMS Payment Gateway -> Permissions -> Allow SMS permission."
+    "Open Settings -> Apps -> App Manager -> Find SMS Payment Gateway -> Permissions -> Allow SMS permission.": "Open Settings -> Apps -> App Manager -> Find SMS Payment Gateway -> Permissions -> Allow SMS permission.",
+    "Earn": "Earn"
 }

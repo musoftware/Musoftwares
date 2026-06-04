@@ -1,9 +1,8 @@
 ---
-trigger: model_decision
-description: "Guidelines and requirements for using modular PHP translation arrays instead of global JSON language files."
+description: Guidelines and requirements for using modular PHP translation arrays instead of global JSON language files.
 ---
 
-# Rule: Do Not Use Global JSON Translation Files (Use PHP Arrays)
+# No JSON Translations
 
 ## Problem Statement
 Relying on a giant flat JSON file (e.g., `lang/en.json` or `lang/ar.json`) for translations creates massive, unmanageable files over time. It causes merge conflicts, makes it difficult to track which module or feature owns which string, and slows down developers. Furthermore, using raw English sentences as keys (e.g., `__('Manage and track your leads pipeline')`) makes the code brittle and visually cluttered.
