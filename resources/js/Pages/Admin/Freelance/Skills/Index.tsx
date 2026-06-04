@@ -19,11 +19,13 @@ import { __ } from '@/lib/i18n';
 export default function Index({ skills, filters }: any) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [isBulkCreateOpen, setIsBulkCreateOpen] = useState(false);
     const [editingSkill, setEditingSkill] = useState<any>(null);
     const [formData, setFormData] = useState({
         name: '',
         description: '',
     });
+    const [bulkSkills, setBulkSkills] = useState('');
     const [search, setSearch] = useState(filters.search || '');
 
     const handleSearch = (e: any) => {
@@ -37,6 +39,16 @@ export default function Index({ skills, filters }: any) {
             onSuccess: () => {
                 setIsCreateOpen(false);
                 resetForm();
+            },
+        });
+    };
+
+    const handleBulkCreateSubmit = (e: any) => {
+        e.preventDefault();
+        router.post(route('admin.freelance.skills.bulkStore'), { skills: bulkSkills }, {
+            onSuccess: () => {
+                setIsBulkCreateOpen(false);
+                setBulkSkills('');
             },
         });
     };
@@ -130,10 +142,43 @@ export default function Index({ skills, filters }: any) {
                     )}
                 </form>
 
-                <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                    <DialogTrigger asChild>
-                        <Button>{__('freelance.create_skill', undefined, 'Create Skill')}</Button>
-                    </DialogTrigger>
+                <div className="flex gap-2">
+                    <Dialog open={isBulkCreateOpen} onOpenChange={setIsBulkCreateOpen}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline">{__('freelance.add_bulk_skills', undefined, 'Add Bulk Skills')}</Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>{__('freelance.add_bulk_skills', undefined, 'Add Bulk Skills')}</DialogTitle>
+                            </DialogHeader>
+                            <form onSubmit={handleBulkCreateSubmit}>
+                                <div className="space-y-4 p-1">
+                                    <div>
+                                        <Label htmlFor="bulkSkills">{__('freelance.bulk_skills_placeholder', undefined, 'Enter skills, one per line')}</Label>
+                                        <textarea
+                                            id="bulkSkills"
+                                            className="flex min-h-[150px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                            value={bulkSkills}
+                                            onChange={(e) => setBulkSkills(e.target.value)}
+                                            placeholder="PHP&#10;Laravel&#10;ReactJS"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <DialogFooter className="mt-6">
+                                    <Button type="button" variant="outline" onClick={() => setIsBulkCreateOpen(false)}>
+                                        {__('freelance.cancel')}
+                                    </Button>
+                                    <Button type="submit">{__('freelance.save_skills', undefined, 'Save Skills')}</Button>
+                                </DialogFooter>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+
+                    <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                        <DialogTrigger asChild>
+                            <Button>{__('freelance.create_skill', undefined, 'Create Skill')}</Button>
+                        </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
                             <DialogTitle>{__('freelance.create_new_skill', undefined, 'Create New Skill')}</DialogTitle>
@@ -149,6 +194,7 @@ export default function Index({ skills, filters }: any) {
                         </form>
                     </DialogContent>
                 </Dialog>
+                </div>
             </div>
 
             <div className="overflow-hidden rounded-lg bg-white shadow">

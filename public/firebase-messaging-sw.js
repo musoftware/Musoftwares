@@ -33,8 +33,32 @@ messaging.onBackgroundMessage((payload) => {
 self.addEventListener('notificationclick', function(event) {
     event.notification.close();
     
-    const urlToOpen = new URL(event.notification.data?.url || '/', self.location.origin).href;
-
+    console.log('[firebase-messaging-sw.js] notificationclick event data:', event.notification.data);
+    
+    let url = '/';
+    const data = event.notification.data;
+    
+    if (data) {
+        // If data is the payload directly
+        if (data.fcmOptions && data.fcmOptions.link) {
+            url = data.fcmOptions.link;
+        } else if (data.data && data.data.url) {
+            url = data.data.url;
+        } 
+        // If data has FCM_MSG wrapper
+        else if (data.FCM_MSG && data.FCM_MSG.fcmOptions && data.FCM_MSG.fcmOptions.link) {
+            url = data.FCM_MSG.fcmOptions.link;
+        } else if (data.FCM_MSG && data.FCM_MSG.data && data.FCM_MSG.data.url) {
+            url = data.FCM_MSG.data.url;
+        }
+        // Direct URL property (fallback)
+        else if (data.url) {
+            url = data.url;
+        }
+    }
+    
+    console.log('[firebase-messaging-sw.js] Extracted URL to open:', url);
+    const urlToOpen = new URL(url, self.location.origin).href;
     event.waitUntil(
         clients.matchAll({
             type: 'window',
