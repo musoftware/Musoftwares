@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('freelance_jobs', function (Blueprint $table) {
-            $table->timestamp('last_poked_at')->nullable()->after('status');
-        });
+        if (!Schema::hasColumn('freelance_jobs', 'last_poked_at')) {
+            Schema::table('freelance_jobs', function (Blueprint $table) {
+                $table->timestamp('last_poked_at')->nullable()->after('status');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('freelance_jobs', function (Blueprint $table) {
-            $table->dropColumn('last_poked_at');
-        });
+        if (Schema::hasColumn('freelance_jobs', 'last_poked_at')) {
+            Schema::table('freelance_jobs', function (Blueprint $table) {
+                $table->dropColumn('last_poked_at');
+            });
+        }
     }
 };
