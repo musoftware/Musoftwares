@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
+use App\Models\NotificationCampaign;
 
 class BroadcastNotificationController extends Controller
 {
@@ -15,7 +16,10 @@ class BroadcastNotificationController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Admin/Notifications/Broadcast');
+        $campaigns = NotificationCampaign::latest()->get();
+        return Inertia::render('Admin/Notifications/Broadcast', [
+            'campaigns' => $campaigns
+        ]);
     }
 
     /**
@@ -30,6 +34,13 @@ class BroadcastNotificationController extends Controller
         ]);
 
         try {
+            $campaign = NotificationCampaign::create([
+                'title' => $validated['title'],
+                'body' => $validated['body'],
+                'target_url' => $validated['url'] ?? null,
+                'status' => 'sending',
+            ]);
+
             $messaging = app('firebase.messaging');
             
             $notification = Notification::create($validated['title'], $validated['body']);
@@ -38,16 +49,19 @@ class BroadcastNotificationController extends Controller
                 ->withTopic('global')
                 ->withNotification($notification);
                 
+            $trackingUrl = route('track.campaign', ['id' => $campaign->id]);
             if (!empty($validated['url'])) {
-                $message = $message->withData([
-                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                    'url' => $validated['url']
-                ])->withWebPushConfig([
-                    'fcm_options' => [
-                        'link' => $validated['url']
-                    ]
-                ]);
+                $trackingUrl .= '?redirect=' . urlencode($validated['url']);
             }
+
+            $message = $message->withData([
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                'url' => $trackingUrl
+            ])->withWebPushConfig([
+                'fcm_options' => [
+                    'link' => $trackingUrl
+                ]
+            ]);
 
             // Customize for platforms
             $message = $message->withHighestPossiblePriority()
@@ -68,9 +82,14 @@ class BroadcastNotificationController extends Controller
 
             $messaging->send($message);
 
+            $campaign->update(['status' => 'completed']);
+
             return back()->with('success', __('admin.notification_sent_successfully'));
             
         } catch (\Exception $e) {
+            if (isset($campaign)) {
+                $campaign->update(['status' => 'failed']);
+            }
             \Log::error('Broadcast Notification Failed: ' . $e->getMessage());
             return back()->with('error', __('admin.notification_failed') . ': ' . $e->getMessage());
         }

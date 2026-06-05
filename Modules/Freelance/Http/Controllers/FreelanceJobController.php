@@ -12,14 +12,16 @@ use Illuminate\Support\Facades\DB;
 use Modules\Freelance\Domains\Job\Actions\PostJobAction;
 use Modules\Freelance\Domains\Job\DTOs\PostJobData;
 use Illuminate\Support\Facades\Gate;
+use Modules\Freelance\Traits\ConvertsFreelanceCurrency;
 
 class FreelanceJobController extends Controller
 {
+    use ConvertsFreelanceCurrency;
     public function __construct(private PostJobAction $postJobAction) {}
 
     public function index(Request $request)
     {
-        $query = Job::with(['client', 'skills'])->where('status', 'open');
+        $query = Job::with(['client', 'skills', 'currency'])->where('status', 'open');
 
         if ($request->filled('skill_id')) {
             $query->whereHas('skills', function ($q) use ($request) {
@@ -52,15 +54,27 @@ class FreelanceJobController extends Controller
         }
 
         $jobs = $query->paginate(15)->withQueryString();
+        
+        $userCurrencyId = $request->user()?->currency_id ?? \App\Models\AdminSettings::business_currency();
+        
+        $jobs->through(function ($job) use ($userCurrencyId) {
+            return $this->convertJobCurrency($job, $userCurrencyId);
+        });
+
         return Inertia::render('Freelance/Jobs/Browse', ['jobs' => $jobs]);
     }
 
     public function myJobs(Request $request)
     {
         $jobs = Job::withCount('proposals')
+            ->with('currency')
             ->where('client_id', $request->user()->id)
             ->latest()
             ->paginate(15);
+
+        $jobs->through(function ($job) use ($request) {
+            return $this->convertJobCurrency($job, $request->user()->currency_id);
+        });
 
         return Inertia::render('Freelance/Jobs/MyJobs', ['jobs' => $jobs]);
     }
@@ -195,9 +209,30 @@ class FreelanceJobController extends Controller
         ]);
     }
 
-    public function show(Job $job)
+    public function show(Request $request, Job $job)
     {
-        $job->load(['client', 'skills', 'proposals.freelancer']);
+        // Track unique views (per session) if viewer is not the job owner
+        $user = $request->user();
+        if (!$user || $user->id !== $job->client_id) {
+            $viewedJobs = $request->session()->get('viewed_freelance_jobs', []);
+            if (!in_array($job->id, $viewedJobs)) {
+                $job->increment('views_count');
+                $viewedJobs[] = $job->id;
+                $request->session()->put('viewed_freelance_jobs', $viewedJobs);
+            }
+        }
+
+        $job->load(['client', 'skills', 'proposals.freelancer', 'currency']);
+        
+        $userCurrencyId = $request->user()?->currency_id ?? \App\Models\AdminSettings::business_currency();
+        
+        $this->convertJobCurrency($job, $userCurrencyId);
+        if ($job->relationLoaded('proposals')) {
+            $job->proposals->transform(function ($proposal) use ($userCurrencyId) {
+                return $this->convertProposalCurrency($proposal, $userCurrencyId);
+            });
+        }
+
         return Inertia::render('Freelance/Jobs/Show', [
             'job' => $job,
             'pointsCost' => 2 // Example cost to submit a proposal
@@ -234,5 +269,24 @@ class FreelanceJobController extends Controller
 
         $job->delete();
         return redirect()->route('freelance.my-jobs')->with('success', __('general.job_deleted'));
+    }
+
+    public function poke(Request $request, Job $job)
+    {
+        Gate::authorize('update', $job);
+
+        if ($job->status !== 'open') {
+            return back()->with('error', __('freelance.job_must_be_open_to_poke'));
+        }
+
+        if ($job->last_poked_at && $job->last_poked_at->diffInHours(now()) < 24) {
+            return back()->with('error', __('freelance.poke_too_soon'));
+        }
+
+        \Modules\Freelance\Jobs\PokeFreelancersForJob::dispatch($job);
+
+        $job->update(['last_poked_at' => now()]);
+
+        return back()->with('success', __('freelance.poke_success'));
     }
 }

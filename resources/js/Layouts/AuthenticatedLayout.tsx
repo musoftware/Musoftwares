@@ -816,7 +816,7 @@ function AuthenticatedContent({
             </header>
 
             {/* Notification Permission Banner */}
-            {permission === 'default' && (
+            {permission !== 'granted' && (
                 <div className="bg-indigo-600 px-4 py-3 text-white sm:px-6 lg:px-8">
                     <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                         <p className="text-sm leading-6">

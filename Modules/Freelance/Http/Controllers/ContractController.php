@@ -10,9 +10,11 @@ use Illuminate\Support\Facades\DB;
 use App\Services\ActivityService;
 use Modules\Freelance\Domains\Contract\Actions\CompleteContractAction;
 use Illuminate\Support\Facades\Gate;
+use Modules\Freelance\Traits\ConvertsFreelanceCurrency;
 
 class ContractController extends Controller
 {
+    use ConvertsFreelanceCurrency;
     public function __construct(private CompleteContractAction $completeContractAction) {}
 
     public function index(Request $request)
@@ -23,9 +25,13 @@ class ContractController extends Controller
                 $q->where('client_id', $user->id)
                   ->orWhere('freelancer_id', $user->id);
             })
-            ->with(['job:id,title,type,budget,currency_id', 'client:id,name', 'freelancer:id,name'])
+            ->with(['job:id,title,type,budget,currency_id', 'job.currency', 'client:id,name', 'freelancer:id,name'])
             ->latest()
             ->paginate(15);
+
+        $contracts->through(function ($contract) use ($user) {
+            return $this->convertContractCurrency($contract, $user->currency_id);
+        });
 
         $stats = [
             'total'     => Contract::where('client_id', $user->id)->orWhere('freelancer_id', $user->id)->count(),
@@ -50,11 +56,14 @@ class ContractController extends Controller
         ]);
     }
 
-    public function show(Contract $contract)
+    public function show(Request $request, Contract $contract)
     {
         Gate::authorize('view', $contract);
 
-        $contract->load(['job.client', 'freelancer']);
+        $contract->load(['job.client', 'freelancer', 'job.currency']);
+        
+        $this->convertContractCurrency($contract, $request->user()->currency_id);
+
         return Inertia::render('Freelance/Contracts/Show', ['contract' => $contract]);
     }
 

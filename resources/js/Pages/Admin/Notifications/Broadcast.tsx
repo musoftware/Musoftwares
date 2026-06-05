@@ -8,9 +8,12 @@ import { Button } from '@/Components/ui/button';
 import { Textarea } from '@/Components/ui/textarea';
 import { Send, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import { Badge } from '@/Components/ui/badge';
+import { formatDate } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
-export default function Broadcast() {
+export default function Broadcast({ campaigns = [] }: { campaigns?: any[] }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         body: '',
@@ -28,7 +31,7 @@ export default function Broadcast() {
         <AdminSidebarLayout>
             <Head title={__('admin.broadcast_notification')} />
 
-            <div className="max-w-2xl mx-auto py-8">
+            <div className="max-w-4xl mx-auto py-8 space-y-6">
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
@@ -96,6 +99,57 @@ export default function Broadcast() {
                             </Button>
                         </CardFooter>
                     </form>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{__('admin.past_campaigns')}</CardTitle>
+                        <CardDescription>
+                            {__('admin.past_campaigns_description')}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {campaigns.length === 0 ? (
+                            <div className="text-center py-8 text-slate-500">
+                                {__('admin.no_campaigns_yet')}
+                            </div>
+                        ) : (
+                            <div className="rounded-md border">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>{__('general.title')}</TableHead>
+                                            <TableHead>{__('admin.date')}</TableHead>
+                                            <TableHead className="text-center">{__('freelance.views')}</TableHead>
+                                            <TableHead>{__('general.status')}</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {campaigns.map((campaign) => (
+                                            <TableRow key={campaign.id}>
+                                                <TableCell className="font-medium">{campaign.title}</TableCell>
+                                                <TableCell className="text-slate-500 text-sm">{formatDate(campaign.created_at)}</TableCell>
+                                                <TableCell className="text-center">
+                                                    {campaign.target_url ? (
+                                                        <Badge variant="secondary" className="px-3 py-1 font-bold">
+                                                            {campaign.clicks_count}
+                                                        </Badge>
+                                                    ) : (
+                                                        <span className="text-slate-400 text-xs">-</span>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge className={campaign.status === 'completed' ? 'bg-green-500 hover:bg-green-600' : ''} variant={campaign.status === 'completed' ? 'default' : 'secondary'}>
+                                                        {__(campaign.status)}
+                                                    </Badge>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        )}
+                    </CardContent>
                 </Card>
             </div>
         </AdminSidebarLayout>

@@ -26,6 +26,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:freelance'])-
     Route::get('/jobs/browse', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'index'])->name('jobs.browse');
     Route::get('/jobs/my-jobs', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'myJobs'])->name('my-jobs');
     Route::resource('jobs', \Modules\Freelance\Http\Controllers\FreelanceJobController::class)->except(['index']);
+    Route::post('/jobs/{job}/poke', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'poke'])->name('jobs.poke');
 
     // Proposals
     Route::get('/proposals', [\Modules\Freelance\Http\Controllers\ProposalController::class, 'index'])->name('proposals.index');

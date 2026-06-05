@@ -11,7 +11,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { formatMoney, formatDate } from '@/lib/utils';
-import { Clock, DollarSign, Briefcase, MapPin, CheckCircle2, AlertCircle, FileText, Send, User } from 'lucide-react';
+import { Clock, DollarSign, Briefcase, MapPin, CheckCircle2, AlertCircle, FileText, Send, User, Eye, Bell } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
 import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 import { __ } from '@/lib/i18n';
@@ -45,6 +45,13 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
         router.post(route('freelance.proposals.reject', proposalId));
     };
 
+    const lastPokedAt = job.last_poked_at ? new Date(job.last_poked_at) : null;
+    const canPoke = job.status === 'open' && (!lastPokedAt || (new Date().getTime() - lastPokedAt.getTime()) > 24 * 60 * 60 * 1000);
+
+    const handlePoke = () => {
+        router.post(route('freelance.jobs.poke', job.id));
+    };
+
     return (
         <>
             <Head title={`${job.title} | ${__('freelance.jobs')}`} />
@@ -71,9 +78,25 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                             <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4" /> {__('general.worldwide')}</span>
                                         </div>
                                     </div>
-                                    <Badge variant={job.status === 'open' ? 'default' : 'secondary'} className={`uppercase tracking-wider font-semibold ${job.status === 'open' ? 'bg-emerald-500 hover:bg-emerald-600' : ''}`}>
-                                        {__(job.status.replace('_', ' '))}
-                                    </Badge>
+                                    <div className="flex flex-col items-end gap-2">
+                                        <Badge variant={job.status === 'open' ? 'default' : 'secondary'} className={`uppercase tracking-wider font-semibold ${job.status === 'open' ? 'bg-emerald-500 hover:bg-emerald-600' : ''}`}>
+                                            {__(job.status.replace('_', ' '))}
+                                        </Badge>
+                                        
+                                        {isClient && job.status === 'open' && (
+                                            <Button 
+                                                variant="outline" 
+                                                size="sm" 
+                                                className="text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                                                disabled={!canPoke}
+                                                onClick={handlePoke}
+                                                title={!canPoke ? __('freelance.poke_too_soon') : ''}
+                                            >
+                                                <Bell className="w-3.5 h-3.5 mr-1.5" />
+                                                {__('freelance.poke_freelancers')}
+                                            </Button>
+                                        )}
+                                    </div>
                                 </div>
                             </CardHeader>
                             <CardContent className="p-6 md:p-8 space-y-8">
@@ -123,7 +146,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                                         </div>
                                                         <div className="text-right">
                                                             <div className="text-xl font-bold text-indigo-700 font-mono">
-                                                                <FinancialAmount amount={proposal.bid_amount} currency={globalCurrency} />
+                                                                <FinancialAmount amount={proposal.bid_amount} currency={job.currency} />
                                                             </div>
                                                             <Badge variant="outline" className="mt-1 bg-amber-50 text-amber-700 border-amber-200">
                                                                 {__(proposal.status)}
@@ -168,7 +191,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                         </div>
                                         <div>
                                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">{__('erp.budget')}</p>
-                                            <div className="font-bold text-slate-900"><FinancialAmount amount={job.budget} currency={globalCurrency} /></div>
+                                            <div className="font-bold text-slate-900"><FinancialAmount amount={job.budget} currency={job.currency} /></div>
                                             <p className="text-xs text-slate-500 mt-0.5 capitalize">{__(job.type)} {__('general.price')}</p>
                                         </div>
                                     </div>
@@ -199,6 +222,27 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                 </div>
                             </CardContent>
                             
+                            {isClient && (
+                                <CardFooter className="p-5 bg-slate-50/50 border-t border-slate-100 flex-col gap-4 items-stretch">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-white shadow-sm border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                                            <div className="bg-indigo-50 p-2 rounded-full mb-3">
+                                                <Send className="h-5 w-5 text-indigo-600" />
+                                            </div>
+                                            <p className="text-2xl font-bold text-slate-900 leading-none">{job.notifications_sent_count || 0}</p>
+                                            <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider mt-2">{__('freelance.notified')}</p>
+                                        </div>
+                                        <div className="bg-white shadow-sm border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                                            <div className="bg-emerald-50 p-2 rounded-full mb-3">
+                                                <Eye className="h-5 w-5 text-emerald-600" />
+                                            </div>
+                                            <p className="text-2xl font-bold text-slate-900 leading-none">{job.views_count || 0}</p>
+                                            <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider mt-2">{__('freelance.views')}</p>
+                                        </div>
+                                    </div>
+                                </CardFooter>
+                            )}
+
                             {!isClient && (
                                 <CardFooter className="p-5 bg-slate-50/50 border-t border-slate-100 flex-col gap-4 items-stretch">
                                     {job.status !== 'open' ? (
@@ -233,7 +277,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
 
                                             <form onSubmit={submitProposal} className="space-y-4">
                                                 <div className="space-y-1.5">
-                                                    <Label htmlFor="bid_amount">{__('freelance.your_bid')} ({globalCurrency})</Label>
+                                                    <Label htmlFor="bid_amount">{__('freelance.your_bid')} ({job.currency?.symbol || job.currency?.currency || globalCurrency})</Label>
                                                     <Input
                                                         id="bid_amount"
                                                         type="number"

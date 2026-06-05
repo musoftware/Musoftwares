@@ -79,7 +79,7 @@ function ShowContractContent({ auth, contract }: any) {
                         <div className="text-right">
                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-0.5">{__('freelance.contract_value')}</p>
                             <p className="text-xl font-bold text-slate-900 font-mono">
-                                <FinancialAmount amount={contract.agreed_price} currency={globalCurrency} />
+                                <FinancialAmount amount={contract.agreed_price} currency={contract.job?.currency} />
                             </p>
                         </div>
                         <div className="h-10 w-px bg-slate-200 hidden sm:block"></div>

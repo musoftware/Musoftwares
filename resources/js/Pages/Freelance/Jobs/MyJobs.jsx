@@ -102,7 +102,7 @@ export default function MyJobs({ auth, jobs }) {
                                                 {__(job.type)}
                                             </Badge>
                                             <div className="flex items-center gap-1.5">
-                                                <FinancialAmount amount={job.budget} currency={job.currency_id} size="sm" />
+                                                <FinancialAmount amount={job.budget} currency={job.currency} size="sm" />
                                                 {job.type === 'hourly' && <span className="text-xs text-slate-500 font-medium">/ {__('general.hr')}</span>}
                                             </div>
                                         </div>

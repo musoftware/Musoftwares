@@ -10,9 +10,12 @@ use Modules\Freelance\Models\Proposal;
 use App\Models\PointTransaction;
 use Modules\Freelance\Models\Job;
 use Illuminate\Support\Facades\Schema;
+use Modules\Freelance\Traits\ConvertsFreelanceCurrency;
 
 class DashboardController extends Controller
 {
+    use ConvertsFreelanceCurrency;
+
     public function index(Request $request)
     {
         $user = $request->user();
@@ -27,11 +30,12 @@ class DashboardController extends Controller
         // 1. Active Proposals
         $activeProposals = Proposal::where('freelancer_id', $user->id)
             ->whereIn('status', ['pending'])
-            ->with('job:id,title')
+            ->with(['job:id,title,currency_id', 'job.currency'])
             ->latest()
             ->take(5)
             ->get()
-            ->map(function ($proposal) use ($hasCurrencyCol) {
+            ->map(function ($proposal) use ($hasCurrencyCol, $user) {
+                $this->convertProposalCurrency($proposal, $user->currency_id);
                 return [
                     'id'          => $proposal->id,
                     'title'       => $proposal->job->title ?? __('freelance.unknown_job'),
@@ -39,17 +43,19 @@ class DashboardController extends Controller
                     'budget'      => $proposal->bid_amount ?? $proposal->proposed_budget_points ?? 0,
                     'submittedAt' => $proposal->created_at->format('Y-m-d'),
                     'connectsUsed' => $proposal->points_spent ?? 0,
+                    'currency'    => $proposal->job->currency ?? null,
                 ];
             });
 
         // 2. Active Contracts (as freelancer)
         $contractQuery = Contract::where('freelancer_id', $user->id)
             ->where('status', 'active')
-            ->with(['client:id,name', 'job:id,title'])
+            ->with(['client:id,name', 'job:id,title,currency_id', 'job.currency'])
             ->latest()
             ->take(5);
 
-        $activeContracts = $contractQuery->get()->map(function ($contract) use ($hasAmountCol) {
+        $activeContracts = $contractQuery->get()->map(function ($contract) use ($hasAmountCol, $user) {
+            $this->convertContractCurrency($contract, $user->currency_id);
             return [
                 'id'         => $contract->id,
                 'title'      => $contract->job->title ?? __('freelance.unknown_job'),
@@ -58,6 +64,7 @@ class DashboardController extends Controller
                 'value'      => $hasAmountCol ? ($contract->amount ?? 0) : ($contract->contract_points ?? 0),
                 'progress'   => $this->calculateContractProgress($contract),
                 'status'     => $contract->status,
+                'currency'   => $contract->job->currency ?? null,
             ];
         });
 
@@ -148,7 +155,8 @@ class DashboardController extends Controller
             ->latest()
             ->take(5)
             ->get()
-            ->map(function ($job) use ($hasCurrencyCol) {
+            ->map(function ($job) use ($hasCurrencyCol, $user) {
+                $this->convertJobCurrency($job, $user->currency_id);
                 return [
                     'id'             => $job->id,
                     'title'          => $job->title,
@@ -156,6 +164,7 @@ class DashboardController extends Controller
                     'budget'         => $job->budget ?? 0,
                     'formattedBudget' => $job->formatted_budget ?? null,
                     'currencySymbol'  => $job->currency?->symbol,
+                    'currency'        => $job->currency,
                     'proposalsCount' => $job->proposals_count ?? 0,
                     'createdAt'      => $job->created_at->format('Y-m-d'),
                 ];
@@ -164,11 +173,12 @@ class DashboardController extends Controller
         // 2. Client's active contracts
         $clientContracts = Contract::where('client_id', $user->id)
             ->where('status', 'active')
-            ->with(['freelancer:id,name', 'job:id,title'])
+            ->with(['freelancer:id,name', 'job:id,title,currency_id', 'job.currency'])
             ->latest()
             ->take(5)
             ->get()
-            ->map(function ($contract) use ($hasAmountCol) {
+            ->map(function ($contract) use ($hasAmountCol, $user) {
+                $this->convertContractCurrency($contract, $user->currency_id);
                 return [
                     'id'             => $contract->id,
                     'title'          => $contract->job->title ?? __('freelance.unknown_job'),
@@ -177,17 +187,19 @@ class DashboardController extends Controller
                     'value'          => $hasAmountCol ? ($contract->amount ?? 0) : ($contract->contract_points ?? 0),
                     'progress'       => $this->calculateContractProgress($contract),
                     'status'         => $contract->status,
+                    'currency'       => $contract->job->currency ?? null,
                 ];
             });
 
         // 3. Proposals received on client's jobs
         $clientProposals = Proposal::whereHas('job', fn($q) => $q->where('client_id', $user->id))
             ->whereIn('status', ['pending'])
-            ->with(['job:id,title', 'freelancer:id,name'])
+            ->with(['job:id,title,currency_id', 'job.currency', 'freelancer:id,name'])
             ->latest()
             ->take(5)
             ->get()
-            ->map(function ($proposal) {
+            ->map(function ($proposal) use ($user) {
+                $this->convertProposalCurrency($proposal, $user->currency_id);
                 return [
                     'id'             => $proposal->id,
                     'title'          => $proposal->job->title ?? __('freelance.unknown_job'),
@@ -196,6 +208,7 @@ class DashboardController extends Controller
                     'budget'         => $proposal->bid_amount ?? $proposal->proposed_budget_points ?? 0,
                     'pointsSpent'    => $proposal->points_spent ?? 0,
                     'submittedAt'    => $proposal->created_at->format('Y-m-d'),
+                    'currency'       => $proposal->job->currency ?? null,
                 ];
             });
 

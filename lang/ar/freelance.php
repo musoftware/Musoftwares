@@ -287,4 +287,12 @@ return [
   'snooze_notifications' => 'كتم الإشعارات',
   'temporarily_mute_notifications_without_turning_them_off' => 'كتم الإشعارات مؤقتاً دون إيقافها بالكامل',
   'turn_off_to_completely_stop_receiving_job_matches' => 'إيقاف لتتوقف تماماً عن تلقي مطابقات الوظائف',
+  'notified' => 'تم إشعارهم',
+  'views' => 'المشاهدات',
+  'poke_freelancers' => 'تذكير المستقلين',
+  'poke_success' => 'تم إرسال تذكير للمستقلين بنجاح.',
+  'poke_too_soon' => 'يمكنك إرسال تذكير للمستقلين مرة واحدة كل 24 ساعة.',
+  'job_must_be_open_to_poke' => 'يجب أن تكون الوظيفة مفتوحة لإرسال التذكيرات.',
+  'job_reminder_subject' => 'تذكير: هناك وظيفة تطابق مهاراتك لا تزال متاحة',
+  'job_reminder_body' => 'لا يزال العميل يبحث عن عروض لهذه الوظيفة: :title',
 ];

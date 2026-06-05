@@ -101,6 +101,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Public Referral Redirect Route
 Route::get('/r/{ref}', [\App\Http\Controllers\ReferralController::class, 'referral_redirect'])->name('ref');
 
+// Tracking Route for Campaigns
+Route::get('/track/campaign/{id}', [\App\Http\Controllers\TrackingController::class, 'trackCampaign'])->name('track.campaign');
+
 Route::get('/fix-cities', function() {
     \Illuminate\Support\Facades\DB::table('cities')->truncate();
     \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\CitySeeder', '--force' => true]);
