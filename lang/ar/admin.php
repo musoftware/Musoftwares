@@ -210,4 +210,11 @@ return [
   'settings' => 'الإعدادات',
   'settings_saved_successfully' => 'تم حفظ الإعدادات بنجاح',
   'save_settings' => 'حفظ الإعدادات',
+  'activate_subscription' => 'تفعيل الاشتراك',
+  'assign_new_module_or_addon_to' => 'تعيين إضافة أو وحدة جديدة لـ',
+  'back_to_profile' => 'العودة للملف الشخصي',
+  'duration_days' => 'المدة (أيام)',
+  'select_module_addon' => 'اختر الوحدة / الإضافة',
+  'select_the_service_plan_and_duration' => 'اختر خطة الخدمة والمدة',
+  'subscription_details' => 'تفاصيل الاشتراك',
 ];
