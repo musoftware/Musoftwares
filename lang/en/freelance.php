@@ -295,4 +295,13 @@ return [
   'job_must_be_open_to_poke' => 'Job must be open to send reminders.',
   'job_reminder_subject' => 'Reminder: A job matching your skills is still open',
   'job_reminder_body' => 'The client is still looking for proposals for: :title',
+
+  'job_title_help' => 'Choose a descriptive and clear title that accurately reflects the role. A good title helps attract the right freelancers quickly.',
+  'job_description_help' => 'Provide comprehensive details about your project, including deliverables, expectations, and any specific requirements. The more details you provide, the better proposals you will receive.',
+  'budget_duration_help' => 'Specify whether you prefer a fixed price for the entire project or an hourly rate. This helps freelancers understand how they will be compensated.',
+  'job_currency_help' => 'Select the currency in which you will pay for this job.',
+  'project_budget_help' => 'Set a realistic budget based on the project\'s scope. A competitive budget attracts highly skilled professionals.',
+  'min_proposal_points_help' => 'Setting a minimum points requirement filters out non-serious applicants. Freelancers will need to spend these points to submit a proposal, ensuring higher quality bids.',
+  'expected_duration_help' => 'Indicate how long you expect the project to take. This helps freelancers assess if they have the availability to meet your deadline.',
+  'required_skills_help' => 'Select all relevant skills required for the task. This ensures your job reaches a wider and more targeted audience of freelancers who possess these specific skills.',
 ];
