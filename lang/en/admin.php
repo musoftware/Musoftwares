@@ -210,4 +210,11 @@ return [
   'settings' => 'Settings',
   'settings_saved_successfully' => 'Settings saved successfully',
   'save_settings' => 'Save Settings',
+  'activate_subscription' => 'Activate Subscription',
+  'assign_new_module_or_addon_to' => 'Assign new module or addon to',
+  'back_to_profile' => 'Back to Profile',
+  'duration_days' => 'Duration (Days)',
+  'select_module_addon' => 'Select Module / Addon',
+  'select_the_service_plan_and_duration' => 'Select the service plan and duration',
+  'subscription_details' => 'Subscription Details',
 ];

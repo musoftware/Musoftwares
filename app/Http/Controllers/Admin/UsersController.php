@@ -723,6 +723,25 @@ class UsersController extends Controller
         return redirect()->route('admin.users.show', $user->id)->with('success', __('general.task_created_successfully'));
     }
 
+    public function createSubscription($id)
+    {
+        $user = User::findOrFail($id);
+        $serviceItems = app(\App\Services\PricingService::class)->getServiceItems();
+
+        return Inertia::render('Admin/Users/AddSubscription', [
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+            ],
+            'serviceItems' => collect($serviceItems)->map(function ($item) {
+                return [
+                    'id' => $item['id'],
+                    'name' => $item['name'],
+                ];
+            })->values(),
+        ]);
+    }
+
     public function activateMembership(Request $request, $id)
     {
         $user = User::findOrFail($id);

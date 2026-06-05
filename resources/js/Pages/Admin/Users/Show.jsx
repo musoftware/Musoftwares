@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { Copy, Mail, MessageCircle, ChevronDown, Key, Wallet, FileText, Briefcase, Trash2, Edit, ShieldCheck } from 'lucide-react';
+import { Copy, Mail, MessageCircle, ChevronDown, Key, Wallet, FileText, Briefcase, Trash2, Edit, ShieldCheck, Plus } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import HiddenAmount from '@/Components/HiddenAmount';
 import {
@@ -761,8 +761,14 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
 
                     {/* User Subscriptions List */}
                     <div id="subscriptions" className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200 scroll-mt-24">
-                        <h2 className="text-lg font-bold font-sora text-slate-900 mb-4 border-b pb-2 flex items-center gap-2">
-                            <Briefcase size={18} className="text-slate-400" />{__('general.user_subscriptions')}</h2>
+                        <div className="flex justify-between items-center mb-4 border-b pb-2">
+                            <h2 className="text-lg font-bold font-sora text-slate-900 flex items-center gap-2">
+                                <Briefcase size={18} className="text-slate-400" />{__('general.user_subscriptions')}
+                            </h2>
+                            <Link href={`/admin/users/${client.id}/subscriptions/create`} className="bg-slate-900 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-slate-800 transition flex items-center gap-1 font-semibold">
+                                <Plus size={14} /> {__('admin.add_subscription')}
+                            </Link>
+                        </div>
                         {subscriptions && subscriptions.length > 0 ? (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left text-sm">

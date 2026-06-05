@@ -237,7 +237,14 @@
             "view_in_admin_panel": "View in Admin Panel",
             "settings": "الإعدادات",
             "settings_saved_successfully": "تم حفظ الإعدادات بنجاح",
-            "save_settings": "حفظ الإعدادات"
+            "save_settings": "حفظ الإعدادات",
+            "activate_subscription": "تفعيل الاشتراك",
+            "assign_new_module_or_addon_to": "تعيين إضافة أو وحدة جديدة لـ",
+            "back_to_profile": "العودة للملف الشخصي",
+            "duration_days": "المدة (أيام)",
+            "select_module_addon": "اختر الوحدة \/ الإضافة",
+            "select_the_service_plan_and_duration": "اختر خطة الخدمة والمدة",
+            "subscription_details": "تفاصيل الاشتراك"
         },
         "auth": {
             "failed": "failed",
@@ -7673,7 +7680,14 @@
             "view_in_admin_panel": "View in Admin Panel",
             "settings": "Settings",
             "settings_saved_successfully": "Settings saved successfully",
-            "save_settings": "Save Settings"
+            "save_settings": "Save Settings",
+            "activate_subscription": "Activate Subscription",
+            "assign_new_module_or_addon_to": "Assign new module or addon to",
+            "back_to_profile": "Back to Profile",
+            "duration_days": "Duration (Days)",
+            "select_module_addon": "Select Module \/ Addon",
+            "select_the_service_plan_and_duration": "Select the service plan and duration",
+            "subscription_details": "Subscription Details"
         },
         "auth": {
             "failed": "failed",
