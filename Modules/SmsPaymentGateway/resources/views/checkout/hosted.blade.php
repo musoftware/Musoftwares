@@ -100,6 +100,7 @@
             <!-- Step 1 -->
             <div class="bg-[#EEF2FF] border border-[#D8DFFA] rounded-[16px] px-3 py-3.5">
                 <div class="flex items-center justify-start gap-2 mb-2">
+                    <div class="w-[26px] h-[26px] bg-primary text-white rounded-full flex items-center justify-center text-[13px] font-extrabold shrink-0">1</div>
                     <span class="text-[14px] font-extrabold text-[#1A1A3E]">{{ __('sms_gateway.choose_method_and_transfer') }}</span>
                 </div>
                 <p class="text-[11.5px] text-[#555570] mb-3 text-start leading-relaxed font-medium tracking-tight">{{ __('sms_gateway.transfer_instructions', ['amount' => number_format($amount, 2)]) }}</p>
@@ -115,6 +116,7 @@
                 <!-- Step 2 -->
                 <div class="flex flex-col">
                     <div class="flex items-center justify-start gap-2 mb-2.5">
+                        <div class="w-[26px] h-[26px] bg-primary text-white rounded-full flex items-center justify-center text-[13px] font-extrabold shrink-0">2</div>
                         <span class="text-[14px] font-extrabold text-[#1A1A3E]">{{ app()->getLocale() == 'ar' ? 'اختر طريقة التحويل التي استخدمتها:' : 'Select your payment method:' }}</span>
                     </div>
 
@@ -143,12 +145,12 @@
                 <!-- Step 3 -->
                 <div class="flex flex-col">
                     <div class="flex items-center justify-start gap-2 mb-2.5">
+                        <div class="w-[26px] h-[26px] bg-primary text-white rounded-full flex items-center justify-center text-[13px] font-extrabold shrink-0">3</div>
                         <span class="text-[14px] font-extrabold text-[#1A1A3E]" id="step2-label-text">{{ __('sms_gateway.enter_transaction_reference') }}</span>
                     </div>
                     <input type="text" id="ref-input" required 
                            placeholder="{{ __('sms_gateway.reference_placeholder') }}"
                            class="w-full py-[14px] px-[16px] border-[1.5px] border-[#E4E8F5] rounded-[13px] text-[14px] bg-white {{ app()->getLocale() == 'ar' ? 'text-right' : 'text-left' }} font-medium text-[#1A1A2E] outline-none transition-all focus:border-primary focus:shadow-[0_0_0_3px_rgba(75,67,214,0.1)] placeholder:text-[#A8A8BC] placeholder:text-[13.5px] placeholder:font-medium" dir="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}">
-                    <p class="text-[10px] text-gray-500 mt-2 {{ app()->getLocale() == 'ar' ? 'text-right' : 'text-left' }}" id="step2-hint">{{ __('sms_gateway.reference_hint') }}</p>
                 </div>
 
                 <!-- ERROR MSG -->
@@ -197,7 +199,6 @@
     function updateStep2UI(isEtisalat) {
         document.getElementById('step2-label-text').textContent = isEtisalat ? SENDER_LABEL : TX_LABEL;
         document.getElementById('ref-input').placeholder = isEtisalat ? SENDER_PLACEHOLDER : TX_PLACEHOLDER;
-        document.getElementById('step2-hint').textContent = isEtisalat ? SENDER_HINT : TX_HINT;
         
         if(isEtisalat) {
             document.getElementById('ref-input').setAttribute('type', 'tel');
