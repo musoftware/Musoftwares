@@ -37,6 +37,9 @@
             "notification_title_placeholder": "أدخل عنوان الإشعار",
             "message": "الرسالة",
             "notification_body_placeholder": "أدخل محتوى الإشعار",
+            "past_campaigns": "الحملات السابقة",
+            "past_campaigns_description": "سجل الإشعارات العامة التي تم إرسالها من النظام.",
+            "no_campaigns_yet": "لم يتم إرسال أي حملات بعد.",
             "link_optional": "الرابط (اختياري)",
             "share": "مشاركة",
             "share_24_hours": "مشاركة (24 ساعة)",
@@ -1108,7 +1111,15 @@
             "select_snooze_duration": "حدد مدة كتم الإشعارات",
             "snooze_notifications": "كتم الإشعارات",
             "temporarily_mute_notifications_without_turning_them_off": "كتم الإشعارات مؤقتاً دون إيقافها بالكامل",
-            "turn_off_to_completely_stop_receiving_job_matches": "إيقاف لتتوقف تماماً عن تلقي مطابقات الوظائف"
+            "turn_off_to_completely_stop_receiving_job_matches": "إيقاف لتتوقف تماماً عن تلقي مطابقات الوظائف",
+            "notified": "تم إشعارهم",
+            "views": "المشاهدات",
+            "poke_freelancers": "تذكير المستقلين",
+            "poke_success": "تم إرسال تذكير للمستقلين بنجاح.",
+            "poke_too_soon": "يمكنك إرسال تذكير للمستقلين مرة واحدة كل 24 ساعة.",
+            "job_must_be_open_to_poke": "يجب أن تكون الوظيفة مفتوحة لإرسال التذكيرات.",
+            "job_reminder_subject": "تذكير: هناك وظيفة تطابق مهاراتك لا تزال متاحة",
+            "job_reminder_body": "لا يزال العميل يبحث عن عروض لهذه الوظيفة: :title"
         },
         "frontend": {
             "pricing": {
@@ -7454,6 +7465,9 @@
             "notification_title_placeholder": "Enter notification title",
             "message": "Message",
             "notification_body_placeholder": "Enter the notification content",
+            "past_campaigns": "Past Campaigns",
+            "past_campaigns_description": "History of broadcast notifications sent from the system.",
+            "no_campaigns_yet": "No campaigns sent yet.",
             "link_optional": "Link (Optional)",
             "share": "Share",
             "share_24_hours": "Share (24 Hours)",
@@ -8525,7 +8539,15 @@
             "select_snooze_duration": "Select Snooze Duration",
             "snooze_notifications": "Snooze Notifications",
             "temporarily_mute_notifications_without_turning_them_off": "Temporarily mute notifications without turning them off",
-            "turn_off_to_completely_stop_receiving_job_matches": "Turn off to completely stop receiving job matches"
+            "turn_off_to_completely_stop_receiving_job_matches": "Turn off to completely stop receiving job matches",
+            "notified": "Notified",
+            "views": "Views",
+            "poke_freelancers": "Remind Freelancers",
+            "poke_success": "Reminder sent to freelancers successfully.",
+            "poke_too_soon": "You can only remind freelancers once every 24 hours.",
+            "job_must_be_open_to_poke": "Job must be open to send reminders.",
+            "job_reminder_subject": "Reminder: A job matching your skills is still open",
+            "job_reminder_body": "The client is still looking for proposals for: :title"
         },
         "frontend": {
             "pricing": {

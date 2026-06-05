@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('freelance_jobs', function (Blueprint $table) {
-            $table->unsignedInteger('notifications_sent_count')->default(0)->after('status');
-            $table->unsignedInteger('views_count')->default(0)->after('notifications_sent_count');
+            if (!Schema::hasColumn('freelance_jobs', 'notifications_sent_count')) {
+                $table->unsignedInteger('notifications_sent_count')->default(0)->after('status');
+            }
+            if (!Schema::hasColumn('freelance_jobs', 'views_count')) {
+                $table->unsignedInteger('views_count')->default(0)->after('notifications_sent_count');
+            }
         });
     }
 

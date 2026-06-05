@@ -305,7 +305,7 @@ export default function FreelanceDashboard({
                                                     <div className="min-w-0">
                                                         <span className="text-sm font-semibold text-slate-900 block truncate">{proposal.title}</span>
                                                         <span className="text-xs text-slate-500 mt-1 block">
-                                                            {__('general.freelancer')}: {proposal.freelancerName} &bull; {__('freelance.bid')}: <FinancialAmount amount={proposal.budget} currency={clientData.stats.currency} className="text-xs font-mono font-medium text-slate-600" /> &bull; {__('general.submitted')} {formatDate(proposal.submittedAt)}
+                                                            {__('general.freelancer')}: {proposal.freelancerName} &bull; {__('freelance.bid')}: <FinancialAmount amount={proposal.budget} currency={proposal.currency} className="text-xs font-mono font-medium text-slate-600" /> &bull; {__('general.submitted')} {formatDate(proposal.submittedAt)}
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-4 shrink-0">
@@ -417,7 +417,7 @@ export default function FreelanceDashboard({
                                                     <div className="min-w-0">
                                                         <span className="text-sm font-semibold text-slate-900 block truncate">{proposal.title}</span>
                                                         <span className="text-xs text-slate-500 mt-1 block">
-                                                            {__('freelance.bid')}: <FinancialAmount amount={proposal.budget} currency={stats.currency} className="text-xs font-mono font-medium text-slate-600" /> &bull; {__('general.submitted')} {formatDate(proposal.submittedAt)}
+                                                            {__('freelance.bid')}: <FinancialAmount amount={proposal.budget} currency={proposal.currency} className="text-xs font-mono font-medium text-slate-600" /> &bull; {__('general.submitted')} {formatDate(proposal.submittedAt)}
                                                         </span>
                                                     </div>
                                                     <div className="shrink-0">

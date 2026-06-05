@@ -287,4 +287,12 @@ return [
   'snooze_notifications' => 'Snooze Notifications',
   'temporarily_mute_notifications_without_turning_them_off' => 'Temporarily mute notifications without turning them off',
   'turn_off_to_completely_stop_receiving_job_matches' => 'Turn off to completely stop receiving job matches',
+  'notified' => 'Notified',
+  'views' => 'Views',
+  'poke_freelancers' => 'Remind Freelancers',
+  'poke_success' => 'Reminder sent to freelancers successfully.',
+  'poke_too_soon' => 'You can only remind freelancers once every 24 hours.',
+  'job_must_be_open_to_poke' => 'Job must be open to send reminders.',
+  'job_reminder_subject' => 'Reminder: A job matching your skills is still open',
+  'job_reminder_body' => 'The client is still looking for proposals for: :title',
 ];

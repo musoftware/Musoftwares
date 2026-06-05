@@ -220,7 +220,7 @@ export default function FreelanceLayout({ children, clean = false }) {
             </header>
 
             {/* Notification Permission Banner */}
-            {permission === 'default' && (
+            {permission !== 'granted' && (
                 <div className="bg-emerald-600 px-4 py-3 text-white sm:px-6 lg:px-8">
                     <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 max-w-7xl mx-auto">
                         <p className="text-sm leading-6">

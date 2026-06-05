@@ -15,12 +15,13 @@ class Job extends Model
 
     protected $table = 'freelance_jobs';
 
-    protected $fillable = ['client_id', 'title', 'description', 'budget', 'currency_id', 'min_proposal_points', 'type', 'duration', 'status'];
+    protected $fillable = ['client_id', 'title', 'description', 'budget', 'currency_id', 'min_proposal_points', 'type', 'duration', 'status', 'last_poked_at'];
 
     protected $appends = ['formatted_budget'];
 
     protected $casts = [
         'status' => JobState::class,
+        'last_poked_at' => 'datetime',
     ];
 
     public function getFormattedBudgetAttribute()

@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notification_campaigns', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->text('body');
-            $table->string('target_url')->nullable();
-            $table->unsignedInteger('sent_count')->default(0);
-            $table->unsignedInteger('clicks_count')->default(0);
-            $table->string('status')->default('sent');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('notification_campaigns')) {
+            Schema::create('notification_campaigns', function (Blueprint $table) {
+                $table->id();
+                $table->string('title');
+                $table->text('body');
+                $table->string('target_url')->nullable();
+                $table->unsignedInteger('sent_count')->default(0);
+                $table->unsignedInteger('clicks_count')->default(0);
+                $table->string('status')->default('sent');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

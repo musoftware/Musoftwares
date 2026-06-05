@@ -191,7 +191,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
                                             <div className="text-right">
                                                 <FinancialAmount
                                                     amount={contract.amount}
-                                                    currency={contract.currency_id}
+                                                    currency={contract.job?.currency}
                                                     className="text-base font-black text-slate-900"
                                                 />
                                                 <p className="text-[10px] text-slate-400">{__('freelance.contract_value')}</p>

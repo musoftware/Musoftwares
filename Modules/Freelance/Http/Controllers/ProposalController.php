@@ -15,9 +15,11 @@ use Modules\Freelance\Domains\Contract\Actions\AcceptProposalAction;
 use Modules\Freelance\Domains\Proposal\Actions\SubmitProposalAction;
 use Modules\Freelance\Domains\Proposal\DTOs\SubmitProposalData;
 use Illuminate\Support\Facades\Gate;
+use Modules\Freelance\Traits\ConvertsFreelanceCurrency;
 
 class ProposalController extends Controller
 {
+    use ConvertsFreelanceCurrency;
     public function __construct(
         private AcceptProposalAction $acceptProposalAction,
         private SubmitProposalAction $submitProposalAction
@@ -28,9 +30,13 @@ class ProposalController extends Controller
         $user = $request->user();
 
         $proposals = Proposal::where('freelancer_id', $user->id)
-            ->with('job:id,title,budget,currency_id,type,status')
+            ->with(['job:id,title,budget,currency_id,type,status', 'job.currency'])
             ->latest()
             ->paginate(20);
+
+        $proposals->through(function ($proposal) use ($user) {
+            return $this->convertProposalCurrency($proposal, $user->currency_id);
+        });
 
         $stats = [
             'total'    => Proposal::where('freelancer_id', $user->id)->count(),
