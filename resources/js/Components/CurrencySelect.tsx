@@ -58,12 +58,17 @@ export function CurrencySelect({
                         triggerClassName
                     )}
                 >
-                    <SelectValue placeholder={placeholder || __('general.select_currency')} />
+                    <SelectValue placeholder={placeholder || __('general.select_currency')}>
+                        {value && currencies.find(c => String(c[valueKey]) === String(value))
+                            ? `${currencies.find(c => String(c[valueKey]) === String(value))?.currency || currencies.find(c => String(c[valueKey]) === String(value))?.name || ''} ${currencies.find(c => String(c[valueKey]) === String(value))?.symbol ? `(${currencies.find(c => String(c[valueKey]) === String(value))?.symbol})` : ''}`.trim()
+                            : undefined
+                        }
+                    </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                     {currencies.map((c) => (
                         <SelectItem key={c.id} value={String(c[valueKey])}>
-                            {c.currency || c.name} {c.symbol ? `(${c.symbol})` : ''}
+                            {`${c.currency || c.name || ''} ${c.symbol ? `(${c.symbol})` : ''}`.trim()}
                         </SelectItem>
                     ))}
                 </SelectContent>
