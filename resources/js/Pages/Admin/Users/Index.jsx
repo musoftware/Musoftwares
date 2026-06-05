@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import ClientActionsSheet from './ClientActionsSheet';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { DataTable } from '@/Components/ui/DataTable';
-import { MoreHorizontal, Eye, Edit, LogIn, Key, Wallet, Users, User, FolderOpen, FileText, ShieldCheck } from 'lucide-react';
+import { MoreHorizontal, Eye, Edit, LogIn, Key, Wallet, Users, User, FolderOpen, FileText, ShieldCheck, CheckCircle2, Copy } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
@@ -36,6 +36,7 @@ export default function Index({ clients, filters, stats }) {
     const [isChangeRoleOpen, setIsChangeRoleOpen] = useState(false);
     const [selectedRoleUser, setSelectedRoleUser] = useState(null);
     const [selectedRole, setSelectedRole] = useState('client');
+    const [resetPasswordState, setResetPasswordState] = useState({ isOpen: false, clientId: null, status: 'confirm', newPassword: '' });
 
     const handleSearch = (search) => {
         router.get(
@@ -78,17 +79,7 @@ export default function Index({ clients, filters, stats }) {
     };
 
     const handleResetPassword = (clientId) => {
-        if (confirm("Are you sure you want to reset this user's password?")) {
-            axios.post(`/admin/users/${clientId}/reset-password`).then((response) => {
-                alert(`Password reset successfully.\nNew password: ${response.data.new_password}`);
-            }).catch(() => {
-                toast({
-                    title: "Error",
-                    description: "Failed to reset password.",
-                    variant: "destructive"
-                });
-            });
-        }
+        setResetPasswordState({ isOpen: true, clientId, status: 'confirm', newPassword: '' });
     };
 
     const handleUpdateRoleSubmit = (e) => {
@@ -377,6 +368,96 @@ export default function Index({ clients, filters, stats }) {
                             <Button type="submit">{__("general.update_role")}</Button>
                         </DialogFooter>
                     </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Reset Password Dialog */}
+            <Dialog 
+                open={resetPasswordState.isOpen} 
+                onOpenChange={(open) => {
+                    if (!open && resetPasswordState.status !== 'loading') {
+                        setResetPasswordState({ isOpen: false, clientId: null, status: 'confirm', newPassword: '' });
+                    }
+                }}
+            >
+                <DialogContent className="sm:max-w-md">
+                    {resetPasswordState.status === 'confirm' && (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle>{__("general.reset_password")}</DialogTitle>
+                                <DialogDescription>
+                                    Are you sure you want to reset this user's password? They will immediately lose access with their current password.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter className="mt-4">
+                                <Button variant="ghost" onClick={() => setResetPasswordState(prev => ({ ...prev, isOpen: false }))}>
+                                    {__("general.cancel")}
+                                </Button>
+                                <Button 
+                                    variant="destructive"
+                                    onClick={() => {
+                                        setResetPasswordState(prev => ({ ...prev, status: 'loading' }));
+                                        axios.post(`/admin/users/${resetPasswordState.clientId}/reset-password`).then((response) => {
+                                            setResetPasswordState(prev => ({ ...prev, status: 'success', newPassword: response.data.new_password }));
+                                        }).catch(() => {
+                                            toast({
+                                                title: "Error",
+                                                description: "Failed to reset password.",
+                                                variant: "destructive"
+                                            });
+                                            setResetPasswordState(prev => ({ ...prev, isOpen: false }));
+                                        });
+                                    }}
+                                >
+                                    Yes, Reset Password
+                                </Button>
+                            </DialogFooter>
+                        </>
+                    )}
+
+                    {resetPasswordState.status === 'loading' && (
+                        <div className="py-12 flex flex-col items-center justify-center space-y-4">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                            <p className="text-slate-500 text-sm">Resetting password...</p>
+                        </div>
+                    )}
+
+                    {resetPasswordState.status === 'success' && (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle className="text-emerald-600 flex items-center gap-2">
+                                    <CheckCircle2 className="h-5 w-5" />
+                                    Password Reset Successfully
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Please copy the new password below and send it to the user.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="my-6">
+                                <div className="flex items-center gap-2">
+                                    <div className="flex-1 bg-slate-50 border border-slate-200 rounded-md p-3 font-mono text-center text-lg font-semibold tracking-widest text-slate-900 select-all">
+                                        {resetPasswordState.newPassword}
+                                    </div>
+                                    <Button 
+                                        variant="outline" 
+                                        size="icon"
+                                        className="h-14 w-14 shrink-0"
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(resetPasswordState.newPassword);
+                                            toast({ title: "Copied!", description: "Password copied to clipboard." });
+                                        }}
+                                    >
+                                        <Copy className="h-5 w-5 text-slate-600" />
+                                    </Button>
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button className="w-full sm:w-auto" onClick={() => setResetPasswordState({ isOpen: false, clientId: null, status: 'confirm', newPassword: '' })}>
+                                    Done
+                                </Button>
+                            </DialogFooter>
+                        </>
+                    )}
                 </DialogContent>
             </Dialog>
         </AdminSidebarLayout>

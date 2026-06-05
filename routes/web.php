@@ -548,6 +548,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/users/{id}/login-as', [\App\Http\Controllers\Admin\UsersController::class, 'loginAs'])->name('users.login-as');
     Route::post('/users/{id}/login-as', [\App\Http\Controllers\Admin\UsersController::class, 'loginAs']); // Allows POST for React compatibility
     Route::get('/users/reset-password/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'reset_password'])->name('users.reset-password');
+    Route::post('/users/{id}/reset-password', [\App\Http\Controllers\Admin\UsersController::class, 'reset_password']); // Allows POST for React compatibility
     Route::post('/users/{id}/generate-password', [\App\Http\Controllers\Admin\UsersController::class, 'reset_password'])->name('users.generate-password');
     Route::get('/users/{id}/referrals', [\App\Http\Controllers\Admin\UsersController::class, 'referrals'])->name('users.referrals');
     Route::delete('/users/{user}/referrals/{referred_user}/unlink', [\App\Http\Controllers\Admin\UsersController::class, 'unlink_referral'])->name('users.referrals.unlink');
