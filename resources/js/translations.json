@@ -1119,7 +1119,15 @@
             "poke_too_soon": "يمكنك إرسال تذكير للمستقلين مرة واحدة كل 24 ساعة.",
             "job_must_be_open_to_poke": "يجب أن تكون الوظيفة مفتوحة لإرسال التذكيرات.",
             "job_reminder_subject": "تذكير: هناك وظيفة تطابق مهاراتك لا تزال متاحة",
-            "job_reminder_body": "لا يزال العميل يبحث عن عروض لهذه الوظيفة: :title"
+            "job_reminder_body": "لا يزال العميل يبحث عن عروض لهذه الوظيفة: :title",
+            "job_title_help": "اختر عنواناً وصفياً وواضحاً يعكس طبيعة الوظيفة بدقة. العنوان الجيد يساعد في جذب المستقلين المناسبين بسرعة.",
+            "job_description_help": "قدم تفاصيل شاملة حول مشروعك، بما في ذلك المخرجات المطلوبة والتوقعات وأي متطلبات خاصة. كلما كانت التفاصيل أكثر، زادت جودة العروض التي ستتلقاها.",
+            "budget_duration_help": "حدد ما إذا كنت تفضل ميزانية ثابتة للمشروع بأكمله أو الدفع بالساعة. هذا يساعد المستقلين على فهم طريقة التعويض المالي.",
+            "job_currency_help": "اختر العملة التي ستقوم بالدفع بها لهذه الوظيفة.",
+            "project_budget_help": "ضع ميزانية واقعية بناءً على حجم المشروع. الميزانية التنافسية تجذب محترفين ذوي مهارات عالية.",
+            "min_proposal_points_help": "تحديد حد أدنى من النقاط يساهم في تصفية المتقدمين غير الجادين. سيحتاج المستقلون لإنفاق هذه النقاط لتقديم عرض، مما يضمن تلقي عروض ذات جودة أعلى.",
+            "expected_duration_help": "وضح المدة المتوقعة لإنجاز المشروع. هذا يساعد المستقلين في تقييم ما إذا كان لديهم الوقت الكافي لتلبية الموعد النهائي الخاص بك.",
+            "required_skills_help": "اختر جميع المهارات ذات الصلة المطلوبة لإنجاز المهمة. هذا يضمن وصول وظيفتك إلى شريحة أوسع وأكثر دقة من المستقلين الذين يمتلكون هذه المهارات المحددة للوصول لعدد أكبر."
         },
         "frontend": {
             "pricing": {
@@ -8547,7 +8555,15 @@
             "poke_too_soon": "You can only remind freelancers once every 24 hours.",
             "job_must_be_open_to_poke": "Job must be open to send reminders.",
             "job_reminder_subject": "Reminder: A job matching your skills is still open",
-            "job_reminder_body": "The client is still looking for proposals for: :title"
+            "job_reminder_body": "The client is still looking for proposals for: :title",
+            "job_title_help": "Choose a descriptive and clear title that accurately reflects the role. A good title helps attract the right freelancers quickly.",
+            "job_description_help": "Provide comprehensive details about your project, including deliverables, expectations, and any specific requirements. The more details you provide, the better proposals you will receive.",
+            "budget_duration_help": "Specify whether you prefer a fixed price for the entire project or an hourly rate. This helps freelancers understand how they will be compensated.",
+            "job_currency_help": "Select the currency in which you will pay for this job.",
+            "project_budget_help": "Set a realistic budget based on the project's scope. A competitive budget attracts highly skilled professionals.",
+            "min_proposal_points_help": "Setting a minimum points requirement filters out non-serious applicants. Freelancers will need to spend these points to submit a proposal, ensuring higher quality bids.",
+            "expected_duration_help": "Indicate how long you expect the project to take. This helps freelancers assess if they have the availability to meet your deadline.",
+            "required_skills_help": "Select all relevant skills required for the task. This ensures your job reaches a wider and more targeted audience of freelancers who possess these specific skills."
         },
         "frontend": {
             "pricing": {

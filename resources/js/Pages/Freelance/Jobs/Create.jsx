@@ -4,9 +4,25 @@ import { useForm, router } from '@inertiajs/react';
 import axios from 'axios';
 import { useFreelanceMode } from '@/Components/Freelance/FreelanceModeContext';
 import { cn } from '@/lib/utils';
-import { Zap } from 'lucide-react';
+import { Zap, Info } from 'lucide-react';
 import { CurrencySelect } from '@/Components/CurrencySelect';
 import { __ } from '@/lib/i18n';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+function FieldTooltip({ text }) {
+    return (
+        <TooltipProvider delayDuration={200}>
+            <Tooltip>
+                <TooltipTrigger type="button" tabIndex={-1} className="inline-flex items-center ml-1.5 focus:outline-none translate-y-0.5">
+                    <Info className="h-4 w-4 text-gray-400 hover:text-indigo-500 transition-colors" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs text-sm font-normal">
+                    {text}
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    );
+}
 
 export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 1.00, preferredCurrency = 'USD' }) {
     const freelanceModeContext = useFreelanceMode();
@@ -113,7 +129,10 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                         <h3 className="text-lg font-semibold border-b pb-2">{__('general.basic_information')}</h3>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">{__('freelance.job_title')}</label>
+                            <label className="flex items-center text-sm font-bold text-gray-700 mb-1">
+                                {__('freelance.job_title')}
+                                <FieldTooltip text={__('freelance.job_title_help')} />
+                            </label>
                             <input
                                 type="text"
                                 value={data.title}
@@ -125,7 +144,10 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">{__('general.description')}</label>
+                            <label className="flex items-center text-sm font-bold text-gray-700 mb-1">
+                                {__('general.description')}
+                                <FieldTooltip text={__('freelance.job_description_help')} />
+                            </label>
                             <div className="border border-gray-300 rounded-lg shadow-sm overflow-hidden focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500">
                                 {/* Simple Textarea without mock toolbar */}
                                 <textarea
@@ -141,7 +163,10 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
 
                     {/* Budget & Duration */}
                     <div className="space-y-4">
-                        <h3 className="text-lg font-semibold border-b pb-2">{__('erp.budget_duration')}</h3>
+                        <h3 className="flex items-center text-lg font-semibold border-b pb-2">
+                            {__('erp.budget_duration')}
+                            <FieldTooltip text={__('freelance.budget_duration_help')} />
+                        </h3>
 
                         <div className="flex gap-4 mb-4">
                             <label className={`flex-1 flex items-center justify-center border-2 rounded-lg py-3 cursor-pointer transition ${data.type === 'fixed' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-200 hover:border-indigo-200'}`}>
@@ -156,7 +181,10 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
 
                         <div className="flex flex-col sm:flex-row gap-4">
                             <div className="w-full sm:w-1/3">
-                                <label className="block text-sm font-bold text-gray-700 mb-1">{__('general.currency')}</label>
+                                <label className="flex items-center text-sm font-bold text-gray-700 mb-1">
+                                    {__('general.currency')}
+                                    <FieldTooltip text={__('freelance.job_currency_help')} />
+                                </label>
                                 <CurrencySelect
                                     currencies={currencies}
                                     value={data.currency_id}
@@ -165,7 +193,10 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                                 />
                             </div>
                             <div className="w-full sm:w-1/3">
-                                <label className="block text-sm font-bold text-gray-700 mb-1">{__('erp.project_budget')}</label>
+                                <label className="flex items-center text-sm font-bold text-gray-700 mb-1">
+                                    {__('erp.project_budget')}
+                                    <FieldTooltip text={__('freelance.project_budget_help')} />
+                                </label>
                                 <input
                                     type="number"
                                     value={data.budget}
@@ -176,7 +207,10 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                                 {errors.budget && <p className="text-red-500 text-xs mt-1">{errors.budget}</p>}
                             </div>
                             <div className="w-full sm:w-1/3">
-                                <label className="block text-sm font-bold text-gray-700 mb-1">{__('freelance.min_proposal_bid_points')}</label>
+                                <label className="flex items-center text-sm font-bold text-gray-700 mb-1">
+                                    {__('freelance.min_proposal_bid_points')}
+                                    <FieldTooltip text={__('freelance.min_proposal_points_help')} />
+                                </label>
                                 <input
                                     type="number"
                                     value={data.min_proposal_points}
@@ -189,7 +223,10 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">{__('general.expected_duration')}</label>
+                            <label className="flex items-center text-sm font-bold text-gray-700 mb-1">
+                                {__('general.expected_duration')}
+                                <FieldTooltip text={__('freelance.expected_duration_help')} />
+                            </label>
                             <input
                                 type="text"
                                 value={data.duration}
@@ -202,7 +239,10 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
 
                     {/* Skills */}
                     <div className="space-y-4">
-                        <h3 className="text-lg font-semibold border-b pb-2">{__('general.required_skills')}</h3>
+                        <h3 className="flex items-center text-lg font-semibold border-b pb-2">
+                            {__('general.required_skills')}
+                            <FieldTooltip text={__('freelance.required_skills_help')} />
+                        </h3>
                         <p className="text-sm text-gray-500 mb-2">{__('general.these_skills_will_trigger_notifications')}</p>
 
                         {/* Selected Skills */}
