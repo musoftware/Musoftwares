@@ -44,7 +44,7 @@ return [
   'session_expired_title' => 'انتهت الجلسة',
   'session_expired_message' => 'انتهت صلاحية جلسة الدفع. يرجى طلب رابط دفع جديد.',
   'requesting_payment' => 'يطلب منك دفع',
-  'choose_method_and_transfer' => 'اختر الطريقة وحوّل المبلغ',
+  'choose_method_and_transfer' => 'الخطوة الأولى: قم بتحويل المبلغ',
   'transfer_instructions' => 'برجاء تحويل المبلغ المطلوب بدقة (:amount) إلى رقم المبيعات التالي:',
   'enter_transaction_reference' => 'أدخل رقم العملية',
   'reference_placeholder' => 'رقم العملية أو الرقم المرجعي',

@@ -44,7 +44,7 @@ return [
   'session_expired_title' => 'Session Expired',
   'session_expired_message' => 'This payment session has expired. Please request a new payment link.',
   'requesting_payment' => 'is requesting payment',
-  'choose_method_and_transfer' => 'Choose method & transfer the amount',
+  'choose_method_and_transfer' => 'Step 1: Transfer the amount',
   'transfer_instructions' => 'Please transfer the exact amount (:amount) to the following number:',
   'enter_transaction_reference' => 'Enter your transaction reference',
   'reference_placeholder' => 'Transaction ID or Reference Number',
