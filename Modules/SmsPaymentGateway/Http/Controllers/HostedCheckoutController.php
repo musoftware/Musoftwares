@@ -86,7 +86,7 @@ class HostedCheckoutController extends Controller
             }
             $paymentMethods[] = [
                 'id' => 'instapay',
-                'name' => 'InstaPay',
+                'name' => __('sms_gateway.instapay'),
                 'icon' => !empty($customLogos['instapay']) ? $customLogos['instapay'] : asset('assets/images/gateways/instapay.png'),
                 'phone' => $walletNumbers['instapay'],
                 'is_etisalat' => $isEtisalatInstapay,
