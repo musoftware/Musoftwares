@@ -102,6 +102,7 @@ Route::get('/r/{ref}', [\App\Http\Controllers\ReferralController::class, 'referr
 
 // Tracking Route for Campaigns
 Route::get('/track/campaign/{id}', [\App\Http\Controllers\TrackingController::class, 'trackCampaign'])->name('track.campaign');
+Route::get('/track/campaign/{id}/view.png', [\App\Http\Controllers\TrackingController::class, 'trackCampaignView'])->name('track.campaign.view');
 
 Route::get('/fix-cities', function () {
     \Illuminate\Support\Facades\DB::table('cities')->truncate();
@@ -367,6 +368,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // Broadcast Notifications
     Route::get('/notifications/broadcast', [\App\Http\Controllers\Admin\BroadcastNotificationController::class, 'index'])->name('notifications.broadcast');
     Route::post('/notifications/broadcast/send', [\App\Http\Controllers\Admin\BroadcastNotificationController::class, 'send'])->name('notifications.broadcast.send');
+    Route::get('/notifications/broadcast/{id}', [\App\Http\Controllers\Admin\BroadcastNotificationController::class, 'show'])->name('notifications.broadcast.show');
 
     // Reports
     Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');

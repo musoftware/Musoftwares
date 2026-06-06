@@ -43,7 +43,8 @@ class BroadcastNotificationController extends Controller
 
             $messaging = app('firebase.messaging');
             
-            $notification = Notification::create($validated['title'], $validated['body']);
+            $notification = Notification::create($validated['title'], $validated['body'])
+                ->withImageUrl(route('track.campaign.view', ['id' => $campaign->id]));
             
             $message = CloudMessage::new()
                 ->withTopic('global')
@@ -93,5 +94,17 @@ class BroadcastNotificationController extends Controller
             \Log::error('Broadcast Notification Failed: ' . $e->getMessage());
             return back()->with('error', __('admin.notification_failed') . ': ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Show the statistics and details of a specific broadcast campaign.
+     */
+    public function show($id)
+    {
+        $campaign = NotificationCampaign::findOrFail($id);
+        
+        return Inertia::render('Admin/Notifications/Show', [
+            'campaign' => $campaign
+        ]);
     }
 }

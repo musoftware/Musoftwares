@@ -15,6 +15,7 @@ class NotificationCampaign extends Model
         'target_url',
         'sent_count',
         'clicks_count',
+        'views_count',
         'status',
     ];
 }

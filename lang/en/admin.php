@@ -9,6 +9,7 @@ return [
   'notification_title_placeholder' => 'Enter notification title',
   'message' => 'Message',
   'notification_body_placeholder' => 'Enter the notification content',
+  'clicks' => 'Clicks',
   'past_campaigns' => 'Past Campaigns',
   'past_campaigns_description' => 'History of broadcast notifications sent from the system.',
   'no_campaigns_yet' => 'No campaigns sent yet.',
