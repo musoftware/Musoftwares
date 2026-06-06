@@ -142,7 +142,7 @@ class RenewPlatformSubscriptions extends Command
             $daysToAdd = 365 * 3;
         }
 
-        $newExpiresAt->addDays($daysToAdd);
+        $newExpiresAt->addDays((int) $daysToAdd);
 
         $subscription->update([
             'status' => 'active',

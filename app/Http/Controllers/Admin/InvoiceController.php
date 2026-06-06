@@ -659,7 +659,7 @@ class InvoiceController extends Controller
                 'client_id' => $item->invoice->user_id,
                 'project_id' => $item->invoice->project_id,
                 'project_name' => $item->invoice->project ? $item->invoice->project->name : null,
-                'date' => $item->invoice->date ?? null,
+                'date' => $item->invoice->date() ?? null,
             ],
             'invoice_currency' => $item->invoice->relationLoaded('currency') && $item->invoice->getRelation('currency') ? [
                 'id' => $item->invoice->getRelation('currency')->id,

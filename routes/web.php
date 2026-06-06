@@ -15,7 +15,7 @@ Route::get('/install-app', function () {
 })->name('install-app');
 
 
-Route::get('/test-amc-api', function(\App\Services\AmcAcademyApiService $service) {
+Route::get('/test-amc-api', function (\App\Services\AmcAcademyApiService $service) {
     // Array of mock FBIDs to test bulk lookup and deduction
     $testFbids = ['10000000000001', '10000000000002'];
     $result = $service->searchFbidsBulk($testFbids);
@@ -27,6 +27,9 @@ Route::get('/test-amc-api', function(\App\Services\AmcAcademyApiService $service
     ]);
 });
 
+Route::get('/test22', function () {
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+});
 // Platforms
 Route::get('/platforms', [HomeController::class, 'platforms'])->name('platforms');
 Route::get('/platforms/crm', [HomeController::class, 'platformCrm'])->name('platforms.crm');
@@ -69,7 +72,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markRead'])->name('notifications.mark-read');
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
-    
+
     // FCM Device Token
     Route::post('/device-tokens', [\App\Http\Controllers\DeviceTokenController::class, 'store'])->name('device-tokens.store');
 });
@@ -100,7 +103,7 @@ Route::get('/r/{ref}', [\App\Http\Controllers\ReferralController::class, 'referr
 // Tracking Route for Campaigns
 Route::get('/track/campaign/{id}', [\App\Http\Controllers\TrackingController::class, 'trackCampaign'])->name('track.campaign');
 
-Route::get('/fix-cities', function() {
+Route::get('/fix-cities', function () {
     \Illuminate\Support\Facades\DB::table('cities')->truncate();
     \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\CitySeeder', '--force' => true]);
     return 'Done';
@@ -224,7 +227,6 @@ Route::middleware(['auth', 'verified', 'onboarding'])->prefix('billing')->name('
     Route::get('/invoices/{uuid}/pay', [\Modules\ERP\Http\Controllers\InvoicePaymentController::class, 'show'])->name('invoices.pay');
     Route::post('/invoices/{uuid}/pay/wallet', [\Modules\ERP\Http\Controllers\InvoicePaymentController::class, 'processWalletPayment'])->name('invoices.pay.wallet');
 });
-
 
 
 // Marketplace Routes — literal routes BEFORE wildcards
@@ -421,9 +423,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/invoices/{invoice}/reschedule', [\App\Http\Controllers\Admin\InvoiceController::class, 'reschedule'])->name('invoices.reschedule');
 
 
-
-
-
     // ── Platform Users Transactions ───────────────────────────────
     Route::get('/transactions', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'index'])->name('transactions.index');
     Route::get('/transactions/create', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'create'])->name('transactions.create');
@@ -482,7 +481,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::delete('/busy-times/{busyTime}', [\App\Http\Controllers\Admin\AdminBusyTimesController::class, 'destroy'])->name('busy-times.destroy');
 
 
-
     Route::resource('vouchers', \App\Http\Controllers\Admin\AdminVoucherController::class);
 
     Route::resource('coupons', \App\Http\Controllers\Admin\AdminCouponController::class);
@@ -506,7 +504,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::resource('free-downloads', \App\Http\Controllers\Admin\AdminFreeDownloadController::class)->except(['create', 'show', 'edit']);
 
 
-
     // ── Freelance (Admin Control) ───────────────────────────────────
     Route::prefix('freelance')->name('freelance.')->group(function () {
         Route::post('skills/bulk', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'bulkStore'])->name('skills.bulkStore');
@@ -523,7 +520,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::post('contracts/{contract}/resolve-dispute', [\App\Http\Controllers\Admin\FreelanceContractController::class, 'resolveDispute'])->name('contracts.resolve-dispute');
         Route::resource('proposals', \App\Http\Controllers\Admin\FreelanceProposalController::class)->only(['index', 'show', 'destroy']);
     });
-
 
 
     // ── User Management (Full Admin Control) ────────────────────────
@@ -743,7 +739,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/subscriptions/kashier/failure', [\App\Http\Controllers\SubscriptionController::class, 'kashierFailure'])->name('subscriptions.kashier.failure');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 // Support Ticket Routes
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -778,7 +774,7 @@ Route::middleware(['auth', 'verified'])->prefix('financial')->name('financial.')
 
     // P2P Wallet Transfer Routes
     Route::get('/transfer', [\App\Http\Controllers\WalletTransferController::class, 'create'])->name('transfer.create');
-     // Route::get('/conversations/{id}', [\App\Http\Controllers\ConversationController::class, 'show']);
+    // Route::get('/conversations/{id}', [\App\Http\Controllers\ConversationController::class, 'show']);
     // Route::get('/conversations/{id}/messages', [\App\Http\Controllers\ConversationController::class, 'messages']);
     // Route::post('/conversations/{id}/read', [\App\Http\Controllers\ConversationController::class, 'markAsRead']);
 
