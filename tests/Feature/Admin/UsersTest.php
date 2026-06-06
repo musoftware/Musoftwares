@@ -138,4 +138,78 @@ class UsersTest extends TestCase
         $this->assertEquals($this->clientUser->id, auth()->id());
         $this->assertEquals($this->admin->id, session('impersonator_id'));
     }
+    public function test_admin_can_view_create_subscription_page(): void
+    {
+        $response = $this->actingAs($this->admin)->get("/admin/users/{$this->clientUser->id}/subscriptions/create");
+        $response->assertStatus(200);
+    }
+
+    public function test_admin_can_activate_membership(): void
+    {
+        $this->mock(\App\Services\PricingService::class, function ($mock) {
+            $mock->shouldReceive('getServiceItems')->andReturn([
+                ['id' => 'erp', 'name' => 'ERP']
+            ]);
+        });
+
+        $response = $this->actingAs($this->admin)->post("/admin/users/{$this->clientUser->id}/membership", [
+            'object' => 'erp',
+            'duration_days' => 30,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('user_subscriptions', [
+            'user_id' => $this->clientUser->id,
+            'object' => 'erp',
+            'status' => 'active',
+        ]);
+    }
+
+    public function test_admin_can_update_membership(): void
+    {
+        $subscription = \App\Models\UserSubscription::create([
+            'user_id' => $this->clientUser->id,
+            'object' => 'erp',
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addDays(30),
+            'auto_renew' => false,
+        ]);
+
+        $response = $this->actingAs($this->admin)->put("/admin/users/{$this->clientUser->id}/membership/{$subscription->id}", [
+            'status' => 'expired',
+            'expires_at' => now()->subDay()->format('Y-m-d H:i:s'),
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('user_subscriptions', [
+            'id' => $subscription->id,
+            'status' => 'expired',
+        ]);
+    }
+
+    public function test_admin_can_delete_membership(): void
+    {
+        $subscription = \App\Models\UserSubscription::create([
+            'user_id' => $this->clientUser->id,
+            'object' => 'erp',
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addDays(30),
+            'auto_renew' => false,
+        ]);
+
+        $response = $this->actingAs($this->admin)->delete("/admin/users/{$this->clientUser->id}/membership/{$subscription->id}");
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseMissing('user_subscriptions', [
+            'id' => $subscription->id,
+        ]);
+    }
 }
