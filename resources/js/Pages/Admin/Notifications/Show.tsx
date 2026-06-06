@@ -4,15 +4,19 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
-import { ArrowLeft, BarChart3, Eye, MousePointerClick, Calendar, Send, Link as LinkIcon } from 'lucide-react';
+import { ArrowLeft, BarChart3, Eye, MousePointerClick, Calendar, Send, Link as LinkIcon, Users } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 
 export default function Show({ campaign }: { campaign: any }) {
     // Calculate CTR
     const ctr = campaign.views_count > 0 
         ? ((campaign.clicks_count / campaign.views_count) * 100).toFixed(2) 
         : '0.00';
+
+    const views = campaign.views?.filter((v: any) => v.type === 'view') || [];
+    const clicks = campaign.views?.filter((v: any) => v.type === 'click') || [];
 
     return (
         <AdminSidebarLayout>
@@ -30,6 +34,11 @@ export default function Show({ campaign }: { campaign: any }) {
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
                                 {campaign.title}
+                                {campaign.audience_type === 'personal' && (
+                                    <Badge variant="outline" className="ml-2 bg-indigo-50 text-indigo-700 border-indigo-200">
+                                        Personal
+                                    </Badge>
+                                )}
                             </h1>
                             <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
                                 <Calendar className="w-3.5 h-3.5" />
@@ -97,6 +106,80 @@ export default function Show({ campaign }: { campaign: any }) {
                         </CardContent>
                     </Card>
                 </div>
+
+                {campaign.audience_type === 'personal' && (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-lg">
+                                    <Eye className="w-5 h-5 text-blue-500" />
+                                    {__('admin.who_viewed')}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {views.length === 0 ? (
+                                    <div className="text-center py-4 text-slate-500 text-sm">
+                                        No views tracked yet.
+                                    </div>
+                                ) : (
+                                    <div className="max-h-64 overflow-y-auto pr-2 border rounded-md">
+                                        <Table>
+                                            <TableHeader className="bg-slate-50 sticky top-0">
+                                                <TableRow>
+                                                    <TableHead>User</TableHead>
+                                                    <TableHead className="text-right">Time</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {views.map((view: any) => (
+                                                    <TableRow key={view.id}>
+                                                        <TableCell className="font-medium">{view.user?.name || 'Unknown'}</TableCell>
+                                                        <TableCell className="text-right text-xs text-slate-500">{formatDate(view.created_at)}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-lg">
+                                    <MousePointerClick className="w-5 h-5 text-purple-500" />
+                                    {__('admin.who_clicked')}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {clicks.length === 0 ? (
+                                    <div className="text-center py-4 text-slate-500 text-sm">
+                                        No clicks tracked yet.
+                                    </div>
+                                ) : (
+                                    <div className="max-h-64 overflow-y-auto pr-2 border rounded-md">
+                                        <Table>
+                                            <TableHeader className="bg-slate-50 sticky top-0">
+                                                <TableRow>
+                                                    <TableHead>User</TableHead>
+                                                    <TableHead className="text-right">Time</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {clicks.map((click: any) => (
+                                                    <TableRow key={click.id}>
+                                                        <TableCell className="font-medium">{click.user?.name || 'Unknown'}</TableCell>
+                                                        <TableCell className="text-right text-xs text-slate-500">{formatDate(click.created_at)}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
+                )}
 
                 {/* Campaign Details */}
                 <Card>

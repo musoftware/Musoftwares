@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\NotificationCampaign;
+use App\Models\NotificationCampaignView;
 use Illuminate\Http\Request;
 
 class TrackingController extends Controller
@@ -14,8 +15,17 @@ class TrackingController extends Controller
     {
         $campaign = NotificationCampaign::findOrFail($id);
 
-        // Increment the clicks count
+        // Increment the global clicks count
         $campaign->increment('clicks_count');
+
+        // Log personal click if user_id is provided
+        if ($request->has('user_id')) {
+            NotificationCampaignView::firstOrCreate([
+                'notification_campaign_id' => $campaign->id,
+                'user_id' => $request->query('user_id'),
+                'type' => 'click',
+            ]);
+        }
 
         $redirectUrl = $request->query('redirect');
 
@@ -30,12 +40,22 @@ class TrackingController extends Controller
     /**
      * Track a view on a notification campaign and return a tracking pixel/logo.
      */
-    public function trackCampaignView($id)
+    public function trackCampaignView(Request $request, $id)
     {
         $campaign = NotificationCampaign::find($id);
 
         if ($campaign) {
+            // Increment the global views count
             $campaign->increment('views_count');
+
+            // Log personal view if user_id is provided
+            if ($request->has('user_id')) {
+                NotificationCampaignView::firstOrCreate([
+                    'notification_campaign_id' => $campaign->id,
+                    'user_id' => $request->query('user_id'),
+                    'type' => 'view',
+                ]);
+            }
         }
 
         $imagePath = public_path('icons/pwa-192.png');

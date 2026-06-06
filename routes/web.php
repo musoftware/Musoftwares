@@ -368,6 +368,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // Broadcast Notifications
     Route::get('/notifications/broadcast', [\App\Http\Controllers\Admin\BroadcastNotificationController::class, 'index'])->name('notifications.broadcast');
     Route::post('/notifications/broadcast/send', [\App\Http\Controllers\Admin\BroadcastNotificationController::class, 'send'])->name('notifications.broadcast.send');
+    Route::get('/notifications/search-users', [\App\Http\Controllers\Admin\BroadcastNotificationController::class, 'searchUsers'])->name('notifications.search_users');
     Route::get('/notifications/broadcast/{id}', [\App\Http\Controllers\Admin\BroadcastNotificationController::class, 'show'])->name('notifications.broadcast.show');
 
     // Reports

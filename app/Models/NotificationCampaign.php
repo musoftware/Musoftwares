@@ -17,5 +17,11 @@ class NotificationCampaign extends Model
         'clicks_count',
         'views_count',
         'status',
+        'audience_type',
     ];
+
+    public function views()
+    {
+        return $this->hasMany(NotificationCampaignView::class, 'notification_campaign_id');
+    }
 }
