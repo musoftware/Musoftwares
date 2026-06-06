@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, ReactNode } from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/Components/ui/sidebar';
 import { AppSidebar } from '@/Components/Admin/AppSidebar';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
 
@@ -16,8 +16,10 @@ interface AdminSidebarLayoutProps extends PropsWithChildren {
 }
 
 export default function AdminSidebarLayout({ title, header, user, children, actions }: AdminSidebarLayoutProps) {
-    const displayName = user?.name || 'Admin User';
-    const displayEmail = user?.email || 'admin@example.com';
+    const { auth } = usePage<any>().props;
+    const currentUser = user || auth?.user;
+    const displayName = currentUser?.name || '';
+    const displayEmail = currentUser?.email || '';
 
     return (
         <TooltipProvider>
@@ -45,7 +47,7 @@ export default function AdminSidebarLayout({ title, header, user, children, acti
                         <DropdownMenuTrigger className="outline-none relative shrink-0">
                             <Avatar className="h-9 w-9 border border-slate-200 cursor-pointer hover:opacity-80 transition-opacity duration-150">
                                 <AvatarFallback className="bg-slate-900 text-white font-medium text-xs">
-                                    {displayName.substring(0, 2).toUpperCase() || 'AD'}
+                                    {displayName ? displayName.substring(0, 2).toUpperCase() : 'U'}
                                 </AvatarFallback>
                             </Avatar>
                         </DropdownMenuTrigger>
@@ -54,6 +56,9 @@ export default function AdminSidebarLayout({ title, header, user, children, acti
                                 <p className="text-sm font-medium text-slate-900 truncate">{displayName}</p>
                                 <p className="text-xs text-slate-500 truncate">{displayEmail}</p>
                             </div>
+                            <DropdownMenuItem className="cursor-pointer rounded-lg text-sm mb-1" asChild>
+                                <Link href={route().has('dashboard') ? route('dashboard') : '#'}>{__('general.dashboard')}</Link>
+                            </DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer rounded-lg text-sm mb-1" asChild>
                                 <Link href={route().has('profile.edit') ? route('profile.edit') : '#'}>Profile</Link>
                             </DropdownMenuItem>
