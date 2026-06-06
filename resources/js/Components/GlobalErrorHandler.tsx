@@ -11,17 +11,17 @@ export function GlobalErrorHandler() {
     useEffect(() => {
         const handleNetworkError = () => {
             toast({
-                title: "Connection error",
-                description: "Please check your internet and try again.",
+                title: __('general.connection_error'),
+                description: __('general.check_your_internet'),
                 variant: "destructive",
-                action: <ToastAction altText="Retry" onClick={() => window.location.reload()}>Retry</ToastAction>
+                action: <ToastAction altText={__('general.retry')} onClick={() => window.location.reload()}>{__('general.retry')}</ToastAction>
             });
         };
 
         const handleServerError = () => {
             toast({
-                title: "Something went wrong on our end",
-                description: "We're working on it. Please try again in a moment.",
+                title: __('general.something_went_wrong_on_our_end'),
+                description: __('general.were_working_on_it'),
                 variant: "destructive",
             });
         };
@@ -32,9 +32,9 @@ export function GlobalErrorHandler() {
 
         const handleLongRequest = () => {
             toast({
-                title: "This is taking longer than usual...",
-                description: "Please wait or cancel the request.",
-                action: <ToastAction altText="Cancel" onClick={() => window.stop()}>Cancel</ToastAction>
+                title: __('general.this_is_taking_longer_than_usual'),
+                description: __('general.please_wait_or_cancel_the_request'),
+                action: <ToastAction altText={__('general.cancel')} onClick={() => window.stop()}>{__('general.cancel')}</ToastAction>
             });
         };
 

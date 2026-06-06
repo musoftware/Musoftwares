@@ -129,6 +129,11 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function skills()
+    {
+        return $this->hasMany(\Modules\Freelance\Models\UserSkill::class, 'user_id');
+    }
+
 
     public function invoices()
     {

@@ -7,7 +7,8 @@ import { Switch } from '@/Components/ui/switch';
 import { Label } from '@/Components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/Components/ui/card';
 import { useToast } from '@/Components/ui/use-toast';
-import { Settings, Bell, BellOff } from 'lucide-react';
+import { Settings, Bell, BellOff, Smartphone } from 'lucide-react';
+import { usePage, router } from '@inertiajs/react';
 import {
     Select,
     SelectContent,
@@ -18,6 +19,8 @@ import {
 
 export default function NotificationSettings({ profile }) {
     const { toast } = useToast();
+    const { flash } = usePage().props;
+    const [generatingToken, setGeneratingToken] = useState(false);
 
     // Determine current mute status
     const isMuted = profile?.notifications_muted_until && new Date(profile.notifications_muted_until) > new Date();
@@ -123,6 +126,56 @@ export default function NotificationSettings({ profile }) {
                                 </Button>
                             </div>
                         </form>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center gap-2">
+                            <Smartphone className="w-5 h-5 text-indigo-600" />
+                            <CardTitle>iOS Shortcut Notifications</CardTitle>
+                        </div>
+                        <CardDescription>
+                            Since iPhones do not support web push notifications natively in Chrome, you can set up an iOS Shortcut to receive alerts.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4">
+                            <h3 className="text-indigo-900 font-semibold mb-2">Setup Guide</h3>
+                            <ol className="list-decimal list-inside text-sm text-indigo-800 space-y-2">
+                                <li>Click the button below to generate your secure API Token.</li>
+                                <li>Copy the generated token.</li>
+                                <li><a href="#" className="underline font-medium">Download the iOS Shortcut</a> (iCloud Link).</li>
+                                <li>When installing the shortcut on your iPhone, paste the token when prompted.</li>
+                                <li>Set up an iOS Personal Automation (in the Shortcuts app) to run this shortcut automatically (e.g. at 9 AM, or when you open Chrome).</li>
+                            </ol>
+                        </div>
+
+                        {flash?.ios_shortcut_token && (
+                            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
+                                <Label className="text-green-900 font-bold">Your API Token (Copy this now):</Label>
+                                <div className="mt-2 p-3 bg-white border border-green-300 rounded font-mono text-sm break-all select-all">
+                                    {flash.ios_shortcut_token}
+                                </div>
+                                <p className="text-xs text-green-700 mt-2">This token will not be shown again. Keep it secret.</p>
+                            </div>
+                        )}
+
+                        <div className="pt-2">
+                            <Button 
+                                variant="outline" 
+                                className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                                onClick={() => {
+                                    setGeneratingToken(true);
+                                    router.post(route('freelance.settings.notifications.shortcut-token'), {}, {
+                                        onFinish: () => setGeneratingToken(false),
+                                    });
+                                }}
+                                disabled={generatingToken}
+                            >
+                                {generatingToken ? 'Generating...' : 'Generate API Token'}
+                            </Button>
+                        </div>
                     </CardContent>
                 </Card>
 

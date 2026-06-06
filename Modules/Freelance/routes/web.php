@@ -16,7 +16,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:freelance'])-
     
     Route::get('/settings/notifications', [\Modules\Freelance\Http\Controllers\SettingsController::class, 'notifications'])->name('settings.notifications');
     Route::put('/settings/notifications', [\Modules\Freelance\Http\Controllers\SettingsController::class, 'updateNotifications'])->name('settings.notifications.update');
-
+    Route::post('/settings/notifications/shortcut-token', [\Modules\Freelance\Http\Controllers\ShortcutNotificationController::class, 'generateToken'])->name('settings.notifications.shortcut-token');
     // User Skills
     Route::post('/user-skills', [\Modules\Freelance\Http\Controllers\UserSkillController::class, 'store'])->name('user-skills.store');
     Route::delete('/user-skills/{skill_id}', [\Modules\Freelance\Http\Controllers\UserSkillController::class, 'destroy'])->name('user-skills.destroy');

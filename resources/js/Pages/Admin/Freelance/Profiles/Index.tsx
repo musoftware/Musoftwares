@@ -4,7 +4,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/Components/ui/dropdown-menu';
 import { Input } from '@/Components/ui/input';
-import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, User } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
 export default function Index({ profiles, filters }: any) {
@@ -49,6 +49,7 @@ export default function Index({ profiles, filters }: any) {
                             <th className="p-4 font-medium text-gray-600">{__('admin.title', undefined, 'Title')}</th>
                             <th className="p-4 font-medium text-gray-600">{__('admin.bio', undefined, 'Bio')}</th>
                             <th className="p-4 font-medium text-gray-600">{__('admin.skills', undefined, 'Skills')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('admin.notifications_enabled', undefined, 'Notifications')}</th>
                             <th className="p-4 font-medium text-gray-600 text-right">{__('freelance.actions')}</th>
                         </tr>
                     </thead>
@@ -76,6 +77,17 @@ export default function Index({ profiles, filters }: any) {
                                         )}
                                     </div>
                                 </td>
+                                <td className="p-4">
+                                    {profile.user?.fcm_token || profile.user?.last_shortcut_sync_at ? (
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                            {__('general.yes', undefined, 'Yes')}
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                            {__('general.no', undefined, 'No')}
+                                        </span>
+                                    )}
+                                </td>
                                 <td className="p-4 text-right">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
@@ -87,6 +99,12 @@ export default function Index({ profiles, filters }: any) {
                                         <DropdownMenuContent align="end" className="w-56">
                                             <DropdownMenuLabel>{__('freelance.actions')}</DropdownMenuLabel>
                                             <DropdownMenuSeparator />
+                                            <DropdownMenuItem asChild className="cursor-pointer">
+                                                <Link href={`/admin/users/${profile.user_id}`}>
+                                                    <User className="mr-2 h-4 w-4 text-purple-600" />
+                                                    <span>{__('admin.view_user_profile', undefined, 'View User Profile')}</span>
+                                                </Link>
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem asChild className="cursor-pointer">
                                                 <Link href={route('admin.freelance.profiles.edit', profile.id)}>
                                                     <Edit className="mr-2 h-4 w-4 text-blue-600" />

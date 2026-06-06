@@ -304,4 +304,5 @@ return [
   'min_proposal_points_help' => 'Setting a minimum points requirement filters out non-serious applicants. Freelancers will need to spend these points to submit a proposal, ensuring higher quality bids.',
   'expected_duration_help' => 'Indicate how long you expect the project to take. This helps freelancers assess if they have the availability to meet your deadline.',
   'required_skills_help' => 'Select all relevant skills required for the task. This ensures your job reaches a wider and more targeted audience of freelancers who possess these specific skills.',
+  'ios_shortcut_token_generated' => 'iOS shortcut token generated successfully.',
 ];

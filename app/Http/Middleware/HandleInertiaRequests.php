@@ -48,6 +48,7 @@ class HandleInertiaRequests extends Middleware
                 'team_member' => \Illuminate\Support\Facades\Auth::guard('erp_team')->user(),
                 'crm_team_member' => \Illuminate\Support\Facades\Auth::guard('crm_team')->user(),
                 'is_impersonating' => session()->has('impersonator_id'),
+                'has_ios_shortcut_active' => $user ? $user->last_shortcut_sync_at !== null : false,
                 'active_modules' => function () use ($user) {
                     if (!$user) return [];
                     try {
@@ -164,6 +165,7 @@ class HandleInertiaRequests extends Middleware
                 'warning' => fn () => $request->session()->get('warning'),
                 'new_publishable_key' => fn () => $request->session()->get('new_publishable_key'),
                 'new_secret_key' => fn () => $request->session()->get('new_secret_key'),
+                'ios_shortcut_token' => fn () => $request->session()->get('ios_shortcut_token'),
             ],
             'is_lance_domain' => $request->getHost() === 'lance.musoftwares.com',
         ];
