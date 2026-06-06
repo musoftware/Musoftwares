@@ -34,9 +34,19 @@ axios.interceptors.response.use(
             clearTimeout((error.config as any).__timeoutId);
         }
 
+        if (axios.isCancel(error) || error.code === 'ERR_CANCELED' || error.name === 'AbortError' || error.message === 'canceled') {
+            return Promise.reject(error);
+        }
+
         if (!(error as any).response) {
-            // Network error
-            window.dispatchEvent(new Event('app:network-error'));
+            // Network error or intercepted request
+            if (!navigator.onLine) {
+                window.dispatchEvent(new Event('app:network-error'));
+            } else if (error.message !== 'Network Error') {
+                // If there's no response and it's not a generic Network Error (e.g., timeout), 
+                // we might not want to falsely blame the internet.
+                console.error("Request failed without response:", error.message);
+            }
         } else {
             const status = (error as any).response.status;
             if (status === 500 || status === 503) {

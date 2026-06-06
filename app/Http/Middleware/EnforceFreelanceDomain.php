@@ -23,7 +23,6 @@ class EnforceFreelanceDomain
                 return $next($request);
             }
 
-            // List of allowed route prefixes for the freelance domain
             $allowedPrefixes = [
                 'freelance',
                 'login',
@@ -43,7 +42,9 @@ class EnforceFreelanceDomain
                 'broadcasting',
                 'device-tokens',
                 'notifications',
-                'build'
+                'build',
+                'onboarding-wizard',
+                'product-tour',
             ];
 
             $isAllowed = false;

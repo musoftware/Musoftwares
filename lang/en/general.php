@@ -5738,4 +5738,13 @@ return [
   'notifications_enabled_successfully' => 'Push notifications have been enabled successfully.',
   'saved_successfully' => 'Saved successfully',
   'settings' => 'Settings',
+  'connection_error' => 'Connection error',
+  'check_your_internet' => 'Please check your internet and try again.',
+  'retry' => 'Retry',
+  'something_went_wrong_on_our_end' => 'Something went wrong on our end',
+  'were_working_on_it' => 'We\'re working on it. Please try again in a moment.',
+  'this_is_taking_longer_than_usual' => 'This is taking longer than usual...',
+  'please_wait_or_cancel_the_request' => 'Please wait or cancel the request.',
+  'are_you_sure_you_want_to_delete_this_user' => 'Are you sure you want to delete this user?',
+  'this_action_cannot_be_undone_all_data_related_to_this_user_will_be_permanently_removed' => 'This action cannot be undone. All data related to this user will be permanently removed.',
 ];

@@ -5543,4 +5543,13 @@ return [
   'notifications_enabled_successfully' => 'تم تفعيل الإشعارات بنجاح.',
   'saved_successfully' => 'تم الحفظ بنجاح',
   'settings' => 'الإعدادات',
+  'connection_error' => 'خطأ في الاتصال',
+  'check_your_internet' => 'يرجى التحقق من اتصال الإنترنت الخاص بك والمحاولة مرة أخرى.',
+  'retry' => 'إعادة المحاولة',
+  'something_went_wrong_on_our_end' => 'حدث خطأ من جانبنا',
+  'were_working_on_it' => 'نحن نعمل على إصلاحه. يرجى المحاولة مرة أخرى بعد قليل.',
+  'this_is_taking_longer_than_usual' => 'هذا يستغرق وقتاً أطول من المعتاد...',
+  'please_wait_or_cancel_the_request' => 'يرجى الانتظار أو إلغاء الطلب.',
+  'are_you_sure_you_want_to_delete_this_user' => 'هل أنت متأكد أنك تريد حذف هذا المستخدم؟',
+  'this_action_cannot_be_undone_all_data_related_to_this_user_will_be_permanently_removed' => 'لا يمكن التراجع عن هذا الإجراء. ستتم إزالة كافة البيانات المتعلقة بهذا المستخدم بشكل دائم.',
 ];

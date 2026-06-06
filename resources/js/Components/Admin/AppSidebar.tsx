@@ -100,6 +100,7 @@ const items: MenuItem[] = [
         { title: "Proposals", url: "/admin/freelance/proposals" },
         { title: "Contracts", url: "/admin/freelance/contracts" },
         { title: "Skills", url: "/admin/freelance/skills" },
+        { title: "Profiles", url: "/admin/freelance/profiles" },
     ]
   },
   { 

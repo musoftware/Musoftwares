@@ -34,8 +34,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
     const [selectedRole, setSelectedRole] = useState(client.role || 'client');
     
     // New Modal States
-    const [isAssignTaskOpen, setIsAssignTaskOpen] = useState(false);
-    const [isSwapBudgetOpen, setIsSwapBudgetOpen] = useState(false);
+    const [isDeleteUserOpen, setIsDeleteUserOpen] = useState(false);
     const [isActivateMembershipOpen, setIsActivateMembershipOpen] = useState(false);
 
 
@@ -73,26 +72,11 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
 
 
 
-    const [taskForm, setTaskForm] = useState({ title: '', description: '' });
-    const submitAssignTask = (e) => {
+    const submitDeleteUser = (e) => {
         e.preventDefault();
-        router.post(`/admin/users/${client.id}/tasks`, taskForm, {
+        router.delete(`/admin/users/${client.id}`, {
             onSuccess: () => {
-                setIsAssignTaskOpen(false);
-                setTaskForm({ title: '', description: '' });
-                alert("Task assigned successfully!");
-            }
-        });
-    };
-
-    const [swapForm, setSwapForm] = useState({ amount: '', target_user_id: '' });
-    const submitSwapBudget = (e) => {
-        e.preventDefault();
-        router.post(`/admin/users/${client.id}/swap-budget`, swapForm, {
-            onSuccess: () => {
-                setIsSwapBudgetOpen(false);
-                setSwapForm({ amount: '', target_user_id: '' });
-                alert("Budget swapped successfully!");
+                setIsDeleteUserOpen(false);
             }
         });
     };
@@ -194,7 +178,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                 
                                 <div className="pt-4 mt-4 border-t border-slate-100"></div>
                                 <DropdownMenuGroup>
-                                    <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-700">
+                                    <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-700" onClick={() => setIsDeleteUserOpen(true)}>
                                         <Trash2 className="mr-2 h-4 w-4" />
                                         <span>{__('general.delete_user')}</span>
                                     </DropdownMenuItem>
@@ -318,41 +302,21 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
             </div>
 
             {/* Modals */}
-            <Dialog open={isAssignTaskOpen} onOpenChange={setIsAssignTaskOpen}>
+            <Dialog open={isDeleteUserOpen} onOpenChange={setIsDeleteUserOpen}>
                 <DialogContent>
-                    <form onSubmit={submitAssignTask}>
+                    <form onSubmit={submitDeleteUser}>
                         <DialogHeader>
-                            <DialogTitle>{__('general.assign_task')}</DialogTitle>
-                            <DialogDescription>{__('general.create_an_erp_task_for_this_client')}</DialogDescription>
+                            <DialogTitle>{__('general.delete_user')}</DialogTitle>
+                            <DialogDescription>{__('general.are_you_sure_you_want_to_delete_this_user')}</DialogDescription>
                         </DialogHeader>
                         <div className="py-4">
-                            <p className="text-sm text-gray-500">{__('general.this_will_create_a_new_task_named')}<strong>{client.name}'s Task</strong>{__('general.and_link_it_to_their_erp_account')}</p>
+                            <p className="text-sm text-gray-500">
+                                {__('general.this_action_cannot_be_undone_all_data_related_to_this_user_will_be_permanently_removed')}
+                            </p>
                         </div>
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setIsAssignTaskOpen(false)}>Cancel</Button>
-                            <Button type="submit">{__('general.create_task')}</Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
-
-            <Dialog open={isSwapBudgetOpen} onOpenChange={setIsSwapBudgetOpen}>
-                <DialogContent>
-                    <form onSubmit={submitSwapBudget}>
-                        <DialogHeader>
-                            <DialogTitle>{__('general.swap_budgets')}</DialogTitle>
-                            <DialogDescription>{__('general.transfer_funds_from_this_user_s_wallet_to_another_user_s_wallet')}</DialogDescription>
-                        </DialogHeader>
-                        <div className="py-4">
-                            <p className="text-sm text-gray-500 mb-2">{__('general.select_destination_wallet_and_amount')}</p>
-                            <div className="space-y-4">
-                                <Input type="number" placeholder={__('general.amount_to_transfer')} />
-                                <Input placeholder={__('general.target_user_email_or_id')} />
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setIsSwapBudgetOpen(false)}>Cancel</Button>
-                            <Button type="submit">{__('general.transfer_funds')}</Button>
+                            <Button type="button" variant="outline" onClick={() => setIsDeleteUserOpen(false)}>{__('general.cancel')}</Button>
+                            <Button type="submit" variant="destructive">{__('general.delete_user')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

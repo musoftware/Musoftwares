@@ -816,7 +816,7 @@ function AuthenticatedContent({
             </header>
 
             {/* Notification Permission Banner */}
-            {permission !== 'granted' && (
+            {permission !== 'granted' && !auth?.has_ios_shortcut_active && (
                 <div className="bg-indigo-600 px-4 py-3 text-white sm:px-6 lg:px-8">
                     <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                         <p className="text-sm leading-6">
@@ -824,12 +824,20 @@ function AuthenticatedContent({
                             <svg viewBox="0 0 2 2" className="mx-2 inline h-0.5 w-0.5 fill-current" aria-hidden="true"><circle cx="1" cy="1" r="1" /></svg>
                             {__('general.notifications_disabled_message')}
                         </p>
-                        <button
-                            onClick={requestPermission}
-                            className="flex-none rounded-full bg-indigo-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-900 transition-colors"
-                        >
-                            {__('general.enable_notifications')} <span aria-hidden="true">&rarr;</span>
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={requestPermission}
+                                className="flex-none rounded-full bg-indigo-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-900 transition-colors"
+                            >
+                                {__('general.enable_notifications')} <span aria-hidden="true">&rarr;</span>
+                            </button>
+                            <Link
+                                href={safeRoute('freelance.settings.notifications') || '#'}
+                                className="flex-none rounded-full border border-indigo-400 px-3.5 py-1 text-sm font-semibold text-indigo-100 hover:bg-indigo-500 transition-colors"
+                            >
+                                iPhone User? Use iOS Shortcut
+                            </Link>
+                        </div>
                     </div>
                 </div>
             )}
