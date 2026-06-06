@@ -10,13 +10,9 @@ use App\Http\Controllers\HomeController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/portfolio', [HomeController::class, 'portfolio'])->name('portfolio');
 
-Route::get('/dddwqdqwdqw', function(){
-    echo 'ss';
-    \Illuminate\Support\Facades\Artisan::call('migrate');
-});
-Route::get('/php-check', function () {
-    return 'Active PHP Version: ' . phpversion();
-});
+Route::get('/install-app', function () {
+    return \Inertia\Inertia::render('PWA/InstallGuide');
+})->name('install-app');
 
 
 Route::get('/test-amc-api', function(\App\Services\AmcAcademyApiService $service) {
