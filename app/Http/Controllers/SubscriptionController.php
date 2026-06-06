@@ -312,12 +312,12 @@ class SubscriptionController extends Controller
                 // Create subscriptions for each purchased item
                 if (isset($request->items) && is_array($request->items)) {
                     foreach ($request->items as $item) {
-                        $expiry = \Carbon\Carbon::now()->addDays($days);
+                        $expiry = \Carbon\Carbon::now()->addDays((int) $days);
                         
                         // Check if they already own it, extend expiry
                         $existing = \App\Models\UserSubscription::where('user_id', $user->id)->where('object', $item)->first();
                         if ($existing && $existing->status === 'active' && \Carbon\Carbon::parse($existing->expires_at)->isFuture()) {
-                            $expiry = \Carbon\Carbon::parse($existing->expires_at)->addDays($days);
+                            $expiry = \Carbon\Carbon::parse($existing->expires_at)->addDays((int) $days);
                         }
 
                         \App\Models\UserSubscription::updateOrCreate(
@@ -518,12 +518,12 @@ class SubscriptionController extends Controller
                                     $items = $metadata['items'] ?? [];
                                     if (is_array($items) && !empty($items)) {
                                         foreach ($items as $item) {
-                                            $expiry = \Carbon\Carbon::now()->addDays($days);
+                                            $expiry = \Carbon\Carbon::now()->addDays((int) $days);
                                             
                                             // Check if they already own it, extend expiry
                                             $existing = \App\Models\UserSubscription::where('user_id', $user->id)->where('object', $item)->first();
                                             if ($existing && $existing->status === 'active' && \Carbon\Carbon::parse($existing->expires_at)->isFuture()) {
-                                                $expiry = \Carbon\Carbon::parse($existing->expires_at)->addDays($days);
+                                                $expiry = \Carbon\Carbon::parse($existing->expires_at)->addDays((int) $days);
                                             }
 
                                             \App\Models\UserSubscription::updateOrCreate(
