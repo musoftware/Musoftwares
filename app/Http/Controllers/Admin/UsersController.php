@@ -42,7 +42,7 @@ class UsersController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
-                
+
                 if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'whatsapp_number')) {
                     $q->orWhere('whatsapp_number', 'like', "%{$search}%");
                 }
@@ -220,7 +220,7 @@ class UsersController extends Controller
                 'country'              => $user->country ?? '',
                 'city'                 => $user->city ?? '',
                 'currency'             => $user->currency_id ?? $user->currency ?? '',
-                
+
                 'hour_rate_currency'   => $user->hour_rate_currency_id ?? $user->hour_rate_currency ?? '',
                 'hour_rate'            => $user->hour_rate ?? '',
                 'booking_rate_currency'=> $user->booking_rate_currency_id ?? $user->booking_rate_currency ?? '',
@@ -233,24 +233,24 @@ class UsersController extends Controller
                 'subscription_plan'    => $user->plan_id ?? '',
                 'postpaid_limit'       => $user->postpaid_limit ?? '',
                 'subscription_force'   => (bool) ($user->subscription_force ?? false),
-                
+
                 'client_taxable'       => (bool) ($user->client_taxable ?? false),
                 'invoice_taxable'      => (bool) ($user->invoice_taxable ?? false),
                 'timer_taxable'        => (bool) ($user->timer_taxable ?? false),
-                
+
                 'allow_referral_system'=> (bool) ($user->allow_referral_system ?? false),
                 'allow_view_times'     => (bool) ($user->allow_view_times ?? false),
                 'allow_postpaid'       => (bool) ($user->allow_postpaid ?? false),
 
                 'account_status'       => $user->account_status ?? 'active',
                 'block_reason'         => $user->block_reason ?? '',
-                
+
                 'kyc_verified'         => (bool) ($user->kyc_verified ?? false),
                 'kyc_notes'            => $user->kyc_notes ?? '',
                 'kyc_verified_at'      => $user->kyc_verified_at ? $user->kyc_verified_at->format('M d, Y \a\t H:i') : null,
                 'kyc_verifier'         => $user->kycVerifier ? ['name' => $user->kycVerifier->name] : null,
                 'kyc_documents_count'  => $user->kycDocuments ? $user->kycDocuments->count() : 0,
-                
+
                 'affiliate_commission_percentage' => $user->affiliate_commission_percentage ?? 1.00,
                 'add_commission_to_total' => (bool) ($user->add_commission_to_total ?? false),
                 'ref_user_id'          => $user->ref_user_id ?? '',
@@ -432,7 +432,7 @@ class UsersController extends Controller
     public function showLegacyCoWorker($id)
     {
         $worker = \App\Models\CoWorker::with('techTags')->findOrFail($id);
-        
+
         $workerData = [
             'id'          => $worker->id,
             'person_name' => $worker->person_name,
@@ -456,7 +456,7 @@ class UsersController extends Controller
     public function editLegacyCoWorker($id)
     {
         $worker = CoWorker::with('techTags')->findOrFail($id);
-        
+
         $workerData = [
             'id'          => $worker->id,
             'person_name' => $worker->person_name,
@@ -495,7 +495,7 @@ class UsersController extends Controller
         ]);
 
         $worker = CoWorker::findOrFail($id);
-        
+
         $worker->update($request->only([
             'person_name', 'email', 'mobile', 'facebook', 'linked_in', 'whatsapp', 'time_from', 'time_to'
         ]));
@@ -597,7 +597,7 @@ class UsersController extends Controller
     {
         try {
             $loginUrl = route('login');
-            
+
             $message = "Hello {$coWorker->person_name},\n\n";
             $message .= $isPasswordReset ? "Your password has been reset.\n\n" : "Your account has been created as an employee.\n\n";
             $message .= "Login Credentials:\n";
@@ -634,7 +634,7 @@ class UsersController extends Controller
             $earnings = \App\Models\Earning::where('user_id', $client->id)
                 ->where('referred_user_id', $referral->id)
                 ->get();
-            
+
             $total_commission = 0;
             foreach ($earnings as $earning) {
                 // If the app has CurrenciesExchange::RateToday, we use it, otherwise fallback
@@ -644,7 +644,7 @@ class UsersController extends Controller
                     $total_commission += $earning->amount; // Fallback
                 }
             }
-            
+
             return [
                 'id' => $referral->id,
                 'name' => $referral->name,
@@ -745,7 +745,7 @@ class UsersController extends Controller
     public function activateMembership(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        
+
         $request->validate([
             'object' => 'required|string',
             'duration_days' => 'required|integer|min:1',
@@ -766,7 +766,7 @@ class UsersController extends Controller
             'expires_at' => now()->addDays((int) $request->duration_days),
             'auto_renew' => false,
         ]);
-
+ 
         return back()->with('success', "Membership ({$plan['name']}) activated successfully for {$request->duration_days} days.");
     }
 
