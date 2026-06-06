@@ -5552,4 +5552,15 @@ return [
   'please_wait_or_cancel_the_request' => 'يرجى الانتظار أو إلغاء الطلب.',
   'are_you_sure_you_want_to_delete_this_user' => 'هل أنت متأكد أنك تريد حذف هذا المستخدم؟',
   'this_action_cannot_be_undone_all_data_related_to_this_user_will_be_permanently_removed' => 'لا يمكن التراجع عن هذا الإجراء. ستتم إزالة كافة البيانات المتعلقة بهذا المستخدم بشكل دائم.',
+
+  // PWA Install Guide
+  'install_app' => 'تثبيت التطبيق',
+  'install_app_title' => 'تثبيت التطبيق',
+  'install_app_description' => 'لتفعيل الإشعارات والحصول على أفضل تجربة، يرجى تثبيت التطبيق على جهازك.',
+  'install_app_step_1' => 'اضغط على زر المشاركة (Share)',
+  'install_app_step_1_desc' => 'موجود في الشريط السفلي في متصفح سفاري، أو في أعلى الشاشة في متصفح كروم.',
+  'install_app_step_2' => 'اختر "إضافة إلى الشاشة الرئيسية" (Add to Home Screen)',
+  'install_app_step_2_desc' => 'قد تحتاج للنزول للأسفل قليلاً في القائمة لتجد هذا الخيار.',
+  'install_app_step_3' => 'اضغط على "إضافة" (Add) من أعلى الشاشة',
+  'install_app_step_3_desc' => 'سيظهر التطبيق الآن على شاشتك الرئيسية ويمكنك تفعيل الإشعارات منه مباشرة!',
 ];

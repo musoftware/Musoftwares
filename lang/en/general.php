@@ -5747,4 +5747,15 @@ return [
   'please_wait_or_cancel_the_request' => 'Please wait or cancel the request.',
   'are_you_sure_you_want_to_delete_this_user' => 'Are you sure you want to delete this user?',
   'this_action_cannot_be_undone_all_data_related_to_this_user_will_be_permanently_removed' => 'This action cannot be undone. All data related to this user will be permanently removed.',
+
+  // PWA Install Guide
+  'install_app' => 'Install App',
+  'install_app_title' => 'Install the App',
+  'install_app_description' => 'To enable notifications and get the best experience, please install the app on your home screen.',
+  'install_app_step_1' => 'Tap the Share button',
+  'install_app_step_1_desc' => 'It is located at the bottom of the screen (Safari) or the top right (Chrome).',
+  'install_app_step_2' => 'Select "Add to Home Screen"',
+  'install_app_step_2_desc' => 'You may need to scroll down to find this option in the menu.',
+  'install_app_step_3' => 'Tap "Add" in the top right',
+  'install_app_step_3_desc' => 'The app will now appear on your home screen and you can enable notifications!',
 ];

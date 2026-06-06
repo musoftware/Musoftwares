@@ -75,7 +75,27 @@ export function useFCM() {
     };
 
     const requestPermission = async () => {
-        if (!('Notification' in window)) return;
+        if (!('Notification' in window)) {
+            // Check if iOS and not standalone
+            const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+            // @ts-ignore
+            const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+
+            if (isIos && !isStandalone) {
+                router.visit('/install-app');
+            }
+            return;
+        }
+
+        // Even if Notification is in window, iOS Safari requires standalone mode for Push Notifications
+        const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+        // @ts-ignore
+        const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+
+        if (isIos && !isStandalone) {
+            router.visit('/install-app');
+            return;
+        }
         
         const currentPermission = await Notification.requestPermission();
         setPermission(currentPermission);

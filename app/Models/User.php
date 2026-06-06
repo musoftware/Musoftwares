@@ -135,6 +135,11 @@ class User extends Authenticatable
     }
 
 
+    public function deviceTokens()
+    {
+        return $this->hasMany(\App\Models\DeviceToken::class);
+    }
+
     public function invoices()
     {
         return $this->hasMany(\App\Models\Invoice::class);
@@ -514,7 +519,14 @@ class User extends Authenticatable
      */
     public function routeNotificationForFcm($notification)
     {
-        return $this->fcm_token;
+        $tokens = $this->deviceTokens()->pluck('token')->toArray();
+        
+        // Fallback to the old fcm_token column if no tokens found in the new table
+        if (empty($tokens) && $this->fcm_token) {
+            return $this->fcm_token;
+        }
+        
+        return $tokens;
     }
 }
 

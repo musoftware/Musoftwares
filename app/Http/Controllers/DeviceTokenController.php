@@ -18,7 +18,12 @@ class DeviceTokenController extends Controller
         $user = $request->user();
         $token = $request->input('token');
 
-        // Update the user's fcm_token
+        // Ensure the token is saved in the device_tokens table
+        $user->deviceTokens()->firstOrCreate([
+            'token' => $token
+        ]);
+        
+        // Also update the fallback column for compatibility if needed
         $user->fcm_token = $token;
         $user->save();
 
