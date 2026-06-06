@@ -260,7 +260,9 @@
             "title_placeholder": "مثال: مطور ويب شامل",
             "bio_placeholder": "صف خبرة المستقل ومهاراته...",
             "profile_updated_successfully": "تم تحديث الملف الشخصي بنجاح.",
-            "profile_deleted_successfully": "تم حذف الملف الشخصي بنجاح."
+            "profile_deleted_successfully": "تم حذف الملف الشخصي بنجاح.",
+            "notifications_enabled": "الإشعارات مفعلة",
+            "view_user_profile": "عرض ملف المستخدم"
         },
         "auth": {
             "failed": "failed",
@@ -7731,7 +7733,9 @@
             "title_placeholder": "e.g. Senior Full Stack Developer",
             "bio_placeholder": "Describe the freelancer's experience and expertise...",
             "profile_updated_successfully": "Profile updated successfully.",
-            "profile_deleted_successfully": "Profile deleted successfully."
+            "profile_deleted_successfully": "Profile deleted successfully.",
+            "notifications_enabled": "Notifications Enabled",
+            "view_user_profile": "View User Profile"
         },
         "auth": {
             "failed": "failed",

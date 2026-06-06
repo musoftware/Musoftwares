@@ -763,7 +763,7 @@ class UsersController extends Controller
             'object' => $plan['id'],
             'status' => 'active',
             'started_at' => now(),
-            'expires_at' => now()->addDays($request->duration_days),
+            'expires_at' => now()->addDays((int) $request->duration_days),
             'auto_renew' => false,
         ]);
 
