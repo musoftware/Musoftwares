@@ -31,7 +31,7 @@ export default function EditProfile({ profile, userSkills, availableSkills }) {
     const { data, setData, put, processing, errors } = useForm({
         title: profile?.title || '',
         bio: profile?.bio || '',
-        hourly_rate: profile?.hourly_rate || 0,
+        hourly_rate: profile?.hourly_rate ? Number(profile.hourly_rate) : '',
     });
 
     const submitProfile = (e) => {

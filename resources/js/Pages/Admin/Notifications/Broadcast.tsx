@@ -12,6 +12,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/Components/ui/badge';
 import { formatDate } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import { Link } from '@inertiajs/react';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/Components/ui/dropdown-menu';
+import { MoreHorizontal, Eye } from 'lucide-react';
 
 export default function Broadcast({ campaigns = [] }: { campaigns?: any[] }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -122,6 +125,7 @@ export default function Broadcast({ campaigns = [] }: { campaigns?: any[] }) {
                                             <TableHead>{__('admin.date')}</TableHead>
                                             <TableHead className="text-center">{__('freelance.views')}</TableHead>
                                             <TableHead>{__('general.status')}</TableHead>
+                                            <TableHead className="text-right">{__('general.actions')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -142,6 +146,24 @@ export default function Broadcast({ campaigns = [] }: { campaigns?: any[] }) {
                                                     <Badge className={campaign.status === 'completed' ? 'bg-green-500 hover:bg-green-600' : ''} variant={campaign.status === 'completed' ? 'default' : 'secondary'}>
                                                         {__(campaign.status)}
                                                     </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                                <span className="sr-only">Open menu</span>
+                                                                <MoreHorizontal className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem asChild>
+                                                                <Link href={route('admin.notifications.broadcast.show', campaign.id)} className="flex items-center cursor-pointer">
+                                                                    <Eye className="w-4 h-4 mr-2" />
+                                                                    {__('general.view')}
+                                                                </Link>
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
                                                 </TableCell>
                                             </TableRow>
                                         ))}

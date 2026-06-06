@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('notification_campaigns', function (Blueprint $table) {
-            $table->unsignedInteger('views_count')->default(0)->after('clicks_count');
-        });
+        if (!Schema::hasColumn('notification_campaigns', 'views_count')) {
+            Schema::table('notification_campaigns', function (Blueprint $table) {
+                $table->unsignedInteger('views_count')->default(0)->after('clicks_count');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('notification_campaigns', function (Blueprint $table) {
-            $table->dropColumn('views_count');
-        });
+        if (Schema::hasColumn('notification_campaigns', 'views_count')) {
+            Schema::table('notification_campaigns', function (Blueprint $table) {
+                $table->dropColumn('views_count');
+            });
+        }
     }
 };

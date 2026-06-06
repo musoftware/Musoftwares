@@ -9,6 +9,7 @@ return [
   'notification_title_placeholder' => 'أدخل عنوان الإشعار',
   'message' => 'الرسالة',
   'notification_body_placeholder' => 'أدخل محتوى الإشعار',
+  'clicks' => 'النقرات',
   'past_campaigns' => 'الحملات السابقة',
   'past_campaigns_description' => 'سجل الإشعارات العامة التي تم إرسالها من النظام.',
   'no_campaigns_yet' => 'لم يتم إرسال أي حملات بعد.',

@@ -766,7 +766,7 @@ class UsersController extends Controller
             'expires_at' => now()->addDays((int) $request->duration_days),
             'auto_renew' => false,
         ]);
- 
+
         return back()->with('success', "Membership ({$plan['name']}) activated successfully for {$request->duration_days} days.");
     }
 
