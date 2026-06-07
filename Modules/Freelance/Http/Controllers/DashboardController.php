@@ -35,7 +35,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get()
             ->map(function ($proposal) use ($hasCurrencyCol, $user) {
-                $this->convertProposalCurrency($proposal, $user->currency_id);
+                $this->convertModelCurrency($proposal, 'bid_amount', 'currency_id', $user->currency_id, (string) $proposal->created_at);
                 return [
                     'id'          => $proposal->id,
                     'title'       => $proposal->job->title ?? __('freelance.unknown_job'),
@@ -55,7 +55,7 @@ class DashboardController extends Controller
             ->take(5);
 
         $activeContracts = $contractQuery->get()->map(function ($contract) use ($hasAmountCol, $user) {
-            $this->convertContractCurrency($contract, $user->currency_id);
+            $this->convertModelCurrency($contract, $hasAmountCol ? 'amount' : 'contract_points', 'currency_id', $user->currency_id, (string) $contract->created_at);
             return [
                 'id'         => $contract->id,
                 'title'      => $contract->job->title ?? __('freelance.unknown_job'),
@@ -157,7 +157,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get()
             ->map(function ($job) use ($hasCurrencyCol, $user) {
-                $this->convertJobCurrency($job, $user->currency_id);
+                $this->convertModelCurrency($job, 'budget', 'currency_id', $user->currency_id, (string) $job->created_at);
                 return [
                     'id'             => $job->id,
                     'title'          => $job->title,
@@ -178,7 +178,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get()
             ->map(function ($contract) use ($hasAmountCol, $user) {
-                $this->convertContractCurrency($contract, $user->currency_id);
+                $this->convertModelCurrency($contract, $hasAmountCol ? 'amount' : 'contract_points', 'currency_id', $user->currency_id, (string) $contract->created_at);
                 return [
                     'id'             => $contract->id,
                     'title'          => $contract->job->title ?? __('freelance.unknown_job'),
@@ -199,7 +199,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get()
             ->map(function ($proposal) use ($user) {
-                $this->convertProposalCurrency($proposal, $user->currency_id);
+                $this->convertModelCurrency($proposal, 'bid_amount', 'currency_id', $user->currency_id, (string) $proposal->created_at);
                 return [
                     'id'             => $proposal->id,
                     'title'          => $proposal->job->title ?? __('freelance.unknown_job'),

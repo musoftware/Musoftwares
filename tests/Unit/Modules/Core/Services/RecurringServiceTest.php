@@ -25,7 +25,7 @@ class RecurringServiceTest extends TestCase
     {
         $userId = DB::table('users')->insertGetId([
             'name' => 'User',
-            'email' => 'test@example.com',
+            'email' => 'test_' . uniqid() . '@example.com',
             'password' => bcrypt('password'),
             'created_at' => now(),
             'updated_at' => now(),

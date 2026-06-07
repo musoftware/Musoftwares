@@ -11,10 +11,11 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { formatMoney, formatDate } from '@/lib/utils';
-import { Clock, DollarSign, Briefcase, MapPin, CheckCircle2, AlertCircle, FileText, Send, User, Eye, Bell } from 'lucide-react';
+import { Clock, DollarSign, Briefcase, MapPin, CheckCircle2, AlertCircle, FileText, Send, User, Eye, Bell, Trash2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
 import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 import { __ } from '@/lib/i18n';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 
 function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
     const { mode } = useFreelanceMode();
@@ -32,6 +33,8 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
         currency_id: job.currency_id,
         points_spent: job.min_proposal_points || 2
     });
+
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const submitProposal = (e: React.FormEvent) => {
         e.preventDefault();
@@ -51,6 +54,12 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
 
     const handlePoke = () => {
         router.post(route('freelance.jobs.poke', job.id));
+    };
+
+    const handleDelete = () => {
+        router.delete(route('freelance.jobs.destroy', job.id), {
+            onSuccess: () => setIsDeleteDialogOpen(false)
+        });
     };
 
     return (
@@ -96,6 +105,30 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
                                                 <Bell className="w-3.5 h-3.5 mr-1.5" />
                                                 {__('freelance.poke_freelancers')}
                                             </Button>
+                                        )}
+                                        {isClient && (
+                                            <>
+                                                <Button 
+                                                    variant="destructive" 
+                                                    size="sm" 
+                                                    onClick={() => setIsDeleteDialogOpen(true)}
+                                                    className="w-full sm:w-auto"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                                                    {__('general.delete')}
+                                                </Button>
+
+                                                <ConfirmModal
+                                                    isOpen={isDeleteDialogOpen}
+                                                    title={__('general.delete_confirmation')}
+                                                    description={__('general.are_you_sure_you_want_to_delete')}
+                                                    confirmLabel={__('general.delete')}
+                                                    cancelLabel={__('general.cancel')}
+                                                    variant="danger"
+                                                    onConfirm={handleDelete}
+                                                    onCancel={() => setIsDeleteDialogOpen(false)}
+                                                />
+                                            </>
                                         )}
                                     </div>
                                 </div>
@@ -343,7 +376,7 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
     );
 }
 
-export default function ShowJob({ auth, job, pointsCost = 5 }: any) {
+export default function ShowJob({ auth, job, pointsCost = 5, userCurrency }: any) {
     if (!job) {
         return (
             <FreelanceLayout clean={true}>

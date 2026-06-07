@@ -37,8 +37,8 @@ class RecurringBusinessController extends Controller
         $stats = [
             'monthly_total' => RecurringCost::monthly_str(),
             'annual_total' => RecurringCost::annual_str(),
-            'business_currency_code' => $bCurrency->currency,
-            'business_currency_symbol' => $bCurrency->symbol,
+            'business_currency_code' => $bCurrency['currency'] ?? 'USD',
+            'business_currency_symbol' => $bCurrency['symbol'] ?? '$',
         ];
 
         return Inertia::render('Admin/Business/RecurringCosts/Index', [
@@ -60,8 +60,8 @@ class RecurringBusinessController extends Controller
         $bCurrency = \App\Helpers\CurrencyHelper::getBusinessCurrency();
 
         $stats = [
-            'business_currency_code' => $bCurrency->currency,
-            'business_currency_symbol' => $bCurrency->symbol,
+            'business_currency_code' => $bCurrency['currency'] ?? 'USD',
+            'business_currency_symbol' => $bCurrency['symbol'] ?? '$',
         ];
 
         return Inertia::render('Admin/Business/RecurringCosts/Create', [
@@ -281,8 +281,8 @@ class RecurringBusinessController extends Controller
         $stats = [
             'monthly_total' => RecurringIncome::monthly_str(),
             'annual_total' => RecurringIncome::annual_str(),
-            'business_currency_code' => $bCurrency->currency,
-            'business_currency_symbol' => $bCurrency->symbol,
+            'business_currency_code' => $bCurrency['currency'] ?? 'USD',
+            'business_currency_symbol' => $bCurrency['symbol'] ?? '$',
         ];
 
         return Inertia::render('Admin/Business/RecurringIncome/Index', [

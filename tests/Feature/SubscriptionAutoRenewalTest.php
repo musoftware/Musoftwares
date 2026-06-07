@@ -16,8 +16,6 @@ class SubscriptionAutoRenewalTest extends TestCase
     use DatabaseTransactions;
 
     protected User $user;
-    protected ModulePlan $freePlan;
-    protected ModulePlan $paidPlan;
 
     protected function setUp(): void
     {
@@ -27,28 +25,8 @@ class SubscriptionAutoRenewalTest extends TestCase
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
 
         // Create standard client user
-        $this->user = User::factory()->create(['onboarding_completed' => true]);
+        $this->user = User::factory()->create(['onboarding_completed' => true, 'currency_id' => 1]);
         $this->user->assignRole('client');
-
-        // Create a Free Plan
-        $this->freePlan = ModulePlan::create([
-            'module' => 'marketplace',
-            'name' => 'Marketplace Free',
-            'price' => 0.00,
-            'billing' => 'monthly',
-            'features' => [],
-            'is_active' => true,
-        ]);
-
-        // Create a Paid Plan
-        $this->paidPlan = ModulePlan::create([
-            'module' => 'booking',
-            'name' => 'Booking Premium',
-            'price' => 49.00,
-            'billing' => 'monthly',
-            'features' => [],
-            'is_active' => true,
-        ]);
     }
 
     public function test_free_subscription_auto_renew(): void
@@ -57,12 +35,14 @@ class SubscriptionAutoRenewalTest extends TestCase
 
         $subscription = UserSubscription::create([
             'user_id' => $this->user->id,
-            'plan_id' => $this->freePlan->id,
+            'object' => 'marketplace',
             'status' => 'active',
             'started_at' => Carbon::now()->subMonth(),
             'expires_at' => $expiryTime,
             'auto_renew' => true,
         ]);
+        
+        // Since marketplace is not in saas config, it defaults to price 0
 
         // Run auto-renewal artisan command
         $exitCode = Artisan::call('subscription:renew');
@@ -80,15 +60,19 @@ class SubscriptionAutoRenewalTest extends TestCase
 
     public function test_paid_subscription_auto_renew_with_sufficient_balance(): void
     {
-        // Setup morphOne wallet and credit it with 100 USD
-        $wallet = $this->user->getWallet();
-        $wallet->update(['balance' => 100.00]);
+        $pricingService = app(\App\Services\PricingService::class);
+        $serviceItems = $pricingService->getServiceItems();
+        $item = collect($serviceItems)->firstWhere('id', 'erp');
+        $expectedPrice = $item['monthly_price'] ?? 499.99;
+
+        $this->user->user_balance = $expectedPrice + 100.00;
+        $this->user->save();
 
         $expiryTime = Carbon::now()->subMinutes(5);
 
         $subscription = UserSubscription::create([
             'user_id' => $this->user->id,
-            'plan_id' => $this->paidPlan->id,
+            'object' => 'erp',
             'status' => 'active',
             'started_at' => Carbon::now()->subMonth(),
             'expires_at' => $expiryTime,
@@ -108,36 +92,36 @@ class SubscriptionAutoRenewalTest extends TestCase
         $expectedNewExpiry = Carbon::parse($expiryTime)->addMonth()->toDateTimeString();
         $this->assertEquals($expectedNewExpiry, $subscription->expires_at->toDateTimeString());
 
-        // Wallet balance should be debited by 49.00 USD
-        $this->assertEquals(51.00, (float) $wallet->fresh()->balance);
+        // Wallet balance should be debited by expectedPrice
+        $this->assertEquals(100.00, round((float) $this->user->fresh()->user_balance, 2));
 
-        // Double-entry ledger validation: check journal entries
-        $this->assertDatabaseHas('journal_entries', [
-            'reference_type' => 'subscription_renewal',
-            'reference_id' => (string) $subscription->id,
-        ]);
-
-        // Double-entry ledger validation: check wallet transaction
-        $this->assertDatabaseHas('wallet_transactions', [
-            'wallet_id' => $wallet->id,
-            'type' => 'debit',
-            'amount' => 49.00,
-            'reference_type' => 'subscription_renewal',
-            'reference_id' => (string) $subscription->id,
+        $this->assertDatabaseHas('transactions', [
+            'user_id' => $this->user->id,
+            'type' => 'used',
+            'amount' => -1 * $expectedPrice,
         ]);
     }
 
     public function test_paid_subscription_auto_renew_fails_with_insufficient_balance(): void
     {
-        // Setup morphOne wallet and credit it with only 10 USD (plan is 49 USD)
-        $wallet = $this->user->getWallet();
-        $wallet->update(['balance' => 10.00]);
+        $pricingService = app(\App\Services\PricingService::class);
+        $serviceItems = $pricingService->getServiceItems();
+        $item = collect($serviceItems)->firstWhere('id', 'erp');
+        $expectedPrice = $item['monthly_price'] ?? 499.99;
+
+        // Give less than required
+        $this->user->user_balance = $expectedPrice - 10.00;
+        if ($this->user->user_balance < 0) {
+            $this->user->user_balance = 0;
+        }
+        $initialBalance = $this->user->user_balance;
+        $this->user->save();
 
         $expiryTime = Carbon::now()->subMinutes(5);
 
         $subscription = UserSubscription::create([
             'user_id' => $this->user->id,
-            'plan_id' => $this->paidPlan->id,
+            'object' => 'erp',
             'status' => 'active',
             'started_at' => Carbon::now()->subMonth(),
             'expires_at' => $expiryTime,
@@ -157,8 +141,8 @@ class SubscriptionAutoRenewalTest extends TestCase
         // Expiry should NOT be extended
         $this->assertEquals($expiryTime->toDateTimeString(), $subscription->expires_at->toDateTimeString());
 
-        // Wallet balance should remain 10 USD
-        $this->assertEquals(10.00, (float) $wallet->fresh()->balance);
+        // Wallet balance should remain unchanged
+        $this->assertEquals(round($initialBalance, 2), round((float) $this->user->fresh()->user_balance, 2));
     }
 
     public function test_does_not_renew_if_auto_renew_is_false(): void
@@ -167,7 +151,7 @@ class SubscriptionAutoRenewalTest extends TestCase
 
         $subscription = UserSubscription::create([
             'user_id' => $this->user->id,
-            'plan_id' => $this->freePlan->id,
+            'object' => 'marketplace',
             'status' => 'active',
             'started_at' => Carbon::now()->subMonth(),
             'expires_at' => $expiryTime,
@@ -191,7 +175,7 @@ class SubscriptionAutoRenewalTest extends TestCase
 
         $subscription = UserSubscription::create([
             'user_id' => $this->user->id,
-            'plan_id' => $this->freePlan->id,
+            'object' => 'marketplace',
             'status' => 'active',
             'started_at' => Carbon::now(),
             'expires_at' => $expiryTime,
@@ -209,3 +193,4 @@ class SubscriptionAutoRenewalTest extends TestCase
         $this->assertEquals($expiryTime->toDateTimeString(), $subscription->expires_at->toDateTimeString());
     }
 }
+

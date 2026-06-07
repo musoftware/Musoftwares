@@ -5,7 +5,42 @@ import { DataTable } from '@/Components/ui/DataTable';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
+import { MoreHorizontal, Trash } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+
+const TransactionActions = ({ tx, type }) => {
+    const [isOpen, setIsOpen] = React.useState(false);
+
+    const handleDelete = () => {
+        router.delete(`/admin/transactions/${tx.id}?type=${type}`, {
+            onSuccess: () => setIsOpen(false),
+            preserveScroll: true,
+        });
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">{__('general.actions')}</span>
+                    <MoreHorizontal className="h-4 w-4" />
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-xs">
+                <DialogHeader>
+                    <DialogTitle>{__('general.actions')}</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col gap-2 py-2">
+                    <Button variant="destructive" className="justify-start gap-2" onClick={handleDelete}>
+                        <Trash className="w-4 h-4" />
+                        {__('general.delete')}
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 export default function Cost({ transactions, filters }) {
     const handleSearch = (search) => {
@@ -85,6 +120,12 @@ export default function Cost({ transactions, filters }) {
                 </span>
             )
         },
+        {
+            key: 'actions',
+            label: '',
+            className: 'w-[50px] text-right',
+            render: (tx) => <TransactionActions tx={tx} type="cost" />
+        }
     ];
 
     return (

@@ -23,5 +23,10 @@ return [
     'unauthorized_project' => 'unauthorized_project',
     'upgrade_to_inventory' => 'upgrade_to_inventory',
     'cannot_change_own_role' => 'لا يمكنك تغيير الصلاحيات/الدور الخاص بحسابك.',
-    'configure_storage_provider' => 'الرجاء تكوين مزود التخزين الخاص بك.'
+    'configure_storage_provider' => 'الرجاء تكوين مزود التخزين الخاص بك.',
+    'client_currency_required' => 'عملة العميل مطلوبة.',
+    'currency_not_found' => 'العملة غير موجودة.',
+    'escrow_currency_not_found' => 'عملة الضمان غير موجودة.',
+    'invalid_currency' => 'عملة غير صالحة.',
+    'multi_currency_addon_required' => 'إضافة تعدد العملات مطلوبة.',
 ];

@@ -49,9 +49,13 @@ class ProposalController extends Controller
             'rejected' => Proposal::where('freelancer_id', $user->id)->where('status', 'rejected')->count(),
         ];
 
+        $userCurrencyModel = $this->getUserCurrencyObject($user);
+        $userCurrencyId = $userCurrencyModel->id ?? null;
+
         return Inertia::render('Freelance/Proposals/Index', [
-            'proposals' => $proposals,
-            'stats'     => $stats,
+            'proposals'    => $proposals,
+            'stats'        => $stats,
+            'userCurrency' => $this->currencyForFrontend($userCurrencyId),
         ]);
     }
 

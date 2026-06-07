@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Project;
 use App\Models\Transaction;
+use App\Models\CostTransaction;
 use App\Models\AdminSettings;
 use App\Models\Currency;
 use App\Models\CurrenciesExchange;
@@ -133,6 +134,32 @@ class AdminTransactionController extends Controller
             return redirect()->back()->with('success', "Transaction #{$transaction->id} reversed successfully. New transaction ID: #{$reverse->id}");
         } catch (\Exception $e) {
             return redirect()->back()->with('danger', 'Error reversing transaction: ' . $e->getMessage());
+        }
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $type = $request->query('type', 'income');
+
+        try {
+            if ($type === 'cost') {
+                $transaction = CostTransaction::findOrFail($id);
+            } else {
+                $transaction = Transaction::findOrFail($id);
+            }
+
+            $user = User::find($transaction->user_id ?? $transaction->client_id);
+            $project = Project::find($transaction->project_id);
+
+            $transaction->delete();
+
+            if ($user) {
+                $this->transactionService->recalculateUserBalance($user, $project);
+            }
+
+            return redirect()->back()->with('success', __('general.deleted_successfully'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('danger', __('general.error_occurred') . ': ' . $e->getMessage());
         }
     }
 

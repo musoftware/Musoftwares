@@ -110,11 +110,11 @@ class ClientService
 
         $totalRevenue = Invoice::where('client_id', $client->id)
             ->where('status', 'paid')
-            ->sum('total');
+            ->sum('amount');
 
         $unpaidRevenue = Invoice::where('client_id', $client->id)
             ->whereIn('status', ['unpaid', 'due', 'sent', 'overdue'])
-            ->sum('total');
+            ->sum('amount');
 
         $projectsCount = $client->projects()->count();
         $ticketsCount = $hasTickets ? $client->tickets()->count() : 0;

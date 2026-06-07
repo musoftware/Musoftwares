@@ -22,9 +22,9 @@ class SaaSMeteringTest extends TestCase
             'name' => 'Admin', 
             'email' => 'admin@test.com', 
             'password' => 'test',
-            'tenant_id' => 1
         ]);
         $this->actingAs($user);
+        app()->instance('currentTenant', (object)['id' => 1]);
 
         TenantUsage::create([
             'tenant_id' => 1,
@@ -48,9 +48,9 @@ class SaaSMeteringTest extends TestCase
             'name' => 'Admin', 
             'email' => 'admin@test.com', 
             'password' => 'test',
-            'tenant_id' => 1
         ]);
         $this->actingAs($user);
+        app()->instance('currentTenant', (object)['id' => 1]);
 
         TenantUsage::create([
             'tenant_id' => 1,
@@ -77,9 +77,9 @@ class SaaSMeteringTest extends TestCase
             'name' => 'Admin', 
             'email' => 'admin@test.com', 
             'password' => 'test',
-            'tenant_id' => 1
         ]);
         $this->actingAs($user);
+        app()->instance('currentTenant', (object)['id' => 1]);
 
         TenantUsage::create([
             'tenant_id' => 1,

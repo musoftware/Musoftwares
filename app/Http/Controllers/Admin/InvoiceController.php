@@ -663,7 +663,7 @@ class InvoiceController extends Controller
             ],
             'invoice_currency' => $item->invoice->relationLoaded('currency') && $item->invoice->getRelation('currency') ? [
                 'id' => $item->invoice->getRelation('currency')->id,
-                'code' => $item->invoice->getRelation('currency')->currency ?? $item->invoice->getRelation('currency')->code,
+                'currency' => $item->invoice->getRelation('currency')->currency,
                 'symbol' => $item->invoice->getRelation('currency')->symbol,
             ] : null,
             'timers' => $timers->values()->all(),

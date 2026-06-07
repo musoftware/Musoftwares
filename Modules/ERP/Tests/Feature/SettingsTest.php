@@ -20,7 +20,7 @@ class SettingsTest extends TestCase
         $this->seed(\Database\Seeders\CurrenciesSeeder::class);
     }
 
-    public function test_settings_update_without_multi_currency_updates_all_client_currencies(): void
+    public function test_settings_update_without_multi_currency_throws_exception(): void
     {
         $user = User::factory()->create();
         $tenant = Tenant::create([
@@ -29,21 +29,11 @@ class SettingsTest extends TestCase
             'status' => 'active',
             'base_currency_id' => 1 // USD
         ]);
-        
-        $client1 = TenantClient::create([
-            'tenant_id' => $tenant->id,
-            'name' => 'Client One',
-            'email' => 'one@test.com',
-            'currency_id' => 1 // USD
-        ]);
 
-        $client2 = TenantClient::create([
-            'tenant_id' => $tenant->id,
-            'name' => 'Client Two',
-            'email' => 'two@test.com',
-            'currency_id' => 1 // USD
-        ]);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage(__('errors.multi_currency_addon_required'));
 
+        $this->withoutExceptionHandling();
         $response = $this->actingAs($user)
             ->withSession(['tenant_id' => $tenant->id])
             ->put('/erp/settings', [
@@ -51,19 +41,6 @@ class SettingsTest extends TestCase
                 'taxRate' => '14.00',
                 'defaultCurrency' => 'EUR', // EUR (ID 3)
             ]);
-
-        $response->assertRedirect();
-        
-        $tenant->refresh();
-        $this->assertEquals(3, $tenant->base_currency_id);
-        $this->assertEquals('Updated Workspace', $tenant->name);
-
-        $client1->refresh();
-        $client2->refresh();
-
-        // Since user doesn't have 'erp-multi-currency' subscription, currencies must be updated to 3 (EUR)
-        $this->assertEquals(3, $client1->currency_id);
-        $this->assertEquals(3, $client2->currency_id);
     }
 
     public function test_settings_update_with_multi_currency_does_not_update_client_currencies(): void

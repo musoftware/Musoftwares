@@ -72,7 +72,7 @@ class ProjectController extends Controller implements HasMiddleware
             'budget' => $validated['budget'] ?? 0,
             'currency_id' => $client->currency_id,
             'due_date' => $validated['due_date'] ?? null,
-            'created_by' => $user->id,
+            'created_by' => $request->user()->id,
         ]);
 
         ActivityLogger::log(
@@ -162,8 +162,8 @@ class ProjectController extends Controller implements HasMiddleware
     {
         $this->authorize('update', $project);
 
-        // Get tenant base currency
-        $tenant = auth()->user()->tenant;
+        $user = auth()->user();
+        $tenant = $user->tenant;
         if (!$tenant || !$tenant->base_currency_id) {
             abort(400, "Tenant configuration missing base currency.");
         }

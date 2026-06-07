@@ -365,6 +365,10 @@ Route::middleware(['auth', 'verified', 'onboarding', 'moderator'])->prefix('admi
 Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
 
+    // AI Estimator
+    Route::get('/tools/ai-estimator', [\App\Http\Controllers\Admin\AiEstimatorController::class, 'index'])->name('tools.ai-estimator');
+    Route::post('/tools/ai-estimator/estimate', [\App\Http\Controllers\Admin\AiEstimatorController::class, 'estimate'])->name('tools.ai-estimator.estimate');
+
     // Broadcast Notifications
     Route::get('/notifications/broadcast', [\App\Http\Controllers\Admin\BroadcastNotificationController::class, 'index'])->name('notifications.broadcast');
     Route::post('/notifications/broadcast/send', [\App\Http\Controllers\Admin\BroadcastNotificationController::class, 'send'])->name('notifications.broadcast.send');
@@ -430,6 +434,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/transactions', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'index'])->name('transactions.index');
     Route::get('/transactions/create', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'create'])->name('transactions.create');
     Route::post('/transactions', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'store'])->name('transactions.store');
+    Route::delete('/transactions/{id}', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'destroy'])->name('transactions.destroy');
     Route::get('/transactions/transfer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'transfer'])->name('transactions.transfer');
     Route::post('/transactions/transfer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'start_transfer'])->name('transactions.start_transfer');
     Route::post('/project/current_timer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'current_timer'])->name('project.current_timer');
@@ -675,6 +680,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/tasks/as_list', [\App\Http\Controllers\Admin\AdminTaskController::class, 'asList'])->name('tasks.as_list');
     Route::post('/tasks/todos/{todo}/complete', [\App\Http\Controllers\Admin\AdminTaskController::class, 'completeTodo'])->name('tasks.todos.complete');
     Route::get('/tasks/calendar', [\App\Http\Controllers\Admin\AdminTaskController::class, 'calendar'])->name('tasks.calendar');
+    Route::post('/tasks/calendar/store-and-bill', [\App\Http\Controllers\Admin\AdminTaskController::class, 'storeAndBillCalendarTodo'])->name('tasks.calendar.store-and-bill');
     Route::get('/tasks/client-tasks', [\App\Http\Controllers\Admin\AdminTaskController::class, 'clientTasks'])->name('tasks.client-tasks');
     Route::post('/tasks/client-tasks/{client}/todos', [\App\Http\Controllers\Admin\AdminTaskController::class, 'storeClientTodo'])->name('tasks.client-tasks.store');
     Route::post('/tasks/client-tasks/{client}/todos-unpaid', [\App\Http\Controllers\Admin\AdminTaskController::class, 'storeUnpaidTodo'])->name('tasks.client-tasks.store-unpaid');

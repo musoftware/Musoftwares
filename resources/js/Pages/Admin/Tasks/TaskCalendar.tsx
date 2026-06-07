@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import {
     Calendar as CalendarIcon,
     ChevronLeft,
@@ -11,9 +11,14 @@ import {
     Clock,
     AlertCircle,
     User,
+    Plus,
+    Trash2,
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/Components/ui/dialog';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { __ } from '@/lib/i18n';
 
@@ -69,6 +74,40 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
     const initialClientId = filters.client_id || filters.tenant_id || '';
     const [clientFilter, setClient] = useState(initialClientId);
     const currentDate = new Date(year, month - 1, 1);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    
+    const { data, setData, post, processing, errors, reset } = useForm({
+        client_id: '',
+        title: '',
+        date: '',
+        start_time: '',
+        end_time: '',
+        checklist_items: [] as { title: string }[],
+    });
+
+    const handleDayDoubleClick = (day: Date) => {
+        reset();
+        setData({
+            client_id: clientFilter || '',
+            title: '',
+            date: format(day, 'yyyy-MM-dd'),
+            start_time: '09:00',
+            end_time: '10:00',
+            checklist_items: [],
+        });
+        setIsModalOpen(true);
+    };
+
+    const submitTask = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(route('admin.tasks.calendar.store-and-bill'), {
+            onSuccess: () => {
+                setIsModalOpen(false);
+                reset();
+            }
+        });
+    };
 
     const handleClientChange = (val: string) => {
         setClient(val);
@@ -174,7 +213,8 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                             return (
                                 <div
                                     key={idx}
-                                    className={`min-h-[140px] border-r border-b border-slate-100 p-2 flex flex-col transition-colors ${
+                                    onDoubleClick={() => handleDayDoubleClick(day)}
+                                    className={`min-h-[140px] border-r border-b border-slate-100 p-2 flex flex-col transition-colors cursor-pointer ${
                                         !isCurrentMonth ? 'bg-slate-50/50 opacity-60' : ''
                                     } ${isCurrentDay ? 'bg-indigo-50/30' : 'hover:bg-slate-50/30'}`}
                                 >
@@ -257,6 +297,139 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                     </div>
                 </Card>
             </div>
+
+            {/* Create & Bill Task Modal */}
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>{__('general.create_and_bill_focus_task')}</DialogTitle>
+                    </DialogHeader>
+                    
+                    <form onSubmit={submitTask} className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="client_id">{__('general.client')} *</Label>
+                            <select
+                                id="client_id"
+                                value={data.client_id}
+                                onChange={e => setData('client_id', e.target.value)}
+                                className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                required
+                            >
+                                <option value="">{__('general.select_client')}</option>
+                                {clients.map(c => (
+                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                ))}
+                            </select>
+                            {errors.client_id && <p className="text-xs text-red-500">{errors.client_id}</p>}
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="title">{__('general.title')} *</Label>
+                            <Input
+                                id="title"
+                                value={data.title}
+                                onChange={e => setData('title', e.target.value)}
+                                placeholder="e.g. Server Maintenance"
+                                required
+                            />
+                            {errors.title && <p className="text-xs text-red-500">{errors.title}</p>}
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="date">{__('general.date')} *</Label>
+                                <Input
+                                    id="date"
+                                    type="date"
+                                    value={data.date}
+                                    onChange={e => setData('date', e.target.value)}
+                                    required
+                                />
+                                {errors.date && <p className="text-xs text-red-500">{errors.date}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="start_time">{__('general.start_time')} *</Label>
+                                <Input
+                                    id="start_time"
+                                    type="time"
+                                    value={data.start_time}
+                                    onChange={e => setData('start_time', e.target.value)}
+                                    required
+                                />
+                                {errors.start_time && <p className="text-xs text-red-500">{errors.start_time}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="end_time">{__('general.end_time')} *</Label>
+                                <Input
+                                    id="end_time"
+                                    type="time"
+                                    value={data.end_time}
+                                    onChange={e => setData('end_time', e.target.value)}
+                                    required
+                                />
+                                {errors.end_time && <p className="text-xs text-red-500">{errors.end_time}</p>}
+                            </div>
+                        </div>
+
+                        <div className="space-y-2 pt-2 border-t border-slate-100">
+                            <div className="flex items-center justify-between">
+                                <Label>{__('general.sub_todos')}</Label>
+                                <Button 
+                                    type="button" 
+                                    variant="outline" 
+                                    size="sm" 
+                                    onClick={() => setData('checklist_items', [...data.checklist_items, { title: '' }])}
+                                    className="h-7 px-2 text-xs"
+                                >
+                                    <Plus className="h-3 w-3 mr-1" /> Add Item
+                                </Button>
+                            </div>
+                            
+                            <div className="space-y-2">
+                                {data.checklist_items.map((item, index) => (
+                                    <div key={index} className="flex items-center gap-2">
+                                        <Input
+                                            value={item.title}
+                                            onChange={e => {
+                                                const newItems = [...data.checklist_items];
+                                                newItems[index].title = e.target.value;
+                                                setData('checklist_items', newItems);
+                                            }}
+                                            placeholder="Checklist item description..."
+                                            className="h-8 text-sm"
+                                            required
+                                        />
+                                        <Button 
+                                            type="button" 
+                                            variant="ghost" 
+                                            size="sm" 
+                                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                            onClick={() => {
+                                                const newItems = data.checklist_items.filter((_, i) => i !== index);
+                                                setData('checklist_items', newItems);
+                                            }}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                ))}
+                                {data.checklist_items.length === 0 && (
+                                    <p className="text-xs text-slate-400 italic">No checklist items added.</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <DialogFooter className="pt-4 border-t border-slate-100">
+                            <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+                                {__('general.cancel')}
+                            </Button>
+                            <Button type="submit" disabled={processing}>
+                                {processing ? __('general.processing') : __('general.create_and_bill')}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
             
             <style>{`
                 .styled-scrollbar::-webkit-scrollbar {

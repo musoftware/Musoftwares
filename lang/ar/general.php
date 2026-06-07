@@ -1,6 +1,15 @@
 <?php
 
 return [
+  'approve_and_complete' => 'الموافقة والإكمال',
+  'contract_marked_as_completed_successfully' => 'تم تحديد العقد كمكتمل بنجاح',
+  'deleted_successfully' => 'تم الحذف بنجاح',
+  'min' => 'دقيقة',
+  'are_you_sure_you_want_to_delete' => 'هل أنت متأكد أنك تريد الحذف؟',
+  'create_and_bill' => 'إنشاء وإصدار فاتورة',
+  'create_and_bill_focus_task' => 'إنشاء وإصدار فاتورة (مهمة مركزة)',
+  'delete_confirmation' => 'تأكيد الحذف',
+  'sub_todos' => 'المهام الفرعية',
   'payment_successful_thank_you' => '?? ????? ?????. ????? ??!',
   'payment_failed_please_try_again' => '??? ?????. ???? ???????? ??? ????.',
   'return_to_home' => 'العودة إلى الرئيسية',
@@ -5563,4 +5572,8 @@ return [
   'install_app_step_2_desc' => 'قد تحتاج للنزول للأسفل قليلاً في القائمة لتجد هذا الخيار.',
   'install_app_step_3' => 'اضغط على "إضافة" (Add) من أعلى الشاشة',
   'install_app_step_3_desc' => 'سيظهر التطبيق الآن على شاشتك الرئيسية ويمكنك تفعيل الإشعارات منه مباشرة!',
+  'approve_and_complete' => 'الموافقة والإكتمال',
+  'contract_marked_as_completed_successfully' => 'تم وضع علامة على العقد بأنه مكتمل بنجاح.',
+  'deleted_successfully' => 'تم الحذف بنجاح.',
+  'min' => 'دقيقة',
 ];

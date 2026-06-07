@@ -83,7 +83,7 @@ class ClientControllerTest extends TestCase
                 'name' => 'Updated Name',
                 'email' => 'updated@example.com',
                 'phone' => '987654321',
-                'currency_id' => 1,
+                'currency' => 'USD',
             ]);
 
         $response->assertRedirect(route('erp.dashboard', ['section' => 'clients']));
@@ -123,7 +123,7 @@ class ClientControllerTest extends TestCase
             'tenant_id' => $tenant->id,
             'name' => 'Lead Client',
             'email' => 'lead@example.com',
-            'status' => 'lead',
+            'status' => 'inactive',
             'currency_id' => 1,
         ]);
 

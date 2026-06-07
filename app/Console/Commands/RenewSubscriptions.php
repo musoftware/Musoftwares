@@ -39,7 +39,7 @@ class RenewSubscriptions extends Command
         $now = Carbon::now();
 
         // 1. Find all active subscriptions that have expired or are expiring now, and have auto_renew set to true
-        $expiringSubscriptions = UserSubscription::with(['client', 'plan'])
+        $expiringSubscriptions = UserSubscription::with(['user'])
             ->where('status', 'active')
             ->where('auto_renew', true)
             ->where('expires_at', '<=', $now)
@@ -47,31 +47,41 @@ class RenewSubscriptions extends Command
 
         $this->info("Found {$expiringSubscriptions->count()} expiring subscriptions to process.");
 
+        $pricingService = app(\App\Services\PricingService::class);
+        $serviceItems = $pricingService->getServiceItems();
+
         foreach ($expiringSubscriptions as $subscription) {
-            $this->info("Processing subscription ID: {$subscription->id} for client: {$subscription->client->name} (Plan: {$subscription->plan->name})");
+            $user = $subscription->user;
+            if (!$user) {
+                $this->warn("Subscription ID: {$subscription->id} has no associated user. Skipping.");
+                continue;
+            }
+
+            $item = collect($serviceItems)->firstWhere('id', $subscription->object);
+            $itemName = $item['name'] ?? ucfirst(str_replace('-', ' ', $subscription->object));
+
+            $this->info("Processing subscription ID: {$subscription->id} for user: {$user->name} (Item: {$itemName})");
 
             try {
-                $user = $subscription->client;
-                $plan = $subscription->plan;
-                // Check plan price
-                $price = (float) $plan->price;
+                // Check price
+                $price = $item['monthly_price'] ?? 0;
 
                 if ($price <= 0) {
                     // Free plan - just renew without balance deduction
-                    $this->renewSubscription($subscription, $plan);
+                    $this->renewSubscription($subscription);
                     $this->info("Subscription ID: {$subscription->id} renewed successfully (Free Plan).");
                     continue;
                 }
 
                 // Debit balance
                 try {
-                    if ((float) $user->available_balance() < $price) {
+                    if ((float) $user->user_balance < $price) {
                         throw new Exception("Insufficient balance");
                     }
-                    $user->add_balance(-1 * $price, 'Subscription Renewal: ' . $plan->name, 'used');
+                    $user->add_balance(-1 * $price, 'Subscription Renewal: ' . $itemName, 'used');
 
                     // If debit succeeded, renew subscription
-                    $this->renewSubscription($subscription, $plan);
+                    $this->renewSubscription($subscription);
                     $this->info("Subscription ID: {$subscription->id} renewed successfully via balance debit of {$price} USD.");
                 } catch (Exception $balanceException) {
                     // Insufficient funds or error
@@ -95,15 +105,11 @@ class RenewSubscriptions extends Command
     /**
      * Helper to extend expires_at based on billing cycle.
      */
-    protected function renewSubscription(UserSubscription $subscription, $plan): void
+    protected function renewSubscription(UserSubscription $subscription): void
     {
         $newExpiresAt = $subscription->expires_at ? Carbon::parse($subscription->expires_at) : Carbon::now();
 
-        if ($plan->billing === 'yearly') {
-            $newExpiresAt->addYear();
-        } else {
-            $newExpiresAt->addMonth(); // default to monthly
-        }
+        $newExpiresAt->addMonth(); // default to monthly
 
         $subscription->update([
             'status' => 'active',

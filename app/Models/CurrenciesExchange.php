@@ -18,6 +18,11 @@ class CurrenciesExchange extends Model
      */
     protected static $memoryCache = [];
 
+    public static function flushCache(): void
+    {
+        static::$memoryCache = [];
+    }
+
     public static function is_exist($currency1, $currency2, $date): bool
     {
         $count = CurrenciesExchange::where('currency1', $currency1)

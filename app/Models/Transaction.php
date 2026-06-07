@@ -51,7 +51,6 @@ class Transaction extends Model
                     // If no currency was explicitly passed for the transaction, assume it is in the user's native currency.
                     $currentCurrencyId = $userCurrencyId;
                     $transaction->currency_id = $userCurrencyId;
-                    $transaction->currency = $userCurrencyId;
                 }
                 
                 if ($currentCurrencyId != $userCurrencyId) {
@@ -63,7 +62,6 @@ class Transaction extends Model
                         $userCurrencyId
                     );
                     $transaction->currency_id = $userCurrencyId;
-                    $transaction->currency = $userCurrencyId; // In case the column is named 'currency'
                 }
             }
 

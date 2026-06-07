@@ -75,6 +75,9 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
         Route::apiResource('assets', \Modules\Booking\app\Features\WhiteLabel\Http\Controllers\AssetController::class)->only(['index', 'store', 'destroy']);
         Route::apiResource('domains', \Modules\Booking\app\Features\WhiteLabel\Http\Controllers\DomainController::class)->only(['index', 'store', 'destroy']);
     });
+
+    // Advanced Booking Rules
+    Route::apiResource('booking-rules', \Modules\Booking\app\Features\BookingRules\Controllers\BookingAdvancedRulesController::class);
 });
 
 // Unauthenticated Webhooks & Public Routes

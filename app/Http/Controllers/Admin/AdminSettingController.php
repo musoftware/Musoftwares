@@ -55,6 +55,9 @@ class AdminSettingController extends Controller
             'friday_work_allowed'         => AdminSettings::GetValue('friday_work_allowed') === '1',
             'max_devices_per_tenant'      => AdminSettings::GetValue('max_devices_per_tenant') ?? 3,
             'gemini_api_keys'             => AdminSettings::GetValue('gemini_api_keys'),
+            'expected_monthly_income'     => AdminSettings::GetValue('expected_monthly_income'),
+            'work_days_per_month'         => AdminSettings::GetValue('work_days_per_month'),
+            'hours_per_day'               => AdminSettings::GetValue('hours_per_day'),
         ];
 
         return Inertia::render('Admin/Settings/Index', [
@@ -86,6 +89,9 @@ class AdminSettingController extends Controller
             'friday_work_allowed'         => 'boolean',
             'max_devices_per_tenant'      => 'nullable|integer|min:1',
             'gemini_api_keys'             => 'nullable|string',
+            'expected_monthly_income'     => 'nullable|numeric|min:0',
+            'work_days_per_month'         => 'nullable|numeric|min:0',
+            'hours_per_day'               => 'nullable|numeric|min:0',
         ]);
 
         $this->configService->updateSettings($validated);

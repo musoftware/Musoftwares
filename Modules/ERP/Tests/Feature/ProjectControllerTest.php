@@ -61,7 +61,7 @@ class ProjectControllerTest extends TestCase
     public function test_project_show_page_loads_with_related_data_and_transactions(): void
     {
         $user = User::factory()->create();
-        $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Acme Tenant', 'status' => 'active']);
+        $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Acme Tenant', 'status' => 'active', 'base_currency_id' => 1]);
         \App\Models\UserSubscription::create([
             'user_id' => $user->id,
             'object' => 'erp-projects',

@@ -960,4 +960,155 @@ class AdminTaskController extends Controller
             return back()->withErrors(['error' => 'Failed to create and bill task.']);
         }
     }
+
+    /**
+     * Store and instantly bill a focus calendar Todo directly from the Admin Task Calendar.
+     */
+    public function storeAndBillCalendarTodo(Request $request)
+    {
+        $request->validate([
+            'client_id'       => 'required|exists:users,id',
+            'title'           => 'required|string|max:255',
+            'date'            => 'required|date_format:Y-m-d',
+            'start_time'      => 'required|date_format:H:i',
+            'end_time'        => 'required|date_format:H:i',
+            'checklist_items' => 'nullable|array',
+            'checklist_items.*.title' => 'required|string|max:255',
+        ]);
+
+        $client = User::findOrFail($request->client_id);
+        
+        $startStr = $request->date . ' ' . $request->start_time . ':00';
+        $endStr = $request->date . ' ' . $request->end_time . ':00';
+        $start = \Carbon\Carbon::parse($startStr, 'Africa/Cairo');
+        $end = \Carbon\Carbon::parse($endStr, 'Africa/Cairo');
+
+        if (!$end->gt($start)) {
+            return back()->withErrors(['error' => 'End time must be after start time.']);
+        }
+
+        if (Todo::focusCalendarSlotTaken($start, $end)) {
+            return back()->withErrors(['error' => 'This time slot overlaps with an existing scheduled focus task.']);
+        }
+
+        // Calculate rate based on client config
+        $rateEgp = \App\Helpers\FinanceHelper::calculateOverheadHourlyRate();
+        if ((float) $client->booking_rate > 0 && ($client->booking_rate_expires_at === null || now('Africa/Cairo')->startOfDay()->lte(\Carbon\Carbon::parse($client->booking_rate_expires_at)->startOfDay()))) {
+            $rateEgp = (float) \App\Models\CurrenciesExchange::RateToday($client->booking_rate, $client->booking_rate_currency ?? $client->currency ?? 1, 2);
+        } else if ($client->hasSubscription() && $client->plan) {
+            $rateEgp = $client->plan->calcDiscount((float) $rateEgp);
+        }
+        $fh = \App\Helpers\FinanceHelper::instance();
+        $baseCost = $fh->price_fixer($rateEgp, 2);
+        $commission = 0;
+        if ($client->ref_user && $client->ref_user->shouldAddCommissionToTotal()) {
+            $commission = $client->ref_user->calculateCommissionAmount($baseCost, 2, $client);
+        }
+        $finalCostEgp = $fh->price_fixer($baseCost + $commission, 2);
+
+        $durationHours = $start->diffInMinutes($end) / 60;
+        $totalCostEgp = $finalCostEgp * $durationHours;
+
+        $userCurrencyId = (int) $client->currency;
+        $amountInUserCurrency = \App\Models\CurrenciesExchange::RateToday((float) $totalCostEgp, 2, $userCurrencyId);
+
+        if ($client->available_balance() < $amountInUserCurrency) {
+            return back()->withErrors(['error' => 'Client has insufficient balance (' . $fh->format_money($client->available_balance(), $client->currency) . ' available, requires ' . $fh->format_money($amountInUserCurrency, $client->currency) . ').']);
+        }
+
+        try {
+            return \Illuminate\Support\Facades\Cache::lock('client_focus_calendar_slot', 30)->block(10, function () use ($request, $client, $start, $end, $userCurrencyId, $amountInUserCurrency, $totalCostEgp) {
+                
+                if (Todo::focusCalendarSlotTaken($start, $end)) {
+                    return back()->withErrors(['error' => 'This time slot overlaps with an existing booking.']);
+                }
+
+                \Illuminate\Support\Facades\DB::beginTransaction();
+                try {
+                    $todo = new Todo();
+                    $todo->title = $request->title;
+                    $todo->user_id = $client->id;
+                    $todo->tenant_id = session('tenant_id');
+                    $todo->start_at = $start->toDateTimeString();
+                    $todo->end_at = $end->toDateTimeString();
+                    $todo->is_paid = true;
+                    $todo->cost = round($totalCostEgp, 2);
+                    $todo->currency_id = 2; // Stored in base EGP
+                    $todo->save();
+
+                    if (!empty($request->checklist_items)) {
+                        foreach ($request->checklist_items as $itemData) {
+                            $checklistItem = new \App\Models\TodoChecklistItem();
+                            $checklistItem->todo_id = $todo->id;
+                            $checklistItem->title = $itemData['title'];
+                            $checklistItem->is_completed = false;
+                            $checklistItem->save();
+                        }
+                    }
+
+                    $invoice = new \App\Models\Invoice();
+                    $invoice->user_id = $client->id;
+                    $invoice->currency = $userCurrencyId;
+                    $invoice->project_id = null;
+                    $invoice->status = 'unpaid';
+                    $invoice->schedule = [
+                        'start_date' => $start->toDateTimeString(),
+                        'end_date'   => $end->toDateTimeString(),
+                    ];
+                    $client->invoices()->save($invoice);
+
+                    $item = new \App\Models\InvoiceItem();
+                    $item->item_title = \Illuminate\Support\Str::limit($todo->title, 255);
+                    $item->amount = 0;
+                    $item->qty = 1;
+                    $item->item_type = 'timer';
+                    $invoice->items()->save($item);
+
+                    $timer = new \App\Models\InvoiceItemTimer();
+                    $timer->invoice_item_id = $item->id;
+                    $timer->user_id = $client->id;
+                    $timer->project_id = $invoice->project_id;
+                    $timer->date_start = $start->toDateTimeString();
+                    $timer->date_end = $end->toDateTimeString();
+                    $timer->amount = round($amountInUserCurrency, 2);
+                    $timer->currency_id = $invoice->currency;
+                    $item->timers()->save($timer);
+
+                    $invoice->unpaid = $invoice->total();
+                    $invoice->save();
+                    $invoice->bill_invoice();
+
+                    \Illuminate\Support\Facades\DB::commit();
+
+                    try {
+                        if (class_exists('App\Services\GoogleCalendarService')) {
+                            $calendarService = app(\App\Services\GoogleCalendarService::class);
+                            $calendarService->addEvent(
+                                'Task Paid (#' . $todo->id . '): ' . $todo->title,
+                                $start,
+                                $end,
+                                'Client ' . $client->name . ' (ID: ' . $client->id . ') paid for this task. Reference Todo #' . $todo->id
+                            );
+                        }
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::warning('Google Calendar sync failed: ' . $e->getMessage());
+                    }
+
+                    return redirect()->back()->with('message', __('general.scheduled_task_created_and_billed_successfully'));
+
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\DB::rollBack();
+                    throw $e;
+                }
+
+            });
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+            return back()->withErrors(['error' => 'Booking system is currently busy. Please try again.']);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Admin storeAndBillCalendarTodo failed: ' . $e->getMessage(), [
+                'user_id' => $client->id,
+            ]);
+            return back()->withErrors(['error' => 'Failed to create and bill task.']);
+        }
+    }
 }

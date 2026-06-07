@@ -25,7 +25,11 @@ class AdminInvoiceTest extends TestCase
         $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
 
-        $this->clientUser = User::factory()->create(['onboarding_completed' => true]);
+        $currency = \App\Models\Currency::first() ?? \App\Models\Currency::factory()->create();
+        $this->clientUser = User::factory()->create([
+            'onboarding_completed' => true,
+            'currency_id' => $currency->id,
+        ]);
         $this->clientUser->assignRole('client');
     }
 

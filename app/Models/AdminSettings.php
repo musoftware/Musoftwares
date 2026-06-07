@@ -10,6 +10,8 @@ class AdminSettings extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['setting_key', 'setting_value'];
+
     /** Cache TTL for settings (seconds). */
     const SETTINGS_CACHE_TTL = 300;
 
