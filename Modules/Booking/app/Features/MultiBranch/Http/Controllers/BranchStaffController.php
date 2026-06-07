@@ -8,22 +8,30 @@ use Modules\Booking\app\Features\MultiBranch\Repositories\BookingBranchRepositor
 use Modules\Booking\app\Features\MultiBranch\Services\BranchManagerService;
 use Modules\Booking\app\Features\MultiBranch\Http\Resources\BookingBranchResource;
 
-class BranchStaffController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class BranchStaffController extends Controller implements HasMiddleware
 {
     protected $repository;
     protected $managerService;
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(function ($request, $next) {
+                if (!feature('booking-multi-branch')) {
+                    return response()->json(['message' => 'Feature locked. Upgrade to enable Multi Branch.'], 403);
+                }
+                return $next($request);
+            }),
+        ];
+    }
 
     public function __construct(BookingBranchRepository $repository, BranchManagerService $managerService)
     {
         $this->repository = $repository;
         $this->managerService = $managerService;
-        
-        $this->middleware(function ($request, $next) {
-            if (!feature('booking-multi-branch')) {
-                return response()->json(['message' => 'Feature locked. Upgrade to enable Multi Branch.'], 403);
-            }
-            return $next($request);
-        });
     }
 
     public function index($branchId)

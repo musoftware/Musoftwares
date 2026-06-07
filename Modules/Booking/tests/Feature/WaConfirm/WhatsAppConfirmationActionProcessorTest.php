@@ -3,6 +3,7 @@
 namespace Modules\Booking\tests\Feature\WaConfirm;
 
 use Tests\TestCase;
+use Illuminate\Support\Facades\Schema;
 use Modules\Booking\Models\Booking;
 use Modules\Booking\app\Features\WaConfirm\Models\BookingWaConfirmation;
 use Modules\Booking\app\Features\WaConfirm\Models\BookingWaActionToken;
@@ -16,11 +17,18 @@ class WhatsAppConfirmationActionProcessorTest extends TestCase
 {
     use DatabaseTransactions;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Schema::disableForeignKeyConstraints();
+    }
+
+
     public function test_it_confirms_booking_and_fires_event()
     {
         Event::fake();
 
-        $booking = Booking::forceCreate(['tenant_id' => 1, 'status' => 'pending']);
+        $booking = Booking::forceCreate(['status' => 'pending', 'booking_event_type_id' => 1, 'starts_at' => now(), 'ends_at' => now()->addHour()]);
         $confirmation = BookingWaConfirmation::forceCreate([
             'tenant_id' => 1,
             'booking_id' => $booking->id,
@@ -51,7 +59,7 @@ class WhatsAppConfirmationActionProcessorTest extends TestCase
     {
         Event::fake();
 
-        $booking = Booking::forceCreate(['tenant_id' => 1, 'status' => 'pending']);
+        $booking = Booking::forceCreate(['status' => 'pending', 'booking_event_type_id' => 1, 'starts_at' => now(), 'ends_at' => now()->addHour()]);
         $confirmation = BookingWaConfirmation::forceCreate([
             'tenant_id' => 1,
             'booking_id' => $booking->id,

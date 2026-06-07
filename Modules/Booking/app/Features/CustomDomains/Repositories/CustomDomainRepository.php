@@ -11,7 +11,7 @@ class CustomDomainRepository
      */
     public function getSettings()
     {
-        $tenantId = auth()->user()->tenant_id;
+        $tenantId = (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id());
         
         return BookingCustomDomain::where('tenant_id', $tenantId)->first();
     }
@@ -43,7 +43,7 @@ class CustomDomainRepository
      */
     public function delete()
     {
-        $tenantId = auth()->user()->tenant_id;
+        $tenantId = (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id());
         return BookingCustomDomain::withoutGlobalScope('tenant')->where('tenant_id', $tenantId)->delete();
     }
 }

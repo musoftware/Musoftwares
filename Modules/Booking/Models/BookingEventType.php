@@ -22,7 +22,7 @@ class BookingEventType extends Model
         'capacity',
         'duration_minutes',
         'price',
-        'currency',
+        'currency_id',
         'requires_payment',
         'is_active',
         'timezone',

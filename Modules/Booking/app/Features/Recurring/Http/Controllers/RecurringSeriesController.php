@@ -16,13 +16,12 @@ class RecurringSeriesController extends Controller
     public function __construct(BookingRecurringLimitsService $limitsService)
     {
         $this->limitsService = $limitsService;
-        $this->middleware('auth:sanctum');
-    }
+        }
 
     public function index()
     {
         $series = RecurringSeries::with('occurrences', 'exceptions')
-            ->where('tenant_id', auth()->user()->tenant_id)
+            ->where('tenant_id', (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))
             ->get();
             
         return response()->json($series);
@@ -30,7 +29,7 @@ class RecurringSeriesController extends Controller
 
     public function store(Request $request)
     {
-        if (!$this->limitsService->canCreateSeries(auth()->user()->tenant_id)) {
+        if (!$this->limitsService->canCreateSeries((app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))) {
             return response()->json(['message' => 'Feature locked. Upgrade to use Recurring Appointments.'], 403);
         }
 
@@ -57,7 +56,7 @@ class RecurringSeriesController extends Controller
     public function cancel(Request $request, int $id)
     {
         $series = RecurringSeries::where('id', $id)
-            ->where('tenant_id', auth()->user()->tenant_id)
+            ->where('tenant_id', (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))
             ->firstOrFail();
 
         $series->update(['status' => 'cancelled']);

@@ -13,12 +13,14 @@ class WorkspaceAccessTest extends BaseTenantTestCase
 
     public function test_telesales_agent_cannot_access_manager_workspace()
     {
-        $agent = User::factory()->create(['tenant_id' => $this->tenant->id]);
+        $agent = User::factory()->create();
+        $this->workspace->users()->attach($agent->id, ['role_id' => 1]); // role logic can be adjusted later if needed
         
         // Give only sales-staff addon
-        UserSubscription::factory()->create([
+        UserSubscription::create([
             'user_id' => $agent->id,
-            'module_id' => 'crm-sales-staff'
+            'object' => 'module:crm-sales-staff',
+            'status' => 'active'
         ]);
 
         $this->actingAs($agent);
@@ -34,12 +36,14 @@ class WorkspaceAccessTest extends BaseTenantTestCase
 
     public function test_manager_can_access_manager_workspace()
     {
-        $manager = User::factory()->create(['tenant_id' => $this->tenant->id]);
+        $manager = User::factory()->create();
+        $this->workspace->users()->attach($manager->id, ['role_id' => 1]);
         
         // Give manager addon
-        UserSubscription::factory()->create([
+        UserSubscription::create([
             'user_id' => $manager->id,
-            'module_id' => 'crm-sales-management'
+            'object' => 'module:crm-sales-management',
+            'status' => 'active'
         ]);
 
         $this->actingAs($manager);

@@ -32,7 +32,7 @@ class PublicPage extends Model
         // users need to find it by slug. But we still enforce tenant_id on creation.
         static::creating(function ($model) {
             if (!$model->tenant_id && auth()->check()) {
-                $model->tenant_id = auth()->user()->tenant_id;
+                $model->tenant_id = (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id());
             }
         });
     }

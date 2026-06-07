@@ -13,7 +13,7 @@ class UpdateBookingPageRequest extends FormRequest
 
     public function rules()
     {
-        $tenantId = auth()->user()->tenant_id;
+        $tenantId = (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id());
         // Find existing setting to ignore its ID for unique slug validation
         $setting = \Modules\Booking\app\Features\PublicBooking\Models\BookingPageSetting::withoutGlobalScope('tenant')
                         ->where('tenant_id', $tenantId)

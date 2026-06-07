@@ -5,8 +5,17 @@ namespace Modules\Freelance\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Proposal extends Model
 {
+    use HasFactory;
+    
+    protected static function newFactory()
+    {
+        return \Modules\Freelance\Database\Factories\ProposalFactory::new();
+    }
+
     protected $table = 'freelance_proposals';
     protected $fillable = ['job_id', 'freelancer_id', 'cover_letter', 'bid_amount', 'currency_id', 'proposed_budget_points', 'points_spent', 'status'];
 

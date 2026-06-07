@@ -8,6 +8,8 @@ return new class extends Migration
 {
     public function up()
     {
+        Schema::disableForeignKeyConstraints();
+
         // Service Categories
         Schema::create('marketplace_service_categories', function (Blueprint $table) {
             $table->id();
@@ -77,6 +79,8 @@ return new class extends Migration
             $table->text('comment')->nullable();
             $table->timestamps();
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     public function down()

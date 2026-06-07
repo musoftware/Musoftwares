@@ -17,16 +17,17 @@ class LeadManualCreationTest extends BaseTenantTestCase
         // Give only sales-staff addon to allow accessing CRM
         UserSubscription::create([
             'user_id' => $this->adminUser->id,
-            'object' => 'crm-sales-staff',
+            'object' => 'crm',
             'status' => 'active',
             'started_at' => now(),
             'expires_at' => now()->addYear(),
         ]);
 
         $this->actingAs($this->adminUser);
+        $this->withoutExceptionHandling();
 
         // Submit the form
-        $response = $this->post('/erp/crm/leads', [
+        $response = $this->withSession(['crm_workspace_id' => $this->workspace->id])->post('/crm/leads', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'phone' => '1234567890',
@@ -56,7 +57,7 @@ class LeadManualCreationTest extends BaseTenantTestCase
     {
         UserSubscription::create([
             'user_id' => $this->adminUser->id,
-            'object' => 'crm-sales-staff',
+            'object' => 'crm',
             'status' => 'active',
             'started_at' => now(),
             'expires_at' => now()->addYear(),
@@ -64,7 +65,7 @@ class LeadManualCreationTest extends BaseTenantTestCase
 
         $this->actingAs($this->adminUser);
 
-        $response = $this->post('/erp/crm/leads', [
+        $response = $this->withSession(['crm_workspace_id' => $this->workspace->id])->post('/crm/leads', [
             'name' => '',
             'email' => 'john@example.com',
         ]);

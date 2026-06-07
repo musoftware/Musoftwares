@@ -16,49 +16,10 @@ class MaxSubscriptionMonthsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create(['currency_id' => 1]);
     }
 
-    public function test_checkout_page_passes_max_subscription_months_to_frontend()
-    {
-        $this->actingAs($this->user);
-
-        // Use a tool that exists in config — facebook-extractor is always free and active
-        $toolSlug = 'facebook-extractor';
-        $planGuid = 'fbe12345-0000-0000-0000-000000000001';
-
-        // Temporarily set a max_subscription_months on the tool via config
-        config(["tools.fbe12345-0000-0000-0000-000000000000.max_subscription_months" => 1]);
-
-        $response = $this->get("/tools/{$toolSlug}/subscribe/{$planGuid}");
-
-        $response->assertStatus(200)
-                 ->assertInertia(fn (AssertableInertia $page) => $page
-                     ->component('Tools/Subscribe')
-                     ->where('maxSubscriptionMonths', 1)
-                 );
-    }
-
-    public function test_checkout_page_passes_null_when_no_restriction()
-    {
-        $this->actingAs($this->user);
-
-        $toolSlug = 'facebook-extractor';
-        $planGuid = 'fbe12345-0000-0000-0000-000000000001';
-
-        // Ensure no max_subscription_months is set
-        $tools = config('tools');
-        unset($tools['fbe12345-0000-0000-0000-000000000000']['max_subscription_months']);
-        config(['tools' => $tools]);
-
-        $response = $this->get("/tools/{$toolSlug}/subscribe/{$planGuid}");
-
-        $response->assertStatus(200)
-                 ->assertInertia(fn (AssertableInertia $page) => $page
-                     ->component('Tools/Subscribe')
-                     ->where('maxSubscriptionMonths', null)
-                 );
-    }
+    // The checkout page redirects to the central subscriptions.plans route, so we don't assert Inertia directly here anymore.
 
     public function test_subscribing_yearly_is_blocked_when_max_subscription_months_is_one()
     {
@@ -72,6 +33,7 @@ class MaxSubscriptionMonthsTest extends TestCase
 
         $response = $this->post("/tools/{$toolSlug}/subscribe/{$planGuid}", [
             'billing_cycle' => 'yearly',
+            'payment_method' => 'wallet',
         ]);
 
         $response->assertRedirect();
@@ -88,11 +50,12 @@ class MaxSubscriptionMonthsTest extends TestCase
         // Set the restriction
         config(["tools.fbe12345-0000-0000-0000-000000000000.max_subscription_months" => 1]);
 
+        $this->user->add_balance(1000, 'Test balance', 'received');
         $response = $this->post("/tools/{$toolSlug}/subscribe/{$planGuid}", [
             'billing_cycle' => 'monthly',
+            'payment_method' => 'wallet',
         ]);
 
-        // For a free tool, it should succeed and redirect to tutorial
         $response->assertRedirect("/tools/{$toolSlug}/tutorial");
     }
 
@@ -108,11 +71,12 @@ class MaxSubscriptionMonthsTest extends TestCase
         unset($tools['fbe12345-0000-0000-0000-000000000000']['max_subscription_months']);
         config(['tools' => $tools]);
 
+        $this->user->add_balance(2000, 'Test balance', 'received');
         $response = $this->post("/tools/{$toolSlug}/subscribe/{$planGuid}", [
             'billing_cycle' => 'yearly',
+            'payment_method' => 'wallet',
         ]);
 
-        // For a free tool with no restriction, should redirect to tutorial
         $response->assertRedirect("/tools/{$toolSlug}/tutorial");
     }
 }

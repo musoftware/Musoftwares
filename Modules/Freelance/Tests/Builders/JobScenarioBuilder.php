@@ -44,6 +44,8 @@ class JobScenarioBuilder
             'client_id' => $this->client->id,
             'title' => 'Enterprise System Architecture',
             'description' => 'Build a robust freelance platform.',
+            'budget' => 5000.0,
+            'currency_id' => 1,
             'budget_points' => 5000,
             'min_proposal_points' => 0,
             'type' => 'fixed',

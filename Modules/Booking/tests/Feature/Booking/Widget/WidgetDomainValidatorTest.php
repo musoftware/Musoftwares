@@ -19,15 +19,11 @@ class WidgetDomainValidatorTest extends TestCase
         $widget = BookingWidget::create(['tenant_id' => 1, 'name' => 'Test Widget']);
         BookingWidgetDomain::create(['tenant_id' => 1, 'widget_id' => $widget->id, 'domain' => 'myclinic.com']);
 
-        $request = Request::create('/api/public/widgets/' . $widget->uuid . '/embed.js', 'GET');
-        $request->headers->set('Origin', 'https://myclinic.com');
+        $response = $this->postJson('/api/public/widgets/' . $widget->uuid . '/view', [], [
+            'Origin' => 'https://myclinic.com'
+        ]);
 
-        $middleware = new ValidateWidgetDomain();
-        $response = $middleware->handle($request, function ($req) {
-            return response()->json(['status' => 'ok']);
-        });
-
-        $this->assertEquals(200, $response->getStatusCode());
+        $response->assertStatus(200);
     }
 
     public function test_blocks_request_from_unauthorized_domain()
@@ -35,15 +31,11 @@ class WidgetDomainValidatorTest extends TestCase
         $widget = BookingWidget::create(['tenant_id' => 1, 'name' => 'Test Widget']);
         BookingWidgetDomain::create(['tenant_id' => 1, 'widget_id' => $widget->id, 'domain' => 'myclinic.com']);
 
-        $request = Request::create('/api/public/widgets/' . $widget->uuid . '/embed.js', 'GET');
-        $request->headers->set('Origin', 'https://hacker-site.com');
+        $response = $this->postJson('/api/public/widgets/' . $widget->uuid . '/view', [], [
+            'Origin' => 'https://hacker-site.com'
+        ]);
 
-        $middleware = new ValidateWidgetDomain();
-        $response = $middleware->handle($request, function ($req) {
-            return response()->json(['status' => 'ok']);
-        });
-
-        $this->assertEquals(403, $response->getStatusCode());
-        $this->assertStringContainsString('CORS Policy', $response->getContent());
+        $response->assertStatus(403);
+        $response->assertJsonFragment(['error' => 'CORS Policy: Domain hacker-site.com is not whitelisted for this widget.']);
     }
 }

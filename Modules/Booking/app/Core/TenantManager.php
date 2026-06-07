@@ -26,7 +26,7 @@ class TenantManager
     {
         // Fallback to checking the authenticated user's tenant if not explicitly set
         if (! $this->tenantId && auth()->check()) {
-            return auth()->user()->tenant_id ?? null;
+            return (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()) ?? null;
         }
 
         return $this->tenantId;

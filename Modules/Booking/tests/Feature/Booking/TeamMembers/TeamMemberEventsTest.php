@@ -22,7 +22,7 @@ class TeamMemberEventsTest extends TestCase
         Notification::fake();
 
         // Create an admin user who is creating the staff
-        $admin = User::factory()->create(['tenant_id' => 1]);
+        $admin = User::factory()->create([]);
         $this->actingAs($admin);
 
         // Assume limits pass or are mocked

@@ -1,9 +1,9 @@
 <?php
 
-namespace Modules\Booking\Features\Availability;
+namespace Modules\Booking\app\Features\Availability;
 
 use Illuminate\Database\Eloquent\Model;
-use Modules\Booking\Features\Resources\BookingResource;
+use Modules\Booking\app\Features\Resources\BookingResource;
 
 class BookingScheduleException extends Model
 {

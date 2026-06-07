@@ -9,23 +9,30 @@ use Modules\Booking\app\Features\PublicBooking\Http\Requests\UpdateBookingPageRe
 use Modules\Booking\app\Features\PublicBooking\Events\BookingPageSettingsUpdated;
 use Modules\Booking\app\Features\PublicBooking\Events\BookingPagePublished;
 
-class BookingPageSettingsController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class BookingPageSettingsController extends Controller implements HasMiddleware
 {
     protected $repository;
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(function ($request, $next) {
+                if (!feature('booking-online-page')) {
+                    return response()->json([
+                        'message' => 'Feature locked. Upgrade your subscription to enable the Online Booking Page.'
+                    ], 403);
+                }
+                return $next($request);
+            }),
+        ];
+    }
 
     public function __construct(BookingPageRepository $repository)
     {
         $this->repository = $repository;
-        
-        // Admin endpoints are guarded by the SaaS feature flag
-        $this->middleware(function ($request, $next) {
-            if (!feature('booking-online-page')) {
-                return response()->json([
-                    'message' => 'Feature locked. Upgrade your subscription to enable the Online Booking Page.'
-                ], 403);
-            }
-            return $next($request);
-        });
     }
 
     public function show()

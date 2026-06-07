@@ -27,7 +27,7 @@ it('ensures job discovery process is driven by skill matching', function () {
     // Suppose we have an action or query to get relevant jobs for freelancer
     // For test purposes, we simulate the algorithm:
     $relevantJobs = Job::whereHas('skills', function($q) use ($freelancer) {
-        $q->whereIn('skills.id', $freelancer->freelanceSkills->pluck('id'));
+        $q->whereIn('freelance_skills.id', $freelancer->freelanceSkills->pluck('id'));
     })->get();
 
     expect($relevantJobs->contains('id', $jobMatching->id))->toBeTrue();

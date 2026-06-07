@@ -126,8 +126,61 @@ class WalletController extends Controller implements HasMiddleware
         $averageCost = $wallet->balance_grams > 0 ? ($wallet->balance_amount / $wallet->balance_grams) : 0;
         
         $currentValue = 0;
-        if ($latestPrice && $wallet->balance_grams > 0) {
-            $currentValue = $wallet->balance_grams * ($latestPrice->price_gram_21k ?? 0); // Default to 21k
+        $karatBalances = [
+            '18' => 0,
+            '21' => 0,
+            '22' => 0,
+            '24' => 0,
+        ];
+
+        // Process transactions for Karat specific breakdown and P/L
+        foreach ($wallet->transactions as $tx) {
+            $karat = (string) $tx->karat;
+            if (!isset($karatBalances[$karat])) {
+                $karatBalances[$karat] = 0;
+            }
+            
+            if (in_array($tx->type, ['buy', 'transfer_in'])) {
+                $karatBalances[$karat] += $tx->grams;
+            } elseif (in_array($tx->type, ['sell', 'transfer_out'])) {
+                $karatBalances[$karat] -= $tx->grams;
+            }
+        }
+
+        if ($latestPrice) {
+            // Helper to get price per gram based on karat
+            $getPriceForKarat = function($k) use ($latestPrice) {
+                switch((string)$k) {
+                    case '18': return $latestPrice->price_gram_18k ?? 0;
+                    case '21': return $latestPrice->price_gram_21k ?? 0;
+                    case '24': return $latestPrice->price_gram_24k ?? 0;
+                    case '22': 
+                        $price24 = $latestPrice->price_gram_24k ?? 0;
+                        return $price24 > 0 ? ($price24 * (22 / 24)) : 0;
+                    default: return $latestPrice->price_gram_21k ?? 0; // fallback
+                }
+            };
+
+            foreach ($karatBalances as $k => $grams) {
+                if ($grams > 0) {
+                    $currentValue += $grams * $getPriceForKarat($k);
+                }
+            }
+
+            // Map Individual P/L to transactions
+            $wallet->transactions->transform(function ($tx) use ($getPriceForKarat) {
+                $currentGramPrice = $getPriceForKarat($tx->karat);
+                $tx->current_value = $tx->grams * $currentGramPrice;
+                
+                if (in_array($tx->type, ['buy', 'transfer_in'])) {
+                    // P/L = current total value - original total amount (including fees)
+                    $tx->profit_loss = $tx->current_value - $tx->total_amount; 
+                } else {
+                    $tx->profit_loss = 0; 
+                }
+                
+                return $tx;
+            });
         }
 
         $isProfit = $currentValue > $wallet->balance_amount;
@@ -150,6 +203,7 @@ class WalletController extends Controller implements HasMiddleware
 
         return Inertia::render('GoldSavers/Wallets/Show', [
             'wallet' => $wallet,
+            'karatBalances' => $karatBalances,
             'hasGoalTracking' => $user->hasModuleSubscription('gold-goal-tracking'),
             'latestPrice' => $latestPrice,
             'gamification' => [

@@ -3,6 +3,7 @@
 namespace Modules\Booking\tests\Feature\WaConfirm;
 
 use Tests\TestCase;
+use Illuminate\Support\Facades\Schema;
 use Modules\Booking\Models\Booking;
 use Modules\Booking\app\Features\WaConfirm\Models\BookingWaConfirmation;
 use Modules\Booking\app\Features\WaConfirm\Services\ConfirmationTokenManager;
@@ -14,9 +15,16 @@ class ConfirmationTokenManagerTest extends TestCase
 {
     use DatabaseTransactions;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Schema::disableForeignKeyConstraints();
+    }
+
+
     public function test_it_generates_and_validates_tokens_securely()
     {
-        $booking = Booking::forceCreate(['tenant_id' => 1, 'status' => 'pending']);
+        $booking = Booking::forceCreate(['status' => 'pending', 'booking_event_type_id' => 1, 'starts_at' => now(), 'ends_at' => now()->addHour()]);
         $confirmation = BookingWaConfirmation::forceCreate([
             'tenant_id' => 1,
             'booking_id' => $booking->id,
@@ -46,7 +54,7 @@ class ConfirmationTokenManagerTest extends TestCase
 
     public function test_expired_tokens_throw_exception()
     {
-        $booking = Booking::forceCreate(['tenant_id' => 1, 'status' => 'pending']);
+        $booking = Booking::forceCreate(['status' => 'pending', 'booking_event_type_id' => 1, 'starts_at' => now(), 'ends_at' => now()->addHour()]);
         $confirmation = BookingWaConfirmation::forceCreate([
             'tenant_id' => 1,
             'booking_id' => $booking->id,

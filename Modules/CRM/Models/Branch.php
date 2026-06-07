@@ -4,10 +4,11 @@ namespace Modules\CRM\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Branch extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasFactory;
 
     protected $table = 'crm_branches';
 
@@ -91,5 +92,10 @@ class Branch extends Model
                 // on all descendant paths using `REPLACE(path, old_path, new_path)`.
             }
         });
+    }
+
+    protected static function newFactory()
+    {
+        return \Modules\CRM\Database\Factories\BranchFactory::new();
     }
 }

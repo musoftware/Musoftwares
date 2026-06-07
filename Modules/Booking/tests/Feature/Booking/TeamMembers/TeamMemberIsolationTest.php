@@ -14,17 +14,17 @@ class TeamMemberIsolationTest extends TestCase
     public function test_tenant_cannot_see_other_tenants_team_members()
     {
         // Create Tenant A and User A
-        $userA = User::factory()->create(['tenant_id' => 1]);
+        $userA = User::factory()->create([]);
         $teamMemberA = BookingTeamMember::create([
-            'tenant_id' => 1,
+            'tenant_id' => $userA->id,
             'user_id' => $userA->id,
             'job_title' => 'Tenant A Staff',
         ]);
 
         // Create Tenant B and User B
-        $userB = User::factory()->create(['tenant_id' => 2]);
+        $userB = User::factory()->create([]);
         BookingTeamMember::create([
-            'tenant_id' => 2,
+            'tenant_id' => $userB->id,
             'user_id' => $userB->id,
             'job_title' => 'Tenant B Staff',
         ]);
@@ -45,11 +45,11 @@ class TeamMemberIsolationTest extends TestCase
 
     public function test_tenant_cannot_edit_other_tenants_team_members()
     {
-        $userA = User::factory()->create(['tenant_id' => 1]);
+        $userA = User::factory()->create([]);
         
-        $userB = User::factory()->create(['tenant_id' => 2]);
+        $userB = User::factory()->create([]);
         $teamMemberB = BookingTeamMember::create([
-            'tenant_id' => 2,
+            'tenant_id' => $userB->id,
             'user_id' => $userB->id,
             'job_title' => 'Tenant B Staff',
         ]);

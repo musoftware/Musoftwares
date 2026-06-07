@@ -12,7 +12,7 @@ class BookingPageRepository
      */
     public function getSettings()
     {
-        $tenantId = auth()->user()->tenant_id;
+        $tenantId = (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id());
         
         return BookingPageSetting::firstOrCreate(
             ['tenant_id' => $tenantId],

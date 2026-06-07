@@ -137,9 +137,14 @@ class MarketplaceTest extends TestCase
     {
         $this->actingAs($this->user);
 
+        // Give user balance
+        $this->user->user_balance = 500;
+        $this->user->save();
+
         // We subscribe to facebook-extractor free plan fbe12345-0000-0000-0000-000000000001
         $response = $this->post('/tools/facebook-extractor/subscribe/fbe12345-0000-0000-0000-000000000001', [
             'billing_cycle' => 'monthly',
+            'payment_method' => 'wallet',
         ]);
 
         $response->assertRedirect('/tools/facebook-extractor/tutorial');

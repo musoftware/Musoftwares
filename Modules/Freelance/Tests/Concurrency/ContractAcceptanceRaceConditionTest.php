@@ -25,8 +25,8 @@ it('prevents accepting multiple proposals for the same job simultaneously', func
     $job = $scenario->getJob();
     $freelancers = $scenario->getFreelancers();
 
-    $proposal1 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[0]->id, 'cover_letter' => 'A', 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'pending']);
-    $proposal2 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[1]->id, 'cover_letter' => 'B', 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'pending']);
+    $proposal1 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[0]->id, 'cover_letter' => 'A', 'bid_amount' => 100, 'currency_id' => 1, 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'pending']);
+    $proposal2 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[1]->id, 'cover_letter' => 'B', 'bid_amount' => 100, 'currency_id' => 1, 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'pending']);
 
     $action = app(AcceptProposalAction::class);
     

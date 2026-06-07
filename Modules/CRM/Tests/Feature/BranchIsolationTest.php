@@ -11,7 +11,7 @@ class BranchIsolationTest extends BaseBranchTestCase
     public function test_models_automatically_scope_to_branch_context()
     {
         // We are currently in the primary branch context
-        $lead1 = Lead::create(['name' => 'Primary Lead', 'status' => 'new']);
+        $lead1 = Lead::create(['name' => 'Primary Lead', 'status' => 'new', 'message' => 'test']);
         
         // Assert the lead was created in the primary branch automatically
         // Assuming branch_id is automatically appended if present in context
@@ -27,6 +27,6 @@ class BranchIsolationTest extends BaseBranchTestCase
         $this->assertEquals($this->secondaryBranch->id, $secondaryBranchId);
         $this->assertNotEquals($branchId, $secondaryBranchId);
         
-        $lead2 = Lead::create(['name' => 'Secondary Lead', 'status' => 'new']);
+        $lead2 = Lead::create(['name' => 'Secondary Lead', 'status' => 'new', 'message' => 'test']);
     }
 }

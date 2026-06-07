@@ -16,7 +16,7 @@ class TeamMemberManagerService
     public function createTeamMember(array $data)
     {
         return DB::transaction(function () use ($data) {
-            $tenantId = auth()->user()->tenant_id ?? $data['tenant_id'];
+            $tenantId = (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()) ?? $data['tenant_id'];
 
             // Create System User
             $user = User::create([

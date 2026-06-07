@@ -15,10 +15,9 @@ class RecurringConflictResolver
     public function isSlotAvailable(Carbon $date, RecurringSeries $series): bool
     {
         // Check if there is already a booking for this resource at this exact time
-        $conflict = Booking::where('tenant_id', $series->tenant_id)
-            ->where('resource_id', $series->resource_id)
-            ->where('start_date', $date->format('Y-m-d'))
-            ->where('start_time', $date->format('H:i:s'))
+        $conflict = Booking::where('booking_event_type_id', $series->resource_id ?: 1)
+            ->whereDate('starts_at', $date->format('Y-m-d'))
+            ->whereTime('starts_at', $date->format('H:i:s'))
             ->exists();
 
         if ($conflict) {

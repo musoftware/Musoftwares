@@ -29,9 +29,9 @@ it('accepts a proposal, refunds other freelancers, and creates a contract', func
     $freelancers = $scenario->getFreelancers();
 
     // Create 3 proposals
-    $proposal1 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[0]->id, 'cover_letter' => 'A', 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'pending']);
-    $proposal2 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[1]->id, 'cover_letter' => 'B', 'proposed_budget_points' => 1500, 'points_spent' => 3, 'status' => 'pending']);
-    $proposal3 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[2]->id, 'cover_letter' => 'C', 'proposed_budget_points' => 2000, 'points_spent' => 4, 'status' => 'pending']);
+    $proposal1 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[0]->id, 'cover_letter' => 'A', 'bid_amount' => 100, 'currency_id' => $currencyId, 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'pending']);
+    $proposal2 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[1]->id, 'cover_letter' => 'B', 'bid_amount' => 150, 'currency_id' => $currencyId, 'proposed_budget_points' => 1500, 'points_spent' => 3, 'status' => 'pending']);
+    $proposal3 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[2]->id, 'cover_letter' => 'C', 'bid_amount' => 200, 'currency_id' => $currencyId, 'proposed_budget_points' => 2000, 'points_spent' => 4, 'status' => 'pending']);
 
     $action = app(AcceptProposalAction::class);
     
@@ -71,7 +71,7 @@ it('throws exception if non-client tries to accept proposal', function () {
     $freelancer = $scenario->getFreelancer(0);
     $otherUser = $scenario->getFreelancer(1); // acting as random user
 
-    $proposal = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancer->id, 'cover_letter' => 'A', 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'pending']);
+    $proposal = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancer->id, 'cover_letter' => 'A', 'bid_amount' => 100, 'currency_id' => 1, 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'pending']);
 
     $action = app(AcceptProposalAction::class);
     

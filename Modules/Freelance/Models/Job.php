@@ -3,6 +3,7 @@
 namespace Modules\Freelance\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
@@ -11,7 +12,7 @@ use Modules\Freelance\Domains\Job\States\JobState;
 
 class Job extends Model
 {
-    use Searchable, SoftDeletes, HasStates;
+    use Searchable, SoftDeletes, HasStates, HasFactory;
 
     protected $table = 'freelance_jobs';
 
@@ -51,5 +52,10 @@ class Job extends Model
     public function currency()
     {
         return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
+    protected static function newFactory()
+    {
+        return \Modules\Freelance\Database\Factories\JobFactory::new();
     }
 }

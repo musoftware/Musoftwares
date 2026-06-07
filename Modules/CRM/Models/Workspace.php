@@ -4,11 +4,12 @@ namespace Modules\CRM\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\User;
 
 class Workspace extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasFactory;
 
     protected $table = 'crm_workspaces';
 
@@ -51,5 +52,10 @@ class Workspace extends Model
     public function teamMembers()
     {
         return $this->hasMany(CrmTeamMember::class);
+    }
+
+    protected static function newFactory()
+    {
+        return \Modules\CRM\Database\Factories\WorkspaceFactory::new();
     }
 }

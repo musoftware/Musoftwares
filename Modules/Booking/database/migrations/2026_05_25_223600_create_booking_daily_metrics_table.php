@@ -18,9 +18,9 @@ return new class extends Migration
                 $table->integer('cancelled_bookings')->default(0);
                 $table->integer('no_show_bookings')->default(0);
                 $table->decimal('total_revenue', 10, 2)->default(0);
-                $table->string('currency', 3)->default('USD');
+                $table->string('currency_id', 3)->default('USD');
                 
-                $table->unique(['tenant_id', 'date', 'currency']);
+                $table->unique(['tenant_id', 'date', 'currency_id']);
                 $table->timestamps();
             });
         }

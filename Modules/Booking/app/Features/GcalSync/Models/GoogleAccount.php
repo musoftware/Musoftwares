@@ -35,7 +35,7 @@ class GoogleAccount extends Model
         static::addGlobalScope('tenant', function (Builder $builder) {
             $tenantId = app()->bound('currentTenant') ? app('currentTenant')->id : null;
             if (!$tenantId && auth()->check()) {
-                $tenantId = auth()->user()->tenant_id;
+                $tenantId = (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id());
             }
             if ($tenantId) {
                 $builder->where('tenant_id', $tenantId);
@@ -44,7 +44,7 @@ class GoogleAccount extends Model
 
         static::creating(function ($model) {
             if (!$model->tenant_id && auth()->check()) {
-                $model->tenant_id = auth()->user()->tenant_id;
+                $model->tenant_id = (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id());
             }
         });
     }

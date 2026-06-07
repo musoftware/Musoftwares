@@ -12,8 +12,8 @@ class TeamMemberFeatureFlagTest extends TestCase
 
     public function test_tenant_without_addon_cannot_add_second_staff()
     {
-        $tenantId = 1;
-        $admin = User::factory()->create(['tenant_id' => $tenantId]);
+        $admin = User::factory()->create([]);
+        $tenantId = $admin->id;
         
         $this->actingAs($admin);
         

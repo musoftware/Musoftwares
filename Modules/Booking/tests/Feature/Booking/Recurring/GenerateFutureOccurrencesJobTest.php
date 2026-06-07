@@ -18,10 +18,20 @@ class GenerateFutureOccurrencesJobTest extends TestCase
 
     public function test_lazy_generates_occurrences_into_core_bookings_table()
     {
+        $tenant = \App\Models\User::factory()->create();
+        $customer = \App\Models\User::factory()->create();
+        $eventType = \Modules\Booking\Models\BookingEventType::create([
+            'user_id' => $tenant->id,
+            'title' => 'Test Event',
+            'slug' => 'test-event-'.rand(),
+            'duration_minutes' => 30,
+            'is_active' => true,
+        ]);
+
         $series = RecurringSeries::create([
-            'tenant_id' => 1,
-            'customer_id' => 10,
-            'resource_id' => 5,
+            'tenant_id' => $tenant->id,
+            'customer_id' => $customer->id,
+            'resource_id' => $eventType->id,
             'rrule' => 'FREQ=DAILY',
             'starts_at' => Carbon::now(), // Will generate 30 days out
         ]);

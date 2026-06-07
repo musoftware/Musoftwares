@@ -65,7 +65,8 @@ it('executes a full end-to-end sequence between a client and multiple freelancer
         clientId: $this->client->id,
         title: 'Full Sequence Job',
         description: 'Testing the sequence',
-        budgetPoints: 500,
+        budget: 500.0,
+        currencyId: $this->usdCurrency->id,
         minProposalPoints: 20, // Client wants at least 20 points per proposal
         type: 'fixed',
         duration: '1 week',
@@ -82,7 +83,8 @@ it('executes a full end-to-end sequence between a client and multiple freelancer
         jobId: $job->id,
         freelancerId: $this->freelancer1->id,
         coverLetter: 'I am Freelancer 1',
-        proposedBudgetPoints: 400,
+        bidAmount: 400.0,
+        currencyId: $this->usdCurrency->id,
         pointsSpent: 30 // Bidding 30 points (above min 20)
     );
     app(SubmitProposalAction::class)->execute($submitProposal1Data, $job, $this->freelancer1);
@@ -93,7 +95,8 @@ it('executes a full end-to-end sequence between a client and multiple freelancer
         jobId: $job->id,
         freelancerId: $this->freelancer2->id,
         coverLetter: 'I am Freelancer 2',
-        proposedBudgetPoints: 450,
+        bidAmount: 450.0,
+        currencyId: $this->usdCurrency->id,
         pointsSpent: 20 // Bidding exactly 20 points
     );
     app(SubmitProposalAction::class)->execute($submitProposal2Data, $job, $this->freelancer2);
@@ -104,7 +107,8 @@ it('executes a full end-to-end sequence between a client and multiple freelancer
         jobId: $job->id,
         freelancerId: $this->freelancer3->id,
         coverLetter: 'I am Freelancer 3',
-        proposedBudgetPoints: 300,
+        bidAmount: 300.0,
+        currencyId: $this->usdCurrency->id,
         pointsSpent: 10 // Below minimum 20
     );
     expect(fn () => app(SubmitProposalAction::class)->execute($submitProposal3Data, $job, $this->freelancer3))
@@ -159,7 +163,8 @@ it('tests inactivity refund rule (Unhappy Path)', function () {
 
     // Initial points balance is 200 (since the factory gave 200, but they didn't really 'pay' for this factory job)
     // For test purposes, assume they paid 35 points (25 base + 10 min bid)
-    $this->client->update(['points_balance' => 165]); // 200 - 35 = 165
+    $this->client->points_balance = 165;
+    $this->client->save();
 
     // Execute the refund action
     $refundCount = app(\Modules\Freelance\Domains\Job\Actions\RefundInactiveJobsAction::class)->execute();

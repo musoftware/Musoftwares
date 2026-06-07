@@ -1,12 +1,12 @@
 <?php
 
-namespace Modules\Booking\Features\Reservations;
+namespace Modules\Booking\app\Features\Reservations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Booking\Core\Traits\TenantAwareModel;
-use Modules\Booking\Features\Resources\BookingResource;
-use Modules\Booking\Features\Services\BookingService;
+use Modules\Booking\app\Features\Resources\BookingResource;
+use Modules\Booking\app\Features\Services\BookingService;
 
 class BookingReservation extends Model
 {

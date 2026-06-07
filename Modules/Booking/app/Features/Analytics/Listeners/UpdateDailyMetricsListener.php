@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Booking\Features\Analytics\Listeners;
+namespace Modules\Booking\app\Features\Analytics\Listeners;
 
 use Modules\Booking\Events\BookingStatusChanged;
 use Modules\Booking\Models\BookingDailyMetric;
@@ -12,20 +12,20 @@ class UpdateDailyMetricsListener implements ShouldQueue
     public function handle(BookingStatusChanged $event)
     {
         $booking = $event->booking;
-        $tenantId = $booking->eventType->user->tenant_id ?? null;
+        $tenantId = $booking->eventType->user_id ?? null;
 
         if (!$tenantId) {
             return;
         }
 
         $date = $booking->starts_at->format('Y-m-d');
-        $currency = $booking->currency ?? null;
+        $currency = $booking->currency_id ?? null;
 
         // Use atomic increment/decrement to prevent race conditions during concurrent status updates
         $metric = BookingDailyMetric::firstOrCreate([
             'tenant_id' => $tenantId,
             'date' => $date,
-            'currency' => $currency,
+            'currency_id' => $currency,
         ]);
 
         // Logic based on the new status

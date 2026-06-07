@@ -26,7 +26,8 @@ it('prevents a freelancer from submitting duplicate proposals for the same job',
         jobId: $job->id,
         freelancerId: $freelancer->id,
         coverLetter: 'I am the best fit for this.',
-        proposedBudgetPoints: 1000,
+        bidAmount: 1000.0,
+        currencyId: 1,
         pointsSpent: 2
     );
 

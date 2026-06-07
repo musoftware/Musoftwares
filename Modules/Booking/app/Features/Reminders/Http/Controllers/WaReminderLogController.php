@@ -7,16 +7,21 @@ use Illuminate\Http\Request;
 use Modules\Booking\app\Features\Reminders\Models\BookingWaReminder;
 use Modules\Booking\app\Features\Reminders\Services\WaReminderLimitsService;
 
-class WaReminderLogController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class WaReminderLogController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware(function ($request, $next) {
-            if (!feature('booking-wa-reminders')) {
-                return response()->json(['message' => 'Feature locked. Upgrade to enable WhatsApp reminders.'], 403);
-            }
-            return $next($request);
-        });
+        return [
+            new Middleware(function ($request, $next) {
+                if (!feature('booking-wa-reminders')) {
+                    return response()->json(['message' => 'Feature locked. Upgrade to enable WhatsApp reminders.'], 403);
+                }
+                return $next($request);
+            }),
+        ];
     }
 
     public function index(Request $request)
@@ -31,7 +36,7 @@ class WaReminderLogController extends Controller
 
     public function getLimits(WaReminderLimitsService $limitsService)
     {
-        $tenantId = auth()->user()->tenant_id;
+        $tenantId = (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id());
         
         return response()->json([
             'can_use' => $limitsService->canUse($tenantId),

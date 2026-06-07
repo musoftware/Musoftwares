@@ -13,11 +13,11 @@ class TeamMemberPolicyTest extends TestCase
 
     public function test_staff_cannot_edit_other_staff_profiles()
     {
-        $tenantId = 1;
-        $staff1 = User::factory()->create(['tenant_id' => $tenantId]);
+        $staff1 = User::factory()->create([]);
+        $tenantId = $staff1->id;
         $profile1 = BookingTeamMember::create(['tenant_id' => $tenantId, 'user_id' => $staff1->id]);
 
-        $staff2 = User::factory()->create(['tenant_id' => $tenantId]);
+        $staff2 = User::factory()->create([]);
         $profile2 = BookingTeamMember::create(['tenant_id' => $tenantId, 'user_id' => $staff2->id]);
 
         // Staff 1 tries to edit Staff 2

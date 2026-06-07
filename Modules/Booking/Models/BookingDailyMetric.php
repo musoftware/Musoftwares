@@ -17,7 +17,7 @@ class BookingDailyMetric extends Model
         'cancelled_bookings',
         'no_show_bookings',
         'total_revenue',
-        'currency',
+        'currency_id',
     ];
 
     public function tenant()

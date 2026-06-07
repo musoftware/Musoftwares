@@ -25,7 +25,7 @@ class GoogleOAuthService
         // Save the tokens into the tenant's account
         return GoogleAccount::updateOrCreate(
             [
-                'tenant_id' => auth()->user()->tenant_id,
+                'tenant_id' => (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()),
                 'google_id' => $googleUser->getId()
             ],
             [

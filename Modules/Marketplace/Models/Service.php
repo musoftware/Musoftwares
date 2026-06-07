@@ -7,9 +7,11 @@ use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Service extends Model
 {
-    use Searchable, SoftDeletes;
+    use Searchable, SoftDeletes, HasFactory;
 
     protected $table = 'marketplace_services';
 

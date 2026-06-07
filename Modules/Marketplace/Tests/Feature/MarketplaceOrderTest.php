@@ -17,18 +17,27 @@ class MarketplaceOrderTest extends TestCase
 {
     use DatabaseTransactions;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutMiddleware();
+    }
+
     public function test_buyer_can_place_order_with_sufficient_balance()
     {
-        $buyer = User::factory()->create();
-        $buyer->update(['user_balance' => 1000]);
+        $buyer = User::factory()->create(['user_balance' => 1000]);
 
         $seller = User::factory()->create();
         
-        $service = Service::factory()->create(['seller_id' => $seller->id]);
-        $package = ServicePackage::factory()->create([
+        $category = \Modules\Marketplace\Models\ServiceCategory::create(['name' => 'Test', 'slug' => 'test']);
+        $service = Service::create(['seller_id' => $seller->id, 'title' => 'Test Service', 'category_id' => $category->id, 'description' => 'test', 'status' => 'active']);
+        $package = ServicePackage::create([
             'service_id' => $service->id,
+            'name' => 'Basic',
+            'description' => 'test',
             'price' => 100,
-            'currency_id' => 1
+            'currency_id' => 1,
+            'delivery_days' => 1
         ]);
 
         $response = $this->actingAs($buyer)->post(route('marketplace.orders.store'), [
@@ -58,16 +67,19 @@ class MarketplaceOrderTest extends TestCase
 
     public function test_buyer_cannot_place_order_with_insufficient_balance()
     {
-        $buyer = User::factory()->create();
-        $buyer->update(['user_balance' => 50]);
+        $buyer = User::factory()->create(['user_balance' => 50]);
 
         $seller = User::factory()->create();
         
-        $service = Service::factory()->create(['seller_id' => $seller->id]);
-        $package = ServicePackage::factory()->create([
+        $category = \Modules\Marketplace\Models\ServiceCategory::create(['name' => 'Test', 'slug' => 'test']);
+        $service = Service::create(['seller_id' => $seller->id, 'title' => 'Test Service', 'category_id' => $category->id, 'description' => 'test', 'status' => 'active']);
+        $package = ServicePackage::create([
             'service_id' => $service->id,
+            'name' => 'Basic',
+            'description' => 'test',
             'price' => 100,
-            'currency_id' => 1
+            'currency_id' => 1,
+            'delivery_days' => 1
         ]);
 
         $response = $this->actingAs($buyer)->post(route('marketplace.orders.store'), [

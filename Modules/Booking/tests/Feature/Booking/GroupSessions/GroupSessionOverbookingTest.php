@@ -14,10 +14,10 @@ class GroupSessionOverbookingTest extends TestCase
 
     public function test_overbooking_routes_customer_to_waitlist()
     {
-        $user = User::factory()->create(['tenant_id' => 1]);
+        $user = User::factory()->create([]);
         
         $session = GroupSession::create([
-            'tenant_id' => 1,
+            'tenant_id' => $user->id,
             'title' => 'Waitlist Test Class',
             'starts_at' => Carbon::tomorrow(),
             'ends_at' => Carbon::tomorrow()->addHour(),
@@ -25,10 +25,10 @@ class GroupSessionOverbookingTest extends TestCase
         ]);
 
         // First customer secures the seat
-        $this->actingAs($user)->postJson("/api/group-sessions/{$session->id}/join", ['customer_id' => 10]);
+        $this->actingAs($user)->postJson("/api/v1/group-sessions/{$session->id}/join", ['customer_id' => 10]);
 
         // Second customer tries, should hit waitlist
-        $response = $this->actingAs($user)->postJson("/api/group-sessions/{$session->id}/join", ['customer_id' => 11]);
+        $response = $this->actingAs($user)->postJson("/api/v1/group-sessions/{$session->id}/join", ['customer_id' => 11]);
 
         $response->assertStatus(200)
                  ->assertJsonPath('status', 'waitlisted');

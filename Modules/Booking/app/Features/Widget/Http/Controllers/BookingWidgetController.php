@@ -17,18 +17,17 @@ class BookingWidgetController extends Controller
     {
         $this->widgetService = $widgetService;
         $this->limitsService = $limitsService;
-        $this->middleware('auth:sanctum');
     }
 
     public function index()
     {
-        $widgets = BookingWidget::with('domains')->where('tenant_id', auth()->user()->tenant_id)->get();
+        $widgets = BookingWidget::with('domains')->where('tenant_id', (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))->get();
         return response()->json($widgets);
     }
 
     public function store(Request $request)
     {
-        if (!$this->limitsService->canUseWidget(auth()->user()->tenant_id)) {
+        if (!$this->limitsService->canUseWidget((app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))) {
             return response()->json(['message' => 'Feature locked. Upgrade to use Booking Widgets.'], 403);
         }
 
@@ -41,7 +40,7 @@ class BookingWidgetController extends Controller
             'domains.*' => 'string'
         ]);
 
-        $widget = $this->widgetService->createWidget(auth()->user()->tenant_id, $validated);
+        $widget = $this->widgetService->createWidget((app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()), $validated);
 
         return response()->json($widget->load('domains'), 201);
     }

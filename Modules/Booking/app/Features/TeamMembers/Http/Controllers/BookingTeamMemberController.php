@@ -43,7 +43,7 @@ class BookingTeamMemberController extends Controller
     {
         $this->authorize('create', BookingTeamMember::class);
         
-        $tenantId = auth()->user()->tenant_id;
+        $tenantId = (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id());
         $currentCount = BookingTeamMember::where('tenant_id', $tenantId)->count();
 
         // Enforce limits via feature flag / saas config
