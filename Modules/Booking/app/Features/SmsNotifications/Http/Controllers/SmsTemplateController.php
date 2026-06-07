@@ -14,18 +14,17 @@ class SmsTemplateController extends Controller
     public function __construct(BookingSmsLimitsService $limitsService)
     {
         $this->limitsService = $limitsService;
-        $this->middleware('auth:sanctum');
-    }
+        }
 
     public function index()
     {
-        $templates = SmsTemplate::where('tenant_id', auth()->user()->tenant_id)->get();
+        $templates = SmsTemplate::where('tenant_id', (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))->get();
         return response()->json($templates);
     }
 
     public function store(Request $request)
     {
-        if (!$this->limitsService->canSendSms(auth()->user()->tenant_id)) {
+        if (!$this->limitsService->canSendSms((app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))) {
             return response()->json(['message' => 'Feature locked. Upgrade to use SMS Notifications.'], 403);
         }
 
@@ -36,7 +35,7 @@ class SmsTemplateController extends Controller
         ]);
 
         $template = SmsTemplate::updateOrCreate(
-            ['tenant_id' => auth()->user()->tenant_id, 'type' => $validated['type']],
+            ['tenant_id' => (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()), 'type' => $validated['type']],
             $validated
         );
 

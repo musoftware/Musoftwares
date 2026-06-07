@@ -28,7 +28,8 @@ it('submits a proposal successfully and deducts points', function () {
         jobId: $job->id,
         freelancerId: $freelancer->id,
         coverLetter: 'I can do this!',
-        proposedBudgetPoints: 400,
+        bidAmount: 400.0,
+        currencyId: 1,
         pointsSpent: 2,
     );
 
@@ -77,7 +78,8 @@ it('fails to submit proposal if already submitted', function () {
         jobId: $job->id,
         freelancerId: $freelancer->id,
         coverLetter: 'Second bid',
-        proposedBudgetPoints: 400,
+        bidAmount: 400.0,
+        currencyId: 1,
         pointsSpent: 2,
     );
 

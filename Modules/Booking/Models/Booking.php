@@ -26,12 +26,13 @@ class Booking extends Model
         'status',
         'payment_status',
         'price',
-        'currency',
+        'currency_id',
         'payment_method',
         'transaction_id',
         'notes',
         'internal_notes',
         'project_id',
+        'recurring_series_id',
     ];
 
     protected $casts = [

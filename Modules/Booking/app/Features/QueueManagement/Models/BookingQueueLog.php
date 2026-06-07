@@ -23,8 +23,8 @@ class BookingQueueLog extends Model
         static::addGlobalScope('tenant', function ($builder) {
             if (app()->bound('currentTenant') && app('currentTenant')) {
                 $builder->where('tenant_id', app('currentTenant')->id);
-            } elseif (auth()->check() && auth()->user()->tenant_id) {
-                $builder->where('tenant_id', auth()->user()->tenant_id);
+            } elseif (auth()->check() && (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id())) {
+                $builder->where('tenant_id', (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()));
             }
         });
     }

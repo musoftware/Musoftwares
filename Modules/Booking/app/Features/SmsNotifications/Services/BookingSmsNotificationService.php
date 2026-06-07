@@ -36,7 +36,7 @@ class BookingSmsNotificationService
         if (!$template) return;
 
         $message = $this->renderer->render($template->content, $booking);
-        $mobile = $booking->customer->phone ?? null;
+        $mobile = $booking->guest_phone ?? null;
 
         if (!$mobile) return;
 

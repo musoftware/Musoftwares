@@ -19,12 +19,18 @@ class EscrowServiceTest extends TestCase
         $buyer = User::factory()->create(['user_balance' => 1000]);
         $seller = User::factory()->create(['user_balance' => 0]);
 
-        $order = ServiceOrder::factory()->create([
+        $category = \Modules\Marketplace\Models\ServiceCategory::create(['name' => 'Test', 'slug' => 'test']);
+        $service = \Modules\Marketplace\Models\Service::create(['seller_id' => $seller->id, 'title' => 'Test Service', 'category_id' => $category->id, 'description' => 'test', 'status' => 'active']);
+        $package = \Modules\Marketplace\Models\ServicePackage::create(['service_id' => $service->id, 'name' => 'Basic', 'description' => 'test', 'price' => 100, 'currency_id' => 1, 'delivery_days' => 1]);
+
+        $order = ServiceOrder::create([
             'buyer_id' => $buyer->id,
             'seller_id' => $seller->id,
+            'package_id' => $package->id,
             'amount' => 100,
             'commission_amount' => 10, // 10%
-            'currency_id' => 1
+            'currency_id' => 1,
+            'status' => 'pending'
         ]);
 
         $service = new EscrowService();
@@ -47,12 +53,18 @@ class EscrowServiceTest extends TestCase
         $buyer = User::factory()->create(['user_balance' => 1000]);
         $seller = User::factory()->create(['user_balance' => 0]);
 
-        $order = ServiceOrder::factory()->create([
+        $category = \Modules\Marketplace\Models\ServiceCategory::create(['name' => 'Test', 'slug' => 'test']);
+        $service = \Modules\Marketplace\Models\Service::create(['seller_id' => $seller->id, 'title' => 'Test Service', 'category_id' => $category->id, 'description' => 'test', 'status' => 'active']);
+        $package = \Modules\Marketplace\Models\ServicePackage::create(['service_id' => $service->id, 'name' => 'Basic', 'description' => 'test', 'price' => 100, 'currency_id' => 1, 'delivery_days' => 1]);
+
+        $order = ServiceOrder::create([
             'buyer_id' => $buyer->id,
             'seller_id' => $seller->id,
+            'package_id' => $package->id,
             'amount' => 100,
             'commission_amount' => 10,
-            'currency_id' => 1
+            'currency_id' => 1,
+            'status' => 'pending'
         ]);
 
         $service = new EscrowService();

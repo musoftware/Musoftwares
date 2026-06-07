@@ -640,10 +640,10 @@ class InvoiceController extends Controller
 
         $client_rate = 0;
         $user = $item->invoice->user;
-        if ($user && (float) ($user->booking_rate ?? 0) > 0) {
+        if ($user && (float) ($user->hour_rate ?? 0) > 0) {
             $client_rate = \App\Models\CurrenciesExchange::RateToday(
-                $user->booking_rate,
-                $user->booking_rate_currency_id ?? $user->currency_id ?? 1,
+                $user->hour_rate,
+                $user->hour_rate_currency_id ?? $user->hour_rate_currency ?? $user->currency_id ?? 1,
                 $item->invoice->currency_id
             );
         }
@@ -661,10 +661,10 @@ class InvoiceController extends Controller
                 'project_name' => $item->invoice->project ? $item->invoice->project->name : null,
                 'date' => $item->invoice->date() ?? null,
             ],
-            'invoice_currency' => $item->invoice->relationLoaded('currency') && $item->invoice->getRelation('currency') ? [
-                'id' => $item->invoice->getRelation('currency')->id,
-                'currency' => $item->invoice->getRelation('currency')->currency,
-                'symbol' => $item->invoice->getRelation('currency')->symbol,
+            'invoice_currency' => $item->invoice->currency()->first() ? [
+                'id' => $item->invoice->currency()->first()->id,
+                'currency' => $item->invoice->currency()->first()->currency,
+                'symbol' => $item->invoice->currency()->first()->symbol,
             ] : null,
             'timers' => $timers->values()->all(),
             'total_seconds' => $totalSeconds,

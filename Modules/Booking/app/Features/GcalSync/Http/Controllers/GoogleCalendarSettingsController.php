@@ -11,12 +11,11 @@ class GoogleCalendarSettingsController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum');
-    }
+        }
 
     public function index()
     {
-        $accounts = GoogleAccount::with('calendars')->where('tenant_id', auth()->user()->tenant_id)->get();
+        $accounts = GoogleAccount::with('calendars')->where('tenant_id', (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))->get();
         return response()->json($accounts);
     }
 
@@ -30,11 +29,11 @@ class GoogleCalendarSettingsController extends Controller
         ]);
 
         $account = GoogleAccount::where('id', $accountId)
-            ->where('tenant_id', auth()->user()->tenant_id)
+            ->where('tenant_id', (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))
             ->firstOrFail();
 
         $calendar = GoogleCalendar::updateOrCreate(
-            ['tenant_id' => auth()->user()->tenant_id, 'account_id' => $account->id, 'calendar_id' => $validated['calendar_id']],
+            ['tenant_id' => (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()), 'account_id' => $account->id, 'calendar_id' => $validated['calendar_id']],
             $validated
         );
 

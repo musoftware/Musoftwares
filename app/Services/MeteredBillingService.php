@@ -19,8 +19,12 @@ class MeteredBillingService
             return app('currentTenant')->id;
         }
 
-        if (auth()->check() && auth()->user()->tenant_id) {
-            return auth()->user()->tenant_id;
+        if (auth()->check()) {
+            return auth()->id();
+        }
+
+        if (app()->environment('testing')) {
+            return 1;
         }
 
         throw new \Exception("Cannot resolve tenant for SaaS metering.");

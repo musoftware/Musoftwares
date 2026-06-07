@@ -34,7 +34,9 @@ abstract class BaseTenantTestCase extends TestCase
      */
     protected function setUpTenant(): void
     {
-        $this->adminUser = User::factory()->create();
+        $this->adminUser = User::factory()->create([
+            'onboarding_completed' => true,
+        ]);
         
         $this->workspace = Workspace::forceCreate([
             'user_id' => $this->adminUser->id,

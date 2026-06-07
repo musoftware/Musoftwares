@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Booking\Features\Scheduling;
+namespace Modules\Booking\app\Features\Scheduling;
 
 class CapacityManager
 {

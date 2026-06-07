@@ -19,7 +19,7 @@ class BookingBranchUser extends Pivot
     {
         static::creating(function ($model) {
             if (!$model->tenant_id && auth()->check()) {
-                $model->tenant_id = auth()->user()->tenant_id;
+                $model->tenant_id = (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id());
             }
         });
     }

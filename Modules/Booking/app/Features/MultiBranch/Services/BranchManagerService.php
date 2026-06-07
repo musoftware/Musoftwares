@@ -12,7 +12,7 @@ class BranchManagerService
      */
     public function assignStaff(BookingBranch $branch, int $userId, string $role = 'staff')
     {
-        $tenantId = auth()->user()->tenant_id;
+        $tenantId = (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id());
 
         // Using syncWithoutDetaching to avoid duplicating existing users
         $branch->users()->syncWithoutDetaching([

@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Booking\Features\Analytics\Services;
+namespace Modules\Booking\app\Features\Analytics\Services;
 
 use Modules\Booking\Models\BookingDailyMetric;
 use Carbon\Carbon;
@@ -24,9 +24,9 @@ class BookingAnalyticsService
                 DB::raw('SUM(cancelled_bookings) as cancelled_bookings'),
                 DB::raw('SUM(no_show_bookings) as no_show_bookings'),
                 DB::raw('SUM(total_revenue) as total_revenue'),
-                'currency'
+                'currency_id'
             )
-            ->groupBy('currency')
+            ->groupBy('currency_id')
             ->get();
 
         $totalBookings = $metrics->sum('total_bookings');
@@ -41,7 +41,7 @@ class BookingAnalyticsService
             'no_show_bookings' => $totalNoShows,
             'no_show_rate_percent' => $noShowRate,
             'revenue_by_currency' => $metrics->mapWithKeys(function ($item) {
-                return [$item->currency => (float) $item->total_revenue];
+                return [$item->currency_id => (float) $item->total_revenue];
             })->toArray()
         ];
     }

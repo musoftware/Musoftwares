@@ -17,26 +17,24 @@ class BookingBranchIsolationTest extends TestCase
             'name' => 'Tenant1', 
             'email' => 't1@test.com', 
             'password' => 'test',
-            'tenant_id' => 1
-        ]);
+            ]);
         
         $tenant2 = User::forceCreate([
             'name' => 'Tenant2', 
             'email' => 't2@test.com', 
             'password' => 'test',
-            'tenant_id' => 2
-        ]);
+            ]);
 
         $this->actingAs($tenant1);
         $branch1 = BookingBranch::create([
-            'tenant_id' => 1,
+            'tenant_id' => $tenant1->id,
             'name' => 'Downtown Clinic',
             'timezone' => 'UTC'
         ]);
 
         $this->actingAs($tenant2);
         $branch2 = BookingBranch::create([
-            'tenant_id' => 2,
+            'tenant_id' => $tenant2->id,
             'name' => 'Uptown Clinic',
             'timezone' => 'UTC'
         ]);

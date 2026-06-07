@@ -4,8 +4,8 @@ namespace Modules\Booking\Tests\Feature;
 
 use Tests\TestCase;
 use Modules\Booking\Models\BookingDailyMetric;
-use Modules\Booking\Features\Analytics\Services\BookingAnalyticsService;
-use Modules\Booking\Features\Analytics\Listeners\UpdateDailyMetricsListener;
+use Modules\Booking\app\Features\Analytics\Services\BookingAnalyticsService;
+use Modules\Booking\app\Features\Analytics\Listeners\UpdateDailyMetricsListener;
 use Modules\Booking\Events\BookingStatusChanged;
 use Modules\Booking\Models\Booking;
 use Modules\Booking\Models\BookingEventType;
@@ -24,8 +24,7 @@ class BookingAnalyticsTest extends TestCase
             'name' => 'Clinic 1', 
             'email' => 't1@test.com', 
             'password' => 'test',
-            'tenant_id' => 1
-        ]);
+            ]);
         
         $eventType = BookingEventType::forceCreate([
             'user_id' => $tenant->id,
@@ -46,19 +45,19 @@ class BookingAnalyticsTest extends TestCase
             'status' => 'confirmed',
             'payment_status' => 'paid',
             'price' => 150.00,
-            'currency' => 'USD'
+            'currency_id' => 'USD'
         ]);
 
         // Manually trigger listener
         $listener = new UpdateDailyMetricsListener();
         $listener->handle(new BookingStatusChanged($booking, 'confirmed'));
 
-        $metric = BookingDailyMetric::where('tenant_id', 1)->first();
+        $metric = BookingDailyMetric::where('tenant_id', $tenant->id)->first();
         
         $this->assertNotNull($metric);
         $this->assertEquals(1, $metric->total_bookings);
         $this->assertEquals(150.00, $metric->total_revenue);
-        $this->assertEquals('USD', $metric->currency);
+        $this->assertEquals('USD', $metric->currency_id);
         
         // Simulate completion
         $booking->status = 'completed';
@@ -70,28 +69,34 @@ class BookingAnalyticsTest extends TestCase
 
     public function test_analytics_service_rolls_up_data()
     {
+        $tenant = User::forceCreate([
+            'name' => 'Clinic 2', 
+            'email' => 't2@test.com', 
+            'password' => 'test',
+            ]);
+
         BookingDailyMetric::create([
-            'tenant_id' => 2,
+            'tenant_id' => $tenant->id,
             'date' => Carbon::now()->subDays(2)->format('Y-m-d'),
             'total_bookings' => 5,
             'completed_bookings' => 4,
             'no_show_bookings' => 1,
             'total_revenue' => 500.00,
-            'currency' => 'EGP'
+            'currency_id' => 'EGP'
         ]);
         
         BookingDailyMetric::create([
-            'tenant_id' => 2,
+            'tenant_id' => $tenant->id,
             'date' => Carbon::now()->subDays(1)->format('Y-m-d'),
             'total_bookings' => 10,
             'completed_bookings' => 9,
             'no_show_bookings' => 1,
             'total_revenue' => 1000.00,
-            'currency' => 'EGP'
+            'currency_id' => 'EGP'
         ]);
 
         $service = new BookingAnalyticsService();
-        $summary = $service->getSummary(2, Carbon::now()->subDays(7)->format('Y-m-d'), Carbon::now()->format('Y-m-d'));
+        $summary = $service->getSummary($tenant->id, Carbon::now()->subDays(7)->format('Y-m-d'), Carbon::now()->format('Y-m-d'));
 
         $this->assertEquals(15, $summary['total_bookings']);
         $this->assertEquals(13, $summary['completed_bookings']);

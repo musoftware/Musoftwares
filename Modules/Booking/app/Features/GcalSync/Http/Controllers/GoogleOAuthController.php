@@ -17,12 +17,11 @@ class GoogleOAuthController extends Controller
     {
         $this->oauthService = $oauthService;
         $this->limitsService = $limitsService;
-        $this->middleware('auth:sanctum');
-    }
+        }
 
     public function redirect(Request $request)
     {
-        if (!$this->limitsService->canConnectCalendar(auth()->user()->tenant_id)) {
+        if (!$this->limitsService->canConnectCalendar((app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))) {
             return response()->json(['message' => 'Feature locked. Upgrade to connect Google Calendar.'], 403);
         }
 

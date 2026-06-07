@@ -20,21 +20,30 @@ class RecurringConflictResolverTest extends TestCase
     {
         Event::fake();
 
+        $tenant = \App\Models\User::factory()->create();
+        $customer = \App\Models\User::factory()->create();
+        $eventType = \Modules\Booking\Models\BookingEventType::create([
+            'user_id' => $tenant->id,
+            'title' => 'Test Event',
+            'slug' => 'test-event-'.rand(),
+            'duration_minutes' => 30,
+            'is_active' => true,
+        ]);
+
         $series = RecurringSeries::create([
-            'tenant_id' => 1,
-            'customer_id' => 10,
-            'resource_id' => 5,
+            'tenant_id' => $tenant->id,
+            'customer_id' => $customer->id,
+            'resource_id' => $eventType->id,
             'rrule' => 'FREQ=WEEKLY',
             'starts_at' => Carbon::parse('2026-06-01 10:00:00'),
         ]);
 
         // Create an existing single booking that blocks the slot
         Booking::create([
-            'tenant_id' => 1,
-            'customer_id' => 99,
-            'resource_id' => 5, // Same resource
-            'start_date' => '2026-06-01',
-            'start_time' => '10:00:00',
+            'client_user_id' => $customer->id,
+            'booking_event_type_id' => $eventType->id, // Same resource
+            'starts_at' => '2026-06-01 10:00:00',
+            'ends_at' => '2026-06-01 10:30:00',
             'status' => 'confirmed'
         ]);
 
@@ -50,10 +59,20 @@ class RecurringConflictResolverTest extends TestCase
     {
         Event::fake();
 
+        $tenant = \App\Models\User::factory()->create();
+        $customer = \App\Models\User::factory()->create();
+        $eventType = \Modules\Booking\Models\BookingEventType::create([
+            'user_id' => $tenant->id,
+            'title' => 'Test Event',
+            'slug' => 'test-event-'.rand(),
+            'duration_minutes' => 30,
+            'is_active' => true,
+        ]);
+
         $series = RecurringSeries::create([
-            'tenant_id' => 1,
-            'customer_id' => 10,
-            'resource_id' => 5,
+            'tenant_id' => $tenant->id,
+            'customer_id' => $customer->id,
+            'resource_id' => $eventType->id,
             'rrule' => 'FREQ=WEEKLY',
             'starts_at' => Carbon::parse('2026-06-01 10:00:00'),
         ]);

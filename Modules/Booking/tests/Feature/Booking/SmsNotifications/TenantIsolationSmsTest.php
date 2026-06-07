@@ -14,13 +14,13 @@ class TenantIsolationSmsTest extends TestCase
 
     public function test_tenant_cannot_view_other_tenant_templates()
     {
-        $user1 = User::factory()->create(['tenant_id' => 1]);
-        $user2 = User::factory()->create(['tenant_id' => 2]);
+        $user1 = User::factory()->create([]);
+        $user2 = User::factory()->create([]);
 
-        SmsTemplate::create(['tenant_id' => 1, 'type' => 'confirmation', 'content' => 'T1 Conf']);
-        SmsTemplate::create(['tenant_id' => 2, 'type' => 'confirmation', 'content' => 'T2 Conf']);
+        SmsTemplate::create(['tenant_id' => $user1->id, 'type' => 'confirmation', 'content' => 'T1 Conf']);
+        SmsTemplate::create(['tenant_id' => $user2->id, 'type' => 'confirmation', 'content' => 'T2 Conf']);
 
-        $response = $this->actingAs($user1)->getJson('/api/sms-templates');
+        $response = $this->actingAs($user1)->getJson('/api/v1/sms-templates');
         
         $response->assertStatus(200)->assertJsonCount(1);
         $this->assertEquals('T1 Conf', $response->json()[0]['content']);
@@ -28,10 +28,10 @@ class TenantIsolationSmsTest extends TestCase
 
     public function test_tenant_credentials_are_encrypted()
     {
-        $user = User::factory()->create(['tenant_id' => 1]);
+        $user = User::factory()->create([]);
 
         $setting = SmsSetting::create([
-            'tenant_id' => 1,
+            'tenant_id' => $user->id,
             'provider_name' => 'twilio',
             'provider_credentials' => ['token' => 'super_secret']
         ]);

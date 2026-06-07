@@ -27,7 +27,8 @@ it('submits a proposal successfully and deducts points', function () {
         jobId: $job->id,
         freelancerId: $freelancer->id,
         coverLetter: 'I am the best fit for this.',
-        proposedBudgetPoints: 1000,
+        bidAmount: 1000.0,
+        currencyId: 1,
         pointsSpent: 2
     );
 
@@ -57,7 +58,8 @@ it('prevents submitting multiple proposals for the same job', function () {
         jobId: $job->id,
         freelancerId: $freelancer->id,
         coverLetter: 'I am the best fit for this.',
-        proposedBudgetPoints: 1000,
+        bidAmount: 1000.0,
+        currencyId: 1,
         pointsSpent: 2
     );
 
@@ -83,7 +85,8 @@ it('throws exception if freelancer has insufficient points', function () {
         jobId: $job->id,
         freelancerId: $freelancer->id,
         coverLetter: 'I am the best fit for this.',
-        proposedBudgetPoints: 1000,
+        bidAmount: 1000.0,
+        currencyId: 1,
         pointsSpent: 2
     );
 
@@ -109,7 +112,8 @@ it('rolls back proposal creation if point deduction fails', function () {
         jobId: $job->id,
         freelancerId: $freelancer->id,
         coverLetter: 'Will fail.',
-        proposedBudgetPoints: 1000,
+        bidAmount: 1000.0,
+        currencyId: 1,
         pointsSpent: 2
     );
 

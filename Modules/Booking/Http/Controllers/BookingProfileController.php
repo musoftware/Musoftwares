@@ -40,7 +40,7 @@ class BookingProfileController extends Controller
         // Fetch public data for the tenant
         // We join against User to ensure the host is active
         $eventTypes = BookingEventType::whereHas('user', function($q) use ($tenantId) {
-                $q->where('tenant_id', $tenantId);
+                $q->where('id', $tenantId);
             })
             ->where('is_active', true)
             ->with(['providers' => function ($q) {
@@ -53,7 +53,7 @@ class BookingProfileController extends Controller
             ->get();
 
         $providers = BookingProvider::whereHas('host', function($q) use ($tenantId) {
-                $q->where('tenant_id', $tenantId);
+                $q->where('id', $tenantId);
             })
             ->where('is_active', true)
             ->get();

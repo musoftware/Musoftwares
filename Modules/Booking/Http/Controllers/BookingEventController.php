@@ -32,7 +32,7 @@ class BookingEventController extends Controller
             'duration_minutes' => 'required|integer|min:5',
             'description' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
-            'currency' => 'nullable|string|size:3',
+            'currency_id' => 'nullable|string|size:3',
             'requires_payment' => 'boolean',
         ]);
 

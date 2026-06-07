@@ -14,12 +14,11 @@ class SmsSettingController extends Controller
     public function __construct(BookingSmsLimitsService $limitsService)
     {
         $this->limitsService = $limitsService;
-        $this->middleware('auth:sanctum');
-    }
+        }
 
     public function index()
     {
-        $setting = SmsSetting::where('tenant_id', auth()->user()->tenant_id)->first();
+        $setting = SmsSetting::where('tenant_id', (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))->first();
         // Do not expose raw credentials, just indicate if it's set
         if ($setting) {
             $setting->has_credentials = !empty($setting->provider_credentials);
@@ -30,7 +29,7 @@ class SmsSettingController extends Controller
 
     public function store(Request $request)
     {
-        if (!$this->limitsService->canSendSms(auth()->user()->tenant_id)) {
+        if (!$this->limitsService->canSendSms((app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))) {
             return response()->json(['message' => 'Feature locked. Upgrade to use SMS Notifications.'], 403);
         }
 
@@ -42,7 +41,7 @@ class SmsSettingController extends Controller
         ]);
 
         $setting = SmsSetting::updateOrCreate(
-            ['tenant_id' => auth()->user()->tenant_id],
+            ['tenant_id' => (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id())],
             $validated
         );
 

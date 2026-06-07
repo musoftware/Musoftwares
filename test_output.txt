@@ -1,0 +1,1238 @@
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\DeterministicSmsParserTest::it_extracts_real_vodafone_cash_sms_sample_1(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\DeterministicSmsParserTest::it_extracts_real_vodafone_cash_sms_sample_2(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\DeterministicSmsParserTest::it_extracts_real_vodafone_cash_sms_sample_3_with_decimal_amount(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\DeterministicSmsParserTest::it_rejects_promotional_cashback_messages(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\DeterministicSmsParserTest::it_normalizes_phone_numbers_correctly(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\DeterministicSmsParserTest::it_extracts_real_instapay_arabic_sms(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\DeterministicSmsParserTest::it_extracts_real_instapay_english_sms(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\DeterministicSmsParserTest::it_extracts_real_vodafone_cash_sms_from_ladyturbans(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\DeterministicSmsParserTest::it_extracts_real_english_wallet_sms(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\RealtimePaymentMatchingEngineTest::it_matches_transaction_to_order_by_phone_number(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\RealtimePaymentMatchingEngineTest::it_matches_transaction_to_order_by_exact_reference(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\RealtimePaymentMatchingEngineTest::it_ignores_transaction_if_amount_varies_too_much(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\TransactionIngestionSpoofTest::it_accepts_valid_balance_progression(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\TransactionIngestionSpoofTest::it_detects_spoofed_upward_balance_jump(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Modules\SmsPaymentGateway\Tests\Unit\TransactionIngestionSpoofTest::it_ignores_downward_balance_jumps_as_legitimate_external_spending(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   PASS  Tests\Unit\BookingPriority\PriorityAssignmentEngineTest
+  ✓ escalate assigns emergency priority level
+
+   PASS  Tests\Unit\BookingRules\RuleConditionEvaluatorTest
+  ✓ it returns true when no conditions exist                                                                     0.03s  
+
+   PASS  Tests\Unit\BookingSmartSlots\SmartSlotEngineTest
+  ✓ engine generates balanced slots
+
+   PASS  Tests\Unit\ExampleTest
+  ✓ that true is true
+
+   PASS  Tests\Unit\App\Services\RecurringServiceTest
+  ✓ exception handling during entry processing logs error                                                        0.42s  
+
+   PASS  Tests\Feature\AdminAuthSecurityTest
+  ✓ guest cannot access admin dashboard                                                                          0.27s  
+  ✓ regular user cannot access admin dashboard                                                                   0.37s  
+  ✓ admin can access admin dashboard                                                                             0.29s  
+
+   PASS  Tests\Feature\AdminLayoutLinksTest
+  ✓ admin layout links are accessible without errors                                                             0.30s  
+
+   PASS  Tests\Feature\AdminNoteTest
+  ✓ can list admin notes                                                                                         0.27s  
+  ✓ can store admin note                                                                                         0.31s  
+  ✓ can toggle pin admin note                                                                                    0.33s  
+  ✓ can delete admin note                                                                                        0.27s  
+
+   PASS  Tests\Feature\AdminUserPermissionsTest
+  ✓ admin can update user role directly                                                                          0.31s  
+  ✓ cannot update user role with invalid role                                                                    0.27s  
+  ✓ admin cannot update own role                                                                                 0.26s  
+
+   PASS  Tests\Feature\AdminUserUILinksTest
+  ✓ admin can view users index with search                                                                       0.28s  
+  ✓ admin can view user profile                                                                                  0.29s  
+  ✓ admin can view user edit page                                                                                0.32s  
+  ✓ admin can access login as endpoint                                                                           0.25s  
+  ✓ admin can reset user password                                                                                0.25s  
+  ✓ admin can view user referrals                                                                                0.26s  
+  ✓ admin can view user files                                                                                    0.33s  
+  ✓ admin can view user reports                                                                                  0.25s  
+  ✓ admin can view users create page                                                                             0.25s  
+  ✓ admin can view problematic users page                                                                        0.29s  
+  ✓ admin can view co work page                                                                                  0.27s  
+  ✓ admin can view earning analyze page                                                                          0.29s  
+  ✓ admin can view user projects                                                                                 0.25s  
+  ✓ admin can view user notes                                                                                    0.29s  
+  ✓ admin can view invoice create for user                                                                       0.26s  
+  ✓ admin can view transaction create for user                                                                   0.28s  
+  ✓ admin can view user invoices                                                                                 0.28s  
+  ✓ admin can view user transactions                                                                             0.25s  
+
+   PASS  Tests\Feature\Admin\AdminBlogArticleControllerTest
+  ✓ admin can view blog articles index                                                                           0.31s  
+  ✓ non admin cannot view blog articles index                                                                    0.38s  
+  ✓ admin can view create blog article page                                                                      0.30s  
+  ✓ admin can store blog article                                                                                 0.27s  
+  ✓ admin can view edit blog article page                                                                        0.32s  
+  ✓ admin can update blog article                                                                                0.31s  
+  ✓ admin can destroy blog article                                                                               0.27s  
+
+   PASS  Tests\Feature\Admin\AdminBusyTimesControllerTest
+  ✓ admin can view busy times index                                                                              0.31s  
+  ✓ admin can filter busy times index                                                                            0.29s  
+  ✓ non admin cannot view busy times index                                                                       0.30s  
+  ✓ admin can toggle active status                                                                               0.27s  
+  ✓ non admin cannot toggle active status                                                                        0.29s  
+  ✓ admin can destroy busy time                                                                                  0.28s  
+  ✓ non admin cannot destroy busy time                                                                           0.35s  
+
+   PASS  Tests\Feature\Admin\AdminCouponControllerTest
+  ✓ admin can view coupons index                                                                                 0.29s  
+  ✓ non admin cannot view coupons index                                                                          0.31s  
+  ✓ admin can store new coupon                                                                                   0.31s  
+  ✓ store coupon requires name                                                                                   0.29s  
+  ✓ admin can view coupon details                                                                                0.31s  
+  ✓ admin can update coupon                                                                                      0.26s  
+  ✓ admin can delete coupon                                                                                      0.28s  
+
+   PASS  Tests\Feature\Admin\AdminFinancialOperationsControllerTest
+  ✓ admin can access financial operations index                                                                  0.34s  
+  ✓ non admin cannot access financial operations index                                                           0.28s  
+  ✓ admin can store cost transaction                                                                             0.27s  
+  ✓ admin can delete cost transaction                                                                            0.25s  
+
+   PASS  Tests\Feature\Admin\AdminFreeDownloadControllerTest
+  ✓ admin can view free downloads index                                                                          0.29s  
+  ✓ non admin cannot view free downloads index                                                                   0.29s  
+  ✓ admin can store new free download                                                                            0.26s  
+  ✓ store free download requires title                                                                           0.24s  
+  ✓ admin can update free download                                                                               0.26s  
+  ✓ admin can delete free download                                                                               0.27s  
+
+   PASS  Tests\Feature\Admin\AdminInvoiceControllerTest
+  ✓ admin can access invoices index                                                                              0.28s  
+  ✓ non admin cannot access invoices index                                                                       0.30s  
+  ✓ admin can view invoice                                                                                       0.36s  
+
+   PASS  Tests\Feature\Admin\AdminInvoiceTest
+  ✓ admin can view invoices index                                                                                0.32s  
+  ✓ non admin cannot view invoices index                                                                         0.28s  
+  ✓ admin can create invoice                                                                                     0.25s  
+  ✓ admin can view invoice show                                                                                  0.32s  
+  ✓ admin can cancel invoice                                                                                     0.28s  
+  ✓ admin can change invoice status                                                                              0.27s  
+
+   PASS  Tests\Feature\Admin\AdminLanguageLineControllerTest
+  ✓ admin can view language lines index                                                                          0.34s  
+  ✓ non admin cannot view language lines index                                                                   0.29s  
+  ✓ admin can store language line                                                                                0.24s  
+  ✓ admin can update language line                                                                               0.28s  
+  ✓ admin can destroy language line                                                                              0.27s  
+
+   PASS  Tests\Feature\Admin\AdminPaymentMethodControllerTest
+  ✓ admin can access payment methods index                                                                       0.30s  
+  ✓ non admin cannot access payment methods index                                                                0.29s  
+  ✓ admin can view payment method                                                                                0.30s  
+  ✓ admin can update payment method status                                                                       0.25s  
+
+   PASS  Tests\Feature\Admin\AdminPaymentMethodTest
+  ✓ admin can view payment methods index                                                                         0.29s  
+  ✓ non admin cannot view payment methods index                                                                  0.32s  
+  ✓ admin can view payment method show                                                                           0.35s  
+  ✓ admin can update payment method status                                                                       0.27s  
+
+   PASS  Tests\Feature\Admin\AdminPointsControllerTest
+  ✓ admin can view points index                                                                                  0.28s  
+  ✓ non admin cannot view points index                                                                           0.32s  
+  ✓ admin can add points                                                                                         0.27s  
+  ✓ admin can deduct points                                                                                      0.25s  
+  ✓ admin can view points history                                                                                0.25s  
+
+   PASS  Tests\Feature\Admin\AdminProjectControllerTest
+  ✓ admin can access projects index                                                                              0.30s  
+  ✓ non admin cannot access projects index                                                                       0.27s  
+  ✓ admin can store project                                                                                      0.25s  
+
+   PASS  Tests\Feature\Admin\AdminQuotationTest
+  ✓ admin can view quotation print                                                                               0.33s  
+  ✓ non admin cannot view quotation print                                                                        0.31s  
+
+   PASS  Tests\Feature\Admin\AdminRecurringBusinessTest
+  ✓ admin can view recurring costs index                                                                         0.33s  
+  ✓ admin can store recurring cost                                                                               0.34s  
+  ✓ admin can delete recurring cost                                                                              0.32s  
+  ✓ admin can view recurring income index                                                                        0.36s  
+  ✓ admin can store recurring income                                                                             0.31s  
+  ✓ admin can view recurring salaries index                                                                      0.36s  
+  ✓ admin can store recurring salary                                                                             0.35s  
+
+   PASS  Tests\Feature\Admin\AdminResellerControllerTest
+  ✓ admin can view resellers index                                                                               0.39s  
+  ✓ non admin cannot view resellers index                                                                        0.38s  
+  ✓ admin can view create page                                                                                   0.37s  
+  ✓ admin can store reseller                                                                                     0.33s  
+  ✓ admin can view reseller show                                                                                 0.28s  
+  ✓ admin can update reseller                                                                                    0.27s  
+  ✓ admin can delete reseller                                                                                    0.27s  
+  ✓ admin can adjust balance                                                                                     0.27s  
+  ✓ admin can search users                                                                                       0.30s  
+
+   PASS  Tests\Feature\Admin\AdminSettingControllerTest
+  ✓ admin can view settings index                                                                                0.31s  
+  ✓ non admin cannot view settings index                                                                         0.30s  
+  ✓ admin can update settings                                                                                    0.37s  
+  ✓ admin can do update prices                                                                                   0.29s  
+  ✓ admin can recalculate overhead hourly rate                                                                   0.29s  
+
+   PASS  Tests\Feature\Admin\AdminTaskControllerTest
+  ✓ admin can access tasks as list                                                                               0.32s  
+  ✓ non admin cannot access tasks as list                                                                        0.32s  
+  ✓ admin can complete todo                                                                                      0.32s  
+  ✓ admin can access calendar                                                                                    0.35s  
+  ✓ admin can access client tasks                                                                                0.33s  
+  ✓ admin can schedule todo                                                                                      0.27s  
+
+   PASS  Tests\Feature\Admin\AdminTicketControllerTest
+  ✓ admin can view tickets index                                                                                 0.32s  
+  ✓ non admin cannot view tickets index                                                                          0.30s  
+  ✓ admin can view ticket show                                                                                   0.31s  
+  ✓ admin can update ticket status                                                                               0.29s  
+  ✓ admin update ticket validation                                                                               0.28s  
+  ✓ admin can reply to ticket                                                                                    0.30s  
+  ✓ admin reply ticket validation                                                                                0.35s  
+  ✓ admin can assign ticket                                                                                      0.30s  
+  ✓ admin assign ticket validation                                                                               0.27s  
+  ✓ admin can add canned response                                                                                0.26s  
+  ✓ admin add canned response validation                                                                         0.29s  
+
+   WARN  Tests\Feature\Admin\AdminToolControllerTest
+  ✓ admin can view tools index                                                                                   0.30s  
+  ✓ non admin cannot view tools index                                                                            0.36s  
+  ✓ admin can view create tool page                                                                              0.39s  
+  ✓ admin store tool redirects with error                                                                        0.33s  
+  ✓ admin can view edit tool page                                                                                0.39s  
+  … admin can update tool max subscription months → Skipping test that modifies config/tools.php directly to av… 0.33s  
+  ✓ admin destroy tool redirects with error                                                                      0.31s  
+  ✓ admin upload version redirects with error                                                                    0.34s  
+
+   PASS  Tests\Feature\Admin\AdminTransactionControllerTest
+  ✓ admin can access transactions index                                                                          0.40s  
+  ✓ non admin cannot access transactions index                                                                   0.41s  
+  ✓ admin can access create transaction page with user                                                           0.37s  
+  ✓ admin cannot access create transaction page without user                                                     0.35s  
+  ✓ admin can store transaction                                                                                  0.34s  
+
+   PASS  Tests\Feature\Admin\AdminTransactionTest
+  ✓ admin can view transactions index                                                                            0.36s  
+  ✓ non admin cannot view transactions index                                                                     0.32s  
+  ✓ admin can view create transaction page                                                                       0.38s  
+  ✓ create transaction page requires user                                                                        0.26s  
+  ✓ admin can store transaction                                                                                  0.29s  
+
+   PASS  Tests\Feature\Admin\AdminVoucherControllerTest
+  ✓ admin can view vouchers index                                                                                0.29s  
+  ✓ non admin cannot view vouchers index                                                                         0.38s  
+  ✓ admin can store new voucher                                                                                  0.33s  
+  ✓ store voucher requires name                                                                                  0.37s  
+  ✓ admin can view voucher details                                                                               0.41s  
+  ✓ admin can update voucher                                                                                     0.37s  
+  ✓ admin can delete voucher                                                                                     0.37s  
+
+   PASS  Tests\Feature\Admin\AdminWithdrawRequestControllerTest
+  ✓ admin can access withdraw requests index                                                                     0.51s  
+  ✓ non admin cannot access withdraw requests index                                                              0.41s  
+  ✓ admin can view withdraw request and it changes to reviewing                                                  0.37s  
+  ✓ admin can update withdraw request status                                                                     0.29s  
+
+   PASS  Tests\Feature\Admin\AdminWithdrawRequestTest
+  ✓ admin can view withdraw requests index                                                                       0.29s  
+  ✓ non admin cannot view withdraw requests index                                                                0.34s  
+  ✓ admin can view withdraw request show                                                                         0.34s  
+  ✓ admin can update withdraw request status                                                                     0.38s  
+
+   PASS  Tests\Feature\Admin\CharityCounterControllerTest
+  ✓ admin can view charity counter index                                                                         0.40s  
+  ✓ non admin cannot view charity counter index                                                                  0.34s  
+  ✓ admin can add amount                                                                                         0.28s  
+  ✓ admin can subtract amount                                                                                    0.29s  
+
+   WARN  Tests\Feature\Admin\ContractAiControllerTest
+  - admin can generate contract ai → Route not found, update to correct route URL for generate.                  0.29s  
+  - admin can review contract ai → Route not found, update to correct route URL for review.                      0.28s  
+  - fails if api key missing → Route not found.                                                                  0.28s  
+
+   PASS  Tests\Feature\Admin\DashboardControllerTest
+  ✓ admin can view dashboard                                                                                     0.39s  
+  ✓ non admin cannot view dashboard                                                                              0.34s  
+
+   PASS  Tests\Feature\Admin\EmployeeTodoControllerTest
+  ✓ admin can view employee todos index                                                                          0.38s  
+  ✓ non admin cannot view employee todos index                                                                   0.38s  
+  ✓ admin can store employee todo                                                                                0.27s  
+  ✓ store employee todo validation                                                                               0.26s  
+  ✓ admin can update employee todo                                                                               0.27s  
+  ✓ update employee todo validation                                                                              0.31s  
+  ✓ admin can delete employee todo                                                                               0.40s  
+
+   PASS  Tests\Feature\Admin\FinancialOperationsTest
+  ✓ admin can view finance index                                                                                 0.45s  
+  ✓ non admin cannot view finance index                                                                          0.35s  
+  ✓ admin can store finance entry                                                                                0.31s  
+  ✓ admin can update finance entry                                                                               0.35s  
+  ✓ admin can delete finance entry                                                                               0.37s  
+  ✓ admin can mark finance entry as paid                                                                         0.35s  
+
+   PASS  Tests\Feature\Admin\FreelanceContractControllerTest
+  ✓ admin can view contracts index                                                                               0.43s  
+  ✓ non admin cannot view contracts index                                                                        0.35s  
+  ✓ admin can view contract show                                                                                 0.35s  
+  ✓ admin can update contract status                                                                             0.33s  
+  ✓ admin can delete contract                                                                                    0.31s  
+  ✓ admin can resolve dispute refund client                                                                      0.28s  
+
+   PASS  Tests\Feature\Admin\FreelanceJobControllerTest
+  ✓ admin can view jobs index                                                                                    0.34s  
+  ✓ non admin cannot view jobs index                                                                             0.38s  
+  ✓ admin can view job show                                                                                      0.38s  
+  ✓ admin can view job create                                                                                    0.29s  
+  ✓ admin can store job                                                                                          0.28s  
+  ✓ admin can view job edit                                                                                      0.31s  
+  ✓ admin can update job                                                                                         0.29s  
+  ✓ admin can update job status                                                                                  0.32s  
+  ✓ admin can delete job                                                                                         0.32s  
+  ✓ admin can force refund                                                                                       0.39s  
+
+   PASS  Tests\Feature\Admin\FreelanceProposalControllerTest
+  ✓ admin can view proposals index                                                                               0.46s  
+  ✓ non admin cannot view proposals index                                                                        0.29s  
+  ✓ admin can view proposal show                                                                                 0.31s  
+  ✓ admin can delete proposal                                                                                    0.27s  
+
+   PASS  Tests\Feature\Admin\FreelanceSkillControllerTest
+  ✓ admin can view skills index                                                                                  0.46s  
+  ✓ non admin cannot view skills index                                                                           0.39s  
+  ✓ admin can store skill                                                                                        0.29s  
+  ✓ admin can update skill                                                                                       0.27s  
+  ✓ admin can approve skill                                                                                      0.29s  
+  ✓ admin can reject skill                                                                                       0.27s  
+  ✓ admin can block user from skills                                                                             0.27s  
+  ✓ admin can delete skill                                                                                       0.27s  
+
+   PASS  Tests\Feature\Admin\HoursCalendarControllerTest
+  ✓ admin can view hours calendar index                                                                          0.31s  
+  ✓ non admin cannot view hours calendar index                                                                   0.31s  
+  ✓ admin can get hours calendar data                                                                            0.26s  
+  ✓ non admin cannot get hours calendar data                                                                     0.29s  
+
+   PASS  Tests\Feature\Admin\KycControllerTest
+  ✓ admin can view kyc index                                                                                     0.32s  
+  ✓ non admin cannot view kyc index                                                                              0.29s  
+  ✓ admin can approve kyc                                                                                        0.25s  
+  ✓ admin can reject kyc                                                                                         0.26s  
+  ✓ admin reject kyc validation                                                                                  0.28s  
+
+   PASS  Tests\Feature\Admin\MarketplaceOrderControllerTest
+  ✓ admin can view orders index                                                                                  0.28s  
+  ✓ non admin cannot view orders index                                                                           0.28s  
+  ✓ admin can view order show                                                                                    0.29s  
+  ✓ admin can resolve dispute                                                                                    0.32s  
+
+   PASS  Tests\Feature\Admin\MarketplaceServiceControllerTest
+  ✓ admin can view all services                                                                                  0.32s  
+  ✓ non admin cannot view all services                                                                           0.33s  
+  ✓ admin can view pending services                                                                              0.32s  
+  ✓ admin can approve service                                                                                    0.29s  
+  ✓ admin can reject service                                                                                     0.27s  
+  ✓ admin can suspend service                                                                                    0.27s  
+  ✓ admin can feature service                                                                                    0.28s  
+  ✓ admin can view edit service                                                                                  0.31s  
+  ✓ admin can update service                                                                                     0.32s  
+  ✓ admin can delete service                                                                                     0.31s  
+
+   PASS  Tests\Feature\Admin\PlanControllerTest
+  ✓ admin can view plans index                                                                                   0.37s  
+  ✓ non admin cannot view plans index                                                                            0.40s  
+
+   PASS  Tests\Feature\Admin\ProjectControllerTest
+  ✓ admin can view projects index                                                                                0.36s  
+  ✓ non admin cannot view projects index                                                                         0.37s  
+  ✓ admin can store project                                                                                      0.32s  
+  ✓ store project validation                                                                                     0.34s  
+  ✓ admin can update project                                                                                     0.39s  
+  ✓ admin can archive project                                                                                    0.39s  
+  ✓ admin can restore project                                                                                    0.33s  
+  ✓ admin can delete project                                                                                     0.35s  
+
+   PASS  Tests\Feature\Admin\ReportControllerTest
+  ✓ admin can view reports index                                                                                 0.44s  
+  ✓ non admin cannot view reports index                                                                          0.42s  
+  ✓ admin reports index validation fails with invalid dates                                                      0.36s  
+  ✓ admin reports index validation fails if to is before from                                                    0.36s  
+  ✓ admin reports index with valid dates                                                                         0.39s  
+
+   PASS  Tests\Feature\Admin\SerialDeviceControllerTest
+  ✓ admin can view serial devices index                                                                          0.47s  
+  ✓ non admin cannot view serial devices index                                                                   0.38s  
+  ✓ admin can update serial device status                                                                        0.35s  
+  ✓ admin can delete serial device                                                                               0.32s  
+  ✓ admin can export serial devices                                                                              0.36s  
+  ✓ admin can bulk update status                                                                                 0.34s  
+  ✓ admin can bulk delete                                                                                        0.35s  
+
+   PASS  Tests\Feature\Admin\SerialSoftwareControllerTest
+  ✓ admin can view serial softwares index                                                                        0.43s  
+  ✓ non admin cannot view serial softwares index                                                                 0.39s  
+  ✓ admin can store serial software                                                                              0.34s  
+  ✓ admin can update serial software status                                                                      0.32s  
+  ✓ admin can delete serial software                                                                             0.33s  
+  ✓ admin can export serial softwares                                                                            0.37s  
+
+   PASS  Tests\Feature\Admin\SerialUserDeviceControllerTest
+  ✓ admin can view serial user devices index                                                                     0.37s  
+  ✓ non admin cannot view serial user devices index                                                              0.38s  
+  ✓ admin can view assign page                                                                                   0.35s  
+  ✓ admin can store serial user device                                                                           0.33s  
+  ✓ admin can update status                                                                                      0.35s  
+  ✓ admin can delete assignment                                                                                  0.36s  
+  ✓ admin can view by user                                                                                       0.38s  
+  ✓ admin can update user status                                                                                 0.33s  
+  ✓ admin can update user temp valid                                                                             0.38s  
+
+   PASS  Tests\Feature\Admin\UserFileControllerTest
+  ✓ admin can view user files root                                                                               0.46s  
+  ✓ admin can view user files inside child folder                                                                0.41s  
+  ✓ non admin cannot view user files                                                                             0.42s  
+  ✓ admin can upload file to root                                                                                0.37s  
+  ✓ admin can upload file to child folder                                                                        0.44s  
+  ✓ admin can create new folder in root                                                                          0.37s  
+  ✓ admin can create new child folder inside parent folder                                                       0.38s  
+  ✓ admin can rename file and folder                                                                             0.36s  
+  ✓ admin can move file and folder to child folder                                                               0.37s  
+  ✓ admin can delete file and folder                                                                             0.35s  
+  ✓ admin can download single file                                                                               0.38s  
+  ✓ admin can download multiple files and folders as zip                                                         0.31s  
+  ✓ admin cannot manipulate files belonging to other users                                                       0.33s  
+
+   PASS  Tests\Feature\Admin\UserNoteControllerTest
+  ✓ admin can view user notes                                                                                    0.31s  
+  ✓ non admin cannot view user notes                                                                             0.36s  
+  ✓ admin can get user notes json                                                                                0.29s  
+  ✓ admin can store user note                                                                                    0.26s  
+  ✓ admin can delete user note                                                                                   0.27s  
+  ✓ admin can archive user note                                                                                  0.26s  
+  ✓ admin can unarchive user note                                                                                0.27s  
+  ✓ admin can toggle pin user note                                                                               0.29s  
+
+   PASS  Tests\Feature\Admin\UsersTest
+  ✓ admin can view users index                                                                                   0.32s  
+  ✓ non admin cannot view users index                                                                            0.31s  
+  ✓ admin can view create user page                                                                              0.34s  
+  ✓ admin can store new user                                                                                     0.27s  
+  ✓ store user requires last name                                                                                0.31s  
+  ✓ admin can view edit user page                                                                                0.34s  
+  ✓ admin can update user                                                                                        0.26s  
+  ✓ admin can delete user                                                                                        0.27s  
+  ✓ admin cannot delete self                                                                                     0.26s  
+  ✓ admin can toggle block user                                                                                  0.27s  
+  ✓ admin can login as user                                                                                      0.27s  
+  ✓ admin can view create subscription page                                                                      0.29s  
+  ✓ admin can activate membership                                                                                0.24s  
+  ✓ admin can update membership                                                                                  0.27s  
+  ✓ admin can delete membership                                                                                  0.25s  
+
+   PASS  Tests\Feature\ArchitectureTest
+  ✓ financial service exists                                                                                     0.21s  
+
+   PASS  Tests\Feature\Auth\AuthenticationTest
+  ✓ login screen can be rendered                                                                                 0.22s  
+  ✓ users can authenticate using the login screen                                                                0.22s  
+  ✓ users can not authenticate with invalid password                                                             0.43s  
+  ✓ users can logout                                                                                             0.24s  
+
+   PASS  Tests\Feature\Auth\EmailVerificationTest
+  ✓ email verification screen can be rendered                                                                    0.27s  
+  ✓ email can be verified                                                                                        0.23s  
+  ✓ email is not verified with invalid hash                                                                      0.27s  
+
+   PASS  Tests\Feature\Auth\PasswordConfirmationTest
+  ✓ confirm password screen can be rendered                                                                      0.25s  
+  ✓ password can be confirmed                                                                                    0.23s  
+  ✓ password is not confirmed with invalid password                                                              0.52s  
+
+   PASS  Tests\Feature\Auth\PasswordResetTest
+  ✓ reset password link screen can be rendered                                                                   0.24s  
+  ✓ reset password link can be requested                                                                         0.43s  
+  ✓ reset password screen can be rendered                                                                        0.44s  
+  ✓ password can be reset with valid token                                                                       0.45s  
+
+   PASS  Tests\Feature\Auth\PasswordUpdateTest
+  ✓ password can be updated                                                                                      0.25s  
+  ✓ correct password must be provided to update password                                                         0.24s  
+
+   PASS  Tests\Feature\Auth\RegistrationTest
+  ✓ registration screen can be rendered                                                                          0.25s  
+  ✓ new users can register                                                                                       0.24s  
+
+   PASS  Tests\Feature\BalanceSheetTest
+  ✓ balance sheet route exists                                                                                   0.34s  
+  ✓ balance sheet returns pdf content type                                                                       0.28s  
+  ✓ balance sheet redirects for invalid user                                                                     0.24s  
+  ✓ balance sheet requires authentication                                                                        0.24s  
+  ✓ frontend links point to correct route                                                                        0.22s  
+
+   PASS  Tests\Feature\BookingPriority\BookingPriorityFlowTest
+  ✓ vip booking is queued higher than normal                                                                     0.25s  
+  ✓ emergency escalation triggers queue rebalance                                                                0.22s  
+
+   PASS  Tests\Feature\BookingRules\BookingAdvancedRulesFlowTest
+  ✓ it creates a booking rule                                                                                    0.25s  
+
+   PASS  Tests\Feature\BookingRules\TenantIsolationAdvancedRulesTest
+  ✓ tenant cannot access other tenant rules                                                                      0.24s  
+
+   PASS  Tests\Feature\BookingSmartSlots\BookingSmartSlotsFlowTest
+  ✓ gap optimization job updates fragmentation score                                                             0.24s  
+  ✓ api returns dynamic slots                                                                                    0.22s  
+
+   PASS  Tests\Feature\Booking\WhiteLabel\BookingWhiteLabelServiceTest
+  ✓ it creates default settings if none exist                                                                    0.24s  
+  ✓ it updates settings and flushes cache                                                                        0.23s  
+
+   PASS  Tests\Feature\Booking\WhiteLabel\TenantIsolationWhiteLabelTest
+  ✓ enforce white label limits blocks when feature disabled                                                      0.24s  
+
+   PASS  Tests\Feature\Booking\WhiteLabel\WhiteLabelDomainResolverTest
+  ✓ it adds a new domain and generates txt record                                                                0.25s  
+
+   PASS  Tests\Feature\Booking\WhiteLabel\WhiteLabelThemeManagerTest
+  ✓ it generates css variables                                                                                   0.21s  
+
+   PASS  Tests\Feature\CRM\CampaignTest
+  ✓ campaign multi tenancy isolation                                                                             0.24s  
+  ✓ ai copywriter generation returns valid format                                                                0.23s  
+  ✓ scheduling campaign validates dates                                                                          0.24s  
+
+   PASS  Tests\Feature\CRM\LeadTest
+  ✓ user can view own leads                                                                                      0.28s  
+  ✓ user cannot view other tenant leads                                                                          0.30s  
+  ✓ lead deletion cascades and cleans up                                                                         0.23s  
+
+   WARN  Tests\Feature\CRM\SequenceTest
+  ✓ sequence multi tenancy isolation                                                                             0.25s  
+  - sequence controller uses correct models → Sequence steps feature is not yet implemented.                     0.22s  
+
+   PASS  Tests\Feature\CurrencyStrictnessTest
+  ✓ transaction fails loudly without currency                                                                    0.22s  
+  ✓ transaction boot converts amount to user currency                                                            0.24s  
+  ✓ invoice creation fails without client currency                                                               0.25s  
+  ✓ invoice creation succeeds with client currency                                                               0.24s  
+
+   PASS  Tests\Feature\ERPInvoiceManualPaymentTransactionTest
+  ✓ mark paid manual generates credit and debit transactions                                                     0.33s  
+  ✓ mark paid manual handles remaining amount after partial payment                                              0.30s  
+
+   PASS  Tests\Feature\ERPReferralSystemTest
+  ✓ client creation auto generates unique referral code                                                          0.26s  
+  ✓ referral pages are gated by saas addon subscription                                                          0.33s  
+  ✓ invoice show page does not crash without addon subscription                                                  0.32s  
+  ✓ referral commission calculates and distributes correctly                                                     0.30s  
+
+   PASS  Tests\Feature\ERPSupportTicketTest
+  ✓ can store support ticket with existing client                                                                0.26s  
+  ✓ can resolve and close and delete own support ticket                                                          0.31s  
+  ✓ tenant scoping prevents unauthorized access                                                                  0.39s  
+
+   PASS  Tests\Feature\ExampleTest
+  ✓ the application returns a successful response                                                                0.25s  
+
+   PASS  Tests\Feature\Financial\PayoutMethodTest
+  ✓ can view payout methods page                                                                                 0.28s  
+  ✓ can store bank transfer payout method                                                                        0.25s  
+  ✓ fails to store bank transfer without full name                                                               0.24s  
+  ✓ can store vodafone cash payout method                                                                        0.25s  
+  ✓ can store instapay payout method                                                                             0.25s  
+  ✓ can update payout method                                                                                     0.25s  
+  ✓ can delete payout method                                                                                     0.26s  
+
+   PASS  Tests\Feature\FreelanceWorkflowTest
+  ✓ freelance lifecycle workflow                                                                                 0.35s  
+markPaid Response Status: 302
+
+   PASS  Tests\Feature\InvoiceWorkflowTest
+  ✓ can view invoices index                                                                                      0.31s  
+  ✓ can create invoice workflow                                                                                  0.29s  
+  ✓ can send and mark paid invoice                                                                               0.30s  
+  ✓ can update invoice                                                                                           0.29s  
+
+   PASS  Tests\Feature\MarketplaceEscrowTest
+  ✓ checkout locks funds in escrow without paying seller immediately                                             0.27s  
+  ✓ completion releases escrow to seller                                                                         0.26s  
+"REDIRECTED TO: http://localhost/marketplace/services/603" // tests\Feature\MarketplaceWorkflowTest.php:79
+
+   PASS  Tests\Feature\MarketplaceWorkflowTest
+  ✓ can browse marketplace services                                                                              0.28s  
+  ✓ seller can create and admin approves service                                                                 0.27s  
+  ✓ buyer can purchase service package workflow                                                                  0.31s  
+
+   PASS  Tests\Feature\ModuleSubscriptionSecurityTest
+  ✓ booking blocked without subscription                                                                         0.28s  
+
+   PASS  Tests\Feature\NotificationTest
+  ✓ invoice paid event dispatches notification                                                                   0.27s  
+  ✓ invoice paid event dispatches notification via email routing                                                 0.28s  
+  ✓ withdrawal approved event dispatches notification                                                            0.27s  
+
+   PASS  Tests\Feature\PointPurchaseTest
+  ✓ purchase package using wallet success                                                                        0.28s  
+  ✓ purchase package insufficient wallet redirects to kashier                                                    0.27s  
+  ✓ purchase custom points via wallet success                                                                    0.29s  
+  ✓ purchase custom points insufficient wallet redirects to kashier                                              0.26s  
+
+   PASS  Tests\Feature\ProductionConfigTest
+  ✓ production env file has redis configured                                                                     0.22s  
+
+   PASS  Tests\Feature\ProfileTest
+  ✓ profile page is displayed                                                                                    0.28s  
+  ✓ profile information can be updated                                                                           0.25s  
+  ✓ email verification status is unchanged when the email address is unchanged                                   0.26s  
+  ✓ user can delete their account                                                                                0.24s  
+  ✓ correct password must be provided to delete account                                                          0.24s  
+
+   PASS  Tests\Feature\RecurringEntrySchedulerTest
+  ✓ processes due recurring entry and creates log                                                                0.26s  
+  ✓ skips inactive recurring entries                                                                             0.26s  
+  ✓ skips future entries                                                                                         0.26s  
+  ✓ dry run does not create logs                                                                                 0.27s  
+
+   PASS  Tests\Feature\ReportServiceTest
+  ✓ get pnl report executes successfully                                                                         0.29s  
+  ✓ get pnl report includes main invoices grouped as main                                                        0.26s  
+
+   PASS  Tests\Feature\SaaSMeteringTest
+  ✓ it allows unlimited usage                                                                                    0.27s  
+  ✓ it enforces limits and throws exception                                                                      0.29s  
+  ✓ it dispatches events at thresholds                                                                           0.26s  
+
+   PASS  Tests\Feature\SerialDeviceControllerTest
+  ✓ index renders successfully                                                                                   0.38s  
+  ✓ index stats are correct                                                                                      0.39s  
+  ✓ index filters by status                                                                                      0.41s  
+  ✓ index filters by search                                                                                      0.37s  
+  ✓ index filters by software                                                                                    0.38s  
+  ✓ index sorts by column                                                                                        0.39s  
+  ✓ index respects per page                                                                                      0.43s  
+  ✓ update status changes device status                                                                          0.27s  
+  ✓ destroy deletes device                                                                                       0.26s  
+  ✓ export returns csv                                                                                           0.28s  
+  ✓ export respects status filter                                                                                0.27s  
+  ✓ bulk update status                                                                                           0.27s  
+  ✓ bulk delete                                                                                                  0.28s  
+  ✓ guest is redirected                                                                                          0.26s  
+  ✓ non admin is forbidden                                                                                       0.32s  
+
+   PASS  Tests\Feature\SerialSoftwareControllerTest
+  ✓ index renders successfully                                                                                   0.39s  
+  ✓ index returns correct stats                                                                                  0.37s  
+  ✓ index search filter                                                                                          0.42s  
+  ✓ index status filter                                                                                          0.38s  
+  ✓ index sorting by name asc                                                                                    0.38s  
+  ✓ index per page                                                                                               0.44s  
+  ✓ index resource has device counts                                                                             0.38s  
+  ✓ store creates software                                                                                       0.27s  
+  ✓ update status changes default status                                                                         0.26s  
+  ✓ destroy deletes software                                                                                     0.28s  
+  ✓ export returns csv                                                                                           0.28s  
+  ✓ guest cannot access index                                                                                    0.26s  
+  ✓ non admin cannot access index                                                                                0.31s  
+
+   PASS  Tests\Feature\SubscriptionAutoRenewalTest
+  ✓ free subscription auto renew                                                                                 0.27s  
+  ✓ paid subscription auto renew with sufficient balance                                                         0.29s  
+  ✓ paid subscription auto renew fails with insufficient balance                                                 0.32s  
+  ✓ does not renew if auto renew is false                                                                        0.27s  
+  ✓ does not renew if not expired yet                                                                            0.27s  
+
+   PASS  Tests\Feature\SubscriptionModuleTest
+  ✓ user has subscription returns true when active subscription exists                                           0.25s  
+  ✓ user has subscription returns false when no subscriptions                                                    0.24s  
+  ✓ user has subscription returns false when all expired                                                         0.26s  
+  ✓ user has module subscription returns true for subscribed module                                              0.24s  
+  ✓ user has module subscription returns false for different module                                              0.22s  
+  ✓ user has module subscription returns false when expired                                                      0.25s  
+  ✓ user has module subscription returns true for addon                                                          0.30s  
+  ✓ subscription service returns true for subscribed module                                                      0.25s  
+  ✓ subscription service returns false for unsubscribed module                                                   0.27s  
+  ✓ subscription service checks specific module not any                                                          0.26s  
+  ✓ feature manager returns active features for user                                                             0.23s  
+  ✓ feature manager has returns true for active feature                                                          0.26s  
+  ✓ feature manager has returns false for missing feature                                                        0.23s  
+  ✓ feature manager excludes expired subscriptions                                                               0.25s  
+  ✓ pricing service returns erp module                                                                           0.27s  
+  ✓ pricing service returns erp backup addon                                                                     0.23s  
+  ✓ pricing service monthly price is yearly divided by 10                                                        0.23s  
+  ✓ user can purchase addon if they own parent module                                                            0.33s  
+  ✓ user cannot purchase addon without parent module                                                             0.28s  
+  ✓ user can purchase module and addon together                                                                  0.28s  
+  ✓ subscribe fails with insufficient balance                                                                    0.27s  
+  ✓ subscribe fails with no items                                                                                0.24s  
+  ✓ dashboard loads without plan id error                                                                        0.30s  
+  ✓ manage page shows active subscriptions with price                                                            0.30s  
+  ✓ plans page shows owned features                                                                              0.31s  
+  ✓ crm features shared contains active subscriptions                                                            0.24s  
+  ✓ crm features shared excludes expired subscriptions                                                           0.29s  
+  ✓ active modules shows erp true when subscribed                                                                0.31s  
+  ✓ active modules shows erp false when not subscribed                                                           0.33s  
+  ✓ user subscription uses correct table                                                                         0.27s  
+  ✓ user subscription has no plan id column                                                                      0.27s  
+  ✓ purchasing already owned module extends expiry                                                               0.27s  
+  ✓ subscribe succeeds for free tools with zero balance                                                          0.28s  
+  ✓ subscribe fails for paid tools with zero balance                                                             0.28s  
+  ✓ volume discount applied to paid tools                                                                        0.30s  
+
+   PASS  Tests\Feature\Subscriptions\AddonPurchaseTest
+  ✓ Validation & Integrity → it prevents purchasing an addon if the parent module is not selected                0.30s  
+  ✓ Validation & Integrity → it prevents unauthenticated users from accessing checkout                           0.29s  
+  ✓ Wallet Purchases → it fails when user has insufficient wallet balance                                        0.26s  
+  ✓ Wallet Purchases → it successfully purchases a module and addon using wallet balance                         0.34s  
+  ✓ Kashier Checkout & Webhooks → it generates a Kashier payment URL for card checkout                           0.28s  
+  ✓ Kashier Checkout & Webhooks → it processes successful Kashier webhook payload securely and ensures idempote… 0.29s  
+
+   PASS  Tests\Feature\Subscriptions\AddonSubscriptionTest
+  ✓ new user can subscribe to erp                                                                                0.29s  
+  ✓ active user can add new addon as prorated upgrade                                                            0.30s  
+  ✓ subscription fails if addon purchased without parent module                                                  0.33s  
+
+   PASS  Tests\Feature\Subscriptions\ToolSubscriptionTest
+  ✓ tenant is created successfully without tenant id column error during wallet subscribe                        0.33s  
+  ✓ user cannot subscribe to tools without sufficient balance                                                    0.32s  
+
+   PASS  Tests\Feature\SupportTicketTest
+  ✓ client can view own tickets                                                                                  0.33s  
+  ✓ client can open support ticket workflow                                                                      0.30s  
+  ✓ admin can view all tickets                                                                                   0.31s  
+  ✓ can resolve ticket                                                                                           0.32s  
+
+   PASS  Tests\Feature\TenantClientUserIdBackfillTest
+  ✓ backfill matches clients by email                                                                            0.30s  
+  ✓ backfill skips clients with no matching user                                                                 0.30s  
+  ✓ dry run does not write user id                                                                               0.29s  
+  ✓ skips clients that already have user id                                                                      0.30s  
+
+   PASS  Tests\Feature\WithdrawalWorkflowTest
+  ✓ client can view withdrawal index                                                                             0.31s  
+  ✓ admin can view withdrawal index                                                                              0.33s  
+  ✓ client can request withdrawal success                                                                        0.31s  
+  ✓ client cannot request withdrawal insufficient funds                                                          0.30s  
+  ✓ admin can approve and mark paid withdrawal                                                                   0.33s  
+  ✓ admin can reject withdrawal                                                                                  0.30s  
+  ✓ client can cancel pending withdrawal                                                                         0.31s  
+
+   PASS  Modules\ERP\Tests\Feature\BackupControllerTest
+  ✓ user without subscription cannot download backup                                                             0.29s  
+  ✓ user can download backup                                                                                     0.26s  
+  ✓ user can restore backup                                                                                      0.29s  
+
+   PASS  Modules\ERP\Tests\Feature\CalendarControllerTest
+  ✓ user without calendar addon cannot view calendar                                                             0.30s  
+  ✓ user with calendar addon can view calendar                                                                   0.28s  
+
+   PASS  Modules\ERP\Tests\Feature\ClientControllerTest
+  ✓ client show page loads successfully without authorization errors                                             0.29s  
+  ✓ client creation successfully                                                                                 0.28s  
+  ✓ client update successfully                                                                                   0.27s  
+  ✓ client delete successfully                                                                                   0.28s  
+  ✓ client update status successfully                                                                            0.28s  
+
+   PASS  Modules\ERP\Tests\Feature\DebtControllerTest
+  ✓ user without subscription cannot access debts                                                                0.32s  
+  ✓ user can access debts index                                                                                  0.32s  
+  ✓ user can view client debt                                                                                    0.29s  
+
+   PASS  Modules\ERP\Tests\Feature\FileControllerTest
+  ✓ user without subscription can access index but gets no feature                                               0.29s  
+  ✓ user can access files index                                                                                  0.28s  
+  ✓ cannot upload without provider                                                                               0.27s  
+  ✓ can upload with provider                                                                                     0.31s  
+  ✓ can delete file                                                                                              0.29s  
+
+   PASS  Modules\ERP\Tests\Feature\InventoryTest
+  ✓ inventory dashboard loads                                                                                    0.35s  
+  ✓ can create product                                                                                           0.26s  
+  ✓ can adjust stock                                                                                             0.27s  
+  ✓ can search products                                                                                          0.27s  
+  ✓ invoice creation deducts stock                                                                               0.26s  
+
+   PASS  Modules\ERP\Tests\Feature\MultiBranch\BranchIsolationManagerTest
+  ✓ it sets and gets active branch                                                                               0.23s  
+
+   PASS  Modules\ERP\Tests\Feature\MultiBranch\BranchPermissionResolverTest
+  ✓ tenant admin has global access                                                                               0.28s  
+  ✓ branch manager has access to assigned branch                                                                 0.24s  
+
+   PASS  Modules\ERP\Tests\Feature\MultiBranch\BranchTransferServiceTest
+  ✓ can create and approve transfer                                                                              0.26s  
+
+   PASS  Modules\ERP\Tests\Feature\MultiBranch\ERPMultiBranchFlowTest
+  ✓ full multi branch lifecycle                                                                                  0.26s  
+
+   PASS  Modules\ERP\Tests\Feature\MultiBranch\MultiBranchServiceTest
+  ✓ can create branch if under limit                                                                             0.25s  
+  ✓ throws exception if over limit                                                                               0.22s  
+
+   PASS  Modules\ERP\Tests\Feature\MultiBranch\TenantIsolationMultiBranchTest
+  ✓ tenant a cannot access tenant b branches                                                                     0.25s  
+
+   PASS  Modules\ERP\Tests\Feature\PayrollTest
+  ✓ can update payroll contract                                                                                  0.27s  
+  ✓ can generate draft payslips                                                                                  0.28s  
+  ✓ can update payslip items and recalculate net                                                                 0.29s  
+  ✓ can mark payslip as paid and generate expense                                                                0.26s  
+
+   PASS  Modules\ERP\Tests\Feature\PosCheckoutTest
+  ✓ can checkout as guest with payment and cost expense                                                          0.31s  
+  ✓ can checkout existing client as unpaid                                                                       0.29s  
+
+   PASS  Modules\ERP\Tests\Feature\PosTest
+  ✓ user cannot access pos without addon                                                                         0.35s  
+  ✓ user can access pos with addon                                                                               0.29s  
+  ✓ pos checkout creates invoice and transaction                                                                 0.27s  
+
+   PASS  Modules\ERP\Tests\Feature\ProjectControllerTest
+  ✓ project creation inherits client currency                                                                    0.27s  
+  ✓ project show page loads with related data and transactions                                                   0.36s  
+  ✓ invoice create route with project preselects client and project                                              0.39s  
+  ✓ project update successfully                                                                                  0.35s  
+  ✓ project delete successfully                                                                                  0.33s  
+  ✓ edit non existent project renders not found view                                                             0.34s  
+  ✓ show non existent project renders not found view                                                             0.32s  
+
+   PASS  Modules\ERP\Tests\Feature\ReferralControllerTest
+  ✓ referrals index loads clients with referrers                                                                 0.36s  
+  ✓ referrals tree loads client referrals                                                                        0.36s  
+  ✓ referrals earnings loads earnings list                                                                       0.37s  
+
+   PASS  Modules\ERP\Tests\Feature\SettingsTest
+  ✓ settings update without multi currency throws exception                                                      0.31s  
+  ✓ settings update with multi currency does not update client currencies                                        0.34s  
+
+   PASS  Modules\ERP\Tests\Feature\SmtpSettingControllerTest
+  ✓ smtp edit loads settings                                                                                     0.37s  
+  ✓ smtp update saves settings                                                                                   0.32s  
+
+   PASS  Modules\ERP\Tests\Feature\TaskControllerTest
+  ✓ task index loads                                                                                             0.37s  
+  ✓ task store creates task                                                                                      0.33s  
+  ✓ task store item creates todo                                                                                 0.34s  
+
+   PASS  Modules\ERP\Tests\Feature\TeamAuthAndOversightTest
+  ✓ team member can login with correct credentials                                                               0.26s  
+  ✓ team member cannot login with incorrect credentials                                                          0.47s  
+  ✓ suspended team member cannot login                                                                           0.25s  
+  ✓ team member can logout                                                                                       0.27s  
+  ✓ team member session bridging on dashboard                                                                    0.33s  
+  ✓ manager role can mutate clients                                                                              0.25s  
+  ✓ member role cannot mutate clients but can mutate tasks                                                       0.27s  
+  ✓ admin can access oversight pages                                                                             0.32s  
+  ✓ non admin cannot access oversight pages                                                                      0.31s  
+
+   PASS  Modules\ERP\Tests\Feature\WalletControllerTest
+  ✓ show ledger                                                                                                  0.28s  
+  ✓ receive and send payments                                                                                    0.27s  
+  ✓ refund payment                                                                                               0.27s  
+  ✓ user cannot modify other tenant client                                                                       0.27s  
+  ✓ receive and send with project                                                                                0.26s  
+  ✓ send insufficient balance                                                                                    0.27s  
+
+   PASS  Modules\ERP\Tests\Feature\WhiteLabelTest
+  ✓ invoice pdf shows branding without white label addon                                                         0.24s  
+  ✓ invoice pdf hides branding with white label addon                                                            0.26s  
+
+   WARN  Modules\Freelance\Tests\Feature\ContractLifecycleWorkflowTest
+  - it handles full contract lifecycle from acceptance to completion via API → Routes not implemented yet.       0.27s  
+
+   WARN  Modules\Freelance\Tests\Feature\FreelanceFullSequenceTest
+  ✓ it executes a full end-to-end sequence between a client and multiple freelancers                             0.28s  
+  ! it prevents freelancers from accessing or editing other freelancer proposals (Security) → This test did not… 0.28s  
+  ✓ it tests inactivity refund rule (Unhappy Path)                                                               0.29s  
+
+   PASS  Modules\Freelance\Tests\Feature\FreelanceSkillApprovalTest
+  ✓ it allows admin to view freelance skills                                                                     0.32s  
+  ✓ it allows admin to approve a pending skill                                                                   0.26s  
+  ✓ it allows admin to reject a pending skill                                                                    0.25s  
+  ✓ it allows admin to block a user from adding skills                                                           0.27s  
+  ✓ it hides rejected skills from normal users API response                                                      0.26s  
+
+   PASS  Modules\Freelance\Tests\Feature\FreelanceSkillMatchingTest
+  ✓ it ensures job discovery process is driven by skill matching                                                 0.25s  
+
+   PASS  Modules\Freelance\Tests\Feature\JobPostingWorkflowTest
+  ✓ it allows a user to post a job with existing approved skills                                                 0.31s  
+  ✓ it allows a user to post a job with new custom skills                                                        0.33s  
+  ✓ it prevents posting a job with a rejected skill                                                              0.25s  
+  ✓ it prevents user from adding custom skills if blocked                                                        0.28s  
+
+   PASS  Modules\Freelance\Tests\Feature\PostJobActionTest
+  ✓ it posts a job successfully and deducts points                                                               0.26s  
+  ✓ it fails to post a job if insufficient points                                                                0.24s  
+
+   WARN  Modules\Freelance\Tests\Feature\ProposalSubmissionWorkflowTest
+  - it allows a freelancer to submit a proposal via API → Route /api/freelance/jobs/{job}/proposals not impleme… 0.26s  
+
+   PASS  Modules\Freelance\Tests\Feature\SubmitProposalActionTest
+  ✓ it submits a proposal successfully and deducts points                                                        0.25s  
+  ✓ it fails to submit proposal if already submitted                                                             0.25s  
+
+   PASS  Modules\Freelance\Tests\Unit\Actions\AcceptProposalActionTest
+  ✓ it accepts a proposal, refunds other freelancers, and creates a contract                                     0.26s  
+  ✓ it throws exception if non-client tries to accept proposal                                                   0.26s  
+
+   PASS  Modules\Freelance\Tests\Unit\Actions\CompleteContractActionTest
+  ✓ it completes a contract and releases escrow to freelancer                                                    0.28s  
+  ✓ it throws exception if non-client tries to complete contract                                                 0.26s  
+  ✓ it throws exception if contract is already completed                                                         0.26s  
+
+   PASS  Modules\Freelance\Tests\Unit\Actions\PostJobActionTest
+  ✓ it posts a job successfully and deducts points                                                               0.29s  
+  ✓ it throws exception if client has insufficient points                                                        0.28s  
+  ✓ it reverts database transaction if point deduction fails                                                     0.30s  
+
+   PASS  Modules\Freelance\Tests\Unit\Actions\SubmitProposalActionTest
+  ✓ it submits a proposal successfully and deducts points                                                        0.26s  
+  ✓ it prevents submitting multiple proposals for the same job                                                   0.24s  
+  ✓ it throws exception if freelancer has insufficient points                                                    0.26s  
+  ✓ it rolls back proposal creation if point deduction fails                                                     0.28s  
+
+   PASS  Modules\Freelance\Tests\Finance\AddPointsTest
+  ✓ it adds points and creates a transaction log                                                                 0.26s  
+  ✓ it throws exception if addition amount is zero or negative                                                   0.25s  
+
+   PASS  Modules\Freelance\Tests\Finance\DeductPointsTest
+  ✓ it deducts points and creates a transaction log                                                              0.26s  
+  ✓ it throws exception if points balance is insufficient                                                        0.26s  
+  ✓ it throws exception if deduction amount is zero or negative                                                  0.26s  
+  ✓ it locks row and ensures atomicity                                                                           0.25s  
+
+   WARN  Modules\Freelance\Tests\Security\ContractHijackPreventionTest
+  - it prevents an unauthorized user from modifying a contract state → Route not implemented yet.                0.28s  
+
+   WARN  Modules\Freelance\Tests\Security\FreelanceSecurityTest
+  ! it prevents client from closing another clients job → This test did not perform any assertions               0.25s  
+  ! it prevents mass assignment of points_spent in proposals to bypass minimums → This test did not perform any… 0.28s  
+
+   WARN  Modules\Freelance\Tests\Security\ProposalAuthorizationTest
+  - it prevents a user from withdrawing someone elses proposal via API → Route not implemented yet.              0.26s  
+  - it prevents a freelancer from accepting their own proposal → Route not implemented yet.                      0.27s  
+
+   PASS  Modules\Freelance\Tests\Concurrency\ContractAcceptanceRaceConditionTest
+  ✓ it prevents accepting multiple proposals for the same job simultaneously                                     0.25s  
+
+   PASS  Modules\Freelance\Tests\Concurrency\PointsDeductionRaceConditionTest
+  ✓ it uses pessimistic locking to prevent points deduction race conditions                                      0.27s  
+  ✓ it prevents negative point balances under concurrent logic simulation                                        0.24s  
+
+   PASS  Modules\Freelance\Tests\Concurrency\ProposalRaceConditionTest
+  ✓ it prevents a freelancer from submitting duplicate proposals for the same job                                0.25s  
+
+   PASS  Modules\Freelance\Tests\Performance\JobQueryPerformanceTest
+  ✓ it loads jobs and their related counts without N+1 queries                                                   0.26s  
+
+   PASS  Modules\Freelance\Tests\Performance\QueueRecoveryTest
+  ✓ it handles large batches of notifications gracefully                                                         0.24s  
+
+   PASS  Modules\CRM\Tests\Feature\BranchIsolationTest
+  ✓ models automatically scope to branch context                                                                 0.25s  
+
+   PASS  Modules\CRM\Tests\Feature\CrmTeamTest
+  ✓ can view team members index                                                                                  0.31s  
+  ✓ can add team member                                                                                          0.27s  
+  ✓ can add social media role                                                                                    0.28s  
+  ✓ cannot exceed capacity limit                                                                                 0.27s  
+  ✓ can update team member role                                                                                  0.30s  
+  ✓ can suspend team member                                                                                      0.29s  
+  ✓ can delete team member                                                                                       0.27s  
+  ✓ team member cannot manage team                                                                               0.30s  
+  ✓ crm team member model roles                                                                                  0.24s  
+  ✓ workspace has team members relationship                                                                      0.24s  
+  ✓ crm login page renders                                                                                       0.27s  
+  ✓ crm team member can login                                                                                    0.26s  
+  ✓ suspended member cannot login                                                                                0.27s  
+  ✓ login redirects social media to leads                                                                        0.28s  
+  ✓ login redirects manager to manager dashboard                                                                 0.27s  
+  ✓ member email unique per workspace                                                                            0.28s  
+  ✓ no erp dependency                                                                                            0.27s  
+
+   PASS  Modules\CRM\Tests\Feature\CrmWidgetTest
+  ✓ can view widgets index                                                                                       0.31s  
+  ✓ can create widget                                                                                            0.27s  
+  ✓ can capture lead via widget                                                                                  0.28s  
+
+   WARN  Modules\CRM\Tests\Feature\LeadAssignmentTest
+  - lead is assigned via round robin → AssignLeadRoundRobinAction is not implemented yet.                        0.28s  
+
+   PASS  Modules\CRM\Tests\Feature\LeadManualCreationTest
+  ✓ can create lead manually                                                                                     0.33s  
+  ✓ create lead manually requires name                                                                           0.34s  
+
+   PASS  Modules\CRM\Tests\Feature\TenantIsolationTest
+  ✓ models automatically scope to tenant context                                                                 0.35s  
+  ✓ jobs maintain tenant isolation without session                                                               0.33s  
+
+   FAIL  Modules\CRM\Tests\Feature\WebhookConcurrencyTest
+  ⨯ concurrent webhook floods are idempotent                                                                     0.33s  
+
+   FAIL  Modules\CRM\Tests\Feature\WorkspaceAccessTest
+  ⨯ telesales agent cannot access manager workspace                                                              0.27s  
+  ⨯ manager can access manager workspace                                                                         0.24s  
+
+   FAIL  Modules\Marketplace\Tests\Feature\EscrowServiceTest
+  ⨯ escrow release credits seller correctly                                                                      0.26s  
+  ⨯ escrow refund credits buyer                                                                                  0.23s  
+
+   FAIL  Modules\Marketplace\Tests\Feature\MarketplaceOrderTest
+  ⨯ buyer can place order with sufficient balance                                                                0.25s  
+  ⨯ buyer cannot place order with insufficient balance                                                           0.24s  
+
+   FAIL  Modules\Booking\Tests\Feature\BookingAnalyticsTest
+  ⨯ listener increments metrics correctly                                                                        0.24s  
+  ⨯ analytics service rolls up data                                                                              0.26s  
+
+   FAIL  Modules\Booking\Tests\Feature\BookingBranchIsolationTest
+  ⨯ branches are isolated by tenant                                                                              0.24s  
+
+   FAIL  Modules\Booking\Tests\Feature\BookingProfileTest
+  ⨯ booking profile resolves by slug                                                                             0.26s  
+
+   PASS  Modules\Booking\tests\Feature\Booking\GcalSync\CalendarConflictResolverTest
+  ✓ imported busy slots prevent public booking                                                                   0.25s  
+
+   PASS  Modules\Booking\tests\Feature\Booking\GcalSync\GoogleOAuthFlowTest
+  ✓ tenant cannot redirect if no feature flag                                                                    0.24s  
+
+   PASS  Modules\Booking\tests\Feature\Booking\GcalSync\PushBookingToGoogleJobTest
+  ✓ pushes booking and fires event                                                                               0.25s  
+
+   FAIL  Modules\Booking\tests\Feature\Booking\GroupSessions\GroupSessionBookingFlowTest
+  ⨯ customer can join group session                                                                              0.27s  
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+   FAILED  Modules\CRM\Tests\Feature\WebhookConcurrencyTest > concurrent webhook floods are idempote…  ErrorException   
+  Undefined property: Modules\CRM\Tests\Feature\WebhookConcurrencyTest::$tenant
+
+  at Modules\CRM\Tests\Feature\WebhookConcurrencyTest.php:22
+     18▕     {
+     19▕         $branchId = 1;
+     20▕ 
+     21▕         $agent = User::factory()->create([
+  ➜  22▕             'tenant_id' => $this->tenant->id,
+     23▕             'branch_id' => $branchId,
+     24▕         ]);
+     25▕         UserSubscription::factory()->create(['user_id' => $agent->id, 'module_id' => 'crm-sales-staff']);
+     26▕
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+   FAILED  Modules\CRM\Tests\Feature\WorkspaceAccessTest > telesales agent cannot access manager wor…  ErrorException   
+  Undefined property: Modules\CRM\Tests\Feature\WorkspaceAccessTest::$tenant
+
+  at Modules\CRM\Tests\Feature\WorkspaceAccessTest.php:16
+     12▕     use DatabaseTransactions;
+     13▕ 
+     14▕     public function test_telesales_agent_cannot_access_manager_workspace()
+     15▕     {
+  ➜  16▕         $agent = User::factory()->create(['tenant_id' => $this->tenant->id]);
+     17▕         
+     18▕         // Give only sales-staff addon
+     19▕         UserSubscription::factory()->create([
+     20▕             'user_id' => $agent->id,
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+   FAILED  Modules\CRM\Tests\Feature\WorkspaceAccessTest > manager can access manager workspace        ErrorException   
+  Undefined property: Modules\CRM\Tests\Feature\WorkspaceAccessTest::$tenant
+
+  at Modules\CRM\Tests\Feature\WorkspaceAccessTest.php:37
+     33▕     }
+     34▕ 
+     35▕     public function test_manager_can_access_manager_workspace()
+     36▕     {
+  ➜  37▕         $manager = User::factory()->create(['tenant_id' => $this->tenant->id]);
+     38▕         
+     39▕         // Give manager addon
+     40▕         UserSubscription::factory()->create([
+     41▕             'user_id' => $manager->id,
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+   FAILED  Modules\Marketplace\Tests\Feature\EscrowServiceTest > escrow release credits sell…  BadMethodCallException   
+  Call to undefined method Modules\Marketplace\Models\ServiceOrder::factory()
+
+  at vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:67
+     63▕      * @throws \BadMethodCallException
+     64▕      */
+     65▕     protected static function throwBadMethodCallException($method)
+     66▕     {
+  ➜  67▕         throw new BadMethodCallException(sprintf(
+     68▕             'Call to undefined method %s::%s()', static::class, $method
+     69▕         ));
+     70▕     }
+     71▕ }
+
+  1   vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:67
+  2   vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:36
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+   FAILED  Modules\Marketplace\Tests\Feature\EscrowServiceTest > escrow refund credits buyer   BadMethodCallException   
+  Call to undefined method Modules\Marketplace\Models\ServiceOrder::factory()
+
+  at vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:67
+     63▕      * @throws \BadMethodCallException
+     64▕      */
+     65▕     protected static function throwBadMethodCallException($method)
+     66▕     {
+  ➜  67▕         throw new BadMethodCallException(sprintf(
+     68▕             'Call to undefined method %s::%s()', static::class, $method
+     69▕         ));
+     70▕     }
+     71▕ }
+
+  1   vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:67
+  2   vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:36
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+   FAILED  Modules\Marketplace\Tests\Feature\MarketplaceOrderTest > buyer can place order wi…  BadMethodCallException   
+  Call to undefined method Modules\Marketplace\Models\Service::factory()
+
+  at vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:67
+     63▕      * @throws \BadMethodCallException
+     64▕      */
+     65▕     protected static function throwBadMethodCallException($method)
+     66▕     {
+  ➜  67▕         throw new BadMethodCallException(sprintf(
+     68▕             'Call to undefined method %s::%s()', static::class, $method
+     69▕         ));
+     70▕     }
+     71▕ }
+
+  1   vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:67
+  2   vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:36
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+   FAILED  Modules\Marketplace\Tests\Feature\MarketplaceOrderTest > buyer cannot place order…  BadMethodCallException   
+  Call to undefined method Modules\Marketplace\Models\Service::factory()
+
+  at vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:67
+     63▕      * @throws \BadMethodCallException
+     64▕      */
+     65▕     protected static function throwBadMethodCallException($method)
+     66▕     {
+  ➜  67▕         throw new BadMethodCallException(sprintf(
+     68▕             'Call to undefined method %s::%s()', static::class, $method
+     69▕         ));
+     70▕     }
+     71▕ }
+
+  1   vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:67
+  2   vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:36
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+   FAILED  Modules\Booking\Tests\Feature\BookingAnalyticsTest > listener increments metrics correctl…  QueryException   
+  SQLSTATE[42S22]: Column not found: 1054 Unknown column 'tenant_id' in 'field list' (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: newmusoftware, SQL: insert into `users` (`name`, `email`, `password`, `tenant_id`, `updated_at`, `created_at`) values (Clinic 1, t1@test.com, $2y$04$nnezTLGSwvHqRvkmc7Smiu1AGK6ypSIf8tBEbminRFoFm4GuaOava, 1, 2026-06-07 13:50:34, 2026-06-07 13:50:34))
+
+  at vendor\laravel\framework\src\Illuminate\Database\MySqlConnection.php:47
+     43▕             if ($this->pretending()) {
+     44▕                 return true;
+     45▕             }
+     46▕ 
+  ➜  47▕             $statement = $this->getPdo()->prepare($query);
+     48▕ 
+     49▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+     50▕ 
+     51▕             $this->recordsHaveBeenModified();
+
+  1   vendor\laravel\framework\src\Illuminate\Database\MySqlConnection.php:47
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+   FAILED  Modules\Booking\Tests\Feature\BookingAnalyticsTest > analytics service rolls up data                 Error   
+  Class "Modules\Booking\Features\Analytics\Services\BookingAnalyticsService" not found
+
+  at Modules\Booking\tests\Feature\BookingAnalyticsTest.php:93
+     89▕             'total_revenue' => 1000.00,
+     90▕             'currency' => 'EGP'
+     91▕         ]);
+     92▕ 
+  ➜  93▕         $service = new BookingAnalyticsService();
+     94▕         $summary = $service->getSummary(2, Carbon::now()->subDays(7)->format('Y-m-d'), Carbon::now()->format('Y-m-d'));
+     95▕ 
+     96▕         $this->assertEquals(15, $summary['total_bookings']);
+     97▕         $this->assertEquals(13, $summary['completed_bookings']);
+
+  1   Modules\Booking\tests\Feature\BookingAnalyticsTest.php:93
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+   FAILED  Modules\Booking\Tests\Feature\BookingBranchIsolationTest > branches are isolated by tenan…  QueryException   
+  SQLSTATE[42S22]: Column not found: 1054 Unknown column 'tenant_id' in 'field list' (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: newmusoftware, SQL: insert into `users` (`name`, `email`, `password`, `tenant_id`, `updated_at`, `created_at`) values (Tenant1, t1@test.com, $2y$04$NHg9C2htsENDCPhXITtkpO1UQjA2GrIGyYKPnwwsI99J41fYZORbi, 1, 2026-06-07 13:50:35, 2026-06-07 13:50:35))
+
+  at vendor\laravel\framework\src\Illuminate\Database\MySqlConnection.php:47
+     43▕             if ($this->pretending()) {
+     44▕                 return true;
+     45▕             }
+     46▕ 
+  ➜  47▕             $statement = $this->getPdo()->prepare($query);
+     48▕ 
+     49▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+     50▕ 
+     51▕             $this->recordsHaveBeenModified();
+
+  1   vendor\laravel\framework\src\Illuminate\Database\MySqlConnection.php:47
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+   FAILED  Modules\Booking\Tests\Feature\BookingProfileTest > booking profile resolves by slug         QueryException   
+  SQLSTATE[42S22]: Column not found: 1054 Unknown column 'tenant_id' in 'field list' (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: newmusoftware, SQL: insert into `users` (`name`, `email`, `password`, `tenant_id`, `updated_at`, `created_at`) values (Clinic 1, t1@test.com, $2y$04$jMA7MA2u38s5O8ZepOlVGe83uUac/5zPkCXt.OAfayUGlrVRbj/he, 1, 2026-06-07 13:50:35, 2026-06-07 13:50:35))
+
+  at vendor\laravel\framework\src\Illuminate\Database\MySqlConnection.php:47
+     43▕             if ($this->pretending()) {
+     44▕                 return true;
+     45▕             }
+     46▕ 
+  ➜  47▕             $statement = $this->getPdo()->prepare($query);
+     48▕ 
+     49▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+     50▕ 
+     51▕             $this->recordsHaveBeenModified();
+
+  1   vendor\laravel\framework\src\Illuminate\Database\MySqlConnection.php:47
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:827
+
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+   FAILED  Modules\Booking\tests\Feature\Booking\GroupSessions\GroupSessionBookingFlowTest > customer can join group…   
+  Expected response status code [200] but received 404.
+Failed asserting that 404 is identical to 200.
+
+  at Modules\Booking\tests\Feature\Booking\GroupSessions\GroupSessionBookingFlowTest.php:31
+     27▕         $response = $this->actingAs($user)->postJson("/api/group-sessions/{$session->id}/join", [
+     28▕             'customer_id' => 50
+     29▕         ]);
+     30▕ 
+  ➜  31▕         $response->assertStatus(200)
+     32▕                  ->assertJsonPath('status', 'confirmed');
+     33▕                  
+     34▕         $this->assertDatabaseHas('booking_group_session_participants', [
+     35▕             'group_session_id' => $session->id,
+
+
+  Tests:    12 failed, 3 risky, 1 incomplete, 10 skipped, 642 passed, [2m125 pending[22m (1981 assertions)
+  Duration: 200.17s
+

@@ -299,7 +299,7 @@ class BookingController extends Controller
             'status' => $eventType->requires_payment ? 'pending' : 'confirmed',
             'payment_status' => $eventType->requires_payment ? 'pending' : 'free',
             'price' => $eventType->price,
-            'currency' => $eventType->currency,
+            'currency_id' => $eventType->currency_id,
             'notes' => $request->notes,
         ]);
 
@@ -388,7 +388,7 @@ class BookingController extends Controller
             $booking->guest_name,
             $booking->guest_email,
             $booking->id,
-            $booking->currency ?? null
+            $booking->currency_id ?? null
         );
 
         return Inertia::location($paymentUrl);
@@ -603,7 +603,7 @@ class BookingController extends Controller
                 [
                     'name' => $booking->guest_name,
                     'phone' => $booking->guest_phone,
-                    'currency' => $booking->currency ?? null
+                    'currency_id' => $booking->currency_id ?? null
                 ]
             );
         }

@@ -17,8 +17,7 @@ class BookingProfileTest extends TestCase
             'name' => 'Clinic 1', 
             'email' => 't1@test.com', 
             'password' => 'test',
-            'tenant_id' => 1
-        ]);
+            ]);
         
         $config = BookingPageConfig::create([
             'tenant_id' => 1,

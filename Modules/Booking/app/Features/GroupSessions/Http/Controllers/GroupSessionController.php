@@ -20,21 +20,20 @@ class GroupSessionController extends Controller
     {
         $this->sessionService = $sessionService;
         $this->limitsService = $limitsService;
-        $this->middleware('auth:sanctum');
-    }
+        }
 
     public function index()
     {
         $sessions = GroupSession::withCount(['participants' => function($q) {
             $q->where('status', 'confirmed');
-        }])->where('tenant_id', auth()->user()->tenant_id)->get();
+        }])->where('tenant_id', (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))->get();
         
         return response()->json($sessions);
     }
 
     public function store(Request $request)
     {
-        if (!$this->limitsService->canCreateSession(auth()->user()->tenant_id)) {
+        if (!$this->limitsService->canCreateSession((app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))) {
             return response()->json(['message' => 'Feature locked. Upgrade to unlock Group Sessions.'], 403);
         }
 
@@ -72,7 +71,7 @@ class GroupSessionController extends Controller
 
         $participant = GroupParticipant::where('group_session_id', $id)
             ->where('customer_id', $validated['customer_id'])
-            ->where('tenant_id', auth()->user()->tenant_id)
+            ->where('tenant_id', (app()->bound('currentTenant') ? app('currentTenant')->id : auth()->id()))
             ->firstOrFail();
 
         $participant->update(['status' => 'cancelled']);

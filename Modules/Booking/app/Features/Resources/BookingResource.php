@@ -1,14 +1,14 @@
 <?php
 
-namespace Modules\Booking\Features\Resources;
+namespace Modules\Booking\app\Features\Resources;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Booking\Core\Traits\TenantAwareModel;
-use Modules\Booking\Features\Availability\BookingResourceSchedule;
-use Modules\Booking\Features\Availability\BookingScheduleException;
-use Modules\Booking\Features\Availability\BookingScheduleRule;
-use Modules\Booking\Features\Availability\BookingResourceTimeOff;
+use Modules\Booking\app\Features\Availability\BookingResourceSchedule;
+use Modules\Booking\app\Features\Availability\BookingScheduleException;
+use Modules\Booking\app\Features\Availability\BookingScheduleRule;
+use Modules\Booking\app\Features\Availability\BookingResourceTimeOff;
 
 class BookingResource extends Model
 {

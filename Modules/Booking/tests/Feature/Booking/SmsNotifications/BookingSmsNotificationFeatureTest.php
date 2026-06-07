@@ -20,9 +20,12 @@ class BookingSmsNotificationFeatureTest extends TestCase
     {
         Queue::fake();
 
-        $tenantId = 1;
-        $customer = User::factory()->create(['tenant_id' => $tenantId, 'phone' => '01012345678']);
+        $this->mock(\Modules\Booking\app\Features\SmsNotifications\Services\BookingSmsLimitsService::class, function ($mock) {
+            $mock->shouldReceive('canSendSms')->andReturn(true);
+        });
 
+        $tenantId = 1;
+        
         SmsSetting::create([
             'tenant_id' => $tenantId,
             'provider_name' => 'twilio',
@@ -37,19 +40,18 @@ class BookingSmsNotificationFeatureTest extends TestCase
             'is_active' => true
         ]);
 
-        $booking = Booking::create([
-            'tenant_id' => $tenantId,
-            'customer_id' => $customer->id,
-            'start_date' => '2026-06-01',
-            'start_time' => '10:00:00',
-            'status' => 'confirmed'
-        ]);
+        $booking = new Booking();
+        $booking->guest_phone = '01012345678';
+        $booking->starts_at = \Carbon\Carbon::parse('2026-06-01 10:00:00');
+        $booking->status = 'confirmed';
+        $booking->tenant_id = $tenantId;
+        $booking->id = 55;
 
         $service = app(BookingSmsNotificationService::class);
         $service->scheduleSms($booking, 'confirmation');
 
-        Queue::assertPushed(SendSmsJob::class, function ($job) use ($booking, $customer) {
-            return $job->bookingId === $booking->id && $job->mobile === $customer->phone;
+        Queue::assertPushed(SendSmsJob::class, function ($job) use ($booking) {
+            return $job->bookingId === $booking->id && $job->mobile === '01012345678';
         });
     }
 }

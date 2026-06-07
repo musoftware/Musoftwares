@@ -90,9 +90,35 @@ if ($DryRun) {
 Write-Host ""
 
 # -----------------------------------------------------------------------
-# 1. Detect Changed PHP Files
+# 1. Run Pest / PHPUnit Tests (optional)
 # -----------------------------------------------------------------------
-Step 1 $totalSteps "Detecting changed PHP files..."
+if (-not $SkipTests -and -not $RemoteTests) {
+    Step 1 $totalSteps "Running tests locally (php artisan test)..."
+
+    # Check local PHP version
+    $phpVer = [version]((& $PHP_BIN -r "echo PHP_VERSION;" 2>&1) -replace '[^\d\.]', '')
+    if ($phpVer -lt [version]"8.2.0") {
+        Write-Host ""
+        Write-Host "  [!] Warning: Local PHP version ($phpVer) is older than 8.2." -ForegroundColor Yellow
+        Write-Host "      Tests require PHP 8.2+ (for readonly classes etc)." -ForegroundColor Yellow
+        Write-Host "      Skipping local tests automatically. Use -RemoteTests to test on server." -ForegroundColor Yellow
+    } else {
+        cmd.exe /c "`"$PHP_BIN`" -d memory_limit=2G vendor\bin\pest --stop-on-failure 2>&1"
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host ""
+            Fail "Tests failed! Fix failing tests before deploying."
+            exit 1
+        }
+        Pass "All tests passed."
+    }
+} elseif ($RemoteTests) {
+    Step 1 $totalSteps "Skipping local tests (will run on remote server)..."
+}
+
+# -----------------------------------------------------------------------
+# 2. Detect Changed PHP Files
+# -----------------------------------------------------------------------
+Step 2 $totalSteps "Detecting changed PHP files..."
 
 $phpFiles = @()
 
@@ -125,9 +151,9 @@ foreach ($f in $phpFiles) {
 }
 
 # -----------------------------------------------------------------------
-# 2. PHP Syntax Check (php -l) on each changed file
+# 3. PHP Syntax Check (php -l) on each changed file
 # -----------------------------------------------------------------------
-Step 2 $totalSteps "Running PHP syntax check (php -l)..."
+Step 3 $totalSteps "Running PHP syntax check (php -l)..."
 
 $syntaxErrors = 0
 foreach ($file in $phpFiles) {
@@ -149,9 +175,9 @@ if ($syntaxErrors -gt 0) {
 Pass "All $($phpFiles.Count) files passed syntax check."
 
 # -----------------------------------------------------------------------
-# 3. PHPStan Static Analysis (full project with baseline)
+# 4. PHPStan Static Analysis (full project with baseline)
 # -----------------------------------------------------------------------
-Step 3 $totalSteps "Running PHPStan static analysis..."
+Step 4 $totalSteps "Running PHPStan static analysis..."
 
 Info "Analysing full project (baseline ignores existing issues, only NEW errors fail)..."
 cmd.exe /c "`"$PHP_BIN`" vendor\bin\phpstan analyse --memory-limit=2G --no-progress"
@@ -163,31 +189,7 @@ if ($LASTEXITCODE -ne 0) {
 
 Pass "PHPStan passed - no new errors detected."
 
-# -----------------------------------------------------------------------
-# 4. Run Pest / PHPUnit Tests (optional)
-# -----------------------------------------------------------------------
-if (-not $SkipTests -and -not $RemoteTests) {
-    Step 4 $totalSteps "Running tests locally (php artisan test)..."
 
-    # Check local PHP version
-    $phpVer = [version]((& $PHP_BIN -r "echo PHP_VERSION;" 2>&1) -replace '[^\d\.]', '')
-    if ($phpVer -lt [version]"8.2.0") {
-        Write-Host ""
-        Write-Host "  [!] Warning: Local PHP version ($phpVer) is older than 8.2." -ForegroundColor Yellow
-        Write-Host "      Tests require PHP 8.2+ (for readonly classes etc)." -ForegroundColor Yellow
-        Write-Host "      Skipping local tests automatically. Use -RemoteTests to test on server." -ForegroundColor Yellow
-    } else {
-        cmd.exe /c "`"$PHP_BIN`" -d memory_limit=2G vendor\bin\pest --stop-on-failure 2>&1"
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host ""
-            Fail "Tests failed! Fix failing tests before deploying."
-            exit 1
-        }
-        Pass "All tests passed."
-    }
-} elseif ($RemoteTests) {
-    Step 4 $totalSteps "Skipping local tests (will run on remote server)..."
-}
 
 # -----------------------------------------------------------------------
 # 5. Upload Changed Files to Server

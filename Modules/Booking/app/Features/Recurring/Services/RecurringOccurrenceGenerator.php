@@ -34,7 +34,7 @@ class RecurringOccurrenceGenerator
         foreach ($dates as $date) {
             // Check if we already generated it
             $alreadyGenerated = Booking::where('recurring_series_id', $series->id)
-                ->where('start_date', $date->format('Y-m-d'))
+                ->whereDate('starts_at', $date->format('Y-m-d'))
                 ->exists();
 
             if ($alreadyGenerated) continue;
@@ -44,13 +44,11 @@ class RecurringOccurrenceGenerator
 
             // Create occurrence
             Booking::create([
-                'tenant_id' => $series->tenant_id,
                 'recurring_series_id' => $series->id,
-                'customer_id' => $series->customer_id,
-                'resource_id' => $series->resource_id,
-                'service_id' => $series->service_id,
-                'start_date' => $date->format('Y-m-d'),
-                'start_time' => $date->format('H:i:s'),
+                'client_user_id' => $series->customer_id,
+                'booking_event_type_id' => $series->resource_id ?: 1,
+                'starts_at' => $date->format('Y-m-d H:i:s'),
+                'ends_at' => $date->copy()->addMinutes($series->duration_minutes ?: 30)->format('Y-m-d H:i:s'),
                 'status' => 'confirmed'
             ]);
 

@@ -12,7 +12,7 @@ class TeamMemberApiTest extends TestCase
 
     public function test_api_validation_requires_name_and_email()
     {
-        $admin = User::factory()->create(['tenant_id' => 1]);
+        $admin = User::factory()->create([]);
         $this->actingAs($admin);
 
         $response = $this->postJson('/api/v1/team-members', []);

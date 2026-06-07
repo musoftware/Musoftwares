@@ -13,20 +13,28 @@ use Modules\Booking\app\Features\MultiBranch\Events\BookingBranchDeleted;
 use Modules\Booking\app\Features\MultiBranch\Http\Resources\BookingBranchResource;
 use Modules\Booking\app\Features\MultiBranch\Models\BookingBranch;
 
-class BookingBranchController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class BookingBranchController extends Controller implements HasMiddleware
 {
     protected $repository;
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(function ($request, $next) {
+                if (!feature('booking-multi-branch')) {
+                    return response()->json(['message' => 'Feature locked. Upgrade to enable Multi Branch.'], 403);
+                }
+                return $next($request);
+            }),
+        ];
+    }
 
     public function __construct(BookingBranchRepository $repository)
     {
         $this->repository = $repository;
-        
-        $this->middleware(function ($request, $next) {
-            if (!feature('booking-multi-branch')) {
-                return response()->json(['message' => 'Feature locked. Upgrade to enable Multi Branch.'], 403);
-            }
-            return $next($request);
-        });
     }
 
     public function index()

@@ -22,8 +22,7 @@ class GroupSessionCapacityTest extends TestCase
         $host = User::forceCreate([
             'name' => 'Host', 
             'email' => 'host@test.com', 
-            'password' => 'test',
-            'tenant_id' => 1
+            'password' => 'test'
         ]);
         
         $eventType = BookingEventType::forceCreate([

@@ -1,22 +1,30 @@
 <?php
 
-namespace Modules\Booking\Features\Analytics\Http\Controllers;
+namespace Modules\Booking\app\Features\Analytics\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Modules\Booking\Features\Analytics\Services\BookingAnalyticsService;
+use Modules\Booking\app\Features\Analytics\Services\BookingAnalyticsService;
 use Carbon\Carbon;
 use Inertia\Inertia;
 
-class AnalyticsDashboardController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class AnalyticsDashboardController extends Controller implements HasMiddleware
 {
     protected $analyticsService;
 
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('feature:booking-analytics'),
+        ];
+    }
+
     public function __construct(BookingAnalyticsService $analyticsService)
     {
-        // Enforce the SaaS feature flag
-        $this->middleware('feature:booking-analytics');
         $this->analyticsService = $analyticsService;
     }
 

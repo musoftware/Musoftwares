@@ -26,6 +26,8 @@ interface GoldTransaction {
     fees: number;
     transaction_date: string;
     notes: string;
+    current_value?: number;
+    profit_loss?: number;
 }
 
 interface GoldWallet {
@@ -42,6 +44,7 @@ interface GoldWallet {
 
 interface ShowProps {
     wallet: GoldWallet;
+    karatBalances: Record<string, number>;
     hasGoalTracking: boolean;
     latestPrice?: any;
     gamification?: {
@@ -53,7 +56,7 @@ interface ShowProps {
     };
 }
 
-export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamification }: ShowProps) {
+export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, latestPrice, gamification }: ShowProps) {
     const [isCreatingTx, setIsCreatingTx] = useState(false);
     const [isEditingWallet, setIsEditingWallet] = useState(false);
     const [editingTx, setEditingTx] = useState<GoldTransaction | null>(null);
@@ -231,6 +234,13 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                             </CardHeader>
                             <CardContent>
                                 <div className="text-3xl font-bold text-slate-900">{wallet.balance_grams} {__('general.g')}</div>
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {Object.entries(karatBalances).map(([karat, grams]) => grams > 0 ? (
+                                        <div key={karat} className="text-xs bg-slate-200 text-slate-700 px-2 py-1 rounded font-medium">
+                                            {grams}g ({karat}k)
+                                        </div>
+                                    ) : null)}
+                                </div>
                             </CardContent>
                         </Card>
                         <Card className="bg-slate-50 border-slate-200 shadow-none">
@@ -249,7 +259,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                             <Card className={gamification.isProfit ? "bg-green-50 border-green-200 shadow-none" : "bg-red-50 border-red-200 shadow-none"}>
                                 <CardHeader className="pb-2">
                                     <CardTitle className={`text-sm font-medium ${gamification.isProfit ? 'text-green-700' : 'text-red-700'}`}>
-                                        {__('general.current_value')} (21k)
+                                        {__('general.current_value')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
@@ -404,6 +414,7 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                                 <th className="px-4 py-3">{__('gold_saver.price_per_gram')}</th>
                                                 <th className="px-4 py-3">{__('general.fees')}</th>
                                                 <th className="px-4 py-3">{__('general.total')}</th>
+                                                <th className="px-4 py-3">{__('general.current_value')} (P/L)</th>
                                                 <th className="px-4 py-3">{__('general.notes')}</th>
                                                 <th className="px-4 py-3 w-10"></th>
                                             </tr>
@@ -430,6 +441,21 @@ export default function ShowWallet({ wallet, hasGoalTracking, latestPrice, gamif
                                                     <td className="px-4 py-3">{formatNumber(tx.price_per_gram)}</td>
                                                     <td className="px-4 py-3">{formatNumber(tx.fees)}</td>
                                                     <td className="px-4 py-3 font-semibold">{formatNumber(tx.total_amount)} {wallet.currency}</td>
+                                                    <td className="px-4 py-3 font-semibold">
+                                                        {tx.current_value !== undefined ? (
+                                                            <div className="flex flex-col">
+                                                                <span>{formatNumber(tx.current_value)} {wallet.currency}</span>
+                                                                {tx.type === 'buy' && tx.profit_loss !== undefined && (
+                                                                    <span className={`text-xs ${tx.profit_loss >= 0 ? 'text-green-600' : 'text-red-600'} flex items-center`}>
+                                                                        {tx.profit_loss >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
+                                                                        {tx.profit_loss >= 0 ? '+' : ''}{formatNumber(tx.profit_loss)}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            '---'
+                                                        )}
+                                                    </td>
                                                     <td className="px-4 py-3 text-muted-foreground">{tx.notes}</td>
                                                     <td className="px-4 py-3 text-right">
                                                         <Dialog>
