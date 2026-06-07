@@ -388,7 +388,7 @@ class BookingController extends Controller
             $booking->guest_name,
             $booking->guest_email,
             $booking->id,
-            $booking->currency ?? 'USD'
+            $booking->currency ?? null
         );
 
         return Inertia::location($paymentUrl);
@@ -603,7 +603,7 @@ class BookingController extends Controller
                 [
                     'name' => $booking->guest_name,
                     'phone' => $booking->guest_phone,
-                    'currency' => $booking->currency ?? 'USD'
+                    'currency' => $booking->currency ?? null
                 ]
             );
         }
@@ -612,3 +612,4 @@ class BookingController extends Controller
         event(new \Modules\Booking\Events\BookingStatusChanged($booking, 'confirmed'));
     }
 }
+

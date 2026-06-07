@@ -72,7 +72,7 @@ class SmsPaymentGatewayOrderController extends Controller
                 'subtotal' => $calculatedTotal,
                 'tax' => 0,
                 'total_amount' => $request->total_amount,
-                'currency' => $request->currency ?? 'EGP',
+                'currency' => $request->currency ?? null,
                 'status' => 'pending_payment',
                 'payment_method' => 'sms-payment-gateway',
                 'notes' => $request->notes,
@@ -417,3 +417,4 @@ class SmsPaymentGatewayOrderController extends Controller
         ];
     }
 }
+

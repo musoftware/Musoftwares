@@ -254,7 +254,7 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                                         <Badge variant="outline" className="font-mono text-xs text-slate-600 bg-slate-50">{txn.sender_name || txn.sender}</Badge>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap font-bold text-slate-900">
-                                                        {txn.amount ? formatMoney(txn.amount, txn.currency || 'EGP') : '---'}
+                                                        {txn.amount ? formatMoney(txn.amount, txn.currency) : '---'}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         {getStatusBadge(txn.status)}
@@ -405,4 +405,5 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
         </AuthenticatedLayout>
     );
 }
+
 

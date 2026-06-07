@@ -37,7 +37,7 @@ class InvoiceWorkflowTest extends TestCase
 
         $this->user = User::factory()->create([
             'onboarding_completed' => true,
-            'preferred_currency' => 'USD',
+            'currency_id' => 1,
         ]);
         $this->user->assignRole('client');
 
@@ -161,11 +161,18 @@ class InvoiceWorkflowTest extends TestCase
 
     public function test_can_send_and_mark_paid_invoice(): void
     {
-        \Modules\ERP\Models\ClientWallet::create([
+        \Modules\ERP\Models\WalletTransaction::create([
             'tenant_id' => $this->tenant->id,
             'client_id' => $this->client->id,
-            'balance' => 1000.00,
+            'type' => 'received',
+            'direction' => 'credit',
+            'amount' => 1000.00,
             'currency_id' => $this->currency->id,
+            'business_amount' => 1000.00,
+            'business_currency_id' => $this->tenant->base_currency_id,
+            'exchange_rate' => 1.0,
+            'exchange_rate_date' => now()->toDateString(),
+            'note' => 'Test Balance Seed',
         ]);
 
         $invoice = Invoice::create([

@@ -103,13 +103,13 @@ class ProjectController extends Controller
         $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
 
         $currency = \App\Models\Currency::find($tenant->base_currency_id);
-        $businessCurrency = $currency ? $currency->currency : 'USD';
+        $businessCurrency = $currency;
 
         $data = $this->projectService->getProjectDashboardStats($project);
 
         $stats = $data['stats'];
         $stats['businessCurrency'] = $businessCurrency;
-        $stats['projectCurrency'] = $project->currency?->currency ?? 'USD';
+        $stats['projectCurrency'] = $project->currency;
 
         return Inertia::render('ERP/Projects/Show', [
             'project' => ProjectDashboardResource::make($data['project'])->resolve(),

@@ -18,6 +18,9 @@ class ProjectService
     public function createProject(array $validated, Tenant $tenant, int $userId): Project
     {
         $client = TenantClient::where('tenant_id', $tenant->id)->findOrFail($validated['client_id']);
+        if (!$client->currency_id) {
+            throw new \Exception("Client {$client->name} is missing an associated currency relation.");
+        }
 
         $project = Project::create([
             'tenant_id' => $tenant->id,
@@ -43,6 +46,9 @@ class ProjectService
     public function updateProject(Project $project, array $validated, Tenant $tenant): Project
     {
         $client = TenantClient::where('tenant_id', $tenant->id)->findOrFail($validated['client_id']);
+        if (!$client->currency_id) {
+            throw new \Exception("Client {$client->name} is missing an associated currency relation.");
+        }
 
         $project->update([
             'name' => $validated['name'],

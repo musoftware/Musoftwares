@@ -13,6 +13,11 @@ class CurrenciesExchange extends Model
 
     protected $guarded = [];
 
+    /**
+     * In-memory cache to prevent N+1 queries during bulk conversions
+     */
+    protected static $memoryCache = [];
+
     public static function is_exist($currency1, $currency2, $date): bool
     {
         $count = CurrenciesExchange::where('currency1', $currency1)
@@ -69,30 +74,50 @@ class CurrenciesExchange extends Model
 
     public static function RateToday($amount, $cur1, $cur2)
     {
-        $ex = CurrenciesExchange::where('currency1', trim($cur1))
-            ->where('currency2', trim($cur2))
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        if ($ex != null) {
-            return round($ex->rate * $amount, 2);
-        } else {
-            return round($amount * static::Rate(date('Y-m-d'), $cur1, $cur2), 2);
+        if (trim($cur1) == trim($cur2)) {
+            return round($amount, 2);
         }
+
+        $cacheKey = 'today_' . trim($cur1) . '_' . trim($cur2);
+
+        if (!isset(static::$memoryCache[$cacheKey])) {
+            $ex = CurrenciesExchange::where('currency1', trim($cur1))
+                ->where('currency2', trim($cur2))
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($ex != null) {
+                static::$memoryCache[$cacheKey] = $ex->rate;
+            } else {
+                static::$memoryCache[$cacheKey] = static::Rate(date('Y-m-d'), $cur1, $cur2);
+            }
+        }
+
+        return round(static::$memoryCache[$cacheKey] * $amount, 2);
     }
 
     public static function RateTodayNoRound($amount, $cur1, $cur2)
     {
-        $ex = CurrenciesExchange::where('currency1', trim($cur1))
-            ->where('currency2', trim($cur2))
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        if ($ex != null) {
-            return number_format(round($ex->rate * $amount, 9), 9, '.', '');
-        } else {
-            return number_format(round($amount * static::Rate(date('Y-m-d'), $cur1, $cur2), 9), 9, '.', '');
+        if (trim($cur1) == trim($cur2)) {
+            return number_format($amount, 9, '.', '');
         }
+
+        $cacheKey = 'today_' . trim($cur1) . '_' . trim($cur2);
+
+        if (!isset(static::$memoryCache[$cacheKey])) {
+            $ex = CurrenciesExchange::where('currency1', trim($cur1))
+                ->where('currency2', trim($cur2))
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($ex != null) {
+                static::$memoryCache[$cacheKey] = $ex->rate;
+            } else {
+                static::$memoryCache[$cacheKey] = static::Rate(date('Y-m-d'), $cur1, $cur2);
+            }
+        }
+
+        return number_format(round(static::$memoryCache[$cacheKey] * $amount, 9), 9, '.', '');
     }
 
     public static function RateByDate($date, $amount, $cur1, $cur2)
@@ -101,35 +126,41 @@ class CurrenciesExchange extends Model
             return 1 * $amount;
         }
         $date_str = date('Y-m-d', strtotime($date));
-        $ex = CurrenciesExchange::where('currency1', trim($cur1))
-            ->where('currency2', trim($cur2))
-            ->where('date_string', trim($date_str))
-            ->first();
+        $cacheKey = 'date_' . $date_str . '_' . trim($cur1) . '_' . trim($cur2);
 
-        if ($ex == null) {
+        if (!isset(static::$memoryCache[$cacheKey])) {
             $ex = CurrenciesExchange::where('currency1', trim($cur1))
                 ->where('currency2', trim($cur2))
-                ->orderByDesc('date_string')->first();
-        }
+                ->where('date_string', trim($date_str))
+                ->first();
 
-        if ($ex == null) {
-            try {
-                Artisan::call('currency:fetch-rates');
+            if ($ex == null) {
                 $ex = CurrenciesExchange::where('currency1', trim($cur1))
                     ->where('currency2', trim($cur2))
-                    ->where('date_string', trim($date_str))
-                    ->first();
-                if ($ex == null) {
+                    ->orderByDesc('date_string')->first();
+            }
+
+            if ($ex == null) {
+                try {
+                    Artisan::call('currency:fetch-rates');
                     $ex = CurrenciesExchange::where('currency1', trim($cur1))
                         ->where('currency2', trim($cur2))
-                        ->orderByDesc('date_string')->first();
+                        ->where('date_string', trim($date_str))
+                        ->first();
+                    if ($ex == null) {
+                        $ex = CurrenciesExchange::where('currency1', trim($cur1))
+                            ->where('currency2', trim($cur2))
+                            ->orderByDesc('date_string')->first();
+                    }
+                } catch (\Exception $e) {
+                    // Ignore command failure
                 }
-            } catch (\Exception $e) {
-                // Ignore command failure
             }
+
+            static::$memoryCache[$cacheKey] = $ex ? $ex->rate : 1.0;
         }
 
-        $rate = $ex ? $ex->rate : 1.0;
+        $rate = static::$memoryCache[$cacheKey];
         return round($rate * $amount, 2);
     }
 
@@ -140,26 +171,32 @@ class CurrenciesExchange extends Model
             return 1 * $amount;
         }
         $date_str = date('Y-m-d', strtotime($date));
-        $ex = CurrenciesExchange::where('currency1', trim($cur1))
-            ->where('currency2', trim($cur2))
-            ->where('date_string', trim($date_str))
-            ->first();
+        $cacheKey = 'date_' . $date_str . '_' . trim($cur1) . '_' . trim($cur2);
 
-        if ($ex == null) {
+        if (!isset(static::$memoryCache[$cacheKey])) {
             $ex = CurrenciesExchange::where('currency1', trim($cur1))
                 ->where('currency2', trim($cur2))
-                ->orderByDesc('date_string')->first();
-        }
+                ->where('date_string', trim($date_str))
+                ->first();
 
-        if ($ex == null) {
-            if ($date_str == '1970-01-01') {
+            if ($ex == null) {
                 $ex = CurrenciesExchange::where('currency1', trim($cur1))
                     ->where('currency2', trim($cur2))
-                    ->orderBy('id')->first();
+                    ->orderByDesc('date_string')->first();
             }
+
+            if ($ex == null) {
+                if ($date_str == '1970-01-01') {
+                    $ex = CurrenciesExchange::where('currency1', trim($cur1))
+                        ->where('currency2', trim($cur2))
+                        ->orderBy('id')->first();
+                }
+            }
+
+            static::$memoryCache[$cacheKey] = $ex ? $ex->rate : 1.0;
         }
 
-        $rate = $ex ? $ex->rate : 1.0;
+        $rate = static::$memoryCache[$cacheKey];
         return number_format(round($rate * $amount, 11), 11, '.', '');
     }
 
@@ -171,21 +208,25 @@ class CurrenciesExchange extends Model
             return 1;
         }
 
-        $ex = CurrenciesExchange::where('currency1', trim($cur1))
-            ->where('currency2', trim($cur2))
-            ->where('date_string', trim($date))
-            ->first();
+        $cacheKey = 'date_rate_' . trim($date) . '_' . trim($cur1) . '_' . trim($cur2);
 
-        if ($ex == null) {
-            $ex = CurrenciesExchange::where('currency1', $cur1)
-                ->where('currency2', $cur2)
-                ->where('date_string', date('Y-m-d', strtotime($date) - (24 * 60 * 60)))
+        if (!isset(static::$memoryCache[$cacheKey])) {
+            $ex = CurrenciesExchange::where('currency1', trim($cur1))
+                ->where('currency2', trim($cur2))
+                ->where('date_string', trim($date))
                 ->first();
+
+            if ($ex == null) {
+                $ex = CurrenciesExchange::where('currency1', $cur1)
+                    ->where('currency2', $cur2)
+                    ->where('date_string', date('Y-m-d', strtotime($date) - (24 * 60 * 60)))
+                    ->first();
+            }
+
+            static::$memoryCache[$cacheKey] = $ex ? $ex->rate : 1;
         }
-        if ($ex == null) {
-            return 1;
-        }
-        return $ex->rate;
+
+        return static::$memoryCache[$cacheKey];
     }
 
     public static function UsdToCost($ex_cost, $source)

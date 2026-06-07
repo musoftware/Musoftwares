@@ -14,6 +14,8 @@ use Inertia\Inertia;
 
 class ReferralController extends Controller
 {
+    use \App\Traits\ConvertsCurrency;
+
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -44,24 +46,16 @@ class ReferralController extends Controller
     {
         $user = Auth::user();
         
-        $formatMoney = function($amount, $currency) {
-            if (class_exists(\App\Models\CurrenciesExchange::class)) {
-                // If a global finance helper format method exists, we could use it here.
-                // For now, we return a generic format or the original if no helper exists.
-            }
-            return \App\Helpers\FinanceHelper::instance()->format_money($amount, $currency);
-        };
-
         // Use the exact database columns that are synced by BalancesHelper
         $pending_balance = $user->pending_commission;
-        $pending_balance_str = $formatMoney($pending_balance, $user->currency_name());
+        $pending_balance_str = $this->formatAmount($pending_balance, $user->currency_id ?: 1);
 
         // Available commission in legacy was: user_balance - withdrawing_commission
         $available_commission = max(0, (float)($user->user_balance - $user->withdrawing_commission));
-        $available_commission_str = $formatMoney($available_commission, $user->currency_name());
+        $available_commission_str = $this->formatAmount($available_commission, $user->currency_id ?: 1);
 
         $withdrawed_commission = $user->withdrawn_commission;
-        $withdrawed_commission_str = $formatMoney($withdrawed_commission, $user->currency_name());
+        $withdrawed_commission_str = $this->formatAmount($withdrawed_commission, $user->currency_id ?: 1);
 
         return Inertia::render('Dashboard/Referrals/Earns', [
             'pending_balance' => $pending_balance,

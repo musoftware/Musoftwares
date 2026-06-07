@@ -235,7 +235,8 @@ class PayrollController extends Controller
             Expense::create([
                 'tenant_id' => $tenant->id,
                 'title' => __('erp.payroll_expense_title', ['name' => $payslip->member->name, 'month' => $payslip->month, 'year' => $payslip->year]),
-                'amount' => $payslip->net_amount, // Amount in business currency
+                'amount' => $payslip->net_amount,
+                'currency_id' => $payslip->currency_id,
                 'category' => 'Payroll',
                 'date' => now()->toDateString(),
                 'description' => __('erp.salary_payment_for', ['name' => $payslip->member->name, 'month' => $payslip->month, 'year' => $payslip->year]),

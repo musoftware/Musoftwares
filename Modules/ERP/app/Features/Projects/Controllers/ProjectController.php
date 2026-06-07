@@ -163,8 +163,12 @@ class ProjectController extends Controller implements HasMiddleware
         $this->authorize('update', $project);
 
         // Get tenant base currency
+        $tenant = auth()->user()->tenant;
+        if (!$tenant || !$tenant->base_currency_id) {
+            abort(400, "Tenant configuration missing base currency.");
+        }
         $currency = \App\Models\Currency::find($tenant->base_currency_id);
-        $businessCurrency = $currency ? $currency->currency : 'USD';
+        $businessCurrency = $currency ? $currency->currency : null;
 
         // Load project relationships
         $project->load(['client', 'creator', 'currency']);
@@ -270,7 +274,7 @@ class ProjectController extends Controller implements HasMiddleware
             ],
             'stats' => [
                 'businessCurrency' => $businessCurrency,
-                'projectCurrency' => $project->currency?->currency ?? 'USD',
+                'projectCurrency' => $project->currency?->currency ?? null,
                 'paidInvoicesCount' => $paidCount,
                 'unpaidInvoicesCount' => $unpaidCount,
                 'totalInvoicesCount' => $totalCount,
@@ -312,7 +316,7 @@ class ProjectController extends Controller implements HasMiddleware
                     'description' => $exp->description,
                     'amount' => round((float) $exp->amount, 2),
                     'business_amount' => round((float) $exp->business_amount, 2),
-                    'currency' => $exp->currency?->currency ?? 'USD',
+                    'currency' => $exp->currency?->currency ?? null,
                     'date' => $exp->created_at?->format('Y-m-d'),
                     'payer' => $exp->payer?->name ?? 'System',
                 ];
@@ -333,3 +337,4 @@ class ProjectController extends Controller implements HasMiddleware
         ]);
     }
 }
+

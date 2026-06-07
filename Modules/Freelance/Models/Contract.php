@@ -10,15 +10,9 @@ class Contract extends Model
     protected $table = 'freelance_contracts';
     protected $fillable = ['job_id', 'proposal_id', 'client_id', 'freelancer_id', 'amount', 'currency_id', 'contract_points', 'status', 'started_at', 'completed_at'];
 
-    protected $appends = ['formatted_amount'];
+    protected $appends = [];
 
-    public function getFormattedAmountAttribute()
-    {
-        if ($this->amount && $this->currency) {
-            return sprintf($this->currency->string_format, $this->amount);
-        }
-        return $this->amount;
-    }
+
 
     protected $casts = [
         'started_at' => 'datetime',

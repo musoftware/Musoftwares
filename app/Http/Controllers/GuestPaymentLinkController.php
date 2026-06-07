@@ -10,6 +10,8 @@ use Inertia\Inertia;
 
 class GuestPaymentLinkController extends Controller
 {
+    use \App\Traits\ConvertsCurrency;
+
     public function show(Request $request, $uuid)
     {
         $paymentLink = PaymentLink::with('currency')->where('uuid', $uuid)->firstOrFail();
@@ -20,6 +22,8 @@ class GuestPaymentLinkController extends Controller
                 'message' => __('general.payment_already_paid', ['default' => 'This payment link has already been paid.'])
             ]);
         }
+
+
 
         return Inertia::render('Guest/PaymentLinkShow', [
             'paymentLink' => $paymentLink,

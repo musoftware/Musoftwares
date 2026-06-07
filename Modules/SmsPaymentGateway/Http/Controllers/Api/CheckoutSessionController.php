@@ -52,7 +52,7 @@ class CheckoutSessionController extends Controller
             $isTest = $request->smsGatewayIsTest;
 
             // Resolve currency
-            $currencyCode = $request->currency ?? 'EGP';
+            $currencyCode = $request->currency ?? null;
             $currency = \App\Models\Currency::where('currency', strtoupper($currencyCode))->first();
             if (!$currency) {
                 return response()->json([
@@ -202,3 +202,4 @@ class CheckoutSessionController extends Controller
         ]);
     }
 }
+

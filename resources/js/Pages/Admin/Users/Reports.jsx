@@ -19,7 +19,7 @@ export default function Reports({ client, dates = [], unpaid = 0 }) {
     const userBalance = Number(client.user_balance) || 0;
     const totalPaid = Number(client.total_paid) || 0;
     const hourRate = Number(client.hour_rate) || 1; // prevent div by zero
-    const currency = client.currency || 'USD';
+    const currency = client.currency;
 
     return (
         <AdminSidebarLayout title={__('general.user_reports')} header="User Reports">
@@ -111,3 +111,4 @@ export default function Reports({ client, dates = [], unpaid = 0 }) {
         </AdminSidebarLayout>
     );
 }
+

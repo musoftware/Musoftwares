@@ -76,7 +76,7 @@ class ClientController extends Controller
                 'email' => $client->email ?? '-',
                 'phone' => $client->phone ?? '-',
                 'address' => $client->address ?? '-',
-                'currency' => $client->currency?->currency ?? 'USD',
+                'currency' => $client->currency,
                 'balance' => round($client->balance(), 2),
                 'unpaid' => round($unpaid, 2),
                 'totalPaid' => round($totalPaid, 2),

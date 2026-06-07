@@ -39,7 +39,11 @@ class FinanceService
     public function formatMoneyCurrentUser(float $amount): string
     {
         $user = Auth::user();
-        $currency = $user?->preferred_currency ?? 'USD';
+        $currencyModel = $user?->currency_id ? \App\Models\Currency::find($user->currency_id) : null;
+        if (!$currencyModel) {
+            throw new \Exception("User {$user?->id} is missing a currency_id configuration.");
+        }
+        $currency = $currencyModel->currency;
         return $this->formatMoney($amount, $currency);
     }
 

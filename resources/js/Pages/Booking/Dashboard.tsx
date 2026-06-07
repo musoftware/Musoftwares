@@ -19,7 +19,7 @@ interface DashboardProps {
 
 export default function Dashboard({ stats, upcoming_bookings }: DashboardProps) {
     const { wallet, settings } = usePage<any>().props;
-    const currency = wallet?.currency || settings?.base_currency || 'USD';
+    const currency = wallet?.currency || settings?.base_currency;
 
     return (
         <WorkspaceLayout
@@ -126,3 +126,4 @@ export default function Dashboard({ stats, upcoming_bookings }: DashboardProps) 
         </WorkspaceLayout>
     );
 }
+

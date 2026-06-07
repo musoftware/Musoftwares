@@ -32,7 +32,16 @@ class TransactionController extends Controller
 
         $transaction->load(['client.currency', 'creator', 'currency']);
 
-        $businessCurrency = \App\Models\Currency::find($tenant->base_currency_id)?->currency ?? 'USD';
+        $tenantCurrencyModel = \App\Models\Currency::find($tenant->base_currency_id);
+        if (!$tenantCurrencyModel) {
+            throw new \Exception("Tenant base currency not found.");
+        }
+        
+        if (!$transaction->currency) {
+            throw new \Exception("Transaction is missing an associated currency relation.");
+        }
+
+        $businessCurrency = $tenantCurrencyModel;
 
         $title = 'Manual ' . ucfirst($transaction->type);
         if ($transaction->reference_type === 'invoice') $title = 'Invoice Settlement';
@@ -49,8 +58,8 @@ class TransactionController extends Controller
             'direction' => strtoupper($ownerDirection),
             'amount' => round($transaction->amount, 2),
             'business_amount' => round($transaction->business_amount ?? $transaction->amount, 2),
-            'currency' => $transaction->currency?->currency ?? $businessCurrency,
-            'client_currency' => $transaction->client?->currency?->currency ?? $businessCurrency,
+            'currency' => $transaction->currency,
+            'client_currency' => $transaction->client?->currency ?? $transaction->currency,
             'business_currency' => $businessCurrency,
             'balance_before' => 0,
             'balance_after' => 0,

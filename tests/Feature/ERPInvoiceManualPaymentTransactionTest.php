@@ -35,7 +35,7 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
 
         $this->user = User::factory()->create([
             'onboarding_completed' => true,
-            'preferred_currency' => 'USD',
+            'currency_id' => 1,
         ]);
         $this->user->assignRole('client');
 
@@ -119,7 +119,7 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
         $debitTx = $transactions[2];
         $this->assertEquals('used', $debitTx->type);
         $this->assertEquals('debit', $debitTx->direction);
-        $this->assertEquals(500.00, (float) $debitTx->amount);
+        $this->assertEquals(-500.00, (float) $debitTx->amount);
         $this->assertEquals(Invoice::class, $debitTx->reference_type);
         $this->assertEquals($invoice->id, $debitTx->reference_id);
     }
@@ -195,7 +195,7 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
         // First transaction (debit from partial bill)
         $this->assertEquals('used', $transactions[1]->type);
         $this->assertEquals('debit', $transactions[1]->direction);
-        $this->assertEquals(200.00, (float) $transactions[1]->amount);
+        $this->assertEquals(-200.00, (float) $transactions[1]->amount);
 
         // Second transaction (credit from manual mark paid for the remaining amount)
         $this->assertEquals('received', $transactions[2]->type);
@@ -205,6 +205,6 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
         // Third transaction (debit from manual mark paid for the remaining amount)
         $this->assertEquals('used', $transactions[3]->type);
         $this->assertEquals('debit', $transactions[3]->direction);
-        $this->assertEquals(300.00, (float) $transactions[3]->amount);
+        $this->assertEquals(-300.00, (float) $transactions[3]->amount);
     }
 }

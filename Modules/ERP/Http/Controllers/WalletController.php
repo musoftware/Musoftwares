@@ -113,6 +113,9 @@ class WalletController extends Controller
                 $amount = (float) $request->input('amount');
 
                 $businessCurrencyId = $tenant->base_currency_id;
+                if (!$clientModel->currency_id) {
+                    throw new \Exception("Client {$clientModel->name} is missing an associated currency relation.");
+                }
                 $businessAmount = \App\Models\CurrenciesExchange::RateByDate(
                     now(),
                     $amount,
@@ -180,6 +183,9 @@ class WalletController extends Controller
                 }
 
                 $businessCurrencyId = $tenant->base_currency_id;
+                if (!$clientModel->currency_id) {
+                    throw new \Exception("Client {$clientModel->name} is missing an associated currency relation.");
+                }
                 $businessAmount = \App\Models\CurrenciesExchange::RateByDate(
                     now(),
                     $amount,
@@ -244,6 +250,9 @@ class WalletController extends Controller
                 $amount = (float) $request->input('amount');
 
                 $businessCurrencyId = $tenant->base_currency_id;
+                if (!$clientModel->currency_id) {
+                    throw new \Exception("Client {$clientModel->name} is missing an associated currency relation.");
+                }
                 $businessAmount = \App\Models\CurrenciesExchange::RateByDate(
                     now(),
                     $amount,
@@ -308,6 +317,9 @@ class WalletController extends Controller
                 $amount = (float) $request->input('amount');
 
                 $businessCurrencyId = $tenant->base_currency_id;
+                if (!$clientModel->currency_id) {
+                    throw new \Exception("Client {$clientModel->name} is missing an associated currency relation.");
+                }
                 $businessAmount = \App\Models\CurrenciesExchange::RateByDate(
                     now(),
                     $amount,

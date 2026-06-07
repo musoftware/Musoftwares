@@ -11,6 +11,8 @@ use Inertia\Inertia;
 
 class VoucherController extends Controller
 {
+    use \App\Traits\ConvertsCurrency;
+
     public function index()
     {
         $user = Auth::user();
@@ -65,6 +67,10 @@ class VoucherController extends Controller
             ->with(['voucher', 'spentCurrency', 'rewardCurrency'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
+
+        $userRedemptions->getCollection()->transform(function ($rd) {
+            return $rd;
+        });
 
         return Inertia::render('Vouchers/Index', [
             'vouchers' => $formattedVouchers,

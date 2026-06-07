@@ -11,6 +11,8 @@ use Inertia\Inertia;
 
 class FinancialController extends Controller
 {
+    use \App\Traits\ConvertsCurrency;
+
     public function transactions(Request $request)
     {
         $user = $request->user();
@@ -18,7 +20,7 @@ class FinancialController extends Controller
             'id' => null, 
             'balance' => (float)$user->user_balance, 
             'locked_balance' => (float)$user->locked_balance(),
-            'currency' => $user->currency_name()
+            'currency' => $user->currency_name(),
         ];
         $transactions = $user->transactions()->latest()->paginate(15);
 
@@ -51,10 +53,14 @@ class FinancialController extends Controller
             'id' => null, 
             'balance' => (float)$user->user_balance, 
             'locked_balance' => (float)$user->locked_balance(),
-            'currency' => $user->currency_name()
+            'currency' => $user->currency_name(),
         ];
         $payoutMethods = $user->payoutMethods()->where('status', 'approved')->get();
         $withdrawals = $user->withdraw()->with('payoutMethod')->latest()->paginate(15);
+
+        $withdrawals->getCollection()->transform(function ($wd) use ($user) {
+            return $wd;
+        });
 
         return Inertia::render('Financial/Withdrawals', [
             'withdrawals' => $withdrawals,

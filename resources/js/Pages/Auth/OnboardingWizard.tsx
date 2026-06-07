@@ -23,8 +23,7 @@ interface UserData {
     mobile_1: string;
     mobile_2: string;
     telegram_username: string;
-    preferred_currency: string;
-    preferred_currency_locked_at: string | null;
+    currency_id: number | null;
 }
 
 interface Props {
@@ -109,7 +108,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                 newErrors.mobile_1 = 'Please enter a valid phone number.';
             }
         } else if (currentStep === 3) {
-            if (!(formData as any).preferred_currency) (newErrors as any).preferred_currency = 'Currency selection is required.';
+            // Step 3 validation (if needed in the future)
         }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;

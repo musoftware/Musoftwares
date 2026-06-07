@@ -19,7 +19,7 @@ class UpdateDailyMetricsListener implements ShouldQueue
         }
 
         $date = $booking->starts_at->format('Y-m-d');
-        $currency = $booking->currency ?? 'USD';
+        $currency = $booking->currency ?? null;
 
         // Use atomic increment/decrement to prevent race conditions during concurrent status updates
         $metric = BookingDailyMetric::firstOrCreate([
@@ -46,3 +46,4 @@ class UpdateDailyMetricsListener implements ShouldQueue
         }
     }
 }
+

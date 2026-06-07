@@ -14,6 +14,8 @@ use Exception;
 
 class WalletTransferController extends Controller
 {
+    use \App\Traits\ConvertsCurrency;
+
     protected WalletTransferService $transferService;
 
     public function __construct(WalletTransferService $transferService)
@@ -36,7 +38,7 @@ class WalletTransferController extends Controller
             ],
             'wallet' => [
                 'balance' => (float) $user->user_balance,
-                'currency' => $user->preferred_currency ?? 'USD',
+                'currency' => $user->currency_id ? (\App\Models\Currency::find($user->currency_id)?->currency) : null,
             ]
         ]);
     }
@@ -71,7 +73,7 @@ class WalletTransferController extends Controller
                 $sender->id,
                 $receiver->id,
                 (float) $request->amount,
-                $sender->preferred_currency ?? 'USD',
+                (int) $sender->currency_id,
                 $request->reason
             );
 
@@ -192,8 +194,12 @@ class WalletTransferController extends Controller
                 $sender->id,
                 $receiver->id,
                 (float) $request->amount,
-                $sender->preferred_currency ?? 'USD'
+                (int) $sender->currency_id
             );
+
+            if (!isset($preview['currency'])) {
+                throw new \Exception(__('errors.currency_not_found'));
+            }
 
             return response()->json([
                 'success' => true,

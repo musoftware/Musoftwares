@@ -51,8 +51,8 @@ class ERPDashboardController extends Controller
         $recurringCount = 0;
 
         if ($tenantId) {
-            $totalPaidRevenue = Invoice::where('tenant_id', $tenantId)
-                ->where('status', 'paid')
+            $totalPaidRevenue = WalletTransaction::where('tenant_id', $tenantId)
+                ->whereIn('type', ['received', 'earned', 'refunded', 'sent'])
                 ->sum('business_amount');
 
             $outstandingRevenue = Invoice::where('tenant_id', $tenantId)
@@ -100,7 +100,7 @@ class ERPDashboardController extends Controller
                         'email' => $client->email ?? '-',
                         'phone' => $client->phone ?? '-',
                         'address' => $client->address ?? '-',
-                        'currency' => $client->currency?->currency ?? 'USD',
+                        'currency' => $client->currency,
                         'balance' => round($client->balance ?? 0, 2),
                         'unpaid' => round($unpaid, 2),
                         'totalPaid' => round($totalPaid, 2),
@@ -113,7 +113,7 @@ class ERPDashboardController extends Controller
         // ── Real Invoice List ─────────────────────────────────────
         $invoices = collect();
         if ($tenantId) {
-            $invoices = Invoice::with(['client'])
+            $invoices = Invoice::with(['client', 'currency'])
                 ->where('tenant_id', $tenantId)
                 ->whereIn('status', ['draft', 'sent', 'partial'])
                 ->latest()
@@ -125,7 +125,7 @@ class ERPDashboardController extends Controller
                         'invoiceNumber' => $invoice->invoice_number,
                         'clientName' => $invoice->client?->name ?? 'Unknown',
                         'amount' => round($invoice->amount, 2),
-                        'currency' => $invoice->amount_currency ?? 'USD',
+                        'currency' => $invoice->currency,
                         'issuedDate' => $invoice->issued_at?->format('Y-m-d'),
                         'dueDate' => $invoice->due_date?->format('Y-m-d'),
                         'status' => $invoice->status,
@@ -143,9 +143,9 @@ class ERPDashboardController extends Controller
                 $monthEnd = $monthStart->copy()->endOfMonth();
                 $monthName = $monthStart->format('M');
 
-                $sales = Invoice::where('tenant_id', $tenantId)
-                    ->where('status', 'paid')
-                    ->whereBetween('paid_at', [$monthStart, $monthEnd])
+                $sales = WalletTransaction::where('tenant_id', $tenantId)
+                    ->whereIn('type', ['received', 'earned', 'refunded', 'sent'])
+                    ->whereBetween('created_at', [$monthStart, $monthEnd])
                     ->sum('business_amount');
 
                 $costs = DB::table('erp_invoice_costs')
@@ -203,15 +203,15 @@ class ERPDashboardController extends Controller
             // M6 fix: capture subMonth once to avoid calling now() twice
             $lastMonthDate = Carbon::now()->subMonth();
 
-            $thisMonth = Invoice::where('tenant_id', $tenantId)
-                ->where('status', 'paid')
-                ->whereMonth('paid_at', Carbon::now()->month)
-                ->whereYear('paid_at', Carbon::now()->year)
+            $thisMonth = WalletTransaction::where('tenant_id', $tenantId)
+                ->whereIn('type', ['received', 'earned', 'refunded', 'sent'])
+                ->whereMonth('created_at', Carbon::now()->month)
+                ->whereYear('created_at', Carbon::now()->year)
                 ->sum('business_amount');
-            $lastMonth = Invoice::where('tenant_id', $tenantId)
-                ->where('status', 'paid')
-                ->whereMonth('paid_at', $lastMonthDate->month)
-                ->whereYear('paid_at', $lastMonthDate->year)
+            $lastMonth = WalletTransaction::where('tenant_id', $tenantId)
+                ->whereIn('type', ['received', 'earned', 'refunded', 'sent'])
+                ->whereMonth('created_at', $lastMonthDate->month)
+                ->whereYear('created_at', $lastMonthDate->year)
                 ->sum('business_amount');
             if ($lastMonth > 0) {
                 $growthPercent = round((($thisMonth - $lastMonth) / $lastMonth) * 100, 1);
@@ -371,8 +371,8 @@ class ERPDashboardController extends Controller
                     else if ($txn->reference_type === 'manual_send') $title = __('erp.manual_send');
                     else if ($txn->reference_type === 'manual_refund') $title = __('erp.manual_refund');
 
-                    $txnCurrency = $txn->currency?->currency ?? $businessCurrency;
-                    $clientCurrency = $txn->client?->currency?->currency ?? $txnCurrency;
+                    $txnCurrency = $txn->currency;
+                    $clientCurrency = $txn->client?->currency;
                     
                     return [
                         'id' => $txn->id,
@@ -567,15 +567,14 @@ class ERPDashboardController extends Controller
 
         // Update tenant's default currency if provided
         if (isset($validated['defaultCurrency'])) {
+            if (!$user->hasModuleSubscription('erp-multi-currency')) {
+                throw new \Exception(__('errors.multi_currency_addon_required'));
+            }
+
             $currency = \App\Models\Currency::where('currency', $validated['defaultCurrency'])->first();
             if ($currency) {
                 $tenant->base_currency_id = $currency->id;
                 $tenant->save();
-
-                // If user doesn't have multi-currency addon, update all clients' currency
-                if (!$user->hasModuleSubscription('erp-multi-currency')) {
-                    $tenant->clients()->update(['currency_id' => $currency->id]);
-                }
             }
         }
 

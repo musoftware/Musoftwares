@@ -8,7 +8,8 @@ readonly class SubmitProposalData
         public int $jobId,
         public int $freelancerId,
         public string $coverLetter,
-        public int $proposedBudgetPoints,
+        public float $bidAmount,
+        public int $currencyId,
         public int $pointsSpent,
     ) {}
 }

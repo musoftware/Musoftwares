@@ -25,7 +25,10 @@ class InvoiceService
     public function createInvoice(array $validated, Tenant $tenant): Invoice
     {
         $client = TenantClient::with('currency')->where('tenant_id', $tenant->id)->findOrFail($validated['client_id']);
-        $amountCurrency = $client->currency ? $client->currency->currency : 'USD';
+        if (!$client->currency_id || !$client->currency) {
+            throw new \Exception("Client {$client->name} is missing an associated currency relation.");
+        }
+        $amountCurrency = $client->currency->currency;
 
         return DB::transaction(function () use ($validated, $tenant, $client, $amountCurrency) {
             $currency = Currency::find($tenant->base_currency_id);
@@ -125,7 +128,10 @@ class InvoiceService
     public function updateInvoice(Invoice $invoice, array $validated, Tenant $tenant): Invoice
     {
         $client = TenantClient::with('currency')->where('tenant_id', $tenant->id)->findOrFail($validated['client_id']);
-        $amountCurrency = $client->currency ? $client->currency->currency : 'USD';
+        if (!$client->currency_id || !$client->currency) {
+            throw new \Exception("Client {$client->name} is missing an associated currency relation.");
+        }
+        $amountCurrency = $client->currency->currency;
 
         return DB::transaction(function () use ($invoice, $validated, $tenant, $client, $amountCurrency) {
             $currency = Currency::find($tenant->base_currency_id);

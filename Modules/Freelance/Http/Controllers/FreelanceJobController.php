@@ -12,11 +12,11 @@ use Illuminate\Support\Facades\DB;
 use Modules\Freelance\Domains\Job\Actions\PostJobAction;
 use Modules\Freelance\Domains\Job\DTOs\PostJobData;
 use Illuminate\Support\Facades\Gate;
-use Modules\Freelance\Traits\ConvertsFreelanceCurrency;
+use App\Traits\ConvertsCurrency;
 
 class FreelanceJobController extends Controller
 {
-    use ConvertsFreelanceCurrency;
+    use ConvertsCurrency;
     public function __construct(private PostJobAction $postJobAction) {}
 
     public function index(Request $request)
@@ -45,23 +45,42 @@ class FreelanceJobController extends Controller
         }
 
         $sort = $request->input('sort', 'newest');
+        $user = $request->user();
+
+        if ($user) {
+            $userSkillIds = \Modules\Freelance\Models\UserSkill::where('user_id', $user->id)->pluck('skill_id')->toArray();
+            if (!empty($userSkillIds)) {
+                $query->withCount(['skills as skill_match_count' => function ($q) use ($userSkillIds) {
+                    $q->whereIn('freelance_skills.id', $userSkillIds);
+                }]);
+            }
+        }
+
         if ($sort === 'budget_high') {
             $query->orderBy('budget', 'desc');
         } elseif ($sort === 'budget_low') {
             $query->orderBy('budget', 'asc');
         } else {
+            // Newest with skill matching priority
+            if ($user && !empty($userSkillIds)) {
+                $query->orderBy('skill_match_count', 'desc');
+            }
             $query->latest();
         }
 
         $jobs = $query->paginate(15)->withQueryString();
         
-        $userCurrencyId = $request->user()?->currency_id ?? \App\Models\AdminSettings::business_currency();
+        $userCurrencyModel = $this->getUserCurrencyObject($request->user());
+        $userCurrencyId = $userCurrencyModel->id;
         
         $jobs->through(function ($job) use ($userCurrencyId) {
-            return $this->convertJobCurrency($job, $userCurrencyId);
+            return $this->convertModelCurrency($job, 'budget', 'currency_id', $userCurrencyId);
         });
 
-        return Inertia::render('Freelance/Jobs/Browse', ['jobs' => $jobs]);
+        return Inertia::render('Freelance/Jobs/Browse', [
+            'jobs' => $jobs,
+            'userCurrency' => $this->currencyForFrontend($userCurrencyId)
+        ]);
     }
 
     public function myJobs(Request $request)
@@ -72,11 +91,17 @@ class FreelanceJobController extends Controller
             ->latest()
             ->paginate(15);
 
-        $jobs->through(function ($job) use ($request) {
-            return $this->convertJobCurrency($job, $request->user()->currency_id);
+        $userCurrencyModel = $this->getUserCurrencyObject($request->user());
+        $userCurrencyId = $userCurrencyModel->id;
+
+        $jobs->through(function ($job) use ($userCurrencyId) {
+            return $this->convertModelCurrency($job, 'budget', 'currency_id', $userCurrencyId);
         });
 
-        return Inertia::render('Freelance/Jobs/MyJobs', ['jobs' => $jobs]);
+        return Inertia::render('Freelance/Jobs/MyJobs', [
+            'jobs' => $jobs,
+            'userCurrency' => $this->currencyForFrontend($userCurrencyId)
+        ]);
     }
 
     public function store(Request $request)
@@ -222,20 +247,30 @@ class FreelanceJobController extends Controller
             }
         }
 
-        $job->load(['client', 'skills', 'proposals.freelancer', 'currency']);
+        $job->load([
+            'client', 
+            'skills', 
+            'proposals' => function ($q) {
+                $q->orderBy('points_spent', 'desc')->latest();
+            },
+            'proposals.freelancer', 
+            'currency'
+        ]);
         
-        $userCurrencyId = $request->user()?->currency_id ?? \App\Models\AdminSettings::business_currency();
+        $userCurrencyId = $this->getUserCurrencyObject($request->user())->id;
         
-        $this->convertJobCurrency($job, $userCurrencyId);
+        $this->convertModelCurrency($job, 'budget', 'currency_id', $userCurrencyId);
         if ($job->relationLoaded('proposals')) {
             $job->proposals->transform(function ($proposal) use ($userCurrencyId) {
-                return $this->convertProposalCurrency($proposal, $userCurrencyId);
+                $this->convertModelCurrency($proposal, 'bid_amount', 'currency_id', $userCurrencyId);
+                return $proposal;
             });
         }
 
         return Inertia::render('Freelance/Jobs/Show', [
             'job' => $job,
-            'pointsCost' => 2 // Example cost to submit a proposal
+            'pointsCost' => 2, // Example cost to submit a proposal
+            'userCurrency' => $this->currencyForFrontend($userCurrencyId),
         ]);
     }
 

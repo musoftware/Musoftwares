@@ -103,7 +103,7 @@ class PaymentGatewayService
             'internal_order_id'  => $internalOrderId,
             'external_order_id'  => $data['order_id'],
             'amount'             => $commissionData['amount'],
-            'currency'           => $data['currency'] ?? 'EGP',
+            'currency'           => $data['currency'] ?? null,
             'commission_rate'    => $commissionData['commission_rate'],
             'commission_amount'  => $commissionData['commission_amount'],
             'net_amount'         => $commissionData['net_amount'],
@@ -291,3 +291,4 @@ class PaymentGatewayService
         return $client;
     }
 }
+

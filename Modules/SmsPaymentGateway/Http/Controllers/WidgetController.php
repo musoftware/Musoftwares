@@ -72,7 +72,7 @@ class WidgetController extends Controller
             'verifyUrl' => route('sms-payment-gateway.widget.verify', ['uuid' => $order->uuid]),
             'merchantName' => $user->name,
             'order_number' => $order->metadata['order_number'] ?? ('ORD-' . $order->id),
-            'currency' => $order->currency->code ?? 'EGP',
+            'currency' => $order->currency->code ?? null,
             'status' => $order->status,
         ]);
     }
@@ -179,3 +179,4 @@ class WidgetController extends Controller
         return false;
     }
 }
+

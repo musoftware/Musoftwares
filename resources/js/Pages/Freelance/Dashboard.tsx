@@ -18,6 +18,7 @@ import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisp
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { ContractQuickView } from '@/Components/ContextualPanels';
 import { formatDate } from '@/lib/utils';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { MetricCard } from '@/Components/ui/MetricCard';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
@@ -47,7 +48,8 @@ export default function FreelanceDashboard({
         activeProposals: 0,
         activeContracts: 0,
         totalEarnings: 0,
-        currency: auth?.user?.preferred_currency || 'USD'
+        currencyCode: null,
+        currencySymbol: null,
     };
 
     const activeProposals = initialProposals || [];
@@ -163,7 +165,7 @@ export default function FreelanceDashboard({
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                         <MetricCard 
                             label={__('general.contracted_value')}
-                            value={clientData.stats.totalContractedValue}
+                            value={clientData.stats.isFiat ? formatCurrency(clientData.stats.totalContractedValue, clientData.stats) : `${clientData.stats.totalContractedValue} ${__('freelance.pts', undefined, 'pts')}`}
                             icon={DollarSign}
                         />
                         <MetricCard 
@@ -191,7 +193,7 @@ export default function FreelanceDashboard({
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <MetricCard 
                             label={__('general.total_earnings')}
-                            value={stats.totalEarnings}
+                            value={stats.isFiat ? formatCurrency(stats.totalEarnings, stats) : `${stats.totalEarnings} ${__('freelance.pts', undefined, 'pts')}`}
                             icon={DollarSign}
                         />
                         <MetricCard 
@@ -235,7 +237,7 @@ export default function FreelanceDashboard({
                                                             {job.title}
                                                         </Link>
                                                         <span className="text-xs text-slate-500 mt-1 block">
-                                                            {__('erp.budget')}: <FinancialAmount amount={job.budget} currency={job.currency} className="text-xs font-mono font-medium text-slate-600" /> &bull; {__('general.posted')} {formatDate(job.createdAt)} &bull; {job.proposalsCount} {__('freelance.proposals')}
+                                                            {__('erp.budget')}: <span className="text-xs font-mono font-medium text-slate-600">{job.budget !== null && job.budget !== undefined ? formatCurrency(job.budget, userCurrency) : `${job.budget_points ?? 0} ${__('freelance.pts', undefined, 'pts')}`}</span> &bull; {__('general.posted')} {formatDate(job.createdAt)} &bull; {job.proposalsCount} {__('freelance.proposals')}
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-4 shrink-0">
@@ -305,7 +307,7 @@ export default function FreelanceDashboard({
                                                     <div className="min-w-0">
                                                         <span className="text-sm font-semibold text-slate-900 block truncate">{proposal.title}</span>
                                                         <span className="text-xs text-slate-500 mt-1 block">
-                                                            {__('general.freelancer')}: {proposal.freelancerName} &bull; {__('freelance.bid')}: <FinancialAmount amount={proposal.budget} currency={proposal.currency} className="text-xs font-mono font-medium text-slate-600" /> &bull; {__('general.submitted')} {formatDate(proposal.submittedAt)}
+                                                            {__('general.freelancer')}: {proposal.freelancerName} &bull; {__('freelance.bid')}: <span className="text-xs font-mono font-medium text-slate-600">{proposal.budget !== null && proposal.budget !== undefined ? formatCurrency(proposal.budget, userCurrency) : `${proposal.budget_points ?? 0} ${__('freelance.pts', undefined, 'pts')}`}</span> &bull; {__('general.submitted')} {formatDate(proposal.submittedAt)}
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-4 shrink-0">
@@ -417,7 +419,7 @@ export default function FreelanceDashboard({
                                                     <div className="min-w-0">
                                                         <span className="text-sm font-semibold text-slate-900 block truncate">{proposal.title}</span>
                                                         <span className="text-xs text-slate-500 mt-1 block">
-                                                            {__('freelance.bid')}: <FinancialAmount amount={proposal.budget} currency={proposal.currency} className="text-xs font-mono font-medium text-slate-600" /> &bull; {__('general.submitted')} {formatDate(proposal.submittedAt)}
+                                                            {__('freelance.bid')}: <span className="text-xs font-mono font-medium text-slate-600">{proposal.budget !== null && proposal.budget !== undefined ? formatCurrency(proposal.budget, userCurrency) : `${proposal.budget_points ?? 0} ${__('freelance.pts', undefined, 'pts')}`}</span> &bull; {__('general.submitted')} {formatDate(proposal.submittedAt)}
                                                         </span>
                                                     </div>
                                                     <div className="shrink-0">

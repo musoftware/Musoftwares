@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Eye, Trash2, CheckCircle, XCircle, AlertCircle, MoreHorizontal, Edit, RefreshCw, Plus } from 'lucide-react';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { __ } from '@/lib/i18n';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Index({ jobs, filters }: any) {
     const [search, setSearch] = useState(filters.search || '');
@@ -108,7 +109,7 @@ export default function Index({ jobs, filters }: any) {
                                     <div>{job.client?.name || __('freelance.unknown_client')}</div>
                                     <div className="text-xs text-gray-500">{job.client?.email}</div>
                                 </td>
-                                <td className="p-4 font-medium text-slate-900">{job.formatted_budget}</td>
+                                <td className="p-4 font-medium text-slate-900">{formatCurrency(job.budget, job.currency)}</td>
                                 <td className="p-4">{job.proposals_count || 0}</td>
                                 <td className="p-4 capitalize">
                                     <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold leading-5 

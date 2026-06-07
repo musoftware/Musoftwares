@@ -11,7 +11,7 @@ import { formatMoney } from '@/lib/utils';
 import { format } from 'date-fns';
 
 export default function Referrals({ client, referrals }) {
-    const currency = client.currency || 'USD';
+    const currency = client.currency;
 
     const getInitials = (name) => {
         if (!name) return 'U';
@@ -145,3 +145,4 @@ export default function Referrals({ client, referrals }) {
         </AdminSidebarLayout>
     );
 }
+

@@ -94,19 +94,7 @@ class User extends Authenticatable
         $this->attributes['currency_id'] = $value;
     }
 
-    public function getPreferredCurrencyAttribute(): ?string
-    {
-        $name = $this->currency_name();
-        return $name === '--' ? null : $name;
-    }
 
-    public function setPreferredCurrencyAttribute($value)
-    {
-        $currency = \App\Models\Currency::where('currency', $value)->first();
-        if ($currency) {
-            $this->attributes['currency_id'] = $currency->id;
-        }
-    }
 
     public function tickets(): HasMany
     {

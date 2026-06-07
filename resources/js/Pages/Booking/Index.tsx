@@ -99,7 +99,7 @@ export default function Index({ events }: { events: EventType[] }) {
                                         </div>
                                         {event.requires_payment && event.price && (
                                             <div className="flex items-center">
-                                                <CurrencyDisplay amount={event.price} currency={event.currency || 'USD'} className="text-muted-foreground font-normal" />
+                                                <CurrencyDisplay amount={event.price} currency={event.currency} className="text-muted-foreground font-normal" />
                                             </div>
                                         )}
                                     </div>
@@ -121,3 +121,4 @@ export default function Index({ events }: { events: EventType[] }) {
         </WorkspaceLayout>
     );
 }
+

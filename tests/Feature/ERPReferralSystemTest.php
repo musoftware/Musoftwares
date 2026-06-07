@@ -38,7 +38,7 @@ class ERPReferralSystemTest extends TestCase
 
         $this->user = User::factory()->create([
             'onboarding_completed' => true,
-            'preferred_currency' => 'USD',
+            'currency_id' => 1,
         ]);
         $this->user->assignRole('client');
 

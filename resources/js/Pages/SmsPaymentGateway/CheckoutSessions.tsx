@@ -80,7 +80,7 @@ export default function CheckoutSessions({ sessions }: Props) {
                                                 {session.is_test && <Badge variant="outline" className="ml-2 bg-amber-50 text-amber-600 border-amber-200">Test</Badge>}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">
-                                                {formatMoney(session.amount, session.currency?.currency || 'EGP')}
+                                                {formatMoney(session.amount, session.currency?.currency)}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                                                 {session.customer_name || '—'}
@@ -120,3 +120,4 @@ export default function CheckoutSessions({ sessions }: Props) {
         </AuthenticatedLayout>
     );
 }
+

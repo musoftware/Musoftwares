@@ -44,7 +44,7 @@ class FbmbLookupController extends Controller
 
         return \Inertia\Inertia::render('Fbmb/Index', [
             'pointsBalance' => $user->points_balance,
-            'currency'      => $user->preferred_currency ?? 'USD',
+            'currency'      => $user->currency_id ? (\App\Models\Currency::find($user->currency_id)?->currency) : null,
             'history'       => $history,
             'pricingTiers'  => $this->lookupService->getPricingTiers(),
         ]);

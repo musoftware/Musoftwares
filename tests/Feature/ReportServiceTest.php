@@ -92,7 +92,7 @@ class ReportServiceTest extends TestCase
         Invoice::create([
             'tenant_id' => null,
             'invoice_number' => 'INV-MAIN-001',
-            'client_id' => $this->user->id, // platform user ID
+            'client_id' => $this->client->id, // Use client->id instead of user->id
             'status' => 'paid',
             'amount' => 750.00,
             'amount_currency' => 'USD',

@@ -12,6 +12,8 @@ use App\Helpers\KashierHelper;
 
 class PointPurchaseController extends Controller
 {
+    use \App\Traits\ConvertsCurrency;
+
     protected PointPurchaseService $pointsService;
 
     public function __construct(PointPurchaseService $pointsService)

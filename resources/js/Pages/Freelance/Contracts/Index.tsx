@@ -4,7 +4,7 @@ import FreelanceLayout from '../Layout';
 import { Card } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatMoney } from '@/lib/utils';
 import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 import { PageHeader } from '@/Components/ui/PageHeader';
 import { EmptyState } from '@/Components/ui/EmptyState';
@@ -37,9 +37,9 @@ function ProgressBar({ value }: { value: number }) {
 const FILTERS = ['all', 'active', 'completed', 'disputed'] as const;
 type Filter = typeof FILTERS[number];
 
-export default function ContractsIndex({ contracts, stats }: any) {
+export default function ContractsIndex({ contracts, stats, userCurrency }: any) {
     const { auth } = usePage().props as any;
-    const globalCurrency = auth?.user?.preferred_currency || 'USD';
+    const globalCurrency = userCurrency;
     const userId = auth?.user?.id;
 
     const [filter, setFilter] = useState<Filter>('all');
@@ -53,7 +53,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
         { label: __('freelance.total_contracts'), value: stats?.total       ?? 0, icon: FileText,     color: 'text-indigo-600 bg-indigo-50'  },
         { label: __('general.active'),          value: stats?.active      ?? 0, icon: Activity,     color: 'text-emerald-600 bg-emerald-50' },
         { label: __('general.completed'),       value: stats?.completed   ?? 0, icon: CheckCircle2, color: 'text-blue-600    bg-blue-50'   },
-        { label: __('general.total_earned'),    value: stats?.total_value ?? 0, icon: DollarSign,   color: 'text-amber-600  bg-amber-50',  isCurrency: true },
+        { label: __('general.total_earned'),    value: stats?.total_value ?? 0, icon: DollarSign,   color: 'text-amber-600  bg-amber-50',  isCurrency: true, isFiat: stats?.isFiat ?? false },
     ];
 
     return (
@@ -83,13 +83,11 @@ export default function ContractsIndex({ contracts, stats }: any) {
                                 <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', s.color)}>
                                     <Icon className="h-4 w-4" />
                                 </div>
-                                <div>
+                                <div className="flex flex-col items-center justify-center flex-1 text-center">
                                     {s.isCurrency ? (
-                                        <FinancialAmount
-                                            amount={s.value}
-                                            currency={globalCurrency}
-                                            className="text-xl font-black text-slate-900 leading-none"
-                                        />
+                                        <span className="text-xl font-black text-slate-900 leading-none font-mono">
+                                            {s.isFiat ? formatMoney(s.value, userCurrency) : `${s.value} ${__('freelance.pts', undefined, 'pts')}`}
+                                        </span>
                                     ) : (
                                         <p className="text-2xl font-black text-slate-900 leading-none">{s.value}</p>
                                     )}
@@ -189,11 +187,9 @@ export default function ContractsIndex({ contracts, stats }: any) {
 
                                         <div className="flex items-center gap-4 shrink-0">
                                             <div className="text-right">
-                                                <FinancialAmount
-                                                    amount={contract.amount}
-                                                    currency={contract.job?.currency}
-                                                    className="text-base font-black text-slate-900"
-                                                />
+                                                <span className="text-base font-black text-slate-900 font-mono">
+                                                    {contract.amount !== null && contract.amount !== undefined ? formatMoney(contract.amount, userCurrency) : `${contract.contract_points} ${__('freelance.pts', undefined, 'pts')}`}
+                                                </span>
                                                 <p className="text-[10px] text-slate-400">{__('freelance.contract_value')}</p>
                                             </div>
 

@@ -44,10 +44,10 @@ class BalancesHelper
 
     public function CalcWithdrawnCommission($user)
     {
-        $data = $user->withdraw()->groupBy('currency')->where('status', 'approved')->select(DB::raw('sum(amount) as amount, currency'))->get();
+        $data = $user->withdraw()->groupBy('currency_id')->where('status', 'approved')->select(DB::raw('sum(amount) as amount, currency_id'))->get();
         $amount = 0;
         foreach ($data as $commission) {
-            $user_amount = CurrenciesExchange::RateByDate($commission->created_at, $commission->amount, $commission->currency, $user->currency);
+            $user_amount = CurrenciesExchange::RateByDate($commission->created_at, $commission->amount, $commission->currency_id, $user->currency_id);
             $amount += $user_amount;
         }
         $user->withdrawn_commission = $amount;
@@ -57,10 +57,10 @@ class BalancesHelper
 
     public function CalcPendingCommission($user)
     {
-        $data = $user->commissions()->groupBy('currency')->where('convert_to_balance_on', '>', DB::raw('NOW()'))->select(DB::raw('sum(amount) as amount, currency'))->get();
+        $data = $user->commissions()->groupBy('currency_id')->where('convert_to_balance_on', '>', DB::raw('NOW()'))->select(DB::raw('sum(amount) as amount, currency_id'))->get();
         $amount = 0;
         foreach ($data as $commission) {
-            $user_amount = CurrenciesExchange::RateByDate($commission->created_at, $commission->amount, $commission->currency, $user->currency);
+            $user_amount = CurrenciesExchange::RateByDate($commission->created_at, $commission->amount, $commission->currency_id, $user->currency_id);
             $amount += $user_amount;
         }
         $user->pending_commission = $amount;
@@ -70,15 +70,15 @@ class BalancesHelper
     public function CalcBalance($user, $project = null)
     {
         $balance = $user->transactions()
-            ->groupBy('currency')
+            ->groupBy('currency_id')
             ->when($project != null, function ($q) use ($project) {
                 return $q->where('project_id', $project->id);
             })
-            ->select(DB::raw('sum(amount) as total_amount'), 'currency')
+            ->select(DB::raw('sum(amount) as total_amount'), 'currency_id')
             ->get();
         $total_spend = 0;
         foreach ($balance as $item) {
-            $total_spend += CurrenciesExchange::RateToday($item->total_amount, $item->currency, $user->currency);
+            $total_spend += CurrenciesExchange::RateToday($item->total_amount, $item->currency_id, $user->currency_id);
         }
         if ($project == null) {
             $user->user_balance = $total_spend - $this->CalcWithdrawingCommission($user);
@@ -96,13 +96,13 @@ class BalancesHelper
             ->when($project != null, function ($q) use ($project) {
                 return $q->where('project_id', $project->id);
             })
-            ->groupBy('currency')
-            ->select(DB::raw('sum(amount) as total_amount'), 'currency')
+            ->groupBy('currency_id')
+            ->select(DB::raw('sum(amount) as total_amount'), 'currency_id')
             ->get();
 
         $total_spend = 0;
         foreach ($total_paid as $item) {
-            $total_spend += CurrenciesExchange::RateToday($item->total_amount, $item->currency, $user->currency);
+            $total_spend += CurrenciesExchange::RateToday($item->total_amount, $item->currency_id, $user->currency_id);
         }
 
         if ($project == null) {
@@ -118,12 +118,12 @@ class BalancesHelper
     public function CalcCostBalance($user)
     {
         $balance = $user->costTransactions()
-            ->groupBy('currency')
-            ->select(DB::raw('sum(amount) as total_amount'), 'currency')
+            ->groupBy('currency_id')
+            ->select(DB::raw('sum(amount) as total_amount'), 'currency_id')
             ->get();
         $total_spend = 0;
         foreach ($balance as $item) {
-            $total_spend += CurrenciesExchange::RateToday($item->total_amount, $item->currency, $user->currency);
+            $total_spend += CurrenciesExchange::RateToday($item->total_amount, $item->currency_id, $user->currency_id);
         }
         $user->total_cost = $total_spend;
         $user->save();

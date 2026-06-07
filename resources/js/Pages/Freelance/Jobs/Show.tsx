@@ -16,10 +16,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
 import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 import { __ } from '@/lib/i18n';
 
-function ShowJobContent({ auth, job, pointsCost }: any) {
+function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
     const { mode } = useFreelanceMode();
     const isClient = mode === 'client';
-    const globalCurrency = auth?.user?.preferred_currency || 'USD';
+    const globalCurrency = userCurrency;
 
     const hasSubmitted = !isClient && job.proposals?.some((p: any) => p.freelancer_id === auth.user.id);
     const userPoints = auth.user.points_balance || 0;
@@ -29,7 +29,8 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
         bid_amount: '',
         delivery_days: '',
         cover_letter: '',
-        currency_id: job.currency_id
+        currency_id: job.currency_id,
+        points_spent: job.min_proposal_points || 2
     });
 
     const submitProposal = (e: React.FormEvent) => {
@@ -142,11 +143,12 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                                             <h3 className="font-bold text-lg text-slate-900">{proposal.freelancer?.name}</h3>
                                                             <div className="flex items-center gap-3 text-sm text-slate-500">
                                                                 <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {proposal.delivery_days} {__('general.days_delivery')}</span>
+                                                                <span className="flex items-center gap-1 font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full"><AlertCircle className="h-3.5 w-3.5" /> {proposal.points_spent} {__('freelance.points')}</span>
                                                             </div>
                                                         </div>
                                                         <div className="text-right">
                                                             <div className="text-xl font-bold text-indigo-700 font-mono">
-                                                                <FinancialAmount amount={proposal.bid_amount} currency={job.currency} />
+                                                                {proposal.bid_amount !== null && proposal.bid_amount !== undefined ? formatMoney(proposal.bid_amount, userCurrency) : `${proposal.proposed_budget_points} ${__('freelance.pts', undefined, 'pts')}`}
                                                             </div>
                                                             <Badge variant="outline" className="mt-1 bg-amber-50 text-amber-700 border-amber-200">
                                                                 {__(proposal.status)}
@@ -191,7 +193,9 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                         </div>
                                         <div>
                                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">{__('erp.budget')}</p>
-                                            <div className="font-bold text-slate-900"><FinancialAmount amount={job.budget} currency={job.currency} /></div>
+                                            <div className="font-bold text-slate-900 font-mono">
+                                                {job.budget !== null && job.budget !== undefined ? formatMoney(job.budget, userCurrency) : `${job.budget_points} ${__('freelance.pts', undefined, 'pts')}`}
+                                            </div>
                                             <p className="text-xs text-slate-500 mt-0.5 capitalize">{__(job.type)} {__('general.price')}</p>
                                         </div>
                                     </div>
@@ -262,7 +266,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                             <div className="bg-white rounded-lg border border-slate-200 p-4 text-center space-y-2">
                                                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('freelance.connects_required')}</p>
                                                 <div className="flex items-center justify-center gap-2">
-                                                    <span className="text-2xl font-bold text-indigo-600 font-mono">{pointsCost}</span>
+                                                    <span className="text-2xl font-bold text-indigo-600 font-mono">{data.points_spent}</span>
                                                 </div>
                                                 <p className="text-xs text-slate-500">{__('general.your_balance')} <span className="font-bold text-slate-700">{userPoints}</span></p>
                                             </div>
@@ -297,6 +301,18 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
+                                                    <Label htmlFor="points_spent">{__('freelance.points_to_spend')} ({__('general.min')}: {job.min_proposal_points || 2})</Label>
+                                                    <Input
+                                                        id="points_spent"
+                                                        type="number"
+                                                        min={job.min_proposal_points || 2}
+                                                        value={data.points_spent}
+                                                        onChange={e => setData('points_spent', parseInt(e.target.value) || 0)}
+                                                        required
+                                                    />
+                                                    <p className="text-xs text-slate-500">{__('freelance.spend_more_points_to_rank_higher')}</p>
+                                                </div>
+                                                <div className="space-y-1.5">
                                                     <Label htmlFor="cover_letter">{__('general.cover_letter')}</Label>
                                                     <Textarea
                                                         id="cover_letter"
@@ -309,7 +325,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                                 </div>
                                                 <Button 
                                                     type="submit" 
-                                                    disabled={processing || userPoints < pointsCost}
+                                                    disabled={processing || userPoints < data.points_spent}
                                                     className="w-full bg-indigo-600 hover:bg-indigo-700 font-bold"
                                                 >
                                                     <Send className="mr-2 h-4 w-4" /> {__('freelance.submit_proposal')}
@@ -340,7 +356,7 @@ export default function ShowJob({ auth, job, pointsCost = 5 }: any) {
 
     return (
         <FreelanceLayout clean={true}>
-            <ShowJobContent auth={auth} job={job} pointsCost={pointsCost} />
+            <ShowJobContent auth={auth} job={job} pointsCost={pointsCost} userCurrency={userCurrency} />
         </FreelanceLayout>
     );
 }

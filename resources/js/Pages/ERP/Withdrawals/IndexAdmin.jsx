@@ -2,6 +2,7 @@ import ERPLayout from '@/Layouts/ERPLayout';
 import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function IndexAdmin({ auth, withdrawals }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -82,7 +83,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                                     {withdrawal.client?.name}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-gray-900">
-                                                    {withdrawal.formatted_amount}
+                                                    {formatCurrency(withdrawal.amount, withdrawal.currency)}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-500">
                                                     <div>

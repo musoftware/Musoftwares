@@ -98,7 +98,7 @@ export default function Billing({ subscriptions }: Props) {
                                                 </div>
                                                 <div className="text-right flex-shrink-0">
                                                     <Badge className={`${statusColors[sub.status] ?? ''} hover:${statusColors[sub.status]}`}>{sub.status}</Badge>
-                                                    <p className="text-lg font-bold text-slate-900 dark:text-white mt-1">{formatMoney(sub.amount_paid, sub.currency || 'USD')}</p>
+                                                    <p className="text-lg font-bold text-slate-900 dark:text-white mt-1">{formatMoney(sub.amount_paid, sub.currency)}</p>
                                                 </div>
                                             </div>
 
@@ -130,3 +130,4 @@ export default function Billing({ subscriptions }: Props) {
         </ToolsPublicLayout>
     );
 }
+

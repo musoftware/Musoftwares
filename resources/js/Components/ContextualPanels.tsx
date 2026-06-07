@@ -113,7 +113,7 @@ export function InvoiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                     <div>
                         <div className="text-text-muted text-[11px] font-semibold uppercase tracking-wider">{__('general.amount_due')}</div>
                         <div className="font-mono text-xl font-bold text-text-primary mt-0.5">
-                            {formatMoney(data.amount, data.currency || 'USD')}
+                            {formatMoney(data.amount, data.currency)}
                         </div>
                     </div>
                     <Badge variant="outline" className={`rounded-full px-3 py-1 text-xs capitalize ${statusColors[data.status] || 'bg-gray-100'}`}>
@@ -154,10 +154,10 @@ export function InvoiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                             <div key={i} className="flex justify-between py-3">
                                 <div>
                                     <div className="font-medium text-text-primary text-xs">{item.description}</div>
-                                    <div className="text-text-muted text-[11px] mt-0.5">Qty: {item.qty} × {formatMoney(item.rate, data.currency || 'USD')}</div>
+                                    <div className="text-text-muted text-[11px] mt-0.5">Qty: {item.qty} × {formatMoney(item.rate, data.currency)}</div>
                                 </div>
                                 <span className="font-mono font-medium text-text-primary self-center text-xs">
-                                    {formatMoney(item.qty * item.rate, data.currency || 'USD')}
+                                    {formatMoney(item.qty * item.rate, data.currency)}
                                 </span>
                             </div>
                         ))}
@@ -557,3 +557,4 @@ export function ServiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
         </SlideOver>
     );
 }
+

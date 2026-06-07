@@ -13,12 +13,9 @@ class UserReferralRequestWithdraw extends Model
     use HasFactory;
 
     protected $guarded = [];
-    protected $appends = ['formatted_amount'];
+    protected $appends = [];
 
-    public function getFormattedAmountAttribute()
-    {
-        return \App\Helpers\FinanceHelper::instance()->format_money($this->amount, $this->currency_id);
-    }
+
 
     public function user()
     {
@@ -78,10 +75,10 @@ class UserReferralRequestWithdraw extends Model
 
     public static function withdrawed_balance()
     {
-        $data = static::query()->where('status', 'approved')->groupBy('currency')->select(DB::raw('sum(amount) as amount, currency'))->get();
+        $data = static::query()->where('status', 'approved')->groupBy('currency_id')->select(DB::raw('sum(amount) as amount, currency_id'))->get();
         $amount = 0;
         foreach ($data as $commission) {
-            $user_amount = CurrenciesExchange::RateByDate($commission->created_at, $commission->amount, $commission->currency, \App\Models\CurrenciesExchange::BusinessCurrency());
+            $user_amount = CurrenciesExchange::RateByDate($commission->created_at, $commission->amount, $commission->currency_id, \App\Models\CurrenciesExchange::BusinessCurrency());
             $amount += $user_amount;
         }
         return $amount;

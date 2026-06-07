@@ -31,7 +31,7 @@ const statusStyles: Record<string, { cls: string; label: string }> = {
 
 export default function Show({ withdrawRequest }: Props) {
     const { settings } = usePage<any>().props;
-    const base_currency = settings?.base_currency || 'USD';
+    const base_currency = settings?.base_currency;
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
 
@@ -209,3 +209,4 @@ export default function Show({ withdrawRequest }: Props) {
         </AdminSidebarLayout>
     );
 }
+

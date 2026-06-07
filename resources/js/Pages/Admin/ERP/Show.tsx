@@ -20,6 +20,7 @@ import {
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
 import { __ } from '@/lib/i18n';
+import { formatCurrency } from '@/lib/utils';
 
 interface TenantDetail {
     id: number;
@@ -37,7 +38,7 @@ interface ClientRow {
     name: string;
     email: string;
     phone: string;
-    currency: string;
+    currency: any;
     invoices_count: number;
 }
 
@@ -46,7 +47,7 @@ interface InvoiceRow {
     invoice_number: string;
     client_name: string;
     amount: number;
-    currency: string;
+    currency: any;
     status: string;
     issued_at: string;
 }
@@ -227,7 +228,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                                     {client.phone}
                                                 </td>
                                                 <td className="px-6 py-4 text-center font-semibold text-slate-600 font-mono">
-                                                    {client.currency}
+                                                    {client.currency?.currency}
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
                                                     <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded bg-indigo-50 text-indigo-700 font-semibold font-mono text-xs">
@@ -270,7 +271,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                                     {invoice.client_name}
                                                 </td>
                                                 <td className="px-6 py-4 text-right font-bold text-slate-900 font-mono">
-                                                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: invoice.currency }).format(invoice.amount)}
+                                                    {formatCurrency(invoice.amount, invoice.currency)}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${

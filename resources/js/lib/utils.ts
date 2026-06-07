@@ -17,8 +17,12 @@ const CURRENCY_FORMATS: Record<string, string> = {
     'IQD': '%v IQD'
 };
 
-export function formatMoney(amount: number | string, currency: any = 'USD') {
+export function formatMoney(amount: number | string, currency: any) {
     const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+
+    if (!currency) {
+        return `[ERR: NO CURR] ${numericAmount}`;
+    }
 
     let curCode = 'USD';
     if (typeof currency === 'string') {
@@ -92,9 +96,13 @@ export function formatMoney(amount: number | string, currency: any = 'USD') {
 
 export { formatMoney as formatCurrency };
 
-export function formatCompactCurrency(amount: number | string, currency: any = 'USD') {
+export function formatCompactCurrency(amount: number | string, currency: any) {
     const numericAmount =
         typeof amount === 'string' ? parseFloat(amount) : amount;
+
+    if (!currency) {
+        return `[ERR: NO CURR] ${numericAmount}`;
+    }
 
     let curCode = 'USD';
     if (typeof currency === 'string') {

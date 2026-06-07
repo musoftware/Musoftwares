@@ -31,7 +31,7 @@ interface Props {
 }
 
 export default function Show({ proposal, auth }: Props) {
-    const businessCurrency = auth?.admin_settings?.business_currency || 'USD';
+    const businessCurrency = auth?.admin_settings?.business_currency;
     const items = proposal.ai_estimate?.items || [];
     
     const { post, processing } = useForm({});
@@ -129,3 +129,4 @@ export default function Show({ proposal, auth }: Props) {
         </AuthenticatedLayout>
     );
 }
+

@@ -149,10 +149,10 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                             {item.quantity} {item.uom && <span className="text-xs text-muted-foreground uppercase">{item.uom}</span>}
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            <CurrencyDisplay amount={item.unit_price} currency={invoice.amount_currency} />
+                                            <CurrencyDisplay amount={item.unit_price} currency={invoice.currency} />
                                         </TableCell>
                                         <TableCell className="text-right font-bold">
-                                            <CurrencyDisplay amount={item.total} currency={invoice.amount_currency} />
+                                            <CurrencyDisplay amount={item.total} currency={invoice.currency} />
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -163,24 +163,24 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                             <div className="w-full md:w-1/3 space-y-4">
                                 <div className="flex justify-between text-muted-foreground">
                                     <span>{__('general.subtotal')}</span>
-                                    <span><CurrencyDisplay amount={parseFloat(invoice.amount || 0) - parseFloat(invoice.tax_amount || 0) + parseFloat(invoice.discount_amount || 0)} currency={invoice.amount_currency} /></span>
+                                    <span><CurrencyDisplay amount={parseFloat(invoice.amount || 0) - parseFloat(invoice.tax_amount || 0) + parseFloat(invoice.discount_amount || 0)} currency={invoice.currency} /></span>
                                 </div>
                                 {invoice.discount_amount > 0 && (
                                     <div className="flex justify-between text-destructive">
                                         <span>{__('general.discount')}</span>
-                                        <span>-<CurrencyDisplay amount={invoice.discount_amount} currency={invoice.amount_currency} /></span>
+                                        <span>-<CurrencyDisplay amount={invoice.discount_amount} currency={invoice.currency} /></span>
                                     </div>
                                 )}
                                 {invoice.tax_amount > 0 && (
                                     <div className="flex justify-between text-muted-foreground">
                                         <span>{__('general.tax')} ({invoice.tax_rate}%)</span>
-                                        <span><CurrencyDisplay amount={invoice.tax_amount} currency={invoice.amount_currency} /></span>
+                                        <span><CurrencyDisplay amount={invoice.tax_amount} currency={invoice.currency} /></span>
                                     </div>
                                 )}
                                 <div className="pt-4 border-t-2 border-border flex justify-between items-center">
                                     <span className="text-xl font-black uppercase text-foreground">{__('general.total')}</span>
                                     <span className="text-3xl font-black text-primary">
-                                        <CurrencyDisplay amount={invoice.amount} currency={invoice.amount_currency} />
+                                        <CurrencyDisplay amount={invoice.amount} currency={invoice.currency} />
                                     </span>
                                 </div>
                             </div>
@@ -330,7 +330,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                 <div className="text-right">
                                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{__('general.amount_due')}</p>
                                     <p className="text-lg font-bold text-indigo-600">
-                                        <CurrencyDisplay amount={invoice.amount} currency={invoice.amount_currency} />
+                                        <CurrencyDisplay amount={invoice.amount} currency={invoice.currency} />
                                     </p>
                                 </div>
                             </div>
@@ -371,10 +371,10 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                                     {item.quantity} {item.uom && <span className="text-xs text-slate-400 uppercase">{item.uom}</span>}
                                                 </TableCell>
                                                 <TableCell className="text-right font-medium text-slate-700 py-4">
-                                                    <CurrencyDisplay amount={item.unit_price} currency={invoice.amount_currency} />
+                                                    <CurrencyDisplay amount={item.unit_price} currency={invoice.currency} />
                                                 </TableCell>
                                                 <TableCell className="text-right font-semibold text-slate-900 py-4">
-                                                    <CurrencyDisplay amount={item.total} currency={invoice.amount_currency} />
+                                                    <CurrencyDisplay amount={item.total} currency={invoice.currency} />
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -386,13 +386,13 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                 <div className="w-full md:w-1/2 space-y-3">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-slate-500 font-medium">Subtotal</span>
-                                        <span className="font-medium text-slate-900"><CurrencyDisplay amount={parseFloat(invoice.amount || 0) - parseFloat(invoice.tax_amount || 0) + parseFloat(invoice.discount_amount || 0)} currency={invoice.amount_currency} /></span>
+                                        <span className="font-medium text-slate-900"><CurrencyDisplay amount={parseFloat(invoice.amount || 0) - parseFloat(invoice.tax_amount || 0) + parseFloat(invoice.discount_amount || 0)} currency={invoice.currency} /></span>
                                     </div>
                                     <div className="pt-3 border-t border-slate-100 flex justify-between items-center">
                                         <span className="text-base font-semibold text-slate-900">{__('general.total')}</span>
                                         <div className="text-right">
                                             <div className="text-2xl font-bold text-indigo-600 tracking-tight">
-                                                <CurrencyDisplay amount={invoice.amount} currency={invoice.amount_currency} />
+                                                <CurrencyDisplay amount={invoice.amount} currency={invoice.currency} />
                                             </div>
                                             <div className="text-xs text-slate-400 font-medium mt-1">
                                                 ≈ <CurrencyDisplay amount={invoice.business_amount} currency={invoice.business_currency} />
@@ -415,7 +415,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                                 <TableRow key={cost.id} className="border-b border-slate-50 hover:bg-slate-50/50">
                                                     <TableCell className="font-medium text-slate-900 py-4">{cost.title}</TableCell>
                                                     <TableCell className="text-right font-medium text-slate-900 py-4">
-                                                        <CurrencyDisplay amount={cost.amount} currency={cost.currency?.currency || cost.amount_currency} />
+                                                        <CurrencyDisplay amount={cost.amount} currency={cost.currency || invoice.currency} />
                                                     </TableCell>
                                                     <TableCell className="w-[100px] py-4">
                                                         <Badge variant={cost.payment_status === 'paid' ? 'default' : 'outline'} className={cost.payment_status === 'paid' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'text-slate-500'}>
@@ -469,7 +469,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                 <div className="flex justify-between items-center">
                                     <p className="text-sm font-medium text-slate-500">{__('general.available_balance')}</p>
                                     <p className="text-lg font-bold tracking-tight text-slate-900">
-                                        <CurrencyDisplay amount={invoice.client?.balance || 0} currency={invoice.client?.currency?.currency || invoice.amount_currency} />
+                                        <CurrencyDisplay amount={invoice.client?.balance || 0} currency={invoice.client?.currency || invoice.currency} />
                                     </p>
                                 </div>
                                 <div className="flex gap-2">
@@ -496,7 +496,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                                 <p className="text-xs text-slate-500 font-medium mt-0.5">{earning.referrer?.name || `ID: ${earning.referrer_id}`}</p>
                                             </div>
                                             <p className="font-bold text-emerald-600">
-                                                +<CurrencyDisplay amount={earning.amount} currency={earning.amount_currency} />
+                                                +<CurrencyDisplay amount={earning.amount} currency={earning.currency || invoice.currency} />
                                             </p>
                                         </div>
                                     ))}

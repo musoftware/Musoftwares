@@ -52,7 +52,7 @@ class GoldVendorDriver implements GoldProviderDriver
 
         // Vendor responses use configurable key mapping
         $keyMap        = $credentials['key_map'] ?? [];
-        $currencyCode  = $this->source->base_currency ?? 'EGP';
+        $currencyCode  = $this->source->base_currency ?? null;
         $currencyId    = \App\Models\Currency::where('code', $currencyCode)->first()?->id ?? 2;
         $exchangeRate  = (float) ($credentials['exchange_rate'] ?? 1.0);
 
@@ -99,3 +99,4 @@ class GoldVendorDriver implements GoldProviderDriver
         return $this->latencyMs;
     }
 }
+

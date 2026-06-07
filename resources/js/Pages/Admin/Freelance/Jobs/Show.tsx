@@ -6,6 +6,7 @@ import { Badge } from '@/Components/ui/badge';
 import { ArrowLeft, Trash2, ShieldAlert, Edit, RefreshCw, FileText } from 'lucide-react';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { __ } from '@/lib/i18n';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Show({ job }: any) {
     const [deleteConfirm, setDeleteConfirm] = React.useState(false);
@@ -64,7 +65,7 @@ export default function Show({ job }: any) {
                         <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50 p-4 rounded-md">
                             <div>
                                 <span className="text-gray-500 block mb-1">{__('freelance.budget')}</span>
-                                <span className="font-semibold text-gray-900">{job.formatted_budget}</span>
+                                <span className="font-semibold text-gray-900">{formatCurrency(job.budget, job.currency)}</span>
                             </div>
                             <div>
                                 <span className="text-gray-500 block mb-1">{__('freelance.duration')}</span>
@@ -106,7 +107,7 @@ export default function Show({ job }: any) {
                                         </div>
                                         <div className="text-right flex items-center space-x-4">
                                             <div>
-                                                <div className="font-semibold text-green-600">{proposal.formatted_bid_amount}</div>
+                                                <div className="font-semibold text-green-600">{formatCurrency(proposal.bid_amount, proposal.currency || job.currency)}</div>
                                                 <Badge variant="outline" className="capitalize text-xs">{proposal.status}</Badge>
                                             </div>
                                             <Button 
@@ -145,7 +146,7 @@ export default function Show({ job }: any) {
                                         </div>
                                         <div className="text-right flex items-center space-x-4">
                                             <div>
-                                                <div className="font-semibold text-green-600">{contract.formatted_amount || contract.amount}</div>
+                                                <div className="font-semibold text-green-600">{formatCurrency(contract.amount, contract.currency || job.currency)}</div>
                                                 <Badge variant="outline" className="capitalize text-xs">{__('freelance.' + contract.status) || contract.status}</Badge>
                                             </div>
                                             <Link href={route('admin.freelance.contracts.show', contract.id)}>

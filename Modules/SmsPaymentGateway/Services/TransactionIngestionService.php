@@ -198,7 +198,7 @@ class TransactionIngestionService
                 'sender' => $transactionData['sender'] ?? '',
                 'sender_name' => $smsData['sender'] ?? '',
                 'amount' => $transactionData['amount'],
-                'currency_id' => \App\Models\Currency::where('currency', strtoupper($transactionData['currency'] ?? 'EGP'))->value('id') ?? 1,
+                'currency_id' => \App\Models\Currency::where('currency', strtoupper($transactionData['currency'] ?? null))->value('id') ?? 1,
                 'balance' => $transactionData['balance'] ?? null,
                 'phone_number' => $phoneNumber,
                 'reference_number' => $transactionData['reference_number'] ?? null,
@@ -318,3 +318,4 @@ class TransactionIngestionService
         return $this->parser->normalizePhoneNumber($phone);
     }
 }
+

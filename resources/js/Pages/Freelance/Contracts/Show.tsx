@@ -9,17 +9,17 @@ import { Input } from '@/Components/ui/input';
 import { Textarea } from '@/Components/ui/textarea';
 import { formatMoney, formatDate } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
-import { 
-    Clock, DollarSign, CheckCircle2, AlertCircle, 
-    Send, Paperclip, FileText, User, UploadCloud, FileCheck 
+import {
+    Clock, DollarSign, CheckCircle2, AlertCircle,
+    Send, Paperclip, FileText, User, UploadCloud, FileCheck
 } from 'lucide-react';
 import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 import { __ } from '@/lib/i18n';
 
-function ShowContractContent({ auth, contract }: any) {
+function ShowContractContent({ auth, contract, userCurrency }: any) {
     const { mode } = useFreelanceMode();
     const isClient = mode === 'client';
-    const globalCurrency = auth?.user?.preferred_currency || 'USD';
+    const globalCurrency = userCurrency;
 
     const [messageInput, setMessageInput] = useState('');
     const [deliveryDescription, setDeliveryDescription] = useState('');
@@ -35,13 +35,13 @@ function ShowContractContent({ auth, contract }: any) {
     };
 
     const handleMarkCompleted = () => {
-        if(confirm(__('freelance.are_you_sure_you_want'))) {
+        if (confirm(__('freelance.are_you_sure_you_want'))) {
             router.post(route('freelance.contracts.complete', contract.id));
         }
     };
 
     const handleRaiseDispute = () => {
-        if(confirm(__('freelance.are_you_sure_you_want_2'))) {
+        if (confirm(__('freelance.are_you_sure_you_want_2'))) {
             router.post(route('freelance.contracts.dispute', contract.id));
         }
     };
@@ -58,7 +58,7 @@ function ShowContractContent({ auth, contract }: any) {
             <Head title={`${__('freelance.contract')}: ${contract.title}`} />
 
             <div className="w-full space-y-6 pb-12">
-                
+
                 {/* Header Banner */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-xl border border-slate-200/60 shadow-sm">
                     <div className="space-y-1">
@@ -66,7 +66,7 @@ function ShowContractContent({ auth, contract }: any) {
                             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
                                 {contract.title}
                             </h1>
-                            <Badge variant={contract.status === 'active' ? 'default' : contract.status === 'completed' ? 'secondary' : 'destructive'} 
+                            <Badge variant={contract.status === 'active' ? 'default' : contract.status === 'completed' ? 'secondary' : 'destructive'}
                                 className={`uppercase tracking-wider font-semibold ${contract.status === 'active' ? 'bg-indigo-600 hover:bg-indigo-700' : contract.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : ''}`}
                             >
                                 {__(contract.status)}
@@ -74,12 +74,12 @@ function ShowContractContent({ auth, contract }: any) {
                         </div>
                         <p className="text-sm text-slate-500">{__('freelance.contract_workspace_messages')}</p>
                     </div>
-                    
+
                     <div className="flex items-center gap-6">
                         <div className="text-right">
                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-0.5">{__('freelance.contract_value')}</p>
                             <p className="text-xl font-bold text-slate-900 font-mono">
-                                <FinancialAmount amount={contract.agreed_price} currency={contract.job?.currency} />
+                                {contract.amount !== null && contract.amount !== undefined ? formatMoney(contract.amount, userCurrency) : `${contract.contract_points} ${__('freelance.pts', undefined, 'pts')}`}
                             </p>
                         </div>
                         <div className="h-10 w-px bg-slate-200 hidden sm:block"></div>
@@ -95,7 +95,7 @@ function ShowContractContent({ auth, contract }: any) {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     {/* Left Column - Workspace (8 cols) */}
                     <div className="lg:col-span-8 space-y-6">
-                        
+
                         {/* Parties */}
                         <Card className="shadow-sm border-slate-200/60 overflow-hidden">
                             <CardContent className="p-0 flex items-stretch">
@@ -125,8 +125,8 @@ function ShowContractContent({ auth, contract }: any) {
                             <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4 px-6 flex flex-row items-center justify-between">
                                 <CardTitle className="text-sm font-semibold flex items-center gap-2 text-slate-900">
                                     <span className="relative flex h-2 w-2">
-                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                                     </span>
                                     {__('general.live_chat')}
                                 </CardTitle>
@@ -141,9 +141,8 @@ function ShowContractContent({ auth, contract }: any) {
                                             <span className="text-[10px] text-slate-400 font-medium mb-1 mx-1">
                                                 {msg.sender_name} • {msg.time}
                                             </span>
-                                            <div className={`px-4 py-2.5 rounded-2xl max-w-[85%] text-sm shadow-sm ${
-                                                isMe ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-white border border-slate-200 text-slate-800 rounded-tl-sm'
-                                            }`}>
+                                            <div className={`px-4 py-2.5 rounded-2xl max-w-[85%] text-sm shadow-sm ${isMe ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-white border border-slate-200 text-slate-800 rounded-tl-sm'
+                                                }`}>
                                                 {msg.text}
                                             </div>
                                         </div>
@@ -196,7 +195,7 @@ function ShowContractContent({ auth, contract }: any) {
                                                     onClick={handleMarkCompleted}
                                                     className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12"
                                                 >
-                                                    <CheckCircle2 className="mr-2 h-5 w-5" /> {__('payment.approve_release_payment')}
+                                                    <CheckCircle2 className="mr-2 h-5 w-5" /> {__('general.approve_and_complete')}
                                                 </Button>
                                                 <Button
                                                     onClick={handleRaiseDispute}
@@ -256,8 +255,8 @@ function ShowContractContent({ auth, contract }: any) {
                                         <CheckCircle2 className="h-8 w-8 text-emerald-600" />
                                     </div>
                                     <h3 className="text-xl font-bold text-emerald-900 mb-2">{__('freelance.contract_completed')}</h3>
-                                    <p className="text-sm text-emerald-700 mb-6 font-medium">{__('general.funds_have_been_released_successfully')}</p>
-                                    
+                                    <p className="text-sm text-emerald-700 mb-6 font-medium">{__('general.contract_marked_as_completed_successfully')}</p>
+
                                     {isClient && (
                                         <Button variant="outline" className="border-emerald-300 text-emerald-700 hover:bg-emerald-100 font-bold w-full bg-white">
                                             {__('general.leave_feedback')}
@@ -266,7 +265,7 @@ function ShowContractContent({ auth, contract }: any) {
                                 </CardContent>
                             </Card>
                         )}
-                        
+
                         {contract.status === 'disputed' && (
                             <Card className="shadow-sm border-red-200 bg-red-50 overflow-hidden">
                                 <CardContent className="p-8 flex flex-col items-center justify-center text-center">
@@ -285,7 +284,7 @@ function ShowContractContent({ auth, contract }: any) {
     );
 }
 
-export default function ShowContract({ auth, contract }: any) {
+export default function ShowContract({ auth, contract, userCurrency }: any) {
     if (!contract) {
         return (
             <FreelanceLayout clean={true}>
@@ -298,7 +297,7 @@ export default function ShowContract({ auth, contract }: any) {
 
     return (
         <FreelanceLayout clean={true}>
-            <ShowContractContent auth={auth} contract={contract} />
+            <ShowContractContent auth={auth} contract={contract} userCurrency={userCurrency} />
         </FreelanceLayout>
     );
 }

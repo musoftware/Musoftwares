@@ -7,6 +7,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class InvoiceResource extends JsonResource
 {
+    use \App\Traits\ConvertsCurrency;
+
     /**
      * Transform the resource into an array.
      *

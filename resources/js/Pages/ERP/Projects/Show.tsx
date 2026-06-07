@@ -38,8 +38,8 @@ interface Project {
 }
 
 interface Stats {
-    businessCurrency: string;
-    projectCurrency: string;
+    businessCurrency: any;
+    projectCurrency: any;
     paidInvoicesCount: number;
     unpaidInvoicesCount: number;
     totalInvoicesCount: number;
@@ -56,7 +56,7 @@ interface Invoice {
     status: string;
     amount: number;
     business_amount: number;
-    currency: string;
+    currency: any;
     created_at: string;
 }
 
@@ -68,7 +68,7 @@ interface Transaction {
     direction: string;
     amount: number;
     business_amount: number;
-    currency: string;
+    currency: any;
     date: string;
     authorizer: string;
 }
@@ -79,7 +79,7 @@ interface Expense {
     description?: string;
     amount: number;
     business_amount: number;
-    currency: string;
+    currency: any;
     date: string;
     payer: string;
 }
@@ -156,7 +156,7 @@ export default function ProjectShow({
         });
     };
 
-    const businessCurrency = stats.businessCurrency || 'USD';
+    const businessCurrency = stats.businessCurrency;
 
     // Calculate tasks progress percentage
     const completedTasks = tasks.filter(t => t.category === 'Done').length;
@@ -235,7 +235,7 @@ export default function ProjectShow({
                     {[
                         { 
                             label: 'Project Budget', 
-                            value: <CurrencyDisplay amount={project.budget} currency={stats.projectCurrency || 'USD'} />, 
+                            value: <CurrencyDisplay amount={project.budget} currency={project.currency} />, 
                             sub: 'Allocated budget',
                             icon: Briefcase, 
                             color: 'text-indigo-600' 
@@ -426,7 +426,7 @@ export default function ProjectShow({
                                                                 {txn.note}
                                                             </td>
                                                             <td className="px-6 py-3.5 text-right font-mono font-semibold">
-                                                                <CurrencyDisplay amount={txn.amount} currency={stats.projectCurrency || 'USD'} />
+                                                                <CurrencyDisplay amount={txn.amount} currency={project.currency} />
                                                             </td>
                                                             <td className="px-6 py-3.5 text-right font-mono text-slate-500">
                                                                 <CurrencyDisplay amount={txn.business_amount} currency={businessCurrency} />
@@ -748,3 +748,4 @@ export default function ProjectShow({
         </ERPLayout>
     );
 }
+

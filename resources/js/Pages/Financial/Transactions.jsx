@@ -29,7 +29,7 @@ export default function Transactions({ transactions, wallet }) {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {Number(wallet?.balance || 0).toFixed(2)} <span className="text-sm font-normal text-muted-foreground">{wallet?.currency || 'USD'}</span>
+                                {Number(wallet?.balance || 0).toFixed(2)} <span className="text-sm font-normal text-muted-foreground">{wallet?.currency}</span>
                             </div>
                             <p className="mt-1 text-xs text-muted-foreground">{__('general.available_across_all_platform_workspaces')}</p>
                         </CardContent>
@@ -42,7 +42,7 @@ export default function Transactions({ transactions, wallet }) {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {Number(wallet?.earned_balance || 0).toFixed(2)} <span className="text-sm font-normal text-muted-foreground">{wallet?.currency || 'USD'}</span>
+                                {Number(wallet?.earned_balance || 0).toFixed(2)} <span className="text-sm font-normal text-muted-foreground">{wallet?.currency}</span>
                             </div>
                             <p className="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-1">
                                 <CheckCircle2 className="w-3 h-3" />{__('general.eligible_for_withdrawal')}</p>
@@ -56,7 +56,7 @@ export default function Transactions({ transactions, wallet }) {
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
-                                {Number(wallet?.locked_balance || 0).toFixed(2)} <span className="text-sm font-normal text-muted-foreground">{wallet?.currency || 'USD'}</span>
+                                {Number(wallet?.locked_balance || 0).toFixed(2)} <span className="text-sm font-normal text-muted-foreground">{wallet?.currency}</span>
                             </div>
                             <p className="text-xs text-amber-600 font-medium flex items-center gap-1 mt-1">
                                 <AlertCircle className="w-3 h-3" />{__('general.pending_in_active_contracts')}</p>
@@ -106,7 +106,7 @@ export default function Transactions({ transactions, wallet }) {
                                                 )}
                                             </TableCell>
                                             <TableCell className={`font-medium ${tx.type === 'credit' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                                {tx.type === 'credit' ? '+' : '-'}{Number(tx.amount).toFixed(2)} {wallet?.currency || 'USD'}
+                                                {tx.type === 'credit' ? '+' : '-'}{Number(tx.amount).toFixed(2)} {wallet?.currency}
                                             </TableCell>
                                             <TableCell className="text-muted-foreground">
                                                 {Number(tx.balance_before).toFixed(2)}
@@ -158,3 +158,4 @@ export default function Transactions({ transactions, wallet }) {
         </AuthenticatedLayout>
     );
 }
+

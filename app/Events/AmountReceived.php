@@ -13,18 +13,22 @@ class AmountReceived
     public $client;
     public $amount;
     public $reason;
-    public $currency;
+    public $currencyId;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($client, $amount, $reason, $currency = 'EGP')
+    public function __construct($client, $amount, $reason, $currencyId = null)
     {
         $this->client = $client;
         $this->amount = $amount;
         $this->reason = $reason;
-        $this->currency = $currency;
+        $this->currencyId = $currencyId;
+
+        if (!$this->currencyId) {
+            throw new \Exception("AmountReceived event is missing currency_id.");
+        }
     }
 }

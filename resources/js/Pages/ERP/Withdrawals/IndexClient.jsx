@@ -2,6 +2,7 @@ import ERPLayout from '@/Layouts/ERPLayout';
 import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 import { formatMoney } from '@/lib/utils';
 
 export default function IndexClient({
@@ -63,7 +64,7 @@ export default function IndexClient({
                         <div className="overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
                             <h3 className="text-sm font-medium text-gray-500">{__('general.total_balance')}</h3>
                             <p className="mt-2 text-3xl font-semibold text-gray-900">
-                                {formatMoney(wallet?.balance || 0, wallet?.currency || 'USD')}
+                                {formatMoney(wallet?.balance || 0, wallet?.currency)}
                             </p>
                         </div>
                         <div className="overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
@@ -71,13 +72,13 @@ export default function IndexClient({
                                 Locked (Pending)
                             </h3>
                             <p className="mt-2 text-3xl font-semibold text-yellow-600">
-                                {formatMoney(lockedAmount, wallet?.currency || 'USD')}
+                                {formatMoney(lockedAmount, wallet?.currency)}
                             </p>
                         </div>
                         <div className="overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
                             <h3 className="text-sm font-medium text-gray-500">{__('general.available_for_withdrawal')}</h3>
                             <p className="mt-2 text-3xl font-semibold text-green-600">
-                                {formatMoney(availableBalance, wallet?.currency || 'USD')}
+                                {formatMoney(availableBalance, wallet?.currency)}
                             </p>
                         </div>
                     </div>
@@ -175,7 +176,7 @@ export default function IndexClient({
                                                     ).toLocaleDateString()}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-gray-900">
-                                                    {withdrawal.formatted_amount}
+                                                    {formatCurrency(withdrawal.amount, withdrawal.currency)}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span
@@ -242,3 +243,4 @@ export default function IndexClient({
         </ERPLayout>
     );
 }
+

@@ -92,7 +92,7 @@ class GoldHistoricalPriceService
                 'close_price' => $prices->last(),
                 'avg_price'   => round($prices->avg(), 4),
                 'tick_count'  => $prices->count(),
-                'currency'    => $snapshots->first()?->currency ?? 'EGP',
+                'currency'    => $snapshots->first()?->currency ?? null,
             ]
         );
     }
@@ -150,3 +150,4 @@ class GoldHistoricalPriceService
         };
     }
 }
+

@@ -38,8 +38,44 @@ class Transaction extends Model
         static::observe(\App\Observers\TransactionObserver::class);
 
         static::saving(function ($transaction) {
-            $currency = $transaction->currency_id ?? \App\Models\AdminSettings::business_currency();
+            // Force user currency conversion if different
+            if ($transaction->user_id && $transaction->user) {
+                if (!$transaction->user->currency_id) {
+                    throw new \Exception("User {$transaction->user_id} is missing a currency_id. Global fallback is prohibited.");
+                }
+                
+                $userCurrencyId = $transaction->user->currency_id;
+                $currentCurrencyId = $transaction->currency_id ?? $transaction->currency;
+                
+                if (!$currentCurrencyId) {
+                    // If no currency was explicitly passed for the transaction, assume it is in the user's native currency.
+                    $currentCurrencyId = $userCurrencyId;
+                    $transaction->currency_id = $userCurrencyId;
+                    $transaction->currency = $userCurrencyId;
+                }
+                
+                if ($currentCurrencyId != $userCurrencyId) {
+                    $date = $transaction->created_at ?? now();
+                    $transaction->amount = \App\Models\CurrenciesExchange::RateByDate(
+                        $date,
+                        $transaction->amount,
+                        $currentCurrencyId,
+                        $userCurrencyId
+                    );
+                    $transaction->currency_id = $userCurrencyId;
+                    $transaction->currency = $userCurrencyId; // In case the column is named 'currency'
+                }
+            }
+
+            $currency = $transaction->currency_id ?? $transaction->currency;
+            if (!$currency) {
+                throw new \Exception("Transaction is missing an associated currency relation and no user fallback is available.");
+            }
+
             $businessCurrencyId = \App\Models\AdminSettings::business_currency();
+            if (is_object($businessCurrencyId)) {
+                $businessCurrencyId = $businessCurrencyId->id;
+            }
             
             $date = $transaction->created_at ?? now();
             $transaction->business_amount = \App\Models\CurrenciesExchange::RateByDate(
@@ -148,6 +184,11 @@ class Transaction extends Model
     public function project()
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class, 'currency_id');
     }
 
     /**
