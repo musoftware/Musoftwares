@@ -60,12 +60,20 @@ class ServiceController extends Controller
 
     public function show($id, Request $request)
     {
-        $service = Service::with(['seller', 'category', 'packages.currency'])->findOrFail($id);
+        $service = Service::with(['seller', 'category', 'packages.currency'])->find($id);
+
+        if (!$service) {
+            return Inertia::render('Marketplace/Services/ExclusiveService', [
+                'serviceSlug' => str_replace('-', ' ', $id),
+            ]);
+        }
 
         if ($service->status !== 'active') {
             $user = auth()->user();
             if (!$user || ($user->id !== $service->seller_id && !$user->hasRole('admin'))) {
-                abort(404, __('general.service_not_found_or_not_active'));
+                return Inertia::render('Marketplace/Services/ExclusiveService', [
+                    'serviceSlug' => $service->title ?? str_replace('-', ' ', $id),
+                ]);
             }
         }
 

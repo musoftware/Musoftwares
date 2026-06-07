@@ -3,11 +3,11 @@
 namespace Tests\Feature\BookingPriority;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class BookingPriorityFlowTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_vip_booking_is_queued_higher_than_normal()
     {

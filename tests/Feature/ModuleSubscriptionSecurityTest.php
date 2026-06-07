@@ -4,12 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Services\SubscriptionService;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ModuleSubscriptionSecurityTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $user;
 

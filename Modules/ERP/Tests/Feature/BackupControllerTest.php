@@ -3,7 +3,7 @@
 namespace Modules\ERP\Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
@@ -14,7 +14,7 @@ use Tests\TestCase;
 
 class BackupControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
     protected function setUp(): void
     {
         parent::setUp();

@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Modules\ERP\Models\RecurringEntry;
@@ -13,7 +13,7 @@ use Tests\TestCase;
 
 class RecurringEntrySchedulerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected Tenant $tenant;
     protected User $user;

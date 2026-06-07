@@ -8,12 +8,12 @@ use Modules\Booking\Models\Booking;
 use Modules\Booking\Models\BookingEventType;
 use Modules\Booking\Services\GroupSessionCapacityService;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 
 class GroupSessionCapacityTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_group_session_enforces_capacity()
     {

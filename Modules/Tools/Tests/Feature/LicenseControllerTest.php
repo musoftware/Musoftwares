@@ -7,11 +7,11 @@ use Illuminate\Support\Str;
 use Modules\Tools\Models\ActivatedDevice;
 use Modules\Tools\Models\ToolLicense;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class LicenseControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
     protected User $user;
     protected ToolLicense $license;
 

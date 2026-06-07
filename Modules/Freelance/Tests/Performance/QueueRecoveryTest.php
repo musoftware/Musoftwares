@@ -1,11 +1,11 @@
 <?php
 
-uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\DatabaseTransactions::class);
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 use Modules\Freelance\Jobs\NotifyFreelancersForJob;
 use Modules\Freelance\Models\Job;
 use Modules\Freelance\Tests\Builders\JobScenarioBuilder;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 
 

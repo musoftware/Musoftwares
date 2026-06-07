@@ -9,12 +9,12 @@ use App\Services\MeteredBillingService;
 use App\Exceptions\SaaSLimitExceededException;
 use App\Events\SaaSLimitApproaching;
 use App\Events\SaaSLimitReached;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 
 class SaaSMeteringTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_it_allows_unlimited_usage()
     {

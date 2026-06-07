@@ -4,14 +4,14 @@ namespace Modules\CRM\Tests\Feature;
 
 use App\Models\User;
 use App\Models\UserSubscription;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Modules\CRM\Domains\SalesOperations\Actions\AssignLeadRoundRobinAction;
 use Modules\CRM\Tests\Support\BaseTenantTestCase;
 
 class LeadAssignmentTest extends BaseTenantTestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_lead_is_assigned_via_round_robin()
     {

@@ -4,7 +4,7 @@ namespace Modules\Booking\app\Features\Services;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\Booking\Core\Traits\TenantAwareModel;
+use Modules\Booking\app\Core\Traits\TenantAwareModel;
 
 class BookingService extends Model
 {

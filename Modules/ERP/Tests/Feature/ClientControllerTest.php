@@ -3,14 +3,14 @@
 namespace Modules\ERP\Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\Tenant;
 use Tests\TestCase;
 
 class ClientControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
     protected function setUp(): void
     {
         parent::setUp();

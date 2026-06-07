@@ -3,7 +3,7 @@
 namespace Modules\ERP\Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantFile;
 use Modules\ERP\Models\TenantStorageProvider;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 
 class FileControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     private User $user;
     private Tenant $tenant;

@@ -7,12 +7,12 @@ use Modules\Booking\app\Features\QueueManagement\Models\BookingQueue;
 use Modules\Booking\app\Features\QueueManagement\Models\BookingQueueEntry;
 use Modules\Booking\app\Features\QueueManagement\Services\QueueFlowManager;
 use Modules\Booking\app\Features\QueueManagement\Events\QueueTokenCalled;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 
 class QueueFlowManagerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_it_calls_highest_priority_oldest_waiting_entry()
     {

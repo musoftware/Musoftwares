@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\CRM;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
@@ -11,7 +11,7 @@ use Modules\CRM\Models\Workspace;
 
 class LeadTest extends TestCase
 {
-    use DatabaseTransactions, WithFaker;
+    use RefreshDatabase, WithFaker;
 
     protected function createUserWithWorkspaceAndSubscription()
     {

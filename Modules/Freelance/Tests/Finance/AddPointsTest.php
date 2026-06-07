@@ -1,11 +1,11 @@
 <?php
 
-uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\DatabaseTransactions::class);
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 use Modules\Freelance\Domains\Finance\Actions\AddPointsAction;
 use App\Models\User;
 use App\Models\PointTransaction;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 
 

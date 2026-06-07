@@ -3,13 +3,13 @@
 namespace Modules\Booking\tests\Feature\Booking\OnlinePage;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 use Modules\Booking\app\Features\OnlinePage\Models\PublicPage;
 
 class PublicBookingFlowTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_customer_can_initiate_booking_page()
     {

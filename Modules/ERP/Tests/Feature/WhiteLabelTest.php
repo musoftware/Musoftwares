@@ -3,14 +3,14 @@
 namespace Modules\ERP\Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\Invoice;
 use Tests\TestCase;
 
 class WhiteLabelTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_invoice_pdf_shows_branding_without_white_label_addon()
     {

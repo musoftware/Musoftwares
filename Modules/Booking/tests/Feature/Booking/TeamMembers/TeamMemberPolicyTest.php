@@ -3,13 +3,13 @@
 namespace Modules\Booking\tests\Feature\Booking\TeamMembers;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 use Modules\Booking\app\Features\TeamMembers\Models\BookingTeamMember;
 
 class TeamMemberPolicyTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_staff_cannot_edit_other_staff_profiles()
     {

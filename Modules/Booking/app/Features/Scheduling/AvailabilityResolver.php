@@ -15,7 +15,7 @@ class AvailabilityResolver
      */
     public function resolveAvailableResources(int $serviceId, string $startDate, string $endDate): array
     {
-        $service = \Modules\Booking\Features\Services\BookingService::find($serviceId);
+        $service = \Modules\Booking\app\Features\Services\BookingService::find($serviceId);
         if (!$service) {
             return [];
         }
@@ -23,7 +23,7 @@ class AvailabilityResolver
         // 1. Get all active resources in the current tenant.
         // In a real scenario, there might be a pivot table linking resources to services they provide.
         // For now, we fetch all active resources.
-        $resources = \Modules\Booking\Features\Resources\BookingResource::where('is_active', true)->get();
+        $resources = \Modules\Booking\app\Features\Resources\BookingResource::where('is_active', true)->get();
 
         $availableResources = [];
         $slotGenerator = new SlotGenerator();

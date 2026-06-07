@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\Client;
 use App\Models\AdminNote;
@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class AdminNoteTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $admin;
     protected Tenant $tenant;

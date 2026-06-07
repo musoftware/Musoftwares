@@ -52,7 +52,7 @@ class EventServiceProvider extends ServiceProvider
         // Booking
         BookingStatusChanged::class    => [
             SendBookingNotification::class,
-            \Modules\Booking\Features\Analytics\Listeners\UpdateDailyMetricsListener::class,
+            \Modules\Booking\app\Features\Analytics\Listeners\UpdateDailyMetricsListener::class,
         ],
     ];
 

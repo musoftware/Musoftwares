@@ -3,14 +3,14 @@
 namespace Modules\SmsPaymentGateway\Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 use Modules\SmsPaymentGateway\Models\SmsGatewayApiKey;
 use Modules\SmsPaymentGateway\Models\SmsGatewayCheckoutSession;
 
 class CheckoutSessionApiTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected $user;
     protected $apiKey;

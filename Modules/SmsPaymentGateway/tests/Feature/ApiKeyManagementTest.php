@@ -3,13 +3,13 @@
 namespace Modules\SmsPaymentGateway\Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 use Modules\SmsPaymentGateway\Models\SmsGatewayApiKey;
 
 class ApiKeyManagementTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected $user;
 

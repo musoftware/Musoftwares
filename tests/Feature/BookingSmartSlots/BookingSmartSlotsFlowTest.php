@@ -3,11 +3,11 @@
 namespace Tests\Feature\BookingSmartSlots;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class BookingSmartSlotsFlowTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_gap_optimization_job_updates_fragmentation_score()
     {

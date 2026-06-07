@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Freelance\Models\Skill;
 use Modules\Freelance\Models\Job;
 use Modules\Freelance\Models\Proposal;
@@ -14,7 +14,7 @@ use Tests\TestCase;
 
 class FreelanceWorkflowTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $clientUser;
     protected User $freelancerUser;

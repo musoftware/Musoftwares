@@ -4,12 +4,12 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use Modules\Freelance\Models\Skill;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class FreelanceSkillControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $admin;
     protected User $clientUser;

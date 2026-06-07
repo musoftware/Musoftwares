@@ -3,7 +3,7 @@
 namespace Modules\SmsPaymentGateway\Tests\Unit;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayTransaction;
 use App\Models\PaymentOrder;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayOrderLink;
@@ -13,7 +13,7 @@ use App\Models\User;
 
 class RealtimePaymentMatchingEngineTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected RealtimePaymentMatchingEngine $engine;
 

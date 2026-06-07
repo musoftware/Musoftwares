@@ -3,14 +3,14 @@
 namespace Modules\Booking\tests\Feature\Booking\SmsNotifications;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 use Modules\Booking\app\Features\SmsNotifications\Models\SmsTemplate;
 use Modules\Booking\app\Features\SmsNotifications\Models\SmsSetting;
 
 class TenantIsolationSmsTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_tenant_cannot_view_other_tenant_templates()
     {

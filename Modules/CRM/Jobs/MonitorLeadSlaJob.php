@@ -65,7 +65,7 @@ class MonitorLeadSlaJob implements ShouldQueue
                         'tenant_id' => $this->tenantId,
                         'lead_id' => $lead->id,
                         'type' => 'sla_breach',
-                        'description' => "Lead SLA breached. Agent {$lead->assigned_to_id} failed to contact in time.",
+                        'description' => "Lead SLA breached. Agent {$lead->assigned_to} failed to contact in time.",
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

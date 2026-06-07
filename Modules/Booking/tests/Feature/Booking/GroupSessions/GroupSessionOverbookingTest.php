@@ -3,14 +3,14 @@
 namespace Modules\Booking\tests\Feature\Booking\GroupSessions;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 use Modules\Booking\app\Features\GroupSessions\Models\GroupSession;
 use Illuminate\Support\Carbon;
 
 class GroupSessionOverbookingTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_overbooking_routes_customer_to_waitlist()
     {

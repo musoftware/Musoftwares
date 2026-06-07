@@ -4,12 +4,12 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Models\UserPaymentMethod;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class AdminPaymentMethodControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected function setUp(): void
     {

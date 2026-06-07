@@ -3,7 +3,7 @@
 namespace Modules\ERP\Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\DebtTransaction;
@@ -12,7 +12,7 @@ use App\Models\UserSubscription;
 
 class DebtControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     private User $user;
     private Tenant $tenant;

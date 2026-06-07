@@ -7,7 +7,7 @@ use App\Models\Plan;
 use Modules\ERP\Models\Tenant;
 use App\Models\TenantFeature;
 use App\Models\Transaction;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -17,7 +17,7 @@ use function Pest\Laravel\post;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 
-uses(Tests\TestCase::class, DatabaseTransactions::class);
+uses(Tests\TestCase::class, RefreshDatabase::class);
 
 beforeEach(function () {
     // 1. Scaffold Currencies & Rates required by SubscriptionController

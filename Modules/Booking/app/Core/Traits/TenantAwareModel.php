@@ -1,8 +1,8 @@
 <?php
 
-namespace Modules\Booking\Core\Traits;
+namespace Modules\Booking\app\Core\Traits;
 
-use Modules\Booking\Core\Scopes\TenantScope;
+use Modules\Booking\app\Core\Scopes\TenantScope;
 
 trait TenantAwareModel
 {

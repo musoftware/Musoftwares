@@ -5,11 +5,11 @@ namespace Modules\Booking\Tests\Feature;
 use Tests\TestCase;
 use App\Models\User;
 use Modules\Booking\Models\BookingBranch;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class BookingBranchIsolationTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_branches_are_isolated_by_tenant()
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Booking\Core\Scopes;
+namespace Modules\Booking\app\Core\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;

@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\PointPackage;
 use App\Models\PointTransaction;
 use Tests\TestCase;
@@ -12,7 +12,7 @@ use App\Helpers\KashierHelper;
 
 class PointPurchaseTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $user;
     protected PointPackage $package;

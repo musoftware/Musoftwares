@@ -3,7 +3,7 @@
 namespace Modules\Booking\tests\Feature\Booking\Recurring;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Booking\app\Features\Recurring\Models\RecurringSeries;
 use Modules\Booking\app\Features\Recurring\Models\RecurringException;
 use Modules\Booking\app\Features\Recurring\Services\RecurringConflictResolver;
@@ -14,7 +14,7 @@ use Modules\Booking\app\Features\Recurring\Events\OccurrenceSkipped;
 
 class RecurringConflictResolverTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_resolver_detects_existing_booking_conflict()
     {
@@ -79,7 +79,7 @@ class RecurringConflictResolverTest extends TestCase
 
         // Mark date as an exception (e.g. holiday)
         RecurringException::create([
-            'tenant_id' => 1,
+            'tenant_id' => $tenant->id,
             'series_id' => $series->id,
             'exception_date' => '2026-06-08',
             'reason' => 'holiday'

@@ -2,7 +2,7 @@
 
 namespace Modules\ERP\Tests\Feature;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Modules\ERP\Models\Tenant;
@@ -16,7 +16,7 @@ use Modules\ERP\Models\Invoice;
 
 class PosCheckoutTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected function setUp(): void
     {

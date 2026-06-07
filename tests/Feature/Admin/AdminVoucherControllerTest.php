@@ -5,12 +5,12 @@ namespace Tests\Feature\Admin;
 use App\Models\User;
 use App\Models\Voucher;
 use App\Models\Currency;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class AdminVoucherControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $admin;
     protected User $clientUser;

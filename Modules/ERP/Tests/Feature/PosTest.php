@@ -6,12 +6,12 @@ use App\Models\User;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\Product;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class PosTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
     protected function setUp(): void
     {
         parent::setUp();

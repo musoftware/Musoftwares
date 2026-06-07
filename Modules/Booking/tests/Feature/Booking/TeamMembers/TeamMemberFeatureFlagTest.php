@@ -3,12 +3,12 @@
 namespace Modules\Booking\tests\Feature\Booking\TeamMembers;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 
 class TeamMemberFeatureFlagTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_tenant_without_addon_cannot_add_second_staff()
     {

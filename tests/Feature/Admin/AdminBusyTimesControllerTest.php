@@ -4,12 +4,12 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Models\RecurringBusyTime;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class AdminBusyTimesControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $admin;
     protected User $clientUser;

@@ -4,13 +4,13 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Models\CostTransaction;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Database\Seeders\RolesAndPermissionsSeeder;
 
 class FinancialOperationsTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $admin;
     protected User $clientUser;

@@ -1,11 +1,11 @@
 <?php
 
-uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\DatabaseTransactions::class);
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 use Modules\Freelance\Tests\Builders\JobScenarioBuilder;
 use Modules\Freelance\Models\Proposal;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 
 

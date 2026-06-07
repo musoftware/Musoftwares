@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\SupportTicket;
@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class ERPSupportTicketTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $user;
     protected Tenant $tenant;

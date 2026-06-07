@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Modules\CRM\Domains\WorkforceMonitoring\Actions\CalculateKpisAction;
 
 class WorkspaceController extends Controller
@@ -37,8 +38,8 @@ class WorkspaceController extends Controller
         } else {
             // 2. Fetch from pivot
             $workspaceUser = DB::table('crm_workspace_users')
-                ->where('workspace_id', $workspaceId)
-                ->where('user_id', $user->id)
+                ->where('crm_workspace_users.workspace_id', $workspaceId)
+                ->where('crm_workspace_users.user_id', $user->id)
                 ->join('crm_roles', 'crm_workspace_users.role_id', '=', 'crm_roles.id')
                 ->select('crm_roles.name')
                 ->first();
@@ -97,8 +98,8 @@ class WorkspaceController extends Controller
         if ($isOwner) return; // Owner always bypasses role checks
 
         $workspaceUser = DB::table('crm_workspace_users')
-            ->where('workspace_id', $workspaceId)
-            ->where('user_id', $user->id)
+            ->where('crm_workspace_users.workspace_id', $workspaceId)
+            ->where('crm_workspace_users.user_id', $user->id)
             ->join('crm_roles', 'crm_workspace_users.role_id', '=', 'crm_roles.id')
             ->select('crm_roles.name')
             ->first();
@@ -190,7 +191,7 @@ class WorkspaceController extends Controller
         $staleLeads = $workspaceId ? DB::table('leads')
             ->where('workspace_id', $workspaceId)
             ->where('is_stale', true)
-            ->select('id', 'name', 'phone', 'pipeline_stage', 'updated_at', 'assigned_to_id')
+            ->select('id', 'name', 'phone', 'pipeline_stage', 'updated_at', 'assigned_to')
             ->orderBy('updated_at', 'asc')
             ->limit(10)
             ->get() : collect();
