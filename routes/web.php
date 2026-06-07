@@ -750,6 +750,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 require __DIR__ . '/auth.php';
 
+// Guest Support Ticket Routes
+Route::post('/support/guest-tickets', [\App\Http\Controllers\SupportTicketController::class, 'guestStore'])->name('tickets.guest.store');
+
 // Support Ticket Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/tickets', [\App\Http\Controllers\SupportTicketController::class, 'index'])->name('tickets.index');

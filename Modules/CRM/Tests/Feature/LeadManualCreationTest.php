@@ -4,13 +4,13 @@ namespace Modules\CRM\Tests\Feature;
 
 use App\Models\User;
 use App\Models\UserSubscription;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\CRM\Tests\Support\BaseTenantTestCase;
 use Modules\CRM\Models\Lead;
 
 class LeadManualCreationTest extends BaseTenantTestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_can_create_lead_manually()
     {

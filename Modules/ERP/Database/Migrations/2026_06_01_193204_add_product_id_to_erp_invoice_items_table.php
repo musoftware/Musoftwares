@@ -12,7 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("ALTER TABLE erp_invoice_items MODIFY COLUMN type ENUM('simple', 'quantity', 'timer', 'product') NOT NULL");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE erp_invoice_items MODIFY COLUMN type ENUM('simple', 'quantity', 'timer', 'product') NOT NULL");
+        }
     }
 
     /**
@@ -20,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE erp_invoice_items MODIFY COLUMN type ENUM('simple', 'quantity', 'timer') NOT NULL");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE erp_invoice_items MODIFY COLUMN type ENUM('simple', 'quantity', 'timer') NOT NULL");
+        }
     }
 };

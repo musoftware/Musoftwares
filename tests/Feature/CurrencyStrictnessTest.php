@@ -9,13 +9,13 @@ use App\Models\User;
 use App\Models\Project;
 use App\Models\Invoice;
 use App\Models\AdminSettings;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class CurrencyStrictnessTest extends TestCase
 {
-    use DatabaseTransactions, WithFaker;
+    use RefreshDatabase, WithFaker;
 
     protected function setUp(): void
     {

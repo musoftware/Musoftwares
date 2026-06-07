@@ -3,14 +3,14 @@
 namespace Modules\Booking\tests\Feature\Booking\Widget;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 use Modules\Booking\app\Features\Widget\Models\BookingWidget;
 use Modules\Booking\app\Features\Widget\Models\BookingWidgetDomain;
 
 class TenantIsolationWidgetTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_tenant_cannot_view_other_tenant_widgets()
     {

@@ -3,7 +3,7 @@
 namespace Modules\SmsPaymentGateway\Tests\Unit;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayTransaction;
 use Modules\SmsPaymentGateway\Services\TransactionIngestionService;
 use Modules\SmsPaymentGateway\Services\DeterministicSmsParser;
@@ -13,7 +13,7 @@ use App\Models\User;
 
 class TransactionIngestionSpoofTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected TransactionIngestionService $service;
 

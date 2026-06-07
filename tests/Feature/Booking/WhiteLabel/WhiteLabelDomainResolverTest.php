@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Booking\WhiteLabel;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Modules\Booking\app\Features\WhiteLabel\Services\WhiteLabelDomainResolver;
 use Modules\Booking\app\Features\WhiteLabel\Models\WhiteLabelDomain;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Queue;
 
 class WhiteLabelDomainResolverTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_it_adds_a_new_domain_and_generates_txt_record()
     {

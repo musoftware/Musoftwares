@@ -2,7 +2,7 @@
 
 namespace Modules\CRM\Tests\Feature;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Modules\CRM\Models\Workspace;
@@ -11,7 +11,7 @@ use App\Models\User;
 
 class CrmTeamTest extends TestCase
 {
-    use DatabaseTransactions, WithFaker;
+    use RefreshDatabase, WithFaker;
 
     protected $user;
     protected $workspace;

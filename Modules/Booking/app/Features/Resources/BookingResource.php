@@ -4,7 +4,7 @@ namespace Modules\Booking\app\Features\Resources;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\Booking\Core\Traits\TenantAwareModel;
+use Modules\Booking\app\Core\Traits\TenantAwareModel;
 use Modules\Booking\app\Features\Availability\BookingResourceSchedule;
 use Modules\Booking\app\Features\Availability\BookingScheduleException;
 use Modules\Booking\app\Features\Availability\BookingScheduleRule;

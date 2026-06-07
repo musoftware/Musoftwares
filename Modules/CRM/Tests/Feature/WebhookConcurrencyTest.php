@@ -4,7 +4,7 @@ namespace Modules\CRM\Tests\Feature;
 
 use App\Models\User;
 use App\Models\UserSubscription;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Modules\CRM\Domains\LeadAcquisition\Actions\ProcessLeadImportAction;
 use Modules\CRM\Domains\LeadAcquisition\DTOs\LeadImportData;
@@ -12,7 +12,7 @@ use Modules\CRM\Tests\Support\BaseTenantTestCase;
 
 class WebhookConcurrencyTest extends BaseTenantTestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_concurrent_webhook_floods_are_idempotent()
     {

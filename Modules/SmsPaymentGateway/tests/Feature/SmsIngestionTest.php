@@ -3,7 +3,7 @@
 namespace Modules\SmsPaymentGateway\Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayDevice;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayTransaction;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Schema;
 
 class SmsIngestionTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_it_can_ingest_we_pay_sms_successfully()
     {

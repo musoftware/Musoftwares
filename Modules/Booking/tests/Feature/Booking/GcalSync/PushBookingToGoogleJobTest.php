@@ -3,7 +3,7 @@
 namespace Modules\Booking\tests\Feature\Booking\GcalSync;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Modules\Booking\app\Features\GcalSync\Jobs\PushBookingToGoogleJob;
 use Modules\Booking\Models\Booking;
@@ -13,7 +13,7 @@ use Modules\Booking\app\Features\GcalSync\Events\BookingSyncedToGoogle;
 
 class PushBookingToGoogleJobTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_pushes_booking_and_fires_event()
     {

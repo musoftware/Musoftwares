@@ -3,7 +3,7 @@
 namespace Modules\Booking\tests\Feature\Booking\GroupSessions;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Booking\app\Features\GroupSessions\Models\GroupSession;
 use Modules\Booking\app\Features\GroupSessions\Models\GroupParticipant;
 use Modules\Booking\app\Features\GroupSessions\Models\GroupWaitlist;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Event;
 
 class PromoteWaitlistJobTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_promotes_next_waitlist_user_when_job_runs()
     {

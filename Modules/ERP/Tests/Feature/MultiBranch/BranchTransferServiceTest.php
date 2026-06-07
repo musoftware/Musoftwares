@@ -3,14 +3,14 @@
 namespace Modules\ERP\Tests\Feature\MultiBranch;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\ERP\Models\Branch;
 use App\Models\User;
 use Modules\ERP\app\Features\MultiBranch\Services\BranchTransferService;
 
 class BranchTransferServiceTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_can_create_and_approve_transfer()
     {

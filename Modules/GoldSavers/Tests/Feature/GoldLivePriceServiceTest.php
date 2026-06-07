@@ -8,10 +8,10 @@ use Modules\GoldSavers\app\Features\LivePrices\Providers\GoldProviderDriver;
 use Modules\GoldSavers\app\Features\LivePrices\Services\GoldMarketProviderManager;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery\MockInterface;
 
-uses(Tests\TestCase::class, DatabaseTransactions::class);
+uses(Tests\TestCase::class, RefreshDatabase::class);
 
 beforeEach(function () {
     Event::fake();

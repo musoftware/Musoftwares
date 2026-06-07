@@ -3,7 +3,7 @@
 namespace Modules\ERP\Tests\Feature\MultiBranch;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\ERP\Models\Branch;
 use App\Models\User;
 use Modules\ERP\app\Features\MultiBranch\Scopes\BranchScope;
@@ -11,7 +11,7 @@ use Modules\ERP\app\Features\MultiBranch\Managers\BranchIsolationManager;
 
 class TenantIsolationMultiBranchTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_tenant_a_cannot_access_tenant_b_branches()
     {

@@ -5,12 +5,12 @@ namespace Modules\Booking\tests\Feature\QueueManagement;
 use Tests\TestCase;
 use Modules\Booking\app\Features\QueueManagement\Models\BookingQueue;
 use Modules\Booking\app\Features\QueueManagement\Services\QueueTokenGenerator;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Carbon\Carbon;
 
 class QueueTokenGeneratorTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_it_generates_sequential_tokens_with_prefix()
     {

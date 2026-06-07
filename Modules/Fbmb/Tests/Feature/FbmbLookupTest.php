@@ -2,7 +2,7 @@
 
 namespace Modules\Fbmb\Tests\Feature;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\User;
 use Modules\Fbmb\Models\FbmbLookupResult;
@@ -13,7 +13,7 @@ use PDO;
 
 class FbmbLookupTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected string $dbPath;
 

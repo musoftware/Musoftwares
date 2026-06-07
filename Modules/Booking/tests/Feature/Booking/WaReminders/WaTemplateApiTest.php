@@ -3,11 +3,11 @@
 namespace Modules\Booking\tests\Feature\Booking\WaReminders;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class WaTemplateApiTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_tenant_can_create_template()
     {

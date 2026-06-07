@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('device_token', 255)->nullable()->unique();
             $table->string('device_name')->nullable();
-            $table->string('connection_code', 64)->unique();
+            $table->string('connection_code', 64)->nullable()->unique();
             $table->timestamp('connection_code_expires_at')->nullable();
             $table->enum('status', ['pending', 'connected', 'disconnected'])->default('pending');
             $table->timestamp('connected_at')->nullable();

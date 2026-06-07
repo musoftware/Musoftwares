@@ -6,11 +6,11 @@ use Tests\TestCase;
 use Modules\ERP\app\Features\MultiBranch\Services\MultiBranchService;
 use Modules\ERP\app\Features\MultiBranch\Services\ERPMultiBranchLimitsService;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class MultiBranchServiceTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_can_create_branch_if_under_limit()
     {

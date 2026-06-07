@@ -8,12 +8,12 @@ use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServiceCategory;
 use Modules\Marketplace\Models\ServicePackage;
 use Modules\Marketplace\Models\ServiceOrder;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class MarketplaceOrderControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $admin;
     protected User $buyerUser;

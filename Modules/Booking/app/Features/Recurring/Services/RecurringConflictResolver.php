@@ -28,7 +28,7 @@ class RecurringConflictResolver
 
         // Check if it's an exception (e.g. holiday)
         $isException = $series->exceptions()
-            ->where('exception_date', $date->format('Y-m-d'))
+            ->whereDate('exception_date', $date->format('Y-m-d'))
             ->exists();
 
         if ($isException) {

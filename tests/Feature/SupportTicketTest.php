@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Ticket;
 use App\Models\Conversation;
 use App\Models\Message;
@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class SupportTicketTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $client;
     protected User $admin;

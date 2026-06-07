@@ -6,11 +6,11 @@ use App\Models\User;
 use Modules\Tools\Models\ToolSubscription;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class MarketplaceTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $user;
 

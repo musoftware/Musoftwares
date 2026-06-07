@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServicePackage;
 use Modules\Marketplace\Models\ServiceOrder;
@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class MarketplaceEscrowTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected function setUp(): void
     {

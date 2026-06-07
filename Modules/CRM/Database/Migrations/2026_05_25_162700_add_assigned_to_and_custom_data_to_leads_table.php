@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('leads', function (Blueprint $table) {
-            if (!Schema::hasColumn('leads', 'assignable_type')) {
-                $table->nullableMorphs('assignable'); // Creates assignable_type and assignable_id
+            if (!Schema::hasColumn('leads', 'assigned_to')) {
+                $table->unsignedBigInteger('assigned_to')->nullable()->after('status');
+                $table->foreign('assigned_to')->references('id')->on('users')->onDelete('set null');
             }
             if (!Schema::hasColumn('leads', 'custom_data')) {
                 $table->json('custom_data')->nullable()->after('user_agent');
@@ -27,7 +28,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('leads', function (Blueprint $table) {
-            $table->dropMorphs('assignable');
+            $table->dropForeign(['assigned_to']);
+            $table->dropColumn('assigned_to');
             $table->dropColumn('custom_data');
         });
     }

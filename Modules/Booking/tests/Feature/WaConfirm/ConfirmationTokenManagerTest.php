@@ -7,18 +7,19 @@ use Illuminate\Support\Facades\Schema;
 use Modules\Booking\Models\Booking;
 use Modules\Booking\app\Features\WaConfirm\Models\BookingWaConfirmation;
 use Modules\Booking\app\Features\WaConfirm\Services\ConfirmationTokenManager;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Carbon\Carbon;
 use Exception;
 
 class ConfirmationTokenManagerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
-        Schema::disableForeignKeyConstraints();
+        $user = \App\Models\User::factory()->create(['id' => 1]);
+        \Illuminate\Support\Facades\DB::table('booking_event_types')->insert(['id' => 1, 'user_id' => $user->id, 'title' => 'test', 'slug' => 'test', 'duration_minutes' => 60]);
     }
 
 

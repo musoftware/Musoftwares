@@ -16,7 +16,7 @@ class ConflictValidator
     public function hasConflict(int $resourceId, string $startAt, string $endAt, int $capacityRequired = 1): bool
     {
         // 1. Check for overlapping reservations
-        $overlappingReservationsCount = \Modules\Booking\Features\Reservations\BookingReservation::where('resource_id', $resourceId)
+        $overlappingReservationsCount = \Modules\Booking\app\Features\Reservations\BookingReservation::where('resource_id', $resourceId)
             ->whereIn('status', ['confirmed', 'checked_in', 'in_progress'])
             ->where(function ($query) use ($startAt, $endAt) {
                 $query->where(function ($q) use ($startAt, $endAt) {
@@ -27,7 +27,7 @@ class ConflictValidator
 
         // If the overlapping count + new required capacity > resource max capacity, then conflict
         // (Assuming max capacity is 1 for non-group resources)
-        $resource = \Modules\Booking\Features\Resources\BookingResource::find($resourceId);
+        $resource = \Modules\Booking\app\Features\Resources\BookingResource::find($resourceId);
         if (!$resource || !$resource->is_active) {
             return true;
         }
@@ -40,7 +40,7 @@ class ConflictValidator
         }
 
         // 2. Check if the slot falls inside a schedule exception
-        $hasException = \Modules\Booking\Features\Availability\BookingScheduleException::where('resource_id', $resourceId)
+        $hasException = \Modules\Booking\app\Features\Availability\BookingScheduleException::where('resource_id', $resourceId)
             ->where('start_date', '<=', \Carbon\Carbon::parse($startAt)->toDateString())
             ->where('end_date', '>=', \Carbon\Carbon::parse($endAt)->toDateString())
             ->exists();

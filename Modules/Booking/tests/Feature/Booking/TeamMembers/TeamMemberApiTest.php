@@ -3,12 +3,12 @@
 namespace Modules\Booking\tests\Feature\Booking\TeamMembers;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 
 class TeamMemberApiTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_api_validation_requires_name_and_email()
     {

@@ -15,7 +15,7 @@ class SlotGenerator
      */
     public function generate(int $resourceId, string $startDate, string $endDate, int $serviceDuration): array
     {
-        $resource = \Modules\Booking\Features\Resources\BookingResource::with([
+        $resource = \Modules\Booking\app\Features\Resources\BookingResource::with([
             'schedules',
             'exceptions' => function ($q) use ($startDate, $endDate) {
                 $q->whereBetween('start_date', [$startDate, $endDate]);
@@ -29,7 +29,7 @@ class SlotGenerator
             return [];
         }
 
-        $reservations = \Modules\Booking\Features\Reservations\BookingReservation::where('resource_id', $resourceId)
+        $reservations = \Modules\Booking\app\Features\Reservations\BookingReservation::where('resource_id', $resourceId)
             ->whereIn('status', ['confirmed', 'checked_in', 'in_progress'])
             ->whereBetween('start_at', [$startDate, $endDate])
             ->get();

@@ -3,7 +3,7 @@
 namespace Modules\Booking\tests\Feature\Booking\Widget;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Modules\Booking\app\Features\Widget\Models\BookingWidget;
 use Modules\Booking\app\Features\Widget\Models\BookingWidgetDomain;
@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 
 class WidgetDomainValidatorTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_allows_request_from_whitelisted_domain()
     {

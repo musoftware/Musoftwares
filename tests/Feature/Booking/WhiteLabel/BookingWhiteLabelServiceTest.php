@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Booking\WhiteLabel;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Modules\Booking\app\Features\WhiteLabel\Services\BookingWhiteLabelService;
 use Modules\Booking\app\Features\WhiteLabel\Models\WhiteLabelSetting;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Cache;
 
 class BookingWhiteLabelServiceTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     private BookingWhiteLabelService $service;
 

@@ -3,7 +3,7 @@
 namespace Modules\Booking\tests\Feature\Booking\Recurring;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Booking\app\Features\Recurring\Models\RecurringSeries;
 use Modules\Booking\app\Features\Recurring\Jobs\GenerateFutureOccurrencesJob;
 use Modules\Booking\app\Features\Recurring\Services\RecurringOccurrenceGenerator;
@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
 
 class GenerateFutureOccurrencesJobTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_lazy_generates_occurrences_into_core_bookings_table()
     {

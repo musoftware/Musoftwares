@@ -148,4 +148,66 @@ class SupportTicketController extends Controller
 
         return redirect()->back()->with('success', __('general.ticket_deleted'));
     }
+
+    public function guestStore(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:50',
+            'description' => 'required|string',
+            'g-recaptcha-response' => ['required', new \App\Rules\Recaptcha()],
+        ], [
+            'g-recaptcha-response.required' => __('general.recaptcha_required') ?? 'يرجى التحقق من الكابتشا (Google reCAPTCHA).'
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $message = $validated['description'] . "\n\nرقم الهاتف: " . $validated['phone'];
+
+            $ticket = Ticket::create([
+                'user_id' => null,
+                'anonymous_name' => $validated['name'],
+                'anonymous_email' => $validated['email'],
+                'ticket_subject' => 'طلب خدمة حصرية',
+                'ticket_message' => $message,
+                'ticket_status' => 'open',
+                'priority' => 'high',
+            ]);
+
+            // Notify Admins
+            $admins = \App\Models\User::role(['admin', 'Admin'])->get();
+            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewGuestTicketNotification($ticket));
+
+            // Firebase Notification
+            try {
+                $messaging = app('firebase.messaging');
+                $notification = \Kreait\Firebase\Messaging\Notification::create(
+                    'طلب خدمة حصرية جديد',
+                    'طلب جديد من ' . $validated['name']
+                );
+
+                $tokens = $admins->whereNotNull('fcm_token')->pluck('fcm_token')->toArray();
+                if (!empty($tokens)) {
+                    $messageObj = \Kreait\Firebase\Messaging\CloudMessage::new()
+                        ->withNotification($notification)
+                        ->withData([
+                            'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                            'url' => route('admin.tickets.show', $ticket->id)
+                        ]);
+                    $messaging->sendMulticast($messageObj, $tokens);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Firebase Notification Failed: ' . $e->getMessage());
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'تم ارسال الطلب بنجاح');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors(['error' => 'Failed to create ticket: ' . $e->getMessage()]);
+        }
+    }
 }

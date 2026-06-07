@@ -2,7 +2,7 @@
 
 namespace Modules\Marketplace\Tests\Feature;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\User;
 use Modules\Marketplace\Models\ServiceOrder;
@@ -12,7 +12,7 @@ use Modules\Marketplace\Models\MarketplaceEscrow;
 
 class EscrowServiceTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     public function test_escrow_release_credits_seller_correctly()
     {

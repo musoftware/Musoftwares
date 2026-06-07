@@ -8,9 +8,9 @@ use Modules\GoldSavers\app\Features\LivePrices\Providers\GoldPricePayload;
 use Modules\GoldSavers\app\Features\LivePrices\Events\GoldMarketProviderFailed;
 use Illuminate\Support\Facades\Event;
 use Mockery\MockInterface;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(Tests\TestCase::class, DatabaseTransactions::class);
+uses(Tests\TestCase::class, RefreshDatabase::class);
 
 beforeEach(function () {
     Event::fake();

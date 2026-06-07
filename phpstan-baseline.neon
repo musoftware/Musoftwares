@@ -379,12 +379,6 @@ parameters:
 			path: Modules/Booking/Services/GroupSessionCapacityService.php
 
 		-
-			message: '#^Call to an undefined method Modules\\Booking\\Features\\Analytics\\Http\\Controllers\\AnalyticsDashboardController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/Analytics/Http/Controllers/AnalyticsDashboardController.php
-
-		-
 			message: '#^Instantiated class Modules\\Booking\\app\\Features\\BookingRules\\Events\\BookingRuleBlockedBooking not found\.$#'
 			identifier: class.notFound
 			count: 1
@@ -463,22 +457,10 @@ parameters:
 			path: Modules/Booking/app/Features/CustomDomains/Services/CustomDomainLimitsService.php
 
 		-
-			message: '#^Call to an undefined method Modules\\Booking\\app\\Features\\GcalSync\\Http\\Controllers\\GoogleCalendarSettingsController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/GcalSync/Http/Controllers/GoogleCalendarSettingsController.php
-
-		-
 			message: '#^Relation ''calendars'' is not found in Modules\\Booking\\app\\Features\\GcalSync\\Models\\GoogleAccount model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
 			path: Modules/Booking/app/Features/GcalSync/Http/Controllers/GoogleCalendarSettingsController.php
-
-		-
-			message: '#^Call to an undefined method Modules\\Booking\\app\\Features\\GcalSync\\Http\\Controllers\\GoogleOAuthController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/GcalSync/Http/Controllers/GoogleOAuthController.php
 
 		-
 			message: '#^Function feature invoked with 2 parameters, 1 required\.$#'
@@ -511,28 +493,10 @@ parameters:
 			path: Modules/Booking/app/Features/GcalSync/Services/GoogleTokenManager.php
 
 		-
-			message: '#^Call to an undefined method Modules\\Booking\\app\\Features\\GroupSessions\\Http\\Controllers\\GroupSessionController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/GroupSessions/Http/Controllers/GroupSessionController.php
-
-		-
 			message: '#^Function feature invoked with 2 parameters, 1 required\.$#'
 			identifier: arguments.count
 			count: 1
 			path: Modules/Booking/app/Features/GroupSessions/Services/BookingGroupSessionLimitsService.php
-
-		-
-			message: '#^Call to an undefined method Modules\\Booking\\app\\Features\\MultiBranch\\Http\\Controllers\\BookingBranchController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/MultiBranch/Http/Controllers/BookingBranchController.php
-
-		-
-			message: '#^Call to an undefined method Modules\\Booking\\app\\Features\\MultiBranch\\Http\\Controllers\\BranchStaffController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/MultiBranch/Http/Controllers/BranchStaffController.php
 
 		-
 			message: '#^Access to an undefined property Modules\\Booking\\app\\Features\\MultiBranch\\Http\\Resources\\BookingBranchResource\:\:\$address\.$#'
@@ -607,12 +571,6 @@ parameters:
 			path: Modules/Booking/app/Features/MultiBranch/Services/BookingBranchLimitsService.php
 
 		-
-			message: '#^Call to an undefined method Modules\\Booking\\app\\Features\\OnlinePage\\Http\\Controllers\\Admin\\PublicPageSettingsController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/OnlinePage/Http/Controllers/Admin/PublicPageSettingsController.php
-
-		-
 			message: '#^Relation ''theme'' is not found in Modules\\Booking\\app\\Features\\OnlinePage\\Models\\PublicPage model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
@@ -631,22 +589,10 @@ parameters:
 			path: Modules/Booking/app/Features/OnlinePage/Services/PublicBookingPageService.php
 
 		-
-			message: '#^Call to an undefined method Modules\\Booking\\app\\Features\\PublicBooking\\Http\\Controllers\\BookingPageSettingsController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/PublicBooking/Http/Controllers/BookingPageSettingsController.php
-
-		-
 			message: '#^Function feature invoked with 2 parameters, 1 required\.$#'
 			identifier: arguments.count
 			count: 1
 			path: Modules/Booking/app/Features/PublicBooking/Http/Controllers/PublicBookingPageController.php
-
-		-
-			message: '#^Call to an undefined method Modules\\Booking\\app\\Features\\Recurring\\Http\\Controllers\\RecurringSeriesController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/Recurring/Http/Controllers/RecurringSeriesController.php
 
 		-
 			message: '#^Relation ''occurrences'' is not found in Modules\\Booking\\app\\Features\\Recurring\\Models\\RecurringSeries model\.$#'
@@ -661,12 +607,6 @@ parameters:
 			path: Modules/Booking/app/Features/Recurring/Services/BookingRecurringLimitsService.php
 
 		-
-			message: '#^Call to an undefined method Modules\\Booking\\app\\Features\\Reminders\\Http\\Controllers\\WaReminderLogController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/Reminders/Http/Controllers/WaReminderLogController.php
-
-		-
 			message: '#^Relation ''booking'' is not found in Modules\\Booking\\app\\Features\\Reminders\\Models\\BookingWaReminder model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
@@ -679,40 +619,22 @@ parameters:
 			path: Modules/Booking/app/Features/Reminders/Http/Controllers/WaReminderLogController.php
 
 		-
-			message: '#^Call to an undefined method Modules\\Booking\\app\\Features\\Reminders\\Http\\Controllers\\WaTemplateController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/Reminders/Http/Controllers/WaTemplateController.php
-
-		-
-			message: '#^Relation ''exceptions'' is not found in Modules\\Booking\\Features\\Resources\\BookingResource model\.$#'
+			message: '#^Relation ''exceptions'' is not found in Modules\\Booking\\app\\Features\\Resources\\BookingResource model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
 			path: Modules/Booking/app/Features/Scheduling/SlotGenerator.php
 
 		-
-			message: '#^Relation ''schedules'' is not found in Modules\\Booking\\Features\\Resources\\BookingResource model\.$#'
+			message: '#^Relation ''schedules'' is not found in Modules\\Booking\\app\\Features\\Resources\\BookingResource model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
 			path: Modules/Booking/app/Features/Scheduling/SlotGenerator.php
 
 		-
-			message: '#^Relation ''timeOffs'' is not found in Modules\\Booking\\Features\\Resources\\BookingResource model\.$#'
+			message: '#^Relation ''timeOffs'' is not found in Modules\\Booking\\app\\Features\\Resources\\BookingResource model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
 			path: Modules/Booking/app/Features/Scheduling/SlotGenerator.php
-
-		-
-			message: '#^Call to an undefined method Modules\\Booking\\app\\Features\\SmsNotifications\\Http\\Controllers\\SmsSettingController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/SmsNotifications/Http/Controllers/SmsSettingController.php
-
-		-
-			message: '#^Call to an undefined method Modules\\Booking\\app\\Features\\SmsNotifications\\Http\\Controllers\\SmsTemplateController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/SmsNotifications/Http/Controllers/SmsTemplateController.php
 
 		-
 			message: '#^Function feature invoked with 2 parameters, 1 required\.$#'
@@ -799,12 +721,6 @@ parameters:
 			path: Modules/Booking/app/Features/WaConfirm/Models/BookingWaActionToken.php
 
 		-
-			message: '#^Call to an undefined method Modules\\Booking\\app\\Features\\WaReminders\\Http\\Controllers\\WaTemplateController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/WaReminders/Http/Controllers/WaTemplateController.php
-
-		-
 			message: '#^Relation ''booking'' is not found in Modules\\Booking\\app\\Features\\WaReminders\\Models\\WaSchedule model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
@@ -821,12 +737,6 @@ parameters:
 			identifier: class.notFound
 			count: 3
 			path: Modules/Booking/app/Features/WhiteLabel/Services/BookingWhiteLabelLimitsService.php
-
-		-
-			message: '#^Call to an undefined method Modules\\Booking\\app\\Features\\Widget\\Http\\Controllers\\BookingWidgetController\:\:middleware\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Booking/app/Features/Widget/Http/Controllers/BookingWidgetController.php
 
 		-
 			message: '#^Relation ''domains'' is not found in Modules\\Booking\\app\\Features\\Widget\\Models\\BookingWidget model\.$#'
@@ -875,12 +785,6 @@ parameters:
 			identifier: larastan.relationExistence
 			count: 1
 			path: Modules/CRM/Http/Controllers/PipelineController.php
-
-		-
-			message: '#^Call to static method guard\(\) on an unknown class Modules\\CRM\\Http\\Controllers\\Auth\.$#'
-			identifier: class.notFound
-			count: 2
-			path: Modules/CRM/Http/Controllers/WorkspaceController.php
 
 		-
 			message: '#^Relation ''users'' is not found in Modules\\CRM\\Models\\Workspace model\.$#'
@@ -1097,8 +1001,6 @@ parameters:
 			identifier: property.notFound
 			count: 8
 			path: Modules/ERP/Models/Invoice.php
-
-
 
 		-
 			message: '#^Access to an undefined property Modules\\ERP\\Models\\Invoice\:\:\$business_amount\.$#'
@@ -1705,7 +1607,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: Modules/ERP/Transformers/TransactionResource.php
-
 
 		-
 			message: '#^Undefined variable\: \$request$#'
@@ -2876,8 +2777,6 @@ parameters:
 			identifier: class.notFound
 			count: 1
 			path: app/Console/Commands/RenewPlatformSubscriptions.php
-
-
 
 		-
 			message: '#^Call to static method query\(\) on an unknown class App\\Models\\ShopGovernorate\.$#'

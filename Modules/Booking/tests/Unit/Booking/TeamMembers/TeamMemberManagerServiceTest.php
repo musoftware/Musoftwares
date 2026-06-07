@@ -3,14 +3,14 @@
 namespace Modules\Booking\tests\Unit\Booking\TeamMembers;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Booking\app\Features\TeamMembers\Services\TeamMemberManagerService;
 use Modules\Booking\app\Features\TeamMembers\Models\BookingTeamMember;
 use App\Models\User;
 
 class TeamMemberManagerServiceTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected $service;
 

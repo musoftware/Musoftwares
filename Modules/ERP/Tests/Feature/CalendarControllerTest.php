@@ -3,7 +3,7 @@
 namespace Modules\ERP\Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\Project;
@@ -13,7 +13,7 @@ use Modules\ERP\Models\TenantClient;
 
 class CalendarControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected function setUp(): void
     {

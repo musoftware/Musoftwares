@@ -10,17 +10,18 @@ use Modules\Booking\app\Features\WaConfirm\Models\BookingWaActionToken;
 use Modules\Booking\app\Features\WaConfirm\Services\WhatsAppConfirmationActionProcessor;
 use Modules\Booking\app\Features\WaConfirm\Events\BookingConfirmedByCustomer;
 use Modules\Booking\app\Features\WaConfirm\Events\BookingCancelledByCustomer;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 
 class WhatsAppConfirmationActionProcessorTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
-        Schema::disableForeignKeyConstraints();
+        $user = \App\Models\User::factory()->create(['id' => 1]);
+        \Illuminate\Support\Facades\DB::table('booking_event_types')->insert(['id' => 1, 'user_id' => $user->id, 'title' => 'test', 'slug' => 'test', 'duration_minutes' => 60]);
     }
 
 

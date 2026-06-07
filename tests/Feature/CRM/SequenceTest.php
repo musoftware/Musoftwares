@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\CRM;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
@@ -10,7 +10,7 @@ use Modules\CRM\Models\Sequence;
 
 class SequenceTest extends TestCase
 {
-    use DatabaseTransactions, WithFaker;
+    use RefreshDatabase, WithFaker;
 
     public function test_sequence_multi_tenancy_isolation()
     {

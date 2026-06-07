@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Marketplace\Models\ServiceCategory;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServicePackage;
@@ -13,7 +13,7 @@ use Tests\TestCase;
 
 class MarketplaceWorkflowTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $buyer;
     protected User $seller;

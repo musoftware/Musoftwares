@@ -10,12 +10,12 @@ use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\WalletTransaction;
 use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\ReferralEarning;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ERPReferralSystemTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $user;
     protected Tenant $tenant;

@@ -5,12 +5,12 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\Invoice;
 use Spatie\Permission\Models\Role;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class BalanceSheetTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected $admin;
     protected $clientUser;
