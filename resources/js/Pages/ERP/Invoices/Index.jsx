@@ -72,7 +72,7 @@ export default function Index({ invoices, stats, filters }) {
             render: (row) => (
                 <CurrencyDisplay
                     amount={row.amount}
-                    currency={row.amount_currency}
+                    currency={row.currency}
                     className="font-medium"
                 />
             ),

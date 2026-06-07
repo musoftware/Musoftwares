@@ -7,6 +7,7 @@ import { Badge } from '@/Components/ui/badge';
 import { buttonVariants } from '@/Components/ui/button';
 import { PageHeader } from '@/Components/ui/PageHeader';
 import { EmptyState } from '@/Components/ui/EmptyState';
+import { formatMoney } from '@/lib/utils';
 import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 import { cn, formatDate } from '@/lib/utils';
 import { Briefcase, Plus, Clock, ChevronRight, FileText } from 'lucide-react';
@@ -14,9 +15,8 @@ import { __ } from '@/lib/i18n';
 
 import { FreelanceCard } from '@/Components/Freelance/ui/FreelanceCard';
 
-export default function MyJobs({ auth, jobs }) {
+export default function MyJobs({ jobs, userCurrency }) {
     const freelanceModeContext = useFreelanceMode();
-    const globalCurrency = auth?.user?.preferred_currency || 'USD';
 
     useEffect(() => {
         if (freelanceModeContext && freelanceModeContext.setMode) {
@@ -102,7 +102,7 @@ export default function MyJobs({ auth, jobs }) {
                                                 {__(job.type)}
                                             </Badge>
                                             <div className="flex items-center gap-1.5">
-                                                <FinancialAmount amount={job.budget} currency={job.currency} size="sm" />
+                                                <span className="font-mono text-sm font-semibold">{job.budget !== null && job.budget !== undefined ? formatMoney(job.budget, userCurrency) : `${job.budget_points} ${__('freelance.pts', undefined, 'pts')}`}</span>
                                                 {job.type === 'hourly' && <span className="text-xs text-slate-500 font-medium">/ {__('general.hr')}</span>}
                                             </div>
                                         </div>

@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { __ } from '@/lib/i18n';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Show({ order, conversation }: any) {
     const { auth } = usePage().props as any;
@@ -478,7 +479,7 @@ export default function Show({ order, conversation }: any) {
                                                     <div className="flex justify-between text-gray-500">
                                                         <span>Price</span>
                                                         <span>
-                                                            {order.formatted_amount}
+                                                            {formatCurrency(order.amount, order.currency)}
                                                         </span>
                                                     </div>
                                                     <div className="flex justify-between text-red-500">
@@ -486,13 +487,13 @@ export default function Show({ order, conversation }: any) {
                                                             Platform Fee (10%)
                                                         </span>
                                                         <span>
-                                                            -{order.formatted_commission_amount}
+                                                            -{formatCurrency(order.commission_amount, order.currency)}
                                                         </span>
                                                     </div>
                                                     <div className="flex justify-between border-t border-gray-100 pt-2 font-bold text-gray-900">
                                                         <span>{__('general.your_earnings')}</span>
                                                         <span>
-                                                            {order.formatted_seller_earnings}
+                                                            {formatCurrency(sellerEarnings, order.currency)}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -500,7 +501,7 @@ export default function Show({ order, conversation }: any) {
                                                 <div className="flex justify-between text-lg font-bold text-gray-900">
                                                     <span>{__('general.total_paid')}</span>
                                                     <span>
-                                                        {order.formatted_amount}
+                                                        {formatCurrency(order.amount, order.currency)}
                                                     </span>
                                                 </div>
                                             )}

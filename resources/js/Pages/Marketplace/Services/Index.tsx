@@ -53,8 +53,7 @@ export default function Index({ services }: any) {
                                             <span className="font-medium text-indigo-600">
                                                 {formatMoney(
                                                     service.price,
-                                                    service.currency_code ||
-                                                        'USD',
+                                                    service.currency_code,
                                                 )}
                                             </span>
                                             <span className="text-xs text-gray-400">
@@ -79,3 +78,4 @@ export default function Index({ services }: any) {
         </AuthenticatedLayout>
     );
 }
+

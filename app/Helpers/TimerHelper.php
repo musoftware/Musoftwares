@@ -158,7 +158,7 @@ class TimerHelper
                 'amount' => $amount,
                 'reason' => $reason,
                 'type' => $type,
-                'currency' => $client->currency ?? 'EGP',
+                'currency_id' => $client->currency_id,
                 'has_whatsapp' => !empty($client->whatsapp_number),
                 'whatsapp_number' => $client->whatsapp_number ?? 'NOT SET'
             ]);
@@ -167,7 +167,7 @@ class TimerHelper
                 $client,
                 $amount,
                 $reason,
-                $client->currency ?? 'EGP'
+                $client->currency_id
             ));
             
             \Log::info('✅ AmountReceived Event Dispatched Successfully');

@@ -128,7 +128,7 @@ class InvoiceController extends Controller
                     'id' => $preSelectedClient->id,
                     'name' => $preSelectedClient->name,
                     'email' => $preSelectedClient->email,
-                    'currency_code' => $preSelectedClient->currency?->currency ?? 'USD',
+                    'currency' => $preSelectedClient->currency,
                 ];
             }
         }
@@ -141,7 +141,7 @@ class InvoiceController extends Controller
             'products'          => $hasInventoryAddon ? \Modules\ERP\Models\Product::where('tenant_id', $tenant->id)->where('is_active', true)->get() : [],
             'has_inventory_addon'=> $hasInventoryAddon,
             'currencies'        => Currency::all(),
-            'business_currency' => $baseCurrency ? $baseCurrency->currency : 'USD',
+            'business_currency' => $baseCurrency,
             'pre_selected_client_id' => $preSelectedClientId,
             'pre_selected_project_id' => $hasProjectsAddon ? $preSelectedProjectId : null,
         ]);
@@ -207,6 +207,9 @@ class InvoiceController extends Controller
 
         $invoice->load(['items', 'costs', 'client.currency']);
         $baseCurrency = Currency::find($tenant->base_currency_id);
+        if (!$baseCurrency) {
+            throw new \Exception("Tenant base currency not found.");
+        }
 
         $clients = TenantClient::with('currency')
             ->where('tenant_id', $tenant->id)
@@ -217,7 +220,7 @@ class InvoiceController extends Controller
             'id' => $invoice->client->id,
             'name' => $invoice->client->name,
             'email' => $invoice->client->email,
-            'currency_code' => $invoice->client->currency?->currency ?? 'USD',
+            'currency' => $invoice->client->currency,
         ] : null;
 
         return Inertia::render('ERP/Invoices/Edit', [
@@ -229,7 +232,7 @@ class InvoiceController extends Controller
             'products'          => $hasInventoryAddon ? \Modules\ERP\Models\Product::where('tenant_id', $tenant->id)->where('is_active', true)->get() : [],
             'has_inventory_addon'=> $hasInventoryAddon,
             'currencies'        => Currency::all(),
-            'business_currency' => $baseCurrency ? $baseCurrency->currency : 'USD',
+            'business_currency' => $baseCurrency,
         ]);
     }
 
@@ -260,27 +263,6 @@ class InvoiceController extends Controller
             'status' => 'sent',
             'issued_at' => now()
         ]);
-
-        // Create a wallet transaction record for the issued invoice
-        $client = $invoice->client;
-        if ($client) {
-            WalletTransaction::create([
-                'tenant_id' => $invoice->tenant_id,
-                'client_id' => $client->id,
-                'type' => 'invoice_issued',
-                'direction' => 'debit',
-                'amount' => $invoice->amount,
-                'currency_id' => $invoice->currency_id,
-                'business_amount' => $invoice->business_amount,
-                'business_currency_id' => $invoice->tenant->base_currency_id,
-                'exchange_rate' => $invoice->exchange_rate,
-                'exchange_rate_date' => $invoice->exchange_rate_date ?? now()->toDateString(),
-                'reference_type' => Invoice::class,
-                'reference_id' => $invoice->id,
-                'note' => 'Invoice #' . $invoice->invoice_number . ' issued',
-                'created_by' => Auth::id(),
-            ]);
-        }
 
         return back()->with('success', __('erp.invoice_issued_success'));
     }

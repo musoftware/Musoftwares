@@ -83,7 +83,7 @@ class GoldApiDriver implements GoldProviderDriver
      */
     protected function normalize(array $data): GoldPricePayload
     {
-        $currencyCode  = $this->source->base_currency ?? 'EGP';
+        $currencyCode  = $this->source->base_currency ?? null;
         $currencyId    = \App\Models\Currency::where('code', $currencyCode)->first()?->id ?? 2;
         $exchangeRate  = (float) ($credentials['exchange_rate'] ?? 1.0);
 
@@ -112,3 +112,4 @@ class GoldApiDriver implements GoldProviderDriver
         );
     }
 }
+

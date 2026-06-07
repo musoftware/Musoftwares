@@ -31,7 +31,7 @@ export default function PaymentLinkShow({ paymentLink, pay_url }) {
                     <CardContent>
                         <div className="mb-6 text-center">
                             <span className="text-4xl font-extrabold text-gray-900">
-                                {formatCurrency(paymentLink.amount, paymentLink.currency?.currency || 'EGP')}
+                                {formatCurrency(paymentLink.amount, paymentLink.currency?.currency)}
                             </span>
                         </div>
 
@@ -72,3 +72,4 @@ export default function PaymentLinkShow({ paymentLink, pay_url }) {
         </PublicLayout>
     );
 }
+

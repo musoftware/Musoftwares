@@ -10,23 +10,9 @@ class ServiceOrder extends Model
 {
     protected $table = 'marketplace_orders';
 
-    protected $appends = ['formatted_amount', 'formatted_commission_amount', 'formatted_seller_earnings'];
+    protected $appends = [];
 
-    public function getFormattedAmountAttribute()
-    {
-        return \App\Helpers\FinanceHelper::instance()->format_money($this->amount, $this->currency_id);
-    }
 
-    public function getFormattedCommissionAmountAttribute()
-    {
-        return \App\Helpers\FinanceHelper::instance()->format_money($this->commission_amount, $this->currency_id);
-    }
-
-    public function getFormattedSellerEarningsAttribute()
-    {
-        $earnings = $this->amount - $this->commission_amount;
-        return \App\Helpers\FinanceHelper::instance()->format_money($earnings, $this->currency_id);
-    }
 
     protected $fillable = [
         'buyer_id',

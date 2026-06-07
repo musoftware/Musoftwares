@@ -10,12 +10,21 @@ use Inertia\Inertia;
 
 class HomeController extends Controller
 {
+    use \App\Traits\ConvertsCurrency;
+
     public function index(\Illuminate\Http\Request $request)
     {
         if ($request->getHost() === 'lance.musoftwares.com') {
             return Inertia::render('Freelance/Landing', [
                 'canLogin' => Route::has('login'),
                 'canRegister' => Route::has('register'),
+            ])->withViewData([
+                'meta' => [
+                    'title' => 'Musoftwares Lance',
+                    'description' => 'Find your next freelance job easily.',
+                    'image' => asset('images/freelance-meta.png'),
+                    'url' => 'https://lance.musoftwares.com',
+                ]
             ]);
         }
 
@@ -222,6 +231,8 @@ class HomeController extends Controller
 
         $pricingService = new \App\Services\PricingService();
         $serviceItems = $pricingService->getServiceItems($convertPrice);
+
+
 
         return Inertia::render('Public/Pricing', [
             'canLogin' => Route::has('login'),

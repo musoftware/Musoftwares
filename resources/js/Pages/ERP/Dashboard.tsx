@@ -81,7 +81,7 @@ import { __ } from '@/lib/i18n';
 
 
 // FinancialAmount now uses CurrencyDisplay from the component library
-export function FinancialAmount({ amount, currency = 'USD', colorize = false }: { amount: number; currency?: string; colorize?: boolean }) {
+export function FinancialAmount({ amount, currency = 'USD', colorize = false }: { amount: number; currency?: any; colorize?: boolean }) {
     const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
     let colorClass = 'text-slate-900';
     if (colorize) {
@@ -117,7 +117,7 @@ interface ERPDashboardProps {
         email: string;
         phone: string;
         address: string;
-        currency: string;
+        currency: any;
         totalInvoiced: number;
         totalPaid: number;
     }>;
@@ -126,7 +126,7 @@ interface ERPDashboardProps {
         invoiceNumber: string;
         clientName: string;
         amount: number;
-        currency: string;
+        currency: any;
         issuedDate: string;
         dueDate: string;
         status: string;
@@ -159,7 +159,7 @@ interface ERPDashboardProps {
         note: string;
         direction: string;
         amount: number;
-        currency: string;
+        currency: any;
         balance_before: number;
         balance_after: number;
         reference_type: string;
@@ -282,7 +282,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         growthPercent: null,
         businessCurrency: 'USD',
     };
-    const currency = stats.businessCurrency || 'USD';
+    const currency = stats.businessCurrency;
 
     const [activeClients, setActiveClients] = useState<Array<any>>(serverClients || []);
     const [activeInvoices, setActiveInvoices] = useState<Array<any>>(serverInvoices || []);
@@ -421,7 +421,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     const [settingsForm, setSettingsForm] = useState({
         workspaceName: serverTenant?.name || "Musoftware Enterprise Workspace",
         taxRate: '14.00',
-        defaultCurrency: stats.businessCurrency || 'USD',
+        defaultCurrency: stats.businessCurrency,
         autoReminder: true,
         strictPCI: true
     });
@@ -493,7 +493,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                 setShowWalletModal(false);
                 setWalletForm({ amount: '', type: 'credit', note: '' });
                 toast({ description: `Wallet ${walletForm.type} operation completed.` });
-                prependActivity('Wallet Adjusted', `Performed manual ${walletForm.type} of ${formatMoney(walletForm.amount, selectedClient.currency?.currency || 'USD')} for ${selectedClient.name}.`);
+                prependActivity('Wallet Adjusted', `Performed manual ${walletForm.type} of ${formatMoney(walletForm.amount, selectedClient.currency?.currency)} for ${selectedClient.name}.`);
             },
             onError: (errors) => {
                 toast({ variant: 'destructive', description: Object.values(errors)[0] as string });
@@ -3056,3 +3056,4 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         </ERPLayout>
     );
 }
+

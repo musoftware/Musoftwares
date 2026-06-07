@@ -9,6 +9,8 @@ import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisp
 import { PageHeader } from '@/Components/ui/PageHeader';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { cn } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
+import { formatMoney } from '@/lib/utils';
 import {
     FileText, Clock, CheckCircle2, XCircle, ChevronRight,
     Search, Briefcase, Loader2, AlertCircle, Trash2,
@@ -19,8 +21,8 @@ import { __ } from '@/lib/i18n';
 import { FreelanceCard } from '@/Components/Freelance/ui/FreelanceCard';
 import { FreelanceStatusPill, STATUS_CONFIG } from '@/Components/Freelance/ui/FreelanceStatusPill';
 
-const AppLayout   = FreelanceLayout;
-const AppPage     = ({ children }: { children: React.ReactNode }) =>
+const AppLayout = FreelanceLayout;
+const AppPage = ({ children }: { children: React.ReactNode }) =>
     <div className="w-full space-y-6">{children}</div>;
 
 const FILTERS = ['all', 'pending', 'accepted', 'rejected'] as const;
@@ -28,7 +30,6 @@ type Filter = typeof FILTERS[number];
 
 export default function ProposalsIndex({ proposals, stats }: any) {
     const { auth } = usePage().props as any;
-    const globalCurrency = auth?.user?.preferred_currency || 'USD';
 
     const freelanceModeContext = useFreelanceMode();
 
@@ -38,8 +39,8 @@ export default function ProposalsIndex({ proposals, stats }: any) {
         }
     }, [freelanceModeContext]);
 
-    const [filter, setFilter]       = useState<Filter>('all');
-    const [withdrawing, setWithd]   = useState<number | null>(null);
+    const [filter, setFilter] = useState<Filter>('all');
+    const [withdrawing, setWithd] = useState<number | null>(null);
 
     const allProposals: any[] = proposals?.data ?? [];
     const displayed = filter === 'all'
@@ -56,10 +57,10 @@ export default function ProposalsIndex({ proposals, stats }: any) {
     };
 
     const statCards = [
-        { label: 'Total Submitted', value: stats?.total    ?? 0, icon: FileText,     color: 'text-indigo-600 bg-indigo-50' },
-        { label: 'Pending Review',  value: stats?.pending  ?? 0, icon: Clock,        color: 'text-amber-600  bg-amber-50'  },
-        { label: 'Accepted',        value: stats?.accepted ?? 0, icon: CheckCircle2, color: 'text-emerald-600 bg-emerald-50' },
-        { label: 'Rejected',        value: stats?.rejected ?? 0, icon: XCircle,      color: 'text-red-600    bg-red-50'    },
+        { label: 'Total Submitted', value: stats?.total ?? 0, icon: FileText, color: 'text-indigo-600 bg-indigo-50' },
+        { label: 'Pending Review', value: stats?.pending ?? 0, icon: Clock, color: 'text-amber-600  bg-amber-50' },
+        { label: 'Accepted', value: stats?.accepted ?? 0, icon: CheckCircle2, color: 'text-emerald-600 bg-emerald-50' },
+        { label: 'Rejected', value: stats?.rejected ?? 0, icon: XCircle, color: 'text-red-600    bg-red-50' },
     ];
 
     return (
@@ -89,7 +90,7 @@ export default function ProposalsIndex({ proposals, stats }: any) {
                                 <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', s.color)}>
                                     <Icon className="h-4 w-4" />
                                 </div>
-                                <div>
+                                <div className="flex flex-col items-center justify-center flex-1 text-center">
                                     <p className="text-2xl font-black text-slate-900 leading-none">{s.value}</p>
                                     <p className="text-[11px] text-slate-500 mt-0.5">{__(s.label)}</p>
                                 </div>
@@ -161,11 +162,9 @@ export default function ProposalsIndex({ proposals, stats }: any) {
 
                                     <div className="flex items-center gap-4 shrink-0">
                                         <div className="text-right">
-                                            <FinancialAmount
-                                                amount={proposal.bid_amount}
-                                                currency={proposal.job?.currency}
-                                                className="text-base font-black text-slate-900"
-                                            />
+                                            <span className="text-base font-black text-slate-900 font-mono">
+                                                {proposal.bid_amount !== null && proposal.bid_amount !== undefined ? formatMoney(proposal.bid_amount, userCurrency) : `${proposal.proposed_budget_points} ${__('freelance.pts', undefined, 'pts')}`}
+                                            </span>
                                             <p className="text-[10px] text-slate-400">{__('freelance.your_bid')}</p>
                                         </div>
 

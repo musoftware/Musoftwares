@@ -3,13 +3,20 @@
 namespace Modules\ERP\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Models\AdminSettings;
+use Modules\ERP\Models\Tenant;
 
 class TransactionResource extends JsonResource
 {
     public function toArray($request)
     {
-        $businessCurrency = AdminSettings::business_currency();
+        if (!$this->currency) {
+            throw new \Exception("Transaction is missing an associated currency relation.");
+        }
+
+        $tenantCurrencyModel = \App\Models\Currency::find($this->tenant?->base_currency_id);
+        if (!$tenantCurrencyModel) {
+            throw new \Exception("Tenant base currency not found.");
+        }
 
         return [
             'id' => $this->id,
@@ -19,7 +26,8 @@ class TransactionResource extends JsonResource
             'direction' => strtoupper($this->direction),
             'amount' => round($this->amount, 2),
             'business_amount' => round($this->business_amount ?? $this->amount, 2),
-            'currency' => $this->currency?->currency ?? $businessCurrency,
+            'currency' => $this->currency,
+            'business_currency' => $tenantCurrencyModel,
             'date' => $this->created_at?->format('Y-m-d H:i'),
             'authorizer' => $this->creator?->name ?? 'System Core',
         ];

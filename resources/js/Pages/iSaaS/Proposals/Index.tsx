@@ -27,7 +27,7 @@ interface Props {
 }
 
 export default function Index({ proposals, auth }: Props) {
-    const businessCurrency = auth?.admin_settings?.business_currency || 'USD';
+    const businessCurrency = auth?.admin_settings?.business_currency;
 
     return (
         <AuthenticatedLayout>
@@ -96,3 +96,4 @@ export default function Index({ proposals, auth }: Props) {
         </AuthenticatedLayout>
     );
 }
+

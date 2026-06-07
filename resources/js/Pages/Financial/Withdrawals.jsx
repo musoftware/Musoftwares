@@ -42,7 +42,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                         <div className="space-y-2 text-center md:text-left">
                             <span className="text-sm font-semibold text-primary uppercase tracking-wider">{__('general.available_earned_funds')}</span>
                             <div className="text-4xl sm:text-5xl font-bold tracking-tight">
-                                {formatMoney(maxAvailable, wallet?.currency || 'USD')}
+                                {formatMoney(maxAvailable, wallet?.currency)}
                              </div>
                             <p className="text-sm text-muted-foreground">{__('general.you_can_only_withdraw_funds_that_have_been_earned_on_the_platform')}</p>
                         </div>
@@ -105,7 +105,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                                                 {w.payout_method ? w.payout_method.type.replace('_', ' ') : 'Standard Method'}
                                             </TableCell>
                                             <TableCell className="font-semibold">
-                                                {formatMoney(w.amount, w.currency || 'USD')}
+                                                {formatMoney(w.amount, w.currency)}
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant={
@@ -137,7 +137,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                         
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
-                                <Label htmlFor="amount">Amount to Withdraw (Max: {formatMoney(maxAvailable, wallet?.currency || 'USD')})</Label>
+                                <Label htmlFor="amount">Amount to Withdraw (Max: {formatMoney(maxAvailable, wallet?.currency)})</Label>
                                 <div className="relative">
                                     <Input
                                         id="amount"
@@ -193,3 +193,4 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
         </AuthenticatedLayout>
     );
 }
+

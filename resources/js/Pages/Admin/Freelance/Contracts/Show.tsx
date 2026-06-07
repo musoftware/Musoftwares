@@ -6,6 +6,7 @@ import { Badge } from '@/Components/ui/badge';
 import { ArrowLeft, Trash2, ShieldAlert, CheckCircle, XCircle, AlertTriangle, Users, ArrowRightLeft } from 'lucide-react';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { __ } from '@/lib/i18n';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Show({ contract }: any) {
     const [confirmAction, setConfirmAction] = useState<{
@@ -87,7 +88,7 @@ export default function Show({ contract }: any) {
                         <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50 p-4 rounded-md mb-6">
                             <div>
                                 <span className="text-gray-500 block mb-1">{__('freelance.contract_amount', undefined, 'Contract Amount')}</span>
-                                <span className="font-semibold text-blue-600 text-lg">{contract.formatted_amount}</span>
+                                <span className="font-semibold text-blue-600 text-lg">{formatCurrency(contract.amount, contract.currency || contract.job?.currency)}</span>
                                 <div className="text-xs text-gray-500 mt-1">({contract.contract_points} pts)</div>
                             </div>
                             <div>

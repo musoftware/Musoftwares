@@ -19,7 +19,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
     const wallet_balance = wallet ? Number(wallet.balance) : 0;
     const Layout = is_lance_domain ? FreelanceLayout : AuthenticatedLayout;
     const [customPoints, setCustomPoints] = useState('');
-    const globalCurrency = currency || wallet?.currency || auth?.user?.preferred_currency || 'USD';
+    const globalCurrency = currency || wallet?.currency || auth?.user?.preferred_currency;
 
     // Calculate dynamic price for custom amount using tiers
     const customPricing = useMemo(() => {
@@ -362,3 +362,4 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
         </Layout>
     );
 }
+

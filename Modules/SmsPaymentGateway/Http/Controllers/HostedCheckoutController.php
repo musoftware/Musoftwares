@@ -46,7 +46,7 @@ class HostedCheckoutController extends Controller
                 'state' => 'success',
                 'merchantName' => $session->user->name ?? '',
                 'amount' => $session->amount,
-                'currency' => $session->currency->code ?? 'EGP',
+                'currency' => $session->currency->code ?? null,
                 'walletNumbers' => [],
                 'paymentMethods' => [],
             ]);
@@ -59,7 +59,7 @@ class HostedCheckoutController extends Controller
                 'state' => 'expired',
                 'merchantName' => $session->user->name ?? '',
                 'amount' => $session->amount,
-                'currency' => $session->currency->code ?? 'EGP',
+                'currency' => $session->currency->code ?? null,
                 'walletNumbers' => [],
                 'paymentMethods' => [],
             ]);
@@ -124,7 +124,7 @@ class HostedCheckoutController extends Controller
             'merchantName' => $brandName,
             'hideMethodName' => $settings->hide_method_name ?? false,
             'amount' => $session->amount,
-            'currency' => $session->currency->code ?? 'EGP',
+            'currency' => $session->currency->code ?? null,
             'walletNumbers' => $walletNumbers,
             'paymentMethods' => $paymentMethods,
             'sessionId' => $session->session_id,
@@ -382,3 +382,4 @@ class HostedCheckoutController extends Controller
         return false;
     }
 }
+

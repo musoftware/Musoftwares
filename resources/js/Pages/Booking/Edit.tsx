@@ -28,7 +28,7 @@ interface Props {
 
 export default function Edit({ event }: Props) {
     const { wallet, settings } = usePage<any>().props;
-    const baseCurrency = wallet?.currency || settings?.base_currency || 'USD';
+    const baseCurrency = wallet?.currency || settings?.base_currency;
 
     const { data, setData, put, processing, errors } = useForm({
         title: event.title,
@@ -219,3 +219,4 @@ export default function Edit({ event }: Props) {
         </WorkspaceLayout>
     );
 }
+

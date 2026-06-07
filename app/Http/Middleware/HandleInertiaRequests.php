@@ -114,7 +114,7 @@ class HandleInertiaRequests extends Middleware
                         'id' => null,
                         'balance' => $user->user_balance,
                         'earned_balance' => 0,
-                        'currency' => $user->preferred_currency ?? 'USD',
+                        'currency' => $user->currency_id ? (\App\Models\Currency::find($user->currency_id)?->currency) : null,
                     ];
                 }
                 return null;

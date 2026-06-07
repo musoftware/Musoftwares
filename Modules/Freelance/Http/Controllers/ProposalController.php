@@ -15,11 +15,11 @@ use Modules\Freelance\Domains\Contract\Actions\AcceptProposalAction;
 use Modules\Freelance\Domains\Proposal\Actions\SubmitProposalAction;
 use Modules\Freelance\Domains\Proposal\DTOs\SubmitProposalData;
 use Illuminate\Support\Facades\Gate;
-use Modules\Freelance\Traits\ConvertsFreelanceCurrency;
+use App\Traits\ConvertsCurrency;
 
 class ProposalController extends Controller
 {
-    use ConvertsFreelanceCurrency;
+    use ConvertsCurrency;
     public function __construct(
         private AcceptProposalAction $acceptProposalAction,
         private SubmitProposalAction $submitProposalAction
@@ -35,7 +35,11 @@ class ProposalController extends Controller
             ->paginate(20);
 
         $proposals->through(function ($proposal) use ($user) {
-            return $this->convertProposalCurrency($proposal, $user->currency_id);
+            $this->convertModelCurrency($proposal, 'bid_amount', 'currency_id', $user->currency_id);
+            if ($proposal->relationLoaded('job') && $proposal->job) {
+                $this->convertModelCurrency($proposal->job, 'budget', 'currency_id', $user->currency_id);
+            }
+            return $proposal;
         });
 
         $stats = [
@@ -56,9 +60,9 @@ class ProposalController extends Controller
         $validated = $request->validate([
             'cover_letter' => 'required|string',
             'bid_amount' => 'required|numeric|min:0',
+            'points_spent' => 'required|integer|min:2',
         ]);
 
-        $proposalCost = 2; // Cost to submit proposal
         $user = $request->user();
 
         $data = new SubmitProposalData(
@@ -67,10 +71,11 @@ class ProposalController extends Controller
             coverLetter: $validated['cover_letter'],
             bidAmount: $validated['bid_amount'],
             currencyId: $job->currency_id,
+            pointsSpent: $validated['points_spent'],
         );
 
         try {
-            $this->submitProposalAction->execute($data, $job, $user, $proposalCost);
+            $this->submitProposalAction->execute($data, $job, $user);
         } catch (\Exception $e) {
             return back()->withErrors(['proposal' => $e->getMessage()]);
         }
@@ -102,7 +107,7 @@ class ProposalController extends Controller
                 $proposal->update(['status' => 'rejected']);
 
                 $freelancer = $proposal->freelancer;
-                $proposalCost = 2; // Fixed cost of proposal submission
+                $proposalCost = $proposal->points_spent ?? 2;
                 $freelancer->points_balance += $proposalCost;
                 $freelancer->save();
 
@@ -124,7 +129,7 @@ class ProposalController extends Controller
 
         DB::transaction(function () use ($proposal) {
             $freelancer = $proposal->freelancer;
-            $proposalCost = 2; // Fixed cost of proposal submission
+            $proposalCost = $proposal->points_spent ?? 2;
             $freelancer->points_balance += $proposalCost;
             $freelancer->save();
 

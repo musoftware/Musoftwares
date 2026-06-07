@@ -70,7 +70,7 @@ export default function Index({ income, expense, stats }) {
         return s[(v - 20) % 10] || s[v] || s[0];
     };
 
-    const businessCurrency = stats.business_currency || 'USD';
+    const businessCurrency = stats.business_currency;
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (
@@ -264,3 +264,4 @@ export default function Index({ income, expense, stats }) {
         </ERPLayout>
     );
 }
+

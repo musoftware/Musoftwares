@@ -32,7 +32,8 @@ class SubmitProposalAction
             $proposal = $job->proposals()->create([
                 'freelancer_id' => $data->freelancerId,
                 'cover_letter' => $data->coverLetter,
-                'proposed_budget_points' => $data->proposedBudgetPoints,
+                'bid_amount' => $data->bidAmount,
+                'currency_id' => $data->currencyId,
                 'points_spent' => $data->pointsSpent,
                 'status' => 'pending',
             ]);

@@ -170,7 +170,7 @@ export default function Index({ clients, filters, stats }) {
                 const balance = client.available_balance || 0;
                 return (
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold border ${balance < 0 ? 'bg-red-50 text-red-700 border-red-200' : 'bg-green-50 text-green-700 border-green-200'}`}>
-                        {formatCurrency(balance, client.currency || 'USD')}
+                        {formatCurrency(balance, client.currency)}
                     </span>
                 );
             },
@@ -463,3 +463,4 @@ export default function Index({ clients, filters, stats }) {
         </AdminSidebarLayout>
     );
 }
+

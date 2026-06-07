@@ -50,7 +50,7 @@ class InvoicePaymentController extends Controller
                 'amount'        => (float) $invoice->total(),
                 'paid_amount'   => (float) $invoice->paid,
                 'remaining'     => round((float) $invoice->total() - (float) $invoice->paid, 2),
-                'currency'      => \App\Models\Currency::find($invoice->currency)?->currency ?? 'USD',
+                'currency'      => \App\Models\Currency::find($invoice->currency),
                 'status'        => $invoice->status,
                 'due_date'      => $invoice->created_at?->format('Y-m-d'),
                 'items'         => $invoice->items()->get()->map(fn($i) => [
@@ -61,7 +61,7 @@ class InvoicePaymentController extends Controller
                 ]),
             ],
             'client_balance'  => $balance,
-            'wallet_currency' => $user->preferred_currency ?? \App\Models\Currency::find($invoice->currency)?->currency ?? 'USD',
+            'wallet_currency' => $user->currency_id ? \App\Models\Currency::find($user->currency_id) : \App\Models\Currency::find($invoice->currency),
         ]);
     }
 
@@ -145,7 +145,7 @@ class InvoicePaymentController extends Controller
                 'amount'        => (float) $inv->total(),
                 'paid_amount'   => (float) $inv->paid,
                 'remaining'     => round((float) $inv->total() - (float) $inv->paid, 2),
-                'currency'      => \App\Models\Currency::find($inv->currency)?->currency ?? 'USD',
+                'currency'      => \App\Models\Currency::find($inv->currency),
                 'status'        => $inv->status,
                 'due_date'      => $inv->created_at?->format('Y-m-d'),
                 'issued_at'     => $inv->created_at?->format('Y-m-d'),
@@ -163,7 +163,7 @@ class InvoicePaymentController extends Controller
             'unpaid_invoices' => $unpaidInvoices,
             'paid_invoices'   => $paidInvoices,
             'client_balance'  => $balance,
-            'wallet_currency' => $user->preferred_currency ?? \App\Models\Currency::find($user->currency)?->currency ?? 'USD',
+            'wallet_currency' => $user->currency_id ? \App\Models\Currency::find($user->currency_id) : \App\Models\Currency::find($user->currency),
         ]);
     }
 }

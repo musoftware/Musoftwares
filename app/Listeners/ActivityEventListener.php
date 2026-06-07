@@ -36,16 +36,16 @@ class ActivityEventListener
 
             $event instanceof WalletCredited => ActivityService::log(
                 event:       'wallet.credited',
-                description: "Wallet credited with " . ($event->amount ?? '') . " " . ($event->currency ?? ''),
+                description: "Wallet credited with " . \App\Helpers\FinanceHelper::instance()->format_money($event->amount, $event->currencyId),
                 workspace:   'erp',
-                properties:  ['amount' => $event->amount ?? null, 'currency' => $event->currency ?? null],
+                properties:  ['amount' => $event->amount ?? null, 'currency_id' => $event->currencyId ?? null],
             ),
 
             $event instanceof WalletDebited => ActivityService::log(
                 event:       'wallet.debited',
-                description: "Wallet debited " . ($event->amount ?? '') . " " . ($event->currency ?? ''),
+                description: "Wallet debited " . \App\Helpers\FinanceHelper::instance()->format_money($event->amount, $event->currencyId),
                 workspace:   'erp',
-                properties:  ['amount' => $event->amount ?? null, 'currency' => $event->currency ?? null],
+                properties:  ['amount' => $event->amount ?? null, 'currency_id' => $event->currencyId ?? null],
             ),
 
             $event instanceof WithdrawalRequested => ActivityService::log(

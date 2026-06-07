@@ -59,7 +59,7 @@ export default function CreateService({ categories, seller }: Props) {
     const lowestPrice = data.packages.reduce((min, p) => p.price && Number(p.price) < min ? Number(p.price) : min, Infinity);
     const displayPrice = lowestPrice === Infinity ? 0 : lowestPrice;
     const currencyMap: Record<number, string> = { 1: 'USD', 2: 'EGP', 3: 'EUR', 4: 'GBP', 5: 'AED', 6: 'SAR' };
-    const currency = currencyMap[data.packages[0]?.currency_id] || 'USD';
+    const currency = currencyMap[data.packages[0]?.currency_id];
     const selectedCategory = categories.find(c => String(c.id) === String(data.category_id));
 
     return (
@@ -213,3 +213,4 @@ export default function CreateService({ categories, seller }: Props) {
         </AuthenticatedLayout>
     );
 }
+

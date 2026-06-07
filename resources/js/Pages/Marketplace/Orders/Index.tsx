@@ -5,6 +5,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { useMarketplaceMode } from '@/Components/Marketplace/MarketplaceModeContext';
 import { __ } from '@/lib/i18n';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Index({ orders, tab }: any) {
     const { mode, setMode } = useMarketplaceMode();
@@ -193,7 +194,7 @@ export default function Index({ orders, tab }: any) {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm font-bold text-gray-900">
-                                                            {order.formatted_amount}
+                                                            {formatCurrency(order.amount, order.currency)}
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">

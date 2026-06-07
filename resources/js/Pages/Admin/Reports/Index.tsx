@@ -26,7 +26,7 @@ export default function ReportsIndex({
     moduleBreakdown, 
     auth 
 }: any) {
-    const businessCurrency = stats?.businessCurrency || 'USD';
+    const businessCurrency = stats?.businessCurrency;
     const [showValues, setShowValues] = useState(true);
     
     // P&L form state
@@ -355,3 +355,4 @@ export default function ReportsIndex({
         </AdminSidebarLayout>
     );
 }
+

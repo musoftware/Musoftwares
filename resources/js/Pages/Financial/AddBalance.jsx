@@ -52,7 +52,7 @@ export default function AddBalance({ wallet }) {
 
     const presets = [10, 25, 50, 100, 250, 500];
     const walletBalance = Number(wallet?.balance || 0);
-    const walletCurrency = wallet?.currency || 'USD';
+    const walletCurrency = wallet?.currency;
 
     return (
         <AuthenticatedLayout header={undefined}>
@@ -211,3 +211,4 @@ export default function AddBalance({ wallet }) {
         </AuthenticatedLayout>
     );
 }
+

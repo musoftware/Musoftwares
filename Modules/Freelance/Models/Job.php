@@ -17,20 +17,14 @@ class Job extends Model
 
     protected $fillable = ['client_id', 'title', 'description', 'budget', 'currency_id', 'min_proposal_points', 'type', 'duration', 'status', 'last_poked_at'];
 
-    protected $appends = ['formatted_budget'];
+    protected $appends = [];
 
     protected $casts = [
         'status' => JobState::class,
         'last_poked_at' => 'datetime',
     ];
 
-    public function getFormattedBudgetAttribute()
-    {
-        if ($this->budget && $this->currency) {
-            return sprintf($this->currency->string_format, $this->budget);
-        }
-        return $this->budget;
-    }
+
 
     public function client()
     {

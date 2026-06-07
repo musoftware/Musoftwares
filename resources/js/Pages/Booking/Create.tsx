@@ -12,7 +12,7 @@ import { __ } from '@/lib/i18n';
 import { Calendar, Clock, Users, CalendarOff } from 'lucide-react';
 export default function Create() {
     const { wallet, settings } = usePage<any>().props;
-    const baseCurrency = wallet?.currency || settings?.base_currency || 'USD';
+    const baseCurrency = wallet?.currency || settings?.base_currency;
 
     const { data, setData, post, processing, errors } = useForm({
         title: '',
@@ -202,3 +202,4 @@ export default function Create() {
         </WorkspaceLayout>
     );
 }
+

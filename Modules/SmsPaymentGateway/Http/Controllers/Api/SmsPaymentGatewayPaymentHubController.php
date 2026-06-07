@@ -590,7 +590,7 @@ null";
         return [
             'amount' => $amount,
             'balance' => $balance,
-            'currency' => $data['currency'] ?? 'EGP',
+            'currency' => $data['currency'] ?? null,
             'sender' => $sender,
             'sender_name' => $data['sender_name'] ?? null,
             'phone_number' => $phoneNumber,
@@ -1653,3 +1653,4 @@ null";
         ], 404);
     }
 }
+

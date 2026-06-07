@@ -86,7 +86,7 @@ class ERPAdminController extends Controller
                 'name' => $c->name,
                 'email' => $c->email ?? '-',
                 'phone' => $c->phone ?? '-',
-                'currency' => $c->currency?->currency ?? 'USD',
+                'currency' => $c->currency,
                 'invoices_count' => $c->invoices_count,
             ]);
 
@@ -100,7 +100,7 @@ class ERPAdminController extends Controller
                 'invoice_number' => $i->invoice_number,
                 'client_name' => $i->client?->name ?? 'Unknown',
                 'amount' => $i->amount,
-                'currency' => $i->currency?->currency ?? 'USD',
+                'currency' => $i->currency,
                 'status' => $i->status,
                 'issued_at' => $i->issued_at?->format('Y-m-d'),
             ]);

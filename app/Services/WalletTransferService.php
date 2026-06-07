@@ -24,7 +24,7 @@ class WalletTransferService
     /**
      * Create and process a peer-to-peer wallet transfer.
      */
-    public function executeTransfer(int $senderId, int $receiverId, float $amount, string $currency, ?string $reason = null): WalletTransfer
+    public function executeTransfer(int $senderId, int $receiverId, float $amount, int $currencyId, ?string $reason = null): WalletTransfer
     {
         // 1. Basic validations
         if ($senderId === $receiverId) {
@@ -42,16 +42,22 @@ class WalletTransferService
         $sender = User::findOrFail($senderId);
         $receiver = User::findOrFail($receiverId);
 
-        $senderCurrency = $sender->preferred_currency ?? 'USD';
-        $receiverCurrency = $receiver->preferred_currency ?? 'USD';
-
-        // If sender tries to send a currency different than their preferred currency,
-        // we first validate and then handle it based on their preferred currency.
-        if ($currency !== $senderCurrency) {
+        if ($currencyId !== (int) $sender->currency_id) {
             throw ValidationException::withMessages([
-                'currency' => ['You can only send transfers using your wallet currency (' . $senderCurrency . ').'],
+                'currency' => ['You can only send transfers using your wallet currency.'],
             ]);
         }
+
+        $senderCurrencyModel = \App\Models\Currency::find($sender->currency_id);
+        $receiverCurrencyModel = \App\Models\Currency::find($receiver->currency_id);
+        if (!$senderCurrencyModel) {
+            throw new Exception("Sender (User #{$senderId}) is missing a currency_id configuration.");
+        }
+        if (!$receiverCurrencyModel) {
+            throw new Exception("Receiver (User #{$receiverId}) is missing a currency_id configuration.");
+        }
+        $senderCurrency = $senderCurrencyModel->currency;
+        $receiverCurrency = $receiverCurrencyModel->currency;
 
         // Calculate P2P Fee: 1% of amount, with limits translated from USD equivalents ($0.50 min, $10.00 max)
         $usdToSenderRate = (float) $this->exchangeRateService->getRate('USD', $senderCurrency);
@@ -69,7 +75,7 @@ class WalletTransferService
         $senderBalance = (float) $sender->available_balance();
         if ($senderBalance < $totalDebitRequired) {
             throw ValidationException::withMessages([
-                'amount' => ['Insufficient funds. You need ' . \App\Helpers\FinanceHelper::instance()->format_money($totalDebitRequired, $senderCurrencyId ?? $senderCurrency) . ' (including fees) but only have ' . \App\Helpers\FinanceHelper::instance()->format_money($senderBalance, $senderCurrencyId ?? $senderCurrency) . '.'],
+                'amount' => ['Insufficient funds. You need ' . \App\Helpers\FinanceHelper::instance()->format_money($totalDebitRequired, $currencyId) . ' (including fees) but only have ' . \App\Helpers\FinanceHelper::instance()->format_money($senderBalance, $currencyId) . '.'],
             ]);
         }
 
@@ -88,7 +94,7 @@ class WalletTransferService
 
         if (($dailyTotal + $amount) > $dailyLimitSenderCurrency) {
             throw ValidationException::withMessages([
-                'amount' => ['Daily transfer limit exceeded. Remaining daily limit: ' . \App\Helpers\FinanceHelper::instance()->format_money($dailyLimitSenderCurrency - $dailyTotal, $senderCurrencyId ?? $senderCurrency) . '.'],
+                'amount' => ['Daily transfer limit exceeded. Remaining daily limit: ' . \App\Helpers\FinanceHelper::instance()->format_money($dailyLimitSenderCurrency - $dailyTotal, $currencyId) . '.'],
             ]);
         }
 
@@ -100,7 +106,7 @@ class WalletTransferService
 
         if (($monthlyTotal + $amount) > $monthlyLimitSenderCurrency) {
             throw ValidationException::withMessages([
-                'amount' => ['Monthly transfer limit exceeded. Remaining monthly limit: ' . \App\Helpers\FinanceHelper::instance()->format_money($monthlyLimitSenderCurrency - $monthlyTotal, $senderCurrencyId ?? $senderCurrency) . '.'],
+                'amount' => ['Monthly transfer limit exceeded. Remaining monthly limit: ' . \App\Helpers\FinanceHelper::instance()->format_money($monthlyLimitSenderCurrency - $monthlyTotal, $currencyId) . '.'],
             ]);
         }
 
@@ -171,13 +177,24 @@ class WalletTransferService
     /**
      * Preview transfer metrics (fee, conversion, limits).
      */
-    public function previewTransfer(int $senderId, int $receiverId, float $amount, string $currency): array
+    public function previewTransfer(int $senderId, int $receiverId, float $amount, int $currencyId): array
     {
         $sender = User::findOrFail($senderId);
         $receiver = User::findOrFail($receiverId);
 
-        $senderCurrency = $sender->preferred_currency ?? 'USD';
-        $receiverCurrency = $receiver->preferred_currency ?? 'USD';
+        if ($currencyId !== (int) $sender->currency_id) {
+            throw ValidationException::withMessages([
+                'currency' => ['You can only send transfers using your wallet currency.'],
+            ]);
+        }
+
+        $senderCurrencyModel = \App\Models\Currency::find($sender->currency_id);
+        $receiverCurrencyModel = \App\Models\Currency::find($receiver->currency_id);
+        if (!$senderCurrencyModel || !$receiverCurrencyModel) {
+            throw new Exception("Sender or Receiver is missing a currency_id configuration.");
+        }
+        $senderCurrency = $senderCurrencyModel->currency;
+        $receiverCurrency = $receiverCurrencyModel->currency;
 
         $usdToSenderRate = (float) $this->exchangeRateService->getRate('USD', $senderCurrency);
         

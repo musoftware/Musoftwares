@@ -156,6 +156,9 @@ class WithdrawalController extends Controller
                 }
 
                 $businessCurrencyId = $client->tenant->base_currency_id;
+                if (!$client->currency_id) {
+                    throw new \Exception("Client {$client->name} is missing an associated currency relation.");
+                }
                 $businessAmount = \App\Models\CurrenciesExchange::RateByDate(
                     now(),
                     $amount,

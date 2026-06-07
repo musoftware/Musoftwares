@@ -40,7 +40,7 @@ class DebtTransactionController extends Controller
         $this->checkAddon();
 
         return Inertia::render('ERP/Debts/Transactions/Create', [
-            'baseCurrency' => \App\Models\AdminSettings::business_currency(),
+            'baseCurrency' => Tenant::find($this->getTenantId())->baseCurrency,
         ]);
     }
 
@@ -64,12 +64,13 @@ class DebtTransactionController extends Controller
             $client = TenantClient::where('id', $request->client_id)->where('tenant_id', $tenantId)->firstOrFail();
         } else {
             $user = $this->resolveTenantUser();
+            $tenantModel = Tenant::find($tenantId);
             $client = TenantClient::create([
                 'tenant_id' => $tenantId,
                 'user_id' => $user->id,
                 'name' => $request->new_client_name,
                 'phone' => $request->new_client_phone,
-                'currency_id' => \App\Models\AdminSettings::business_currency()->id,
+                'currency_id' => $tenantModel->base_currency_id,
                 'status' => 'active',
             ]);
         }

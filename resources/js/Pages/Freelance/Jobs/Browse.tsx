@@ -16,10 +16,16 @@ import { cn } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
 import { FreelanceCard } from '@/Components/Freelance/ui/FreelanceCard';
+import { formatMoney } from '@/lib/utils';
 
-function BrowseJobsContent({ jobs }: any) {
+function BrowseJobsContent({ jobs: initialJobs, userCurrency }: any) {
     const { auth } = usePage().props as any;
     const { mode, setMode } = useFreelanceMode();
+    const [jobs, setJobs] = useState(initialJobs);
+
+    useEffect(() => {
+        setJobs(initialJobs);
+    }, [initialJobs]);
     
     // Initialize filters and sort from URL parameters
     const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
@@ -46,7 +52,6 @@ function BrowseJobsContent({ jobs }: any) {
     }, [mode, setMode]);
 
     const displayJobs = jobs?.data?.length ? jobs.data : [];
-    const globalCurrency = auth?.user?.preferred_currency || 'USD';
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -222,7 +227,7 @@ function BrowseJobsContent({ jobs }: any) {
                                                 {__(job.type)}
                                             </Badge>
                                             <div className="flex items-center gap-1.5">
-                                                <FinancialAmount amount={job.budget} currency={job.currency} size="sm" />
+                                                <span className="font-mono text-sm font-semibold">{job.budget !== null && job.budget !== undefined ? formatMoney(job.budget, userCurrency) : `${job.budget_points} ${__('freelance.pts', undefined, 'pts')}`}</span>
                                                 {job.type === 'hourly' && <span className="text-xs text-slate-500 font-medium">/ {__('general.hr')}</span>}
                                             </div>
                                         </div>
@@ -279,10 +284,10 @@ function BrowseJobsContent({ jobs }: any) {
     );
 }
 
-export default function BrowseJobs({ jobs }: any) {
+export default function BrowseJobs({ jobs, userCurrency }: any) {
     return (
         <FreelanceLayout>
-            <BrowseJobsContent jobs={jobs} />
+            <BrowseJobsContent jobs={jobs} userCurrency={userCurrency} />
         </FreelanceLayout>
     );
 }

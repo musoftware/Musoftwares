@@ -229,14 +229,20 @@ class Invoice extends Model
         $this->addCharityAmount();
 
         // Fire InvoicePaid event for notifications
-        event(new \App\Events\InvoicePaid($this->user, $this));
+        event(new \App\Events\InvoicePaid($this));
     }
 
     public static function createInvoice($client, $project, $request)
     {
         $invoice = new Invoice();
         $invoice->user_id = Auth::id();
-        $invoice->currency_id = $client->currency_id ?? $client->currency ?? \App\Models\AdminSettings::GetValue('business_currency', 2);
+        
+        $currencyId = $client->currency_id ?? $client->currency;
+        if (!$currencyId) {
+            throw new \Exception("Client {$client->id} is missing a currency configuration. Cannot create invoice.");
+        }
+        $invoice->currency_id = $currencyId;
+
         if ($project !== null) {
             $invoice->project_id = $project->id;
         }
@@ -645,7 +651,7 @@ class Invoice extends Model
 
             ActionHelper::add_action_coins($this->user, 'Invoice Paid', $coins);
 
-            event(new InvoicePaid($this->user, $this));
+            event(new InvoicePaid($this));
 
             // إضافة جنيه واحد تلقائياً لعداد الخير عند دفع الفاتورة
             $this->addCharityAmount();

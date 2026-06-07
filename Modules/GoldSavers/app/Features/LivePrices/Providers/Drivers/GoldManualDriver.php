@@ -27,7 +27,7 @@ class GoldManualDriver implements GoldProviderDriver
 
         $priceLocalGram24k = (float) ($credentials['price_gram_24k'] ?? 0);
         $priceUsdOz        = (float) ($credentials['price_usd_oz']   ?? 0);
-        $currencyCode      = $this->source->base_currency ?? 'EGP';
+        $currencyCode      = $this->source->base_currency ?? null;
         $currencyId        = \App\Models\Currency::where('code', $currencyCode)->first()?->id ?? 2; // Default to 2 for EGP
         $exchangeRate      = (float) ($credentials['exchange_rate']   ?? 1.0);
 
@@ -64,3 +64,4 @@ class GoldManualDriver implements GoldProviderDriver
         return $this->latencyMs;
     }
 }
+

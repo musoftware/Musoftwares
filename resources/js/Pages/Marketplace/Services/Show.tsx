@@ -227,7 +227,7 @@ export default function Show({ service }: any) {
                                                         Package
                                                     </h3>
                                                     <span className="text-2xl font-bold text-gray-900">
-                                                        {formatCurrency(selectedPackage.price, selectedPackage.currency || 'USD')}
+                                                        {formatCurrency(selectedPackage.price, selectedPackage.currency)}
                                                     </span>
                                                 </div>
                                                 <p className="mb-6 text-sm text-gray-600">
@@ -285,7 +285,7 @@ export default function Show({ service }: any) {
                                                         {__('general.your_balance')}:
                                                     </span>
                                                     <span className="text-sm font-bold text-gray-900">
-                                                        {formatCurrency(displayBalance, auth?.user?.currency || 'USD')}
+                                                        {formatCurrency(displayBalance, auth?.user?.currency)}
                                                     </span>
                                                 </div>
 
@@ -294,7 +294,7 @@ export default function Show({ service }: any) {
                                                         onClick={() => handleBuyNow(selectedPackage.id)}
                                                         className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-3 font-bold text-white transition hover:bg-indigo-700"
                                                     >
-                                                        {__('general.continue')} — {formatCurrency(selectedPackage.price, selectedPackage.currency || 'USD')}
+                                                        {__('general.continue')} — {formatCurrency(selectedPackage.price, selectedPackage.currency)}
                                                         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                                                         </svg>
@@ -302,7 +302,7 @@ export default function Show({ service }: any) {
                                                 ) : (
                                                     <div className="space-y-3">
                                                         <div className="text-center text-sm font-medium text-red-600">
-                                                            {__('general.need_more_balance', { amount: formatCurrency(selectedPackage.price - displayBalance, selectedPackage.currency || 'USD') })}
+                                                            {__('general.need_more_balance', { amount: formatCurrency(selectedPackage.price - displayBalance, selectedPackage.currency) })}
                                                         </div>
                                                         <button className="w-full rounded-lg bg-amber-500 px-4 py-3 font-bold text-white transition hover:bg-amber-600">{__('general.top_up_wallet')}</button>
                                                     </div>
@@ -323,3 +323,4 @@ export default function Show({ service }: any) {
         </MarketplaceLayout>
     );
 }
+

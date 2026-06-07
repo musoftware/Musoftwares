@@ -16,7 +16,7 @@ export default function EditClient({ client, currencies }: { client: any, curren
         email: client.email || '',
         phone: client.phone || '',
         address: client.address || '',
-        currency: client.currency?.currency || 'USD',
+        currency: client.currency?.currency,
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -129,3 +129,4 @@ export default function EditClient({ client, currencies }: { client: any, curren
         </ERPLayout>
     );
 }
+

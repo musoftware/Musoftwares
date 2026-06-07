@@ -11,6 +11,30 @@ class Earning extends Model
 {
     use HasFactory;
 
+    protected static function booted(): void
+    {
+        static::saving(function ($earning) {
+            // Force user currency conversion if different
+            if ($earning->user_id && $earning->user) {
+                $userCurrencyId = $earning->user->currency_id ?? \App\Models\AdminSettings::business_currency();
+                $currentCurrencyId = $earning->currency_id ?? $earning->currency ?? \App\Models\AdminSettings::business_currency();
+                
+                if ($currentCurrencyId != $userCurrencyId) {
+                    $date = $earning->created_at ?? now();
+                    $earning->amount = \App\Models\CurrenciesExchange::RateByDate(
+                        $date,
+                        $earning->amount,
+                        $currentCurrencyId,
+                        $userCurrencyId
+                    );
+                    
+                    $earning->currency = $userCurrencyId;
+                    $earning->currency_id = $userCurrencyId;
+                }
+            }
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

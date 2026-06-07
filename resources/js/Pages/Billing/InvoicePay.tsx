@@ -25,7 +25,7 @@ interface InvoiceDetails {
     amount: number;
     paid_amount: number;
     remaining: number;
-    currency: string;
+    currency: any;
     status: string;
     due_date: string;
     issued_at: string;
@@ -42,7 +42,7 @@ interface PayProps {
     };
     invoice: InvoiceDetails;
     client_balance: number;
-    wallet_currency: string;
+    wallet_currency: any;
 }
 
 export default function InvoicePay({
@@ -266,7 +266,7 @@ export default function InvoicePay({
                                     </Button>
 
                                     <p className="text-[10px] text-slate-400 text-center leading-normal">
-                                        {__('general.by_checking_out_you_authorize')} <span className="font-semibold">{invoice.remaining.toFixed(2)} {invoice.currency}</span> {__('erp.from_your_platform_wallet_balance')}
+                                        {__('general.by_checking_out_you_authorize')} <span className="font-semibold"><CurrencyDisplay amount={invoice.remaining} currency={invoice.currency} /></span> {__('erp.from_your_platform_wallet_balance')}
                                     </p>
                                 </div>
                             )}

@@ -38,7 +38,7 @@ const statusStyles: Record<string, string> = {
 
 export default function Index({ requests, filters }: Props) {
     const { settings } = usePage<any>().props;
-    const base_currency = settings?.base_currency || 'USD';
+    const base_currency = settings?.base_currency;
 
     const handleFilter = (value: string) => {
         router.get(
@@ -181,3 +181,4 @@ export default function Index({ requests, filters }: Props) {
         </AdminSidebarLayout>
     );
 }
+

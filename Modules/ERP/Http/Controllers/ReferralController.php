@@ -89,7 +89,7 @@ class ReferralController extends Controller
                 'id' => $earning->id,
                 'created_at' => $earning->created_at,
                 'amount' => $earning->amount,
-                'currency' => $earning->currencyModel?->currency ?? 'USD',
+                'currency' => $earning->currencyModel,
                 'status' => $earning->status,
                 'client' => [
                     'name' => $earning->referrer?->name ?? 'Unknown',

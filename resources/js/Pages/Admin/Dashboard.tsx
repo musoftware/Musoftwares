@@ -26,7 +26,7 @@ export default function Dashboard({
     stats, operationalStats, systemHealth, revenueChartData, 
     moduleBreakdown, recentActivities, auth 
 }: any) {
-    const businessCurrency = stats?.businessCurrency || 'USD';
+    const businessCurrency = stats?.businessCurrency;
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
     const [showValues, setShowValues] = useState(true);
 
@@ -336,3 +336,4 @@ export default function Dashboard({
         </AdminSidebarLayout>
     );
 }
+

@@ -17,7 +17,7 @@ interface Invoice {
     amount: number;
     paid_amount: number;
     remaining: number;
-    currency: string;
+    currency: any;
     status: string;
     due_date: string;
     issued_at: string;
@@ -50,7 +50,7 @@ interface IndexProps {
     unpaid_invoices?: Invoice[];
     paid_invoices?: Invoice[];
     client_balance?: number;
-    wallet_currency?: string;
+    wallet_currency?: any;
 }
 
 export default function Invoices({

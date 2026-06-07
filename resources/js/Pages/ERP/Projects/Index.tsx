@@ -110,7 +110,7 @@ export default function ProjectsIndex({ projects }: Props) {
                                             <div className="flex items-center gap-3 text-xs text-slate-500">
                                                 {project.budget && (
                                                     <span className="flex items-center gap-1 font-mono">
-                                                        {formatMoney(project.budget, project.currency ?? 'USD')}
+                                                        {formatMoney(project.budget, project.currency)}
                                                     </span>
                                                 )}
                                                 {project.due_date && (

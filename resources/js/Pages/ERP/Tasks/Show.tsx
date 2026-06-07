@@ -248,7 +248,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
             description: todo.description || '',
             priority: todo.priority,
             cost: todo.cost ? todo.cost.toString() : '',
-            cost_currency: todo.cost_currency || 'USD',
+            cost_currency: todo.cost_currency,
             start_at: todo.start_at ? todo.start_at.split('T')[0] : '',
             end_at: todo.end_at ? todo.end_at.split('T')[0] : '',
             tagsInput: todo.tags ? todo.tags.join(', ') : '',
@@ -852,3 +852,4 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
         </ERPLayout>
     );
 }
+

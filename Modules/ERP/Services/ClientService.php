@@ -19,6 +19,12 @@ class ClientService
         }
         $currencyId = Currency::where('currency', $currencyCode)->value('id');
 
+        if (!$currencyId) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'currency' => __('errors.client_currency_required')
+            ]);
+        }
+
         $client = TenantClient::create([
             'tenant_id' => $tenant->id,
             'name'      => $validated['name'],
@@ -41,6 +47,13 @@ class ClientService
     public function updateClient(TenantClient $client, array $validated): TenantClient
     {
         $validated['currency_id'] = Currency::where('currency', $validated['currency'])->value('id');
+        
+        if (!$validated['currency_id']) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'currency' => __('errors.client_currency_required')
+            ]);
+        }
+        
         unset($validated['currency']);
 
         $client->update($validated);

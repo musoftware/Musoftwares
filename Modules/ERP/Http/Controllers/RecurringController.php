@@ -116,7 +116,10 @@ class RecurringController extends Controller
         );
 
         $currencyModel = \App\Models\Currency::where('currency', $validated['amount_currency'])->first();
-        $validated['currency_id']        = $currencyModel ? $currencyModel->id : $tenant->base_currency_id;
+        if (!$currencyModel) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['amount_currency' => __('errors.invalid_currency')]);
+        }
+        $validated['currency_id']        = $currencyModel->id;
         $validated['business_amount']    = $conversion[2];
         $validated['business_currency_id']= $tenant->base_currency_id;
         $validated['exchange_rate']      = $conversion[4];
@@ -218,7 +221,10 @@ class RecurringController extends Controller
         );
 
         $currencyModel = \App\Models\Currency::where('currency', $validated['amount_currency'])->first();
-        $validated['currency_id']        = $currencyModel ? $currencyModel->id : $tenant->base_currency_id;
+        if (!$currencyModel) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['amount_currency' => __('errors.invalid_currency')]);
+        }
+        $validated['currency_id']        = $currencyModel->id;
         $validated['business_amount'] = $conversion[2];
         $validated['business_currency_id'] = $tenant->base_currency_id;
         $validated['exchange_rate'] = $conversion[4];

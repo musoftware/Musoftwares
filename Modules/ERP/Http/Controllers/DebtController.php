@@ -59,11 +59,15 @@ class DebtController extends Controller
 
         $allClients = TenantClient::where('tenant_id', $tenantId)->whereHas('debtTransactions')->get();
         $totalOwedToMe = $allClients->sum(function ($client) {
-            $bal = $client->debt_balance;
+            $given = $client->debtTransactions()->where('type', 'given')->sum('business_amount');
+            $received = $client->debtTransactions()->where('type', 'received')->sum('business_amount');
+            $bal = $given - $received;
             return $bal > 0 ? $bal : 0;
         });
         $totalIOwe = $allClients->sum(function ($client) {
-            $bal = $client->debt_balance;
+            $given = $client->debtTransactions()->where('type', 'given')->sum('business_amount');
+            $received = $client->debtTransactions()->where('type', 'received')->sum('business_amount');
+            $bal = $given - $received;
             return $bal < 0 ? abs($bal) : 0;
         });
 
@@ -72,7 +76,7 @@ class DebtController extends Controller
             'filters' => $request->only(['q']),
             'totalOwedToMe' => $totalOwedToMe,
             'totalIOwe' => $totalIOwe,
-            'baseCurrency' => \App\Models\AdminSettings::business_currency(),
+            'baseCurrency' => Tenant::find($tenantId)->baseCurrency,
         ]);
     }
 
@@ -94,7 +98,7 @@ class DebtController extends Controller
                 'debt_balance' => $client->debt_balance,
             ],
             'transactions' => $transactions,
-            'baseCurrency' => \App\Models\AdminSettings::business_currency(),
+            'baseCurrency' => Tenant::find($this->getTenantId())->baseCurrency,
         ]);
     }
 }

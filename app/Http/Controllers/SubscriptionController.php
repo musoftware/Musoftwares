@@ -16,6 +16,8 @@ use Inertia\Inertia;
 
 class SubscriptionController extends Controller
 {
+    use \App\Traits\ConvertsCurrency;
+
     protected $subscriptionService;
 
     public function __construct(SubscriptionService $subscriptionService)

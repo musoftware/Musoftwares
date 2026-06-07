@@ -51,11 +51,5 @@ class MusoftwarePayment extends Model
         return $this->status === 'success';
     }
 
-    /**
-     * Get formatted amount with currency.
-     */
-    public function getFormattedAmountAttribute(): string
-    {
-        return \App\Helpers\FinanceHelper::instance()->format_money($this->amount, $this->currency_id ?? $this->currency);
-    }
+
 }

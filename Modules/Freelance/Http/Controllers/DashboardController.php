@@ -10,11 +10,11 @@ use Modules\Freelance\Models\Proposal;
 use App\Models\PointTransaction;
 use Modules\Freelance\Models\Job;
 use Illuminate\Support\Facades\Schema;
-use Modules\Freelance\Traits\ConvertsFreelanceCurrency;
+use App\Traits\ConvertsCurrency;
 
 class DashboardController extends Controller
 {
-    use ConvertsFreelanceCurrency;
+    use ConvertsCurrency;
 
     public function index(Request $request)
     {
@@ -74,17 +74,18 @@ class DashboardController extends Controller
             : Contract::where('freelancer_id', $user->id)->where('status', 'completed')->sum('contract_points');
 
         // Get user's currency model (no hardcoded string fallback)
-        $userCurrencyModel = $hasCurrencyCol && $user->currency_id
-            ? \App\Models\Currency::find($user->currency_id)
-            : null;
+        $userCurrencyModel = $this->getUserCurrencyObject($user);
+        $userCurrencyId = $userCurrencyModel->id ?? null;
 
         $stats = [
             'pointsBalance'   => $user->points_balance ?? 0,
             'activeProposals' => Proposal::where('freelancer_id', $user->id)->whereIn('status', ['pending'])->count(),
             'activeContracts' => Contract::where('freelancer_id', $user->id)->where('status', 'active')->count(),
             'totalEarnings'   => $totalEarnings,
-            'currencySymbol'  => $userCurrencyModel?->symbol,
-            'currencyCode'    => $userCurrencyModel?->currency,
+            'currency'        => $userCurrencyModel->currency ?? null,
+            'symbol'          => $userCurrencyModel->symbol ?? null,
+            'string_format'   => $userCurrencyModel->string_format ?? null,
+            'isFiat'          => $hasAmountCol,
         ];
 
         // 4. Recent Activities
@@ -162,7 +163,6 @@ class DashboardController extends Controller
                     'title'          => $job->title,
                     'status'         => $job->status,
                     'budget'         => $job->budget ?? 0,
-                    'formattedBudget' => $job->formatted_budget ?? null,
                     'currencySymbol'  => $job->currency?->symbol,
                     'currency'        => $job->currency,
                     'proposalsCount' => $job->proposals_count ?? 0,
@@ -228,13 +228,15 @@ class DashboardController extends Controller
             ->sum('points');
 
         $clientStats = [
-            'activeJobs'             => Job::where('client_id', $user->id)->where('status', 'open')->count(),
-            'activeContracts'        => Contract::where('client_id', $user->id)->where('status', 'active')->count(),
-            'totalContractedValue'   => $totalContractedValue,
-            'pointsSpent'            => abs((int) $pointsSpentFromDeductions),
-            'receivedProposals'      => Proposal::whereHas('job', fn($q) => $q->where('client_id', $user->id))->where('status', 'pending')->count(),
-            'currencySymbol'         => $userCurrencyModel?->symbol,
-            'currencyCode'           => $userCurrencyModel?->currency,
+            'activeJobs'           => Job::where('client_id', $user->id)->where('status', 'open')->count(),
+            'activeContracts'      => Contract::where('client_id', $user->id)->where('status', 'active')->count(),
+            'totalContractedValue' => $totalContractedValue,
+            'pointsSpent'          => abs((int) $pointsSpentFromDeductions),
+            'receivedProposals'    => Proposal::whereHas('job', fn($q) => $q->where('client_id', $user->id))->where('status', 'pending')->count(),
+            'currency'             => $userCurrencyModel->currency ?? null,
+            'symbol'               => $userCurrencyModel->symbol ?? null,
+            'string_format'        => $userCurrencyModel->string_format ?? null,
+            'isFiat'               => $hasAmountCol,
         ];
 
 
@@ -300,6 +302,7 @@ class DashboardController extends Controller
                 'stats'              => $clientStats,
                 'recentActivities'   => $clientActivities,
             ],
+            'userCurrency'     => $this->currencyForFrontend($userCurrencyId),
         ]);
     }
 

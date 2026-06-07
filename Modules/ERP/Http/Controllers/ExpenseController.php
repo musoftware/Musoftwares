@@ -54,6 +54,7 @@ class ExpenseController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
+            'currency_id' => 'nullable|exists:currencies,id',
             'category' => 'nullable|string|max:255',
             'date' => 'nullable|date',
             'description' => 'nullable|string',
@@ -63,6 +64,7 @@ class ExpenseController extends Controller
             'tenant_id' => $tenant->id,
             'title' => $validated['title'],
             'amount' => $validated['amount'],
+            'currency_id' => $validated['currency_id'] ?? null,
             'category' => $validated['category'] ?? null,
             'date' => $validated['date'] ?? now()->format('Y-m-d'),
             'description' => $validated['description'] ?? null,
@@ -120,6 +122,7 @@ class ExpenseController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
+            'currency_id' => 'nullable|exists:currencies,id',
             'category' => 'nullable|string|max:255',
             'date' => 'nullable|date',
             'description' => 'nullable|string',
@@ -128,6 +131,7 @@ class ExpenseController extends Controller
         $expense->update([
             'title' => $validated['title'],
             'amount' => $validated['amount'],
+            'currency_id' => $validated['currency_id'] ?? $expense->currency_id,
             'category' => $validated['category'] ?? null,
             'date' => $validated['date'] ?? $expense->date,
             'description' => $validated['description'] ?? null,
