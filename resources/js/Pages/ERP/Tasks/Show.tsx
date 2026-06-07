@@ -107,7 +107,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
         description: '',
         priority: 'normal' as 'low' | 'normal' | 'high' | 'urgent',
         cost: '',
-        cost_currency: 'USD',
+        cost_currency: '' as string | null,
         start_at: '',
         end_at: '',
         tagsInput: '',
@@ -232,7 +232,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
             description: '',
             priority: 'normal',
             cost: '',
-            cost_currency: 'USD',
+            cost_currency: null,
             start_at: '',
             end_at: '',
             tagsInput: '',
@@ -782,7 +782,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                                 <Label htmlFor="todo_currency" className="text-xs font-semibold text-foreground">Currency</Label>
                                 <CurrencySelect 
                                     currencies={currencies}
-                                    value={todoData.cost_currency}
+                                    value={todoData.cost_currency ?? undefined}
                                     onChange={(val) => setTodoData({ ...todoData, cost_currency: val })}
                                     valueKey="currency"
                                 />

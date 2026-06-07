@@ -49,7 +49,7 @@ class WithdrawalWorkflowTest extends TestCase
             'name' => 'John Doe',
             'email' => $this->user->email,
             'phone' => '+15559876543',
-            'currency' => 'USD',
+            'currency_id' => 1,
             'address' => '456 West Ave',
         ]);
 

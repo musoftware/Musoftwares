@@ -1,0 +1,23 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - phpstan-baseline.neon
+
+parameters:
+    phpVersion: 80300 # Force PHP 8.3 analysis despite local PHP 8.1 CLI
+
+    paths:
+        - app/
+        - Modules/
+
+    # Level 1 catches undefined variables, properties, and methods
+    level: 1
+
+    ignoreErrors:
+        # Ignore legacy SDKs and tests if needed
+        # - '#.*#'
+
+    excludePaths:
+        - Modules/SmsPaymentGateway/sdk/
+        - */database/factories/*
+        - */database/seeders/*
+        - */Tests/*

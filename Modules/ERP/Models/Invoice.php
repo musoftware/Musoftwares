@@ -110,10 +110,11 @@ class Invoice extends TenantModel
 
     public function getBusinessCurrencyAttribute(): string
     {
-        if (!$this->businessCurrency) {
+        $relation = $this->getRelationValue('businessCurrency');
+        if (!$relation) {
             throw new \Exception("Invoice {$this->id} is missing an associated business currency relation.");
         }
-        return $this->businessCurrency->currency;
+        return $relation->currency;
     }
 
     /**

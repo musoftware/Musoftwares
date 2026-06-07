@@ -78,11 +78,15 @@ class LeadTest extends TestCase
         Lead::factory()->create(['workspace_id' => $workspace1->id, 'name' => 'Tenant 1 Lead']);
         Lead::factory()->create(['workspace_id' => $workspace2->id, 'name' => 'Tenant 2 Lead']);
         
-        $this->actingAs($user1)
+        $response = $this->actingAs($user1)
             ->get(route('crm.leads.index'))
-            ->assertStatus(200)
-            ->assertSee('Tenant 1 Lead')
-            ->assertDontSee('Tenant 2 Lead');
+            ->assertStatus(200);
+            
+        $response->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+            ->component('CRM/Leads/Index')
+            ->has('leads.data', 1)
+            ->where('leads.data.0.name', 'Tenant 1 Lead')
+        );
     }
 
     public function test_lead_deletion_cascades_and_cleans_up()
@@ -94,7 +98,7 @@ class LeadTest extends TestCase
         $sequenceId = \DB::table('sequences')->insertGetId([
             'name' => 'Test Sequence',
             'trigger_type' => 'on_lead_creation',
-            'user_id' => $user->id,
+            'workspace_id' => $workspace->id,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

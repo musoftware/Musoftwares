@@ -1,0 +1,1 @@
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'newmusoftware.password_reset_tokens' doesn't exist (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: newmusoftware, SQL: select * from `password_reset_tokens` where `email` = tmurazik@example.com limit 1)

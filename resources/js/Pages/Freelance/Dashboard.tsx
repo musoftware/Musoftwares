@@ -33,7 +33,8 @@ export default function FreelanceDashboard({
     activeContracts: initialContracts, 
     recentActivities: initialActivities, 
     upcomingBookings: initialBookings,
-    clientData: initialClientData
+    clientData: initialClientData,
+    userCurrency
 }: any) {
     const { auth } = usePage().props as any;
     const [selectedContract, setSelectedContract] = useState<any>(null);

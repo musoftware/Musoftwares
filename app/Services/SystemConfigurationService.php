@@ -21,7 +21,9 @@ class SystemConfigurationService
             'business_tax', 'business_email', 'overhead_cost_default', 'ownwallet',
             'payoneer_active', 'paymob_active', 'paymob_token', 'paymob_card_integration',
             'paymob_wallet_integration', 'paymob_card_iframe', 'gumroad',
-            'whatsapp_default_channel_id', 'friday_work_allowed'
+            'whatsapp_default_channel_id', 'friday_work_allowed',
+            'max_devices_per_tenant', 'gemini_api_keys',
+            'expected_monthly_income', 'work_days_per_month', 'hours_per_day'
         ];
 
         foreach ($supportedKeys as $key) {

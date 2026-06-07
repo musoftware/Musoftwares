@@ -21,7 +21,6 @@ class SerialSoftwareControllerTest extends TestCase
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create([
-            'role' => 'admin',
             'onboarding_completed' => true,
         ]);
         $this->admin->assignRole('admin');
@@ -210,7 +209,6 @@ class SerialSoftwareControllerTest extends TestCase
     public function test_non_admin_cannot_access_index(): void
     {
         $user = User::factory()->create([
-            'role' => 'client',
             'onboarding_completed' => true,
         ]);
 

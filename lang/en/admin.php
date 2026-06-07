@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'ai_estimator_error' => 'AI Estimator Error',
   'notification_sent_successfully' => 'Global notification sent successfully.',
   'notification_failed' => 'Failed to send notification',
   'broadcast_notification' => 'Broadcast Notification',
@@ -253,4 +254,14 @@ return [
   'type' => 'Type',
   'who_viewed' => 'Who Viewed',
   'who_clicked' => 'Who Clicked',
+  'expected_monthly_income' => 'Expected Monthly Income',
+  'work_days_per_month' => 'Work Days / Month',
+  'hours_per_day' => 'Hours / Day',
+  'calculated_hourly_rate' => 'Calculated Hourly Rate',
+  'ai_estimator' => 'AI Estimator',
+  'estimate_hours' => 'Estimate Hours',
+  'task_description' => 'Task Description',
+  'estimated_hours' => 'Estimated Hours',
+  'your_hourly_rate' => 'Your Hourly Rate',
+  'total_price' => 'Total Price',
 ];

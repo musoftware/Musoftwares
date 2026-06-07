@@ -76,7 +76,7 @@ class MarketplaceEscrowTest extends TestCase
         // Escrow should hold 100
         $escrow = MarketplaceEscrow::where('order_id', $order->id)->first();
         $this->assertNotNull($escrow);
-        $this->assertEquals('held', $escrow->status);
+        $this->assertEquals(\Modules\Marketplace\Enums\EscrowStatus::HELD->value, is_object($escrow->status) ? $escrow->status->value : $escrow->status);
         $this->assertEquals(100, $escrow->amount);
 
         // Seller should have nothing yet
@@ -93,7 +93,7 @@ class MarketplaceEscrowTest extends TestCase
         $buyer = User::factory()->create(['onboarding_completed' => true, 'currency_id' => $usdCurrency->id]);
 
         // Manually setup order and escrow state
-        $buyer->user_balance = 900;
+        $buyer->user_balance = 1000;
         $buyer->save();
         $seller->user_balance = 0;
         $seller->save();
@@ -132,12 +132,16 @@ class MarketplaceEscrowTest extends TestCase
             'status' => 'delivered'
         ]);
 
+        $escrowService = app(\Modules\Marketplace\Services\EscrowService::class);
+        // holdFunds will deduct 100 from 1000, leaving 900.
+        $escrowService->holdFunds($order);
+
         $response = $this->actingAs($buyer)
             ->withoutMiddleware(\App\Http\Middleware\EnsureSubscriptionIsActive::class)
             ->post(route('marketplace.orders.complete', $order->id));
         
         $order->refresh();
-        $this->assertEquals('completed', $order->status);
+        $this->assertEquals(\Modules\Marketplace\Enums\ServiceOrderStatus::COMPLETED->value, is_object($order->status) ? $order->status->value : $order->status);
 
         // Escrow released (Marketplace order completion controller handles this by crediting seller)
         $this->assertEquals(900, $buyer->fresh()->user_balance); // balance remains 900

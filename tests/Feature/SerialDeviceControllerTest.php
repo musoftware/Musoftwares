@@ -17,7 +17,11 @@ class SerialDeviceControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->admin = User::factory()->create(['role' => 'admin']);
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->admin = User::factory()->create([
+            'onboarding_completed' => true,
+        ]);
+        $this->admin->assignRole('admin');
     }
 
     /* ─── Index ───────────────────────────────────────────────────── */
@@ -222,7 +226,10 @@ class SerialDeviceControllerTest extends TestCase
 
     public function test_non_admin_is_forbidden(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create([
+            'onboarding_completed' => true,
+        ]);
+        $user->assignRole('client');
         $response = $this->actingAs($user)->get(route('admin.serial-devices.index'));
         $response->assertForbidden();
     }

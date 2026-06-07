@@ -38,7 +38,7 @@ class AdminLanguageLineController extends Controller
         $lines = $query->latest()
                        ->paginate(50)
                        ->withQueryString()
-                       ->through(fn($l) => clone (new LanguageLineResource($l))->resolve());
+                       ->through(fn($l) => (new LanguageLineResource($l))->resolve());
 
         $groups = LanguageLine::distinct()->pluck('group');
         $supportedLocales = array_keys(config('languages.supported', ['en' => []]));

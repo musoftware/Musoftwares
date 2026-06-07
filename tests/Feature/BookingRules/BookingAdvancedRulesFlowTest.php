@@ -24,8 +24,9 @@ class BookingAdvancedRulesFlowTest extends TestCase
             ]
         ];
 
-        // Mocking user and tenant setup...
-        $response = $this->postJson('/api/v1/booking-rules', $payload);
+        $user = \App\Models\User::factory()->create();
+        $response = $this->actingAs($user, 'sanctum')
+                         ->postJson('/api/v1/booking-rules', $payload);
 
         $response->assertStatus(201)
                  ->assertJsonPath('data.name', 'Reject large bookings');

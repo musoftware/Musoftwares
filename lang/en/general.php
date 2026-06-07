@@ -1,6 +1,15 @@
 <?php
 
 return [
+    'approve_and_complete' => 'Approve and Complete',
+    'contract_marked_as_completed_successfully' => 'Contract marked as completed successfully',
+    'deleted_successfully' => 'Deleted successfully',
+    'min' => 'Min',
+  'are_you_sure_you_want_to_delete' => 'Are you sure you want to delete?',
+  'create_and_bill' => 'Create & Bill',
+  'create_and_bill_focus_task' => 'Create & Bill (Focus Task)',
+  'delete_confirmation' => 'Delete Confirmation',
+  'sub_todos' => 'Sub-TODOs',
   'enable_notifications' => 'Enable Notifications',
   'payment_successful_thank_you' => 'Payment successful. Thank you!',
   'payment_failed_please_try_again' => 'Payment failed. Please try again.',

@@ -11,6 +11,10 @@ class CRMServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(\Modules\CRM\Infrastructure\Context\TenantContext::class, function () {
+            return new \Modules\CRM\Infrastructure\Context\TenantContext();
+        });
+        
         $this->app->register(RouteServiceProvider::class);
     }
 

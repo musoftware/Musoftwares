@@ -72,9 +72,12 @@ class EarningAnalyzeService
      */
     public function overdueClearing(): float
     {
-        $data = Earning::whereNull('transaction_id')
-            ->where('convert_to_balance_on', '<', now())
-            ->selectRaw('SUM(amount) as amount, currency_id, FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created_at))) AS avg_date')
+        $query = Earning::query()->where('convert_to_balance_on', '<', now());
+        if (\Illuminate\Support\Facades\Schema::hasColumn('earnings', 'transaction_id')) {
+            $query->whereNull('transaction_id');
+        }
+
+        $data = $query->selectRaw('SUM(amount) as amount, currency_id, FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created_at))) AS avg_date')
             ->groupBy('currency_id')
             ->get();
 
@@ -91,9 +94,12 @@ class EarningAnalyzeService
      */
     public function inWindowClearing(): float
     {
-        $data = Earning::whereNull('transaction_id')
-            ->where('convert_to_balance_on', '>=', now())
-            ->selectRaw('SUM(amount) as amount, currency_id, FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created_at))) AS avg_date')
+        $query = Earning::query()->where('convert_to_balance_on', '>=', now());
+        if (\Illuminate\Support\Facades\Schema::hasColumn('earnings', 'transaction_id')) {
+            $query->whereNull('transaction_id');
+        }
+
+        $data = $query->selectRaw('SUM(amount) as amount, currency_id, FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created_at))) AS avg_date')
             ->groupBy('currency_id')
             ->get();
 
@@ -118,8 +124,12 @@ class EarningAnalyzeService
      */
     public function clearedEarnings(): float
     {
-        $data = Earning::whereNotNull('transaction_id')
-            ->selectRaw('SUM(amount) as amount, currency_id, FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created_at))) AS avg_date')
+        $query = Earning::query();
+        if (\Illuminate\Support\Facades\Schema::hasColumn('earnings', 'transaction_id')) {
+            $query->whereNotNull('transaction_id');
+        }
+
+        $data = $query->selectRaw('SUM(amount) as amount, currency_id, FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created_at))) AS avg_date')
             ->groupBy('currency_id')
             ->get();
 
@@ -366,7 +376,7 @@ class EarningAnalyzeService
                 'amount_business'       => round((float) CurrenciesExchange::RateToday($e->amount, $e->currency_id, $businessCurrency), 2),
                 'currency_code'         => $this->currencyCode($e->currency_id),
                 'currency_symbol'       => $this->currencySymbol($e->currency_id),
-                'status'                => $e->transaction_id ? 'cleared' : ($e->convert_to_balance_on && now()->isAfter($e->convert_to_balance_on) ? 'overdue' : 'pending'),
+                'status'                => (\Illuminate\Support\Facades\Schema::hasColumn('earnings', 'transaction_id') && $e->transaction_id) ? 'cleared' : ($e->convert_to_balance_on && now()->isAfter($e->convert_to_balance_on) ? 'overdue' : 'pending'),
                 'convert_to_balance_on' => $e->convert_to_balance_on,
                 'created_at'            => $e->created_at,
             ])

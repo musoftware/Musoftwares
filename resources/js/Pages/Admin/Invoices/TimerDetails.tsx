@@ -424,7 +424,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                                 {formatDurationMS(timer.duration_seconds)}
                                                 {timer.isNew && <span className="ml-2 text-[9px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">New</span>}
                                             </td>
-                                            <td className="px-4 py-2.5 font-bold text-gray-900">{formatCurrency(timer.amount, invoice_currency?.currency)}</td>
+                                            <td className="px-4 py-2.5 font-bold text-gray-900">{formatCurrency(timer.amount, invoice_currency)}</td>
                                             <td className="px-4 py-2.5 text-center">
                                                 {item.invoice_status === 'unpaid' && (
                                                     <button onClick={() => handleDelete(index)} className="text-gray-400 hover:text-red-500 transition-colors">
@@ -453,7 +453,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                     <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></div>
                                     <span className="font-semibold uppercase tracking-wider text-xs">Timer running —</span>
                                     <span className="font-bold text-base">{formatDurationMS(liveSeconds)}</span>
-                                    <span className="ml-auto font-bold">{formatCurrency((liveSeconds / 3600) * rate, invoice_currency?.currency)}</span>
+                                    <span className="ml-auto font-bold">{formatCurrency((liveSeconds / 3600) * rate, invoice_currency)}</span>
                                 </div>
                             )}
 
@@ -522,7 +522,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                             </div>
                             <div className="flex-1 min-w-[120px]">
                                 <span className="block text-[10px] font-bold text-green-600 uppercase tracking-wider mb-1">{invoice_currency?.currency || 'Amount'}</span>
-                                <div className="text-lg font-black text-green-700">{formatCurrency(currentTotalBillable, invoice_currency?.currency)}</div>
+                                <div className="text-lg font-black text-green-700">{formatCurrency(currentTotalBillable, invoice_currency)}</div>
                             </div>
                         </div>
 

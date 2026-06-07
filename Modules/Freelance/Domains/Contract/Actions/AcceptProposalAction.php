@@ -55,6 +55,8 @@ class AcceptProposalAction
                 'proposal_id' => $proposal->id,
                 'client_id' => $job->client_id,
                 'freelancer_id' => $proposal->freelancer_id,
+                'amount' => $proposal->bid_amount,
+                'currency_id' => $proposal->currency_id ?? $job->currency_id,
                 'contract_points' => $proposal->proposed_budget_points,
                 'status' => 'active',
                 'started_at' => now(),

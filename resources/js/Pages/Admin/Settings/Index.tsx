@@ -50,6 +50,9 @@ interface SettingsData {
     friday_work_allowed: boolean;
     max_devices_per_tenant: number;
     gemini_api_keys: string | null;
+    expected_monthly_income: string | null;
+    work_days_per_month: string | null;
+    hours_per_day: string | null;
 }
 
 interface Props {
@@ -153,9 +156,18 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
     const flash = props.flash as { success?: string } | undefined;
 
     const [form, setForm] = useState<SettingsData>({ ...settings });
-    const [bulkRate, setBulkRate] = useState('');
     const [bulkCurrency, setBulkCurrency] = useState(currencies[0]?.id?.toString() ?? '');
     const [updateProjects, setUpdateProjects] = useState(true);
+
+    const computedRate = React.useMemo(() => {
+        const income = parseFloat(form.expected_monthly_income ?? '0');
+        const days = parseFloat(form.work_days_per_month ?? '0');
+        const hours = parseFloat(form.hours_per_day ?? '0');
+        if (income > 0 && days > 0 && hours > 0) {
+            return (income / (days * hours)).toFixed(2);
+        }
+        return '0.00';
+    }, [form.expected_monthly_income, form.work_days_per_month, form.hours_per_day]);
 
     const set = <K extends keyof SettingsData>(key: K, value: SettingsData[K]) =>
         setForm((prev) => ({ ...prev, [key]: value }));
@@ -169,7 +181,7 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
         e.preventDefault();
         if (!confirm('Are you sure you want to update prices for ALL clients?')) return;
         router.post(route('admin.settings.do-update-prices'), {
-            hour_rate: bulkRate,
+            hour_rate: computedRate,
             currency: bulkCurrency,
             update_projects: updateProjects ? '1' : '0',
         });
@@ -415,23 +427,24 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                         <AlertTriangle className="h-4 w-4 shrink-0" />{__('general.warning_this_will_update_the_hourly_rate_for_all_clients_and_optionally_all_open_projects')}</p>
                     <form onSubmit={handleBulkPriceUpdate} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
-                            <Field label={__('general.new_hour_rate')}>
-                                <Input
-                                    id="bulk_hour_rate"
-                                    type="number"
-                                    step="0.01"
-                                    value={bulkRate}
-                                    onChange={(e) => setBulkRate(e.target.value)}
-                                    placeholder="0.00"
-                                    required
-                                />
-                            </Field>
+                        <div className="grid grid-cols-2 gap-4">
                             <CurrencySelect
                                 label="Currency"
                                 currencies={currencies}
                                 value={bulkCurrency}
                                 onChange={setBulkCurrency}
                             />
+                            <div className="flex flex-col justify-end">
+                                <span className="text-sm font-medium text-gray-700">{__('admin.calculated_hourly_rate')}</span>
+                                <div className="mt-1 h-9 flex items-center px-3 bg-gray-50 border border-gray-200 rounded-md text-gray-900 font-semibold tabular-nums">
+                                    {computedRate}
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                        <div className="bg-gray-50 p-3 rounded-md border border-gray-100 flex items-center justify-between">
+                            <span className="text-sm font-medium text-gray-700">{__('admin.calculated_hourly_rate')}</span>
+                            <span className="text-lg font-bold text-gray-900">{computedRate}</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <input

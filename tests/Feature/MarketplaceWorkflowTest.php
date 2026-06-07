@@ -151,7 +151,7 @@ class MarketplaceWorkflowTest extends TestCase
         
         $escrow = MarketplaceEscrow::where('order_id', $order->id)->first();
         $this->assertNotNull($escrow);
-        $this->assertEquals('held', $escrow->status);
+        $this->assertEquals(\Modules\Marketplace\Enums\EscrowStatus::HELD->value, is_object($escrow->status) ? $escrow->status->value : $escrow->status);
 
         // Verification: Conversation created
         $this->assertDatabaseHas('conversations', [
@@ -165,7 +165,7 @@ class MarketplaceWorkflowTest extends TestCase
             ->post(route('marketplace.orders.deliver', $order->id));
 
         $response->assertStatus(302);
-        $this->assertEquals('delivered', $order->fresh()->status);
+        $this->assertEquals(\Modules\Marketplace\Enums\ServiceOrderStatus::DELIVERED->value, is_object($order->fresh()->status) ? $order->fresh()->status->value : $order->fresh()->status);
         $this->assertNotNull($order->fresh()->delivered_at);
 
         // 5. Buyer completes the service order
@@ -173,7 +173,7 @@ class MarketplaceWorkflowTest extends TestCase
             ->post(route('marketplace.orders.complete', $order->id));
 
         $response->assertStatus(302);
-        $this->assertEquals('completed', $order->fresh()->status);
+        $this->assertEquals(\Modules\Marketplace\Enums\ServiceOrderStatus::COMPLETED->value, is_object($order->fresh()->status) ? $order->fresh()->status->value : $order->fresh()->status);
         $this->assertNotNull($order->fresh()->completed_at);
         
         // After completion, seller gets funds (price - 10% commission = 450)

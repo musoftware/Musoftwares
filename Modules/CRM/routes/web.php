@@ -80,6 +80,7 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', 
         Route::resource('campaigns', \Modules\CRM\Http\Controllers\CampaignController::class);
         Route::post('campaigns/{campaign}/schedule', [\Modules\CRM\Http\Controllers\CampaignController::class, 'schedule'])->name('campaigns.schedule');
         Route::post('campaigns/{campaign}/pause', [\Modules\CRM\Http\Controllers\CampaignController::class, 'pause'])->name('campaigns.pause');
+        Route::post('campaigns/generate-ai', [\Modules\CRM\Http\Controllers\CampaignController::class, 'generateAIContent'])->name('campaigns.generate-ai');
         Route::post('campaigns/{campaign}/resume', [\Modules\CRM\Http\Controllers\CampaignController::class, 'resume'])->name('campaigns.resume');
         
         // ── Sequences

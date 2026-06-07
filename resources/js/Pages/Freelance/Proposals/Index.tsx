@@ -16,8 +16,6 @@ import {
     Search, Briefcase, Loader2, AlertCircle, Trash2,
 } from 'lucide-react';
 import { useFreelanceMode } from '@/Components/Freelance/FreelanceModeContext';
-import { __ } from '@/lib/i18n';
-
 import { FreelanceCard } from '@/Components/Freelance/ui/FreelanceCard';
 import { FreelanceStatusPill, STATUS_CONFIG } from '@/Components/Freelance/ui/FreelanceStatusPill';
 
@@ -28,7 +26,7 @@ const AppPage = ({ children }: { children: React.ReactNode }) =>
 const FILTERS = ['all', 'pending', 'accepted', 'rejected'] as const;
 type Filter = typeof FILTERS[number];
 
-export default function ProposalsIndex({ proposals, stats }: any) {
+export default function ProposalsIndex({ proposals, stats, userCurrency }: any) {
     const { auth } = usePage().props as any;
 
     const freelanceModeContext = useFreelanceMode();

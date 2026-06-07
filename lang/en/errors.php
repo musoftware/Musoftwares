@@ -23,5 +23,10 @@ return [
     'unauthorized_project' => 'unauthorized_project',
     'upgrade_to_inventory' => 'upgrade_to_inventory',
     'cannot_change_own_role' => 'You cannot change your own role/permissions.',
-    'configure_storage_provider' => 'Please configure your storage provider.'
+    'configure_storage_provider' => 'Please configure your storage provider.',
+    'client_currency_required' => 'Client currency is required.',
+    'currency_not_found' => 'Currency not found.',
+    'escrow_currency_not_found' => 'Escrow currency not found.',
+    'invalid_currency' => 'Invalid currency.',
+    'multi_currency_addon_required' => 'Multi-currency addon is required.',
 ];

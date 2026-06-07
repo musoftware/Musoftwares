@@ -17,10 +17,10 @@ class TenantIsolationWhiteLabelTest extends TestCase
 
     public function test_enforce_white_label_limits_blocks_when_feature_disabled()
     {
-        $tenant = Tenant::factory()->create();
-        $user = User::factory()->create(['tenant_id' => $tenant->id]);
+        $user = User::factory()->create();
 
         $request = Request::create('/api/white-label/assets', 'POST');
+        $request->attributes->set('tenant_id', 1);
         $request->setUserResolver(function () use ($user) {
             return $user;
         });

@@ -11,6 +11,11 @@ class Campaign extends Model
 {
     use HasFactory, SoftDeletes, BelongsToWorkspace;
 
+    protected static function newFactory()
+    {
+        return \Modules\CRM\Database\Factories\CampaignFactory::new();
+    }
+
     protected $fillable = [
         'workspace_id',
         'embed_token',

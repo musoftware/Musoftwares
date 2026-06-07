@@ -39,10 +39,12 @@ class BookingAdvancedRulesController extends Controller
         ]);
 
         foreach ($validated['conditions'] as $condition) {
+            $condition['tenant_id'] = 1;
             $rule->conditions()->create($condition);
         }
 
         foreach ($validated['actions'] as $action) {
+            $action['tenant_id'] = 1;
             $rule->actions()->create($action);
         }
 

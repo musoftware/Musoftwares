@@ -47,10 +47,7 @@ class WaContact extends Model
 
 // ── WaConversation ────────────────────────────────────────────────────────────
 
-namespace Modules\Tools\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
 
 class WaConversation extends Model
 {
@@ -80,9 +77,7 @@ class WaConversation extends Model
 
 // ── WaMessage ─────────────────────────────────────────────────────────────────
 
-namespace Modules\Tools\Models;
 
-use Illuminate\Database\Eloquent\Model;
 
 class WaMessage extends Model
 {
@@ -104,9 +99,7 @@ class WaMessage extends Model
 
 // ── WaWorkflow ────────────────────────────────────────────────────────────────
 
-namespace Modules\Tools\Models;
 
-use Illuminate\Database\Eloquent\Model;
 
 class WaWorkflow extends Model
 {
@@ -127,9 +120,7 @@ class WaWorkflow extends Model
 
 // ── WaQualityEvent ────────────────────────────────────────────────────────────
 
-namespace Modules\Tools\Models;
 
-use Illuminate\Database\Eloquent\Model;
 
 class WaQualityEvent extends Model
 {

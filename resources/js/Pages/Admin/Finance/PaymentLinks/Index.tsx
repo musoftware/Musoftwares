@@ -108,7 +108,7 @@ export default function Index({ paymentLinks, currencies }: { paymentLinks: any,
                                             {link.title}
                                         </TableCell>
                                         <TableCell data-label={__('general.amount')} className="font-semibold text-emerald-600">
-                                            {formatCurrency(link.amount, link.currency?.currency)}
+                                            {formatCurrency(link.amount, link.currency)}
                                         </TableCell>
                                         <TableCell data-label={__('general.status')}>
                                             {getStatusBadge(link.status)}

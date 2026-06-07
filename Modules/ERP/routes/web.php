@@ -22,6 +22,7 @@ Route::middleware(['web', 'auth:web,erp_team', 'tenant.active'])
         Route::get('clients/{client}/edit', [\Modules\ERP\Http\Controllers\ClientController::class, 'edit'])->name('clients.edit');
         Route::post('clients', [\Modules\ERP\Http\Controllers\ClientController::class, 'store'])->name('clients.store');
         Route::put('clients/{client}', [\Modules\ERP\Http\Controllers\ClientController::class, 'update'])->name('clients.update');
+        Route::put('clients/{client}/status', [\Modules\ERP\Http\Controllers\ClientController::class, 'updateStatus'])->name('clients.updateStatus');
         Route::delete('clients/{client}', [\Modules\ERP\Http\Controllers\ClientController::class, 'destroy'])->name('clients.destroy');
         Route::get('clients/{client}', [\Modules\ERP\Http\Controllers\ClientController::class, 'show'])->name('clients.show');
         Route::get('clients/{client}/transactions', [\Modules\ERP\Http\Controllers\ClientController::class, 'transactions'])->name('clients.transactions');

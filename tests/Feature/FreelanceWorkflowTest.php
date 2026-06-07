@@ -77,6 +77,7 @@ class FreelanceWorkflowTest extends TestCase
                 'currency_id' => 1,
                 'type' => 'fixed',
                 'duration' => '1 month',
+                'min_proposal_points' => 2,
                 'skills' => [$this->skill->id],
             ]);
 
@@ -94,14 +95,16 @@ class FreelanceWorkflowTest extends TestCase
 
         $job = Job::where('title', 'Build a Laravel SaaS platform')->first();
 
-        // Verify client's point balance is decremented by 10
-        $this->assertEquals(90, $this->clientUser->fresh()->points_balance);
+        // Verify client's point balance is decremented by 27
+        $this->assertEquals(73, $this->clientUser->fresh()->points_balance);
 
         // 3. Freelancer submits a proposal (costs 2 points)
         $response = $this->actingAs($this->freelancerUser)
             ->post(route('freelance.proposals.store', $job->id), [
-                'cover_letter' => 'I am an expert Laravel engineer. Here is my portfolio.',
                 'bid_amount' => 1150.00,
+                'cover_letter' => 'I can build this in 2 weeks',
+                'delivery_time' => 14, // days
+                'points_spent' => 2,
             ]);
 
         $response->assertStatus(302);

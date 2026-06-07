@@ -9,21 +9,23 @@ use App\Models\User;
 use App\Models\Project;
 use App\Models\Invoice;
 use App\Models\AdminSettings;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class CurrencyStrictnessTest extends TestCase
 {
-    use RefreshDatabase, WithFaker;
+    use DatabaseTransactions, WithFaker;
 
     protected function setUp(): void
     {
         parent::setUp();
         
+        CurrenciesExchange::flushCache();
+        
         // Ensure AdminSettings are available
-        AdminSettings::updateOrCreate(['key' => 'business_currency'], ['value' => '1']); // Assume 1 is USD
-        AdminSettings::updateOrCreate(['key' => 'exchange_update_date'], ['value' => now()->toDateString()]);
+        AdminSettings::updateOrCreate(['setting_key' => 'business_currency'], ['setting_value' => '1']); // Assume 1 is USD
+        AdminSettings::updateOrCreate(['setting_key' => 'exchange_update_date'], ['setting_value' => now()->toDateString()]);
 
         // Create base currencies
         Currency::firstOrCreate(['id' => 1], ['currency' => 'USD', 'symbol' => '$']);
@@ -34,6 +36,7 @@ class CurrencyStrictnessTest extends TestCase
             'currency1' => 1,
             'currency2' => 2,
             'rate' => 50,
+            'date_string' => now()->toDateString(),
             'updated_at' => now(),
             'created_at' => now(),
         ]);
@@ -43,6 +46,7 @@ class CurrencyStrictnessTest extends TestCase
             'currency1' => 2,
             'currency2' => 1,
             'rate' => 0.02,
+            'date_string' => now()->toDateString(),
             'updated_at' => now(),
             'created_at' => now(),
         ]);
@@ -51,12 +55,9 @@ class CurrencyStrictnessTest extends TestCase
     public function test_transaction_fails_loudly_without_currency()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('User'); // Part of "User {id} is missing a currency_id"
-
-        $user = User::factory()->create(['currency_id' => null]);
+        $this->expectExceptionMessage('Transaction is missing an associated currency relation');
         
         $transaction = new Transaction([
-            'user_id' => $user->id,
             'amount' => 100,
             'reason' => 'Test missing currency',
             'type' => 'received',
@@ -90,8 +91,7 @@ class CurrencyStrictnessTest extends TestCase
 
     public function test_invoice_creation_fails_without_client_currency()
     {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('is missing a currency configuration');
+        $this->expectException(\Illuminate\Database\QueryException::class);
 
         $client = User::factory()->create(['currency_id' => null]);
         

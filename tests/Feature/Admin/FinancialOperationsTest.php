@@ -74,6 +74,7 @@ class FinancialOperationsTest extends TestCase
             'title' => 'Updated Server Cost',
             'amount' => 200,
             'type' => 'expense',
+            'currency_id' => 1,
             'status' => 'completed',
         ]);
 

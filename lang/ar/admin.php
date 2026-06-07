@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'ai_estimator_error' => 'خطأ في التقدير الذكي',
   'notification_sent_successfully' => 'تم إرسال الإشعار العام بنجاح.',
   'notification_failed' => 'فشل في إرسال الإشعار',
   'broadcast_notification' => 'إرسال إشعار عام',
@@ -253,4 +254,14 @@ return [
   'type' => 'النوع',
   'who_viewed' => 'من شاهد',
   'who_clicked' => 'من نقر',
+  'expected_monthly_income' => 'الدخل الشهري المتوقع',
+  'work_days_per_month' => 'أيام العمل في الشهر',
+  'hours_per_day' => 'ساعات العمل في اليوم',
+  'calculated_hourly_rate' => 'سعر الساعة المحسوب',
+  'ai_estimator' => 'حاسبة الذكاء الاصطناعي',
+  'estimate_hours' => 'حساب الساعات',
+  'task_description' => 'وصف المهمة',
+  'estimated_hours' => 'الساعات المقدرة',
+  'your_hourly_rate' => 'سعر الساعة الخاص بك',
+  'total_price' => 'السعر الإجمالي',
 ];
