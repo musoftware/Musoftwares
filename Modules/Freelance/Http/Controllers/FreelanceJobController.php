@@ -234,7 +234,7 @@ class FreelanceJobController extends Controller
         ]);
     }
 
-    public function show(Request $request, Job $job)
+    public function show(Request $request, Job $job, ?string $slug = null)
     {
         // Track unique views (per session) if viewer is not the job owner
         $user = $request->user();
@@ -257,7 +257,7 @@ class FreelanceJobController extends Controller
             'currency'
         ]);
         
-        $userCurrencyId = $this->getUserCurrencyObject($request->user())->id;
+        $userCurrencyId = $user ? $this->getUserCurrencyObject($user)->id : $job->currency_id;
         
         $this->convertModelCurrency($job, 'budget', 'currency_id', $userCurrencyId);
         if ($job->relationLoaded('proposals')) {
@@ -271,6 +271,7 @@ class FreelanceJobController extends Controller
             'job' => $job,
             'pointsCost' => 2, // Example cost to submit a proposal
             'userCurrency' => $this->currencyForFrontend($userCurrencyId),
+            'jobSlug' => \Illuminate\Support\Str::slug($job->title)
         ]);
     }
 
