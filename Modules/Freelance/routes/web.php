@@ -25,7 +25,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:freelance'])-
     // Jobs
     Route::get('/jobs/browse', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'index'])->name('jobs.browse');
     Route::get('/jobs/my-jobs', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'myJobs'])->name('my-jobs');
-    Route::resource('jobs', \Modules\Freelance\Http\Controllers\FreelanceJobController::class)->except(['index']);
+    Route::resource('jobs', \Modules\Freelance\Http\Controllers\FreelanceJobController::class)->except(['index', 'show']);
     Route::post('/jobs/{job}/poke', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'poke'])->name('jobs.poke');
 
     // Proposals
@@ -40,4 +40,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:freelance'])-
     Route::get('/contracts/{contract}', [\Modules\Freelance\Http\Controllers\ContractController::class, 'show'])->name('contracts.show');
     Route::post('/contracts/{contract}/complete', [\Modules\Freelance\Http\Controllers\ContractController::class, 'complete'])->name('contracts.complete');
     Route::post('/contracts/{contract}/dispute', [\Modules\Freelance\Http\Controllers\ContractController::class, 'dispute'])->name('contracts.dispute');
+});
+
+Route::prefix('freelance')->name('freelance.')->group(function () {
+    Route::get('/jobs/{job}/{slug?}', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'show'])->name('jobs.show');
 });

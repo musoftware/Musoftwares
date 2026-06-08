@@ -22,8 +22,9 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
     const isClient = mode === 'client';
     const globalCurrency = userCurrency;
 
-    const hasSubmitted = !isClient && job.proposals?.some((p: any) => p.freelancer_id === auth.user.id);
-    const userPoints = auth.user.points_balance || 0;
+    const isGuest = !auth?.user;
+    const hasSubmitted = !isGuest && !isClient && job.proposals?.some((p: any) => p.freelancer_id === auth.user.id);
+    const userPoints = auth?.user?.points_balance || 0;
 
     const { data, setData, post, processing, errors } = useForm({
         job_id: job.id,
@@ -64,7 +65,41 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
 
     return (
         <>
-            <Head title={`${job.title} | ${__('freelance.jobs')}`} />
+            <Head>
+                <title>{`${job.title} | ${__('freelance.jobs')}`}</title>
+                <meta name="description" content={job.description.replace(/<[^>]*>?/gm, '').substring(0, 160)} />
+                <meta property="og:title" content={job.title} />
+                <meta property="og:description" content={job.description.replace(/<[^>]*>?/gm, '').substring(0, 160)} />
+                <script type="application/ld+json" dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org/",
+                        "@type": "JobPosting",
+                        "title": job.title,
+                        "description": job.description.replace(/<[^>]*>?/gm, ''),
+                        "datePosted": job.created_at,
+                        "employmentType": job.type === 'fixed' ? 'CONTRACTOR' : 'PART_TIME',
+                        "hiringOrganization": {
+                            "@type": "Organization",
+                            "name": isGuest ? "Confidential Client" : (job.client?.name || "Musoftware Freelance")
+                        },
+                        "jobLocation": {
+                            "@type": "Place",
+                            "address": {
+                                "@type": "PostalAddress",
+                                "addressCountry": "WW"
+                            }
+                        },
+                        "baseSalary": {
+                            "@type": "MonetaryAmount",
+                            "currency": job.currency?.currency || "USD",
+                            "value": {
+                                "@type": "QuantitativeValue",
+                                "value": job.budget
+                            }
+                        }
+                    })
+                }} />
+            </Head>
             
             <div className="w-full space-y-8 pb-12">
                 <div className="flex flex-col gap-2">
@@ -243,19 +278,21 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
                                         </div>
                                     </div>
                                     
-                                    <div className="p-5">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600">
-                                                {(job.client?.name || 'C').charAt(0)}
-                                            </div>
-                                            <div>
-                                                <p className="font-semibold text-slate-900">{job.client?.name}</p>
-                                                <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
-                                                    <CheckCircle2 className="h-3 w-3 text-emerald-500" /> {__('payment.payment_verified')}
+                                    {!isGuest && (
+                                        <div className="p-5">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600">
+                                                    {(job.client?.name || 'C').charAt(0)}
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold text-slate-900">{job.client?.name}</p>
+                                                    <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
+                                                        <CheckCircle2 className="h-3 w-3 text-emerald-500" /> {__('payment.payment_verified')}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             </CardContent>
                             
@@ -288,6 +325,16 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
                                             <AlertTitle>{__('general.closed')}</AlertTitle>
                                             <AlertDescription>{__('freelance.this_job_is_no_longer')}</AlertDescription>
                                         </Alert>
+                                    ) : isGuest ? (
+                                        <div className="bg-white rounded-lg border border-slate-200 p-6 text-center space-y-4">
+                                            <User className="h-10 w-10 text-slate-300 mx-auto" />
+                                            <p className="text-slate-600 font-medium">{__('freelance.log_in_to_submit_proposal', undefined, 'Log in to submit a proposal')}</p>
+                                            <Link href={route('login')} className="block w-full">
+                                                <Button className="w-full bg-indigo-600 hover:bg-indigo-700 font-bold">
+                                                    {__('general.login')}
+                                                </Button>
+                                            </Link>
+                                        </div>
                                     ) : hasSubmitted ? (
                                         <Alert className="bg-emerald-50 border-emerald-200 text-emerald-800">
                                             <CheckCircle2 className="h-4 w-4 text-emerald-600" />
