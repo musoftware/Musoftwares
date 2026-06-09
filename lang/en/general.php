@@ -5767,4 +5767,7 @@ return [
   'install_app_step_2_desc' => 'You may need to scroll down to find this option in the menu.',
   'install_app_step_3' => 'Tap "Add" in the top right',
   'install_app_step_3_desc' => 'The app will now appear on your home screen and you can enable notifications!',
+  'exclusive_service' => 'Exclusive Service',
+  'recaptcha_failed' => 'reCAPTCHA verification failed. Please try again.',
+  'recaptcha_required' => 'Please complete the reCAPTCHA verification.',
 ];
