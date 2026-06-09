@@ -19,16 +19,39 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
     const [loading, setLoading] = useState(false);
     const [localError, setLocalError] = useState<string | null>(null);
 
-    function handleAllow() {
+    async function handleAllow() {
         setLoading(true);
         setLocalError(null);
-        router.post(route('runtime.authorize'), { code, port }, {
-            onError: (errs) => {
-                setLocalError(errs.callback || 'Connection failed. Make sure the runtime is running.');
-                setLoading(false);
-            },
-            onFinish: () => setLoading(false),
-        });
+        
+        try {
+            // 1. Authenticate and get token from backend
+            const response = await window.axios.post(route('runtime.authorize'), { code, port });
+            const { token, userId, userName: authName } = response.data;
+            
+            // 2. Push the token to the local runtime running on user's machine
+            const runtimeUrl = `http://127.0.0.1:${port}/auth/callback`;
+            const localRes = await window.axios.post(runtimeUrl, {
+                device_code: code,
+                token,
+                userId,
+                userName: authName
+            });
+            
+            if (localRes.data.ok) {
+                 router.visit(route('runtime.connect', { code, port, success: 1 }));
+            } else {
+                 setLocalError(localRes.data.message || 'Local connection failed. Make sure the runtime is running.');
+            }
+        } catch (err: any) {
+            setLocalError(
+                err.response?.data?.message || 
+                err.response?.data?.errors?.callback ||
+                err.message || 
+                'Could not connect to the local runtime. Make sure it is running on port ' + port + '.'
+            );
+        } finally {
+            setLoading(false);
+        }
     }
 
     function handleDeny() {
