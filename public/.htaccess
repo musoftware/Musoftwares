@@ -11,6 +11,16 @@
 
     RewriteEngine On
 
+    # Serve subdomain-specific manifests
+    RewriteCond %{HTTP_HOST} ^tools\.musoftwares\.com$ [NC]
+    RewriteRule ^manifest\.json$ manifest-tools.json [L]
+
+    RewriteCond %{HTTP_HOST} ^freelancer\.musoftwares\.com$ [NC]
+    RewriteRule ^manifest\.json$ manifest-freelancer.json [L]
+
+    # Fallback to main manifest
+    RewriteRule ^manifest\.json$ manifest-main.json [L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

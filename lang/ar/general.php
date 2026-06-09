@@ -5576,4 +5576,7 @@ return [
   'contract_marked_as_completed_successfully' => 'تم وضع علامة على العقد بأنه مكتمل بنجاح.',
   'deleted_successfully' => 'تم الحذف بنجاح.',
   'min' => 'دقيقة',
+  'exclusive_service' => 'خدمة حصرية',
+  'recaptcha_failed' => 'فشل التحقق من reCAPTCHA. يرجى المحاولة مرة أخرى.',
+  'recaptcha_required' => 'يرجى إكمال التحقق من reCAPTCHA.',
 ];
