@@ -19,7 +19,7 @@ class RuntimeDownloadController extends Controller
         return Inertia::render('Runtime/Download', [
             'downloadUrl' => url('/downloads/runtime/windows/musoftware-runtime-win.zip'),
             'password' => 'musoftware2026',
-            'version' => '2026.06.03.5',
+            'version' => '2026.06.09.1',
         ]);
     }
 }

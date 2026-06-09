@@ -30,6 +30,7 @@ class RuntimeAuthController extends Controller
     {
         $code = $request->query('code');
         $port = (int) $request->query('port', 18400);
+        $success = $request->query('success') == '1';
 
         if (! $code) {
             return Inertia::render('Tools/RuntimeConnect', [
@@ -38,6 +39,7 @@ class RuntimeAuthController extends Controller
                 'port'        => $port,
                 'userName'    => auth()->user()->name,
                 'userEmail'   => auth()->user()->email,
+                'success'     => $success,
             ]);
         }
 
@@ -46,6 +48,7 @@ class RuntimeAuthController extends Controller
             'port'      => $port,
             'userName'  => auth()->user()->name,
             'userEmail' => auth()->user()->email,
+            'success'   => $success,
         ]);
     }
 
@@ -71,43 +74,10 @@ class RuntimeAuthController extends Controller
             expiresAt:  null, // long-lived — user can revoke from /settings/tokens
         );
 
-        // Push token back to the local runtime's /auth/callback
-        $runtimeUrl = "http://127.0.0.1:{$port}/auth/callback";
-
-        try {
-            $response = Http::timeout(5)->post($runtimeUrl, [
-                'device_code' => $code,
-                'token'       => $token->plainTextToken,
-                'userId'      => (string) $user->id,
-                'userName'    => $user->name,
-            ]);
-
-            if (! $response->successful()) {
-                \Illuminate\Support\Facades\Log::error('Runtime connection failed', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                ]);
-                // Token was created — revoke it since callback failed
-                $token->accessToken->delete();
-
-                return back()->withErrors([
-                    'callback' => 'Could not connect to the runtime. Make sure it is running and try again.',
-                ]);
-            }
-        } catch (\Exception $e) {
-            $token->accessToken->delete();
-
-            return back()->withErrors([
-                'callback' => 'Runtime not reachable on port ' . $port . '. Make sure it is running.',
-            ]);
-        }
-
-        return Inertia::render('Tools/RuntimeConnect', [
-            'code'      => $code,
-            'port'      => $port,
-            'userName'  => $user->name,
-            'userEmail' => $user->email,
-            'success'   => true,
+        return response()->json([
+            'token'    => $token->plainTextToken,
+            'userId'   => (string) $user->id,
+            'userName' => $user->name,
         ]);
     }
 }
