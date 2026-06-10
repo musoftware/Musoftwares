@@ -14,5 +14,6 @@
     "ISaas": true,
     "AffiliatePos": true,
     "PaymentGateway": true,
-    "CRM": true
+    "CRM": true,
+    "PasswordSync": true
 }
