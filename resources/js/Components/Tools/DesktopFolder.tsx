@@ -21,6 +21,7 @@ interface DesktopFolderProps {
     onTouchMove?: (e: React.TouchEvent<HTMLDivElement>) => void;
     onTouchEnd?: (e: React.TouchEvent<HTMLDivElement>) => void;
     onTouchCancel?: (e: React.TouchEvent<HTMLDivElement>) => void;
+    isEditing?: boolean;
 }
 
 export function DesktopFolder({

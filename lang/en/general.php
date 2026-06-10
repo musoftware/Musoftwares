@@ -2,6 +2,7 @@
 
 return [
     'approve_and_complete' => 'Approve and Complete',
+    'back_to_portfolio' => 'Back to Portfolio',
     'contract_marked_as_completed_successfully' => 'Contract marked as completed successfully',
     'deleted_successfully' => 'Deleted successfully',
     'min' => 'Min',
