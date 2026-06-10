@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, useForm, router, Link } from '@inertiajs/react';
+import { useForm, router, Link } from '@inertiajs/react';
 import FreelanceLayout from '../Layout';
 import { useFreelanceMode } from '@/Components/Freelance/FreelanceModeContext';
 import { CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
@@ -16,6 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
 import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 import { __ } from '@/lib/i18n';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { SeoHead } from '@/Components/ui/SeoHead';
 
 function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
     const { mode } = useFreelanceMode();
@@ -65,41 +66,37 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
 
     return (
         <>
-            <Head>
-                <title>{`${job.title} | ${__('freelance.jobs')}`}</title>
-                <meta name="description" content={job.description.replace(/<[^>]*>?/gm, '').substring(0, 160)} />
-                <meta property="og:title" content={job.title} />
-                <meta property="og:description" content={job.description.replace(/<[^>]*>?/gm, '').substring(0, 160)} />
-                <script type="application/ld+json" dangerouslySetInnerHTML={{
-                    __html: JSON.stringify({
-                        "@context": "https://schema.org/",
-                        "@type": "JobPosting",
-                        "title": job.title,
-                        "description": job.description.replace(/<[^>]*>?/gm, ''),
-                        "datePosted": job.created_at,
-                        "employmentType": job.type === 'fixed' ? 'CONTRACTOR' : 'PART_TIME',
-                        "hiringOrganization": {
-                            "@type": "Organization",
-                            "name": isGuest ? "Confidential Client" : (job.client?.name || "Musoftware Freelance")
-                        },
-                        "jobLocation": {
-                            "@type": "Place",
-                            "address": {
-                                "@type": "PostalAddress",
-                                "addressCountry": "WW"
-                            }
-                        },
-                        "baseSalary": {
-                            "@type": "MonetaryAmount",
-                            "currency": job.currency?.currency || "USD",
-                            "value": {
-                                "@type": "QuantitativeValue",
-                                "value": job.budget
-                            }
+            <SeoHead 
+                title={`${job.title} | ${__('freelance.jobs')}`}
+                description={job.description.replace(/<[^>]*>?/gm, '').substring(0, 160)}
+                jsonLd={{
+                    "@context": "https://schema.org/",
+                    "@type": "JobPosting",
+                    "title": job.title,
+                    "description": job.description.replace(/<[^>]*>?/gm, ''),
+                    "datePosted": job.created_at,
+                    "employmentType": job.type === 'fixed' ? 'CONTRACTOR' : 'PART_TIME',
+                    "hiringOrganization": {
+                        "@type": "Organization",
+                        "name": isGuest ? "Confidential Client" : (job.client?.name || "Musoftware Freelance")
+                    },
+                    "jobLocation": {
+                        "@type": "Place",
+                        "address": {
+                            "@type": "PostalAddress",
+                            "addressCountry": "WW"
                         }
-                    })
-                }} />
-            </Head>
+                    },
+                    "baseSalary": {
+                        "@type": "MonetaryAmount",
+                        "currency": job.currency?.currency || "USD",
+                        "value": {
+                            "@type": "QuantitativeValue",
+                            "value": job.budget
+                        }
+                    }
+                }}
+            />
             
             <div className="w-full space-y-8 pb-12">
                 <div className="flex flex-col gap-2">
@@ -317,107 +314,129 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
                                 </CardFooter>
                             )}
 
-                            {!isClient && (
-                                <CardFooter className="p-5 bg-slate-50/50 border-t border-slate-100 flex-col gap-4 items-stretch">
-                                    {job.status !== 'open' ? (
-                                        <Alert>
-                                            <AlertCircle className="h-4 w-4" />
-                                            <AlertTitle>{__('general.closed')}</AlertTitle>
-                                            <AlertDescription>{__('freelance.this_job_is_no_longer')}</AlertDescription>
-                                        </Alert>
-                                    ) : isGuest ? (
-                                        <div className="bg-white rounded-lg border border-slate-200 p-6 text-center space-y-4">
-                                            <User className="h-10 w-10 text-slate-300 mx-auto" />
-                                            <p className="text-slate-600 font-medium">{__('freelance.log_in_to_submit_proposal', undefined, 'Log in to submit a proposal')}</p>
-                                            <Link href={route('login')} className="block w-full">
-                                                <Button className="w-full bg-indigo-600 hover:bg-indigo-700 font-bold">
-                                                    {__('general.login')}
-                                                </Button>
-                                            </Link>
-                                        </div>
-                                    ) : hasSubmitted ? (
-                                        <Alert className="bg-emerald-50 border-emerald-200 text-emerald-800">
-                                            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                                            <AlertTitle className="text-emerald-800 font-bold">{__('freelance.proposal_submitted')}</AlertTitle>
-                                            <AlertDescription className="text-emerald-700">{__('freelance.you_have_already_applied_for')}</AlertDescription>
-                                        </Alert>
-                                    ) : (
-                                        <>
-                                            <div className="bg-white rounded-lg border border-slate-200 p-4 text-center space-y-2">
-                                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('freelance.connects_required')}</p>
-                                                <div className="flex items-center justify-center gap-2">
-                                                    <span className="text-2xl font-bold text-indigo-600 font-mono">{data.points_spent}</span>
-                                                </div>
-                                                <p className="text-xs text-slate-500">{__('general.your_balance')} <span className="font-bold text-slate-700">{userPoints}</span></p>
-                                            </div>
-                                            
-                                            {(errors as any).points && (
-                                                <Alert variant="destructive">
-                                                    <AlertCircle className="h-4 w-4" />
-                                                    <AlertTitle>{__('general.error')}</AlertTitle>
-                                                    <AlertDescription>{(errors as any).points}</AlertDescription>
-                                                </Alert>
-                                            )}
 
-                                            <form onSubmit={submitProposal} className="space-y-4">
+                        </FreelanceCard>
+                    </div>
+                </div>
+
+                {!isClient && (
+                    <FreelanceCard className="mt-8">
+                        <CardHeader className="border-b border-slate-100 bg-slate-50/50 pb-5">
+                            <CardTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                                <Send className="h-5 w-5 text-indigo-600" />
+                                {__('freelance.submit_proposal')}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-6 md:p-8">
+                            {job.status !== 'open' ? (
+                                <Alert>
+                                    <AlertCircle className="h-4 w-4" />
+                                    <AlertTitle>{__('general.closed')}</AlertTitle>
+                                    <AlertDescription>{__('freelance.this_job_is_no_longer')}</AlertDescription>
+                                </Alert>
+                            ) : isGuest ? (
+                                <div className="bg-white rounded-lg border border-slate-200 p-8 text-center space-y-4 max-w-xl mx-auto">
+                                    <User className="h-12 w-12 text-slate-300 mx-auto" />
+                                    <p className="text-slate-600 font-medium text-lg">{__('freelance.log_in_to_submit_proposal', undefined, 'Log in to submit a proposal')}</p>
+                                    <Link href={route('login')} className="block w-full">
+                                        <Button className="w-full bg-indigo-600 hover:bg-indigo-700 font-bold" size="lg">
+                                            {__('general.login')}
+                                        </Button>
+                                    </Link>
+                                </div>
+                            ) : hasSubmitted ? (
+                                <Alert className="bg-emerald-50 border-emerald-200 text-emerald-800">
+                                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                                    <AlertTitle className="text-emerald-800 font-bold text-lg">{__('freelance.proposal_submitted')}</AlertTitle>
+                                    <AlertDescription className="text-emerald-700 mt-2">{__('freelance.you_have_already_applied_for')}</AlertDescription>
+                                </Alert>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                                    <div className="md:col-span-4 space-y-4">
+                                        <div className="bg-white rounded-xl border border-slate-200 p-6 text-center space-y-2 shadow-sm">
+                                            <p className="text-sm font-semibold uppercase tracking-wider text-slate-500">{__('freelance.connects_required')}</p>
+                                            <div className="flex items-center justify-center gap-2">
+                                                <span className="text-4xl font-bold text-indigo-600 font-mono">{data.points_spent}</span>
+                                            </div>
+                                            <p className="text-sm text-slate-500 mt-2 border-t border-slate-100 pt-3">{__('general.your_balance')} <span className="font-bold text-slate-700">{userPoints}</span></p>
+                                        </div>
+                                        
+                                        {(errors as any).points && (
+                                            <Alert variant="destructive">
+                                                <AlertCircle className="h-4 w-4" />
+                                                <AlertTitle>{__('general.error')}</AlertTitle>
+                                                <AlertDescription>{(errors as any).points}</AlertDescription>
+                                            </Alert>
+                                        )}
+                                    </div>
+                                    
+                                    <div className="md:col-span-8">
+                                        <form onSubmit={submitProposal} className="space-y-6">
+                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                                                 <div className="space-y-1.5">
-                                                    <Label htmlFor="bid_amount">{__('freelance.your_bid')} ({job.currency?.symbol || job.currency?.currency || globalCurrency})</Label>
+                                                    <Label htmlFor="bid_amount" className="font-semibold">{__('freelance.your_bid')} ({job.currency?.symbol || job.currency?.currency || globalCurrency})</Label>
                                                     <Input
                                                         id="bid_amount"
                                                         type="number"
                                                         value={data.bid_amount}
                                                         onChange={e => setData('bid_amount', e.target.value)}
+                                                        className="w-full"
                                                         required
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <Label htmlFor="delivery_days">{__('general.delivery_time_days')}</Label>
+                                                    <Label htmlFor="delivery_days" className="font-semibold">{__('general.delivery_time_days')}</Label>
                                                     <Input
                                                         id="delivery_days"
                                                         type="number"
                                                         value={data.delivery_days}
                                                         onChange={e => setData('delivery_days', e.target.value)}
+                                                        className="w-full"
                                                         required
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <Label htmlFor="points_spent">{__('freelance.points_to_spend')} ({__('general.min')}: {job.min_proposal_points || 2})</Label>
+                                                    <Label htmlFor="points_spent" className="font-semibold">{__('freelance.points_to_spend')} ({__('general.min')}: {job.min_proposal_points || 2})</Label>
                                                     <Input
                                                         id="points_spent"
                                                         type="number"
                                                         min={job.min_proposal_points || 2}
                                                         value={data.points_spent}
                                                         onChange={e => setData('points_spent', parseInt(e.target.value) || 0)}
+                                                        className="w-full"
                                                         required
                                                     />
-                                                    <p className="text-xs text-slate-500">{__('freelance.spend_more_points_to_rank_higher')}</p>
+                                                    <p className="text-[10px] text-slate-500 leading-tight">{__('freelance.spend_more_points_to_rank_higher')}</p>
                                                 </div>
-                                                <div className="space-y-1.5">
-                                                    <Label htmlFor="cover_letter">{__('general.cover_letter')}</Label>
-                                                    <Textarea
-                                                        id="cover_letter"
-                                                        value={data.cover_letter}
-                                                        onChange={e => setData('cover_letter', e.target.value)}
-                                                        className="h-32 resize-none"
-                                                        placeholder={__('erp.explain_why_you_are_the')}
-                                                        required
-                                                    />
-                                                </div>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <Label htmlFor="cover_letter" className="font-semibold">{__('general.cover_letter')}</Label>
+                                                <Textarea
+                                                    id="cover_letter"
+                                                    value={data.cover_letter}
+                                                    onChange={e => setData('cover_letter', e.target.value)}
+                                                    className="h-40 resize-none w-full"
+                                                    placeholder={__('erp.explain_why_you_are_the')}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="flex justify-end pt-2">
                                                 <Button 
                                                     type="submit" 
+                                                    size="lg"
                                                     disabled={processing || userPoints < data.points_spent}
-                                                    className="w-full bg-indigo-600 hover:bg-indigo-700 font-bold"
+                                                    className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 font-bold px-8"
                                                 >
                                                     <Send className="mr-2 h-4 w-4" /> {__('freelance.submit_proposal')}
                                                 </Button>
-                                            </form>
-                                        </>
-                                    )}
-                                </CardFooter>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             )}
-                        </FreelanceCard>
-                    </div>
-                </div>
+                        </CardContent>
+                    </FreelanceCard>
+                )}
             </div>
         </>
     );

@@ -5598,4 +5598,5 @@ return [
   'exclusive_service' => 'خدمة حصرية',
   'recaptcha_failed' => 'فشل التحقق من reCAPTCHA. يرجى المحاولة مرة أخرى.',
   'recaptcha_required' => 'يرجى إكمال التحقق من reCAPTCHA.',
+  'add_points' => 'إضافة نقاط',
 ];

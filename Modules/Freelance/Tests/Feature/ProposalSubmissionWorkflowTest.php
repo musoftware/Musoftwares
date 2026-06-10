@@ -10,15 +10,17 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 
 
-it('allows a freelancer to submit a proposal via API', function () {
+it('allows a freelancer to submit a proposal via web routes', function () {
+    $this->withoutMiddleware([\App\Http\Middleware\EnsureOnboardingCompleted::class, \App\Http\Middleware\SubscriptionMiddleware::class]);
+    
     $client = User::factory()->create();
     $freelancer = User::factory()->create(['points_balance' => 50]);
     
 
     $job = Job::create([
         'client_id' => $client->id,
-        'title' => 'API Job',
-        'description' => 'API desc',
+        'title' => 'Web Job',
+        'description' => 'Web desc',
         'budget_points' => 1000,
         'min_proposal_points' => 0,
         'type' => 'fixed',
@@ -28,17 +30,14 @@ it('allows a freelancer to submit a proposal via API', function () {
 
     $payload = [
         'cover_letter' => 'My proposal',
-        'proposed_budget_points' => 800,
+        'bid_amount' => 800,
         'points_spent' => 2
     ];
 
-    $response = $this->actingAs($freelancer)->postJson("/api/freelance/jobs/{$job->id}/proposals", $payload);
+    $response = $this->actingAs($freelancer)->post("/freelance/jobs/{$job->id}/proposals", $payload);
 
-    if ($response->status() === 404) {
-        $this->markTestSkipped('Route /api/freelance/jobs/{job}/proposals not implemented yet.');
-    }
-
-    $response->assertStatus(201);
+    $response->assertSessionHasNoErrors();
+    $response->assertRedirect();
 
     $this->assertDatabaseHas('freelance_proposals', [
         'job_id' => $job->id,

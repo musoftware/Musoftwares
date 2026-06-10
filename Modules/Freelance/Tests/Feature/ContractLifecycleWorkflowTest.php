@@ -11,14 +11,15 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 
 
-it('handles full contract lifecycle from acceptance to completion via API', function () {
+it('handles full contract lifecycle from acceptance to completion via web routes', function () {
+    $this->withoutMiddleware([\App\Http\Middleware\EnsureOnboardingCompleted::class, \App\Http\Middleware\SubscriptionMiddleware::class]);
+
     $client = User::factory()->create();
     $freelancer = User::factory()->create(['points_balance' => 50]);
     
-
     $job = Job::create([
         'client_id' => $client->id,
-        'title' => 'API Lifecycle Job',
+        'title' => 'Web Lifecycle Job',
         'description' => 'Desc',
         'budget_points' => 1000,
         'min_proposal_points' => 0,
@@ -37,13 +38,10 @@ it('handles full contract lifecycle from acceptance to completion via API', func
     ]);
 
     // 1. Accept Proposal
-    $acceptResponse = $this->actingAs($client)->postJson("/api/freelance/proposals/{$proposal->id}/accept");
+    $acceptResponse = $this->actingAs($client)->post("/freelance/proposals/{$proposal->id}/accept");
 
-    if ($acceptResponse->status() === 404) {
-        $this->markTestSkipped('Routes not implemented yet.');
-    }
-
-    $acceptResponse->assertStatus(200);
+    $acceptResponse->assertSessionHasNoErrors();
+    $acceptResponse->assertRedirect(); // Expecting a redirect back
 
     $this->assertDatabaseHas('freelance_contracts', [
         'proposal_id' => $proposal->id,
@@ -53,8 +51,9 @@ it('handles full contract lifecycle from acceptance to completion via API', func
     $contract = Contract::where('proposal_id', $proposal->id)->first();
 
     // 2. Complete Contract
-    $completeResponse = $this->actingAs($client)->postJson("/api/freelance/contracts/{$contract->id}/complete");
-    $completeResponse->assertStatus(200);
+    $completeResponse = $this->actingAs($client)->post("/freelance/contracts/{$contract->id}/complete");
+    $completeResponse->assertSessionHasNoErrors();
+    $completeResponse->assertRedirect();
 
     $this->assertDatabaseHas('freelance_contracts', [
         'id' => $contract->id,

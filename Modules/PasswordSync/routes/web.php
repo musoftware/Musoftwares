@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\PasswordSync\Http\Controllers\PasswordSyncController;
+use Modules\PasswordSync\app\Http\Controllers\PasswordSyncController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('passwordsyncs', PasswordSyncController::class)->names('passwordsync');

@@ -5789,4 +5789,5 @@ return [
   'exclusive_service' => 'Exclusive Service',
   'recaptcha_failed' => 'reCAPTCHA verification failed. Please try again.',
   'recaptcha_required' => 'Please complete the reCAPTCHA verification.',
+  'add_points' => 'Add Points',
 ];

@@ -59,7 +59,7 @@ class ProfileAndSkillTest extends FreelanceTestCase
 
         $response->assertStatus(302);
 
-        $this->assertDatabaseHas('freelance_skill_user', [
+        $this->assertDatabaseHas('freelance_user_skills', [
             'user_id' => $this->freelancer1->id,
             'skill_id' => $skill->id,
         ]);

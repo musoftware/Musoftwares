@@ -9,6 +9,7 @@ import { Input } from '@/Components/ui/input';
 import { Textarea } from '@/Components/ui/textarea';
 import { formatMoney, formatDate } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
 import {
     Clock, DollarSign, CheckCircle2, AlertCircle,
     Send, Paperclip, FileText, User, UploadCloud, FileCheck
@@ -257,11 +258,53 @@ function ShowContractContent({ auth, contract, userCurrency }: any) {
                                     <h3 className="text-xl font-bold text-emerald-900 mb-2">{__('freelance.contract_completed')}</h3>
                                     <p className="text-sm text-emerald-700 mb-6 font-medium">{__('general.contract_marked_as_completed_successfully')}</p>
 
-                                    {isClient && (
-                                        <Button variant="outline" className="border-emerald-300 text-emerald-700 hover:bg-emerald-100 font-bold w-full bg-white">
-                                            {__('general.leave_feedback')}
-                                        </Button>
-                                    )}
+                                    {/* We can check if auth user already reviewed if we passed that data. For now, we assume they can click and backend handles duplicates. */}
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button variant="outline" className="border-emerald-300 text-emerald-700 hover:bg-emerald-100 font-bold w-full bg-white">
+                                                {__('freelance.leave_a_review')}
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="sm:max-w-md">
+                                            <DialogHeader>
+                                                <DialogTitle>{__('freelance.leave_a_review')}</DialogTitle>
+                                                <DialogDescription>
+                                                    {__('freelance.blind_review_notice')}
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <form onSubmit={(e) => {
+                                                e.preventDefault();
+                                                const target = e.target as typeof e.target & {
+                                                    rating: { value: string };
+                                                    comment: { value: string };
+                                                };
+                                                router.post(route('freelance.contracts.reviews.store', contract.id), {
+                                                    rating: target.rating.value,
+                                                    comment: target.comment.value,
+                                                }, { preserveScroll: true });
+                                            }}>
+                                                <div className="space-y-4 py-4">
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium">{__('freelance.rating')}</label>
+                                                        <select name="rating" className="flex h-10 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm" required defaultValue="5">
+                                                            <option value="5">5 - {__('freelance.excellent')}</option>
+                                                            <option value="4">4 - {__('freelance.good')}</option>
+                                                            <option value="3">3 - {__('freelance.average')}</option>
+                                                            <option value="2">2 - {__('freelance.poor')}</option>
+                                                            <option value="1">1 - {__('freelance.terrible')}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium">{__('freelance.comment')}</label>
+                                                        <Textarea name="comment" placeholder={__('freelance.review_comment_placeholder')} className="resize-none" />
+                                                    </div>
+                                                </div>
+                                                <DialogFooter>
+                                                    <Button type="submit">{__('general.submit')}</Button>
+                                                </DialogFooter>
+                                            </form>
+                                        </DialogContent>
+                                    </Dialog>
                                 </CardContent>
                             </Card>
                         )}

@@ -15,7 +15,7 @@ class PublicFreelancerController extends Controller
 
     public function index(Request $request)
     {
-        $query = User::with(['freelanceProfile', 'currency'])
+        $query = User::with(['freelanceProfile'])
             ->whereHas('freelanceProfile');
 
         if ($request->filled('search')) {

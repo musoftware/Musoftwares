@@ -44,6 +44,14 @@ class FreelanceJobController extends Controller
             $query->where('type', $request->type);
         }
 
+        if ($request->filled('budget_min') && is_numeric($request->budget_min)) {
+            $query->where('budget', '>=', $request->budget_min);
+        }
+        
+        if ($request->filled('budget_max') && is_numeric($request->budget_max)) {
+            $query->where('budget', '<=', $request->budget_max);
+        }
+
         $sort = $request->input('sort', 'newest');
         $user = $request->user();
 
@@ -70,16 +78,27 @@ class FreelanceJobController extends Controller
 
         $jobs = $query->paginate(15)->withQueryString();
         
-        $userCurrencyModel = $this->getUserCurrencyObject($request->user());
-        $userCurrencyId = $userCurrencyModel->id;
+        $userCurrencyId = null;
+        if ($user) {
+            try {
+                $userCurrencyId = $this->getUserCurrencyObject($user)->id;
+            } catch (\Exception $e) {
+                // If currency is misconfigured for auth user, fallback to null (original job currency)
+            }
+        }
         
-        $jobs->through(function ($job) use ($userCurrencyId) {
-            return $this->convertModelCurrency($job, 'budget', 'currency_id', $userCurrencyId);
-        });
+        if ($userCurrencyId) {
+            $jobs->through(function ($job) use ($userCurrencyId) {
+                return $this->convertModelCurrency($job, 'budget', 'currency_id', $userCurrencyId);
+            });
+            $frontendCurrency = $this->currencyForFrontend($userCurrencyId);
+        } else {
+            $frontendCurrency = null;
+        }
 
         return Inertia::render('Freelance/Jobs/Browse', [
             'jobs' => $jobs,
-            'userCurrency' => $this->currencyForFrontend($userCurrencyId)
+            'userCurrency' => $frontendCurrency
         ]);
     }
 
@@ -303,15 +322,22 @@ class FreelanceJobController extends Controller
     {
         Gate::authorize('delete', $job);
 
+        app(\Modules\Freelance\Domains\Proposal\Actions\RejectPendingProposalsAction::class)
+            ->execute($job, 'Job Deleted by Client');
+
+        $job->status->transitionTo(\Modules\Freelance\Domains\Job\States\Cancelled::class);
         $job->delete();
         return redirect()->route('freelance.my-jobs')->with('success', __('general.job_deleted'));
     }
 
     public function poke(Request $request, Job $job)
     {
-        Gate::authorize('update', $job);
+        $user = $request->user();
+        if ($user->id !== $job->client_id && !$job->proposals()->where('freelancer_id', $user->id)->exists()) {
+            abort(403);
+        }
 
-        if ($job->status !== 'open') {
+        if ((string) $job->status !== 'open') {
             return back()->with('error', __('freelance.job_must_be_open_to_poke'));
         }
 

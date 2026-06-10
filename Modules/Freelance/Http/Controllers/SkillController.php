@@ -30,6 +30,9 @@ class SkillController extends Controller
             'description' => 'nullable|string',
         ]);
 
+        $validated['status'] = 'pending';
+        $validated['created_by'] = $request->user()?->id;
+
         Skill::create($validated);
         return back()->with('success', __('general.skill_created'));
     }

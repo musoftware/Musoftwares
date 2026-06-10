@@ -52,7 +52,7 @@ class FreelanceContractController extends Controller
     public function updateStatus(Request $request, Contract $contract)
     {
         $request->validate([
-            'status' => 'required|string|in:active,completed,cancelled,disputed'
+            'status' => 'required|string|in:active,completed,cancelled,disputed,suspended'
         ]);
 
         $contract->update(['status' => $request->status]);

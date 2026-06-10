@@ -78,6 +78,12 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                                 >
                                     <Wallet className="h-4 w-4 mr-3 text-slate-500" />{__('general.receive_money')}</Link>
                                 <Link 
+                                    href={`/admin/points_controller/${client.id}/add`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <Coins className="h-4 w-4 mr-3 text-slate-500" />{__('general.add_points')}</Link>
+                                <Link 
                                     href={`/admin/transactions/create?user=${client.id}&type=send-money`} 
                                     onClick={onClose}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"

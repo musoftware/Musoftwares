@@ -57,11 +57,11 @@ class AdminExtendedTest extends FreelanceTestCase
     {
         $response = $this->actingAs($this->adminUser)
             ->post(route('admin.freelance.jobs.status', $this->job->id), [
-                'status' => 'suspended',
+                'status' => 'cancelled',
             ]);
 
         $this->assertContains($response->status(), [200, 302]);
-        $this->assertEquals('suspended', $this->job->fresh()->status);
+        $this->assertEquals('cancelled', (string) $this->job->fresh()->status);
     }
 
     public function test_admin_can_reject_skill(): void

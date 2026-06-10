@@ -25,4 +25,18 @@ class FreelanceProfile extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getAverageRatingAttribute()
+    {
+        return Review::where('reviewee_id', $this->user_id)
+            ->where('is_visible', true)
+            ->avg('rating') ?: 0;
+    }
+
+    public function getReviewsCountAttribute()
+    {
+        return Review::where('reviewee_id', $this->user_id)
+            ->where('is_visible', true)
+            ->count();
+    }
 }

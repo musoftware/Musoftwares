@@ -9,7 +9,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 
 
-it('prevents a user from withdrawing someone elses proposal via API', function () {
+it('prevents a user from withdrawing someone elses proposal via web routes', function () {
+    $this->withoutMiddleware([\App\Http\Middleware\EnsureOnboardingCompleted::class, \App\Http\Middleware\SubscriptionMiddleware::class]);
+    
     $scenario = JobScenarioBuilder::create()
         ->withClient()
         ->withFreelancers(2)
@@ -28,17 +30,15 @@ it('prevents a user from withdrawing someone elses proposal via API', function (
         'status' => 'pending'
     ]);
 
-    // Freelancer 2 tries to delete/withdraw Freelancer 1's proposal
-    $response = $this->actingAs($freelancer2)->deleteJson("/api/freelance/proposals/{$proposal->id}");
-
-    if ($response->status() === 404) {
-        $this->markTestSkipped('Route not implemented yet.');
-    }
+    // Freelancer 2 tries to withdraw Freelancer 1's proposal
+    $response = $this->actingAs($freelancer2)->delete("/freelance/proposals/{$proposal->id}/withdraw");
 
     $response->assertStatus(403);
 });
 
-it('prevents a freelancer from accepting their own proposal', function () {
+it('prevents a freelancer from accepting their own proposal via web routes', function () {
+    $this->withoutMiddleware([\App\Http\Middleware\EnsureOnboardingCompleted::class, \App\Http\Middleware\SubscriptionMiddleware::class]);
+    
     $scenario = JobScenarioBuilder::create()
         ->withClient()
         ->withFreelancers(1)
@@ -56,11 +56,7 @@ it('prevents a freelancer from accepting their own proposal', function () {
         'status' => 'pending'
     ]);
 
-    $response = $this->actingAs($freelancer)->postJson("/api/freelance/proposals/{$proposal->id}/accept");
-
-    if ($response->status() === 404) {
-        $this->markTestSkipped('Route not implemented yet.');
-    }
+    $response = $this->actingAs($freelancer)->post("/freelance/proposals/{$proposal->id}/accept");
 
     $response->assertStatus(403);
 });

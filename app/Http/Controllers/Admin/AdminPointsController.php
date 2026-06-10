@@ -37,6 +37,21 @@ class AdminPointsController extends Controller
     }
 
     /**
+     * Show the form to add or deduct points for a specific user.
+     */
+    public function create(User $user)
+    {
+        return Inertia::render('Admin/Points/Create', [
+            'client' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'points_balance' => (int) ($user->points_balance ?? 0),
+            ]
+        ]);
+    }
+
+    /**
      * Add or deduct points from a specific user.
      */
     public function adjustPoints(Request $request, User $user)

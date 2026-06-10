@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import FreelanceLayout from '../Layout';
+import { Link, router, usePage } from '@inertiajs/react';
+import PublicLayout from '../PublicLayout';
 import { Card } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { Button, buttonVariants } from '@/Components/ui/button';
@@ -14,6 +14,7 @@ import { EmptyState } from '@/Components/ui/EmptyState';
 import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 import { cn } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import { SeoHead } from '@/Components/ui/SeoHead';
 
 import { FreelanceCard } from '@/Components/Freelance/ui/FreelanceCard';
 import { formatMoney } from '@/lib/utils';
@@ -32,6 +33,8 @@ function BrowseJobsContent({ jobs: initialJobs, userCurrency }: any) {
     const [searchTerm, setSearchTerm] = useState(urlParams.get('search') || '');
     const [typeFilter, setTypeFilter] = useState(urlParams.get('type') || 'all');
     const [sortBy, setSortBy] = useState(urlParams.get('sort') || 'newest');
+    const [budgetMin, setBudgetMin] = useState(urlParams.get('budget_min') || '');
+    const [budgetMax, setBudgetMax] = useState(urlParams.get('budget_max') || '');
 
     const typeLabels: Record<string, string> = {
         all: __('general.all_types'),
@@ -58,15 +61,19 @@ function BrowseJobsContent({ jobs: initialJobs, userCurrency }: any) {
         router.get('/freelance/jobs/browse', {
             search: searchTerm || undefined,
             type: typeFilter !== 'all' ? typeFilter : undefined,
-            sort: sortBy !== 'newest' ? sortBy : undefined
+            sort: sortBy !== 'newest' ? sortBy : undefined,
+            budget_min: budgetMin || undefined,
+            budget_max: budgetMax || undefined
         }, { preserveState: true });
     };
 
-    const updateFilters = (newType: string, newSort: string) => {
+    const updateFilters = (newType: string, newSort: string, minBudget?: string, maxBudget?: string) => {
         router.get('/freelance/jobs/browse', {
             search: searchTerm || undefined,
             type: newType !== 'all' ? newType : undefined,
-            sort: newSort !== 'newest' ? newSort : undefined
+            sort: newSort !== 'newest' ? newSort : undefined,
+            budget_min: minBudget !== undefined ? minBudget : (budgetMin || undefined),
+            budget_max: maxBudget !== undefined ? maxBudget : (budgetMax || undefined)
         }, { preserveState: true });
     };
 
@@ -84,7 +91,20 @@ function BrowseJobsContent({ jobs: initialJobs, userCurrency }: any) {
 
     return (
         <>
-            <Head title={`${__('freelance.browse_jobs')} - ${__('freelance.freelance')}`} />
+            <SeoHead 
+                title={`${__('freelance.seo.browse_title', undefined, 'Browse Jobs')} - ${__('freelance.freelance')}`} 
+                description={__('freelance.seo.browse_desc', undefined, 'Discover open freelance opportunities and find the perfect project for your skills.')}
+                canonicalUrl={typeof window !== 'undefined' ? window.location.origin + window.location.pathname : undefined}
+                jsonLd={{
+                    "@context": "https://schema.org",
+                    "@type": "ItemList",
+                    "itemListElement": displayJobs.map((job: any, index: number) => ({
+                        "@type": "ListItem",
+                        "position": index + 1,
+                        "url": typeof window !== 'undefined' ? `${window.location.origin}/freelance/jobs/${job.id}` : ''
+                    }))
+                }}
+            />
 
             <PageHeader
                 title={__('general.find_work')}
@@ -162,6 +182,29 @@ function BrowseJobsContent({ jobs: initialJobs, userCurrency }: any) {
                             </div>
                             <div className="w-full h-px bg-slate-100"></div>
                             <div className="space-y-3">
+                                <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('erp.budget')}</label>
+                                <div className="flex items-center gap-2">
+                                    <Input 
+                                        type="number" 
+                                        placeholder={__('erp.min')} 
+                                        className="h-9 text-sm" 
+                                        value={budgetMin}
+                                        onChange={(e) => setBudgetMin(e.target.value)}
+                                        onBlur={(e) => updateFilters(typeFilter, sortBy, e.target.value, budgetMax)}
+                                    />
+                                    <span className="text-slate-400">-</span>
+                                    <Input 
+                                        type="number" 
+                                        placeholder={__('erp.max')} 
+                                        className="h-9 text-sm" 
+                                        value={budgetMax}
+                                        onChange={(e) => setBudgetMax(e.target.value)}
+                                        onBlur={(e) => updateFilters(typeFilter, sortBy, budgetMin, e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <div className="w-full h-px bg-slate-100"></div>
+                            <div className="space-y-3">
                                 <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('erp.client_history')}</label>
                                 <div className="space-y-2.5">
                                     {['No hires', '1 to 9 hires', '10+ hires'].map(history => (
@@ -227,7 +270,7 @@ function BrowseJobsContent({ jobs: initialJobs, userCurrency }: any) {
                                                 {__(job.type)}
                                             </Badge>
                                             <div className="flex items-center gap-1.5">
-                                                <span className="font-mono text-sm font-semibold">{job.budget !== null && job.budget !== undefined ? formatMoney(job.budget, userCurrency) : `${job.budget_points} ${__('freelance.pts', undefined, 'pts')}`}</span>
+                                                <span className="font-mono text-sm font-semibold">{job.budget !== null && job.budget !== undefined ? formatMoney(job.budget, userCurrency || job.currency) : `${job.budget_points} ${__('freelance.pts', undefined, 'pts')}`}</span>
                                                 {job.type === 'hourly' && <span className="text-xs text-slate-500 font-medium">/ {__('general.hr')}</span>}
                                             </div>
                                         </div>
@@ -286,8 +329,8 @@ function BrowseJobsContent({ jobs: initialJobs, userCurrency }: any) {
 
 export default function BrowseJobs({ jobs, userCurrency }: any) {
     return (
-        <FreelanceLayout>
+        <PublicLayout>
             <BrowseJobsContent jobs={jobs} userCurrency={userCurrency} />
-        </FreelanceLayout>
+        </PublicLayout>
     );
 }

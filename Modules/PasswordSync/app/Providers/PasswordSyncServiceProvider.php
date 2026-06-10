@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\PasswordSync\Providers;
+namespace Modules\PasswordSync\app\Providers;
 
 use Nwidart\Modules\Support\ModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;

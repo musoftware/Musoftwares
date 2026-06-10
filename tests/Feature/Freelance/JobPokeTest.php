@@ -14,6 +14,11 @@ class JobPokeTest extends FreelanceTestCase
             'status' => 'open',
         ]);
 
+        \Modules\Freelance\Models\Proposal::factory()->create([
+            'job_id' => $job->id,
+            'freelancer_id' => $this->freelancer1->id,
+        ]);
+
         $response = $this->actingAs($this->freelancer1)
             ->post(route('freelance.jobs.poke', $job->id));
 

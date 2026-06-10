@@ -10,7 +10,8 @@ it('allows an authenticated user to view the edit profile page', function () {
 
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->get('/freelance/profile/edit');
+    $this->withoutExceptionHandling();
+    $response = $this->actingAs($user)->get('/freelance/profile');
 
     $response->assertStatus(200);
 });

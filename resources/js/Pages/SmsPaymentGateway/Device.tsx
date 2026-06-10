@@ -186,11 +186,11 @@ export default function Device({ device, transactions }: DeviceProps) {
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={submitSettings} className="space-y-6">
-                                {Object.keys(errors).length > 0 && (
+                                {Object.keys(errors || {}).length > 0 && (
                                     <div className="bg-red-50 text-red-600 p-4 rounded-md text-sm border border-red-200">
                                         <p className="font-semibold mb-2">Please fix the following errors:</p>
                                         <ul className="list-disc pl-5">
-                                            {Object.entries(errors).map(([key, error]) => (
+                                            {Object.entries(errors || {}).map(([key, error]) => (
                                                 <li key={key}>{key}: {error}</li>
                                             ))}
                                         </ul>
