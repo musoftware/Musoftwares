@@ -26,6 +26,10 @@ interface DesktopIconProps {
     isEditing?: boolean;
     onRenameSubmit?: (newName: string) => void;
     onContextMenu?: (e: React.MouseEvent) => void;
+    onTouchStart?: (e: React.TouchEvent<HTMLDivElement>) => void;
+    onTouchMove?: (e: React.TouchEvent<HTMLDivElement>) => void;
+    onTouchEnd?: (e: React.TouchEvent<HTMLDivElement>) => void;
+    onTouchCancel?: (e: React.TouchEvent<HTMLDivElement>) => void;
 }
 
 export function DesktopIcon({
@@ -51,7 +55,11 @@ export function DesktopIcon({
     isSelected = false,
     isEditing = false,
     onRenameSubmit,
-    onContextMenu
+    onContextMenu,
+    onTouchStart,
+    onTouchMove,
+    onTouchEnd,
+    onTouchCancel
 }: DesktopIconProps) {
     const [editValue, setEditValue] = React.useState(title);
 
@@ -72,6 +80,10 @@ export function DesktopIcon({
             onClick={onClick}
             onDoubleClick={onDoubleClick}
             onContextMenu={onContextMenu}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+            onTouchCancel={onTouchCancel}
             draggable={draggable}
             onDragStart={(e) => id && onDragStart?.(e, id)}
             onDragEnd={onDragEnd}

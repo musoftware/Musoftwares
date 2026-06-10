@@ -4897,8 +4897,24 @@ return [
   'contact_whatsapp' => 'WhatsApp',
   'contact_facebook' => 'Facebook',
   'contact_location' => 'Location',
-  'portfolio_kbdny_title' => 'Kbdny Affiliate',
-  'portfolio_kbdny_desc' => 'Multi-vendor affiliate platform with real-time commission tracking and payouts.',
+  'portfolio_kbdny_title' => 'Kbdny E-Commerce & Affiliate Platform',
+  'portfolio_kbdny_desc' => 'A comprehensive enterprise-grade dropshipping and affiliate ecosystem. Features advanced multi-role access (Vendors, Affiliates, Moderators), automated inventory & SKU management, robust order fulfillment with bulk Excel processing, dynamic commission tracking, and complex logistics handling including returns, partial deliveries, and wallet payouts.',
+  'portfolio_kbdny_content' => '
+    <h3>Project Overview</h3>
+    <p>The Kbdny (Abdny) Dropshipping & Affiliate E-Commerce Platform is a robust, enterprise-grade multi-vendor ecosystem designed to bridge the gap between product suppliers (Vendors) and marketers (Affiliates). Built on Laravel and optimized for high-volume transactions, it provides an end-to-end operational backend for managing dropshipping logistics, dynamic commissions, and complex fulfillment.</p>
+    
+    <h3>Key Features</h3>
+    <ul>
+        <li><strong>Multi-Role Architecture:</strong> A structured permissions system separating operations between System Admins, Suppliers (Vendors), Marketers (Affiliates), Affiliate Assistants (Moderators), and End Customers.</li>
+        <li><strong>Advanced Inventory & SKU Management:</strong> Dynamic SKU generation, multi-variant tracking, auto-syncing stock levels across vendors, and sophisticated tools for product pricing and approval workflows.</li>
+        <li><strong>Affiliate Operations & Commissions:</strong> Dedicated affiliate portals where marketers can generate API keys, track real-time commissions, manage their custom shopping carts, and oversee payouts.</li>
+        <li><strong>Logistics & Order Fulfillment:</strong> Comprehensive tools for order states including Partial Delivery, Returning, and Replacing. It integrates seamlessly with external shipping companies using bulk Excel exports (R2S, Sheet2) for rapid processing.</li>
+        <li><strong>Financial Tracking:</strong> An integrated wallet and payment request system handling dynamic payouts, balance adjustments, and platform fees.</li>
+    </ul>
+
+    <h3>Technical Highlights</h3>
+    <p>Developed with modern PHP practices on the Laravel framework, the application utilizes sophisticated queue jobs for bulk order processing, advanced database relationships for multi-level commission distribution, and secure APIs for external affiliate integrations. The UI ensures operational speed through bulk editing capabilities and real-time state tracking.</p>
+  ',
   'portfolio_stock_manager_title' => 'Stock Manager',
   'portfolio_stock_manager_desc' => 'Inventory and POS system with multi-location support and KPI reporting.',
   'portfolio_mini_fatora_title' => 'Mini Fatora',
@@ -4928,6 +4944,8 @@ return [
   'portfolio_telegram_sender_desc' => 'Automated Telegram broadcast tool with group/channel targeting and scheduling.',
   'portfolio_inbox_sender_title' => 'Inbox Sender',
   'portfolio_inbox_sender_desc' => 'Email bulk sending system with SMTP rotation and delivery rate optimization.',
+  'portfolio_email_sender_title' => 'Email Sender',
+  'portfolio_email_sender_desc' => 'High-performance bulk email sender built with Laravel. Designed for scalability, inbox deliverability, and automated marketing campaigns with real-time tracking.',
   'portfolio_heic_converter_title' => 'HEIC Converter',
   'portfolio_heic_converter_desc' => 'Batch HEIC to JPG/PNG converter for Windows with drag-and-drop interface.',
   'portfolio_text_studio_title' => 'Text Studio',

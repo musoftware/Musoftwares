@@ -76,12 +76,12 @@ export function ContextMenu({ menu, onClose, onAction }: ContextMenuProps) {
         >
             {menu.type === 'desktop' && (
                 <>
-                    <button onClick={(e) => handleAction(e, 'new_folder')} className="flex items-center gap-3 px-3 py-1.5 hover:bg-white/10 transition-colors w-full text-left">
+                    <button onClick={(e) => handleAction(e, 'new_folder')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-left">
                         <FolderPlus className="w-4 h-4 text-blue-400" />{__('general.new_folder')}</button>
-                    <button onClick={(e) => handleAction(e, 'auto_arrange')} className="flex items-center gap-3 px-3 py-1.5 hover:bg-white/10 transition-colors w-full text-left">
+                    <button onClick={(e) => handleAction(e, 'auto_arrange')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-left">
                         <LayoutGrid className="w-4 h-4 text-emerald-400" />{__('general.auto_arrange')}</button>
                     <div className="h-px bg-white/10 my-1 mx-2"></div>
-                    <button onClick={(e) => handleAction(e, 'settings')} className="flex items-center gap-3 px-3 py-1.5 hover:bg-white/10 transition-colors w-full text-left">
+                    <button onClick={(e) => handleAction(e, 'settings')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-left">
                         <Settings className="w-4 h-4 text-slate-400" /> Settings
                     </button>
                 </>
@@ -89,24 +89,24 @@ export function ContextMenu({ menu, onClose, onAction }: ContextMenuProps) {
 
             {(menu.type === 'icon' || menu.type === 'folder') && (
                 <>
-                    <button onClick={(e) => handleAction(e, 'open')} className="flex items-center gap-3 px-3 py-1.5 hover:bg-white/10 transition-colors w-full text-left font-medium text-white">
+                    <button onClick={(e) => handleAction(e, 'open')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-left font-medium text-white">
                         <MonitorUp className="w-4 h-4 text-blue-400" /> Open
                     </button>
                     <div className="h-px bg-white/10 my-1 mx-2"></div>
-                    <button onClick={(e) => handleAction(e, 'rename')} className="flex items-center gap-3 px-3 py-1.5 hover:bg-white/10 transition-colors w-full text-left">
+                    <button onClick={(e) => handleAction(e, 'rename')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-left">
                         <Pencil className="w-4 h-4 text-amber-400" /> Rename
                     </button>
                     {menu.type === 'icon' && (
-                        <button onClick={(e) => handleAction(e, 'duplicate')} className="flex items-center gap-3 px-3 py-1.5 hover:bg-white/10 transition-colors w-full text-left">
+                        <button onClick={(e) => handleAction(e, 'duplicate')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-left">
                             <Copy className="w-4 h-4 text-slate-400" /> Duplicate
                         </button>
                     )}
                     {menu.type === 'icon' && (
-                        <button onClick={(e) => handleAction(e, 'move_to_desktop')} className="flex items-center gap-3 px-3 py-1.5 hover:bg-white/10 transition-colors w-full text-left">
+                        <button onClick={(e) => handleAction(e, 'move_to_desktop')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-left">
                             <ArrowRightLeft className="w-4 h-4 text-emerald-400" />{__('general.move_to_desktop')}</button>
                     )}
                     <div className="h-px bg-white/10 my-1 mx-2"></div>
-                    <button onClick={(e) => handleAction(e, 'delete')} className="flex items-center gap-3 px-3 py-1.5 hover:bg-red-500/20 text-red-400 transition-colors w-full text-left">
+                    <button onClick={(e) => handleAction(e, 'delete')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-red-500/20 text-red-400 transition-colors w-full text-left">
                         <Trash2 className="w-4 h-4" /> Delete
                     </button>
                 </>

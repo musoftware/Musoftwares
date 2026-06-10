@@ -120,6 +120,14 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
     const [isSubscribeModalOpen, setSubscribeModalOpen] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const [prayerCity, setPrayerCity] = useState(workspaceSettings?.prayerCity || 'Cairo');
     const [prayerCountry, setPrayerCountry] = useState(workspaceSettings?.prayerCountry || 'Egypt');
@@ -174,6 +182,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     const [wallpaperUrl, setWallpaperUrl] = useState(workspaceSettings?.wallpaperUrl || DEFAULT_WALLPAPER_URL);
     const [openWithOneClick, setOpenWithOneClick] = useState(workspaceSettings?.openWithOneClick || false);
     const [runtimeHost, setRuntimeHost] = useState(workspaceSettings?.runtimeHost || '127.0.0.1');
+    const touchTimer = useRef<NodeJS.Timeout | null>(null);
     
     // Window Manager State
     const [activeWindows, setActiveWindows] = useState<{ id: string; slug: string; title: string; iconUrl?: string | null; isMinimized: boolean; isMaximized: boolean; zIndex: number }[]>(workspaceSettings?.activeWindows || []);
@@ -371,6 +380,44 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
             type: 'desktop',
             targetId: null
         });
+    };
+
+    const handleDesktopTouchStart = (e: React.TouchEvent) => {
+        if (touchTimer.current) clearTimeout(touchTimer.current);
+        const touch = e.touches[0];
+        touchTimer.current = setTimeout(() => {
+            setContextMenu({
+                x: touch.clientX,
+                y: touch.clientY,
+                type: 'desktop',
+                targetId: null
+            });
+        }, 500);
+    };
+
+    const handleDesktopTouchMove = () => {
+        if (touchTimer.current) clearTimeout(touchTimer.current);
+    };
+
+    const handleDesktopTouchEnd = () => {
+        if (touchTimer.current) clearTimeout(touchTimer.current);
+    };
+
+    const handleItemTouchStart = (e: React.TouchEvent, id: string, type: 'icon' | 'folder') => {
+        e.stopPropagation();
+        if (touchTimer.current) clearTimeout(touchTimer.current);
+        const touch = e.touches[0];
+        touchTimer.current = setTimeout(() => {
+            if (!selectedItemIds.includes(id)) {
+                setSelectedItemIds([id]);
+            }
+            setContextMenu({
+                x: touch.clientX,
+                y: touch.clientY,
+                type,
+                targetId: id
+            });
+        }, 500);
     };
 
     const handleIconContextMenu = (e: React.MouseEvent, id: string, type: 'icon' | 'folder') => {
@@ -769,6 +816,9 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                 setEditingItemId(null);
             }}
             onContextMenu={handleDesktopContextMenu}
+            onTouchStart={handleDesktopTouchStart}
+            onTouchMove={handleDesktopTouchMove}
+            onTouchEnd={handleDesktopTouchEnd}
         >
             <Head title={__('general.tools_workspace')} />
 
@@ -801,7 +851,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                     if (e.ctrlKey) {
                                         setSelectedItemIds(prev => prev.includes(item.id) ? prev.filter(i => i !== item.id) : [...prev, item.id]);
                                     } else {
-                                        if (openWithOneClick) {
+                                        if (openWithOneClick || isMobile) {
                                             handleToolClick(toolData.slug);
                                             setSelectedItemIds([item.id]);
                                         } else {
@@ -810,7 +860,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                     }
                                 }}
                                 onDoubleClick={() => {
-                                    if (!openWithOneClick) handleToolClick(toolData.slug);
+                                    if (!openWithOneClick && !isMobile) handleToolClick(toolData.slug);
                                 }}
                                 onDragStart={(e) => handleDragStart(e, item.id)}
                                 onDragEnd={() => setDraggedItemId(null)}
@@ -823,6 +873,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                     setEditingItemId(null);
                                 }}
                                 onContextMenu={(e) => handleIconContextMenu(e, item.id, 'icon')}
+                                onTouchStart={(e) => handleItemTouchStart(e, item.id, 'icon')}
                                 draggable
                                 onDragOver={handleDragOver}
                                 onDragLeave={handleDragLeave}
@@ -848,7 +899,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                     if (e.ctrlKey) {
                                         setSelectedItemIds(prev => prev.includes(item.id) ? prev.filter(i => i !== item.id) : [...prev, item.id]);
                                     } else {
-                                        if (openWithOneClick) {
+                                        if (openWithOneClick || isMobile) {
                                             setOpenFolderId(item.id);
                                             setSelectedItemIds([item.id]);
                                         } else {
@@ -857,7 +908,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                     }
                                 }}
                                 onDoubleClick={() => {
-                                    if (!openWithOneClick) setOpenFolderId(item.id);
+                                    if (!openWithOneClick && !isMobile) setOpenFolderId(item.id);
                                 }}
                                 onDragStart={(e) => handleDragStart(e, item.id)}
                                 onDragEnd={() => setDraggedItemId(null)}
@@ -869,11 +920,9 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 className={draggedItemId === item.id ? 'opacity-50 scale-95' : 'hover:scale-105 transition-transform'}
                                 isSelected={selectedItemIds.includes(item.id)}
                                 isEditing={editingItemId === item.id}
-                                onRenameSubmit={(newName) => {
-                                    setDesktopItems(desktopItems.map(i => i.id === item.id ? { ...i, name: newName } : i));
-                                    setEditingItemId(null);
-                                }}
+                                onRenameSubmit={(newName) => handleRenameFolder(item.id, newName)}
                                 onContextMenu={(e) => handleIconContextMenu(e, item.id, 'folder')}
+                                onTouchStart={(e) => handleItemTouchStart(e, item.id, 'folder')}
                             />
                         );
                     }
@@ -1065,6 +1114,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
             {/* Subscribe Modal / App Window */}
             <WindowModal
                 isOpen={isSubscribeModalOpen}
+                isMobile={isMobile}
                 onClose={() => {
                     setSubscribeModalOpen(false);
                     setSelectedTool(null);
@@ -1188,6 +1238,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
             {activeWindows.map((win, index) => (
                 <WindowModal
                     key={win.id}
+                    isMobile={isMobile}
                     isOpen={!win.isMinimized}
                     onClose={() => handleWindowClose(win.id)}
                     title={win.title}

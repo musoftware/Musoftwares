@@ -18,6 +18,7 @@ interface WindowModalProps {
     height?: string;
     zIndex: number;
     onFocus: () => void;
+    isMobile?: boolean;
 }
 
 export function WindowModal({
@@ -35,7 +36,8 @@ export function WindowModal({
     width = 'w-[800px]',
     height = 'h-[600px]',
     zIndex,
-    onFocus
+    onFocus,
+    isMobile = false
 }: WindowModalProps) {
     const parseDim = (val: string | number | undefined, defaultVal: number) => {
         if (typeof val === 'number') return val;
@@ -56,8 +58,10 @@ export function WindowModal({
 
     if (!isOpen) return null;
 
+    const isEffectivelyMaximized = isMaximized || isMobile;
+
     const handlePointerDown = (e: React.PointerEvent) => {
-        if (isMaximized) return;
+        if (isEffectivelyMaximized) return;
         setIsDragging(true);
         onFocus();
         dragOffset.current = {
@@ -68,7 +72,7 @@ export function WindowModal({
     };
 
     const handlePointerMove = (e: React.PointerEvent) => {
-        if (!isDragging || isMaximized) return;
+        if (!isDragging || isEffectivelyMaximized) return;
         posRef.current.x = Math.max(0, e.clientX - dragOffset.current.x);
         posRef.current.y = Math.max(0, e.clientY - dragOffset.current.y);
         
@@ -83,7 +87,7 @@ export function WindowModal({
     };
 
     const handleResizePointerDown = (e: React.PointerEvent, dir: string) => {
-        if (isMaximized) return;
+        if (isEffectivelyMaximized) return;
         e.stopPropagation();
         setIsResizing(true);
         onFocus();
@@ -98,7 +102,7 @@ export function WindowModal({
     };
 
     const handleResizePointerMove = (e: React.PointerEvent) => {
-        if (!isResizing || isMaximized) return;
+        if (!isResizing || isEffectivelyMaximized) return;
         const dx = e.clientX - resizeData.current.startX;
         const dy = e.clientY - resizeData.current.startY;
         
@@ -123,8 +127,8 @@ export function WindowModal({
     return (
         <div 
             ref={modalRef}
-            className={`fixed flex flex-col bg-white rounded-lg shadow-2xl overflow-hidden border border-slate-300 ${isMaximized ? 'inset-0 rounded-none' : ''}`}
-            style={isMaximized ? {
+            className={`fixed flex flex-col bg-white rounded-lg shadow-2xl overflow-hidden border border-slate-300 ${isEffectivelyMaximized ? 'inset-0 rounded-none' : ''}`}
+            style={isEffectivelyMaximized ? {
                 left: 0,
                 top: 0,
                 width: '100%',
@@ -144,7 +148,7 @@ export function WindowModal({
         >
             {/* Windows-like Title Bar */}
             <div 
-                className={`bg-[#f0f0f0] flex items-center justify-between px-3 h-10 border-b border-slate-300 select-none touch-none ${!isMaximized ? 'cursor-move' : ''}`}
+                className={`bg-[#f0f0f0] flex items-center justify-between px-3 h-10 border-b border-slate-300 select-none touch-none ${!isEffectivelyMaximized ? 'cursor-move' : ''}`}
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
@@ -201,7 +205,7 @@ export function WindowModal({
             </div>
 
             {/* Resize Handles */}
-            {!isMaximized && (
+            {!isEffectivelyMaximized && (
                 <>
                     <div 
                         className="absolute right-0 top-0 bottom-0 w-3 cursor-e-resize z-20 touch-none"
