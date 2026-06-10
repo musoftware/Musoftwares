@@ -2,6 +2,7 @@
 
 return [
   'approve_and_complete' => 'الموافقة والإكمال',
+  'back_to_portfolio' => 'العودة إلى معرض الأعمال',
   'contract_marked_as_completed_successfully' => 'تم تحديد العقد كمكتمل بنجاح',
   'deleted_successfully' => 'تم الحذف بنجاح',
   'min' => 'دقيقة',
