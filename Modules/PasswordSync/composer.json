@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/passwordsync",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\PasswordSync\\": "app/",
+            "Modules\\PasswordSync\\Database\\Factories\\": "database/factories/",
+            "Modules\\PasswordSync\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\PasswordSync\\Tests\\": "tests/"
+        }
+    }
+}

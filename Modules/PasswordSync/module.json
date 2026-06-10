@@ -1,0 +1,11 @@
+{
+    "name": "PasswordSync",
+    "alias": "passwordsync",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\PasswordSync\\Providers\\PasswordSyncServiceProvider"
+    ],
+    "files": []
+}
