@@ -97,11 +97,19 @@ class FreelanceJobController extends Controller
 
         $job->update(['status' => $request->status]);
 
+        if ($request->status === 'cancelled') {
+            app(\Modules\Freelance\Domains\Proposal\Actions\RejectPendingProposalsAction::class)
+                ->execute($job, 'Job Cancelled by Admin');
+        }
+
         return back()->with('success', __('freelance.job_status_updated'));
     }
 
     public function destroy(Job $job)
     {
+        app(\Modules\Freelance\Domains\Proposal\Actions\RejectPendingProposalsAction::class)
+            ->execute($job, 'Job Deleted by Admin');
+            
         $job->delete();
         return redirect()->route('admin.freelance.jobs.index')->with('success', __('freelance.job_deleted'));
     }
@@ -124,6 +132,10 @@ class FreelanceJobController extends Controller
             );
             
             $job->update(['status' => 'cancelled']);
+            $job->contracts()->whereNotIn('status', ['completed', 'cancelled'])->update(['status' => 'cancelled']);
+            
+            app(\Modules\Freelance\Domains\Proposal\Actions\RejectPendingProposalsAction::class)
+                ->execute($job, 'Job Cancelled & Force Refunded by Admin');
             
             return back()->with('success', __('freelance.points_refunded_success', ['amount' => $refundAmount]));
         } catch (\Exception $e) {

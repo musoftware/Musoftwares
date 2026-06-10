@@ -3,10 +3,13 @@
 namespace Modules\Freelance\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\User;
 
 class Contract extends Model
 {
+    use HasFactory;
+
     protected $table = 'freelance_contracts';
     protected $fillable = ['job_id', 'proposal_id', 'client_id', 'freelancer_id', 'amount', 'currency_id', 'contract_points', 'status', 'started_at', 'completed_at'];
 
@@ -18,6 +21,11 @@ class Contract extends Model
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
     ];
+
+    protected static function newFactory()
+    {
+        return \Modules\Freelance\Database\Factories\ContractFactory::new();
+    }
 
     public function job()
     {
@@ -42,5 +50,10 @@ class Contract extends Model
     public function currency()
     {
         return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }

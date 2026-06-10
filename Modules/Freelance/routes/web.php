@@ -23,7 +23,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:freelance'])-
 
 
     // Jobs
-    Route::get('/jobs/browse', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'index'])->name('jobs.browse');
     Route::get('/jobs/my-jobs', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'myJobs'])->name('my-jobs');
     Route::resource('jobs', \Modules\Freelance\Http\Controllers\FreelanceJobController::class)->except(['index', 'show']);
     Route::post('/jobs/{job}/poke', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'poke'])->name('jobs.poke');
@@ -40,8 +39,17 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:freelance'])-
     Route::get('/contracts/{contract}', [\Modules\Freelance\Http\Controllers\ContractController::class, 'show'])->name('contracts.show');
     Route::post('/contracts/{contract}/complete', [\Modules\Freelance\Http\Controllers\ContractController::class, 'complete'])->name('contracts.complete');
     Route::post('/contracts/{contract}/dispute', [\Modules\Freelance\Http\Controllers\ContractController::class, 'dispute'])->name('contracts.dispute');
+    Route::post('/contracts/{contract}/reviews', [\Modules\Freelance\Http\Controllers\ReviewController::class, 'store'])->name('contracts.reviews.store');
 });
 
 Route::prefix('freelance')->name('freelance.')->group(function () {
+    Route::get('/jobs/browse', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'index'])->name('jobs.browse');
     Route::get('/jobs/{job}/{slug?}', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'show'])->name('jobs.show');
+    
+    // Public Freelancers
+    Route::get('/freelancers/browse', [\Modules\Freelance\Http\Controllers\PublicFreelancerController::class, 'index'])->name('freelancers.browse');
+    
+    // Static Pages
+    Route::get('/how-it-works', [\Modules\Freelance\Http\Controllers\PublicPageController::class, 'howItWorks'])->name('how-it-works');
+    Route::get('/about-us', [\Modules\Freelance\Http\Controllers\PublicPageController::class, 'aboutUs'])->name('about-us');
 });

@@ -70,6 +70,48 @@
         </script>
     </head>
     <body class="font-sans antialiased">
+        <div id="initial-global-loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; display: flex; justify-content: center; align-items: center; background-color: #0f0f11; transition: opacity 0.5s ease-out, visibility 0.5s ease-out;">
+            <div style="width: 40px; height: 40px; border: 3px solid rgba(255, 255, 255, 0.1); border-radius: 50%; border-top-color: #ffffff; animation: initial-spin 1s ease-in-out infinite;"></div>
+        </div>
+        <style>
+            @keyframes initial-spin {
+                to { transform: rotate(360deg); }
+            }
+        </style>
         @inertia
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var loader = document.getElementById('initial-global-loader');
+                if (loader) {
+                    var checkInterval = setInterval(function() {
+                        var app = document.getElementById('app');
+                        if (app && app.children.length > 0) {
+                            clearInterval(checkInterval);
+                            loader.style.opacity = '0';
+                            loader.style.visibility = 'hidden';
+                            setTimeout(function() {
+                                if (loader.parentNode) {
+                                    loader.parentNode.removeChild(loader);
+                                }
+                            }, 500);
+                        }
+                    }, 50);
+                    // Fallback just in case
+                    setTimeout(function() {
+                        clearInterval(checkInterval);
+                        if (loader && loader.parentNode) {
+                            loader.style.opacity = '0';
+                            loader.style.visibility = 'hidden';
+                            setTimeout(function() {
+                                if (loader.parentNode) {
+                                    loader.parentNode.removeChild(loader);
+                                }
+                            }, 500);
+                        }
+                    }, 10000);
+                }
+            });
+        </script>
     </body>
 </html>

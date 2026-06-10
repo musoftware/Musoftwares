@@ -44,7 +44,7 @@ class ProposalLifecycleTest extends FreelanceTestCase
         $this->assertEquals($initialPoints - 2, $this->freelancer1->fresh()->points_balance);
         $this->assertDatabaseHas('point_transactions', [
             'user_id' => $this->freelancer1->id,
-            'type' => 'used',
+            'type' => 'spent',
         ]);
     }
 

@@ -117,6 +117,14 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function freelanceProfile()
+    {
+        return $this->hasOne(\Modules\Freelance\Models\FreelanceProfile::class, 'user_id');
+    }
+
     public function skills()
     {
         return $this->hasMany(\Modules\Freelance\Models\UserSkill::class, 'user_id');

@@ -24,7 +24,7 @@ import {
     PopoverTrigger,
 } from "@/Components/ui/popover";
 
-export default function EditProfile({ profile, userSkills, availableSkills }) {
+export default function EditProfile({ profile, userSkills, availableSkills, reviews }) {
     const { toast } = useToast();
     const [openSkillSearch, setOpenSkillSearch] = useState(false);
 
@@ -180,6 +180,40 @@ export default function EditProfile({ profile, userSkills, availableSkills }) {
                                 </Command>
                             </PopoverContent>
                         </Popover>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex justify-between items-center">
+                            <span>{__('freelance.reviews_and_ratings')}</span>
+                            <div className="flex items-center space-x-2 text-sm font-normal">
+                                <span className="text-yellow-500">★</span>
+                                <span className="font-bold">{profile.average_rating ? Number(profile.average_rating).toFixed(1) : '0.0'}</span>
+                                <span className="text-slate-500">({profile.reviews_count} {__('freelance.reviews')})</span>
+                            </div>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {reviews && reviews.length > 0 ? (
+                            <div className="space-y-4">
+                                {reviews.map((review) => (
+                                    <div key={review.id} className="border-b border-slate-100 pb-4 last:border-0 last:pb-0">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div className="font-semibold text-slate-900">{review.reviewer.name}</div>
+                                            <div className="flex text-yellow-500 text-sm">
+                                                {Array.from({ length: 5 }).map((_, i) => (
+                                                    <span key={i} className={i < review.rating ? "opacity-100" : "opacity-30"}>★</span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <p className="text-sm text-slate-600">{review.comment}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-sm text-slate-500 text-center py-4">{__('freelance.no_visible_reviews_yet')}</p>
+                        )}
                     </CardContent>
                 </Card>
 

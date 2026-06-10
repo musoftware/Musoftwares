@@ -1187,7 +1187,31 @@
             "min_proposal_points_help": "تحديد حد أدنى من النقاط يساهم في تصفية المتقدمين غير الجادين. سيحتاج المستقلون لإنفاق هذه النقاط لتقديم عرض، مما يضمن تلقي عروض ذات جودة أعلى.",
             "expected_duration_help": "وضح المدة المتوقعة لإنجاز المشروع. هذا يساعد المستقلين في تقييم ما إذا كان لديهم الوقت الكافي لتلبية الموعد النهائي الخاص بك.",
             "required_skills_help": "اختر جميع المهارات ذات الصلة المطلوبة لإنجاز المهمة. هذا يضمن وصول وظيفتك إلى شريحة أوسع وأكثر دقة من المستقلين الذين يمتلكون هذه المهارات المحددة للوصول لعدد أكبر.",
-            "ios_shortcut_token_generated": "تم إنشاء رمز اختصار iOS بنجاح."
+            "ios_shortcut_token_generated": "تم إنشاء رمز اختصار iOS بنجاح.",
+            "seo": {
+                "landing_title": "عرب جوبز فريلانس - وظّف الخبراء أو ابحث عن عمل",
+                "landing_desc": "اعثر على أفضل المواهب أو الوظائف الرائعة. عرب جوبز يوفر لك منصة مخصصة لربط المستقلين بالشركات في لحظات.",
+                "browse_title": "تصفح الوظائف",
+                "browse_desc": "اكتشف فرص العمل الحر المتاحة واعثر على المشروع المثالي لمهاراتك."
+            },
+            "landing_heading": "منصة العمل الحر الأفضل في الوطن العربي",
+            "landing_subheading": "اعثر على أفضل المواهب أو الوظائف الرائعة. عرب جوبز يوفر لك منصة مخصصة لربط المستقلين بالشركات في لحظات.",
+            "get_started": "ابدأ الآن",
+            "average": "متوسط",
+            "blind_review_notice": "تقييم مخفي: سيبقى تقييمك مخفياً حتى يقوم الطرف الآخر بتقديم تقييمه أو تنتهي فترة التقييم.",
+            "comment": "تعليق",
+            "excellent": "ممتاز",
+            "good": "جيد",
+            "leave_a_review": "اترك تقييماً",
+            "no_visible_reviews_yet": "لا توجد تقييمات مرئية حتى الآن.",
+            "poor": "ضعيف",
+            "rating": "التقييم",
+            "review_comment_placeholder": "شارك تجربتك في العمل مع هذا المستخدم...",
+            "review_submitted_hidden": "تم تقديم التقييم بنجاح. سيبقى التقييم مخفياً حتى يقوم الطرف الآخر بتقييمك.",
+            "review_submitted_visible": "تم تقديم التقييم وهو الآن مرئي.",
+            "reviews": "التقييمات",
+            "reviews_and_ratings": "التقييمات والآراء",
+            "terrible": "سيء جداً"
         },
         "frontend": {
             "pricing": {
@@ -6952,7 +6976,8 @@
             "install_app_step_3_desc": "سيظهر التطبيق الآن على شاشتك الرئيسية ويمكنك تفعيل الإشعارات منه مباشرة!",
             "exclusive_service": "خدمة حصرية",
             "recaptcha_failed": "فشل التحقق من reCAPTCHA. يرجى المحاولة مرة أخرى.",
-            "recaptcha_required": "يرجى إكمال التحقق من reCAPTCHA."
+            "recaptcha_required": "يرجى إكمال التحقق من reCAPTCHA.",
+            "add_points": "إضافة نقاط"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -8719,7 +8744,31 @@
             "min_proposal_points_help": "Setting a minimum points requirement filters out non-serious applicants. Freelancers will need to spend these points to submit a proposal, ensuring higher quality bids.",
             "expected_duration_help": "Indicate how long you expect the project to take. This helps freelancers assess if they have the availability to meet your deadline.",
             "required_skills_help": "Select all relevant skills required for the task. This ensures your job reaches a wider and more targeted audience of freelancers who possess these specific skills.",
-            "ios_shortcut_token_generated": "iOS shortcut token generated successfully."
+            "ios_shortcut_token_generated": "iOS shortcut token generated successfully.",
+            "seo": {
+                "landing_title": "ArabiJobs Freelance - Hire Experts & Find Work",
+                "landing_desc": "Find top talent or great jobs. ArabiJobs provides a dedicated platform to connect freelancers with businesses instantly.",
+                "browse_title": "Browse Jobs",
+                "browse_desc": "Discover open freelance opportunities and find the perfect project for your skills."
+            },
+            "landing_heading": "The Premier Freelance Marketplace",
+            "landing_subheading": "Find top talent or great jobs. ArabiJobs provides a dedicated platform to connect freelancers with businesses instantly.",
+            "get_started": "Get Started",
+            "average": "Average",
+            "blind_review_notice": "Blind Review: Your review will be hidden until both parties have submitted their reviews or the review period ends.",
+            "comment": "Comment",
+            "excellent": "Excellent",
+            "good": "Good",
+            "leave_a_review": "Leave a Review",
+            "no_visible_reviews_yet": "No visible reviews yet.",
+            "poor": "Poor",
+            "rating": "Rating",
+            "review_comment_placeholder": "Share your experience working with this user...",
+            "review_submitted_hidden": "Review submitted successfully. It will remain hidden until the other party reviews you.",
+            "review_submitted_visible": "Review submitted and is now visible.",
+            "reviews": "Reviews",
+            "reviews_and_ratings": "Reviews & Ratings",
+            "terrible": "Terrible"
         },
         "frontend": {
             "pricing": {
@@ -14484,7 +14533,8 @@
             "install_app_step_3_desc": "The app will now appear on your home screen and you can enable notifications!",
             "exclusive_service": "Exclusive Service",
             "recaptcha_failed": "reCAPTCHA verification failed. Please try again.",
-            "recaptcha_required": "Please complete the reCAPTCHA verification."
+            "recaptcha_required": "Please complete the reCAPTCHA verification.",
+            "add_points": "Add Points"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",

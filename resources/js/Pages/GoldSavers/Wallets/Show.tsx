@@ -235,7 +235,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                             <CardContent>
                                 <div className="text-3xl font-bold text-slate-900">{wallet.balance_grams} {__('general.g')}</div>
                                 <div className="flex flex-wrap gap-2 mt-2">
-                                    {Object.entries(karatBalances).map(([karat, grams]) => grams > 0 ? (
+                                    {Object.entries(karatBalances || {}).map(([karat, grams]) => grams > 0 ? (
                                         <div key={karat} className="text-xs bg-slate-200 text-slate-700 px-2 py-1 rounded font-medium">
                                             {grams}g ({karat}k)
                                         </div>

@@ -56,6 +56,10 @@ class CompleteContractAction
                 ]);
             }
 
+            // Refund points for all other pending proposals
+            app(\Modules\Freelance\Domains\Proposal\Actions\RejectPendingProposalsAction::class)
+                ->execute($contract->job, 'Job Completed');
+
             ActivityService::log(
                 event: 'contract.completed',
                 description: "Contract completed for job: {$contract->job->title}",

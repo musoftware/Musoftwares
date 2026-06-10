@@ -54,4 +54,15 @@ class KycController extends Controller
 
         return back()->with('success', "User {$user->name} KYC has been rejected.");
     }
+
+    public function showUserDocuments($id)
+    {
+        $user = User::with(['kycDocuments' => function($q) {
+            $q->latest();
+        }])->findOrFail($id);
+
+        return Inertia::render('Admin/Kyc/UserDocuments', [
+            'user' => (new KycUserResource($user))->resolve(),
+        ]);
+    }
 }

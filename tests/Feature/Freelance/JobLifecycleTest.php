@@ -36,7 +36,7 @@ class JobLifecycleTest extends FreelanceTestCase
         
         $this->assertDatabaseHas('point_transactions', [
             'user_id' => $this->clientUser->id,
-            'type' => 'used',
+            'type' => 'spent',
         ]);
     }
 
@@ -91,7 +91,7 @@ class JobLifecycleTest extends FreelanceTestCase
         $this->actingAs($this->clientUser)
             ->delete(route('freelance.jobs.destroy', $job->id));
 
-        $this->assertEquals('cancelled', $job->fresh()->status);
+        $this->assertEquals('cancelled', (string) $job->fresh()->status);
 
         // Verify freelancer got points back
         $this->assertEquals($freelancerPointsAfterBid + 10, $this->freelancer1->fresh()->points_balance);

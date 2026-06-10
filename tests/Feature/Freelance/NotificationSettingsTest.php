@@ -10,6 +10,7 @@ class NotificationSettingsTest extends FreelanceTestCase
             ->put(route('freelance.settings.notifications.update'), [
                 'email_notifications' => true,
                 'push_notifications' => false,
+                'receive_job_notifications' => true,
             ]);
 
         $response->assertStatus(302);
