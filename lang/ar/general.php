@@ -4896,8 +4896,24 @@ return [
   'contact_whatsapp' => 'واتساب',
   'contact_facebook' => 'فيسبوك',
   'contact_location' => 'الموقع',
-  'portfolio_kbdny_title' => 'Kbdny Affiliate',
-  'portfolio_kbdny_desc' => 'Multi-vendor affiliate platform with real-time commission tracking and payouts.',
+  'portfolio_kbdny_title' => 'منصة قبضني لدروبشيبينغ والتسويق بالعمولة',
+  'portfolio_kbdny_desc' => 'نظام متكامل واحترافي للتجارة الإلكترونية والدروبشيبينغ. يتميز بإدارة متقدمة للمخزون والمنتجات، نظام صلاحيات متعدد (بائعين، مسوقين، مشرفين)، معالجة الطلبات الجماعية عبر ملفات Excel، تتبع العمولات اللحظي، وإدارة لوجستية معقدة تشمل المرتجعات، التسليم الجزئي، والمدفوعات الإلكترونية.',
+  'portfolio_kbdny_content' => '
+    <h3>نظرة عامة على المشروع</h3>
+    <p>منصة "قبضني" (Kbdny) هي نظام مؤسسي متكامل للدروبشيبينغ والتسويق بالعمولة، يهدف إلى سد الفجوة بين موردي المنتجات (البائعين) والمسوقين بالعمولة. تم بناء النظام باستخدام إطار عمل Laravel ليكون قادراً على التعامل مع حجم عمليات ضخم، حيث يوفر لوحة تحكم تشغيلية متكاملة لإدارة لوجستيات الدروبشيبينغ، حساب العمولات الديناميكية، وإدارة الطلبات المعقدة.</p>
+    
+    <h3>أهم الميزات</h3>
+    <ul>
+        <li><strong>هيكلة الصلاحيات المتعددة:</strong> نظام أذونات دقيق يفصل العمليات بين مديري النظام، الموردين (Vendors)، المسوقين (Affiliates)، مساعدي المسوقين (Moderators)، والعملاء النهائيين.</li>
+        <li><strong>إدارة متقدمة للمخزون والمنتجات (SKU):</strong> توليد تلقائي لرموز SKU، تتبع المتغيرات المتعددة للمنتج، مزامنة تلقائية لمستويات المخزون عبر الموردين، وأدوات متطورة لتسعير المنتجات ومسارات الموافقة عليها.</li>
+        <li><strong>عمليات التسويق والعمولات:</strong> بوابات مخصصة للمسوقين تمكنهم من إنشاء مفاتيح API، تتبع العمولات لحظياً، إدارة سلات التسوق الخاصة بهم، ومتابعة عمليات الدفع وسحب الأرباح.</li>
+        <li><strong>اللوجستيات وتلبية الطلبات:</strong> أدوات شاملة لتتبع حالات الطلبات بما في ذلك التسليم الجزئي، الاسترجاع، والاستبدال. يتكامل النظام بسلاسة مع شركات الشحن الخارجية باستخدام تصدير مجمع لملفات Excel (مثل R2S، Sheet2) لتسريع وتيرة العمليات.</li>
+        <li><strong>التتبع المالي:</strong> محفظة مدمجة ونظام طلبات دفع يعالج سحب الأرباح الديناميكي، تعديل الأرصدة، واقتطاع رسوم المنصة بدقة.</li>
+    </ul>
+
+    <h3>أبرز التقنيات المستخدمة</h3>
+    <p>تم تطوير المنصة بأحدث ممارسات لغة PHP على إطار عمل Laravel. يعتمد التطبيق على نظام طوابير (Queues) متطور لمعالجة الطلبات الجماعية، وعلاقات قواعد بيانات معقدة لتوزيع العمولات على مستويات متعددة، بالإضافة إلى واجهات برمجة تطبيقات (APIs) آمنة للتكامل مع أنظمة المسوقين الخارجية. كما تضمن واجهة المستخدم سرعة التشغيل من خلال إمكانيات التعديل الجماعي والتتبع اللحظي لحالة النظام.</p>
+  ',
   'portfolio_stock_manager_title' => 'Stock Manager',
   'portfolio_stock_manager_desc' => 'Inventory and POS system with multi-location support and KPI reporting.',
   'portfolio_mini_fatora_title' => 'Mini Fatora',
@@ -4927,6 +4943,8 @@ return [
   'portfolio_telegram_sender_desc' => 'Automated Telegram broadcast tool with group/channel targeting and scheduling.',
   'portfolio_inbox_sender_title' => 'Inbox Sender',
   'portfolio_inbox_sender_desc' => 'Email bulk sending system with SMTP rotation and delivery rate optimization.',
+  'portfolio_email_sender_title' => 'مرسل البريد الإلكتروني',
+  'portfolio_email_sender_desc' => 'برنامج إرسال بريد إلكتروني جماعي عالي الأداء مبني باستخدام Laravel. مصمم لضمان وصول الرسائل، وحملات التسويق الآلية مع تتبع فوري.',
   'portfolio_heic_converter_title' => 'HEIC Converter',
   'portfolio_heic_converter_desc' => 'Batch HEIC to JPG/PNG converter for Windows with drag-and-drop interface.',
   'portfolio_text_studio_title' => 'Text Studio',

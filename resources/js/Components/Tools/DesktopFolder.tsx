@@ -15,9 +15,12 @@ interface DesktopFolderProps {
     style?: React.CSSProperties;
     className?: string;
     isSelected?: boolean;
-    isEditing?: boolean;
     onRenameSubmit?: (newName: string) => void;
     onContextMenu?: (e: React.MouseEvent) => void;
+    onTouchStart?: (e: React.TouchEvent<HTMLDivElement>) => void;
+    onTouchMove?: (e: React.TouchEvent<HTMLDivElement>) => void;
+    onTouchEnd?: (e: React.TouchEvent<HTMLDivElement>) => void;
+    onTouchCancel?: (e: React.TouchEvent<HTMLDivElement>) => void;
 }
 
 export function DesktopFolder({
@@ -37,7 +40,11 @@ export function DesktopFolder({
     isSelected = false,
     isEditing = false,
     onRenameSubmit,
-    onContextMenu
+    onContextMenu,
+    onTouchStart,
+    onTouchMove,
+    onTouchEnd,
+    onTouchCancel
 }: DesktopFolderProps) {
     const [editValue, setEditValue] = React.useState(name);
 
@@ -57,6 +64,10 @@ export function DesktopFolder({
             onClick={onClick}
             onDoubleClick={onDoubleClick}
             onContextMenu={onContextMenu}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+            onTouchCancel={onTouchCancel}
             draggable
             onDragStart={(e) => onDragStart?.(e, id)}
             onDragEnd={onDragEnd}
