@@ -159,6 +159,7 @@ return [
   'thank_you_for_business' => 'شكراً لتعاملكم معنا.',
   'powered_by' => 'مشغل بواسطة Musoftwares.com',
   'min' => 'دقيقة',
+  'max' => 'أقصى',
   'no_items_found' => 'لا توجد عناصر.',
   'in_currency' => 'بـ :currency',
   'notes' => 'ملاحظات',

@@ -49,7 +49,7 @@ export default function AboutUs() {
                 <h2 className="text-3xl font-bold tracking-tight text-slate-900 text-center mb-10">
                     {__('freelance.frequently_asked_questions', undefined, 'Frequently Asked Questions')}
                 </h2>
-                <Accordion type="single" collapsible className="w-full">
+                <Accordion className="w-full">
                     {faqs.map((faq, index) => (
                         <AccordionItem key={index} value={`item-${index}`}>
                             <AccordionTrigger className="text-left text-lg font-semibold text-slate-800 hover:text-emerald-600">

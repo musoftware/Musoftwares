@@ -1,6 +1,6 @@
 <?php
 
-uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(\Tests\Feature\Freelance\FreelanceTestCase::class);
 
 it('renders the how it works page', function () {
     $response = $this->get('/freelance/how-it-works');

@@ -159,6 +159,7 @@ return [
   'thank_you_for_business' => 'Thank you for your business.',
   'powered_by' => 'Powered by Musoftwares.com',
   'min' => 'min',
+  'max' => 'max',
   'no_items_found' => 'No items found.',
   'in_currency' => 'In :currency',
   'notes' => 'Notes',
