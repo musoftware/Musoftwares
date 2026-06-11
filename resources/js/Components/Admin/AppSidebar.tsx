@@ -42,22 +42,31 @@ const items: MenuItem[] = [
     ]
   },
   { 
-    title: "Finance & Business", 
-    url: "/admin/finance", 
+    title: "Invoices", 
+    url: "/admin/invoices", 
     icon: DollarSign,
     subItems: [
         { title: "Unpaid Invoices", url: "/admin/invoices/unpaid" },
         { title: "Archived Invoices", url: "/admin/invoices/archive" },
         { title: "All Invoices", url: "/admin/invoices" },
-        { title: "Financial Operations", url: "/admin/finance" },
-        { title: "Payment Links", url: "/admin/payment-links" },
-        { title: "Hours Calendar", url: "/admin/hours-calendar" },
-        { title: "Reports", url: "/admin/reports" },
-        { title: "Transactions", url: "/admin/transactions?type=income" },
-        { title: "Cost Transactions", url: "/admin/transactions?type=cost" },
+    ]
+  },
+  { 
+    title: "Finance & Business", 
+    url: "/admin/finance", 
+    icon: DollarSign,
+    subItems: [
+        { title: "Costs", url: "/admin/business/costs" },
         { title: "Recurring Costs", url: "/admin/business/recurring/costs" },
+        { title: "Income", url: "/admin/business/income" },
         { title: "Recurring Income", url: "/admin/business/recurring/income" },
         { title: "Recurring Salaries", url: "/admin/business/recurring/salaries" },
+        { title: "Reports", url: "/admin/business/reports" },
+        { title: "Balance", url: "/admin/business/balance-report" },
+        { title: "Payment Links", url: "/admin/payment-links" },
+        { title: "Hours Calendar", url: "/admin/hours-calendar" },
+        { title: "Transactions", url: "/admin/transactions?type=income" },
+        { title: "Cost Transactions", url: "/admin/transactions?type=cost" },
     ]
   },
   { 

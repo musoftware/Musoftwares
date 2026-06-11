@@ -5790,4 +5790,6 @@ return [
   'recaptcha_failed' => 'reCAPTCHA verification failed. Please try again.',
   'recaptcha_required' => 'Please complete the reCAPTCHA verification.',
   'add_points' => 'Add Points',
+  'monthly_breakdown' => 'Monthly Breakdown',
+  'annual_breakdown' => 'Annual Breakdown',
 ];

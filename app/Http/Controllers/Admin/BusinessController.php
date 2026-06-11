@@ -57,11 +57,7 @@ class BusinessController extends Controller
         $sent = (clone $iq)->where('type', 'sent')->sum('business_amount') ?? 0;
         $netIncome = max(0, abs($received) - abs($refunded) - abs($sent));
 
-        $lifetimeReceived = Transaction::where('type', 'received')->sum('business_amount') ?? 0;
-        $lifetimeRefunded = Transaction::where('type', 'refunded')->sum('business_amount') ?? 0;
-        $lifetimeSent = Transaction::where('type', 'sent')->sum('business_amount') ?? 0;
-        $lifetimeIncome = max(0, abs($lifetimeReceived) - abs($lifetimeRefunded) - abs($lifetimeSent));
-
+        // Lifetime stats removed per user request
         // For Chart
         $monthlyTrends = [];
         for ($i = 5; $i >= 0; $i--) {
@@ -76,6 +72,55 @@ class BusinessController extends Controller
             ];
         }
 
+        // Client Breakdown (Monthly & Annually)
+        $monthlyClientData = Transaction::with('user')
+            ->whereIn('type', ['received', 'refunded', 'sent'])
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->get()
+            ->groupBy('user_id');
+
+        $monthlyClientBreakdown = [];
+        foreach ($monthlyClientData as $userId => $txs) {
+            $user = $txs->first()->user;
+            $userName = $user ? $user->name : 'Unknown';
+            $cReceived = $txs->where('type', 'received')->sum('business_amount');
+            $cRefunded = $txs->where('type', 'refunded')->sum('business_amount');
+            $cSent = $txs->where('type', 'sent')->sum('business_amount');
+            $cNet = max(0, abs($cReceived) - abs($cRefunded) - abs($cSent));
+            if ($cNet > 0) {
+                $monthlyClientBreakdown[] = [
+                    'name' => $userName,
+                    'value' => $cNet,
+                ];
+            }
+        }
+
+        $annualClientData = Transaction::with('user')
+            ->whereIn('type', ['received', 'refunded', 'sent'])
+            ->whereYear('created_at', $year)
+            ->get()
+            ->groupBy('user_id');
+
+        $annualClientBreakdown = [];
+        foreach ($annualClientData as $userId => $txs) {
+            $user = $txs->first()->user;
+            $userName = $user ? $user->name : 'Unknown';
+            $cReceived = $txs->where('type', 'received')->sum('business_amount');
+            $cRefunded = $txs->where('type', 'refunded')->sum('business_amount');
+            $cSent = $txs->where('type', 'sent')->sum('business_amount');
+            $cNet = max(0, abs($cReceived) - abs($cRefunded) - abs($cSent));
+            if ($cNet > 0) {
+                $annualClientBreakdown[] = [
+                    'name' => $userName,
+                    'value' => $cNet,
+                ];
+            }
+        }
+
+        usort($monthlyClientBreakdown, fn($a, $b) => $b['value'] <=> $a['value']);
+        usort($annualClientBreakdown, fn($a, $b) => $b['value'] <=> $a['value']);
+
         $bCurrencyId = \App\Models\AdminSettings::business_currency();
         $bCurrency = \App\Models\Currency::find($bCurrencyId);
 
@@ -83,8 +128,9 @@ class BusinessController extends Controller
             'entries' => $entries,
             'stats' => [
                 'total_monthly_income' => $netIncome,
-                'total_lifetime_income' => $lifetimeIncome,
                 'monthly_trends' => $monthlyTrends,
+                'monthly_client_breakdown' => $monthlyClientBreakdown,
+                'annual_client_breakdown' => $annualClientBreakdown,
                 'business_currency_code' => $bCurrency ? $bCurrency->currency : 'EGP',
                 'business_currency_symbol' => $bCurrency ? $bCurrency->symbol : 'e£',
             ]
@@ -154,7 +200,7 @@ class BusinessController extends Controller
             ->where('reason', '!=', 'salary')
             ->sum('business_amount');
 
-        $lifetimeCosts = CostTransaction::where('reason', '!=', 'salary')->sum('business_amount');
+
 
         $monthlyTrends = [];
         for ($i = 5; $i >= 0; $i--) {
@@ -177,7 +223,6 @@ class BusinessController extends Controller
             'entries' => $entries,
             'stats' => [
                 'total_monthly_costs' => abs($totalMonthlyCosts),
-                'total_lifetime_costs' => abs($lifetimeCosts),
                 'monthly_trends' => $monthlyTrends,
                 'business_currency_code' => $bCurrency ? $bCurrency->currency : 'EGP',
                 'business_currency_symbol' => $bCurrency ? $bCurrency->symbol : 'e£',

@@ -173,5 +173,56 @@ class RecurringCost extends Model
         return $total_amount;
     }
 
+    public static function chartData()
+    {
+        $b_currency = AdminSettings::GetValue('business_currency', '1');
+        $data = [];
+        foreach (RecurringCost::all() as $rCost) {
+            $details_str = $rCost->details();
+            $detail = $details_str ? explode(',', (string) $details_str) : [];
+
+            $times_type = 0;
+            if ($rCost->recurring == 'day') {
+                $times_type = 365;
+            }
+            if ($rCost->recurring == 'month') {
+                $times_type = 12;
+            }
+            if ($rCost->recurring == 'week') {
+                $times_type = 51;
+            }
+            if ($rCost->recurring == 'year') {
+                $times_type = 1;
+            }
+
+            $business_amount = CurrenciesExchange::RateToday($rCost->amount, $rCost->currency_id, $b_currency);
+            
+            $multiplier = ($rCost->recurring == 'day') ? 1 : count($detail);
+            
+            $c_amount = $business_amount / max(1, $rCost->recurring_times) * $multiplier * $times_type;
+            
+            $reason = $rCost->reason ?: 'Other';
+            if (!isset($data[$reason])) {
+                $data[$reason] = 0;
+            }
+            $data[$reason] += $c_amount;
+        }
+        
+        $chart = [];
+        foreach ($data as $reason => $annual_amount) {
+            $chart[] = [
+                'name' => $reason,
+                'annual' => round((float) $annual_amount, 2),
+                'monthly' => round((float) $annual_amount / 12, 2),
+            ];
+        }
+        
+        usort($chart, function($a, $b) {
+            return $b['annual'] <=> $a['annual'];
+        });
+
+        return $chart;
+    }
+
 }
 

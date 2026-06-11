@@ -4919,6 +4919,22 @@ return [
   'portfolio_stock_manager_desc' => 'Inventory and POS system with multi-location support and KPI reporting.',
   'portfolio_mini_fatora_title' => 'Mini Fatora',
   'portfolio_mini_fatora_desc' => 'Online invoicing and billing SaaS for freelancers and small businesses.',
+  'portfolio_mini_fatora_content' => '
+    <h3>نظرة عامة على المشروع</h3>
+    <p>ميني فاتورة هي منصة سحابية (SaaS) متكاملة لإصدار الفواتير والفوترة عبر الإنترنت مصممة خصيصاً للمستقلين والشركات الصغيرة والمهنيين المستقلين. تعمل المنصة على تبسيط عملية الفوترة، مما يساعد المستخدمين على تحصيل أموالهم بشكل أسرع وإدارة عملياتهم المالية بكل سهولة.</p>
+    
+    <h3>الميزات الرئيسية</h3>
+    <ul>
+        <li><strong>الفوترة الآلية:</strong> إنشاء وإرسال فواتير احترافية في ثوانٍ، مع دعم لعملات متعددة وقواعد الضرائب.</li>
+        <li><strong>إدارة العملاء:</strong> الاحتفاظ بدليل مركزي لجميع العملاء، وتتبع سجلات الدفع، وإدارة الأرصدة المستحقة.</li>
+        <li><strong>تتبع النفقات:</strong> تسجيل نفقات العمل بسهولة وتصنيفها لتحسين إعداد التقارير المالية والضرائب.</li>
+        <li><strong>المدفوعات عبر الإنترنت:</strong> التكامل مع بوابات الدفع الشهيرة للسماح للعملاء بالدفع مباشرة من رابط الفاتورة.</li>
+        <li><strong>التقارير المالية:</strong> الوصول إلى لوحات معلومات في الوقت الفعلي وإنشاء تقارير مفصلة عن الدخل والنفقات والصحة العامة للعمل.</li>
+    </ul>
+
+    <h3>أبرز النقاط الفنية</h3>
+    <p>تم بناء المنصة مع التركيز على السرعة والأمان وتجربة المستخدم. تستخدم المنصة أحدث تقنيات الويب لضمان التجاوب عبر الأجهزة المختلفة، مع تشفير آمن للبيانات السجلات المالية، وبنية قابلة للتوسع لدعم احتياجات العمل المتنامية.</p>
+  ',
   'portfolio_vodafone_crm_title' => 'Vodafone CRM',
   'portfolio_vodafone_crm_desc' => 'Custom CRM and operations management system for Vodafone Egypt distributor.',
   'portfolio_amc_academy_desc' => 'Full e-learning platform with student portals, scheduling, and assessments.',
@@ -5599,4 +5615,6 @@ return [
   'recaptcha_failed' => 'فشل التحقق من reCAPTCHA. يرجى المحاولة مرة أخرى.',
   'recaptcha_required' => 'يرجى إكمال التحقق من reCAPTCHA.',
   'add_points' => 'إضافة نقاط',
+  'monthly_breakdown' => 'التقسيم الشهري',
+  'annual_breakdown' => 'التقسيم السنوي',
 ];

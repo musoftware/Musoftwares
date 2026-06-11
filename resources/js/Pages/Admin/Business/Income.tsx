@@ -26,7 +26,11 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip as RechartsTooltip,
-    ResponsiveContainer
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell,
+    Legend
 } from 'recharts';
 import {
     Table,
@@ -36,6 +40,8 @@ import {
     TableHeader,
     TableRow,
 } from '@/Components/ui/table';
+
+const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#64748b', '#14b8a6', '#6366f1'];
 
 export default function Income() {
     const { entries, stats, filters } = usePage<any>().props;
@@ -90,7 +96,7 @@ export default function Income() {
             title="Business Income" 
             header="Business Income"
         >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                 <Card className="border-none shadow-sm shadow-slate-200/50">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between space-y-0 pb-2">
@@ -105,23 +111,6 @@ export default function Income() {
                         <p className="text-xs text-slate-500 mt-2 font-medium">
                             <span className="text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded mr-1">This Month</span>
                             Net Income
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card className="border-none shadow-sm shadow-slate-200/50">
-                    <CardContent className="p-6">
-                        <div className="flex items-center justify-between space-y-0 pb-2">
-                            <p className="text-sm font-medium text-slate-500">Lifetime Net Income</p>
-                            <div className="p-2 bg-emerald-50 rounded-xl">
-                                <ArrowUpRight className="h-4 w-4 text-emerald-600" />
-                            </div>
-                        </div>
-                        <div className="text-3xl font-bold text-slate-900 tracking-tight">
-                            {formatCurrency(stats.total_lifetime_income, stats.business_currency_code)}
-                        </div>
-                        <p className="text-xs text-slate-500 mt-2 font-medium">
-                            All time net income
                         </p>
                     </CardContent>
                 </Card>
@@ -174,6 +163,84 @@ export default function Income() {
                     </div>
                 </CardContent>
             </Card>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <Card className="border-none shadow-sm shadow-slate-200/50">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                            <CalendarIcon className="w-5 h-5 text-indigo-500" />
+                            Current Month Income by Client
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="h-[450px] mt-4">
+                            {stats.monthly_client_breakdown?.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={stats.monthly_client_breakdown}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={90}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                        >
+                                            {stats.monthly_client_breakdown.map((entry: any, index: number) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip content={<CustomTooltip />} />
+                                        <Legend />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="h-full flex items-center justify-center text-sm text-slate-500">
+                                    No income data for current month.
+                                </div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-none shadow-sm shadow-slate-200/50">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                            <CalendarIcon className="w-5 h-5 text-indigo-500" />
+                            Current Year Income by Client
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="h-[450px] mt-4">
+                            {stats.annual_client_breakdown?.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={stats.annual_client_breakdown}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={90}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                        >
+                                            {stats.annual_client_breakdown.map((entry: any, index: number) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip content={<CustomTooltip />} />
+                                        <Legend />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div className="h-full flex items-center justify-center text-sm text-slate-500">
+                                    No income data for current year.
+                                </div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
 
             <Card className="border-none shadow-sm shadow-slate-200/50">
                 <CardHeader className="pb-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

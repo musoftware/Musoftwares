@@ -27,7 +27,7 @@ class RecurringBusinessController extends Controller
             return $cost;
         });
         $currencies = Currency::all();
-        
+
         $costReasons = CostTransaction::select('reason')->distinct()->pluck('reason');
         $recurringReasons = RecurringCost::select('reason')->distinct()->pluck('reason');
         $categories = $costReasons->concat($recurringReasons)->unique()->filter()->values();
@@ -39,6 +39,7 @@ class RecurringBusinessController extends Controller
             'annual_total' => RecurringCost::annual_str(),
             'business_currency_code' => $bCurrency['currency'] ?? 'USD',
             'business_currency_symbol' => $bCurrency['symbol'] ?? '$',
+            'chart_data' => RecurringCost::chartData(),
         ];
 
         return Inertia::render('Admin/Business/RecurringCosts/Index', [
@@ -52,7 +53,7 @@ class RecurringBusinessController extends Controller
     public function create_recurring_costs()
     {
         $currencies = Currency::all();
-        
+
         $costReasons = CostTransaction::select('reason')->distinct()->pluck('reason');
         $recurringReasons = RecurringCost::select('reason')->distinct()->pluck('reason');
         $categories = $costReasons->concat($recurringReasons)->unique()->filter()->values();
@@ -92,9 +93,9 @@ class RecurringBusinessController extends Controller
         $rCost->current_date = $request->input('start_date');
         $rCost->recurring = $request->input('recurring');
         $rCost->recurring_times = $request->input('recurring_times');
-        
-        $rCost->reason = $request->input('reason_choice') === 'custom' 
-            ? $request->input('custom_reason') 
+
+        $rCost->reason = $request->input('reason_choice') === 'custom'
+            ? $request->input('custom_reason')
             : $request->input('reason_choice');
 
         if ($request->input('recurring') === 'week') {
@@ -120,7 +121,7 @@ class RecurringBusinessController extends Controller
     {
         $cost = RecurringCost::findOrFail($id);
         $currencies = Currency::all();
-        
+
         $costReasons = CostTransaction::select('reason')->distinct()->pluck('reason');
         $recurringReasons = RecurringCost::select('reason')->distinct()->pluck('reason');
         $categories = $costReasons->concat($recurringReasons)->unique()->filter()->values();
@@ -165,9 +166,9 @@ class RecurringBusinessController extends Controller
         $rCost->current_date = $request->input('start_date');
         $rCost->recurring = $request->input('recurring');
         $rCost->recurring_times = $request->input('recurring_times');
-        
-        $rCost->reason = $request->input('reason_choice') === 'custom' 
-            ? $request->input('custom_reason') 
+
+        $rCost->reason = $request->input('reason_choice') === 'custom'
+            ? $request->input('custom_reason')
             : $request->input('reason_choice');
 
         $rCost->recurring_times_week = null;
@@ -271,7 +272,7 @@ class RecurringBusinessController extends Controller
             return $income;
         });
         $currencies = Currency::all();
-        
+
         $incomeReasons = \App\Models\Transaction::whereIn('type', ['received', 'refunded', 'sent'])->select('reason')->distinct()->pluck('reason');
         $recurringReasons = RecurringIncome::select('reason')->distinct()->pluck('reason');
         $categories = $incomeReasons->concat($recurringReasons)->unique()->filter()->values();
@@ -314,9 +315,9 @@ class RecurringBusinessController extends Controller
         $rIncome->current_date = $request->input('start_date');
         $rIncome->recurring = $request->input('recurring');
         $rIncome->recurring_times = $request->input('recurring_times');
-        
-        $rIncome->reason = $request->input('reason_choice') === 'custom' 
-            ? $request->input('custom_reason') 
+
+        $rIncome->reason = $request->input('reason_choice') === 'custom'
+            ? $request->input('custom_reason')
             : $request->input('reason_choice');
 
         if ($request->input('recurring') === 'week') {
@@ -342,7 +343,7 @@ class RecurringBusinessController extends Controller
     {
         $income = RecurringIncome::findOrFail($id);
         $currencies = Currency::all();
-        
+
         $incomeReasons = \App\Models\Transaction::whereIn('type', ['received', 'refunded', 'sent'])->select('reason')->distinct()->pluck('reason');
         $recurringReasons = RecurringIncome::select('reason')->distinct()->pluck('reason');
         $categories = $incomeReasons->concat($recurringReasons)->unique()->filter()->values();
@@ -387,9 +388,9 @@ class RecurringBusinessController extends Controller
         $rIncome->current_date = $request->input('start_date');
         $rIncome->recurring = $request->input('recurring');
         $rIncome->recurring_times = $request->input('recurring_times');
-        
-        $rIncome->reason = $request->input('reason_choice') === 'custom' 
-            ? $request->input('custom_reason') 
+
+        $rIncome->reason = $request->input('reason_choice') === 'custom'
+            ? $request->input('custom_reason')
             : $request->input('reason_choice');
 
         $rIncome->recurring_times_week = null;

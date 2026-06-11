@@ -271,12 +271,26 @@ class FinancialOperationsController extends Controller
                     $received = (clone $incomeQuery)->where('type', 'received')->sum('business_amount') ?? 0;
                     $refunded = (clone $incomeQuery)->where('type', 'refunded')->sum('business_amount') ?? 0;
                     $sent = (clone $incomeQuery)->where('type', 'sent')->sum('business_amount') ?? 0;
-                    return max(0, $received - $refunded - $sent);
+                    return max(0, abs($received) - abs($refunded) - abs($sent));
                 })(),
                 'total_monthly_salaries' => CostTransaction::whereYear('created_at', now()->year)
                     ->whereMonth('created_at', now()->month)
                     ->where('reason', 'salary')
                     ->sum('business_amount'),
+                'total_monthly_net_profit' => (function() {
+                    $incomeQuery = \App\Models\Transaction::whereYear('created_at', now()->year)
+                        ->whereMonth('created_at', now()->month);
+                    $received = (clone $incomeQuery)->where('type', 'received')->sum('business_amount') ?? 0;
+                    $refunded = (clone $incomeQuery)->where('type', 'refunded')->sum('business_amount') ?? 0;
+                    $sent = (clone $incomeQuery)->where('type', 'sent')->sum('business_amount') ?? 0;
+                    $net_revenue = max(0, abs($received) - abs($refunded) - abs($sent));
+
+                    $expenses = CostTransaction::whereYear('created_at', now()->year)
+                        ->whereMonth('created_at', now()->month)
+                        ->sum('business_amount') ?? 0;
+
+                    return $net_revenue - abs($expenses);
+                })(),
                 'business_currency_code' => (function() {
                     $bCurrencyId = \App\Models\AdminSettings::business_currency();
                     $bCurrency = \App\Models\Currency::find($bCurrencyId);
@@ -308,7 +322,7 @@ class FinancialOperationsController extends Controller
                             ->whereMonth('created_at', $month)
                             ->where('type', 'sent')
                             ->sum('business_amount') ?? 0;
-                        $income = max(0, $received - $refunded - $sent);
+                        $income = max(0, abs($received) - abs($refunded) - abs($sent));
 
                         // Expenses
                         $expenses = CostTransaction::whereYear('created_at', $year)
@@ -322,11 +336,14 @@ class FinancialOperationsController extends Controller
                             ->where('reason', 'salary')
                             ->sum('business_amount') ?? 0;
 
+                        $net_profit = $income - abs($expenses) - abs($salaries);
+
                         $trends[] = [
                             'month' => $monthName,
                             'income' => (float)$income,
-                            'expenses' => (float)$expenses,
-                            'payroll' => (float)$salaries,
+                            'expenses' => (float)abs($expenses),
+                            'payroll' => (float)abs($salaries),
+                            'net_profit' => (float)$net_profit,
                         ];
                     }
                     return $trends;
@@ -695,8 +712,11 @@ class FinancialOperationsController extends Controller
                 $refunded = (clone $incomeQuery)->where('type', 'refunded')->sum('business_amount') ?? 0;
                 $sent = (clone $incomeQuery)->where('type', 'sent')->sum('business_amount') ?? 0;
                 
-                fputcsv($file, ['Gross Income', 'Income', $received]);
-                fputcsv($file, ['Refunds/Sent', 'Income Deduction', -($refunded + $sent)]);
+                $net_revenue = max(0, abs($received) - abs($refunded) - abs($sent));
+
+                fputcsv($file, ['Gross Income', 'Income', abs($received)]);
+                fputcsv($file, ['Refunds/Sent', 'Income Deduction', -(abs($refunded) + abs($sent))]);
+                fputcsv($file, ['Net Revenue', 'Income', $net_revenue]);
                 
                 // Expenses
                 $expenses = \App\Models\CostTransaction::whereYear('created_at', $year)
@@ -705,9 +725,13 @@ class FinancialOperationsController extends Controller
                     ->groupBy('reason')
                     ->get();
                 
+                $total_expenses = 0;
                 foreach ($expenses as $exp) {
-                    fputcsv($file, [ucfirst($exp->reason), 'Expense', $exp->total]);
+                    fputcsv($file, [ucfirst($exp->reason), 'Expense', -abs($exp->total)]);
+                    $total_expenses += abs($exp->total);
                 }
+
+                fputcsv($file, ['Net Profit', 'Profit', $net_revenue - $total_expenses]);
             } else {
                 fputcsv($file, ['Date', 'Title', 'Type', 'Category', 'Original Amount', 'Currency', 'Business Amount']);
                 

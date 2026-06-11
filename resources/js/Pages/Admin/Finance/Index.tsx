@@ -327,13 +327,13 @@ export default function Index({ entries, categories, users, currentTab, stats, a
             <Head title={__('general.admin_financial_ledger')} />
             
             {/* Top Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div className="bg-white p-6 rounded-xl border shadow-sm flex items-center">
                     <div className="bg-slate-100 p-4 rounded-full mr-4 text-slate-800 border">
                         <TrendingUp className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">{__('general.monthly_net_income')}</p>
+                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">{__('general.net_revenue')}</p>
                         <h3 className="text-2xl font-bold text-slate-900">{formatCurrency(stats.total_monthly_income, stats.business_currency_code)}</h3>
                     </div>
                 </div>
@@ -353,6 +353,15 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                     <div>
                         <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">{__('general.monthly_payroll')}</p>
                         <h3 className="text-2xl font-bold text-slate-900">{formatCurrency(stats.total_monthly_salaries, stats.business_currency_code)}</h3>
+                    </div>
+                </div>
+                <div className="bg-white p-6 rounded-xl border shadow-sm flex items-center">
+                    <div className="bg-indigo-50 p-4 rounded-full mr-4 text-indigo-700 border border-indigo-100">
+                        <DollarSign className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">{__('general.net_profit')}</p>
+                        <h3 className="text-2xl font-bold text-indigo-900">{formatCurrency(stats.total_monthly_net_profit, stats.business_currency_code)}</h3>
                     </div>
                 </div>
             </div>
@@ -392,7 +401,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                     <div className="lg:col-span-2 bg-white p-6 rounded-xl border shadow-sm flex flex-col justify-between">
                         <div>
                             <h3 className="text-sm font-semibold text-slate-800 uppercase tracking-wider mb-1">Financial Trends (Last 6 Months)</h3>
-                            <p className="text-xs text-gray-500 mb-4 font-normal">Historical comparison of net income, expenses, and payroll in {stats.business_currency_code}</p>
+                            <p className="text-xs text-gray-500 mb-4 font-normal">Historical comparison of net revenue, net profit, expenses, and payroll in {stats.business_currency_code}</p>
                         </div>
                         <div className="h-[260px] w-full">
                             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={260}>
@@ -406,15 +415,20 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1}/>
                                             <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
                                         </linearGradient>
+                                        <linearGradient id="colorNetProfit" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.1}/>
+                                            <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                                        </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                                     <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10 }} />
                                     <YAxis tickFormatter={formatYAxis} axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10 }} />
                                     <RechartsTooltip content={<CustomTooltip />} cursor={{ stroke: '#e2e8f0', strokeWidth: 1 }} />
                                     <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px', paddingTop: '15px' }} />
-                                    <Area type="monotone" dataKey="income" name="Income" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorIncome)" />
+                                    <Area type="monotone" dataKey="income" name="Net Revenue" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorIncome)" />
                                     <Area type="monotone" dataKey="expenses" name="Expenses" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorExpenses)" />
                                     <Area type="monotone" dataKey="payroll" name="Payroll" stroke="#3b82f6" strokeWidth={2} fillOpacity={0} />
+                                    <Area type="monotone" dataKey="net_profit" name="Net Profit" stroke="#8b5cf6" strokeWidth={2} fillOpacity={1} fill="url(#colorNetProfit)" />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>

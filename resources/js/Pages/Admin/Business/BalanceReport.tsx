@@ -15,6 +15,21 @@ import {
     TrendingDown,
     Activity
 } from 'lucide-react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/Components/ui/select";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/Components/ui/table";
 import { formatCurrency } from '@/lib/utils';
 import {
     AreaChart,
@@ -28,6 +43,9 @@ import {
 
 export default function BalanceReport() {
     const { stats } = usePage<any>().props;
+
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
     const handlePrevYear = () => {
         router.get(route('admin.reports.balance'), { year: stats.year - 1 }, { preserveState: true });
@@ -71,7 +89,16 @@ export default function BalanceReport() {
                     <Button variant="outline" size="icon" onClick={handlePrevYear}>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <div className="text-sm font-semibold w-16 text-center">{stats.year}</div>
+                    <Select value={String(stats.year)} onValueChange={(val) => router.get(route('admin.reports.balance'), { year: val }, { preserveState: true })}>
+                        <SelectTrigger className="w-[100px]">
+                            <SelectValue placeholder="Year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {years.map(y => (
+                                <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                     <Button variant="outline" size="icon" onClick={handleNextYear}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
@@ -190,6 +217,40 @@ export default function BalanceReport() {
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
+                </CardContent>
+            </Card>
+
+            <Card className="border-none shadow-sm shadow-slate-200/50 mb-6">
+                <CardHeader>
+                    <CardTitle className="text-lg font-semibold text-slate-900">Monthly Breakdown ({stats.year})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Month</TableHead>
+                                <TableHead className="text-right">Income</TableHead>
+                                <TableHead className="text-right">Costs</TableHead>
+                                <TableHead className="text-right">Profit</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {stats.monthly_trends.map((monthData: any, idx: number) => (
+                                <TableRow key={idx}>
+                                    <TableCell className="font-medium text-slate-700">{monthData.name}</TableCell>
+                                    <TableCell className="text-right text-emerald-600 font-medium">
+                                        {formatCurrency(monthData.income, stats.business_currency_code)}
+                                    </TableCell>
+                                    <TableCell className="text-right text-rose-600 font-medium">
+                                        {formatCurrency(monthData.costs, stats.business_currency_code)}
+                                    </TableCell>
+                                    <TableCell className={`text-right font-semibold ${monthData.profit >= 0 ? 'text-purple-600' : 'text-rose-600'}`}>
+                                        {formatCurrency(monthData.profit, stats.business_currency_code)}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
                 </CardContent>
             </Card>
         </AdminSidebarLayout>
