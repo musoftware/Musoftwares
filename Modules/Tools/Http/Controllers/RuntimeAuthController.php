@@ -97,7 +97,7 @@ class RuntimeAuthController extends Controller
         }
 
         // If we reach here, local agent is unreachable or failed
-        $token->delete(); // Revoke the token we just created
+        $token->accessToken->delete(); // Revoke the token we just created
 
         return back()->withErrors(['callback' => 'Could not connect to the local runtime agent on port ' . $port]);
     }
