@@ -84,49 +84,7 @@ export default function Reports() {
                 </Card>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <Card className="border-none shadow-sm shadow-slate-200/50">
-                    <CardHeader className="pb-2 border-b border-slate-50">
-                        <CardTitle className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                            <DollarSign className="w-4 h-4" />
-                            Lifetime Income
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                        <div className="text-3xl font-bold text-emerald-600 tracking-tight">
-                            {formatCurrency(stats.lifetime_income, stats.business_currency_code)}
-                        </div>
-                    </CardContent>
-                </Card>
 
-                <Card className="border-none shadow-sm shadow-slate-200/50">
-                    <CardHeader className="pb-2 border-b border-slate-50">
-                        <CardTitle className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                            <TrendingDown className="w-4 h-4 text-rose-500" />
-                            Lifetime Expenses
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                        <div className="text-3xl font-bold text-rose-600 tracking-tight">
-                            {formatCurrency(stats.lifetime_expenses, stats.business_currency_code)}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="border-none shadow-sm shadow-slate-200/50">
-                    <CardHeader className="pb-2 border-b border-slate-50">
-                        <CardTitle className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-purple-500" />
-                            Net Profit
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                        <div className={`text-3xl font-bold tracking-tight ${stats.net_profit >= 0 ? 'text-purple-600' : 'text-rose-600'}`}>
-                            {formatCurrency(stats.net_profit, stats.business_currency_code)}
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
         </AdminSidebarLayout>
     );
 }

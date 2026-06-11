@@ -3037,30 +3037,6 @@ parameters:
 			path: app/Http/Controllers/Admin/FinancialOperationsController.php
 
 		-
-			message: '#^Relation ''project'' is not found in App\\Models\\CostTransaction model\.$#'
-			identifier: larastan.relationExistence
-			count: 3
-			path: app/Http/Controllers/Admin/FinancialOperationsController.php
-
-		-
-			message: '#^Relation ''project'' is not found in App\\Models\\Transaction model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/Admin/FinancialOperationsController.php
-
-		-
-			message: '#^Relation ''user'' is not found in App\\Models\\CostTransaction model\.$#'
-			identifier: larastan.relationExistence
-			count: 3
-			path: app/Http/Controllers/Admin/FinancialOperationsController.php
-
-		-
-			message: '#^Relation ''user'' is not found in App\\Models\\Transaction model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/Admin/FinancialOperationsController.php
-
-		-
 			message: '#^Relation ''client'' is not found in Modules\\Freelance\\Models\\Contract model\.$#'
 			identifier: larastan.relationExistence
 			count: 2
@@ -5683,12 +5659,6 @@ parameters:
 			path: app/Models/Transaction.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Transaction\:\:\$user\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Transaction.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\User\:\:\$avatar\.$#'
 			identifier: property.notFound
 			count: 1
@@ -5761,12 +5731,6 @@ parameters:
 			path: app/Services/DashboardService.php
 
 		-
-			message: '#^Relation ''user'' is not found in App\\Models\\Transaction model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Services/DashboardService.php
-
-		-
 			message: '#^Relation ''referred_user'' is not found in App\\Models\\Earning model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
@@ -5795,27 +5759,3 @@ parameters:
 			identifier: larastan.relationExistence
 			count: 2
 			path: app/Services/SupportDeskService.php
-
-		-
-			message: '#^Relation ''project'' is not found in App\\Models\\CostTransaction model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Services/TransactionService.php
-
-		-
-			message: '#^Relation ''project'' is not found in App\\Models\\Transaction model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Services/TransactionService.php
-
-		-
-			message: '#^Relation ''user'' is not found in App\\Models\\CostTransaction model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Services/TransactionService.php
-
-		-
-			message: '#^Relation ''user'' is not found in App\\Models\\Transaction model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Services/TransactionService.php

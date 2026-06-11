@@ -5,6 +5,9 @@ import { Button } from '@/Components/ui/button';
 import { Trash2, Edit, Plus, DollarSign, TrendingDown, Clock, Search, X, Calendar, ArrowLeft, Eye } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+const COLORS = ['#0f172a', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1'];
 
 export default function Index({ costs, currencies, categories, stats }) {
     const { errors } = usePage().props;
@@ -69,6 +72,69 @@ export default function Index({ costs, currencies, categories, stats }) {
                     </div>
                 </div>
             </div>
+
+            {/* Pie Charts */}
+            {stats.chart_data && stats.chart_data.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div className="bg-white p-6 rounded-xl border shadow-sm">
+                        <h3 className="text-sm text-gray-500 font-medium uppercase tracking-wider mb-4">{__('general.monthly_breakdown')}</h3>
+                        <div className="h-64">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={stats.chart_data}
+                                        dataKey="monthly"
+                                        nameKey="name"
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={2}
+                                    >
+                                        {stats.chart_data.map((entry: any, index: number) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip 
+                                        formatter={(value) => formatCurrency(value, stats.business_currency_code)}
+                                        contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}
+                                    />
+                                    <Legend />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl border shadow-sm">
+                        <h3 className="text-sm text-gray-500 font-medium uppercase tracking-wider mb-4">{__('general.annual_breakdown')}</h3>
+                        <div className="h-64">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={stats.chart_data}
+                                        dataKey="annual"
+                                        nameKey="name"
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={2}
+                                    >
+                                        {stats.chart_data.map((entry: any, index: number) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip 
+                                        formatter={(value) => formatCurrency(value, stats.business_currency_code)}
+                                        contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}
+                                    />
+                                    <Legend />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Title & Actions Bar */}
             <div className="flex justify-between items-center mb-6">

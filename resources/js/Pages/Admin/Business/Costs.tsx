@@ -75,7 +75,7 @@ export default function Costs() {
             title="Business Costs" 
             header="Business Costs"
         >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                 <Card className="border-none shadow-sm shadow-slate-200/50">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between space-y-0 pb-2">
@@ -90,23 +90,6 @@ export default function Costs() {
                         <p className="text-xs text-slate-500 mt-2 font-medium">
                             <span className="text-rose-600 font-semibold bg-rose-50 px-1.5 py-0.5 rounded mr-1">This Month</span>
                             Total Costs
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card className="border-none shadow-sm shadow-slate-200/50">
-                    <CardContent className="p-6">
-                        <div className="flex items-center justify-between space-y-0 pb-2">
-                            <p className="text-sm font-medium text-slate-500">Lifetime Costs</p>
-                            <div className="p-2 bg-rose-50 rounded-xl">
-                                <ArrowDownRight className="h-4 w-4 text-rose-600" />
-                            </div>
-                        </div>
-                        <div className="text-3xl font-bold text-slate-900 tracking-tight">
-                            {formatCurrency(stats.total_lifetime_costs, stats.business_currency_code)}
-                        </div>
-                        <p className="text-xs text-slate-500 mt-2 font-medium">
-                            All time expenses
                         </p>
                     </CardContent>
                 </Card>

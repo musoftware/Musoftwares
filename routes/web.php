@@ -451,6 +451,14 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::delete('/finance/{entry}', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'destroy'])->name('finance.destroy');
     Route::post('/finance/{entry}/mark-paid', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'markAsPaid'])->name('finance.mark-paid');
 
+    // Legacy Business Routes mapped to new BusinessController
+    Route::prefix('business')->group(function() {
+        Route::get('/income', [\App\Http\Controllers\Admin\BusinessController::class, 'income'])->name('income.index');
+        Route::get('/costs', [\App\Http\Controllers\Admin\BusinessController::class, 'costs'])->name('costs.index');
+        Route::get('/reports', [\App\Http\Controllers\Admin\BusinessController::class, 'reports'])->name('reports.index');
+        Route::get('/balance-report', [\App\Http\Controllers\Admin\BusinessController::class, 'balance'])->name('reports.balance');
+    });
+
     // Recurring Business Operations (Recovered from legacy project)
     Route::prefix('business/recurring')->group(function () {
         // Costs
