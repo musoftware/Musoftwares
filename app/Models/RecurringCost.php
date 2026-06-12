@@ -11,6 +11,10 @@ class RecurringCost extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
     public function current_amount()
     {
         return $this->amount;
@@ -149,7 +153,7 @@ class RecurringCost extends Model
     {
         $b_currency = AdminSettings::GetValue('business_currency', '1');
         $total_amount = 0;
-        foreach (RecurringCost::all() as $rCost) {
+        foreach (RecurringCost::where('is_active', true)->get() as $rCost) {
             $detail = explode(',', $rCost->details());
 
             $times_type = 0;
@@ -177,7 +181,7 @@ class RecurringCost extends Model
     {
         $b_currency = AdminSettings::GetValue('business_currency', '1');
         $data = [];
-        foreach (RecurringCost::all() as $rCost) {
+        foreach (RecurringCost::where('is_active', true)->get() as $rCost) {
             $details_str = $rCost->details();
             $detail = $details_str ? explode(',', (string) $details_str) : [];
 

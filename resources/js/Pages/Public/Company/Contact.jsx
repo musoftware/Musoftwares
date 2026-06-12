@@ -33,7 +33,7 @@ export default function Contact({ canLogin, canRegister }) {
                             <p className="text-slate-600 font-light mb-6 flex-1">Email our solutions team for pricing, architecture reviews, and platform demos.</p>
                             <a href="mailto:admin@musoftwares.com" className="text-slate-900 font-semibold hover:underline">admin@musoftwares.com</a>
                         </div>
-                        
+
                         <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-start text-left">
                             <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mb-6">
                                 <Phone className="h-6 w-6 text-slate-900" />
@@ -52,7 +52,7 @@ export default function Contact({ canLogin, canRegister }) {
                             </div>
                             <h3 className="text-lg font-bold text-slate-900 mb-2">Headquarters</h3>
                             <p className="text-slate-600 font-light mb-6 flex-1">Visit our main engineering office for scheduled consultations.</p>
-                            <span className="text-slate-900 font-semibold">Cairo, Egypt</span>
+                            <span className="text-slate-900 font-semibold">Suez, Egypt</span>
                         </div>
                     </div>
                 </div>

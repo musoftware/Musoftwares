@@ -14,6 +14,7 @@ class RecurringSalary extends Model
 
     protected $casts = [
         'amount' => 'float',
+        'is_active' => 'boolean',
     ];
 
     public function user(): BelongsTo

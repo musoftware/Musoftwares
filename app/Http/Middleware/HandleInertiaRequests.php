@@ -151,12 +151,13 @@ class HandleInertiaRequests extends Middleware
                     return 'USD';
                 }
             ],
-            'currencies' => \App\Models\Currency::all()->map(fn($c) => [
+            'currencies' => fn() => \App\Models\Currency::all()->map(fn($c) => [
                 'id' => $c->id,
                 'currency' => $c->currency,
                 'symbol' => $c->symbol,
                 'string_format' => $c->string_format,
             ])->toArray(),
+            'website_services' => fn() => class_exists(\App\Models\WebsiteService::class) ? \App\Models\WebsiteService::all()->toArray() : [],
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
                 'success' => fn () => $request->session()->get('success'),

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { __ } from '@/lib/i18n';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Button } from '@/Components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,7 +8,7 @@ import {
     Monitor, Smartphone, Server, CheckCircle, 
     ArrowRight, LayoutDashboard, Ticket, FolderKanban, X,
     Users, MessageSquare, TrendingUp, Calendar, Store, Wrench,
-    Download, MessageCircle, Search
+    Download, MessageCircle, Search, Box
 } from 'lucide-react';
 
 const fadeUp = {
@@ -59,6 +59,7 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
     const [selectedItem, setSelectedItem] = useState(null);
     const carouselRef = useRef(null);
     const [width, setWidth] = useState(0);
+    const { website_services } = usePage().props;
 
     useEffect(() => {
         if (carouselRef.current) {
@@ -102,11 +103,13 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
                                 {__('general.landing_hero_subtitle')}
                             </motion.p>
                             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 justify-center">
-                                <a href="mailto:admin@musoftwares.com">
-                                    <Button size="lg" className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white rounded-full px-10 h-14 text-base font-semibold transition-all">
-                                        {__('general.landing_hero_cta')}
-                                    </Button>
-                                </a>
+                                <Button 
+                                    onClick={() => window.dispatchEvent(new Event('open-guest-ticket'))}
+                                    size="lg" 
+                                    className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white rounded-full px-10 h-14 text-base font-semibold transition-all"
+                                >
+                                    {__('general.submit_guest_ticket') || 'Submit Guest Ticket'}
+                                </Button>
                                 <Link href="/platforms">
                                     <Button size="lg" variant="outline" className="w-full sm:w-auto hover:bg-slate-50 text-slate-900 border-slate-200 rounded-full px-10 h-14 text-base font-semibold transition-all">
                                         {__('general.landing_hero_secondary_cta')}
@@ -134,38 +137,25 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Service 1: Web Apps */}
-                        <div className="group bg-white rounded-3xl p-10 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-8 text-slate-700 group-hover:bg-slate-900 group-hover:text-white transition-all duration-300">
-                                <Monitor className="w-7 h-7" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-slate-900 mb-4">{__('general.landing_services_web')}</h3>
-                            <p className="text-lg text-slate-500 font-light leading-relaxed">
-                                {__('general.landing_services_web_desc')}
-                            </p>
-                        </div>
-
-                        {/* Service 2: ERPs */}
-                        <div className="group bg-white rounded-3xl p-10 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-8 text-slate-700 group-hover:bg-slate-900 group-hover:text-white transition-all duration-300">
-                                <Server className="w-7 h-7" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-slate-900 mb-4">{__('general.landing_services_erp')}</h3>
-                            <p className="text-lg text-slate-500 font-light leading-relaxed">
-                                {__('general.landing_services_erp_desc')}
-                            </p>
-                        </div>
-
-                        {/* Service 3: Mobile Apps */}
-                        <div className="group bg-white rounded-3xl p-10 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300">
-                            <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-8 text-slate-700 group-hover:bg-slate-900 group-hover:text-white transition-all duration-300">
-                                <Smartphone className="w-7 h-7" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-slate-900 mb-4">{__('general.landing_services_mobile')}</h3>
-                            <p className="text-lg text-slate-500 font-light leading-relaxed">
-                                {__('general.landing_services_mobile_desc')}
-                            </p>
-                        </div>
+                        {website_services && website_services.length > 0 ? (
+                            website_services.map((service) => (
+                                <div key={service.id} className="group bg-white rounded-3xl p-10 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300">
+                                    <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-8 text-slate-700 group-hover:bg-slate-900 transition-all duration-300 overflow-hidden">
+                                        {service.image_path ? (
+                                            <img src={`/storage/${service.image_path}`} alt={service.title} className="w-full h-full object-cover group-hover:opacity-90" />
+                                        ) : (
+                                            <Box className="w-7 h-7 group-hover:text-white" />
+                                        )}
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-slate-900 mb-4">{service.title}</h3>
+                                    <p className="text-lg text-slate-500 font-light leading-relaxed">
+                                        {service.description || service.subtitle || ''}
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="col-span-1 md:col-span-3 text-center text-slate-500 py-12">No services available.</p>
+                        )}
                     </div>
                 </div>
             </section>
@@ -349,11 +339,13 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
                     <p className="text-xl text-slate-500 font-light mb-10 max-w-2xl mx-auto">
                         {__('general.landing_contact_desc')}
                     </p>
-                    <a href="mailto:admin@musoftwares.com">
-                        <Button size="lg" className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-12 h-16 text-lg font-bold shadow-xl hover:shadow-2xl transition-all">
-                            {__('general.landing_contact_cta')}
-                        </Button>
-                    </a>
+                    <Button 
+                        onClick={() => window.dispatchEvent(new Event('open-guest-ticket'))}
+                        size="lg" 
+                        className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-12 h-16 text-lg font-bold shadow-xl hover:shadow-2xl transition-all"
+                    >
+                        {__('general.submit_guest_ticket') || 'Submit Guest Ticket'}
+                    </Button>
                 </div>
             </section>
 

@@ -149,19 +149,24 @@ export default function Costs() {
                         <CardTitle className="text-lg font-semibold text-slate-900">Cost Entries</CardTitle>
                         <CardDescription>Recent expense transactions</CardDescription>
                     </div>
-                    <form onSubmit={handleSearch} className="flex items-center w-full sm:w-auto gap-2">
-                        <div className="relative w-full sm:w-64">
-                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-                            <Input
-                                type="text"
-                                placeholder="Search reason..."
-                                className="pl-9 h-9 border-slate-200 focus-visible:ring-rose-500 rounded-lg w-full text-sm"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                        <Button type="submit" size="sm" variant="secondary">Search</Button>
-                    </form>
+                    <div className="flex flex-col sm:flex-row items-center w-full sm:w-auto gap-3">
+                        <form onSubmit={handleSearch} className="flex items-center w-full sm:w-auto gap-2">
+                            <div className="relative w-full sm:w-64">
+                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+                                <Input
+                                    type="text"
+                                    placeholder="Search reason..."
+                                    className="pl-9 h-9 border-slate-200 focus-visible:ring-rose-500 rounded-lg w-full text-sm"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <Button type="submit" size="sm" variant="secondary">Search</Button>
+                        </form>
+                        <Button size="sm" onClick={() => router.visit(route('admin.costs.create'))} className="bg-rose-600 hover:bg-rose-700 text-white w-full sm:w-auto">
+                            {__('admin.add_cost') || "Add Cost"}
+                        </Button>
+                    </div>
                 </CardHeader>
                 <div className="overflow-x-auto">
                     <Table>

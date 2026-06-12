@@ -8,11 +8,17 @@ class PasswordVault extends Model
 {
     protected $fillable = [
         'user_id',
+        'salt',
         'encrypted_data',
     ];
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class);
+    }
+
+    public function items(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PasswordItem::class, 'password_vault_id');
     }
 }

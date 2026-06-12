@@ -1,9 +1,13 @@
 import { __ } from '@/lib/i18n';
 import { Button } from '@/Components/ui/button';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, useForm } from '@inertiajs/react';
 import { PropsWithChildren, useEffect, useState } from 'react';
-import { Menu, X, ArrowRight, ChevronDown, Monitor, Box, Server, Activity, Phone, MessageCircle, Globe, MapPin } from 'lucide-react';
+import { Menu, X, ArrowRight, ChevronDown, Monitor, Box, Server, Activity, Phone, MessageCircle, Globe, MapPin, Send } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/Components/ui/dialog';
+import { Input } from '@/Components/ui/input';
+import { Textarea } from '@/Components/ui/textarea';
+import { Label } from '@/Components/ui/label';
 
 interface PublicLayoutProps extends PropsWithChildren {
     auth?: {
@@ -17,13 +21,37 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+    const [isGuestTicketOpen, setIsGuestTicketOpen] = useState(false);
+
+    const { data, setData, post, processing, reset } = useForm({
+        name: '',
+        email: '',
+        mobile: '',
+        body: '',
+    });
+
+    const submitGuestTicket = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(route('guest-tickets.submit'), {
+            onSuccess: () => {
+                reset();
+                setIsGuestTicketOpen(false);
+            }
+        });
+    };
 
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
         };
+        const handleOpenTicket = () => setIsGuestTicketOpen(true);
+        
         window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        window.addEventListener('open-guest-ticket', handleOpenTicket);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('open-guest-ticket', handleOpenTicket);
+        };
     }, []);
 
     type NavItem = {
@@ -38,16 +66,21 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
         }[];
     };
 
+    const { website_services } = usePage().props as any;
+
+    const servicesItems = (website_services || []).map((s: any) => ({
+        title: s.title,
+        desc: s.subtitle || '',
+        href: '#',
+        icon: s.image_path ? <img src={`/storage/${s.image_path}`} alt={s.title} className="w-full h-full object-cover rounded-lg" /> : <Monitor className="w-5 h-5 text-slate-400" />
+    }));
+
     const navItems: NavItem[] = [
         {
-            id: 'platforms',
-            label: 'Platforms',
-            href: '/platforms',
-            items: [
-                { title: 'MU CRM', desc: 'Customer Operations Platform', href: '/platforms/crm' },
-                { title: 'MU ERP', desc: 'Enterprise Resource Planning', href: '/platforms/erp' },
-                { title: 'MU Cloud', desc: 'Dedicated Server Management', href: '/platforms/cloud' },
-            ]
+            id: 'services',
+            label: 'Services',
+            href: '#',
+            items: servicesItems
         },
         {
             id: 'solutions',
@@ -134,11 +167,9 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                 <Link href="/login" className="text-sm font-semibold text-slate-600 hover:text-slate-900 px-3 py-2 transition-all">
                                     Client Login
                                 </Link>
-                                <Link href="/register">
-                                    <Button className="bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold h-10 px-6 flex items-center gap-2">
-                                        Explore Solutions <ArrowRight className="h-4 w-4" />
-                                    </Button>
-                                </Link>
+                                <Button onClick={() => setIsGuestTicketOpen(true)} className="bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold h-10 px-6 flex items-center gap-2">
+                                    {__('general.submit_guest_ticket') || 'Submit Guest Ticket'} <Send className="h-4 w-4 ml-1" />
+                                </Button>
                             </>
                         )}
                     </div>
@@ -224,9 +255,9 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                 <Link href="/login" className="block w-full">
                                     <Button variant="outline" className="w-full rounded-full h-12">Client Login</Button>
                                 </Link>
-                                <a href="mailto:admin@musoftwares.com" className="block w-full">
-                                    <Button className="w-full bg-slate-900 text-white rounded-full h-12">Explore Solutions</Button>
-                                </a>
+                                <Button onClick={() => setIsGuestTicketOpen(true)} className="w-full bg-slate-900 text-white rounded-full h-12 flex items-center justify-center gap-2">
+                                    {__('general.submit_guest_ticket') || 'Submit Guest Ticket'} <Send className="h-4 w-4 ml-1" />
+                                </Button>
                             </>
                         )}
                     </div>
@@ -351,6 +382,46 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                     </div>
                 </div>
             </footer>
+
+            {/* Guest Ticket Dialog */}
+            <Dialog open={isGuestTicketOpen} onOpenChange={setIsGuestTicketOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>{__('general.submit_guest_ticket') || 'Submit Guest Ticket'}</DialogTitle>
+                        <DialogDescription>
+                            Please fill out the form below and we will get back to you shortly.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={submitGuestTicket} className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="name">{__('general.name') || 'Name'}</Label>
+                            <Input id="name" required value={data.name} onChange={e => setData('name', e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="email">{__('general.email') || 'Email'}</Label>
+                            <Input id="email" type="email" required value={data.email} onChange={e => setData('email', e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="mobile" className="flex items-center gap-2">
+                                {__('general.mobile') || 'Mobile'} <MessageCircle className="h-4 w-4 text-[#25D366]" />
+                            </Label>
+                            <Input id="mobile" required value={data.mobile} onChange={e => setData('mobile', e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="body">{__('general.message') || 'Message'}</Label>
+                            <Textarea id="body" required value={data.body} onChange={e => setData('body', e.target.value)} rows={4} />
+                        </div>
+                        <DialogFooter className="pt-4">
+                            <Button type="button" variant="outline" onClick={() => setIsGuestTicketOpen(false)}>
+                                {__('general.cancel') || 'Cancel'}
+                            </Button>
+                            <Button type="submit" disabled={processing}>
+                                {__('general.submit') || 'Submit'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

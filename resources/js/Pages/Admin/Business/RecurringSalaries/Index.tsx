@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
-import { Trash2, Edit, Plus, User, Clock, Calendar, ArrowLeft, Eye } from 'lucide-react';
+import { Switch } from '@/Components/ui/switch';
+import { Trash2, Edit, Plus, User, Clock, Calendar, ArrowLeft, Eye, Power } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import {
     Dialog,
@@ -72,6 +73,12 @@ export default function Index({ salaries, currencies, users }) {
             // In the routes we registered 'recurring_salaries.delete'
             router.delete(route('admin.recurring_salaries.delete', id));
         }
+    };
+
+    const handleToggleActive = (id) => {
+        router.post(route('admin.recurring_salaries.toggle', id), {}, {
+            preserveScroll: true
+        });
     };
 
     const formatSchedule = (salary) => {
@@ -282,6 +289,9 @@ export default function Index({ salaries, currencies, users }) {
                                 Amount
                             </th>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
+                                Active
+                            </th>
+                            <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
                                 Note
                             </th>
                             <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Actions</th>
@@ -313,6 +323,14 @@ export default function Index({ salaries, currencies, users }) {
                                     <span className="text-sm font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded">
                                         {formatCurrency(salary.amount, salary.currency)}
                                     </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                    <Switch 
+                                        checked={salary.is_active} 
+                                        onCheckedChange={() => handleToggleActive(salary.id)} 
+                                        aria-label="Toggle active status"
+                                    />
+                                    <div className="text-[10px] text-gray-500 mt-1">{salary.is_active ? __('general.active') : __('general.inactive')}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
                                     <span className="text-xs text-gray-600 italic">

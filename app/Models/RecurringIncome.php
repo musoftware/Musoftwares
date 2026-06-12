@@ -11,6 +11,10 @@ class RecurringIncome extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
     public function current_amount()
     {
         return $this->amount;
@@ -149,7 +153,7 @@ class RecurringIncome extends Model
     {
         $b_currency = AdminSettings::GetValue('business_currency', '1');
         $total_amount = 0;
-        foreach (RecurringIncome::all() as $rIncome) {
+        foreach (RecurringIncome::where('is_active', true)->get() as $rIncome) {
             $detail = explode(',', $rIncome->details());
 
             $times_type = 0;

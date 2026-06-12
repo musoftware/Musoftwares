@@ -5792,4 +5792,10 @@ return [
   'add_points' => 'Add Points',
   'monthly_breakdown' => 'Monthly Breakdown',
   'annual_breakdown' => 'Annual Breakdown',
+    'submit_guest_ticket' => 'Submit Guest Ticket',
+    'ticket_submitted_success' => 'Your ticket has been submitted successfully.',
+    'continue_with_google' => 'Continue with Google',
+    'message' => 'Message',
+    'mobile' => 'Mobile',
+    'or_continue_with' => 'Or continue with',
 ];

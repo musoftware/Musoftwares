@@ -14,14 +14,21 @@ class PasswordSyncController extends Controller
      */
     public function getVault(Request $request)
     {
-        $vault = PasswordVault::firstOrCreate(
+        $vault = PasswordVault::with('items')->firstOrCreate(
             ['user_id' => $request->user()->id],
-            ['encrypted_data' => null]
+            ['encrypted_data' => null, 'salt' => null]
         );
 
         return response()->json([
             'success' => true,
-            'vault' => $vault->encrypted_data
+            'vault' => $vault->encrypted_data,
+            'salt' => $vault->salt,
+            'items' => $vault->items->map(function ($item) {
+                return [
+                    'id' => $item->remote_id,
+                    'data' => $item->encrypted_data
+                ];
+            })
         ]);
     }
 
@@ -31,15 +38,42 @@ class PasswordSyncController extends Controller
     public function updateVault(Request $request)
     {
         $request->validate([
-            'vault' => 'required'
+            'vault' => 'nullable',
+            'salt' => 'nullable|string',
+            'items' => 'nullable|array',
+            'deleted_items' => 'nullable|array',
         ]);
 
         $vault = PasswordVault::firstOrCreate(
             ['user_id' => $request->user()->id]
         );
 
-        $vault->encrypted_data = $request->vault;
+        if ($request->has('vault')) {
+            $vault->encrypted_data = $request->vault;
+        }
+
+        if ($request->has('salt')) {
+            $vault->salt = $request->salt;
+        }
+
         $vault->save();
+
+        if ($request->has('items') && is_array($request->items)) {
+            foreach ($request->items as $itemData) {
+                if (isset($itemData['id']) && isset($itemData['data'])) {
+                    \Modules\PasswordSync\app\Models\PasswordItem::updateOrCreate(
+                        ['password_vault_id' => $vault->id, 'remote_id' => $itemData['id']],
+                        ['encrypted_data' => is_string($itemData['data']) ? $itemData['data'] : json_encode($itemData['data'])]
+                    );
+                }
+            }
+        }
+
+        if ($request->has('deleted_items') && is_array($request->deleted_items)) {
+            \Modules\PasswordSync\app\Models\PasswordItem::where('password_vault_id', $vault->id)
+                ->whereIn('remote_id', $request->deleted_items)
+                ->delete();
+        }
 
         return response()->json([
             'success' => true,

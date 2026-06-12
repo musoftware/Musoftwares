@@ -260,6 +260,14 @@ class RecurringBusinessController extends Controller
         return redirect()->route('admin.recurring_costs.index')->with('success', __('general.recurring_cost_and_generated_transactions_deleted'));
     }
 
+    public function toggle_recurring_costs($id)
+    {
+        $rCost = RecurringCost::findOrFail($id);
+        $rCost->is_active = !$rCost->is_active;
+        $rCost->save();
+        return redirect()->back()->with('success', __('general.status_updated_successfully'));
+    }
+
     // ==========================================
     // RECURRING INCOME ACTIONS
     // ==========================================
@@ -482,6 +490,14 @@ class RecurringBusinessController extends Controller
         return redirect()->route('admin.recurring_income.index')->with('success', __('general.recurring_income_and_generated_transactions_deleted'));
     }
 
+    public function toggle_recurring_income($id)
+    {
+        $rIncome = RecurringIncome::findOrFail($id);
+        $rIncome->is_active = !$rIncome->is_active;
+        $rIncome->save();
+        return redirect()->back()->with('success', __('general.status_updated_successfully'));
+    }
+
     // ==========================================
     // RECURRING SALARIES ACTIONS
     // ==========================================
@@ -675,5 +691,13 @@ class RecurringBusinessController extends Controller
         $salary = RecurringSalary::findOrFail($id);
         $salary->delete();
         return redirect()->route('admin.recurring_salaries.index')->with('success', __('general.recurring_salary_deleted'));
+    }
+
+    public function toggle_recurring_salaries($id)
+    {
+        $salary = RecurringSalary::findOrFail($id);
+        $salary->is_active = !$salary->is_active;
+        $salary->save();
+        return redirect()->back()->with('success', __('general.status_updated_successfully'));
     }
 }
