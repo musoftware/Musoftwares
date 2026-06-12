@@ -316,7 +316,9 @@
             "search_project": "ابحث عن مشروع...",
             "service_created": "تم إنشاء الخدمة بنجاح.",
             "service_deleted": "تم حذف الخدمة بنجاح.",
-            "service_updated": "تم تحديث الخدمة بنجاح."
+            "service_updated": "تم تحديث الخدمة بنجاح.",
+            "google_calendar_connected": "تم ربط تقويم جوجل",
+            "google_calendar_disconnected": "تم إلغاء ربط تقويم جوجل"
         },
         "auth": {
             "failed": "failed",
@@ -7049,7 +7051,14 @@
             "continue_with_google": "المتابعة باستخدام جوجل",
             "message": "الرسالة",
             "mobile": "رقم الجوال",
-            "or_continue_with": "أو المتابعة باستخدام"
+            "or_continue_with": "أو المتابعة باستخدام",
+            "back_to_home": "العودة للصفحة الرئيسية",
+            "connect_google_calendar": "ربط تقويم جوجل",
+            "connect_your_google_calendar_to_automatically_sync_scheduled_tasks_and_bookings": "قم بربط تقويم جوجل الخاص بك لمزامنة المهام المجدولة والحجوزات تلقائياً",
+            "disconnect_google_calendar": "إلغاء ربط تقويم جوجل",
+            "google_calendar_connected": "تم ربط تقويم جوجل",
+            "google_calendar_integration": "تكامل تقويم جوجل",
+            "seo_analytics_integrations": "تكاملات السيو والتحليلات"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -7945,7 +7954,9 @@
             "repayment_added_successfully": "Repayment added successfully.",
             "repayment_exceeds_loan_amount": "Repayment exceeds loan amount.",
             "search_client": "Search client...",
-            "search_project": "Search project..."
+            "search_project": "Search project...",
+            "google_calendar_connected": "Google Calendar Connected",
+            "google_calendar_disconnected": "Google Calendar Disconnected"
         },
         "auth": {
             "failed": "failed",
@@ -14677,7 +14688,14 @@
             "continue_with_google": "Continue with Google",
             "message": "Message",
             "mobile": "Mobile",
-            "or_continue_with": "Or continue with"
+            "or_continue_with": "Or continue with",
+            "back_to_home": "Back to Home",
+            "connect_google_calendar": "Connect Google Calendar",
+            "connect_your_google_calendar_to_automatically_sync_scheduled_tasks_and_bookings": "Connect your Google Calendar to automatically sync scheduled tasks and bookings",
+            "disconnect_google_calendar": "Disconnect Google Calendar",
+            "google_calendar_connected": "Google Calendar Connected",
+            "google_calendar_integration": "Google Calendar Integration",
+            "seo_analytics_integrations": "SEO & Analytics Integrations"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",

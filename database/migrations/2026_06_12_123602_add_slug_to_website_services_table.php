@@ -11,22 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('website_services', function (Blueprint $table) {
-            if (!Schema::hasColumn('website_services', 'slug')) {
-                $table->string('slug')->unique()->after('title_ar')->nullable();
-            }
-        });
+        // Handled by sync_website_services_language_columns
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('website_services', function (Blueprint $table) {
-            if (Schema::hasColumn('website_services', 'slug')) {
-                $table->dropColumn('slug');
-            }
-        });
+        //
     }
 };

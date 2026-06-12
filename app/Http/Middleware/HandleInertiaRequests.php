@@ -149,6 +149,18 @@ class HandleInertiaRequests extends Middleware
                         return \App\Models\AdminSettings::business_currency_name();
                     }
                     return 'USD';
+                },
+                'business_name' => function () {
+                    return class_exists(\App\Models\AdminSettings::class) ? \App\Models\AdminSettings::GetValue('business_name', 'musoftware') : 'musoftware';
+                },
+                'business_phone' => function () {
+                    return class_exists(\App\Models\AdminSettings::class) ? \App\Models\AdminSettings::GetValue('business_phone', '+20 101 521 8548') : '+20 101 521 8548';
+                },
+                'business_address' => function () {
+                    return class_exists(\App\Models\AdminSettings::class) ? \App\Models\AdminSettings::GetValue('business_address', 'Suez, Egypt') : 'Suez, Egypt';
+                },
+                'business_email' => function () {
+                    return class_exists(\App\Models\AdminSettings::class) ? \App\Models\AdminSettings::GetValue('business_email', 'admin@musoftwares.com') : 'admin@musoftwares.com';
                 }
             ],
             'currencies' => fn() => \App\Models\Currency::all()->map(fn($c) => [

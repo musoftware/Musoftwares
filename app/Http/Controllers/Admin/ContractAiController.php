@@ -19,7 +19,7 @@ class ContractAiController extends Controller
         $defaultProvider = \App\Models\AdminSettings::GetValue('default_ai_model', 'openai');
 
         if ($defaultProvider === 'openai') {
-            $apiKey = \App\Models\AdminSettings::GetValue('openai_api_key', env('OPENAI_API_KEY'));
+            $apiKey = \App\Models\AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
             $model = \App\Models\AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
         } else {
             $apiKey = \App\Models\AdminSettings::GetValue('gemini_api_key', env('GEMINI_API_KEY'));
@@ -126,7 +126,7 @@ class ContractAiController extends Controller
         $defaultProvider = \App\Models\AdminSettings::GetValue('default_ai_model', 'openai');
 
         if ($defaultProvider === 'openai') {
-            $apiKey = \App\Models\AdminSettings::GetValue('openai_api_key', env('OPENAI_API_KEY'));
+            $apiKey = \App\Models\AdminSettings::GetValue('openai_api_key', config('services.openai.key'));
             $model = \App\Models\AdminSettings::GetValue('openai_model', 'gpt-4o-mini');
             $providerName = 'OpenAI';
         } else {

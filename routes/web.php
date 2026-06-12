@@ -10,6 +10,7 @@ use App\Http\Controllers\HomeController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/portfolio', [HomeController::class, 'portfolio'])->name('portfolio');
 Route::get('/portfolio/{slug}', [HomeController::class, 'portfolioShow'])->name('portfolio.show');
+Route::get('/website-services/{slug}', [HomeController::class, 'websiteServiceShow'])->name('website-services.show');
 
 Route::get('/install-app', function () {
     return \Inertia\Inertia::render('PWA/InstallGuide');
@@ -450,7 +451,14 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/transactions/transfer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'transfer'])->name('transactions.transfer');
     Route::post('/transactions/transfer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'start_transfer'])->name('transactions.start_transfer');
     Route::post('/project/current_timer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'current_timer'])->name('project.current_timer');
-    // ── Admin Payment Links ───────────────────────────────────────
+    // ── Google Calendar Integrations ─────────────────────────────────
+    Route::prefix('google-calendar')->name('google-calendar.')->group(function () {
+        Route::get('/connect', [\App\Http\Controllers\Admin\GoogleCalendarIntegrationController::class, 'connect'])->name('connect');
+        Route::get('/callback', [\App\Http\Controllers\Admin\GoogleCalendarIntegrationController::class, 'callback'])->name('callback');
+        Route::post('/disconnect', [\App\Http\Controllers\Admin\GoogleCalendarIntegrationController::class, 'disconnect'])->name('disconnect');
+    });
+
+    // ── Third Party Integration Hooks ───────────────────────────────────────
     Route::resource('payment-links', \App\Http\Controllers\Admin\PaymentLinkController::class)->except(['create', 'edit', 'show', 'update']);
 
     // ── Admin Financial Operations ────────────────────────────────

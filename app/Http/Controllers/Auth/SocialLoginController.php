@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use Laravel\Socialite\Facades\Socialite;
 
 class SocialLoginController extends Controller
 {
@@ -18,7 +18,23 @@ class SocialLoginController extends Controller
      */
     public function redirect()
     {
-        return Socialite::driver('google')->redirect();
+        $clientId = config('services.google.client_id');
+        $redirectUri = route('social.google.callback');
+        
+        if (!$clientId) {
+            return redirect()->route('login')->with('error', 'Google Client ID is missing. Please configure it in services.');
+        }
+
+        $url = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query([
+            'client_id' => $clientId,
+            'redirect_uri' => $redirectUri,
+            'response_type' => 'code',
+            'scope' => 'openid profile email',
+            'access_type' => 'online',
+            'prompt' => 'select_account',
+        ]);
+
+        return redirect()->away($url);
     }
 
     /**
@@ -26,16 +42,46 @@ class SocialLoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function callback()
+    public function callback(Request $request)
     {
         try {
-            $googleUser = Socialite::driver('google')->stateless()->user();
+            if ($request->has('error')) {
+                throw new \Exception($request->get('error'));
+            }
+
+            if (!$request->has('code')) {
+                throw new \Exception('No authorization code provided.');
+            }
+
+            $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
+                'client_id' => config('services.google.client_id'),
+                'client_secret' => config('services.google.client_secret'),
+                'redirect_uri' => route('social.google.callback'),
+                'grant_type' => 'authorization_code',
+                'code' => $request->get('code'),
+            ]);
+
+            if ($response->failed()) {
+                throw new \Exception('Failed to get token: ' . $response->body());
+            }
+
+            $tokenData = $response->json();
+            
+            // Get user info
+            $userInfoResponse = Http::withToken($tokenData['access_token'])
+                ->get('https://www.googleapis.com/oauth2/v3/userinfo');
+
+            if ($userInfoResponse->failed()) {
+                throw new \Exception('Failed to get user info: ' . $userInfoResponse->body());
+            }
+
+            $googleUser = $userInfoResponse->json();
             
             // Find existing user by email, or create a new one with a random password
             $user = User::firstOrCreate(
-                ['email' => $googleUser->getEmail()],
+                ['email' => $googleUser['email']],
                 [
-                    'name' => $googleUser->getName() ?? 'Google User',
+                    'name' => $googleUser['name'] ?? 'Google User',
                     'password' => bcrypt(Str::random(16)),
                     'email_verified_at' => now(), // Assume Google emails are verified
                 ]

@@ -28,11 +28,58 @@ export default function WebsiteServiceShow({ service }) {
     const subtitle = locale === 'ar' ? service.subtitle_ar : service.subtitle_en;
     const description = locale === 'ar' ? service.description_ar : service.description_en;
 
+    const seoTitle = locale === 'ar' ? service.seo_title_ar : service.seo_title_en;
+    const seoDescription = locale === 'ar' ? service.seo_description_ar : service.seo_description_en;
+    const seoKeywords = locale === 'ar' ? service.seo_keywords_ar : service.seo_keywords_en;
+
+    const finalTitle = seoTitle || title || '';
+    const finalDescription = seoDescription || subtitle || description || '';
+    const finalKeywords = seoKeywords || '';
+
+    const appUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const imageUrl = locale === 'ar' ? service.primary_image_ar : service.primary_image_en;
+    const fullImageUrl = imageUrl && appUrl ? `${appUrl}/${imageUrl}` : '';
+
+    const schemaData = {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": finalTitle,
+        "description": finalDescription,
+        "provider": {
+            "@type": "Organization",
+            "name": "Musoftware",
+            "url": appUrl
+        },
+        "url": currentUrl,
+        "image": fullImageUrl || undefined
+    };
+
     return (
         <PublicLayout>
             <Head>
-                <title>{`${title} | ${__('general.musoftware_unified_workspace') || 'Musoftware'}`}</title>
-                <meta name="description" content={subtitle || description} />
+                <title>{`${finalTitle} | ${__('general.musoftware_unified_workspace') || 'Musoftware'}`}</title>
+                <meta name="description" content={finalDescription} />
+                {finalKeywords && <meta name="keywords" content={finalKeywords} />}
+                
+                {/* Open Graph */}
+                <meta property="og:title" content={finalTitle} />
+                <meta property="og:description" content={finalDescription} />
+                {fullImageUrl && <meta property="og:image" content={fullImageUrl} />}
+                <meta property="og:url" content={currentUrl} />
+                <meta property="og:type" content="website" />
+                
+                {/* Twitter */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={finalTitle} />
+                <meta name="twitter:description" content={finalDescription} />
+                {fullImageUrl && <meta name="twitter:image" content={fullImageUrl} />}
+                
+                {/* Canonical */}
+                {currentUrl && <link rel="canonical" href={currentUrl} />}
+
+                {/* Structured Data */}
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />
             </Head>
 
             {/* HERO SECTION */}
@@ -73,12 +120,17 @@ export default function WebsiteServiceShow({ service }) {
                             transition={{ duration: 0.6 }}
                             className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-700 bg-slate-800/50 flex items-center justify-center min-h-[300px]"
                         >
-                            {service.image_path ? (
-                                <img 
-                                    src={`/${service.image_path}`} 
-                                    alt={title} 
-                                    className="w-full h-auto object-cover max-h-[500px]" 
-                                />
+                            {(locale === 'ar' ? service.primary_image_ar : service.primary_image_en) ? (
+                                <>
+                                    <img 
+                                        src={`/${locale === 'ar' ? service.primary_image_ar : service.primary_image_en}`} 
+                                        alt={title} 
+                                        className="w-full h-auto object-cover max-h-[500px]" 
+                                    />
+                                    <div className="absolute top-4 right-4 bg-slate-900/80 backdrop-blur-md text-emerald-400 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-widest border border-slate-700">
+                                        {locale === 'ar' ? 'العربية' : 'English'}
+                                    </div>
+                                </>
                             ) : (
                                 <Box className="w-24 h-24 text-slate-600" />
                             )}

@@ -59,7 +59,7 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
     const [selectedItem, setSelectedItem] = useState(null);
     const carouselRef = useRef(null);
     const [width, setWidth] = useState(0);
-    const { website_services } = usePage().props;
+    const { website_services, locale } = usePage().props;
 
     useEffect(() => {
         if (carouselRef.current) {
@@ -139,19 +139,19 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {website_services && website_services.length > 0 ? (
                             website_services.map((service) => (
-                                <div key={service.id} className="group bg-white rounded-3xl p-10 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300">
+                                <Link href={route('website-services.show', service.slug)} key={service.id} className="group bg-white rounded-3xl p-10 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 block text-left">
                                     <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-8 text-slate-700 group-hover:bg-slate-900 transition-all duration-300 overflow-hidden">
-                                        {service.image_path ? (
-                                            <img src={`/storage/${service.image_path}`} alt={service.title} className="w-full h-full object-cover group-hover:opacity-90" />
+                                        {(locale === 'ar' ? service.primary_image_ar : service.primary_image_en) ? (
+                                            <img src={`/${locale === 'ar' ? service.primary_image_ar : service.primary_image_en}`} alt={locale === 'ar' ? service.title_ar : service.title_en} className="w-full h-full object-cover group-hover:opacity-90" />
                                         ) : (
                                             <Box className="w-7 h-7 group-hover:text-white" />
                                         )}
                                     </div>
-                                    <h3 className="text-2xl font-bold text-slate-900 mb-4">{service.title}</h3>
+                                    <h3 className="text-2xl font-bold text-slate-900 mb-4">{locale === 'ar' ? service.title_ar : service.title_en}</h3>
                                     <p className="text-lg text-slate-500 font-light leading-relaxed">
-                                        {service.description || service.subtitle || ''}
+                                        {locale === 'ar' ? (service.description_ar || service.subtitle_ar || '') : (service.description_en || service.subtitle_en || '')}
                                     </p>
-                                </div>
+                                </Link>
                             ))
                         ) : (
                             <p className="col-span-1 md:col-span-3 text-center text-slate-500 py-12">No services available.</p>

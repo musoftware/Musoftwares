@@ -51,6 +51,17 @@ class HomeController extends Controller
         ]);
     }
 
+    public function websiteServiceShow($slug)
+    {
+        $service = \App\Models\WebsiteService::where('slug', $slug)->firstOrFail();
+        
+        return Inertia::render('Public/WebsiteServiceShow', [
+            'service' => $service,
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
     public function platforms()
     {
         return Inertia::render('Public/Platforms', [
