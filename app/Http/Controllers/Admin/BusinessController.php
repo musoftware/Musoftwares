@@ -230,6 +230,60 @@ class BusinessController extends Controller
         ]);
     }
 
+    public function create_cost()
+    {
+        $users = \App\Models\User::select('id', 'name')->get();
+        $projects = \App\Models\Project::whereNotIn('status', ['Completed', 'Cancelled'])->select('id', 'project_name as name', 'client_id')->get();
+        $currencies = array_values(\App\Models\Currency::as_array());
+        
+        $businessCurrency = \App\Helpers\CurrencyHelper::getBusinessCurrency();
+
+        return Inertia::render('Admin/Business/CostsCreate', [
+            'users' => $users,
+            'projects' => $projects,
+            'currencies' => $currencies,
+            'businessCurrency' => $businessCurrency,
+        ]);
+    }
+
+    public function store_cost(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'currency_id' => 'required|exists:currencies,id',
+            'reason' => 'required|string|max:255',
+            'created_at' => 'nullable|date',
+            'user_id' => 'nullable|exists:users,id',
+            'project_id' => 'nullable|exists:projects,id',
+        ]);
+
+        $cost = new CostTransaction();
+        $cost->amount = $request->amount;
+        $cost->currency_id = $request->currency_id;
+        $cost->reason = $request->reason;
+        
+        if ($request->filled('created_at')) {
+            $cost->created_at = $request->created_at;
+        }
+        
+        if ($request->filled('user_id')) {
+            $cost->user_id = $request->user_id;
+        }
+        
+        if ($request->filled('project_id')) {
+            $cost->project_id = $request->project_id;
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($cost) {
+            $cost->save();
+            if ($cost->user_id) {
+                \App\Models\User::find($cost->user_id)->increment('total_cost', $cost->amount);
+            }
+        });
+
+        return redirect()->route('admin.costs.index')->with('success', __('general.saved_successfully'));
+    }
+
     public function reports(Request $request)
     {
         $bCurrencyId = \App\Models\AdminSettings::business_currency();

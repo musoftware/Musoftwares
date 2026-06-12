@@ -11,13 +11,35 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('erp_expenses', function (Blueprint $table) {
-            $table->foreignId('currency_id')->nullable()->after('amount')->constrained('currencies')->nullOnDelete();
-            $table->decimal('business_amount', 15, 2)->nullable()->after('currency_id');
-            $table->foreignId('business_currency_id')->nullable()->after('business_amount')->constrained('currencies')->nullOnDelete();
-            $table->decimal('exchange_rate', 15, 6)->nullable()->after('business_currency_id');
-            $table->date('exchange_rate_date')->nullable()->after('exchange_rate');
-        });
+        if (!Schema::hasColumn('erp_expenses', 'currency_id')) {
+            Schema::table('erp_expenses', function (Blueprint $table) {
+                $table->foreignId('currency_id')->nullable()->after('amount')->constrained('currencies')->nullOnDelete();
+            });
+        }
+        
+        if (!Schema::hasColumn('erp_expenses', 'business_amount')) {
+            Schema::table('erp_expenses', function (Blueprint $table) {
+                $table->decimal('business_amount', 15, 2)->nullable()->after('currency_id');
+            });
+        }
+        
+        if (!Schema::hasColumn('erp_expenses', 'business_currency_id')) {
+            Schema::table('erp_expenses', function (Blueprint $table) {
+                $table->foreignId('business_currency_id')->nullable()->after('business_amount')->constrained('currencies')->nullOnDelete();
+            });
+        }
+        
+        if (!Schema::hasColumn('erp_expenses', 'exchange_rate')) {
+            Schema::table('erp_expenses', function (Blueprint $table) {
+                $table->decimal('exchange_rate', 15, 6)->nullable()->after('business_currency_id');
+            });
+        }
+        
+        if (!Schema::hasColumn('erp_expenses', 'exchange_rate_date')) {
+            Schema::table('erp_expenses', function (Blueprint $table) {
+                $table->date('exchange_rate_date')->nullable()->after('exchange_rate');
+            });
+        }
     }
 
     /**

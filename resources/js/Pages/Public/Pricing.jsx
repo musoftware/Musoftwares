@@ -3,8 +3,9 @@ import PublicLayout from '@/Layouts/PublicLayout';
 import { Check, Info, ArrowRight } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { __ } from '@/lib/i18n';
+import PricingBuilder from '@/Components/PricingBuilder';
 
-export default function Pricing({ currency = 'USD' }) {
+export default function Pricing({ currency = 'USD', serviceItems = [] }) {
     return (
         <PublicLayout>
             <Head>
@@ -28,77 +29,12 @@ export default function Pricing({ currency = 'USD' }) {
                         <h2 className="text-3xl font-bold text-slate-900 mb-4 text-center">{__('frontend.pricing.saas_plans')}</h2>
                         <p className="text-slate-500 font-light text-center mb-12">{__('frontend.pricing.saas_subtitle')}</p>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                            {/* Starter */}
-                            <div className="flex flex-col p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 transition-all shadow-sm">
-                                <div className="mb-8">
-                                    <h3 className="text-2xl font-bold text-slate-900 mb-2">{__('frontend.pricing.starter.title')}</h3>
-                                    <p className="text-slate-500 font-light mb-6">{__('frontend.pricing.starter.desc')}</p>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-4xl font-extrabold text-slate-900">{__('frontend.pricing.starter.price')}</span>
-                                        <span className="text-slate-500 font-light">{__('frontend.pricing.starter.interval')}</span>
-                                    </div>
-                                </div>
-                                <div className="flex-1">
-                                    <ul className="space-y-4 mb-8">
-                                        <li className="flex gap-3 text-slate-600 font-light"><Check className="w-5 h-5 text-slate-400 shrink-0" /> {__('frontend.pricing.starter.f1')}</li>
-                                        <li className="flex gap-3 text-slate-600 font-light"><Check className="w-5 h-5 text-slate-400 shrink-0" /> {__('frontend.pricing.starter.f2')}</li>
-                                        <li className="flex gap-3 text-slate-600 font-light"><Check className="w-5 h-5 text-slate-400 shrink-0" /> {__('frontend.pricing.starter.f3')}</li>
-                                    </ul>
-                                </div>
-                                <Button className="w-full bg-slate-50 hover:bg-slate-100 text-slate-900 border border-slate-200 rounded-full h-12 font-semibold">
-                                    {__('frontend.pricing.starter.cta')}
-                                </Button>
-                            </div>
-
-                            {/* Pro */}
-                            <div className="flex flex-col p-8 rounded-3xl bg-slate-900 text-white shadow-xl relative transform md:-translate-y-4">
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                                    <span className="bg-slate-100 text-slate-900 text-xs font-bold uppercase tracking-widest py-1 px-3 rounded-full">
-                                        {__('frontend.pricing.pro.badge')}
-                                    </span>
-                                </div>
-                                <div className="mb-8 mt-2">
-                                    <h3 className="text-2xl font-bold text-white mb-2">{__('frontend.pricing.pro.title')}</h3>
-                                    <p className="text-slate-400 font-light mb-6">{__('frontend.pricing.pro.desc')}</p>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-4xl font-extrabold text-white">{__('frontend.pricing.pro.price')}</span>
-                                        <span className="text-slate-400 font-light">{__('frontend.pricing.pro.interval')}</span>
-                                    </div>
-                                </div>
-                                <div className="flex-1">
-                                    <ul className="space-y-4 mb-8">
-                                        <li className="flex gap-3 text-slate-300 font-light"><Check className="w-5 h-5 text-slate-500 shrink-0" /> {__('frontend.pricing.pro.f1')}</li>
-                                        <li className="flex gap-3 text-slate-300 font-light"><Check className="w-5 h-5 text-slate-500 shrink-0" /> {__('frontend.pricing.pro.f2')}</li>
-                                        <li className="flex gap-3 text-slate-300 font-light"><Check className="w-5 h-5 text-slate-500 shrink-0" /> {__('frontend.pricing.pro.f3')}</li>
-                                    </ul>
-                                </div>
-                                <Button className="w-full bg-white hover:bg-slate-100 text-slate-900 rounded-full h-12 font-bold">
-                                    {__('frontend.pricing.pro.cta')}
-                                </Button>
-                            </div>
-
-                            {/* Enterprise */}
-                            <div className="flex flex-col p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 transition-all shadow-sm">
-                                <div className="mb-8">
-                                    <h3 className="text-2xl font-bold text-slate-900 mb-2">{__('frontend.pricing.enterprise.title')}</h3>
-                                    <p className="text-slate-500 font-light mb-6">{__('frontend.pricing.enterprise.desc')}</p>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-4xl font-extrabold text-slate-900">{__('frontend.pricing.enterprise.price')}</span>
-                                        <span className="text-slate-500 font-light">{__('frontend.pricing.enterprise.interval')}</span>
-                                    </div>
-                                </div>
-                                <div className="flex-1">
-                                    <ul className="space-y-4 mb-8">
-                                        <li className="flex gap-3 text-slate-600 font-light"><Check className="w-5 h-5 text-slate-400 shrink-0" /> {__('frontend.pricing.enterprise.f1')}</li>
-                                        <li className="flex gap-3 text-slate-600 font-light"><Check className="w-5 h-5 text-slate-400 shrink-0" /> {__('frontend.pricing.enterprise.f2')}</li>
-                                        <li className="flex gap-3 text-slate-600 font-light"><Check className="w-5 h-5 text-slate-400 shrink-0" /> {__('frontend.pricing.enterprise.f3')}</li>
-                                    </ul>
-                                </div>
-                                <Button className="w-full bg-slate-50 hover:bg-slate-100 text-slate-900 border border-slate-200 rounded-full h-12 font-semibold">
-                                    {__('frontend.pricing.enterprise.cta')}
-                                </Button>
-                            </div>
+                        <div className="max-w-7xl mx-auto">
+                            <PricingBuilder 
+                                serviceItems={serviceItems} 
+                                currency={currency} 
+                                isNewSystem={true} 
+                            />
                         </div>
                     </div>
                 </div>

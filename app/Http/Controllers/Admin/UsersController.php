@@ -97,7 +97,7 @@ class UsersController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $user = User::with(['kycDocuments', 'kycVerifier:id,name', 'tickets', 'roles'])
+        $user = User::with(['kycDocuments', 'kycVerifier:id,name', 'tickets', 'roles', 'loans.currency', 'loans.repayments'])
             ->findOrFail($id);
 
         $initials = collect(explode(' ', $user->name))
@@ -150,9 +150,12 @@ class UsersController extends Controller
 
         $modulePlans = \App\Models\ModulePlan::where('is_active', true)->get();
         $subscriptions = $user->subscriptions()->orderBy('expires_at', 'desc')->get();
+        $currencies = \App\Models\Currency::all();
 
         return Inertia::render('Admin/Users/Show', [
             'client' => $userDetail,
+            'loans'  => $user->loans,
+            'currencies' => $currencies,
             'stats'  => $stats,
             'modulePlans' => $modulePlans,
             'subscriptions' => $subscriptions,

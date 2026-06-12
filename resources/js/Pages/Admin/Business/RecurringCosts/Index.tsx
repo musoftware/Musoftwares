@@ -2,7 +2,8 @@ import React from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
-import { Trash2, Edit, Plus, DollarSign, TrendingDown, Clock, Search, X, Calendar, ArrowLeft, Eye } from 'lucide-react';
+import { Switch } from '@/Components/ui/switch';
+import { Trash2, Edit, Plus, DollarSign, TrendingDown, Clock, Search, X, Calendar, ArrowLeft, Eye, Power } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -20,6 +21,12 @@ export default function Index({ costs, currencies, categories, stats }) {
         if (confirm('Are you sure you want to delete this recurring cost?')) {
             router.delete(route('admin.recurring_costs.delete', id));
         }
+    };
+
+    const handleToggleActive = (id) => {
+        router.post(route('admin.recurring_costs.toggle', id), {}, {
+            preserveScroll: true
+        });
     };
 
     const handleDeleteWithTransactions = (id) => {
@@ -163,6 +170,9 @@ export default function Index({ costs, currencies, categories, stats }) {
                                 Amount
                             </th>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
+                                Active
+                            </th>
+                            <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
                                 Transactions
                             </th>
                             <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Actions</th>
@@ -186,6 +196,14 @@ export default function Index({ costs, currencies, categories, stats }) {
                                     <span className="text-sm font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded">
                                         {formatCurrency(cost.amount, cost.currency)}
                                     </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                    <Switch 
+                                        checked={cost.is_active} 
+                                        onCheckedChange={() => handleToggleActive(cost.id)} 
+                                        aria-label="Toggle active status"
+                                    />
+                                    <div className="text-[10px] text-gray-500 mt-1">{cost.is_active ? __('general.active') : __('general.inactive')}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
                                     <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">{__('general.active_log')}</span>

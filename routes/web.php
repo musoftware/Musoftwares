@@ -30,6 +30,7 @@ Route::get('/test-amc-api', function (\App\Services\AmcAcademyApiService $servic
 
 Route::get('/test22', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+    \Illuminate\Support\Facades\Artisan::call('migrate');
 });
 // Platforms
 Route::get('/platforms', [HomeController::class, 'platforms'])->name('platforms');
@@ -363,8 +364,17 @@ Route::middleware(['auth', 'verified', 'onboarding', 'moderator'])->prefix('admi
 });
 
 // Admin Routes
+    // Public Guest Tickets
+    Route::post('/guest-tickets/submit', [\App\Http\Controllers\GuestTicketSubmissionController::class, 'store'])->name('guest-tickets.submit');
+
 Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+
+    // Website Services
+    Route::resource('website-services', \App\Http\Controllers\Admin\WebsiteServiceController::class)->except(['show']);
+
+    // Guest Tickets
+    Route::resource('guest-tickets', \App\Http\Controllers\Admin\GuestTicketController::class)->only(['index', 'show']);
 
     // AI Estimator
     Route::get('/tools/ai-estimator', [\App\Http\Controllers\Admin\AiEstimatorController::class, 'index'])->name('tools.ai-estimator');
@@ -455,6 +465,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::prefix('business')->group(function() {
         Route::get('/income', [\App\Http\Controllers\Admin\BusinessController::class, 'income'])->name('income.index');
         Route::get('/costs', [\App\Http\Controllers\Admin\BusinessController::class, 'costs'])->name('costs.index');
+        Route::get('/costs/create', [\App\Http\Controllers\Admin\BusinessController::class, 'create_cost'])->name('costs.create');
+        Route::post('/costs', [\App\Http\Controllers\Admin\BusinessController::class, 'store_cost'])->name('costs.store');
         Route::get('/reports', [\App\Http\Controllers\Admin\BusinessController::class, 'reports'])->name('reports.index');
         Route::get('/balance-report', [\App\Http\Controllers\Admin\BusinessController::class, 'balance'])->name('reports.balance');
     });
@@ -470,6 +482,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::get('costs/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_costs_view'])->name('recurring_costs.view');
         Route::delete('costs/{id}/delete', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_costs_delete'])->name('recurring_costs.delete');
         Route::delete('costs/{id}/delete-with-transaction', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_costs_delete_with_transaction'])->name('recurring_costs.delete_with_transaction');
+        Route::post('costs/{id}/toggle-status', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'toggle_recurring_costs'])->name('recurring_costs.toggle');
 
         // Income
         Route::get('income', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_income'])->name('recurring_income.index');
@@ -479,6 +492,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::get('income/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_income_view'])->name('recurring_income.view');
         Route::delete('income/{id}/delete', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_income_delete'])->name('recurring_income.delete');
         Route::delete('income/{id}/delete-with-transaction', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_income_delete_with_transaction'])->name('recurring_income.delete_with_transaction');
+        Route::post('income/{id}/toggle-status', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'toggle_recurring_income'])->name('recurring_income.toggle');
 
         // Salaries
         Route::get('salaries', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_salaries'])->name('recurring_salaries.index');
@@ -487,6 +501,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::put('salaries/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'update_recurring_salaries'])->name('recurring_salaries.update');
         Route::get('salaries/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_salaries_view'])->name('recurring_salaries.view');
         Route::delete('salaries/{id}/delete', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_salaries_delete'])->name('recurring_salaries.delete');
+        Route::post('salaries/{id}/toggle-status', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'toggle_recurring_salaries'])->name('recurring_salaries.toggle');
     });
 
     // ── Admin Hours Calendar ──────────────────────────────────────
@@ -574,6 +589,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\UsersController::class, 'edit'])->name('users.edit');
     Route::put('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'update'])->name('users.update');
     Route::delete('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'destroy'])->name('users.destroy');
+
+    // User Loans
+    Route::post('/users/{user}/loans', [\App\Http\Controllers\Admin\AdminUserLoanController::class, 'store'])->name('users.loans.store');
+    Route::put('/users/{user}/loans/{loan}', [\App\Http\Controllers\Admin\AdminUserLoanController::class, 'update'])->name('users.loans.update');
+    Route::delete('/users/{user}/loans/{loan}', [\App\Http\Controllers\Admin\AdminUserLoanController::class, 'destroy'])->name('users.loans.destroy');
+    Route::post('/users/{user}/loans/{loan}/repayments', [\App\Http\Controllers\Admin\AdminUserLoanController::class, 'storeRepayment'])->name('users.loans.repayments.store');
+
     Route::post('/users/{id}/toggle-block', [\App\Http\Controllers\Admin\UsersController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::get('/users/{id}/subscriptions/create', [\App\Http\Controllers\Admin\UsersController::class, 'createSubscription'])->name('users.subscriptions.create');
     Route::post('/users/{id}/membership', [\App\Http\Controllers\Admin\UsersController::class, 'activateMembership'])->name('users.membership.activate');
@@ -901,4 +923,10 @@ Route::prefix('pay')->name('guest.payment-links.')->group(function () {
     Route::get('/failure', [\App\Http\Controllers\GuestPaymentLinkController::class, 'paymentFailure'])->name('failure');
     Route::post('/webhook', [\App\Http\Controllers\GuestPaymentLinkController::class, 'paymentWebhook'])->name('webhook')->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 });
+
+require __DIR__.'/auth.php';
+
+// ── Google Socialite Login ───────────────────────────────────────────
+Route::get('/auth/google/redirect', [\App\Http\Controllers\Auth\SocialLoginController::class, 'redirect'])->name('social.google.redirect');
+Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\SocialLoginController::class, 'callback'])->name('social.google.callback');
 

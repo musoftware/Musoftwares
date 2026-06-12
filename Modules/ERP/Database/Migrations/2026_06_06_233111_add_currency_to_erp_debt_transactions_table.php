@@ -12,11 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('erp_debt_transactions', function (Blueprint $table) {
-            $table->foreignId('currency_id')->nullable()->after('amount')->constrained('currencies')->nullOnDelete();
-            $table->decimal('business_amount', 15, 2)->nullable()->after('currency_id');
-            $table->foreignId('business_currency_id')->nullable()->after('business_amount')->constrained('currencies')->nullOnDelete();
-            $table->decimal('exchange_rate', 15, 6)->nullable()->after('business_currency_id');
-            $table->date('exchange_rate_date')->nullable()->after('exchange_rate');
+            if (!Schema::hasColumn('erp_debt_transactions', 'currency_id')) {
+                $table->foreignId('currency_id')->nullable()->after('amount')->constrained('currencies')->nullOnDelete();
+            }
+            if (!Schema::hasColumn('erp_debt_transactions', 'business_amount')) {
+                $table->decimal('business_amount', 15, 2)->nullable()->after('currency_id');
+            }
+            if (!Schema::hasColumn('erp_debt_transactions', 'business_currency_id')) {
+                $table->foreignId('business_currency_id')->nullable()->after('business_amount')->constrained('currencies')->nullOnDelete();
+            }
+            if (!Schema::hasColumn('erp_debt_transactions', 'exchange_rate')) {
+                $table->decimal('exchange_rate', 15, 6)->nullable()->after('business_currency_id');
+            }
+            if (!Schema::hasColumn('erp_debt_transactions', 'exchange_rate_date')) {
+                $table->date('exchange_rate_date')->nullable()->after('exchange_rate');
+            }
         });
     }
 

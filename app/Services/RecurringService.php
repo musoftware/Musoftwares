@@ -13,7 +13,7 @@ class RecurringService
     public function processDueEntries(): void
     {
         // 1. Process platform recurring costs
-        foreach (\App\Models\RecurringCost::all() as $item) {
+        foreach (\App\Models\RecurringCost::where('is_active', true)->get() as $item) {
             try {
                 $item->apply();
             } catch (\Exception $e) {
@@ -22,7 +22,7 @@ class RecurringService
         }
 
         // 2. Process platform recurring incomes
-        foreach (\App\Models\RecurringIncome::all() as $item) {
+        foreach (\App\Models\RecurringIncome::where('is_active', true)->get() as $item) {
             try {
                 $item->apply();
             } catch (\Exception $e) {
@@ -31,7 +31,7 @@ class RecurringService
         }
 
         // 3. Process platform recurring salaries
-        foreach (\App\Models\RecurringSalary::all() as $item) {
+        foreach (\App\Models\RecurringSalary::where('is_active', true)->get() as $item) {
             try {
                 $item->apply();
             } catch (\Exception $e) {

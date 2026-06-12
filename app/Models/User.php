@@ -435,6 +435,11 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\UserSubscription::class, 'user_id');
     }
 
+    public function loans(): HasMany
+    {
+        return $this->hasMany(\App\Models\UserLoan::class, 'user_id');
+    }
+
     public function activeSubscription()
     {
         return $this->hasOne(\App\Models\UserSubscription::class, 'user_id')->where('status', 'active')->latest();

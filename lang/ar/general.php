@@ -5617,4 +5617,10 @@ return [
   'add_points' => 'إضافة نقاط',
   'monthly_breakdown' => 'التقسيم الشهري',
   'annual_breakdown' => 'التقسيم السنوي',
+  'submit_guest_ticket' => 'إرسال تذكرة زائر',
+  'ticket_submitted_success' => 'تم إرسال تذكرتك بنجاح.',
+  'continue_with_google' => 'المتابعة باستخدام جوجل',
+  'message' => 'الرسالة',
+  'mobile' => 'رقم الجوال',
+  'or_continue_with' => 'أو المتابعة باستخدام',
 ];

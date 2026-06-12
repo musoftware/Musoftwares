@@ -25,8 +25,9 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import UserLoansTab from './UserLoansTab';
 
-export default function Show({ client, stats = {}, wallets, modulePlans = [], subscriptions = [] }) {
+export default function Show({ client, loans = [], stats = {}, wallets, modulePlans = [], subscriptions = [] }) {
     const [isLoginAsLoading, setIsLoginAsLoading] = useState(false);
     const [isResetPassOpen, setIsResetPassOpen] = useState(false);
     const [newPassword, setNewPassword] = useState('');
@@ -823,6 +824,8 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                     ))}
                 </div>
             </div>
+
+            <UserLoansTab client={client} loans={loans} />
 
             <div className="mt-8 bg-white p-6 rounded-lg border border-slate-200 flex flex-col items-center justify-center space-y-4">
                 <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-500">
