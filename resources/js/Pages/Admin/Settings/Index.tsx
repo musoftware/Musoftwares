@@ -14,6 +14,8 @@ import {
     Save,
     RefreshCw,
     Lightbulb,
+    Calendar,
+    Globe,
 } from 'lucide-react';
 import { CurrencySelect } from '@/Components/CurrencySelect';
 
@@ -53,12 +55,18 @@ interface SettingsData {
     expected_monthly_income: string | null;
     work_days_per_month: string | null;
     hours_per_day: string | null;
+    google_analytics_id: string | null;
+    google_tag_manager_id: string | null;
+    meta_pixel_id: string | null;
+    custom_head_scripts: string | null;
+    custom_body_scripts: string | null;
 }
 
 interface Props {
     currencies: Currency[];
     whatsappChannels: WhatsAppChannel[];
     settings: SettingsData;
+    hasGoogleCalendar?: boolean;
 }
 
 function SectionCard({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
@@ -151,7 +159,7 @@ function Toggle({
     );
 }
 
-export default function Index({ currencies, whatsappChannels, settings }: Props) {
+export default function Index({ currencies, whatsappChannels, settings, hasGoogleCalendar }: Props) {
     const { props } = usePage<any>();
     const flash = props.flash as { success?: string } | undefined;
 
@@ -329,8 +337,90 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                                 <p className="text-xs text-gray-500 mt-1">{__('general.provide_one_or_more_gemini_api_keys_comma_separated_for_load_balancing_ai_features_across_multiple_free_tier_accounts')}</p>
                             </Field>
                         </SectionCard>
+
+                        {/* Google Calendar Integration */}
+                        <SectionCard title={__('general.google_calendar_integration')} icon={Calendar}>
+                            <div className="space-y-4">
+                                <p className="text-sm text-gray-600">
+                                    {__('general.connect_your_google_calendar_to_automatically_sync_scheduled_tasks_and_bookings')}
+                                </p>
+                                {hasGoogleCalendar ? (
+                                    <div className="flex flex-col gap-3 border border-green-200 bg-green-50 rounded-md p-4">
+                                        <div className="flex items-center gap-2 text-green-800 font-medium">
+                                            <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                                            {__('general.google_calendar_connected')}
+                                        </div>
+                                        <a href="/admin/google-calendar/disconnect" className="text-sm text-red-600 hover:text-red-800 underline w-max">
+                                            {__('general.disconnect_google_calendar')}
+                                        </a>
+                                    </div>
+                                ) : (
+                                    <a href="/admin/google-calendar/connect" className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-black text-white hover:bg-black/90 rounded-md w-full sm:w-auto">
+                                        <Calendar className="h-4 w-4" />
+                                        {__('general.connect_google_calendar')}
+                                    </a>
+                                )}
+                            </div>
+                        </SectionCard>
                     </div>
                 </div>
+
+                {/* SEO & Analytics Integrations */}
+                <SectionCard title={__('general.seo_analytics_integrations') || 'SEO & Analytics Integrations'} icon={Globe}>
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <Field label="Google Analytics ID (e.g. G-XXXXXXX)">
+                                <Input
+                                    id="google_analytics_id"
+                                    value={form.google_analytics_id ?? ''}
+                                    onChange={(e) => set('google_analytics_id', e.target.value)}
+                                    placeholder="G-..."
+                                />
+                            </Field>
+                            <Field label="Google Tag Manager ID (e.g. GTM-XXXXX)">
+                                <Input
+                                    id="google_tag_manager_id"
+                                    value={form.google_tag_manager_id ?? ''}
+                                    onChange={(e) => set('google_tag_manager_id', e.target.value)}
+                                    placeholder="GTM-..."
+                                />
+                            </Field>
+                            <Field label="Meta Pixel ID">
+                                <Input
+                                    id="meta_pixel_id"
+                                    value={form.meta_pixel_id ?? ''}
+                                    onChange={(e) => set('meta_pixel_id', e.target.value)}
+                                    placeholder="123456789"
+                                />
+                            </Field>
+                        </div>
+
+                        <div className="space-y-4">
+                            <Field label="Custom Header Scripts (<head>)">
+                                <textarea
+                                    id="custom_head_scripts"
+                                    value={form.custom_head_scripts ?? ''}
+                                    onChange={(e) => set('custom_head_scripts', e.target.value)}
+                                    placeholder="<script>...</script>"
+                                    rows={4}
+                                    className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black bg-white font-mono"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">These scripts will be injected globally inside the &lt;head&gt; tag.</p>
+                            </Field>
+                            <Field label="Custom Body Scripts (<body>)">
+                                <textarea
+                                    id="custom_body_scripts"
+                                    value={form.custom_body_scripts ?? ''}
+                                    onChange={(e) => set('custom_body_scripts', e.target.value)}
+                                    placeholder="<script>...</script>"
+                                    rows={4}
+                                    className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black bg-white font-mono"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">These scripts will be injected globally right after the &lt;body&gt; tag.</p>
+                            </Field>
+                        </div>
+                    </div>
+                </SectionCard>
 
                 {/* Payment & Checkout Settings */}
                 <SectionCard title={__('general.payment_checkout_settings')} icon={CreditCard}>

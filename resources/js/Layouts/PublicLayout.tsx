@@ -1,6 +1,6 @@
 import { __ } from '@/lib/i18n';
 import { Button } from '@/Components/ui/button';
-import { Link, usePage, useForm } from '@inertiajs/react';
+import { Link, usePage, useForm, Head } from '@inertiajs/react';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { Menu, X, ArrowRight, ChevronDown, Monitor, Box, Server, Activity, Phone, MessageCircle, Globe, MapPin, Send } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
@@ -8,7 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from '@/Components/ui/input';
 import { Textarea } from '@/Components/ui/textarea';
 import { Label } from '@/Components/ui/label';
-
+import { useToast } from '@/Components/ui/use-toast';
+import { Toaster } from '@/Components/ui/toaster';
 interface PublicLayoutProps extends PropsWithChildren {
     auth?: {
         user: any;
@@ -22,6 +23,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [isGuestTicketOpen, setIsGuestTicketOpen] = useState(false);
+    const { toast } = useToast();
 
     const { data, setData, post, processing, reset } = useForm({
         name: '',
@@ -36,6 +38,10 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
             onSuccess: () => {
                 reset();
                 setIsGuestTicketOpen(false);
+                toast({
+                    title: __('general.success') || 'Success',
+                    description: __('general.ticket_submitted_success') || 'Your ticket has been submitted successfully. We will be in touch shortly.',
+                });
             }
         });
     };
@@ -66,13 +72,15 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
         }[];
     };
 
-    const { website_services } = usePage().props as any;
+    const { website_services, locale } = usePage().props as any;
 
     const servicesItems = (website_services || []).map((s: any) => ({
-        title: s.title,
-        desc: s.subtitle || '',
-        href: '#',
-        icon: s.image_path ? <img src={`/storage/${s.image_path}`} alt={s.title} className="w-full h-full object-cover rounded-lg" /> : <Monitor className="w-5 h-5 text-slate-400" />
+        title: locale === 'ar' ? s.title_ar : s.title_en,
+        desc: locale === 'ar' ? (s.subtitle_ar || s.description_ar || '') : (s.subtitle_en || s.description_en || ''),
+        href: route('website-services.show', s.slug),
+        icon: (locale === 'ar' ? s.primary_image_ar : s.primary_image_en) 
+            ? <img src={`/${locale === 'ar' ? s.primary_image_ar : s.primary_image_en}`} alt={locale === 'ar' ? s.title_ar : s.title_en} className="w-full h-full object-cover rounded-lg" /> 
+            : <Monitor className="w-5 h-5 text-slate-400" />
     }));
 
     const navItems: NavItem[] = [
@@ -112,8 +120,46 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
         }
     ];
 
+    const settings = (usePage().props as any).settings || {};
+    const appUrl = typeof window !== 'undefined' ? window.location.origin : 'https://www.musoftwares.com';
+    const currentUrl = typeof window !== 'undefined' ? window.location.href : appUrl;
+
+    const organizationSchema = {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": settings.business_name || "Musoftware",
+        "url": appUrl,
+        "logo": `${appUrl}/logo.png`,
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": settings.business_phone || "+20 101 521 8548",
+            "contactType": "customer service",
+            "areaServed": "EG",
+            "availableLanguage": ["English", "Arabic"]
+        },
+        "sameAs": [
+            "https://www.facebook.com/musoftwares.com.page/"
+        ]
+    };
+
+    const websiteSchema = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": settings.business_name || "Musoftware",
+        "url": appUrl,
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": `${appUrl}/search?q={search_term_string}`,
+            "query-input": "required name=search_term_string"
+        }
+    };
+
     return (
         <div className="flex min-h-screen flex-col bg-white text-slate-900 antialiased font-sans">
+            <Head>
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
+            </Head>
             {/* Enterprise Header */}
             <header
                 className={`sticky top-0 w-full transition-all duration-300 ${mobileMenuOpen ? 'z-40' : 'z-50'
@@ -422,6 +468,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                     </form>
                 </DialogContent>
             </Dialog>
+            <Toaster />
         </div>
     );
 }

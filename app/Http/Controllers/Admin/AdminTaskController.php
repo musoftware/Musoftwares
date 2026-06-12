@@ -222,6 +222,13 @@ class AdminTaskController extends Controller
             return redirect()->back()->withErrors(['error' => 'Paid tasks cannot be deleted, they must be refunded.']);
         }
         
+        try {
+            $adminUser = auth()->user() ?? \App\Models\User::role('super-admin')->first();
+            if ($adminUser && class_exists(\App\Jobs\SyncTodoToGoogleCalendar::class)) {
+                \App\Jobs\SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'delete');
+            }
+        } catch (\Throwable $e) {}
+
         $todo->delete();
         return redirect()->back()->with('message', __('general.task_removed_from_the_queue'));
     }
@@ -305,14 +312,11 @@ class AdminTaskController extends Controller
                     \Illuminate\Support\Facades\DB::commit();
 
                     try {
-                        if (class_exists('App\Services\GoogleCalendarService') && $todo->start_at && $todo->end_at) {
-                            $calendarService = app(\App\Services\GoogleCalendarService::class);
-                            $calendarService->addEvent(
-                                'Task Paid (#' . $todo->id . '): ' . $todo->title,
-                                \Carbon\Carbon::parse($todo->start_at),
-                                \Carbon\Carbon::parse($todo->end_at),
-                                'Client ' . $client->name . ' (ID: ' . $client->id . ') paid for this task. Reference Todo #' . $todo->id
-                            );
+                        if ($todo->start_at && $todo->end_at) {
+                            $adminUser = auth()->user() ?? \App\Models\User::role('super-admin')->first();
+                            if ($adminUser && class_exists(\App\Jobs\SyncTodoToGoogleCalendar::class)) {
+                                \App\Jobs\SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'create');
+                            }
                         }
                     } catch (\Throwable $e) {
                         \Illuminate\Support\Facades\Log::warning('Google Calendar sync failed: ' . $e->getMessage());
@@ -761,6 +765,14 @@ class AdminTaskController extends Controller
             foreach ($todo->children as $child) {
                 $child->delete();
             }
+            
+            try {
+                $adminUser = auth()->user() ?? \App\Models\User::role('super-admin')->first();
+                if ($adminUser && class_exists(\App\Jobs\SyncTodoToGoogleCalendar::class)) {
+                    \App\Jobs\SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'delete');
+                }
+            } catch (\Throwable $e) {}
+
             $todo->delete();
 
             \Illuminate\Support\Facades\DB::commit();
@@ -930,14 +942,9 @@ class AdminTaskController extends Controller
                     \Illuminate\Support\Facades\DB::commit();
 
                     try {
-                        if (class_exists('App\Services\GoogleCalendarService')) {
-                            $calendarService = app(\App\Services\GoogleCalendarService::class);
-                            $calendarService->addEvent(
-                                'Task Paid (#' . $todo->id . '): ' . $todo->title,
-                                $start,
-                                $end,
-                                'Client ' . $client->name . ' (ID: ' . $client->id . ') paid for this task. Reference Todo #' . $todo->id
-                            );
+                        $adminUser = auth()->user() ?? \App\Models\User::role('super-admin')->first();
+                        if ($adminUser && class_exists(\App\Jobs\SyncTodoToGoogleCalendar::class)) {
+                            \App\Jobs\SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'create');
                         }
                     } catch (\Throwable $e) {
                         \Illuminate\Support\Facades\Log::warning('Google Calendar sync failed: ' . $e->getMessage());
@@ -1081,14 +1088,9 @@ class AdminTaskController extends Controller
                     \Illuminate\Support\Facades\DB::commit();
 
                     try {
-                        if (class_exists('App\Services\GoogleCalendarService')) {
-                            $calendarService = app(\App\Services\GoogleCalendarService::class);
-                            $calendarService->addEvent(
-                                'Task Paid (#' . $todo->id . '): ' . $todo->title,
-                                $start,
-                                $end,
-                                'Client ' . $client->name . ' (ID: ' . $client->id . ') paid for this task. Reference Todo #' . $todo->id
-                            );
+                        $adminUser = auth()->user() ?? \App\Models\User::role('super-admin')->first();
+                        if ($adminUser && class_exists(\App\Jobs\SyncTodoToGoogleCalendar::class)) {
+                            \App\Jobs\SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'create');
                         }
                     } catch (\Throwable $e) {
                         \Illuminate\Support\Facades\Log::warning('Google Calendar sync failed: ' . $e->getMessage());

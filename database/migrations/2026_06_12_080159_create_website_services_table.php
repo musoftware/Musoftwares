@@ -13,9 +13,13 @@ return new class extends Migration
     {
         Schema::create('website_services', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('subtitle')->nullable();
-            $table->text('description')->nullable();
+            $table->string('title_en');
+            $table->string('title_ar');
+            $table->string('slug')->unique();
+            $table->string('subtitle_en')->nullable();
+            $table->string('subtitle_ar')->nullable();
+            $table->text('description_en')->nullable();
+            $table->text('description_ar')->nullable();
             $table->string('image_path')->nullable();
             $table->timestamps();
         });

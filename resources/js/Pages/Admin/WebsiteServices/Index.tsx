@@ -36,14 +36,14 @@ export default function Index({ services }: { services: any[] }) {
                             services.map((service) => (
                                 <TableRow key={service.id}>
                                     <TableCell>
-                                        {service.image_path ? (
-                                            <img src={`/storage/${service.image_path}`} alt={service.title} className="w-10 h-10 rounded object-cover" />
+                                        {service.primary_image_en ? (
+                                            <img src={`/${service.primary_image_en}`} alt={service.title_en} className="w-10 h-10 rounded object-cover" />
                                         ) : (
                                             <div className="w-10 h-10 rounded bg-slate-100 flex items-center justify-center text-slate-400">N/A</div>
                                         )}
                                     </TableCell>
-                                    <TableCell className="font-medium">{service.title}</TableCell>
-                                    <TableCell>{service.subtitle}</TableCell>
+                                    <TableCell className="font-medium">{service.title_en}</TableCell>
+                                    <TableCell>{service.subtitle_en}</TableCell>
                                     <TableCell className="text-right">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>

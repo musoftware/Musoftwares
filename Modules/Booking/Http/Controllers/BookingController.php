@@ -493,6 +493,16 @@ class BookingController extends Controller
 
         event(new \Modules\Booking\Events\BookingStatusChanged($booking, $booking->status));
 
+        try {
+            $host = $booking->eventType->user;
+            if ($host && class_exists(\App\Jobs\SyncBookingToGoogleCalendar::class)) {
+                $action = $booking->status === 'cancelled' ? 'delete' : 'update';
+                \App\Jobs\SyncBookingToGoogleCalendar::dispatch($booking, $host, $action);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Google Calendar sync failed: ' . $e->getMessage());
+        }
+
         return back()->with('success', __('general.booking_status_updated_successfully'));
     }
 
@@ -519,6 +529,15 @@ class BookingController extends Controller
         $booking->save();
 
         event(new \Modules\Booking\Events\BookingStatusChanged($booking, $booking->status, true));
+
+        try {
+            $host = $booking->eventType->user;
+            if ($host && class_exists(\App\Jobs\SyncBookingToGoogleCalendar::class)) {
+                \App\Jobs\SyncBookingToGoogleCalendar::dispatch($booking, $host, 'update');
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Google Calendar sync failed: ' . $e->getMessage());
+        }
 
         return back()->with('success', __('general.booking_rescheduled_successfully'));
     }
@@ -610,6 +629,16 @@ class BookingController extends Controller
 
         // 3. Email notifications via Event
         event(new \Modules\Booking\Events\BookingStatusChanged($booking, 'confirmed'));
+
+        // 4. Google Calendar Sync
+        try {
+            $host = $booking->eventType->user;
+            if ($host && class_exists(\App\Jobs\SyncBookingToGoogleCalendar::class)) {
+                \App\Jobs\SyncBookingToGoogleCalendar::dispatch($booking, $host, 'create');
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Google Calendar sync failed: ' . $e->getMessage());
+        }
     }
 }
 

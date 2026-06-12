@@ -297,4 +297,6 @@ return [
   'service_created' => 'تم إنشاء الخدمة بنجاح.',
   'service_deleted' => 'تم حذف الخدمة بنجاح.',
   'service_updated' => 'تم تحديث الخدمة بنجاح.',
+  'google_calendar_connected' => 'تم ربط تقويم جوجل',
+  'google_calendar_disconnected' => 'تم إلغاء ربط تقويم جوجل',
 ];

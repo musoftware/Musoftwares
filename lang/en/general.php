@@ -5798,4 +5798,11 @@ return [
     'message' => 'Message',
     'mobile' => 'Mobile',
     'or_continue_with' => 'Or continue with',
+    'back_to_home' => 'Back to Home',
+    'connect_google_calendar' => 'Connect Google Calendar',
+    'connect_your_google_calendar_to_automatically_sync_scheduled_tasks_and_bookings' => 'Connect your Google Calendar to automatically sync scheduled tasks and bookings',
+    'disconnect_google_calendar' => 'Disconnect Google Calendar',
+    'google_calendar_connected' => 'Google Calendar Connected',
+    'google_calendar_integration' => 'Google Calendar Integration',
+    'seo_analytics_integrations' => 'SEO & Analytics Integrations',
 ];

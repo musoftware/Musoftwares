@@ -5623,4 +5623,11 @@ return [
   'message' => 'الرسالة',
   'mobile' => 'رقم الجوال',
   'or_continue_with' => 'أو المتابعة باستخدام',
+  'back_to_home' => 'العودة للصفحة الرئيسية',
+  'connect_google_calendar' => 'ربط تقويم جوجل',
+  'connect_your_google_calendar_to_automatically_sync_scheduled_tasks_and_bookings' => 'قم بربط تقويم جوجل الخاص بك لمزامنة المهام المجدولة والحجوزات تلقائياً',
+  'disconnect_google_calendar' => 'إلغاء ربط تقويم جوجل',
+  'google_calendar_connected' => 'تم ربط تقويم جوجل',
+  'google_calendar_integration' => 'تكامل تقويم جوجل',
+    'seo_analytics_integrations' => 'تكاملات السيو والتحليلات',
 ];

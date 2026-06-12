@@ -34,6 +34,12 @@ class AdminSettingController extends Controller
                 ->get()
             : [];
 
+        $hasGoogleCalendar = class_exists(\App\Models\UserIntegration::class) 
+            ? \App\Models\UserIntegration::where('user_id', auth()->id())
+                ->where('provider', 'google_calendar')
+                ->exists()
+            : false;
+
         // Fetch all current settings to pass to frontend
         $settings = [
             'business_currency'           => AdminSettings::GetValue('business_currency'),
@@ -58,12 +64,18 @@ class AdminSettingController extends Controller
             'expected_monthly_income'     => AdminSettings::GetValue('expected_monthly_income'),
             'work_days_per_month'         => AdminSettings::GetValue('work_days_per_month'),
             'hours_per_day'               => AdminSettings::GetValue('hours_per_day'),
+            'google_analytics_id'         => AdminSettings::GetValue('google_analytics_id'),
+            'google_tag_manager_id'       => AdminSettings::GetValue('google_tag_manager_id'),
+            'meta_pixel_id'               => AdminSettings::GetValue('meta_pixel_id'),
+            'custom_head_scripts'         => AdminSettings::GetValue('custom_head_scripts'),
+            'custom_body_scripts'         => AdminSettings::GetValue('custom_body_scripts'),
         ];
 
         return Inertia::render('Admin/Settings/Index', [
             'currencies'       => $currencies,
             'whatsappChannels' => $whatsappChannels,
             'settings'         => $settings,
+            'hasGoogleCalendar'=> $hasGoogleCalendar,
         ]);
     }
 
@@ -92,6 +104,11 @@ class AdminSettingController extends Controller
             'expected_monthly_income'     => 'nullable|numeric|min:0',
             'work_days_per_month'         => 'nullable|numeric|min:0',
             'hours_per_day'               => 'nullable|numeric|min:0',
+            'google_analytics_id'         => 'nullable|string',
+            'google_tag_manager_id'       => 'nullable|string',
+            'meta_pixel_id'               => 'nullable|string',
+            'custom_head_scripts'         => 'nullable|string',
+            'custom_body_scripts'         => 'nullable|string',
         ]);
 
         $this->configService->updateSettings($validated);

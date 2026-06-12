@@ -12,7 +12,7 @@ class PriceCalculatorService
      */
     public function estimate(string $requirements): ?array
     {
-        $apiKey = env('OPENAI_API_KEY');
+        $apiKey = config('services.openai.key');
         
         if (!$apiKey) {
             Log::error('OpenAI API key missing in PriceCalculatorService.');

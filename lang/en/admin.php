@@ -297,4 +297,6 @@ return [
     'repayment_exceeds_loan_amount' => 'Repayment exceeds loan amount.',
     'search_client' => 'Search client...',
     'search_project' => 'Search project...',
+    'google_calendar_connected' => 'Google Calendar Connected',
+    'google_calendar_disconnected' => 'Google Calendar Disconnected',
 ];
