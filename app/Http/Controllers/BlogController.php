@@ -19,6 +19,13 @@ class BlogController extends Controller
 
         return Inertia::render('Public/Blog/Show', [
             'article' => $article
+        ])->withViewData([
+            'meta' => [
+                'title' => ($article->meta_title ?: $article->title) . ' | Musoftware',
+                'description' => $article->meta_description ?: $article->excerpt,
+                'image' => $article->featured_image ? asset('storage/' . $article->featured_image) : asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 }

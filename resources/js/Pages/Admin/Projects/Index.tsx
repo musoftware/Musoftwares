@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
-import { User } from 'lucide-react';
+import { User, AlertCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import {
     Dialog,

@@ -214,10 +214,28 @@ class RecurringBusinessController extends Controller
             $checkDate = $baseDate->copy()->addDays($i);
             if ($rCost->isToday($checkDate)) {
                 $count++;
+                $uniqueId = $rCost->id . '-' . $checkDate->toDateString();
+                $isRecorded = $rCost->createdBefore($checkDate);
+
+                // Fetch the actual transaction amount if this date was already executed
+                $actualAmountStr = null;
+                if ($isRecorded) {
+                    $pivot = \Illuminate\Support\Facades\DB::table('recurring_cost_transactions')
+                        ->where('unique_id', $uniqueId)
+                        ->first();
+                    if ($pivot && $pivot->cost_transaction_id) {
+                        $actualTx = \App\Models\CostTransaction::find($pivot->cost_transaction_id);
+                        if ($actualTx) {
+                            $actualAmountStr = \App\Helpers\FinanceHelper::instance()->format_money($actualTx->amount, $actualTx->currency_id ?? $rCost->currency_id);
+                        }
+                    }
+                }
+
                 $upcomingSchedule[] = [
                     'date' => $checkDate->toDateString(),
-                    'amount_str' => $rCost->current_amount_str(),
-                    'recorded' => $rCost->createdBefore($checkDate),
+                    'amount_str' => $actualAmountStr ?? $rCost->current_amount_str(),
+                    'is_actual' => $actualAmountStr !== null,
+                    'recorded' => $isRecorded,
                 ];
             }
         }
@@ -444,10 +462,28 @@ class RecurringBusinessController extends Controller
             $checkDate = $baseDate->copy()->addDays($i);
             if ($rIncome->isToday($checkDate)) {
                 $count++;
+                $uniqueId = $rIncome->id . '-' . $checkDate->toDateString();
+                $isRecorded = $rIncome->createdBefore($checkDate);
+
+                // Fetch the actual transaction amount if this date was already executed
+                $actualAmountStr = null;
+                if ($isRecorded) {
+                    $pivot = \Illuminate\Support\Facades\DB::table('recurring_income_transactions')
+                        ->where('unique_id', $uniqueId)
+                        ->first();
+                    if ($pivot && $pivot->transaction_id) {
+                        $actualTx = \App\Models\Transaction::find($pivot->transaction_id);
+                        if ($actualTx) {
+                            $actualAmountStr = \App\Helpers\FinanceHelper::instance()->format_money($actualTx->amount, $actualTx->currency_id ?? $rIncome->currency_id);
+                        }
+                    }
+                }
+
                 $upcomingSchedule[] = [
                     'date' => $checkDate->toDateString(),
-                    'amount_str' => $rIncome->current_amount_str(),
-                    'recorded' => $rIncome->createdBefore($checkDate),
+                    'amount_str' => $actualAmountStr ?? $rIncome->current_amount_str(),
+                    'is_actual' => $actualAmountStr !== null,
+                    'recorded' => $isRecorded,
                 ];
             }
         }
@@ -653,10 +689,32 @@ class RecurringBusinessController extends Controller
             $checkDate = $baseDate->copy()->addDays($i);
             if ($salary->isToday($checkDate)) {
                 $count++;
+                $uniqueId = $salary->id . '-' . $checkDate->toDateString();
+                $isRecorded = $salary->createdBefore($checkDate);
+
+                // Fetch the actual transaction amount if this date was already executed
+                $actualAmountStr = null;
+                if ($isRecorded) {
+                    $pivot = \Illuminate\Support\Facades\DB::table('recurring_salary_transactions')
+                        ->where('unique_id', $uniqueId)
+                        ->first();
+                    if ($pivot) {
+                        // Salaries link to transactions table (via transaction_id)
+                        $txId = $pivot->transaction_id ?? null;
+                        if ($txId) {
+                            $actualTx = \App\Models\Transaction::find($txId);
+                            if ($actualTx) {
+                                $actualAmountStr = \App\Helpers\FinanceHelper::instance()->format_money($actualTx->amount, $actualTx->currency_id ?? $salary->currency_id);
+                            }
+                        }
+                    }
+                }
+
                 $upcomingSchedule[] = [
                     'date' => $checkDate->toDateString(),
-                    'amount_str' => $salary->current_amount_str(),
-                    'recorded' => $salary->createdBefore($checkDate),
+                    'amount_str' => $actualAmountStr ?? $salary->current_amount_str(),
+                    'is_actual' => $actualAmountStr !== null,
+                    'recorded' => $isRecorded,
                 ];
             }
         }

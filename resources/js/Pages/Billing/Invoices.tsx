@@ -69,7 +69,7 @@ export default function Invoices({
             label: __('erp.invoice_no'),
             render: (row: Invoice) => (
                 <Link
-                    href={route('billing.invoices.pay', row.id)}
+                    href={route('billing.invoices.pay', row.uuid)}
                     className="font-mono text-slate-900 font-semibold hover:text-indigo-600 transition-colors text-[13px]"
                 >
                     {row.invoice_number}
@@ -145,7 +145,7 @@ export default function Invoices({
                 <div className="flex items-center justify-end gap-2">
                     {row.status !== 'paid' && row.status !== 'cancelled' && row.status !== 'refunded' ? (
                         <Link
-                            href={route('billing.invoices.pay', row.id)}
+                            href={route('billing.invoices.pay', row.uuid)}
                             className={buttonVariants({
                                 variant: 'default',
                                 size: 'sm',
@@ -156,7 +156,7 @@ export default function Invoices({
                         </Link>
                     ) : (
                         <Link
-                            href={route('billing.invoices.pay', row.id)}
+                            href={route('billing.invoices.pay', row.uuid)}
                             className={buttonVariants({
                                 variant: 'ghost',
                                 size: 'icon-sm',

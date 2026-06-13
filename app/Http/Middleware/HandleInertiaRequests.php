@@ -180,6 +180,7 @@ class HandleInertiaRequests extends Middleware
                 'new_secret_key' => fn () => $request->session()->get('new_secret_key'),
                 'ios_shortcut_token' => fn () => $request->session()->get('ios_shortcut_token'),
             ],
+            'locale' => app()->getLocale(),
             'is_lance_domain' => $request->getHost() === 'lance.musoftwares.com',
         ];
     }

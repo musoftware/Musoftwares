@@ -38,7 +38,7 @@ class Project extends Model
             ->orderBy('id');
     }
 
-    public function client()
+    public function client(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
@@ -246,12 +246,12 @@ class Project extends Model
         return $new_items;
     }
 
-    public function cost_transactions()
+    public function cost_transactions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(CostTransaction::class, 'project_id');
     }
 
-    public function contracts()
+    public function contracts(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Contract::class);
     }

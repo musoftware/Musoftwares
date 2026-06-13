@@ -27,29 +27,29 @@ class Job extends Model
 
 
 
-    public function client()
+    public function client(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id');
     }
 
-    public function proposals()
+    public function proposals(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Proposal::class);
     }
 
-    public function contracts()
+    public function contracts(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Contract::class);
     }
 
-    public function skills()
+    public function skills(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Skill::class, 'freelance_job_skills')
             ->withPivot('is_required')
             ->withTimestamps();
     }
 
-    public function currency()
+    public function currency(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
     }

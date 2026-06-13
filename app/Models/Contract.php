@@ -95,7 +95,7 @@ class Contract extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function project()
+    public function project(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
@@ -105,12 +105,12 @@ class Contract extends Model
         return $this->belongsTo(ProjectProposal::class);
     } */
 
-    public function invoices()
+    public function invoices(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Invoice::class);
     }
 
-    public function versions()
+    public function versions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ContractVersion::class)->orderBy('created_at', 'desc');
     }

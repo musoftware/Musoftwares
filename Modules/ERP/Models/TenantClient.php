@@ -69,29 +69,30 @@ class TenantClient extends TenantModel
         return $this->hasMany(WalletTransaction::class, 'client_id');
     }
 
-    public function balance(): float
+    public function balance(): string
     {
         // All transactions reflect correctly on the wallet balance.
         // 'received' and 'earned' are positive.
         // 'refunded', 'sent', and 'used' are negative.
         // Reversals (e.g. cancelled invoices) can result in a positive 'used'.
-        return round((float) $this->transactions()->sum('amount'), 2);
+        return number_format($this->transactions()->sum('amount'), 2, '.', '');
     }
 
-    public function getBalanceAttribute(): float
+    public function getBalanceAttribute(): string
     {
         return $this->balance();
     }
 
-    public function lockedBalance(): float
+    public function lockedBalance(): string
     {
         $unpaidInvoices = $this->invoices()->whereIn('status', ['sent', 'partial'])->get();
-        return round((float) $unpaidInvoices->sum(function ($invoice) {
+        $sum = $unpaidInvoices->sum(function ($invoice) {
             return $invoice->unpaidAmount();
-        }), 2);
+        });
+        return number_format($sum, 2, '.', '');
     }
 
-    public function getLockedBalanceAttribute(): float
+    public function getLockedBalanceAttribute(): string
     {
         return $this->lockedBalance();
     }
@@ -149,14 +150,14 @@ class TenantClient extends TenantModel
         return $this->hasMany(DebtTransaction::class, 'client_id');
     }
 
-    public function debtBalance(): float
+    public function debtBalance(): string
     {
         $given = $this->debtTransactions()->where('type', 'given')->sum('amount');
         $received = $this->debtTransactions()->where('type', 'received')->sum('amount');
-        return (float) ($given - $received);
+        return number_format($given - $received, 2, '.', '');
     }
 
-    public function getDebtBalanceAttribute(): float
+    public function getDebtBalanceAttribute(): string
     {
         return $this->debtBalance();
     }

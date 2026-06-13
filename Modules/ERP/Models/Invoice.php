@@ -121,38 +121,38 @@ class Invoice extends TenantModel
      * Remaining unpaid amount.
      * Recovered from old project: Invoice::unpaid_total()
      */
-    public function unpaidAmount(): float
+    public function unpaidAmount(): string
     {
-        return round(max(0, (float) $this->amount - (float) $this->paid_amount), 2);
+        return number_format(max(0, $this->amount - $this->paid_amount), 2, '.', '');
     }
 
     /**
      * Subtotal before tax/discount (sum of item line totals).
      * Recovered from old project: Invoice::sub_total()
      */
-    public function subTotal(): float
+    public function subTotal(): string
     {
         $items = $this->relationLoaded('items') ? $this->items : $this->items()->get();
-        return (float) $items->sum('total');
+        return number_format($items->sum('total'), 2, '.', '');
     }
 
     /**
      * Total internal cost for this invoice.
      * Recovered from old project: Invoice::totalInternalCost()
      */
-    public function totalCost(): float
+    public function totalCost(): string
     {
         $costs = $this->relationLoaded('costs') ? $this->costs : $this->costs()->get();
-        return (float) $costs->sum('amount');
+        return number_format($costs->sum('amount'), 2, '.', '');
     }
 
     /**
      * Revenue (total minus costs).
      * Recovered from old project: Invoice::revenue()
      */
-    public function revenue(): float
+    public function revenue(): string
     {
-        return round((float) $this->amount - $this->totalCost(), 2);
+        return number_format($this->amount - $this->totalCost(), 2, '.', '');
     }
 
     /**
@@ -201,8 +201,8 @@ class Invoice extends TenantModel
         return DB::transaction(function () use ($amountDue, $client) {
             if ($amountDue > 0) {
                 // Proportion for business amount
-                $ratio = $amountDue / max(0.01, (float) $this->amount);
-                $businessAmountDue = round((float) $this->business_amount * $ratio, 2);
+                $ratio = $amountDue / max(0.01, $this->amount);
+                $businessAmountDue = number_format($this->business_amount * $ratio, 2, '.', '');
 
                 // 1. Create Credit Transaction (external payment deposit)
                 WalletTransaction::create([
@@ -297,7 +297,7 @@ class Invoice extends TenantModel
             return ['ok' => false, 'message' => __('errors.invoice_no_outstanding')];
         }
 
-        if ((float) $client->balance() < $amountDue) {
+        if ($client->balance() < $amountDue) {
             return ['ok' => false, 'message' => __('errors.insufficient_client_balance_details', ['required' => $amountDue, 'available' => $client->balance()])];
         }
 
@@ -311,9 +311,9 @@ class Invoice extends TenantModel
                 'direction' => 'debit',
                 'amount' => -$amountDue,
                 'currency_id' => $this->currency_id,
-                'business_amount' => -(float) $this->business_amount,
+                'business_amount' => -$this->business_amount,
                 'business_currency_id' => $this->tenant->base_currency_id,
-                'exchange_rate' => (float) $this->exchange_rate,
+                'exchange_rate' => $this->exchange_rate,
                 'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
                 'reference_type' => Invoice::class,
                 'reference_id' => $this->id,
@@ -377,8 +377,8 @@ class Invoice extends TenantModel
 
         return DB::transaction(function () use ($client, $amount) {
             // Proportion for business amount
-            $ratio = $amount / max(0.01, (float) $this->amount);
-            $businessAmount = round((float) $this->business_amount * $ratio, 2);
+            $ratio = $amount / max(0.01, $this->amount);
+            $businessAmount = number_format($this->business_amount * $ratio, 2, '.', '');
 
             WalletTransaction::create([
                 'tenant_id' => $this->tenant_id,
@@ -390,7 +390,7 @@ class Invoice extends TenantModel
                 'currency_id' => $this->currency_id,
                 'business_amount' => -$businessAmount,
                 'business_currency_id' => $this->tenant->base_currency_id,
-                'exchange_rate' => (float) $this->exchange_rate,
+                'exchange_rate' => $this->exchange_rate,
                 'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
                 'reference_type' => Invoice::class,
                 'reference_id' => $this->id,
@@ -398,7 +398,7 @@ class Invoice extends TenantModel
                 'created_by' => Auth::id(),
             ]);
 
-            $newPaid = round((float) $this->paid_amount + $amount, 2);
+            $newPaid = number_format($this->paid_amount + $amount, 2, '.', '');
             $this->update([
                 'status' => 'partial',
                 'paid_amount' => $newPaid,
@@ -428,15 +428,15 @@ class Invoice extends TenantModel
         }
 
         return DB::transaction(function () {
-            $paidAmount = (float) $this->paid_amount;
+            $paidAmount = $this->paid_amount;
 
             // Refund any paid amount back to the client
             if ($paidAmount > 0) {
                 $client = $this->client;
 
                 if ($client) {
-                    $ratio = $paidAmount / max(0.01, (float) $this->amount);
-                    $businessAmount = round((float) $this->business_amount * $ratio, 2);
+                    $ratio = $paidAmount / max(0.01, $this->amount);
+                    $businessAmount = number_format($this->business_amount * $ratio, 2, '.', '');
 
                     WalletTransaction::create([
                         'tenant_id' => $this->tenant_id,

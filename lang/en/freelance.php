@@ -366,4 +366,11 @@ return [
   'our_mission' => 'Our Mission',
   'mission_statement' => 'ArabiJobs was founded with a single goal: to empower individuals to build their careers on their own terms, while providing businesses with seamless access to world-class talent.',
   'frequently_asked_questions' => 'Frequently Asked Questions',
+    'on_site_visit' => 'On-site Visit',
+    'otp_invalid' => 'Invalid OTP',
+    'otp_sent' => 'OTP Sent Successfully',
+    'remote_service' => 'Remote Service',
+    'service_type_and_location' => 'Service Type & Location',
+    'service_type_help' => 'Choose if the service is delivered remotely or on-site',
+    'visit_location' => 'Visit Location',
 ];

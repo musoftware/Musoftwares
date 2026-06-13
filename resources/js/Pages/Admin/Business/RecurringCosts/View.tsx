@@ -174,7 +174,7 @@ export default function View({ cost, transactions, upcomingSchedule, total_stat 
                                     <tr>
                                         <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.projected_date')}</th>
                                         <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.estimated_amount')}</th>
+                                        <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.amount')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
@@ -190,8 +190,13 @@ export default function View({ cost, transactions, upcomingSchedule, total_stat 
                                                     <span className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-medium">{__('general.pending_execution')}</span>
                                                 )}
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-slate-700 text-right">
-                                                {run.amount_str}
+                                            <td className="px-4 py-3 whitespace-nowrap text-right">
+                                                <span className={`text-sm font-bold ${run.recorded ? 'text-slate-900' : 'text-slate-400'}`}>
+                                                    {run.amount_str}
+                                                </span>
+                                                <span className="block text-xs mt-0.5 text-gray-400">
+                                                    {run.is_actual ? __('general.actual_amount') : __('general.estimated_amount')}
+                                                </span>
                                             </td>
                                         </tr>
                                     ))}

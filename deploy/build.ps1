@@ -91,7 +91,7 @@ cmd.exe /c "tar.exe -czf build.tar.gz -C public/build ."
 
 # 4 & 5. Upload & Extract
 $remoteZip = "$REMOTE_PATH/public/build.tar.gz"
-$unzipCmd = "cd $REMOTE_PATH/public && rm -rf build/* && mkdir -p build && tar -xzf build.tar.gz -C build/ && rm build.tar.gz"
+$unzipCmd = "cd $REMOTE_PATH/public && rm -rf build_new && mkdir -p build_new && tar -xzf build.tar.gz -C build_new/ && rm -rf build_old && (mv build build_old 2>/dev/null || true) && mv build_new build && rm build.tar.gz"
 
 $hasPutty = $null -ne (Get-Command plink -ErrorAction SilentlyContinue) -and $null -ne (Get-Command pscp -ErrorAction SilentlyContinue)
 

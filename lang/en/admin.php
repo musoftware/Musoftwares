@@ -299,4 +299,8 @@ return [
     'search_project' => 'Search project...',
     'google_calendar_connected' => 'Google Calendar Connected',
     'google_calendar_disconnected' => 'Google Calendar Disconnected',
+    'edit_cost' => 'Edit Cost',
+    'edit_direct_cost' => 'Edit Direct Cost',
+    'edit_direct_cost_description' => 'Update the details of this direct cost',
+    'reverse_transaction' => 'Reverse Transaction',
 ];

@@ -328,7 +328,7 @@ class ERPDashboardController extends Controller
                     return [
                         'id' => $expense->id,
                         'title' => $expense->title,
-                        'amount' => round((float) $expense->amount, 2),
+                        'amount' => number_format($expense->amount, 2, '.', ''),
                         'category' => $expense->category ?? 'General',
                         'date' => $expense->date ? $expense->date->format('Y-m-d') : ($expense->created_at ? $expense->created_at->format('Y-m-d') : ''),
                         'description' => $expense->description ?? '-',
@@ -524,7 +524,7 @@ class ERPDashboardController extends Controller
 
                     // 4. Create first invoice if provided
                     if ($request->invoiceDesc && $request->invoiceAmount) {
-                        $amount = (float) $request->invoiceAmount;
+                        $amount = number_format($request->invoiceAmount, 2, '.', '');
 
                         $invoice = Invoice::create([
                             'tenant_id' => $tenant->id,

@@ -46,7 +46,7 @@ class TeamAuthController extends Controller
         if (!$member->isActive()) {
             Auth::guard('erp_team')->logout();
             throw ValidationException::withMessages([
-                'email' => ['Your account has been suspended. Please contact your workspace administrator.'],
+                'email' => [__('erp.account_suspended_contact_admin')],
             ]);
         }
 
@@ -71,7 +71,7 @@ class TeamAuthController extends Controller
         };
 
         return redirect()->to($redirectRoute)
-            ->with('success', 'Logged in successfully to workspace: ' . $member->tenant->name);
+            ->with('success', __('erp.logged_in_to_workspace', ['workspace' => $member->tenant->name]));
     }
 
     /**

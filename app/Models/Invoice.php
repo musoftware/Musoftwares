@@ -128,7 +128,7 @@ class Invoice extends Model
         return $unpaid;
     }
 
-    public function currency()
+    public function currency(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
     }
@@ -329,7 +329,7 @@ class Invoice extends Model
         return (float) $total;
     }
 
-    public function items()
+    public function items(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(InvoiceItem::class);
     }

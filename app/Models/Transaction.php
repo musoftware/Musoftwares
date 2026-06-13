@@ -185,7 +185,7 @@ class Transaction extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function currency()
+    public function currency(): BelongsTo
     {
         return $this->belongsTo(Currency::class, 'currency_id');
     }

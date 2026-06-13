@@ -299,4 +299,8 @@ return [
   'service_updated' => 'تم تحديث الخدمة بنجاح.',
   'google_calendar_connected' => 'تم ربط تقويم جوجل',
   'google_calendar_disconnected' => 'تم إلغاء ربط تقويم جوجل',
+    'edit_cost' => 'تعديل التكلفة',
+    'edit_direct_cost' => 'تعديل التكلفة المباشرة',
+    'edit_direct_cost_description' => 'تحديث تفاصيل التكلفة المباشرة',
+    'reverse_transaction' => 'عكس المعاملة',
 ];

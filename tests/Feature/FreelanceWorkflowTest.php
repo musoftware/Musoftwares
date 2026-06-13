@@ -76,6 +76,7 @@ class FreelanceWorkflowTest extends TestCase
                 'budget' => 1200.00,
                 'currency_id' => 1,
                 'type' => 'fixed',
+                'service_type' => 'remote',
                 'duration' => '1 month',
                 'min_proposal_points' => 2,
                 'skills' => [$this->skill->id],
