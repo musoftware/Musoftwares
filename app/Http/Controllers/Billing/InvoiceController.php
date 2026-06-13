@@ -41,8 +41,11 @@ class InvoiceController extends Controller
         $unpaidInvoices  = $collection->filter(fn($i) => $i['status'] !== 'paid')->values();
         $paidInvoices    = $collection->filter(fn($i) => $i['status'] === 'paid')->values();
 
-        $businessCurrencyId = AdminSettings::GetValue('business_currency', 2);
-        $walletCurrency = \App\Models\Currency::find($businessCurrencyId);
+        $walletCurrencyId = $user->currency_id;
+        if (!$walletCurrencyId) {
+            throw new \Exception("User {$user->id} is missing a currency configuration.");
+        }
+        $walletCurrency = \App\Models\Currency::find($walletCurrencyId);
 
         return Inertia::render('Billing/Invoices', [
             'invoices'        => $invoices,
@@ -56,11 +59,11 @@ class InvoiceController extends Controller
     /**
      * Show the invoice payment page.
      */
-    public function show(Request $request, $id)
+    public function show(Request $request, $uuid)
     {
         $user = Auth::user();
 
-        $invoice = Invoice::where('id', $id)
+        $invoice = Invoice::where('uuid', $uuid)
             ->where('user_id', $user->id)
             ->with(['items', 'currency'])
             ->firstOrFail();
@@ -70,8 +73,14 @@ class InvoiceController extends Controller
                 ->with('info', __('general.invoice_already_paid'));
         }
 
-        $businessCurrencyId = AdminSettings::GetValue('business_currency', 2);
-        $walletCurrency = \App\Models\Currency::find($businessCurrencyId);
+        $walletCurrencyId = $user->currency_id;
+        if (!$walletCurrencyId) {
+            throw new \Exception("User {$user->id} is missing a currency configuration.");
+        }
+        $walletCurrency = \App\Models\Currency::find($walletCurrencyId);
+        
+        $remaining = $invoice->unpaid_total();
+        $remainingInWalletCurrency = \App\Models\CurrenciesExchange::RateToday($remaining, $invoice->currency_id, $walletCurrencyId);
 
         return Inertia::render('Billing/InvoicePay', [
             'invoice' => [
@@ -95,17 +104,18 @@ class InvoiceController extends Controller
             ],
             'client_balance'  => round((float) $user->balance(), 2),
             'wallet_currency' => $walletCurrency,
+            'remaining_in_wallet_currency' => round((float) $remainingInWalletCurrency, 2),
         ]);
     }
 
     /**
      * Process payment: Wallet deduction if sufficient, else Kashier URL.
      */
-    public function processPayment(Request $request, $id)
+    public function processPayment(Request $request, $uuid)
     {
         $user = Auth::user();
         
-        $invoice = Invoice::where('id', $id)
+        $invoice = Invoice::where('uuid', $uuid)
             ->where('user_id', $user->id)
             ->with(['currency'])
             ->firstOrFail();
@@ -116,8 +126,15 @@ class InvoiceController extends Controller
 
         $remaining = $invoice->unpaid_total();
         
+        $walletCurrencyId = $user->currency_id;
+        if (!$walletCurrencyId) {
+            return response()->json(['success' => false, 'message' => "User is missing a currency configuration"], 500);
+        }
+        
+        $remainingInWalletCurrency = \App\Models\CurrenciesExchange::RateToday($remaining, $invoice->currency_id, $walletCurrencyId);
+        
         // If wallet balance covers the remaining amount, pay via wallet
-        if ((float) $user->balance() >= $remaining) {
+        if ((float) $user->balance() >= $remainingInWalletCurrency) {
             try {
                 $invoice->bill_invoice();
                 return response()->json([

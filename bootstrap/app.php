@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(\App\Http\Middleware\RemoveSecurityHeaders::class);
         $middleware->web(append: [
             \Modules\ERP\Http\Middleware\ShareTeamMemberSession::class,
+            \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
             \App\Http\Middleware\EnforceFreelanceDomain::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,

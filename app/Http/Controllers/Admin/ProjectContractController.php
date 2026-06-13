@@ -57,7 +57,7 @@ class ProjectContractController extends Controller
             'pricing_items' => $validated['pricing_items'] ?? [],
         ];
 
-        DB::transaction(function () use ($validated, $content, $project) {
+        $contract = DB::transaction(function () use ($validated, $content, $project) {
             $contract = Contract::create([
                 'uuid' => (string) Str::uuid(),
                 'project_id' => $project->id,
@@ -81,6 +81,8 @@ class ProjectContractController extends Controller
                 'content' => $contract->content,
                 'total_amount' => $contract->total_amount,
             ]);
+
+            return $contract;
         });
 
         if (isset($validated['status']) && $validated['status'] === 'sent' && $project->client) {

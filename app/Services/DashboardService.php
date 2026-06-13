@@ -22,9 +22,10 @@ class DashboardService
 {
     public function getCoreMetrics(): array
     {
-        $startDate = now()->startOfMonth();
-        $endDate = now()->endOfMonth();
-        $businessCurrencyId = AdminSettings::business_currency();
+        return \Illuminate\Support\Facades\Cache::remember('admin_core_metrics', 300, function () {
+            $startDate = now()->startOfMonth();
+            $endDate = now()->endOfMonth();
+            $businessCurrencyId = AdminSettings::business_currency();
         $businessCurrencyName = AdminSettings::business_currency_name();
 
         $totalUsers = User::count();
@@ -75,11 +76,13 @@ class DashboardService
             'bookingRatePerHour' => round($bookingRatePerHour, 2),
             'businessCurrency'   => $businessCurrencyName,
         ];
+        });
     }
 
     public function getOperationalMetrics(): array
     {
-        $totalProjects = Project::count();
+        return \Illuminate\Support\Facades\Cache::remember('admin_operational_metrics', 300, function () {
+            $totalProjects = Project::count();
         $activeProjects = Project::where('archived', 0)->count();
         $completedProjects = Project::where('archived', 1)->count();
         
@@ -108,6 +111,7 @@ class DashboardService
             'premiumUsers' => $premiumUsers,
             'activeUsers30d' => $activeUsers30d,
         ];
+        });
     }
 
     public function getSystemHealth(): array
@@ -122,39 +126,40 @@ class DashboardService
 
     public function getRevenueThisMonth(): float
     {
-        return (float) Transaction::where('type', 'received')
+        $received = (float) Transaction::whereIn('type', ['received', 'earned'])
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->sum('business_amount');
+
+        $deductions = (float) Transaction::whereIn('type', ['refunded', 'sent'])
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('business_amount');
+
+        return $received + $deductions;
     }
 
     public function getRevenueLastMonth(): float
     {
         $lastMonth = now()->subMonth();
 
-        return (float) Transaction::where('type', 'received')
+        $received = (float) Transaction::whereIn('type', ['received', 'earned'])
             ->whereMonth('created_at', $lastMonth->month)
             ->whereYear('created_at', $lastMonth->year)
             ->sum('business_amount');
+
+        $deductions = (float) Transaction::whereIn('type', ['refunded', 'sent'])
+            ->whereMonth('created_at', $lastMonth->month)
+            ->whereYear('created_at', $lastMonth->year)
+            ->sum('business_amount');
+
+        return $received + $deductions;
     }
 
     public function getMonthlyExpenses($startDate, $endDate, $businessCurrencyId): float
     {
-        $costTransactionSum = CostTransaction::whereBetween('created_at', [$startDate, $endDate])
-            ->get()
-            ->sum(function ($cost) use ($businessCurrencyId) {
-                return CurrenciesExchange::RateToday(
-                    $cost->amount,
-                    $cost->currency ?? 1,
-                    $businessCurrencyId
-                );
-            });
-
-        $sentTransactions = Transaction::whereIn('type', ['sent', 'refunded'])
-            ->whereBetween('created_at', [$startDate, $endDate])
+        return (float) CostTransaction::whereBetween('created_at', [$startDate, $endDate])
             ->sum('business_amount');
-
-        return $costTransactionSum + $sentTransactions;
     }
 
     public function getMonthlyRevenueChart(): array
@@ -167,10 +172,17 @@ class DashboardService
             $month = $date->month;
             $year = $date->year;
 
-            $income = (float) Transaction::where('type', 'received')
+            $received = (float) Transaction::whereIn('type', ['received', 'earned'])
                 ->whereMonth('created_at', $month)
                 ->whereYear('created_at', $year)
                 ->sum('business_amount');
+
+            $deductions = (float) Transaction::whereIn('type', ['refunded', 'sent'])
+                ->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->sum('business_amount');
+
+            $income = $received + $deductions;
 
             $expenses = 0;
             try {
@@ -286,7 +298,7 @@ class DashboardService
 
         $unpaidInvoices = clone $user->invoices()->whereIn('status', ['unpaid', 'partially_paid']);
         $unpaidCount = $unpaidInvoices->count();
-        $unpaidAmount = round($user->unpaid_invoices_amount(), 2);
+        $unpaidAmount = round($user->unpaid_invoices_amount(true), 2);
 
         $openTicketsCount = Ticket::where('user_id', $user->id)
             ->where('ticket_status', '!=', 'resolved')
@@ -301,7 +313,12 @@ class DashboardService
             ->where('status', 'active')
             ->count();
 
-        $totalMonthlySubscription = $this->calculateTotalMonthlySubscription($user);
+        $userCurrency = \App\Models\Currency::find($user->currency_id);
+        if (!$userCurrency) {
+            throw new \Exception("User {$user->id} is missing an associated currency relation.");
+        }
+
+        $totalMonthlySubscription = $this->calculateTotalMonthlySubscription($user, $userCurrency);
 
         return [
             'walletBalance'       => $walletBalance,
@@ -313,11 +330,11 @@ class DashboardService
             'totalMonthlySubscription' => $totalMonthlySubscription,
             'openTickets'         => $openTicketsCount,
             'pendingWithdrawals'  => $pendingWithdrawals,
-            'currency'            => $user->currency_name(),
+            'currency'            => $userCurrency,
         ];
     }
 
-    private function calculateTotalMonthlySubscription(User $user): float
+    private function calculateTotalMonthlySubscription(User $user, $userCurrency): float
     {
         $activeObjects = DB::table('user_subscriptions')
             ->where('user_id', $user->id)
@@ -325,33 +342,29 @@ class DashboardService
             ->pluck('object')
             ->toArray();
 
-        $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
-        $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
+        $usdCurrency = \Illuminate\Support\Facades\Cache::remember('currency_usd', 86400, fn() => \App\Models\Currency::where('currency', 'USD')->first());
+        if (!$usdCurrency) {
+            throw new \Exception("System USD currency not found.");
+        }
         
-        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
-        $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
-        
-        $userCurrencyId = $user->currency_id ?: $egpCurrencyId;
-        $userCurrency = \App\Models\Currency::find($userCurrencyId);
-        $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
+        $egpCurrency = \Illuminate\Support\Facades\Cache::remember('currency_egp', 86400, fn() => \App\Models\Currency::where('currency', 'EGP')->first());
+        if (!$egpCurrency) {
+            throw new \Exception("System EGP currency not found.");
+        }
         
         $rate = 1.0;
-        if ($usdCurrency && $userCurrencyId && $usdCurrency->id != $userCurrencyId) {
-            $rate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $userCurrencyId);
+        if ($usdCurrency->id != $userCurrency->id) {
+            $rate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $userCurrency->id) ?: 1.0;
         }
 
-        $egpRate = 50; // Fallback
-        if ($usdCurrency && $egpCurrencyId) {
-            $egpRate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
-        }
+        $egpRate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrency->id) ?: 50.0;
 
-        $convertPrice = function($egpPrice) use ($egpRate, $rate, $currencyCode) {
-            if ($currencyCode === 'EGP') {
-                return round($egpPrice);
+        $convertPrice = function($egpPrice) use ($egpRate, $rate, $userCurrency) {
+            if ($userCurrency->currency === 'EGP') {
+                return (float) $egpPrice;
             }
-            $usdPrice = $egpPrice / $egpRate;
-            $converted = $usdPrice * $rate;
-            return psychological_price($converted);
+            $usdPrice = $egpRate > 0 ? $egpPrice / $egpRate : 0;
+            return (float) ($usdPrice * $rate);
         };
 
         $erpMonthly = 0;
@@ -378,26 +391,30 @@ class DashboardService
     {
         return $user->invoices()
             ->whereIn('status', ['unpaid', 'partially_paid'])
-            ->orderBy('id', 'asc')
+            ->orderBy('created_at', 'asc')
             ->limit(5)
             ->get()
             ->map(function ($invoice) {
                 $currencyObj = \App\Models\Currency::find($invoice->currency);
+                if (!$currencyObj) {
+                    throw new \Exception("Invoice {$invoice->id} is missing a valid currency.");
+                }
+                
                 return [
                     'id' => $invoice->id,
                     'dbId' => $invoice->id,
                     'date' => $invoice->created_at?->format('M d, Y') ?? '-',
-                    'amount' => round($invoice->unpaid_total(), 2),
-                    'status' => 'due',
+                    'amount' => (float) $invoice->unpaid_total(),
+                    'status' => $invoice->created_at && $invoice->created_at->diffInDays(now()) > 30 ? 'overdue' : 'due_soon',
                     'description' => 'Invoice #' . $invoice->id,
-                    'currency' => $currencyObj ? $currencyObj->currency : 'USD',
+                    'currency' => $currencyObj,
                 ];
             });
     }
 
     private function getRecentTransactions(User $user)
     {
-        return Transaction::where('user_id', $user->id)
+        return Transaction::with('currency')->where('user_id', $user->id)
             ->latest()
             ->limit(8)
             ->get()
@@ -406,9 +423,10 @@ class DashboardService
                 return [
                     'id' => $txn->id,
                     'date' => $txn->created_at?->format('M d, Y') ?? '-',
-                    'type' => $isCredit ? 'deposit' : 'withdrawal',
+                    'type' => $isCredit ? 'deposit' : 'expense',
                     'amount' => $isCredit ? (float) $txn->amount : -1 * (float) $txn->amount,
                     'method' => ucwords(str_replace('_', ' ', $txn->reason ?? 'Wallet')),
+                    'currency' => $txn->currency,
                 ];
             });
     }
@@ -416,35 +434,43 @@ class DashboardService
     private function getWalletChartData(User $user): array
     {
         $sixMonthsAgo = Carbon::now()->subMonths(5)->startOfMonth();
+        
         $chartTransactions = Transaction::where('user_id', $user->id)
             ->where('created_at', '>=', $sixMonthsAgo)
-            ->select(
-                DB::raw("DATE_FORMAT(created_at, '%b') as month"),
-                DB::raw("DATE_FORMAT(created_at, '%Y-%m') as sort_month"),
-                'type',
-                DB::raw('SUM(amount) as total')
-            )
-            ->groupBy('month', 'sort_month', 'type')
-            ->orderBy('sort_month')
-            ->get();
+            ->whereIn('type', ['received', 'earned', 'sent', 'refunded', 'used'])
+            ->get(['created_at', 'type', 'business_amount', 'amount']);
 
         $chartDataRaw = [];
         for ($i = 5; $i >= 0; $i--) {
-            $m = Carbon::now()->subMonths($i)->format('b');
-            $chartDataRaw[$m] = ['month' => $m, 'deposit' => 0, 'withdrawal' => 0];
+            $m = Carbon::now()->subMonths($i)->format('Y-m');
+            $chartDataRaw[$m] = ['deposit' => 0.0, 'expense' => 0.0];
         }
 
         foreach ($chartTransactions as $txn) {
-            if (isset($chartDataRaw[$txn->month])) {
-                if ($txn->type === 'credit') {
-                    $chartDataRaw[$txn->month]['deposit'] = (float) $txn->total;
+            $m = $txn->created_at->format('Y-m');
+            if (isset($chartDataRaw[$m])) {
+                $isCredit = in_array($txn->type, ['received', 'earned']);
+                $val = abs((float) ($txn->business_amount ?? $txn->amount));
+
+                if ($isCredit) {
+                    $chartDataRaw[$m]['deposit'] += $val;
                 } else {
-                    $chartDataRaw[$txn->month]['withdrawal'] = (float) $txn->total;
+                    $chartDataRaw[$m]['expense'] += $val;
                 }
             }
         }
         
-        return array_values($chartDataRaw);
+        $finalData = [];
+        foreach ($chartDataRaw as $key => $data) {
+            $date = Carbon::createFromFormat('Y-m', $key);
+            $finalData[] = [
+                'month' => $date->translatedFormat('M'),
+                'deposit' => round($data['deposit'], 2),
+                'expense' => round($data['expense'], 2),
+            ];
+        }
+
+        return $finalData;
     }
 
     private function getActiveToolLicenses(User $user): array

@@ -60,7 +60,7 @@ class InvoicePaymentController extends Controller
                 ->with('info', __('erp.invoice_already_paid'));
         }
 
-        return Inertia::render('ERP/Client/InvoicePay', [
+        return Inertia::render('ERP/ClientInvoices/Pay', [
             'invoice' => [
                 'id'             => $invoice->id,
                 'invoice_number' => $invoice->invoice_number,
@@ -185,7 +185,7 @@ class InvoicePaymentController extends Controller
         $client = $this->resolveClient();
 
         if (!$client) {
-            return Inertia::render('ERP/Client/Invoices', [
+            return Inertia::render('ERP/ClientInvoices/Index', [
                 'invoices'       => [],
                 'unpaid_invoices'=> [],
                 'paid_invoices'  => [],
@@ -215,7 +215,7 @@ class InvoicePaymentController extends Controller
         $unpaidInvoices  = $collection->filter(fn($i) => $i['status'] !== 'paid')->values();
         $paidInvoices    = $collection->filter(fn($i) => $i['status'] === 'paid')->values();
 
-        return Inertia::render('ERP/Client/Invoices', [
+        return Inertia::render('ERP/ClientInvoices/Index', [
             'invoices'        => $invoices,
             'unpaid_invoices' => $unpaidInvoices,
             'paid_invoices'   => $paidInvoices,

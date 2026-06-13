@@ -11,7 +11,7 @@
  *   - Local agent calls (127.0.0.1) → Network Only (always fresh)
  */
 
-const CACHE_NAME    = 'musoftware-v1';
+const CACHE_NAME    = 'musoftware-v2';
 const OFFLINE_PAGE  = '/offline.html';
 
 // Resources to pre-cache on install (app shell)
@@ -92,9 +92,16 @@ async function cacheFirst(request) {
 
     try {
         const response = await fetch(request);
-        if (response.ok) {
+        // Only cache complete, successful responses.
+        // A partial response (e.g. from a mid-deploy race condition) must NOT be cached.
+        if (response.ok && response.status === 200) {
+            const contentLength = response.headers.get('content-length');
+            // Clone to read body for length check if needed, but primarily rely on status
             const cache = await caches.open(CACHE_NAME);
-            cache.put(request, response.clone());
+            // Only store if content-length header is absent (chunked) or non-zero
+            if (!contentLength || parseInt(contentLength, 10) > 0) {
+                cache.put(request, response.clone());
+            }
         }
         return response;
     } catch {

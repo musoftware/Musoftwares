@@ -28,8 +28,8 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
         valid_until: '',
         total_amount: '',
         currency_id: project.client?.currency_id || '',
-        key_features: [],
-        pricing_items: [],
+        key_features: [] as string[],
+        pricing_items: [] as any[],
         status: 'draft',
     });
 
@@ -106,7 +106,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
         const title = prompt("Enter milestone title:");
         if (!title) return;
         const amount = prompt("Enter amount for this milestone:");
-        if (!amount || isNaN(amount)) return alert("Invalid amount");
+        if (!amount || isNaN(Number(amount))) return alert("Invalid amount");
         
         router.post(route('projects.contracts.invoice', { project: project.id, contract: contract.id }), {
             title,

@@ -19,22 +19,22 @@ class Proposal extends Model
     protected $table = 'freelance_proposals';
     protected $fillable = ['job_id', 'freelancer_id', 'cover_letter', 'bid_amount', 'currency_id', 'proposed_budget_points', 'points_spent', 'status'];
 
-    public function job()
+    public function job(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Job::class);
     }
 
-    public function freelancer()
+    public function freelancer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'freelancer_id');
     }
 
-    public function currency()
+    public function currency(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
     }
 
-    public function offers()
+    public function offers(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ProposalOffer::class);
     }

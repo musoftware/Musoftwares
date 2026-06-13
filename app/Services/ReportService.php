@@ -19,9 +19,15 @@ class ReportService
         $totalIncome = 0;
 
         // Income from platform transactions
-        $invoiceRevenue = (float) \App\Models\Transaction::where('type', 'received')
+        $received = (float) \App\Models\Transaction::whereIn('type', ['received', 'earned'])
             ->whereBetween('created_at', [$from, $to])
             ->sum('business_amount');
+            
+        $deductions = (float) \App\Models\Transaction::whereIn('type', ['refunded', 'sent'])
+            ->whereBetween('created_at', [$from, $to])
+            ->sum('business_amount');
+
+        $invoiceRevenue = $received + $deductions;
         $incomeBreakdown['Invoice payments'] = $invoiceRevenue;
         $totalIncome = $invoiceRevenue;
 

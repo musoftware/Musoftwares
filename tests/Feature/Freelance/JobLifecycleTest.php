@@ -18,6 +18,7 @@ class JobLifecycleTest extends FreelanceTestCase
                 'budget' => 2500.00,
                 'currency_id' => $this->usdCurrency->id,
                 'type' => 'fixed',
+                'service_type' => 'remote',
                 'duration' => '2 months',
                 'min_proposal_points' => 5,
                 'skills' => [$this->skill->id],

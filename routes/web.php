@@ -65,6 +65,9 @@ Route::get('/cookie-policy', [HomeController::class, 'cookiePolicy'])->name('leg
 // Pricing
 Route::get('/pricing', [HomeController::class, 'pricing'])->name('pricing');
 
+// Sitemap
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+
 Route::get('/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -231,10 +234,15 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp', 'erp.te
 // Platform users (subscribers) view their invoices issued by admin and pay them.
 // These are CORE platform billing routes — NOT related to the ERP module.
 Route::middleware(['auth', 'verified', 'onboarding'])->prefix('billing')->name('billing.')->group(function () {
-    Route::get('/invoices', [\Modules\ERP\Http\Controllers\InvoicePaymentController::class, 'clientIndex'])->name('invoices.index');
-    Route::get('/invoices/{uuid}/pay', [\Modules\ERP\Http\Controllers\InvoicePaymentController::class, 'show'])->name('invoices.pay');
-    Route::post('/invoices/{uuid}/pay/wallet', [\Modules\ERP\Http\Controllers\InvoicePaymentController::class, 'processWalletPayment'])->name('invoices.pay.wallet');
+    Route::get('/invoices', [\App\Http\Controllers\Billing\InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/{uuid}/pay', [\App\Http\Controllers\Billing\InvoiceController::class, 'show'])->name('invoices.pay');
+    Route::post('/invoices/{uuid}/pay', [\App\Http\Controllers\Billing\InvoiceController::class, 'processPayment'])->name('invoices.pay.process');
+    Route::get('/invoices/payment/success', [\App\Http\Controllers\Billing\InvoiceController::class, 'paymentSuccess'])->name('invoices.payment.success');
+    Route::get('/invoices/payment/failure', [\App\Http\Controllers\Billing\InvoiceController::class, 'paymentFailure'])->name('invoices.payment.failure');
 });
+
+// Platform invoice payment webhook (unprotected)
+Route::post('/billing/invoices/payment/webhook', [\App\Http\Controllers\Billing\InvoiceController::class, 'paymentWebhook'])->name('billing.invoices.payment.webhook');
 
 
 // Marketplace Routes — literal routes BEFORE wildcards

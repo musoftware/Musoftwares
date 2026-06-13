@@ -31,6 +31,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Home', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Home | Musoftware',
+                'description' => 'Comprehensive ERP and CRM solutions, business management tools, and technical consulting to scale your operations.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -39,6 +46,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Portfolio', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Portfolio | Musoftware',
+                'description' => 'Explore our successful projects, case studies, and the robust applications we have built for businesses worldwide.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -48,6 +62,13 @@ class HomeController extends Controller
             'slug' => $slug,
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => ucfirst(str_replace('-', ' ', $slug)) . ' - Portfolio | Musoftware',
+                'description' => 'Discover the details and success story of ' . ucfirst(str_replace('-', ' ', $slug)) . ' developed by Musoftware.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -55,10 +76,29 @@ class HomeController extends Controller
     {
         $service = \App\Models\WebsiteService::where('slug', $slug)->firstOrFail();
         
+        $lang = request('lang', app()->getLocale());
+        
+        $title = $lang === 'ar' ? ($service->seo_title_ar ?: $service->title_ar) : ($service->seo_title_en ?: $service->title_en);
+        $description = $lang === 'ar' ? ($service->seo_description_ar ?: $service->subtitle_ar) : ($service->seo_description_en ?: $service->subtitle_en);
+        
+        if (empty($description)) {
+            $description = $lang === 'ar' ? strip_tags($service->description_ar) : strip_tags($service->description_en);
+        }
+        $description = \Illuminate\Support\Str::limit($description, 160);
+        
+        $imagePath = $lang === 'ar' ? $service->primary_image_ar : $service->primary_image_en;
+
         return Inertia::render('Public/WebsiteServiceShow', [
             'service' => $service,
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => $title . ' | Musoftware',
+                'description' => $description,
+                'image' => $imagePath ? asset($imagePath) : asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -67,6 +107,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Platforms', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Platforms | Musoftware',
+                'description' => 'Discover our suite of business platforms including CRM, ERP, and Cloud solutions tailored for your business needs.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -75,6 +122,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Platforms/Crm', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'CRM Platform | Musoftware',
+                'description' => 'Manage your customer relationships efficiently with our powerful CRM platform.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -83,6 +137,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Platforms/Erp', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'ERP Platform | Musoftware',
+                'description' => 'Streamline your enterprise resources and operations with our integrated ERP platform.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -91,6 +152,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Platforms/Cloud', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Cloud Solutions | Musoftware',
+                'description' => 'Secure, scalable, and reliable cloud solutions to host and manage your applications.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -99,6 +167,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Solutions', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Industry Solutions | Musoftware',
+                'description' => 'Tailored software solutions for Healthcare, Education, E-commerce, Real Estate, and Finance sectors.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -107,6 +182,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Solutions/Healthcare', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Healthcare Solutions | Musoftware',
+                'description' => 'Advanced digital health and clinic management software solutions.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -115,6 +197,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Solutions/Education', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Education Solutions | Musoftware',
+                'description' => 'Innovative e-learning platforms and school management systems.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -123,6 +212,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Solutions/Ecommerce', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'E-commerce Solutions | Musoftware',
+                'description' => 'Scalable online stores and multi-vendor marketplace solutions.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -131,6 +227,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Solutions/RealEstate', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Real Estate Solutions | Musoftware',
+                'description' => 'Property management and real estate listing platforms.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -139,6 +242,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Solutions/Finance', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Finance Solutions | Musoftware',
+                'description' => 'Secure financial software, accounting tools, and fintech solutions.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -147,6 +257,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Company', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Company | Musoftware',
+                'description' => 'Learn more about Musoftware, our mission, vision, and the team driving innovation.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -155,6 +272,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Company/About', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'About Us | Musoftware',
+                'description' => 'Discover our story, values, and what makes Musoftware a leader in digital solutions.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -163,6 +287,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Company/Careers', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Careers | Musoftware',
+                'description' => 'Join our dynamic team. Explore open positions and career opportunities at Musoftware.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -171,6 +302,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Company/Contact', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Contact Us | Musoftware',
+                'description' => 'Get in touch with our team for inquiries, support, or to discuss your next big project.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -179,6 +317,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Legal/Privacy', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Privacy Policy | Musoftware',
+                'description' => 'Read our privacy policy to understand how we collect, use, and protect your data.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -187,6 +332,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Legal/Terms', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Terms of Service | Musoftware',
+                'description' => 'Review the terms and conditions governing the use of Musoftware services.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -195,6 +347,13 @@ class HomeController extends Controller
         return Inertia::render('Public/Legal/Cookies', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Cookie Policy | Musoftware',
+                'description' => 'Information about how we use cookies to improve your browsing experience.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 
@@ -259,6 +418,13 @@ class HomeController extends Controller
             'canRegister' => Route::has('register'),
             'serviceItems' => $serviceItems,
             'currency' => $currencyCode,
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Pricing | Musoftware',
+                'description' => 'Transparent and flexible pricing plans for our CRM, ERP, and specialized software services.',
+                'image' => asset('images/default-meta.png'),
+                'url' => url()->current(),
+            ]
         ]);
     }
 }

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Modules\ERP\Models\WalletTransaction;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\Tenant;
+use Modules\ERP\Services\WalletService;
 use Inertia\Inertia;
 
 /**
@@ -24,6 +25,12 @@ use Inertia\Inertia;
  */
 class WalletController extends Controller
 {
+    private WalletService $walletService;
+
+    public function __construct(WalletService $walletService)
+    {
+        $this->walletService = $walletService;
+    }
     // ── Tenant resolution helper ─────────────────────────────────────
 
     /**
@@ -110,36 +117,18 @@ class WalletController extends Controller
             }
 
             DB::transaction(function () use ($request, $tenant, $clientModel, $projectId) {
-                $amount = (float) $request->input('amount');
+                $amount = number_format($request->input('amount'), 2, '.', '');
 
-                $businessCurrencyId = $tenant->base_currency_id;
-                if (!$clientModel->currency_id) {
-                    throw new \Exception("Client {$clientModel->name} is missing an associated currency relation.");
-                }
-                $businessAmount = \App\Models\CurrenciesExchange::RateByDate(
-                    now(),
+                $this->walletService->createTransaction(
+                    $clientModel,
+                    'received',
+                    'credit',
                     $amount,
-                    $clientModel->currency_id,
-                    $businessCurrencyId
+                    $tenant->id,
+                    $projectId,
+                    $request->input('note') ?? __('erp.manual_wallet_transaction'),
+                    'manual_receive'
                 );
-
-                WalletTransaction::create([
-                    'tenant_id'        => $tenant->id,
-                    'client_id'        => $clientModel->id,
-                    'project_id'       => $projectId,
-                    'type'             => 'received',
-                    'direction'        => 'credit',
-                    'amount'           => $amount,
-                    'currency_id'      => $clientModel->currency_id,
-                    'business_amount'  => $businessAmount,
-                    'business_currency_id' => $businessCurrencyId,
-                    'exchange_rate'    => \App\Models\CurrenciesExchange::Rate(now()->toDateString(), $clientModel->currency_id, $businessCurrencyId),
-                    'exchange_rate_date'=> now()->toDateString(),
-                    'reference_type'   => 'manual_receive',
-                    'reference_id'     => Auth::id(),
-                    'note'             => $request->input('note') ?? __('erp.manual_wallet_transaction'),
-                    'created_by'       => Auth::id(),
-                ]);
             });
 
             if ($projectId) {
@@ -176,41 +165,22 @@ class WalletController extends Controller
             }
 
             DB::transaction(function () use ($request, $tenant, $clientModel, $projectId) {
-                $amount = (float) $request->input('amount');
+                $amount = number_format($request->input('amount'), 2, '.', '');
 
                 if ($clientModel->balance() < $amount) {
                     throw new \Exception(__('erp.insufficient_client_balance'));
                 }
 
-                $businessCurrencyId = $tenant->base_currency_id;
-                if (!$clientModel->currency_id) {
-                    throw new \Exception("Client {$clientModel->name} is missing an associated currency relation.");
-                }
-                $businessAmount = \App\Models\CurrenciesExchange::RateByDate(
-                    now(),
+                $this->walletService->createTransaction(
+                    $clientModel,
+                    'sent',
+                    'debit',
                     $amount,
-                    $clientModel->currency_id,
-                    $businessCurrencyId
+                    $tenant->id,
+                    $projectId,
+                    $request->input('note') ?? __('erp.manual_wallet_transaction'),
+                    'manual_send'
                 );
-
-                // Sent transactions are stored as negative amounts
-                WalletTransaction::create([
-                    'tenant_id'        => $tenant->id,
-                    'client_id'        => $clientModel->id,
-                    'project_id'       => $projectId,
-                    'type'             => 'sent',
-                    'direction'        => 'debit',
-                    'amount'           => -$amount,
-                    'currency_id'      => $clientModel->currency_id,
-                    'business_amount'  => -$businessAmount,
-                    'business_currency_id' => $businessCurrencyId,
-                    'exchange_rate'    => \App\Models\CurrenciesExchange::Rate(now()->toDateString(), $clientModel->currency_id, $businessCurrencyId),
-                    'exchange_rate_date'=> now()->toDateString(),
-                    'reference_type'   => 'manual_send',
-                    'reference_id'     => Auth::id(),
-                    'note'             => $request->input('note') ?? __('erp.manual_wallet_transaction'),
-                    'created_by'       => Auth::id(),
-                ]);
             });
 
             if ($projectId) {
@@ -247,37 +217,18 @@ class WalletController extends Controller
             }
 
             DB::transaction(function () use ($request, $tenant, $clientModel, $projectId) {
-                $amount = (float) $request->input('amount');
+                $amount = number_format($request->input('amount'), 2, '.', '');
 
-                $businessCurrencyId = $tenant->base_currency_id;
-                if (!$clientModel->currency_id) {
-                    throw new \Exception("Client {$clientModel->name} is missing an associated currency relation.");
-                }
-                $businessAmount = \App\Models\CurrenciesExchange::RateByDate(
-                    now(),
+                $this->walletService->createTransaction(
+                    $clientModel,
+                    'refunded',
+                    'debit',
                     $amount,
-                    $clientModel->currency_id,
-                    $businessCurrencyId
+                    $tenant->id,
+                    $projectId,
+                    $request->input('note') ?? __('erp.manual_wallet_transaction'),
+                    'manual_refund'
                 );
-
-                // Refunded transactions are stored as negative amounts
-                WalletTransaction::create([
-                    'tenant_id'        => $tenant->id,
-                    'client_id'        => $clientModel->id,
-                    'project_id'       => $projectId,
-                    'type'             => 'refunded',
-                    'direction'        => 'debit',
-                    'amount'           => -$amount,
-                    'currency_id'      => $clientModel->currency_id,
-                    'business_amount'  => -$businessAmount,
-                    'business_currency_id' => $businessCurrencyId,
-                    'exchange_rate'    => \App\Models\CurrenciesExchange::Rate(now()->toDateString(), $clientModel->currency_id, $businessCurrencyId),
-                    'exchange_rate_date'=> now()->toDateString(),
-                    'reference_type'   => 'manual_refund',
-                    'reference_id'     => Auth::id(),
-                    'note'             => $request->input('note') ?? __('erp.manual_wallet_transaction'),
-                    'created_by'       => Auth::id(),
-                ]);
             });
 
             if ($projectId) {
@@ -314,36 +265,18 @@ class WalletController extends Controller
             }
 
             DB::transaction(function () use ($request, $tenant, $clientModel, $projectId) {
-                $amount = (float) $request->input('amount');
+                $amount = number_format($request->input('amount'), 2, '.', '');
 
-                $businessCurrencyId = $tenant->base_currency_id;
-                if (!$clientModel->currency_id) {
-                    throw new \Exception("Client {$clientModel->name} is missing an associated currency relation.");
-                }
-                $businessAmount = \App\Models\CurrenciesExchange::RateByDate(
-                    now(),
+                $this->walletService->createTransaction(
+                    $clientModel,
+                    'earned',
+                    'credit',
                     $amount,
-                    $clientModel->currency_id,
-                    $businessCurrencyId
+                    $tenant->id,
+                    $projectId,
+                    $request->input('note') ?? __('erp.manual_wallet_transaction'),
+                    'manual_bonus'
                 );
-
-                WalletTransaction::create([
-                    'tenant_id'        => $tenant->id,
-                    'client_id'        => $clientModel->id,
-                    'project_id'       => $projectId,
-                    'type'             => 'earned',
-                    'direction'        => 'credit',
-                    'amount'           => $amount,
-                    'currency_id'      => $clientModel->currency_id,
-                    'business_amount'  => $businessAmount,
-                    'business_currency_id' => $businessCurrencyId,
-                    'exchange_rate'    => \App\Models\CurrenciesExchange::Rate(now()->toDateString(), $clientModel->currency_id, $businessCurrencyId),
-                    'exchange_rate_date'=> now()->toDateString(),
-                    'reference_type'   => 'manual_bonus',
-                    'reference_id'     => Auth::id(),
-                    'note'             => $request->input('note') ?? __('erp.manual_wallet_transaction'),
-                    'created_by'       => Auth::id(),
-                ]);
             });
 
             if ($projectId) {

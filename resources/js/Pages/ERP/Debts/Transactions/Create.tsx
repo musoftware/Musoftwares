@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { ArrowLeft, Save, Plus } from 'lucide-react';
 import { Link } from '@inertiajs/react';
-import PremiumCombobox from '@/Components/PremiumCombobox';
+
 
 export default function CreateDebtTransaction({ baseCurrency, clients = [] }: any) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('debts');
@@ -65,7 +65,7 @@ export default function CreateDebtTransaction({ baseCurrency, clients = [] }: an
                                     <Label htmlFor="type">{__('erp.transaction_type')}</Label>
                                     <Select 
                                         value={data.type} 
-                                        onValueChange={(val) => setData('type', val)}
+                                        onValueChange={(val) => setData('type', val as string)}
                                     >
                                         <SelectTrigger className={errors.type ? 'border-red-500' : ''}>
                                             <SelectValue placeholder={__('erp.select_type')} />

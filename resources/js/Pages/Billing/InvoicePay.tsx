@@ -43,6 +43,7 @@ interface PayProps {
     invoice: InvoiceDetails;
     client_balance: number;
     wallet_currency: any;
+    remaining_in_wallet_currency: number;
 }
 
 export default function InvoicePay({
@@ -50,21 +51,22 @@ export default function InvoicePay({
     invoice,
     client_balance,
     wallet_currency,
+    remaining_in_wallet_currency,
 }: PayProps) {
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    const hasBalance = client_balance >= invoice.remaining;
+    const hasBalance = client_balance >= remaining_in_wallet_currency;
 
     const handlePayment = async () => {
         setLoading(true);
         setErrorMessage(null);
         try {
             const response = await axios.post(
-                route('billing.invoices.pay.wallet', invoice.id),
-                { amount: invoice.remaining }
+                route('billing.invoices.pay.process', invoice.id),
+                {}
             );
 
             if (response.data.success) {
@@ -74,9 +76,14 @@ export default function InvoicePay({
                     description: response.data.message || __('erp.your_invoice_has_been_settled'),
                     variant: 'default',
                 });
-                setTimeout(() => {
-                    router.visit(response.data.redirect_url);
-                }, 2000);
+                if (response.data.gateway) {
+                    // It's a payment gateway redirect
+                    window.location.href = response.data.redirect_url;
+                } else {
+                    setTimeout(() => {
+                        router.visit(response.data.redirect_url);
+                    }, 2000);
+                }
             } else {
                 setErrorMessage(response.data.message || __('payment.payment_processing_failed'));
             }
@@ -251,22 +258,22 @@ export default function InvoicePay({
                                             <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                                             <div className="text-xs leading-normal">
                                                 <span className="font-bold block mb-1">{__('general.insufficient_funds')}</span>
-                                                {__('erp.your_wallet_balance_is_not')}
+                                                {__('erp.your_wallet_balance_is_not_enough_redirecting_to_payment_gateway')}
                                             </div>
                                         </div>
                                     )}
 
                                     <Button
                                         onClick={handlePayment}
-                                        disabled={loading || !hasBalance || successMessage !== null}
+                                        disabled={loading || successMessage !== null}
                                         className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-sm transition-all duration-150 rounded-xl flex items-center justify-center gap-2"
                                     >
                                         <CreditCard className="w-4 h-4" />
-                                        {loading ? __('general.processing_securely') : __('payment.settle_pay_outstanding')}
+                                        {loading ? __('general.processing_securely') : (hasBalance ? __('payment.settle_pay_outstanding') : __('payment.pay_via_card_gateway'))}
                                     </Button>
 
                                     <p className="text-[10px] text-slate-400 text-center leading-normal">
-                                        {__('general.by_checking_out_you_authorize')} <span className="font-semibold"><CurrencyDisplay amount={invoice.remaining} currency={invoice.currency} /></span> {__('erp.from_your_platform_wallet_balance')}
+                                        {__('general.by_checking_out_you_authorize')} <span className="font-semibold"><CurrencyDisplay amount={hasBalance ? remaining_in_wallet_currency : invoice.remaining} currency={hasBalance ? wallet_currency : invoice.currency} /></span> {hasBalance ? __('erp.from_your_platform_wallet_balance') : ''}
                                     </p>
                                 </div>
                             )}

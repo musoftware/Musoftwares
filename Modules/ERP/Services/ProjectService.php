@@ -35,7 +35,7 @@ class ProjectService
 
         ActivityLogger::log(
             'project_created',
-            "Project '{$project->name}' was created.",
+            __('logs.project_created', ['name' => $project->name]),
             $project,
             $project->client_id
         );
@@ -61,7 +61,7 @@ class ProjectService
 
         ActivityLogger::log(
             'project_updated',
-            "Project '{$project->name}' was updated.",
+            __('logs.project_updated', ['name' => $project->name]),
             $project,
             $project->client_id
         );
@@ -76,7 +76,7 @@ class ProjectService
 
         ActivityLogger::log(
             'project_deleted',
-            "Project '{$name}' was deleted.",
+            __('logs.project_deleted', ['name' => $name]),
             null,
             null
         );
@@ -94,9 +94,9 @@ class ProjectService
         $paidInvoices = $invoices->where('status', 'paid');
         $unpaidInvoices = $invoices->whereIn('status', ['sent', 'partial']);
 
-        $totalInvoicedBusiness = (float) $invoices->sum('business_amount');
-        $totalPaidBusiness = (float) $paidInvoices->sum('business_amount');
-        $totalUnpaidBusiness = (float) $unpaidInvoices->sum('business_amount');
+        $totalInvoicedBusiness = number_format($invoices->sum('business_amount'), 2, '.', '');
+        $totalPaidBusiness = number_format($paidInvoices->sum('business_amount'), 2, '.', '');
+        $totalUnpaidBusiness = number_format($unpaidInvoices->sum('business_amount'), 2, '.', '');
 
         $invoiceIds = $invoices->pluck('id');
         $expenses = InvoiceCost::whereIn('invoice_id', $invoiceIds)
@@ -104,8 +104,8 @@ class ProjectService
             ->latest()
             ->get();
 
-        $totalExpensesBusiness = (float) $expenses->sum('business_amount');
-        $netRevenueBusiness = $totalPaidBusiness - $totalExpensesBusiness;
+        $totalExpensesBusiness = number_format($expenses->sum('business_amount'), 2, '.', '');
+        $netRevenueBusiness = number_format($totalPaidBusiness - $totalExpensesBusiness, 2, '.', '');
 
         $transactions = WalletTransaction::where('project_id', $project->id)
             ->with(['creator', 'currency'])

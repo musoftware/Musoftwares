@@ -53,23 +53,23 @@ class ReportServiceTest extends TestCase
 
     public function test_get_pnl_report_executes_successfully(): void
     {
-        // Create a paid invoice for the tenant
-        $invoice = Invoice::create([
-            'tenant_id' => $this->tenant->id,
-            'invoice_number' => 'INV-TEST-001',
-            'client_id' => $this->client->id,
-            'status' => 'paid',
-            'amount' => 500.00,
-            'amount_currency' => 'USD',
-            'business_amount' => 500.00,
-            'business_currency' => 'USD',
-            'exchange_rate' => 1.0,
-            'exchange_rate_date' => now()->toDateString(),
-            'due_date' => now()->addDays(14)->toDateString(),
-            'paid_amount' => 500.00,
-            'paid_at' => now(),
-            'created_by' => $this->user->id,
-        ]);
+        // Create a 'received' transaction to simulate income
+        $t1 = new \App\Models\Transaction();
+        $t1->user_id = $this->user->id;
+        $t1->amount = 500.00;
+        $t1->type = 'received';
+        $t1->reason = 'Invoice Payment';
+        $t1->currency_id = $this->currency->id;
+        $t1->created_at = now();
+        $t1->save(['timestamps' => false]);
+
+        // Create a 'cost_transaction' to simulate expenses
+        $c1 = new \App\Models\CostTransaction();
+        $c1->reason = 'Server Costs';
+        $c1->amount = 200.00;
+        $c1->currency_id = $this->currency->id;
+        $c1->created_at = now();
+        $c1->save(['timestamps' => false]);
 
         $service = new ReportService();
         $report = $service->getPnlReport(
@@ -78,33 +78,29 @@ class ReportServiceTest extends TestCase
         );
 
         $this->assertIsArray($report);
-        $this->assertArrayHasKey('tenantStats', $report);
+        $this->assertArrayHasKey('totalIncome', $report);
+        $this->assertArrayHasKey('totalExpenses', $report);
+        $this->assertArrayHasKey('netProfit', $report);
         
-        $tenantStats = $report['tenantStats'];
-        $this->assertCount(1, $tenantStats);
-        $this->assertEquals('Test Tenant', $tenantStats[0]->tenant_name);
-        $this->assertEquals(500.00, $tenantStats[0]->revenue);
+        $this->assertEquals(500.00, $report['totalIncome']);
+        $this->assertEquals(200.00, $report['totalExpenses']);
+        $this->assertEquals(300.00, $report['netProfit']);
     }
 
-    public function test_get_pnl_report_includes_main_invoices_grouped_as_main(): void
+    public function test_get_pnl_report_filters_by_date(): void
     {
-        // Create a paid invoice with NULL tenant_id
-        Invoice::create([
-            'tenant_id' => null,
-            'invoice_number' => 'INV-MAIN-001',
-            'client_id' => $this->client->id, // Use client->id instead of user->id
-            'status' => 'paid',
-            'amount' => 750.00,
-            'amount_currency' => 'USD',
-            'business_amount' => 750.00,
-            'business_currency' => 'USD',
-            'exchange_rate' => 1.0,
-            'exchange_rate_date' => now()->toDateString(),
-            'due_date' => now()->addDays(14)->toDateString(),
-            'paid_amount' => 750.00,
-            'paid_at' => now(),
-            'created_by' => $this->user->id,
-        ]);
+        // Create an old 'received' transaction (last month)
+        $t2 = new \App\Models\Transaction();
+        $t2->user_id = $this->user->id;
+        $t2->amount = 750.00;
+        $t2->type = 'received';
+        $t2->reason = 'Old Payment';
+        $t2->currency_id = $this->currency->id;
+        $t2->save();
+        
+        \Illuminate\Support\Facades\DB::table('transactions')
+            ->where('id', $t2->id)
+            ->update(['created_at' => now()->subMonths(2)]);
 
         $service = new ReportService();
         $report = $service->getPnlReport(
@@ -113,11 +109,6 @@ class ReportServiceTest extends TestCase
         );
 
         $this->assertIsArray($report);
-        $this->assertArrayHasKey('tenantStats', $report);
-
-        $tenantStats = $report['tenantStats'];
-        $this->assertCount(1, $tenantStats);
-        $this->assertEquals('System/Main', $tenantStats[0]->tenant_name);
-        $this->assertEquals(750.00, $tenantStats[0]->revenue);
+        $this->assertEquals(0, $report['totalIncome']);
     }
 }

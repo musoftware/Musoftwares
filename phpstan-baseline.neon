@@ -919,12 +919,6 @@ parameters:
 			path: Modules/ERP/Http/Controllers/ERPDashboardController.php
 
 		-
-			message: '#^Relation ''user'' is not found in App\\Models\\Ticket model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: Modules/ERP/Http/Controllers/ERPDashboardController.php
-
-		-
 			message: '#^Variable \$documents on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.variable
 			count: 1
@@ -953,12 +947,6 @@ parameters:
 			identifier: larastan.relationExistence
 			count: 3
 			path: Modules/ERP/Http/Controllers/InvoiceController.php
-
-		-
-			message: '#^Relation ''items'' is not found in App\\Models\\Invoice model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: Modules/ERP/Http/Controllers/InvoicePaymentController.php
 
 		-
 			message: '#^Anonymous function has an unused use \$tenant\.$#'
@@ -1627,22 +1615,10 @@ parameters:
 			path: Modules/Fbmb/Models/FbmbLookupResult.php
 
 		-
-			message: '#^Relation ''proposals'' is not found in Modules\\Freelance\\Models\\Job model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: Modules/Freelance/Console/RefundInactiveJobsCommand.php
-
-		-
 			message: '#^Anonymous function has an unused use \$client\.$#'
 			identifier: closure.unusedUse
 			count: 1
 			path: Modules/Freelance/Domains/Contract/Actions/AcceptProposalAction.php
-
-		-
-			message: '#^Relation ''proposals'' is not found in Modules\\Freelance\\Models\\Job model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: Modules/Freelance/Domains/Job/Actions/RefundInactiveJobsAction.php
 
 		-
 			message: '#^Relation ''job'' is not found in Modules\\Freelance\\Models\\Contract model\.$#'
@@ -1657,21 +1633,9 @@ parameters:
 			path: Modules/Freelance/Http/Controllers/DashboardController.php
 
 		-
-			message: '#^Relation ''currency'' is not found in Modules\\Freelance\\Models\\Job model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: Modules/Freelance/Http/Controllers/DashboardController.php
-
-		-
 			message: '#^Relation ''eventType'' is not found in Modules\\Booking\\Models\\Booking model\.$#'
 			identifier: larastan.relationExistence
 			count: 2
-			path: Modules/Freelance/Http/Controllers/DashboardController.php
-
-		-
-			message: '#^Relation ''freelancer'' is not found in Modules\\Freelance\\Models\\Proposal model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
 			path: Modules/Freelance/Http/Controllers/DashboardController.php
 
 		-
@@ -1679,36 +1643,6 @@ parameters:
 			identifier: larastan.relationExistence
 			count: 4
 			path: Modules/Freelance/Http/Controllers/DashboardController.php
-
-		-
-			message: '#^Relation ''job'' is not found in Modules\\Freelance\\Models\\Proposal model\.$#'
-			identifier: larastan.relationExistence
-			count: 7
-			path: Modules/Freelance/Http/Controllers/DashboardController.php
-
-		-
-			message: '#^Relation ''client'' is not found in Modules\\Freelance\\Models\\Job model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: Modules/Freelance/Http/Controllers/FreelanceJobController.php
-
-		-
-			message: '#^Relation ''currency'' is not found in Modules\\Freelance\\Models\\Job model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: Modules/Freelance/Http/Controllers/FreelanceJobController.php
-
-		-
-			message: '#^Relation ''skills'' is not found in Modules\\Freelance\\Models\\Job model\.$#'
-			identifier: larastan.relationExistence
-			count: 3
-			path: Modules/Freelance/Http/Controllers/FreelanceJobController.php
-
-		-
-			message: '#^Relation ''job'' is not found in Modules\\Freelance\\Models\\Proposal model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: Modules/Freelance/Http/Controllers/ProposalController.php
 
 		-
 			message: '#^Relation ''freelanceSkills'' is not found in App\\Models\\User model\.$#'
@@ -2923,12 +2857,6 @@ parameters:
 			path: app/Http/Controllers/Admin/AdminTaskController.php
 
 		-
-			message: '#^Relation ''projects'' is not found in App\\Models\\User model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/Admin/AdminTransactionController.php
-
-		-
 			message: '#^Relation ''rewardCurrency'' is not found in App\\Models\\Voucher model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
@@ -2995,19 +2923,7 @@ parameters:
 			path: app/Http/Controllers/Admin/FinancialOperationsController.php
 
 		-
-			message: '#^Relation ''client'' is not found in App\\Models\\Project model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/Admin/FinancialOperationsController.php
-
-		-
 			message: '#^Relation ''client_balance'' is not found in App\\Models\\Project model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/Admin/FinancialOperationsController.php
-
-		-
-			message: '#^Relation ''cost_transactions'' is not found in App\\Models\\Project model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
 			path: app/Http/Controllers/Admin/FinancialOperationsController.php
@@ -3049,28 +2965,10 @@ parameters:
 			path: app/Http/Controllers/Admin/FreelanceContractController.php
 
 		-
-			message: '#^Relation ''client'' is not found in Modules\\Freelance\\Models\\Job model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/Admin/FreelanceJobController.php
-
-		-
 			message: '#^Relation ''user'' is not found in Modules\\Freelance\\Models\\FreelanceProfile model\.$#'
 			identifier: larastan.relationExistence
 			count: 3
 			path: app/Http/Controllers/Admin/FreelanceProfileController.php
-
-		-
-			message: '#^Relation ''freelancer'' is not found in Modules\\Freelance\\Models\\Proposal model\.$#'
-			identifier: larastan.relationExistence
-			count: 3
-			path: app/Http/Controllers/Admin/FreelanceProposalController.php
-
-		-
-			message: '#^Relation ''job'' is not found in Modules\\Freelance\\Models\\Proposal model\.$#'
-			identifier: larastan.relationExistence
-			count: 3
-			path: app/Http/Controllers/Admin/FreelanceProposalController.php
 
 		-
 			message: '#^Relation ''creator'' is not found in Modules\\Freelance\\Models\\Skill model\.$#'
@@ -3131,12 +3029,6 @@ parameters:
 			identifier: larastan.relationExistence
 			count: 1
 			path: app/Http/Controllers/Admin/PaymentLinkController.php
-
-		-
-			message: '#^Relation ''client'' is not found in App\\Models\\Project model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/Admin/ProjectController.php
 
 		-
 			message: '#^Relation ''userDeviceAssignment'' is not found in App\\Models\\SerialDevice model\.$#'
@@ -5502,11 +5394,6 @@ parameters:
 			count: 30
 			path: app/Models/Invoice.php
 
-		-
-			message: '#^Access to an undefined property App\\Models\\Invoice\:\:\$items\.$#'
-			identifier: property.notFound
-			count: 4
-			path: app/Models/Invoice.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Invoice\:\:\$project\.$#'
@@ -5555,12 +5442,6 @@ parameters:
 			identifier: class.notFound
 			count: 1
 			path: app/Models/PaymentOrder.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Project\:\:\$client\.$#'
-			identifier: property.notFound
-			count: 4
-			path: app/Models/Project.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Project\:\:\$user\.$#'
@@ -5711,7 +5592,6 @@ parameters:
 			identifier: property.notFound
 			count: 3
 			path: app/Models/WalletTransfer.php
-
 
 		-
 			message: '#^Relation ''user'' is not found in App\\Models\\Ticket model\.$#'

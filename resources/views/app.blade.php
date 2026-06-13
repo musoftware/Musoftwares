@@ -9,7 +9,7 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <meta name="apple-mobile-web-app-title" content="Musoftware">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ isset($meta) && isset($meta['title']) ? $meta['title'] : config('app.name', 'Laravel') }}</title>
         
         @if(isset($meta))
             <meta name="description" content="{{ $meta['description'] ?? '' }}">
@@ -22,6 +22,7 @@
             <meta name="twitter:title" content="{{ $meta['title'] ?? '' }}">
             <meta name="twitter:description" content="{{ $meta['description'] ?? '' }}">
             <meta name="twitter:image" content="{{ $meta['image'] ?? '' }}">
+            <link rel="canonical" href="{{ $meta['url'] ?? url()->current() }}">
         @endif
 
         @php
