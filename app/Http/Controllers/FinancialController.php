@@ -40,7 +40,7 @@ class FinancialController extends Controller
             ];
         });
 
-        return Inertia::render('Financial/Transactions', [
+        return Inertia::render('Client/Financial/Transactions', [
             'transactions' => $transactions,
             'wallet' => $wallet,
         ]);
@@ -62,7 +62,7 @@ class FinancialController extends Controller
             return $wd;
         });
 
-        return Inertia::render('Financial/Withdrawals', [
+        return Inertia::render('Client/Financial/Withdrawals', [
             'withdrawals' => $withdrawals,
             'payoutMethods' => $payoutMethods,
             'wallet' => $wallet,
@@ -120,7 +120,7 @@ class FinancialController extends Controller
     public function addBalance(Request $request)
     {
         $wallet = ['id' => null, 'balance' => (float)$request->user()->user_balance, 'currency' => $request->user()->currency_name()];
-        return Inertia::render('Financial/AddBalance', [
+        return Inertia::render('Client/Financial/AddBalance', [
             'wallet' => $wallet,
         ]);
     }

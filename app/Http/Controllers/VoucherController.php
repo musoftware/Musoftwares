@@ -72,7 +72,7 @@ class VoucherController extends Controller
             return $rd;
         });
 
-        return Inertia::render('Vouchers/Index', [
+        return Inertia::render('Client/Vouchers/Index', [
             'vouchers' => $formattedVouchers,
             'redemptions' => $userRedemptions,
         ]);

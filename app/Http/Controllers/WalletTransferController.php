@@ -30,7 +30,7 @@ class WalletTransferController extends Controller
     public function create()
     {
         $user = Auth::user();
-        return Inertia::render('Financial/WalletTransfer/Create', [
+        return Inertia::render('Client/Financial/WalletTransfer/Create', [
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -120,7 +120,7 @@ class WalletTransferController extends Controller
                 ];
             });
 
-        return Inertia::render('Financial/WalletTransfer/History', [
+        return Inertia::render('Client/Financial/WalletTransfer/History', [
             'transfers' => $transfers,
         ]);
     }
@@ -141,7 +141,7 @@ class WalletTransferController extends Controller
 
         $type = $transfer->sender_id === $user->id ? 'sent' : 'received';
 
-        return Inertia::render('Financial/WalletTransfer/Show', [
+        return Inertia::render('Client/Financial/WalletTransfer/Show', [
             'transfer' => [
                 'id' => $transfer->id,
                 'type' => $type,

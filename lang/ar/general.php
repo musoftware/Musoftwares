@@ -35,6 +35,7 @@ return [
   'active_telesales_agents' => 'Active Telesales Agents',
   'active_users' => 'Active Users',
   'add' => 'Add',
+  'add_funds' => 'إضافة رصيد',
   'add_duration' => 'Add Duration',
   'add_sender' => 'Add Sender',
   'add_software_manually' => 'Add Software Manually',

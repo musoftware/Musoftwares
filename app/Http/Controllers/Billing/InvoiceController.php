@@ -47,7 +47,7 @@ class InvoiceController extends Controller
         }
         $walletCurrency = \App\Models\Currency::find($walletCurrencyId);
 
-        return Inertia::render('Billing/Invoices', [
+        return Inertia::render('Client/Billing/Invoices', [
             'invoices'        => $invoices,
             'unpaid_invoices' => $unpaidInvoices,
             'paid_invoices'   => $paidInvoices,
@@ -82,7 +82,7 @@ class InvoiceController extends Controller
         $remaining = $invoice->unpaid_total();
         $remainingInWalletCurrency = \App\Models\CurrenciesExchange::RateToday($remaining, $invoice->currency_id, $walletCurrencyId);
 
-        return Inertia::render('Billing/InvoicePay', [
+        return Inertia::render('Client/Billing/InvoicePay', [
             'invoice' => [
                 'id'             => $invoice->id,
                 'uuid'           => $invoice->uuid,
@@ -180,7 +180,7 @@ class InvoiceController extends Controller
      */
     public function paymentSuccess(Request $request)
     {
-        return Inertia::render('Billing/PaymentResult', [
+        return Inertia::render('Client/Billing/PaymentResult', [
             'status' => 'success',
             'message' => __('general.payment_successful_thank_you')
         ]);
@@ -191,7 +191,7 @@ class InvoiceController extends Controller
      */
     public function paymentFailure(Request $request)
     {
-        return Inertia::render('Billing/PaymentResult', [
+        return Inertia::render('Client/Billing/PaymentResult', [
             'status' => 'error',
             'message' => __('general.payment_failed_please_try_again')
         ]);

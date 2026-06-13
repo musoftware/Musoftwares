@@ -37,7 +37,7 @@ class ReferralController extends Controller
             $referral->save();
         }
 
-        return Inertia::render('Dashboard/Referrals/Index', [
+        return Inertia::render('Client/Dashboard/Referrals/Index', [
             'referral' => $referral
         ]);
     }
@@ -57,7 +57,7 @@ class ReferralController extends Controller
         $withdrawed_commission = $user->withdrawn_commission;
         $withdrawed_commission_str = $this->formatAmount($withdrawed_commission, $user->currency_id ?: 1);
 
-        return Inertia::render('Dashboard/Referrals/Earns', [
+        return Inertia::render('Client/Dashboard/Referrals/Earns', [
             'pending_balance' => $pending_balance,
             'pending_balance_str' => $pending_balance_str,
             'available_commission' => $available_commission,
@@ -162,7 +162,7 @@ class ReferralController extends Controller
             $commissionByUserId[$referred_user_id] = round($total, 2);
         }
 
-        return Inertia::render('Dashboard/Referrals/Registers', [
+        return Inertia::render('Client/Dashboard/Referrals/Registers', [
             'referred_users' => $referred_users,
             'commissionByUserId' => $commissionByUserId
         ]);

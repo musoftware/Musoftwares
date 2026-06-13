@@ -862,11 +862,11 @@ Route::middleware(['auth', 'verified'])->prefix('financial')->name('financial.')
     // Route::post('/conversations/{id}/read', [\App\Http\Controllers\ConversationController::class, 'markAsRead']);
 
     Route::get('/messages', function () {
-        return Inertia::render('Messages/Index');
+        return Inertia::render('Client/Messages/Index');
     })->name('messages.index');
 
     Route::get('/notifications', function () {
-        return Inertia::render('Notifications/Index');
+        return Inertia::render('Client/Notifications/Index');
     })->name('notifications.index');
 
     // iSAAS Connected Apps Routes
