@@ -24,7 +24,7 @@ class DashboardController extends Controller
         $dashboardService = app(\App\Services\DashboardService::class);
         $data = $dashboardService->getClientDashboardData($user);
 
-        return Inertia::render('Dashboard', $data);
+        return Inertia::render('Client/Dashboard', $data);
     }
 
     /**

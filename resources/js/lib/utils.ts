@@ -213,3 +213,20 @@ export function statusColor(status: string): string {
     // Gray — archived / neutral states (default fallback)
     return 'gray';
 }
+
+/** 
+ * Safely resolves an Inertia/Ziggy route without crashing if it doesn't exist.
+ * This prevents the need to define this helper inside React component bodies.
+ */
+export function safeRoute(name: string, params?: any, fallbackUrl?: string): string {
+    try {
+        // @ts-ignore
+        if (typeof route !== 'undefined') {
+            // @ts-ignore
+            return route(name, params);
+        }
+    } catch (e) {
+        // Silently catch missing route exceptions
+    }
+    return fallbackUrl || '#';
+}

@@ -24,7 +24,7 @@ class SupportTicketController extends Controller
 
         $tickets = $query->latest()->paginate(15);
 
-        return Inertia::render('Support/Tickets/Index', [
+        return Inertia::render('Client/Support/Tickets/Index', [
             'tickets' => $tickets,
             'isAdmin' => $isAdmin,
         ]);

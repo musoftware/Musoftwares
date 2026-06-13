@@ -10,7 +10,7 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         $notifications = $request->user()->notifications()->paginate(10);
-        return Inertia::render('Notifications/Index', [
+        return Inertia::render('Client/Notifications/Index', [
             'notifications' => $notifications
         ]);
     }

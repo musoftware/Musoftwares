@@ -17,7 +17,7 @@ class PayoutMethodController extends Controller
     {
         $payoutMethods = $request->user()->payoutMethods()->latest()->get();
 
-        return Inertia::render('Financial/PayoutMethods', [
+        return Inertia::render('Client/Financial/PayoutMethods', [
             'payoutMethods' => $payoutMethods,
         ]);
     }

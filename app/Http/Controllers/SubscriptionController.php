@@ -101,7 +101,7 @@ class SubscriptionController extends Controller
 
         $proratedRefund = 0;
 
-        return Inertia::render('Subscriptions/Plans', [
+        return Inertia::render('Client/Subscriptions/Plans', [
             'plans' => [],
             'serviceItems' => $serviceItems,
             'activeSubscription' => $activeSub,
@@ -647,7 +647,7 @@ class SubscriptionController extends Controller
 
         $invoices = []; // SubscriptionInvoice might not exist in legacy DB
 
-        return Inertia::render('Subscriptions/Manage', [
+        return Inertia::render('Client/Subscriptions/Manage', [
             'subscriptions' => $subscriptions,
             'invoices'      => $invoices,
             'walletBalance' => (float) $user->user_balance,

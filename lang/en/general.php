@@ -36,6 +36,7 @@ return [
   'active_telesales_agents' => 'Active Telesales Agents',
   'active_users' => 'Active Users',
   'add' => 'Add',
+  'add_funds' => 'Add Funds',
   'add_duration' => 'Add Duration',
   'add_sender' => 'Add Sender',
   'add_software_manually' => 'Add Software Manually',

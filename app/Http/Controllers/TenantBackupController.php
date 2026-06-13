@@ -18,7 +18,7 @@ class TenantBackupController extends Controller
 
     public function index()
     {
-        return Inertia::render('Settings/Backup');
+        return Inertia::render('Client/Settings/Backup');
     }
 
     public function export(Request $request)

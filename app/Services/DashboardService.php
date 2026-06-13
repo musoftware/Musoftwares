@@ -326,6 +326,7 @@ class DashboardService
             'pointsBalance'       => $pointsBalance,
             'unpaidInvoices'      => $unpaidCount,
             'unpaidAmount'        => $unpaidAmount,
+            'outstandingBalance'  => round($unpaidAmount - $walletBalance, 2),
             'activeSubscriptions' => max($activeSubscriptions, 0),
             'totalMonthlySubscription' => $totalMonthlySubscription,
             'openTickets'         => $openTicketsCount,

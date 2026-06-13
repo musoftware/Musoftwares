@@ -50,7 +50,7 @@ class MessagesController extends Controller
                 return $arr;
             });
 
-        return Inertia::render('Messages/Index', [
+        return Inertia::render('Client/Messages/Index', [
             'conversations' => $conversations,
             'users' => $users,
         ]);
