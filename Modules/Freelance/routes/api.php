@@ -17,4 +17,16 @@ use Modules\Freelance\Http\Controllers\ShortcutNotificationController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/freelance/shortcut/notifications', [ShortcutNotificationController::class, 'fetch']);
+
+    // Mobile API Routes
+    Route::prefix('freelance/mobile')->group(function () {
+        Route::get('/jobs',                  [\Modules\Freelance\Http\Controllers\Api\MobileApiController::class, 'getJobs']);
+        Route::post('/jobs',                 [\Modules\Freelance\Http\Controllers\Api\MobileApiController::class, 'storeJob']);
+        Route::get('/jobs/my',               [\Modules\Freelance\Http\Controllers\Api\MobileApiController::class, 'getMyJobs']);
+        Route::get('/jobs/{id}',             [\Modules\Freelance\Http\Controllers\Api\MobileApiController::class, 'getJobDetail']);
+        Route::get('/negotiations',          [\Modules\Freelance\Http\Controllers\Api\MobileApiController::class, 'getNegotiations']);
+        Route::post('/proposals/{id}/negotiate', [\Modules\Freelance\Http\Controllers\Api\MobileApiController::class, 'negotiateProposal']);
+        Route::post('/proposals/{id}/accept',    [\Modules\Freelance\Http\Controllers\Api\MobileApiController::class, 'acceptProposal']);
+        Route::post('/proposals/{id}/reject',    [\Modules\Freelance\Http\Controllers\Api\MobileApiController::class, 'rejectProposal']);
+    });
 });

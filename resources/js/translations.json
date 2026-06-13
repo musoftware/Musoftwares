@@ -5205,6 +5205,12 @@
             "active_context": "Active Context",
             "clear_inbox": "Clear Inbox",
             "ai_copilot": "AI Copilot",
+            "already_signed": "تم توقيع هذا العقد بالفعل.",
+            "contract_update_subject": "تحديث في العقد \/ عرض السعر للمشروع: :project",
+            "hello": "Hello",
+            "contract_update_message": "حدث تحديث في عرض السعر أو العقد الخاص بالمشروع: :project. يرجى مراجعته في أقرب وقت ممكن.",
+            "view_contract": "عرض العقد",
+            "thank_you_for_business": "شكراً لتعاملك معنا.",
             "regenerate_draft": "Regenerate Draft",
             "campaign_os_v3_safeguards": "Campaign OS v3 Safeguards",
             "ai_warming_active": "AI Warming Active",
@@ -6576,7 +6582,6 @@
             "goal_progress": "Goal Progress",
             "goal_type": "Goal Type",
             "grid": "Grid",
-            "hello": "Hello",
             "high": "High",
             "highlights": "Highlights",
             "hijri_date_range": "Hijri date range",
@@ -7058,7 +7063,9 @@
             "disconnect_google_calendar": "إلغاء ربط تقويم جوجل",
             "google_calendar_connected": "تم ربط تقويم جوجل",
             "google_calendar_integration": "تكامل تقويم جوجل",
-            "seo_analytics_integrations": "تكاملات السيو والتحليلات"
+            "seo_analytics_integrations": "تكاملات السيو والتحليلات",
+            "transaction_deposit_desc": "إضافة رصيد: :amount عبر :method",
+            "transaction_withdrawal_desc": "دفع :amount عبر :method"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -11062,6 +11069,12 @@
             "pause_campaign": "Pause Campaign",
             "resume_campaign": "Resume Campaign",
             "campaign_is_locked": "Campaign is locked",
+            "already_signed": "This contract has already been signed.",
+            "contract_update_subject": "Project Contract \/ Proposal Update: :project",
+            "hello": "Hello",
+            "contract_update_message": "There has been an update to the proposal or contract for the project: :project. Please review it at your earliest convenience.",
+            "view_contract": "View Contract",
+            "thank_you_for_business": "Thank you for your business.",
             "this_campaign_has_already_been_scheduled_or_sent_you_cannot_edit_the_content": "This campaign has already been scheduled or sent. You cannot edit the content.",
             "delivery_overview": "Delivery Overview",
             "total_recipients": "Total Recipients",
@@ -14214,7 +14227,6 @@
             "goal_progress": "Goal Progress",
             "goal_type": "Goal Type",
             "grid": "Grid",
-            "hello": "Hello",
             "high": "High",
             "highlights": "Highlights",
             "hijri_date_range": "Hijri date range",
@@ -14695,7 +14707,9 @@
             "disconnect_google_calendar": "Disconnect Google Calendar",
             "google_calendar_connected": "Google Calendar Connected",
             "google_calendar_integration": "Google Calendar Integration",
-            "seo_analytics_integrations": "SEO & Analytics Integrations"
+            "seo_analytics_integrations": "SEO & Analytics Integrations",
+            "transaction_deposit_desc": "Funds added: :amount via :method",
+            "transaction_withdrawal_desc": "Payment for :amount via :method"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",

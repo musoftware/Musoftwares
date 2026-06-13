@@ -9,7 +9,7 @@ class Skill extends Model
 {
     use HasFactory;
     protected $table = 'freelance_skills';
-    protected $fillable = ['name', 'description', 'status', 'created_by'];
+    protected $fillable = ['name', 'type', 'description', 'status', 'created_by'];
 
     public function creator()
     {

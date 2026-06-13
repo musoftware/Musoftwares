@@ -16,6 +16,13 @@ import {
     Search,
     MoreHorizontal
 } from 'lucide-react';
+import { 
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/Components/ui/dropdown-menu';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { formatCurrency } from '@/lib/utils';
 import {
     AreaChart,
@@ -43,6 +50,24 @@ export default function Costs() {
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         router.get(route('admin.costs.index'), { search: searchTerm }, { preserveState: true });
+    };
+
+    const [deleteId, setDeleteId] = useState<number | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const handleDelete = () => {
+        if (!deleteId) return;
+        setIsDeleting(true);
+        router.delete(route('admin.costs.delete', deleteId), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setDeleteId(null);
+                setIsDeleting(false);
+            },
+            onError: () => {
+                setIsDeleting(false);
+            }
+        });
     };
 
     const formatYAxis = (value: number): string => {
@@ -213,9 +238,25 @@ export default function Costs() {
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled>
-                                            <MoreHorizontal className="h-4 w-4 text-slate-400" />
-                                        </Button>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4 text-slate-500" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="w-[160px]">
+                                                <DropdownMenuItem onClick={() => router.visit(route('admin.costs.edit', entry.id))}>
+                                                    {__('general.edit') || "Edit Cost"}
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    onClick={() => setDeleteId(entry.id)}
+                                                    className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                                                >
+                                                    {__('general.delete') || "Delete Cost"}
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -230,6 +271,17 @@ export default function Costs() {
                     </Table>
                 </div>
             </Card>
+
+            <ConfirmModal
+                isOpen={deleteId !== null}
+                title="Delete Cost Transaction"
+                description="Are you sure you want to delete this cost? This will recalculate the associated user's ledger. This action cannot be undone."
+                confirmLabel="Delete Cost"
+                variant="danger"
+                onConfirm={handleDelete}
+                onCancel={() => setDeleteId(null)}
+                loading={isDeleting}
+            />
         </AdminSidebarLayout>
     );
 }

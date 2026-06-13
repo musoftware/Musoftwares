@@ -33,4 +33,9 @@ class Proposal extends Model
     {
         return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
     }
+
+    public function offers()
+    {
+        return $this->hasMany(ProposalOffer::class);
+    }
 }

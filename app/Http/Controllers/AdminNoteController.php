@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\AdminNote;
 use Illuminate\Http\Request;
-use Modules\ERP\Models\Client;
 
 class AdminNoteController extends Controller
 {
@@ -16,7 +15,7 @@ class AdminNoteController extends Controller
         $query = AdminNote::query();
 
         if ($type === 'client') {
-            $query->where('noteable_type', Client::class)
+            $query->where('noteable_type', 'Modules\\ERP\\Models\\TenantClient')
                   ->where('noteable_id', $id);
         } else {
             $query->where('noteable_type', $type)
@@ -38,7 +37,7 @@ class AdminNoteController extends Controller
         ]);
 
         if ($data['noteable_type'] === 'client') {
-            $data['noteable_type'] = Client::class;
+            $data['noteable_type'] = 'Modules\\ERP\\Models\\TenantClient';
         }
 
         $data['author_id'] = auth()->id() ?? 1;

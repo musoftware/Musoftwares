@@ -4,6 +4,7 @@ namespace Modules\ERP\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Modules\ERP\Console\ProcessRecurringEntries;
+use Modules\ERP\Services\RecurringService;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Database\Eloquent\ModelNotFoundException;

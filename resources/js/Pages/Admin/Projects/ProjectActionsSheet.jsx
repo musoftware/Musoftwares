@@ -166,6 +166,12 @@ export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }
                                     <span className="font-normal text-slate-700">{__('general.project_files')}</span>
                                 </Link>
                             </Button>
+                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
+                                <Link href={`/admin/projects/${project.id}/contracts`}>
+                                    <FileText className="h-4 w-4 text-indigo-500" /> 
+                                    <span className="font-normal text-slate-700">Contracts & Proposals</span>
+                                </Link>
+                            </Button>
                         </div>
                     </div>
 

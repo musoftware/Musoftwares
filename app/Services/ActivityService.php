@@ -51,41 +51,10 @@ class ActivityService
         // New named call
         $userId = $userId ?? Auth::id();
 
-        // 1. ERP logging
-        if ($workspace === 'erp') {
-            $tenantId = null;
-            $clientId = null;
-            if ($subject && isset($subject->tenant_id)) {
-                $tenantId = $subject->tenant_id;
-            }
-            if ($subject && isset($subject->client_id)) {
-                $clientId = $subject->client_id;
-            }
-            if (!$tenantId) {
-                $tenantId = session('tenant_id');
-            }
-            if (!$tenantId && Auth::check()) {
-                $tenant = \Modules\ERP\Models\Tenant::where('user_id', Auth::id())->first();
-                if ($tenant) {
-                    $tenantId = $tenant->id;
-                }
-            }
+        // ERP module logs its own activities internally via Modules\ERP\Services\ActivityLogger.
+        // The main ActivityService does NOT write to the ERP module.
 
-            if ($tenantId && class_exists(\Modules\ERP\Models\Activity::class)) {
-                \Modules\ERP\Models\Activity::create([
-                    'tenant_id' => $tenantId,
-                    'client_id' => $clientId,
-                    'subject_type' => $subject ? get_class($subject) : null,
-                    'subject_id' => $subject ? $subject->id : null,
-                    'action' => $event ?? 'unknown',
-                    'description' => $description ?? '',
-                    'causer_id' => $userId,
-                    'properties' => $properties,
-                ]);
-            }
-        }
-
-        // 2. CRM logging
+        // CRM logging
         if ($workspace === 'crm') {
             if (class_exists(\Modules\CRM\Models\Activity::class)) {
                 $workspaceId = session('crm_workspace_id');

@@ -233,7 +233,7 @@ class BusinessController extends Controller
     public function create_cost()
     {
         $users = \App\Models\User::select('id', 'name')->get();
-        $projects = \App\Models\Project::whereNotIn('status', ['Completed', 'Cancelled'])->select('id', 'project_name as name', 'client_id')->get();
+        $projects = \App\Models\Project::whereNotIn('status', ['Completed', 'Cancelled'])->select('id', 'project_name as name', 'user_id')->get();
         $currencies = array_values(\App\Models\Currency::as_array());
         
         $businessCurrency = \App\Helpers\CurrencyHelper::getBusinessCurrency();
@@ -282,6 +282,111 @@ class BusinessController extends Controller
         });
 
         return redirect()->route('admin.costs.index')->with('success', __('general.saved_successfully'));
+    }
+
+    public function edit_cost($id)
+    {
+        $cost = CostTransaction::findOrFail($id);
+        
+        $users = \App\Models\User::select('id', 'name')->get();
+        $projects = \App\Models\Project::whereNotIn('status', ['Completed', 'Cancelled'])->select('id', 'project_name as name', 'user_id')->get();
+        $currencies = array_values(\App\Models\Currency::as_array());
+        
+        $businessCurrency = \App\Helpers\CurrencyHelper::getBusinessCurrency();
+
+        return Inertia::render('Admin/Business/CostsEdit', [
+            'cost' => $cost,
+            'users' => $users,
+            'projects' => $projects,
+            'currencies' => $currencies,
+            'businessCurrency' => $businessCurrency,
+        ]);
+    }
+
+    public function update_cost(Request $request, $id)
+    {
+        $cost = CostTransaction::findOrFail($id);
+        
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'currency_id' => 'required|exists:currencies,id',
+            'reason' => 'required|string|max:255',
+            'created_at' => 'nullable|date',
+            'user_id' => 'nullable|exists:users,id',
+            'project_id' => 'nullable|exists:projects,id',
+        ]);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($cost, $request) {
+            $cost->amount = $request->amount;
+            $cost->currency_id = $request->currency_id;
+            $cost->reason = $request->reason;
+            
+            if ($request->filled('created_at')) {
+                $cost->created_at = $request->created_at;
+            }
+            
+            $cost->user_id = $request->filled('user_id') ? $request->user_id : null;
+            $cost->project_id = $request->filled('project_id') ? $request->project_id : null;
+            
+            $cost->save();
+
+            if ($cost->user_id) {
+                $user = \App\Models\User::find($cost->user_id);
+                if ($user) {
+                    \App\Helpers\BalancesHelper::instance()->CalcCostBalance($user);
+                }
+            }
+        });
+
+        return redirect()->route('admin.costs.index')->with('success', __('general.saved_successfully'));
+    }
+
+    public function delete_cost($id)
+    {
+        $cost = CostTransaction::findOrFail($id);
+        
+        \Illuminate\Support\Facades\DB::transaction(function () use ($cost) {
+            $userId = $cost->user_id;
+            $cost->delete();
+            
+            if ($userId) {
+                $user = \App\Models\User::find($userId);
+                if ($user) {
+                    \App\Helpers\BalancesHelper::instance()->CalcCostBalance($user);
+                }
+            }
+        });
+
+        return redirect()->route('admin.costs.index')->with('success', __('general.deleted_successfully'));
+    }
+
+    public function delete_income($id)
+    {
+        $transaction = Transaction::findOrFail($id);
+        
+        if ($transaction->isReversed() || $transaction->isReverseTransaction()) {
+            return redirect()->back()->with('error', 'Cannot delete a reversed or reversal transaction. It must be kept for ledger integrity.');
+        }
+
+        $transaction->delete_with_balance();
+
+        return redirect()->route('admin.income.index')->with('success', __('general.deleted_successfully'));
+    }
+
+    public function reverse_income(Request $request, $id)
+    {
+        $request->validate([
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        $transaction = Transaction::findOrFail($id);
+        
+        try {
+            $transaction->createReverse($request->reason);
+            return redirect()->route('admin.income.index')->with('success', 'Transaction reversed successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function reports(Request $request)

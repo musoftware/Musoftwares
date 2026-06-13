@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\User;
-use Modules\ERP\Models\Tenant;
 use App\Models\Invoice;
 use App\Models\UserReferralRequestWithdraw;
 use App\Models\AdminSettings;
@@ -30,7 +29,7 @@ class DashboardService
 
         $totalUsers = User::count();
         $totalClients = User::role('client')->count();
-        $activeTenants = Tenant::where('status', 'active')->count();
+        // Note: ERP tenant metrics are not included here — ERP manages its own analytics.
 
         // Revenue
         $revenueThisMonth = $this->getRevenueThisMonth();
@@ -66,16 +65,15 @@ class DashboardService
         $bookingRatePerHour = CurrenciesExchange::RateToday($bookingRateEgp, 2, $businessCurrencyId);
 
         return [
-            'totalUsers' => $totalUsers,
-            'totalClients' => $totalClients,
-            'activeTenants' => $activeTenants,
-            'revenueThisMonth' => round($revenueThisMonth, 2),
-            'revenueGrowth' => $revenueGrowth,
-            'monthlyExpenses' => round($monthlyExpenses, 2),
-            'pendingPayments' => round($pendingPayments, 2),
-            'bookingPrice' => round($bookingPrice, 2),
+            'totalUsers'         => $totalUsers,
+            'totalClients'       => $totalClients,
+            'revenueThisMonth'   => round($revenueThisMonth, 2),
+            'revenueGrowth'      => $revenueGrowth,
+            'monthlyExpenses'    => round($monthlyExpenses, 2),
+            'pendingPayments'    => round($pendingPayments, 2),
+            'bookingPrice'       => round($bookingPrice, 2),
             'bookingRatePerHour' => round($bookingRatePerHour, 2),
-            'businessCurrency' => $businessCurrencyName,
+            'businessCurrency'   => $businessCurrencyName,
         ];
     }
 

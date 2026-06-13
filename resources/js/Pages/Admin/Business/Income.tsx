@@ -18,6 +18,13 @@ import {
     ChevronDown,
     MoreHorizontal
 } from 'lucide-react';
+import { 
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/Components/ui/dropdown-menu';
+import { ConfirmModal, PromptModal } from '@/Components/ui/ConfirmModal';
 import { formatCurrency } from '@/lib/utils';
 import {
     AreaChart,
@@ -64,6 +71,42 @@ export default function Income() {
             sort_by: field,
             sort_dir: newDir
         }, { preserveState: true });
+    };
+
+    const [deleteId, setDeleteId] = useState<number | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const [reverseId, setReverseId] = useState<number | null>(null);
+    const [isReversing, setIsReversing] = useState(false);
+
+    const handleDelete = () => {
+        if (!deleteId) return;
+        setIsDeleting(true);
+        router.delete(route('admin.income.delete', deleteId), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setDeleteId(null);
+                setIsDeleting(false);
+            },
+            onError: () => {
+                setIsDeleting(false);
+            }
+        });
+    };
+
+    const handleReverse = (reason: string) => {
+        if (!reverseId) return;
+        setIsReversing(true);
+        router.post(route('admin.income.reverse', reverseId), { reason }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setReverseId(null);
+                setIsReversing(false);
+            },
+            onError: () => {
+                setIsReversing(false);
+            }
+        });
     };
 
     const formatYAxis = (value: number): string => {
@@ -307,9 +350,28 @@ export default function Income() {
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled>
-                                            <MoreHorizontal className="h-4 w-4 text-slate-400" />
-                                        </Button>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4 text-slate-500" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="w-[180px]">
+                                                <DropdownMenuItem 
+                                                    onClick={() => setReverseId(entry.id)}
+                                                    className="focus:bg-slate-50"
+                                                >
+                                                    {__('admin.reverse_transaction') || "Reverse Transaction"}
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    onClick={() => setDeleteId(entry.id)}
+                                                    className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                                                >
+                                                    {__('general.delete') || "Delete Transaction"}
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -324,6 +386,29 @@ export default function Income() {
                     </Table>
                 </div>
             </Card>
+
+            <ConfirmModal
+                isOpen={deleteId !== null}
+                title="Delete Income Transaction"
+                description="Are you sure you want to delete this transaction? This will recalculate the associated user's ledger. This action cannot be undone."
+                confirmLabel="Delete Transaction"
+                variant="danger"
+                onConfirm={handleDelete}
+                onCancel={() => setDeleteId(null)}
+                loading={isDeleting}
+            />
+
+            <PromptModal
+                isOpen={reverseId !== null}
+                title="Reverse Transaction"
+                description="This will create a negative transaction to nullify this entry in the ledger."
+                label="Reversal Reason"
+                placeholder={`Reversal of transaction #${reverseId}`}
+                confirmLabel="Reverse Transaction"
+                onConfirm={handleReverse}
+                onCancel={() => setReverseId(null)}
+                loading={isReversing}
+            />
         </AdminSidebarLayout>
     );
 }

@@ -228,9 +228,9 @@ class Transaction extends Model
      */
     public function createReverse($reason = null)
     {
-        // Only "sent" transactions can be reversed
-        if ($this->type !== 'sent') {
-            throw new \Exception('Only "sent" transactions can be reversed. This transaction type is: ' . $this->type);
+        // Allowed types for reversal
+        if (!in_array($this->type, ['sent', 'received', 'refunded', 'earned'])) {
+            throw new \Exception('This transaction type cannot be reversed: ' . $this->type);
         }
 
         // Check if already reversed
@@ -248,7 +248,16 @@ class Transaction extends Model
         $reverseReason = $reason ?? ('Reverse transaction #' . $this->id . ($this->reason ? ' - ' . $this->reason : ''));
 
         // Determine reverse type based on original type
-        $reverseType = 'earned'; // For "sent" transactions, reverse is "earned"
+        $reverseType = 'earned'; 
+        if ($this->type === 'sent') {
+            $reverseType = 'earned';
+        } elseif ($this->type === 'received') {
+            $reverseType = 'refunded';
+        } elseif ($this->type === 'refunded') {
+            $reverseType = 'received';
+        } elseif ($this->type === 'earned') {
+            $reverseType = 'sent';
+        }
 
         $reverseTransaction = new Transaction();
         $reverseTransaction->user_id = $this->user_id;

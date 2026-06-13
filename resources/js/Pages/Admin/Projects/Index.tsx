@@ -171,6 +171,11 @@ export default function Index({ projects, clients, currentTab }) {
                                     >
                                         {project.project_name}
                                     </button>
+                                    {project.invoices && project.invoices.length > 0 && (
+                                        <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded w-fit" title="Unpaid Invoices / Milestones">
+                                            <AlertCircle className="w-3 h-3" /> Unpaid Dues
+                                        </div>
+                                    )}
                                 </td>
                                 <td className="p-4">
                                     {project.client ? (

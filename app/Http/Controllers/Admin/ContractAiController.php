@@ -12,8 +12,11 @@ class ContractAiController extends Controller
     public function generate(Request $request)
     {
         $request->validate([
-            'project_name' => 'required|string',
+            'project_id' => 'required|integer',
+            'prompt' => 'required|string',
         ]);
+
+        $project = \App\Models\Project::findOrFail($request->project_id);
 
         $user = Auth::user();
         $defaultProvider = \App\Models\AdminSettings::GetValue('default_ai_model', 'openai');
@@ -34,45 +37,34 @@ class ContractAiController extends Controller
 
         try {
             $prompt = "You are an expert sales and legal consultant for a software company.
-            Project Name: {$request->project_name}
-            Context: Generating a professional proposal/contract.
+            Project Name: {$project->project_name}
+            Client Needs / User Prompt: {$request->prompt}
+            Context: Generating a professional proposal/contract based on the user prompt.
 
-            Please generate professional content for the following empty fields:
-            project_description, description, payment_terms, terms, notes, duration, valid_until, includes_hosting, hosting_duration, includes_support, support_duration, client_name, key_features, pricing_items
+            Please generate professional content for the following fields:
+            description, payment_terms, terms, notes, duration, key_features, pricing_items, total_amount
 
             Guidelines:
-            - project_description: A compelling 2-3 sentence summary.
-            - description: A detailed scope of work (markdown supported).
-            - payment_terms: Use exactly: \"20% before ( unrefund )\\n30% when working and client see result\\n50% after finished\"
+            - description: Executive summary of the project.
+            - payment_terms: Detailed milestone payment structure.
             - terms: Standard liability, confidentiality, and IP clauses (brief).
             - notes: Polite closing notes and validity period.
             - duration: Estimated time to complete (e.g., '2 Weeks', '30 Days').
-            - valid_until: Format as 'YYYY-MM-DD' (suggest 7-14 days from now).
-            - includes_hosting: boolean (suggest true only if it sounds like a web project).
-            - hosting_duration: '1 Year' or similar.
-            - includes_support: boolean (usually true).
-            - support_duration: '3 Months' or similar.
-            - client_name: If the project name contains a client (e.g. 'Site for Pepsi'), extract 'Pepsi'.
-            - key_features: An array of 5-8 specific features or deliverables for this project.
+            - key_features: An array of string features or deliverables for this project.
             - pricing_items: An array of objects for the breakdown. Each object must have: 
-              'item' (title), 'description' (short), 'hours' (integer estimate), 'hourly_rate_egp' (integer).
+              'item' (title), 'description' (short), 'hours' (integer estimate), 'hourly_rate' (integer), 'total' (integer).
+            - total_amount: The sum of all pricing item totals (integer).
 
             Return ONLY valid JSON in this format:
             {
-                \"project_description\": \"...\",
                 \"description\": \"...\",
                 \"payment_terms\": \"...\",
                 \"terms\": \"...\",
                 \"notes\": \"...\",
                 \"duration\": \"...\",
-                \"valid_until\": \"...\",
-                \"includes_hosting\": true,
-                \"hosting_duration\": \"...\",
-                \"includes_support\": true,
-                \"support_duration\": \"...\",
-                \"client_name\": \"...\",
                 \"key_features\": [\"Feature 1\", \"Feature 2\"],
-                \"pricing_items\": [{\"item\": \"...\", \"description\": \"...\", \"hours\": 10, \"hourly_rate_egp\": 500}]
+                \"pricing_items\": [{\"item\": \"...\", \"description\": \"...\", \"hours\": 10, \"hourly_rate\": 50, \"total\": 500}],
+                \"total_amount\": 500
             }
             ";
 
@@ -106,7 +98,7 @@ class ContractAiController extends Controller
             $json = json_decode(trim($cleanContent), true);
 
             if (json_last_error() === JSON_ERROR_NONE && is_array($json)) {
-                 return response()->json(['data' => $json]);
+                 return response()->json($json); // Return raw JSON directly as modal expects res.data.description
             } else {
                 return response()->json(['error' => 'AI response format error.'], 500);
             }

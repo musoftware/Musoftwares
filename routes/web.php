@@ -12,6 +12,10 @@ Route::get('/portfolio', [HomeController::class, 'portfolio'])->name('portfolio'
 Route::get('/portfolio/{slug}', [HomeController::class, 'portfolioShow'])->name('portfolio.show');
 Route::get('/website-services/{slug}', [HomeController::class, 'websiteServiceShow'])->name('website-services.show');
 
+// Public Contract Links
+Route::get('/c/{uuid}', [\App\Http\Controllers\Frontend\ClientContractController::class, 'show'])->name('client.contract.show');
+Route::post('/c/{uuid}/sign', [\App\Http\Controllers\Frontend\ClientContractController::class, 'sign'])->name('client.contract.sign');
+
 Route::get('/install-app', function () {
     return \Inertia\Inertia::render('PWA/InstallGuide');
 })->name('install-app');
@@ -411,6 +415,16 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::resource('/projects', \App\Http\Controllers\Admin\ProjectController::class)->except(['create', 'edit', 'show']);
     Route::post('/projects/{project}/archive', [\App\Http\Controllers\Admin\ProjectController::class, 'archive'])->name('projects.archive');
     Route::post('/projects/{project}/restore', [\App\Http\Controllers\Admin\ProjectController::class, 'restore'])->name('projects.restore');
+    
+    // Project Contracts
+    Route::get('/projects/{project}/contracts', [\App\Http\Controllers\Admin\ProjectContractController::class, 'index'])->name('projects.contracts.index');
+    Route::post('/projects/{project}/contracts', [\App\Http\Controllers\Admin\ProjectContractController::class, 'store'])->name('projects.contracts.store');
+    Route::put('/projects/{project}/contracts/{contract}', [\App\Http\Controllers\Admin\ProjectContractController::class, 'update'])->name('projects.contracts.update');
+    Route::post('/projects/{project}/contracts/{contract}/invoice', [\App\Http\Controllers\Admin\ProjectContractController::class, 'generateInvoice'])->name('projects.contracts.invoice');
+    
+    // Contract AI generator
+    Route::post('/contracts/ai/generate', [\App\Http\Controllers\Admin\ContractAiController::class, 'generate'])->name('contracts.ai.generate');
+    Route::post('/contracts/ai/review', [\App\Http\Controllers\Admin\ContractAiController::class, 'review'])->name('contracts.ai.review');
 
     // ── Admin Plans ───────────────────────────────────────────────
     Route::get('/plans/search-users', [\App\Http\Controllers\Admin\PlanController::class, 'searchUsers'])->name('plans.search-users');
@@ -475,6 +489,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::get('/costs', [\App\Http\Controllers\Admin\BusinessController::class, 'costs'])->name('costs.index');
         Route::get('/costs/create', [\App\Http\Controllers\Admin\BusinessController::class, 'create_cost'])->name('costs.create');
         Route::post('/costs', [\App\Http\Controllers\Admin\BusinessController::class, 'store_cost'])->name('costs.store');
+        Route::get('/costs/edit/{id}', [\App\Http\Controllers\Admin\BusinessController::class, 'edit_cost'])->name('costs.edit');
+        Route::put('/costs/{id}', [\App\Http\Controllers\Admin\BusinessController::class, 'update_cost'])->name('costs.update');
+        Route::delete('/costs/{id}/delete', [\App\Http\Controllers\Admin\BusinessController::class, 'delete_cost'])->name('costs.delete');
+        
+        Route::delete('/income/{id}/delete', [\App\Http\Controllers\Admin\BusinessController::class, 'delete_income'])->name('income.delete');
+        Route::post('/income/{id}/reverse', [\App\Http\Controllers\Admin\BusinessController::class, 'reverse_income'])->name('income.reverse');
+        
         Route::get('/reports', [\App\Http\Controllers\Admin\BusinessController::class, 'reports'])->name('reports.index');
         Route::get('/balance-report', [\App\Http\Controllers\Admin\BusinessController::class, 'balance'])->name('reports.balance');
     });
@@ -534,6 +555,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('settings', [\App\Http\Controllers\Admin\AdminSettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [\App\Http\Controllers\Admin\AdminSettingController::class, 'store'])->name('settings.store');
     Route::post('settings/do-update-prices', [\App\Http\Controllers\Admin\AdminSettingController::class, 'doUpdatePrices'])->name('settings.do-update-prices');
+    Route::post('settings/calculate-hourly-rate', [\App\Http\Controllers\Admin\AdminSettingController::class, 'calculateHourlyRate'])->name('settings.calculate-hourly-rate');
     Route::post('settings/recalculate-overhead-hourly-rate', [\App\Http\Controllers\Admin\AdminSettingController::class, 'recalculateOverheadHourlyRate'])->name('settings.recalculate-overhead-hourly-rate');
 
     Route::resource('language-lines', \App\Http\Controllers\Admin\AdminLanguageLineController::class)->except(['create', 'show', 'edit']);
@@ -910,7 +932,7 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
 // New API routes for polling
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     // Route::get('/conversations', [\App\Http\Controllers\ConversationController::class, 'index']);
-    Route::get('/timer/{id}', [\App\Http\Controllers\TimerController::class, 'show']);
+    Route::get('/timer/{id}', [\Modules\ERP\Http\Controllers\TimerSessionController::class, 'show']);
 
     // Activity Engine — widget API for dashboard feeds
     // Route::get('/activity', [\App\Http\Controllers\ActivityController::class, 'feed'])->name('api.activity.feed');

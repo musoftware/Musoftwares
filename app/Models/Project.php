@@ -250,4 +250,9 @@ class Project extends Model
     {
         return $this->hasMany(CostTransaction::class, 'project_id');
     }
+
+    public function contracts()
+    {
+        return $this->hasMany(Contract::class);
+    }
 }
