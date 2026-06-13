@@ -16,7 +16,7 @@ class Job extends Model
 
     protected $table = 'freelance_jobs';
 
-    protected $fillable = ['client_id', 'title', 'description', 'budget', 'currency_id', 'min_proposal_points', 'type', 'duration', 'status', 'last_poked_at'];
+    protected $fillable = ['client_id', 'title', 'description', 'budget', 'currency_id', 'min_proposal_points', 'type', 'service_type', 'country', 'city', 'district', 'latitude', 'longitude', 'duration', 'status', 'last_poked_at'];
 
     protected $appends = [];
 

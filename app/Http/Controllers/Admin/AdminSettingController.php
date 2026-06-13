@@ -155,4 +155,22 @@ class AdminSettingController extends Controller
 
         return redirect()->back()->with('success', __('admin.overhead_hourly_rate_recalculated', ['rate' => $rate]));
     }
+    public function calculateHourlyRate(Request $request)
+    {
+        $request->validate([
+            'currency_id' => 'required|integer'
+        ]);
+
+        $currencyId = $request->input('currency_id');
+        $baseRate = \App\Helpers\FinanceHelper::calculateOverheadHourlyRate();
+        $businessCurrency = \App\Models\AdminSettings::GetValue('business_currency', 2);
+        
+        $rate = \App\Models\CurrenciesExchange::RateToday(
+            $baseRate,
+            $businessCurrency,
+            $currencyId
+        );
+
+        return response()->json(['rate' => round($rate, 2)]);
+    }
 }

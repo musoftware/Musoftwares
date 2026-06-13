@@ -423,6 +423,11 @@ class Invoice extends Model
         return $this->belongsTo(\App\Models\Project::class);
     }
 
+    public function contract()
+    {
+        return $this->belongsTo(\App\Models\Contract::class);
+    }
+
     public function date()
     {
         return TimezoneHelper::convertToLocal($this->created_at, 'd/m/Y');

@@ -107,9 +107,11 @@ class Contract extends Model
 
     public function invoices()
     {
-        return $this->morphMany(Invoice::class, 'invoiceable');
-        // If Invoice doesn't support morph, I might need to link via project or direct ID.
-        // Existing invoices likely link to project_id or user_id.
-        // I'll check Invoice model again to see if I can add contract_id or use polymorphic.
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function versions()
+    {
+        return $this->hasMany(ContractVersion::class)->orderBy('created_at', 'desc');
     }
 }

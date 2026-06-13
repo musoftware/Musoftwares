@@ -21,7 +21,9 @@ class ProjectController extends Controller
     {
         $status = $request->get('status', 'active');
         
-        $query = Project::with(['client']);
+        $query = Project::with(['client', 'contracts', 'contracts.versions', 'invoices' => function($q) {
+            $q->where('status', 'unpaid');
+        }]);
         
         if ($status === 'archived') {
             $query->where('archived', 1);

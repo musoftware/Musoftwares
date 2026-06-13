@@ -98,7 +98,9 @@ export default function Dashboard({
         subject_type: 'transaction',
         subject_id: Number(String(txn.id).replace('TXN-', '')),
         event: txn.type,
-        description: `${txn.type.charAt(0).toUpperCase() + txn.type.slice(1)} of ${formatMoney(txn.amount, stats.currency)} via ${txn.method}`,
+        description: txn.type === 'deposit' 
+            ? __('general.transaction_deposit_desc', { amount: formatMoney(txn.amount, stats.currency), method: txn.method })
+            : __('general.transaction_withdrawal_desc', { amount: formatMoney(txn.amount, stats.currency), method: txn.method }),
         properties: null,
         workspace: 'system',
         created_at: txn.date,

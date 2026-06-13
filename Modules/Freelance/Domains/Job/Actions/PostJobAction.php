@@ -32,6 +32,12 @@ class PostJobAction
                 'currency_id' => $data->currencyId,
                 'min_proposal_points' => $data->minProposalPoints,
                 'type' => $data->type,
+                'service_type' => $data->serviceType ?? 'remote',
+                'country' => $data->country,
+                'city' => $data->city,
+                'district' => $data->district,
+                'latitude' => $data->latitude,
+                'longitude' => $data->longitude,
                 'duration' => $data->duration,
                 'status' => 'open',
             ]);

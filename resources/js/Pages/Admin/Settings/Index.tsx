@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
+import axios from 'axios';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -167,15 +168,24 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
     const [bulkCurrency, setBulkCurrency] = useState(currencies[0]?.id?.toString() ?? '');
     const [updateProjects, setUpdateProjects] = useState(true);
 
-    const computedRate = React.useMemo(() => {
-        const income = parseFloat(form.expected_monthly_income ?? '0');
-        const days = parseFloat(form.work_days_per_month ?? '0');
-        const hours = parseFloat(form.hours_per_day ?? '0');
-        if (income > 0 && days > 0 && hours > 0) {
-            return (income / (days * hours)).toFixed(2);
-        }
-        return '0.00';
-    }, [form.expected_monthly_income, form.work_days_per_month, form.hours_per_day]);
+    const [computedRate, setComputedRate] = useState<string>('0.00');
+
+    useEffect(() => {
+        if (!bulkCurrency) return;
+        let isMounted = true;
+        
+        axios.post(route('admin.settings.calculate-hourly-rate'), { currency_id: bulkCurrency })
+            .then((res) => {
+                if (isMounted && res.data.rate !== undefined) {
+                    setComputedRate(res.data.rate.toFixed(2));
+                }
+            })
+            .catch((err) => {
+                console.error('Failed to fetch calculated rate', err);
+            });
+            
+        return () => { isMounted = false; };
+    }, [bulkCurrency]);
 
     const set = <K extends keyof SettingsData>(key: K, value: SettingsData[K]) =>
         setForm((prev) => ({ ...prev, [key]: value }));

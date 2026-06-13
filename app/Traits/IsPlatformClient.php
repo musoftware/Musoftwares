@@ -2,40 +2,23 @@
 
 namespace App\Traits;
 
-use Modules\ERP\Models\Tenant;
-
 /**
- * Allows the User model to act as a Client natively for Platform-level ERP operations.
- * This prevents the need for duplicate TenantClient records for the main Musoftware platform.
+ * Allows the User model to act as a Client natively for Platform-level operations.
+ *
+ * NOTE: ERP invoices and ERP projects are FULLY ISOLATED within the ERP module.
+ * This trait no longer references any ERP module models.
+ * ERP clients are managed via Modules\ERP\Models\TenantClient, which links back
+ * to the platform User via the `user_id` FK on the `erp_tenant_clients` table.
  */
 trait IsPlatformClient
 {
-    public function invoices()
-    {
-        return $this->hasMany(\Modules\ERP\Models\Invoice::class, 'client_id')
-                    ->where(function ($q) {
-                        $q->whereNull('tenant_id')
-                          ->orWhere('tenant_id', Tenant::platformId());
-                    });
-    }
-
-
-
+    /**
+     * Platform-level support tickets filed by this user.
+     * These are the main system tickets, NOT ERP module tickets.
+     * ERP tickets live in erp_support_tickets, managed by Modules\ERP\Models\SupportTicket.
+     */
     public function tickets()
     {
-        return $this->hasMany(\App\Models\Ticket::class, 'user_id')
-                    ->where(function ($q) {
-                        $q->whereNull('tenant_id')
-                          ->orWhere('tenant_id', Tenant::platformId());
-                    });
-    }
-
-    public function projects()
-    {
-        return $this->hasMany(\Modules\ERP\Models\Project::class, 'client_id')
-                    ->where(function ($q) {
-                        $q->whereNull('tenant_id')
-                          ->orWhere('tenant_id', Tenant::platformId());
-                    });
+        return $this->hasMany(\App\Models\Ticket::class, 'user_id');
     }
 }

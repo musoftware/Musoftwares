@@ -100,3 +100,23 @@ if (file_exists(base_path('Modules/CRM/routes/api.php'))) {
     require base_path('Modules/CRM/routes/api.php');
 }
 
+// ── Mobile App Auth (OTP) ──────────────────────────────────────────────────
+// Phone number + OTP flow for the React Native Freelancer mobile app.
+
+Route::prefix('auth')->group(function () {
+    Route::post('send-otp',    [\App\Http\Controllers\Api\MobileAuthController::class, 'sendOtp']);
+    Route::post('verify-otp',  [\App\Http\Controllers\Api\MobileAuthController::class, 'verifyOtp']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('user',          [\App\Http\Controllers\Api\MobileAuthController::class, 'me']);
+    Route::put('user/profile',  [\App\Http\Controllers\Api\MobileAuthController::class, 'updateProfile']);
+});
+
+// ── Mobile Freelance API ────────────────────────────────────────────────────
+// Handled by the Freelance module's MobileApiController (already exists).
+
+if (file_exists(base_path('Modules/Freelance/routes/api.php'))) {
+    require base_path('Modules/Freelance/routes/api.php');
+}
+

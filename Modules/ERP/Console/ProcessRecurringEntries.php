@@ -3,7 +3,7 @@
 namespace Modules\ERP\Console;
 
 use Illuminate\Console\Command;
-use App\Services\RecurringService;
+use Modules\ERP\Services\RecurringService;
 use Illuminate\Support\Facades\Log;
 
 class ProcessRecurringEntries extends Command

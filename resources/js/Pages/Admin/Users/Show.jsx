@@ -614,8 +614,8 @@ export default function Show({ client, loans = [], stats = {}, wallets, modulePl
                             <Wallet size={18} className="text-slate-400" />{__('general.financial_summary')}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                                <span className="text-slate-500 text-sm">{__('general.available_balance')}</span>
-                                <span className="font-bold text-slate-900 font-jetbrains">{formatCurrency(client.available_balance || 0, client.currency)}</span>
+                                <span className="text-slate-500 text-sm">{__('general.wallet_balance')}</span>
+                                <span className="font-bold text-slate-900 font-jetbrains">{formatCurrency(client.user_balance || 0, client.currency)}</span>
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-slate-500 text-sm">{__('general.unpaid_invoices')}</span>
@@ -630,7 +630,9 @@ export default function Show({ client, loans = [], stats = {}, wallets, modulePl
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-slate-500 text-sm">Remaining</span>
-                                <span className="font-bold text-green-600 font-jetbrains">{formatCurrency((client.available_balance || 0) - (stats.invoices_unpaid_sum || 0), client.currency)}</span>
+                                <span className={`font-bold font-jetbrains ${((client.user_balance || 0) - (stats.invoices_unpaid_sum || 0)) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {formatCurrency((client.user_balance || 0) - (stats.invoices_unpaid_sum || 0), client.currency)}
+                                </span>
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-slate-500 text-sm">{__('general.pending_comm')}</span>

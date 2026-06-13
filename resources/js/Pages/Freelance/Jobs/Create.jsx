@@ -36,6 +36,12 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
+        service_type: 'remote',
+        country: '',
+        city: '',
+        district: '',
+        latitude: '',
+        longitude: '',
         budget: '',
         currency_id: auth?.user?.currency_id ?? (currencies[0]?.id ?? null),
         min_proposal_points: 0,
@@ -159,6 +165,45 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                             </div>
                             {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
                         </div>
+                    </div>
+
+                    {/* Service Type & Location */}
+                    <div className="space-y-4">
+                        <h3 className="flex items-center text-lg font-semibold border-b pb-2">
+                            {__('freelance.service_type_and_location')}
+                            <FieldTooltip text={__('freelance.service_type_help')} />
+                        </h3>
+
+                        <div className="flex gap-4 mb-4">
+                            <label className={`flex-1 flex items-center justify-center border-2 rounded-lg py-3 cursor-pointer transition ${data.service_type === 'remote' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-200 hover:border-indigo-200'}`}>
+                                <input type="radio" className="sr-only" name="service_type" value="remote" checked={data.service_type === 'remote'} onChange={() => setData('service_type', 'remote')} />
+                                <span className="font-bold">{__('freelance.remote_service')}</span>
+                            </label>
+                            <label className={`flex-1 flex items-center justify-center border-2 rounded-lg py-3 cursor-pointer transition ${data.service_type === 'visit' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-200 hover:border-indigo-200'}`}>
+                                <input type="radio" className="sr-only" name="service_type" value="visit" checked={data.service_type === 'visit'} onChange={() => setData('service_type', 'visit')} />
+                                <span className="font-bold">{__('freelance.on_site_visit')}</span>
+                            </label>
+                        </div>
+
+                        {data.service_type === 'visit' && (
+                            <div className="space-y-4 p-4 bg-gray-50 border rounded-lg">
+                                <h4 className="font-medium text-gray-700">{__('freelance.visit_location')}</h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">{__('general.country')}</label>
+                                        <input type="text" value={data.country} onChange={e => setData('country', e.target.value)} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">{__('general.city')}</label>
+                                        <input type="text" value={data.city} onChange={e => setData('city', e.target.value)} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">{__('general.district')}</label>
+                                        <input type="text" value={data.district} onChange={e => setData('district', e.target.value)} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500" />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Budget & Duration */}

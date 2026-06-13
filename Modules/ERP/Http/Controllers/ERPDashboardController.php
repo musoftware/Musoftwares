@@ -10,11 +10,11 @@ use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\RecurringEntry;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\Project;
-use App\Models\Ticket;
 use Modules\ERP\Models\Activity;
 use Modules\ERP\Models\TenantFile;
 use Modules\ERP\Models\TenantNote;
 use Modules\ERP\Models\TenantStorageProvider;
+use Modules\ERP\Models\SupportTicket;
 use Modules\ERP\Models\WalletTransaction;
 use App\Services\ExchangeRateService;
 use Inertia\Inertia;
@@ -240,10 +240,24 @@ class ERPDashboardController extends Controller
                     ];
                 });
         }
-        // ── Real Support Tickets ──────────────────────────────────
+        // ── Real ERP Support Tickets ──────────────────────────────
         $supportTickets = collect();
-        if (class_exists(Ticket::class)) {
-            $supportTickets = Ticket::with(['user'])->latest()->take(5)->get();
+        if ($tenantId) {
+            $supportTickets = SupportTicket::with(['client'])
+                ->where('tenant_id', $tenantId)
+                ->latest()
+                ->take(5)
+                ->get()
+                ->map(function ($ticket) {
+                    return [
+                        'id'         => $ticket->id,
+                        'subject'    => $ticket->subject,
+                        'status'     => $ticket->status,
+                        'priority'   => $ticket->priority,
+                        'client'     => $ticket->client ? ['id' => $ticket->client->id, 'name' => $ticket->client->name] : null,
+                        'created_at' => $ticket->created_at?->format('Y-m-d'),
+                    ];
+                });
         }
 
         // ── Real Activity Logs ────────────────────────────────────
