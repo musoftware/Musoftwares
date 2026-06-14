@@ -1,0 +1,16 @@
+<?php
+
+namespace Modules\WebTools\Database\Seeders;
+
+use Illuminate\Database\Seeder;
+
+class WebToolsDatabaseSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        // $this->call([]);
+    }
+}
