@@ -21,6 +21,7 @@ class UpdateInvoiceRequest extends FormRequest
             'items.*.amount'     => 'required|numeric|min:0',
             'items.*.qty'        => 'required|numeric|min:1',
             'items.*.item_type'  => 'required|in:quantity,simple,timer',
+            'items.*.merged_from'=> 'nullable|array',
             'deleted_items'      => 'nullable|array',
             'deleted_items.*'    => 'exists:invoice_items,id',
             'cost_lines'         => 'nullable|array',

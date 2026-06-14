@@ -20,9 +20,7 @@ class InvoiceService
                 $invoice->update(['discount' => $data['discount']]);
             }
 
-            if (!empty($data['deleted_items'])) {
-                InvoiceItem::whereIn('id', $data['deleted_items'])->where('invoice_id', $invoice->id)->delete();
-            }
+            // Will delete items after reassignment
 
             if (!empty($data['items'])) {
                 foreach ($data['items'] as $itemData) {
@@ -33,12 +31,13 @@ class InvoiceService
                             $item->update([
                                 'item_title' => $itemData['item_title'],
                                 'amount'     => $itemData['amount'],
-                                'qty'        => $itemData['qty']
+                                'qty'        => $itemData['qty'],
+                                'item_type'  => $itemData['item_type'] ?? $item->item_type,
                             ]);
                         }
                     } else {
                         // Create new
-                        InvoiceItem::create([
+                        $item = InvoiceItem::create([
                             'invoice_id' => $invoice->id,
                             'item_title' => $itemData['item_title'],
                             'amount'     => $itemData['amount'],
@@ -47,7 +46,17 @@ class InvoiceService
                             'currency'   => $invoice->currency
                         ]);
                     }
+
+                    // Re-assign timers if this item is a merge of other timer items
+                    if ($item && !empty($itemData['merged_from'])) {
+                        \App\Models\InvoiceItemTimer::whereIn('invoice_item_id', $itemData['merged_from'])
+                            ->update(['invoice_item_id' => $item->id]);
+                    }
                 }
+            }
+
+            if (!empty($data['deleted_items'])) {
+                InvoiceItem::whereIn('id', $data['deleted_items'])->where('invoice_id', $invoice->id)->delete();
             }
 
             if (!empty($data['deleted_cost_lines'])) {

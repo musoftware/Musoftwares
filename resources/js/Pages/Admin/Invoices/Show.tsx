@@ -175,20 +175,34 @@ export default function Show({ invoice }: { invoice: any }) {
     const handleMergeSelected = () => {
         if (selectedItemsForMerge.length < 2) return;
         
-        // Simple merge: combine titles, sum prices and qtys
         const itemsToMerge = items.filter((_, idx) => selectedItemsForMerge.includes(idx));
+        const hasTimer = itemsToMerge.some(i => i.item_type === 'timer');
         const mergedTitle = itemsToMerge.map(i => i.item_title).join(' + ');
-        const mergedAmount = itemsToMerge.reduce((acc, i) => acc + parseFloat(i.amount || 0), 0);
-        const mergedQty = itemsToMerge.reduce((acc, i) => acc + Number(i.qty || 1), 0);
+        
+        let mergedAmount = 0;
+        let mergedType = 'simple';
+        
+        if (hasTimer) {
+            mergedType = 'timer';
+            // Sum total_amount for timer items and amount * qty for others
+            mergedAmount = itemsToMerge.reduce((acc, i) => {
+                const itemTotal = i.item_type === 'timer' ? (parseFloat(i.total_amount) || 0) : (parseFloat(i.amount || 0) * Number(i.qty || 1));
+                return acc + itemTotal;
+            }, 0);
+        } else {
+            mergedAmount = itemsToMerge.reduce((acc, i) => acc + parseFloat(i.amount || 0), 0);
+        }
         
         const mergedItem = {
             id: 'new-' + Date.now(),
             isNew: true,
             item_title: mergedTitle,
-            item_type: 'simple',
+            item_type: mergedType,
             amount: mergedAmount,
-            qty: 1, // Usually we reset qty to 1 and combine the total amount, or sum qty. Let's do 1 and sum amount.
-            currency: invoice.currency
+            total_amount: mergedAmount,
+            qty: 1,
+            currency: invoice.currency,
+            merged_from: itemsToMerge.map(i => i.id).filter(id => !String(id).startsWith('new-'))
         };
 
         // Mark old non-new items for deletion
@@ -270,7 +284,8 @@ export default function Show({ invoice }: { invoice: any }) {
                 item_title: item.item_title,
                 amount: String(item.amount),
                 qty: item.qty,
-                item_type: item.item_type
+                item_type: item.item_type,
+                merged_from: item.merged_from || []
             }))
         };
 
