@@ -70,6 +70,11 @@ Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'ind
 
 Route::get('/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
 
+// Redirect legacy localized blog URLs (e.g. /es/blog/slug) to new structure
+Route::get('/{locale}/blog/{slug}', function ($locale, $slug) {
+    return redirect()->to("/blog/{$slug}?lang={$locale}", 301);
+})->where('locale', '[a-zA-Z]{2}');
+
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'onboarding'])->name('dashboard');
 

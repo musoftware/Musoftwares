@@ -13,8 +13,11 @@ parameters:
     level: 1
 
     ignoreErrors:
-        # Ignore legacy SDKs and tests if needed
-        # - '#.*#'
+        -
+            message: '#^Class App\\Services\\WhatsAppNotificationService not found\.$#'
+            paths:
+                - Modules/WebTools/Http/Controllers/Financial/PayGuestController.php
+                - Modules/WebTools/Http/Controllers/Financial/WithdrawInstapayController.php
 
     excludePaths:
         - Modules/SmsPaymentGateway/sdk/

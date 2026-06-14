@@ -15,8 +15,8 @@ export default function CoreOperationsCards({ stats }: CoreOperationsCardsProps)
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Action Card 1: Subscriptions & Plans */}
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col h-full hover:shadow-md transition-shadow">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                    <Sparkles className="w-5 h-5 text-primary" />
+                <div className="mb-4">
+                    <Sparkles className="w-6 h-6 text-slate-900" />
                 </div>
                 <div>
                     <h3 className="text-lg font-bold text-slate-900 mb-1">{__('general.active_subscriptions')}</h3>
@@ -37,8 +37,8 @@ export default function CoreOperationsCards({ stats }: CoreOperationsCardsProps)
 
             {/* Action Card 2: Quick Top Up */}
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col h-full hover:shadow-md transition-shadow">
-                <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center mb-4">
-                    <Wallet className="w-5 h-5 text-emerald-700" />
+                <div className="mb-4">
+                    <Wallet className="w-6 h-6 text-slate-900" />
                 </div>
                 <div>
                     <h3 className="text-lg font-bold text-slate-900 mb-1">{__('general.charge_balance')}</h3>
@@ -46,7 +46,7 @@ export default function CoreOperationsCards({ stats }: CoreOperationsCardsProps)
                 <div className="mt-auto pt-4">
                     <Link 
                         href={safeRoute('financial.add-balance', undefined, '/financial/add-balance')} 
-                        className="flex items-center justify-center p-2.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:border-emerald-300 hover:bg-emerald-100 transition-colors group text-emerald-700 font-medium text-sm"
+                        className="flex items-center justify-center p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100 transition-colors group text-slate-700 font-medium text-sm"
                     >
                         {__('general.add_funds')}
                         <ArrowRight className="w-4 h-4 ms-2 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
@@ -56,14 +56,14 @@ export default function CoreOperationsCards({ stats }: CoreOperationsCardsProps)
 
             {/* Action Card 3: Billing Quick Access */}
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col h-full hover:shadow-md transition-shadow">
-                <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center mb-4">
-                    <FileText className="w-5 h-5 text-slate-700" />
+                <div className="mb-4">
+                    <FileText className="w-6 h-6 text-slate-900" />
                 </div>
                 <div>
                     <h3 className="text-lg font-bold text-slate-900 mb-1">{__('general.billing_invoices')}</h3>
                 </div>
                 <div className="mt-auto pt-4">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">{__('general.billing_quick_access')}</p>
+                    <p className="text-xs font-medium text-slate-500 mb-2">{__('general.billing_quick_access')}</p>
                     <div className="flex flex-col gap-2">
                         <Link href={safeRoute('billing.invoices.index', undefined, '/billing/invoices')} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:border-slate-300 transition-colors group">
                             <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">{__('general.unpaid_invoices')}</span>
@@ -79,8 +79,8 @@ export default function CoreOperationsCards({ stats }: CoreOperationsCardsProps)
 
             {/* Action Card 4: Runtime App */}
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col h-full hover:shadow-md transition-shadow">
-                <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center mb-4">
-                    <MonitorPlay className="w-5 h-5 text-indigo-700" />
+                <div className="mb-4">
+                    <MonitorPlay className="w-6 h-6 text-slate-900" />
                 </div>
                 <div>
                     <h3 className="text-lg font-bold text-slate-900 mb-1">{__('general.musoftware_runtime')}</h3>

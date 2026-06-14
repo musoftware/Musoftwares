@@ -11,7 +11,7 @@ interface ActivityFeedItem {
     description: string;
     created_at: string;
     icon: string;
-    color: string;
+    isDeposit: boolean;
 }
 
 interface FinancialHistoryProps {
@@ -39,8 +39,8 @@ export default function FinancialHistory({ chartData, activityFeedItems }: Finan
                                     contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                 />
                                 <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                                <Bar dataKey="deposit" name={__('general.deposits')} fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                                <Bar dataKey="expense" name={__('general.expenses')} fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                                <Bar dataKey="deposit" name={__('general.deposits')} fill="#0f172a" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                                <Bar dataKey="expense" name={__('general.expenses')} fill="#e2e8f0" radius={[4, 4, 0, 0]} maxBarSize={40} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -62,7 +62,7 @@ export default function FinancialHistory({ chartData, activityFeedItems }: Finan
                             <div className="space-y-4">
                                 {activityFeedItems.slice(0, 5).map((txn) => (
                                     <div key={txn.id} className="flex items-start gap-3 pb-4 border-b border-slate-100 last:border-0">
-                                        <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", txn.color === 'emerald' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600')}>
+                                        <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-slate-200 bg-slate-50 text-slate-700")}>
                                             {txn.icon === 'wallet' ? <Wallet className="w-4 h-4" /> : <History className="w-4 h-4" />}
                                         </div>
                                         <div>

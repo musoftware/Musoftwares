@@ -148,7 +148,7 @@ export function WindowModal({
         >
             {/* Windows-like Title Bar */}
             <div 
-                className={`bg-[#f0f0f0] flex items-center justify-between px-3 h-10 border-b border-slate-300 select-none touch-none ${!isEffectivelyMaximized ? 'cursor-move' : ''}`}
+                className={`bg-[#f0f0f0] flex items-center justify-between px-3 h-12 border-b border-slate-300 select-none touch-none ${!isEffectivelyMaximized ? 'cursor-move' : ''}`}
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
@@ -167,29 +167,29 @@ export function WindowModal({
                     {onNewTab && (
                         <button 
                             onClick={(e) => { e.stopPropagation(); onNewTab(); }}
-                            className="h-full px-3 hover:bg-slate-200 text-slate-600 transition-colors flex items-center"
+                            className="h-full w-12 hover:bg-slate-200 text-slate-600 transition-colors flex items-center justify-center"
                             title={__('general.open_in_new_tab')}
                         >
-                            <ExternalLink className="w-3.5 h-3.5" />
+                            <ExternalLink className="w-4 h-4" />
                         </button>
                     )}
                     <button 
                         onClick={(e) => { e.stopPropagation(); onMinimize(); }}
-                        className="h-full px-4 hover:bg-slate-200 text-slate-600 transition-colors flex items-center"
+                        className="h-full w-12 hover:bg-slate-200 text-slate-600 transition-colors flex items-center justify-center"
                         title="Minimize"
                     >
                         <Minus className="w-4 h-4" />
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); onMaximize(); }}
-                        className="h-full px-4 hover:bg-slate-200 text-slate-600 transition-colors flex items-center"
+                        className="h-full w-12 hover:bg-slate-200 text-slate-600 transition-colors flex items-center justify-center"
                         title="Maximize"
                     >
                         <Square className="w-3.5 h-3.5" />
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); onClose(); }}
-                        className="h-full px-4 hover:bg-red-500 hover:text-white text-slate-600 transition-colors flex items-center"
+                        className="h-full w-12 hover:bg-red-500 hover:text-white text-slate-600 transition-colors flex items-center justify-center"
                         title="Close"
                     >
                         <X className="w-4 h-4" />

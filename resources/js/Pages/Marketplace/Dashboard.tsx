@@ -1,4 +1,4 @@
-import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
+import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import {
@@ -57,13 +57,9 @@ export default function MarketplaceDashboard({
     ];
 
     return (
-        <WorkspaceLayout 
-            title={__('general.service_workspace')}
-            workspaceName="Marketplace"
-            tenantId="MKT-DRAFT"
-            menuItems={menuItems}
-        >
-            <div className="space-y-8">
+        <MarketplaceLayout>
+            <Head title={__('general.service_workspace')} />
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                 <ModulePageHeader 
                     title={__('general.service_workspace')}
                     description={__('general.manage_your_active_service_orders_listed_gigs_and_client_sales_in_one_place')}
@@ -284,6 +280,6 @@ export default function MarketplaceDashboard({
                 onClose={() => setSelectedService(null)}
                 data={selectedService}
             />
-        </WorkspaceLayout>
+        </MarketplaceLayout>
     );
 }

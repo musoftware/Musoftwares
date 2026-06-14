@@ -8,38 +8,48 @@ import { __ } from '@/lib/i18n';
 import PendingInvoicesBanner from './Dashboard/Components/PendingInvoicesBanner';
 import CoreOperationsCards from './Dashboard/Components/CoreOperationsCards';
 import FinancialHistory from './Dashboard/Components/FinancialHistory';
-import type { DashboardStats, PendingInvoice, RecentTransaction, ChartData } from './Dashboard/types';
+import type { DashboardStats,  RecentTransaction, ChartData } from './Dashboard/types';
 
 interface DashboardProps {
     stats?: DashboardStats;
-    pendingInvoices?: PendingInvoice[];
     recentTransactions?: RecentTransaction[];
     chartData?: ChartData[];
 }
 
 export default function Dashboard({ 
-    stats: serverStats, 
-    pendingInvoices: serverInvoices, 
-    recentTransactions: serverTransactions,
+    stats, 
+    recentTransactions = [],
     chartData = [],
 }: DashboardProps) {
-    const { auth } = usePage<{ auth: { user: any } }>().props;
+    const { auth } = usePage<{ auth: { user: { id: number; name: string; email: string } } }>().props;
     const user = auth?.user;
 
-    const stats = serverStats as DashboardStats;
-    const recentTransactions = serverTransactions || [];
-
     const activityFeedItems = React.useMemo(() => {
-        return recentTransactions.map((txn) => ({
-            id: txn.id,
-            description: txn.type === 'deposit' 
-                ? __('general.transaction_deposit_desc', { amount: formatMoney(txn.amount, txn.currency), method: txn.method })
-                : __('general.transaction_withdrawal_desc', { amount: formatMoney(txn.amount, txn.currency), method: txn.method }),
-            created_at: txn.date,
-            icon: txn.type === 'deposit' ? 'wallet' : 'receipt',
-            color: txn.type === 'deposit' ? 'emerald' : txn.type === 'expense' ? 'amber' : 'slate',
-        }));
+        return recentTransactions.map((txn) => {
+            const isDeposit = txn.type === 'deposit';
+            
+            return {
+                id: txn.id,
+                description: isDeposit 
+                    ? __('general.transaction_deposit_desc', { amount: formatMoney(txn.amount, txn.currency), method: txn.method })
+                    : __('general.transaction_withdrawal_desc', { amount: formatMoney(txn.amount, txn.currency), method: txn.method }),
+                created_at: txn.date,
+                icon: isDeposit ? 'wallet' : 'receipt',
+                isDeposit,
+            };
+        });
     }, [recentTransactions]);
+
+    if (!stats) {
+        return (
+            <AuthenticatedLayout>
+                <Head title={__('general.dashboard')} />
+                <div className="flex h-[50vh] items-center justify-center">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800"></div>
+                </div>
+            </AuthenticatedLayout>
+        );
+    }
 
     return (
         <AuthenticatedLayout>
