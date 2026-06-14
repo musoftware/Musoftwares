@@ -44,7 +44,9 @@ class BlogController extends Controller
             'meta' => [
                 'title' => ($article->meta_title ?: $article->title) . ' | Musoftware',
                 'description' => $article->meta_description ?: $article->excerpt,
-                'image' => $article->featured_image ? asset('storage/' . $article->featured_image) : asset('images/default-meta.png'),
+                'image' => $article->featured_image 
+                    ? (str_starts_with($article->featured_image, 'http') ? $article->featured_image : asset('storage/' . $article->featured_image)) 
+                    : ($article->service?->cover_image ?: asset('images/default-meta.png')),
                 'url' => url()->current(),
             ]
         ]);

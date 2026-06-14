@@ -5862,4 +5862,7 @@ return [
     'video_animation' => 'video animation',
     'writing_translation' => 'writing translation',
     'our_blog' => 'Our Blog'
+,
+    'your_new_login_details' => 'Your New Login Details',
+    'password_reset_success_email_sent' => 'Password reset successful and email sent! You can also copy the details below:',
 ];

@@ -621,6 +621,16 @@ class UsersController extends Controller
         $user = User::findOrFail($id);
         $newPassword = $this->adminUserService->resetPassword($user);
 
+        try {
+            $messageText = "Hello, {$user->name}\nHere is your login details:\nEmail:\n{$user->email}\nPassword:\n{$newPassword}";
+            \Illuminate\Support\Facades\Mail::raw($messageText, function ($message) use ($user) {
+                $message->to($user->email)
+                        ->subject(__('general.your_new_login_details') ?: 'Your New Login Details');
+            });
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send password reset email: ' . $e->getMessage());
+        }
+
         return response()->json([
             'new_password' => $newPassword,
             'message' => 'Password reset successfully.'

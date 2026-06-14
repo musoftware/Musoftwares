@@ -5687,4 +5687,7 @@ return [
     'video_animation' => 'video animation',
     'writing_translation' => 'writing translation',
     'our_blog' => 'مدونتنا'
+,
+    'your_new_login_details' => 'تفاصيل تسجيل الدخول الجديدة الخاصة بك',
+    'password_reset_success_email_sent' => 'تم إعادة تعيين كلمة المرور بنجاح وتم إرسال بريد إلكتروني! يمكنك أيضاً نسخ التفاصيل أدناه:',
 ];

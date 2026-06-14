@@ -408,10 +408,17 @@ export default function Show({ client, loans = [], stats = {}, wallets, modulePl
                     </DialogHeader>
                     {newPassword ? (
                         <div className="p-4 bg-green-50 border border-green-200 rounded-md">
-                            <p className="text-sm text-green-800 mb-2">Password reset successful! Provide this to the user:</p>
-                            <div className="font-mono text-lg font-bold bg-white p-2 rounded flex justify-between items-center">
-                                {newPassword}
-                                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(newPassword)}><Copy size={14}/></Button>
+                            <p className="text-sm text-green-800 mb-2">{__('general.password_reset_success_email_sent') || 'Password reset successful and email sent! You can also copy the details below:'}</p>
+                            <div className="font-mono text-sm bg-white p-4 rounded relative border border-green-100">
+                                <pre className="whitespace-pre-wrap font-sans text-sm text-slate-700">
+{`Hello, ${client.name} 
+Here is your login details:
+Email:
+${client.email}
+Password:
+${newPassword}`}
+                                </pre>
+                                <Button variant="ghost" size="sm" className="absolute top-2 right-2" onClick={() => copyToClipboard(`Hello, ${client.name} \nHere is your login details:\nEmail:\n${client.email}\nPassword:\n${newPassword}`)}><Copy size={14}/></Button>
                             </div>
                         </div>
                     ) : (

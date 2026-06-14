@@ -7156,7 +7156,9 @@
             "trust_safety": "trust safety",
             "video_animation": "video animation",
             "writing_translation": "writing translation",
-            "our_blog": "مدونتنا"
+            "our_blog": "مدونتنا",
+            "your_new_login_details": "تفاصيل تسجيل الدخول الجديدة الخاصة بك",
+            "password_reset_success_email_sent": "تم إعادة تعيين كلمة المرور بنجاح وتم إرسال بريد إلكتروني! يمكنك أيضاً نسخ التفاصيل أدناه:"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -14894,7 +14896,9 @@
             "trust_safety": "trust safety",
             "video_animation": "video animation",
             "writing_translation": "writing translation",
-            "our_blog": "Our Blog"
+            "our_blog": "Our Blog",
+            "your_new_login_details": "Your New Login Details",
+            "password_reset_success_email_sent": "Password reset successful and email sent! You can also copy the details below:"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
