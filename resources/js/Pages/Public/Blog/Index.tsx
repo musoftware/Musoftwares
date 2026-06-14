@@ -17,6 +17,7 @@ interface BlogArticle {
     created_at: string;
     published_at: string;
     service?: {
+        cover_image?: string;
         seller?: {
             name: string;
         };
@@ -99,9 +100,9 @@ export default function Index({ articles }: IndexProps) {
                                     className="group flex flex-col bg-white rounded-3xl overflow-hidden border border-slate-200/60 shadow-sm hover:shadow-xl hover:border-indigo-100 transition-all duration-300 h-full"
                                 >
                                     <Link href={`/blog/${article.slug}`} className="relative aspect-[16/10] overflow-hidden bg-slate-100 block">
-                                        {article.featured_image ? (
+                                        {article.featured_image || article.service?.cover_image ? (
                                             <img 
-                                                src={article.featured_image.startsWith('http') ? article.featured_image : `/storage/${article.featured_image}`} 
+                                                src={article.featured_image ? (article.featured_image.startsWith('http') ? article.featured_image : `/storage/${article.featured_image}`) : article.service?.cover_image} 
                                                 alt={article.title} 
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
                                             />

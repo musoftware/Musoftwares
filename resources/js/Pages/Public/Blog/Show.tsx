@@ -19,6 +19,7 @@ interface BlogArticle {
     language?: string;
     created_at: string;
     service?: {
+        cover_image?: string;
         seller?: {
             name: string;
         };
@@ -158,10 +159,10 @@ export default function Show({ article }: ShowProps) {
                         </div>
 
                         {/* Featured Image */}
-                        {article.featured_image && (
+                        {(article.featured_image || article.service?.cover_image) && (
                             <div className="w-full aspect-[21/9] rounded-2xl overflow-hidden mb-12 shadow-md border border-slate-100">
                                 <img
-                                    src={article.featured_image}
+                                    src={article.featured_image ? (article.featured_image.startsWith('http') ? article.featured_image : `/storage/${article.featured_image}`) : article.service?.cover_image}
                                     alt={article.title}
                                     className="w-full h-full object-cover object-center"
                                 />
