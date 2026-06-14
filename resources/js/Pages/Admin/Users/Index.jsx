@@ -36,7 +36,7 @@ export default function Index({ clients, filters, stats }) {
     const [isChangeRoleOpen, setIsChangeRoleOpen] = useState(false);
     const [selectedRoleUser, setSelectedRoleUser] = useState(null);
     const [selectedRole, setSelectedRole] = useState('client');
-    const [resetPasswordState, setResetPasswordState] = useState({ isOpen: false, clientId: null, status: 'confirm', newPassword: '' });
+    const [resetPasswordState, setResetPasswordState] = useState({ isOpen: false, clientId: null, client: null, status: 'confirm', newPassword: '' });
 
     const handleSearch = (search) => {
         router.get(
@@ -78,8 +78,8 @@ export default function Index({ clients, filters, stats }) {
         });
     };
 
-    const handleResetPassword = (clientId) => {
-        setResetPasswordState({ isOpen: true, clientId, status: 'confirm', newPassword: '' });
+    const handleResetPassword = (client) => {
+        setResetPasswordState({ isOpen: true, clientId: client.id, client: client, status: 'confirm', newPassword: '' });
     };
 
     const handleUpdateRoleSubmit = (e) => {
@@ -205,7 +205,7 @@ export default function Index({ clients, filters, stats }) {
                         <DropdownMenuGroup>
                             <DropdownMenuItem onClick={() => handleLoginAs(client.id)}>
                                 <LogIn className="mr-2 h-4 w-4" />{__('general.login_as')}</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleResetPassword(client.id)}>
+                            <DropdownMenuItem onClick={() => handleResetPassword(client)}>
                                 <Key className="mr-2 h-4 w-4" />{__('general.reset_password')}</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => { setSelectedRoleUser(client); setSelectedRole(client.role || 'client'); setIsChangeRoleOpen(true); }}>
                                 <ShieldCheck className="mr-2 h-4 w-4" />{__('general.change_role')}</DropdownMenuItem>
@@ -323,7 +323,7 @@ export default function Index({ clients, filters, stats }) {
                 }}
                 onResetPassword={(id) => {
                     setIsSheetOpen(false);
-                    handleResetPassword(id);
+                    handleResetPassword(selectedClient);
                 }}
                 onChangeRole={(user) => {
                     setSelectedRoleUser(user);
@@ -376,7 +376,7 @@ export default function Index({ clients, filters, stats }) {
                 open={resetPasswordState.isOpen} 
                 onOpenChange={(open) => {
                     if (!open && resetPasswordState.status !== 'loading') {
-                        setResetPasswordState({ isOpen: false, clientId: null, status: 'confirm', newPassword: '' });
+                        setResetPasswordState({ isOpen: false, clientId: null, client: null, status: 'confirm', newPassword: '' });
                     }
                 }}
             >
@@ -427,32 +427,35 @@ export default function Index({ clients, filters, stats }) {
                             <DialogHeader>
                                 <DialogTitle className="text-emerald-600 flex items-center gap-2">
                                     <CheckCircle2 className="h-5 w-5" />
-                                    Password Reset Successfully
+                                    {__('general.password_reset_success_email_sent') || 'Password reset successful and email sent! You can also copy the details below:'}
                                 </DialogTitle>
-                                <DialogDescription>
-                                    Please copy the new password below and send it to the user.
-                                </DialogDescription>
                             </DialogHeader>
                             <div className="my-6">
-                                <div className="flex items-center gap-2">
-                                    <div className="flex-1 bg-slate-50 border border-slate-200 rounded-md p-3 font-mono text-center text-lg font-semibold tracking-widest text-slate-900 select-all">
-                                        {resetPasswordState.newPassword}
-                                    </div>
+                                <div className="font-mono text-sm bg-slate-50 border border-slate-200 p-4 rounded relative">
+                                    <pre className="whitespace-pre-wrap font-sans text-sm text-slate-700">
+{`Hello, ${resetPasswordState.client?.name} 
+Here is your login details:
+Email:
+${resetPasswordState.client?.email}
+Password:
+${resetPasswordState.newPassword}`}
+                                    </pre>
                                     <Button 
                                         variant="outline" 
                                         size="icon"
-                                        className="h-14 w-14 shrink-0"
+                                        className="absolute top-2 right-2 h-8 w-8 shrink-0"
                                         onClick={() => {
-                                            navigator.clipboard.writeText(resetPasswordState.newPassword);
-                                            toast({ title: "Copied!", description: "Password copied to clipboard." });
+                                            const txt = `Hello, ${resetPasswordState.client?.name} \nHere is your login details:\nEmail:\n${resetPasswordState.client?.email}\nPassword:\n${resetPasswordState.newPassword}`;
+                                            navigator.clipboard.writeText(txt);
+                                            toast({ title: "Copied!", description: "Message copied to clipboard." });
                                         }}
                                     >
-                                        <Copy className="h-5 w-5 text-slate-600" />
+                                        <Copy className="h-4 w-4 text-slate-600" />
                                     </Button>
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button className="w-full sm:w-auto" onClick={() => setResetPasswordState({ isOpen: false, clientId: null, status: 'confirm', newPassword: '' })}>
+                                <Button className="w-full sm:w-auto" onClick={() => setResetPasswordState({ isOpen: false, clientId: null, client: null, status: 'confirm', newPassword: '' })}>
                                     Done
                                 </Button>
                             </DialogFooter>
