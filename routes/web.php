@@ -68,6 +68,7 @@ Route::get('/pricing', [HomeController::class, 'pricing'])->name('pricing');
 // Sitemap
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
 
+Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
 
 // Redirect legacy localized blog URLs (e.g. /es/blog/slug) to new structure

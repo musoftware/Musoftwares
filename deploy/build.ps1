@@ -102,18 +102,22 @@ if ($hasPutty -and $SSH_PASSWORD -and -not $NoPassword) {
     
     # Upload (using -sftp for safer binary transfer)
     & pscp.exe -sftp -batch -P $SSH_PORT -pw $SSH_PASSWORD $ZIP_PATH "$SSH_USER@$SSH_HOST`:$remoteZip"
+    if ($LASTEXITCODE -ne 0) { Write-Host "Upload failed!" -ForegroundColor Red; exit 1 }
     
     Write-Host "[5/5] Extracting via PuTTY (plink) automatically..." -ForegroundColor Yellow
     # Use -batch and -T to disable interactive prompts and pseudo-terminal allocation
     $plinkCommand = "echo. | plink.exe -batch -T -P $SSH_PORT -pw ""$SSH_PASSWORD"" $SSH_USER@$SSH_HOST ""$unzipCmd"""
     cmd.exe /c $plinkCommand
+    if ($LASTEXITCODE -ne 0) { Write-Host "Extraction failed!" -ForegroundColor Red; exit 1 }
 }
 else {
     Write-Host "[4/5] Uploading build.tar.gz to server..." -ForegroundColor Yellow
     & scp -P $SSH_PORT -o StrictHostKeyChecking=no $ZIP_PATH "$SSH_USER@$SSH_HOST`:$remoteZip"
+    if ($LASTEXITCODE -ne 0) { Write-Host "Upload failed!" -ForegroundColor Red; exit 1 }
     
     Write-Host "[5/5] Extracting on server..." -ForegroundColor Yellow
     & ssh -p $SSH_PORT -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" $unzipCmd
+    if ($LASTEXITCODE -ne 0) { Write-Host "Extraction failed!" -ForegroundColor Red; exit 1 }
 }
 
 # Clean local archive

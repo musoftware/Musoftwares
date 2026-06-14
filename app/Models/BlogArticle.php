@@ -63,7 +63,7 @@ class BlogArticle extends Model
         return $slug;
     }
 
-    public function service()
+    public function service(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\Modules\Marketplace\Models\Service::class);
     }
