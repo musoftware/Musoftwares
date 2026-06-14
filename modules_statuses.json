@@ -15,5 +15,6 @@
     "AffiliatePos": true,
     "PaymentGateway": true,
     "CRM": true,
-    "PasswordSync": true
+    "PasswordSync": true,
+    "WebTools": true
 }

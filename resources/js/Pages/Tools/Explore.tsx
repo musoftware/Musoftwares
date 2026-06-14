@@ -824,12 +824,12 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
 
             {/* Desktop Area */}
             <div 
-                className="flex-1 p-4 md:p-6 overflow-hidden relative"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={handleDesktopDrop}
+                className={`flex-1 p-4 md:p-6 overflow-x-hidden relative ${isMobile ? 'grid grid-cols-3 sm:grid-cols-4 gap-y-6 gap-x-2 overflow-y-auto content-start z-10' : 'overflow-hidden'}`}
+                onDragOver={(e) => { if (!isMobile) e.preventDefault(); }}
+                onDrop={(e) => { if (!isMobile) handleDesktopDrop(e); }}
             >
                 {desktopItems.map((item) => {
-                    const style: React.CSSProperties = {
+                    const style: React.CSSProperties = isMobile ? { position: 'relative' } : {
                         position: 'absolute',
                         left: (item.x || 0) * CELL_WIDTH,
                         top: (item.y || 0) * CELL_HEIGHT,
@@ -1006,7 +1006,9 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                             onClick={handleCreateFolder}
                             className="h-10 px-3 flex items-center justify-center text-slate-300 hover:bg-white/10 rounded transition-colors text-xs font-medium gap-2"
                         >
-                            <FolderPlus className="w-4 h-4 text-yellow-400" />{__('general.new_folder')}</button>
+                            <FolderPlus className="w-4 h-4 text-yellow-400" />
+                            <span className="hidden md:inline">{__('general.new_folder')}</span>
+                        </button>
                     </div>
 
                     {/* Running Apps */}
@@ -1044,7 +1046,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                     {showPrayerTimes && nextPrayer && (
                         <div 
                             onContextMenu={handleHidePrayerTimes}
-                            className="flex items-center gap-3 px-4 border-r border-white/10 mr-2 h-full cursor-pointer hover:bg-white/5 transition-colors"
+                            className="hidden md:flex items-center gap-3 px-4 border-r border-white/10 mr-2 h-full cursor-pointer hover:bg-white/5 transition-colors"
                             title={__('general.right_click_to_hide')}
                         >
                             <span className="text-lg">🕌</span>
@@ -1060,12 +1062,12 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                     
                     <button 
                         onClick={toggleFullscreen}
-                        className="h-full px-3 flex items-center justify-center hover:bg-white/10 transition-colors text-slate-300"
+                        className="hidden md:flex h-full px-3 items-center justify-center hover:bg-white/10 transition-colors text-slate-300"
                         title={__('general.toggle_fullscreen')}
                     >
                         {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
                     </button>
-                    <div className="flex flex-col items-end justify-center px-3 hover:bg-white/10 h-full transition-colors cursor-default">
+                    <div className="hidden md:flex flex-col items-end justify-center px-3 hover:bg-white/10 h-full transition-colors cursor-default">
                         <span>{formatTime(currentTime)}</span>
                         <span>{formatDate(currentTime)}</span>
                     </div>

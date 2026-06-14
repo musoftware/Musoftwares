@@ -283,7 +283,6 @@ class DashboardService
     {
         return [
             'stats'               => $this->getClientStats($user),
-            'pendingInvoices'     => $this->getPendingInvoices($user),
             'recentTransactions'  => $this->getRecentTransactions($user),
             'chartData'           => $this->getWalletChartData($user),
             'activeToolLicenses'  => $this->getActiveToolLicenses($user),
@@ -388,30 +387,7 @@ class DashboardService
         return (float) $erpMonthly + (float) $toolsMonthly;
     }
 
-    private function getPendingInvoices(User $user)
-    {
-        return $user->invoices()
-            ->whereIn('status', ['unpaid', 'partially_paid'])
-            ->orderBy('created_at', 'asc')
-            ->limit(5)
-            ->get()
-            ->map(function ($invoice) {
-                $currencyObj = \App\Models\Currency::find($invoice->currency);
-                if (!$currencyObj) {
-                    throw new \Exception("Invoice {$invoice->id} is missing a valid currency.");
-                }
-                
-                return [
-                    'id' => $invoice->id,
-                    'dbId' => $invoice->id,
-                    'date' => $invoice->created_at?->format('M d, Y') ?? '-',
-                    'amount' => (float) $invoice->unpaid_total(),
-                    'status' => $invoice->created_at && $invoice->created_at->diffInDays(now()) > 30 ? 'overdue' : 'due_soon',
-                    'description' => 'Invoice #' . $invoice->id,
-                    'currency' => $currencyObj,
-                ];
-            });
-    }
+
 
     private function getRecentTransactions(User $user)
     {

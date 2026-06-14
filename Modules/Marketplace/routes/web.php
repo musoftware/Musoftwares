@@ -12,6 +12,11 @@ Route::middleware('web')
 
         // ── Public ────────────────────────────────────────────────────────
         Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+        
+        // Navigation API
+        Route::get('/api/categories', function () {
+            return response()->json(\Modules\Marketplace\Models\ServiceCategory::all());
+        })->withoutMiddleware(['auth']); // Ensure it is public
 
         // ── Auth-only ─────────────────────────────────────────────────────
         Route::middleware('auth')->group(function () {

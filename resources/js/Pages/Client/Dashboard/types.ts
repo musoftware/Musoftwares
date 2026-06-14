@@ -25,15 +25,6 @@ export interface DashboardStats {
     currency: Currency;
 }
 
-export interface PendingInvoice {
-    id: string;
-    dbId: number;
-    date: string;
-    amount: number;
-    status: string;
-    description: string;
-    currency: Currency | null;
-}
 
 export interface RecentTransaction {
     id: string;

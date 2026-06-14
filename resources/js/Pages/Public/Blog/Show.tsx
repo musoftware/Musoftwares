@@ -90,9 +90,9 @@ export default function Show({ article }: ShowProps) {
                 <div className="max-w-4xl mx-auto px-6 relative z-10">
                     {/* Back Button */}
                     <div className="mb-8">
-                        <Link href="/admin/blog-articles">
+                        <Link href="/blog">
                             <Button variant="ghost" className="gap-2 text-slate-500 hover:text-slate-900 transition-colors">
-                                <ArrowLeft className="h-4 w-4" />{__('general.back_to_manager')}</Button>
+                                <ArrowLeft className="h-4 w-4" />{__('general.back_to_articles')}</Button>
                         </Link>
                     </div>
 

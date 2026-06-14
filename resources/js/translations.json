@@ -356,7 +356,13 @@
             "price": "price",
             "saved_replies": "saved_replies",
             "select": "select",
-            "yes": "yes"
+            "yes": "yes",
+            "currency_options_not_configured": "currency options not configured",
+            "email": "email",
+            "log_in_to_continue_payment": "log in to continue payment",
+            "login_url": "login url",
+            "payment_link_session_expired": "payment link session expired",
+            "your_musoftwares_account": "your musoftwares account"
         },
         "crm": {
             "actions": "actions",
@@ -7122,7 +7128,34 @@
             "due_soon": "يستحق قريباً",
             "kashier": "كاشير",
             "expenses": "المصروفات",
-            "deposits": "الإيداعات"
+            "deposits": "الإيداعات",
+            "client_mode": "العميل",
+            "seller_mode": "البائع",
+            "about": "about",
+            "become_a_seller": "become a seller",
+            "blog": "blog",
+            "buying_on_musoftware": "buying on musoftware",
+            "careers": "careers",
+            "categories": "categories",
+            "community": "community",
+            "community_standards": "community standards",
+            "digital_marketing": "digital marketing",
+            "explore": "explore",
+            "forum": "forum",
+            "graphics_design": "graphics design",
+            "help_support": "help support",
+            "investor_relations": "investor relations",
+            "join": "join",
+            "more_from_musoftware": "more from musoftware",
+            "orders": "orders",
+            "podcast": "podcast",
+            "profile": "profile",
+            "programming_tech": "programming tech",
+            "selling_on_musoftware": "selling on musoftware",
+            "support": "support",
+            "trust_safety": "trust safety",
+            "video_animation": "video animation",
+            "writing_translation": "writing translation"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -7416,7 +7449,9 @@
             "available_payment_methods_and_dedicated": "طرق الدفع المتاحة والأرقام المخصصة",
             "have_your_developer_read_the": "Have your developer read the documentation to implement the checkout flow.",
             "set_up_your_webhook_endpoint": "Set up your webhook endpoint to receive real-time payment success notifications.",
-            "pay_via_card_gateway": "الدفع عبر البطاقة\/البوابة"
+            "pay_via_card_gateway": "الدفع عبر البطاقة\/البوابة",
+            "equiv": "equiv",
+            "amount_egp": "amount egp"
         },
         "services": {
             "ai": {
@@ -8059,7 +8094,13 @@
             "price": "price",
             "saved_replies": "saved_replies",
             "select": "select",
-            "yes": "yes"
+            "yes": "yes",
+            "currency_options_not_configured": "currency options not configured",
+            "email": "email",
+            "log_in_to_continue_payment": "log in to continue payment",
+            "login_url": "login url",
+            "payment_link_session_expired": "payment link session expired",
+            "your_musoftwares_account": "your musoftwares account"
         },
         "crm": {
             "actions": "actions",
@@ -14824,7 +14865,34 @@
             "due_soon": "Due Soon",
             "kashier": "Kashier",
             "expenses": "Expenses",
-            "deposits": "Deposits"
+            "deposits": "Deposits",
+            "client_mode": "Client",
+            "seller_mode": "Seller",
+            "about": "about",
+            "become_a_seller": "become a seller",
+            "blog": "blog",
+            "buying_on_musoftware": "buying on musoftware",
+            "careers": "careers",
+            "categories": "categories",
+            "community": "community",
+            "community_standards": "community standards",
+            "digital_marketing": "digital marketing",
+            "explore": "explore",
+            "forum": "forum",
+            "graphics_design": "graphics design",
+            "help_support": "help support",
+            "investor_relations": "investor relations",
+            "join": "join",
+            "more_from_musoftware": "more from musoftware",
+            "orders": "orders",
+            "podcast": "podcast",
+            "profile": "profile",
+            "programming_tech": "programming tech",
+            "selling_on_musoftware": "selling on musoftware",
+            "support": "support",
+            "trust_safety": "trust safety",
+            "video_animation": "video animation",
+            "writing_translation": "writing translation"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -15118,7 +15186,9 @@
             "available_payment_methods_and_dedicated": "Available payment methods and dedicated numbers",
             "have_your_developer_read_the": "Have your developer read the documentation to implement the checkout flow.",
             "set_up_your_webhook_endpoint": "Set up your webhook endpoint to receive real-time payment success notifications.",
-            "pay_via_card_gateway": "Pay with Card"
+            "pay_via_card_gateway": "Pay with Card",
+            "equiv": "equiv",
+            "amount_egp": "amount egp"
         },
         "services": {
             "ai": {

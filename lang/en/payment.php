@@ -41,4 +41,6 @@ return [
   'have_your_developer_read_the' => 'Have your developer read the documentation to implement the checkout flow.',
   'set_up_your_webhook_endpoint' => 'Set up your webhook endpoint to receive real-time payment success notifications.',
   'pay_via_card_gateway' => 'Pay with Card',
+    'equiv' => 'equiv',
+    'amount_egp' => 'amount egp'
 ];
