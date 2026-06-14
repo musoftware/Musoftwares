@@ -2791,12 +2791,6 @@ parameters:
 			path: app/Helpers/UnifiedPointsHelper.php
 
 		-
-			message: '#^Relation ''service'' is not found in App\\Models\\BlogArticle model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/Admin/AdminBlogArticleController.php
-
-		-
 			message: '#^Relation ''user'' is not found in App\\Models\\RecurringBusyTime model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
@@ -3065,12 +3059,6 @@ parameters:
 			identifier: larastan.relationExistence
 			count: 3
 			path: app/Http/Controllers/Admin/UsersController.php
-
-		-
-			message: '#^Relation ''service'' is not found in App\\Models\\BlogArticle model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/BlogController.php
 
 		-
 			message: '#^Anonymous function has an unused use \$user\.$#'

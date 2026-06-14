@@ -220,9 +220,7 @@ export function statusColor(status: string): string {
  */
 export function safeRoute(name: string, params?: any, fallbackUrl?: string): string {
     try {
-        // @ts-expect-error - ignore this
         if (typeof route !== 'undefined') {
-            // @ts-expect-error - ignore this
             return route(name, params);
         }
     } catch (e) {

@@ -5685,5 +5685,6 @@ return [
     'support' => 'support',
     'trust_safety' => 'trust safety',
     'video_animation' => 'video animation',
-    'writing_translation' => 'writing translation'
+    'writing_translation' => 'writing translation',
+    'our_blog' => 'مدونتنا'
 ];
