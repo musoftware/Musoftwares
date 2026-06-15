@@ -20,7 +20,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { 
     Bell, ChevronDown, Wallet, Menu, Plus, Coins, LogOut, 
-    Settings, User, History, Shield, CreditCard, Box, 
+    Settings, User, Users, History, Shield, CreditCard, Box, 
     LayoutDashboard, FileText, ArrowRightLeft, ArrowUpRight,
     MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone, Play, Lock, Calendar, Radar, Wrench, Download
 } from 'lucide-react';
@@ -334,6 +334,9 @@ function AuthenticatedContent({
                                                     <CreditCard className="w-4 h-4 text-slate-400" />{__('general.payout_methods')}</Link>
                                                 <Link href={safeRoute('billing.invoices.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
                                                     <FileText className="w-4 h-4 text-slate-400" />{__('general.my_invoices')}</Link>
+                                                <Link href={safeRoute('referrals.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-indigo-50 text-sm font-medium text-indigo-700">
+                                                    <Users className="w-4 h-4 text-indigo-400" />{__('general.referrals')} & Affiliates
+                                                </Link>
                                             </div>
                                         </div>
                                         <div>

@@ -5690,4 +5690,26 @@ return [
 ,
     'your_new_login_details' => 'تفاصيل تسجيل الدخول الجديدة الخاصة بك',
     'password_reset_success_email_sent' => 'تم إعادة تعيين كلمة المرور بنجاح وتم إرسال بريد إلكتروني! يمكنك أيضاً نسخ التفاصيل أدناه:',
+
+    // Sprint 1 Homepage Additions
+    'landing_problem_badge' => 'التحدي',
+    'landing_problem_title' => 'لماذا تفشل الحلول الحالية؟',
+    'landing_problem_desc' => 'تعاني معظم الشركات من أدوات متناثرة، عمليات يدوية، وبيانات منعزلة. نحن نحل هذه المشكلة بتوحيد مساحة عملك.',
+    'landing_benefits_badge' => 'ميزة MuSoftwares',
+    'landing_benefits_title' => 'حوّل عمليات أعمالك',
+    'landing_benefits_desc' => 'استمتع بتكامل سلس، تدفق عمل مؤتمت، وموثوقية على مستوى المؤسسات.',
+    'landing_statistics_badge' => 'بالأرقام',
+    'landing_statistics_title' => 'تأثيرنا ونمونا',
+    'landing_statistics_desc' => 'انضم إلى مئات الشركات التي تثق في MuSoftwares لتحولها الرقمي.',
+    'landing_testimonials_badge' => 'نجاح العملاء',
+    'landing_testimonials_title' => 'ماذا يقول عملاؤنا',
+    'landing_testimonials_desc' => 'اكتشف كيف ساعدنا الشركات على التوسع وأتمتة عملياتهم.',
+    'landing_footer_cta_title' => 'مستعد لتحويل أعمالك؟',
+    'landing_footer_cta_desc' => 'تواصل مع خبرائنا لمناقشة متطلبات مشروعك.',
+    
+    // Sprint 2 Additions
+    'landing_trusted_by' => 'موثوق من قبل شركات مبتكرة',
+    'landing_portfolio_challenge' => 'التحدي',
+    'landing_portfolio_solution' => 'الحل الذي قدمناه',
+    'landing_portfolio_technologies' => 'التقنيات المستخدمة',
 ];

@@ -5865,4 +5865,26 @@ return [
 ,
     'your_new_login_details' => 'Your New Login Details',
     'password_reset_success_email_sent' => 'Password reset successful and email sent! You can also copy the details below:',
+
+    // Sprint 1 Homepage Additions
+    'landing_problem_badge' => 'The Challenge',
+    'landing_problem_title' => 'Why Current Solutions Fail',
+    'landing_problem_desc' => 'Most businesses struggle with fragmented tools, manual processes, and isolated data. We solve this by unifying your workspace.',
+    'landing_benefits_badge' => 'The MuSoftwares Advantage',
+    'landing_benefits_title' => 'Transform Your Business Operations',
+    'landing_benefits_desc' => 'Experience seamless integration, automated workflows, and enterprise-level reliability.',
+    'landing_statistics_badge' => 'By the Numbers',
+    'landing_statistics_title' => 'Our Impact and Growth',
+    'landing_statistics_desc' => 'Join hundreds of companies that trust MuSoftwares for their digital transformation.',
+    'landing_testimonials_badge' => 'Client Success',
+    'landing_testimonials_title' => 'What Our Clients Say',
+    'landing_testimonials_desc' => 'Discover how we\'ve helped businesses scale and automate their operations.',
+    'landing_footer_cta_title' => 'Ready to transform your business?',
+    'landing_footer_cta_desc' => 'Get in touch with our experts to discuss your project requirements.',
+    
+    // Sprint 2 Additions
+    'landing_trusted_by' => 'Trusted by innovative companies',
+    'landing_portfolio_challenge' => 'The Challenge',
+    'landing_portfolio_solution' => 'Our Solution',
+    'landing_portfolio_technologies' => 'Technologies Used',
 ];

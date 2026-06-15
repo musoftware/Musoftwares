@@ -38,4 +38,7 @@ return [
     'webhook_send_failed' => 'webhook_send_failed',
     'webhook_updated_success' => 'webhook_updated_success',
     'device_limit_reached' => 'تم الوصول للحد الأقصى للأجهزة. لا يمكنك إضافة المزيد.',
+    'embed_modules' => 'تضمين الوحدات',
+    'share_referral_desc' => 'شارك رابط الإحالة الخاص بك لكسب عمولة من جميع المدفوعات التي يقوم بها الأشخاص الذين دعوتهم.',
+    'your_referral_link' => 'رابط الإحالة الخاص بك',
 ];

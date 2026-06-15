@@ -21,7 +21,7 @@ export default function Index({ auth, referral, commission_percentage }: any) {
     };
 
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AuthenticatedLayout>
             <Head title={__('general.referrals')} />
 
             <div className="py-12">
