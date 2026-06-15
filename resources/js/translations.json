@@ -7158,7 +7158,25 @@
             "writing_translation": "writing translation",
             "our_blog": "مدونتنا",
             "your_new_login_details": "تفاصيل تسجيل الدخول الجديدة الخاصة بك",
-            "password_reset_success_email_sent": "تم إعادة تعيين كلمة المرور بنجاح وتم إرسال بريد إلكتروني! يمكنك أيضاً نسخ التفاصيل أدناه:"
+            "password_reset_success_email_sent": "تم إعادة تعيين كلمة المرور بنجاح وتم إرسال بريد إلكتروني! يمكنك أيضاً نسخ التفاصيل أدناه:",
+            "landing_problem_badge": "التحدي",
+            "landing_problem_title": "لماذا تفشل الحلول الحالية؟",
+            "landing_problem_desc": "تعاني معظم الشركات من أدوات متناثرة، عمليات يدوية، وبيانات منعزلة. نحن نحل هذه المشكلة بتوحيد مساحة عملك.",
+            "landing_benefits_badge": "ميزة MuSoftwares",
+            "landing_benefits_title": "حوّل عمليات أعمالك",
+            "landing_benefits_desc": "استمتع بتكامل سلس، تدفق عمل مؤتمت، وموثوقية على مستوى المؤسسات.",
+            "landing_statistics_badge": "بالأرقام",
+            "landing_statistics_title": "تأثيرنا ونمونا",
+            "landing_statistics_desc": "انضم إلى مئات الشركات التي تثق في MuSoftwares لتحولها الرقمي.",
+            "landing_testimonials_badge": "نجاح العملاء",
+            "landing_testimonials_title": "ماذا يقول عملاؤنا",
+            "landing_testimonials_desc": "اكتشف كيف ساعدنا الشركات على التوسع وأتمتة عملياتهم.",
+            "landing_footer_cta_title": "مستعد لتحويل أعمالك؟",
+            "landing_footer_cta_desc": "تواصل مع خبرائنا لمناقشة متطلبات مشروعك.",
+            "landing_trusted_by": "موثوق من قبل شركات مبتكرة",
+            "landing_portfolio_challenge": "التحدي",
+            "landing_portfolio_solution": "الحل الذي قدمناه",
+            "landing_portfolio_technologies": "التقنيات المستخدمة"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -7410,7 +7428,10 @@
             "webhook_registered_success_v2": "webhook_registered_success_v2",
             "webhook_send_failed": "webhook_send_failed",
             "webhook_updated_success": "webhook_updated_success",
-            "device_limit_reached": "تم الوصول للحد الأقصى للأجهزة. لا يمكنك إضافة المزيد."
+            "device_limit_reached": "تم الوصول للحد الأقصى للأجهزة. لا يمكنك إضافة المزيد.",
+            "embed_modules": "تضمين الوحدات",
+            "share_referral_desc": "شارك رابط الإحالة الخاص بك لكسب عمولة من جميع المدفوعات التي يقوم بها الأشخاص الذين دعوتهم.",
+            "your_referral_link": "رابط الإحالة الخاص بك"
         },
         "payment": {
             "cost_line_already_recorded": "cost_line_already_recorded",
@@ -14898,7 +14919,25 @@
             "writing_translation": "writing translation",
             "our_blog": "Our Blog",
             "your_new_login_details": "Your New Login Details",
-            "password_reset_success_email_sent": "Password reset successful and email sent! You can also copy the details below:"
+            "password_reset_success_email_sent": "Password reset successful and email sent! You can also copy the details below:",
+            "landing_problem_badge": "The Challenge",
+            "landing_problem_title": "Why Current Solutions Fail",
+            "landing_problem_desc": "Most businesses struggle with fragmented tools, manual processes, and isolated data. We solve this by unifying your workspace.",
+            "landing_benefits_badge": "The MuSoftwares Advantage",
+            "landing_benefits_title": "Transform Your Business Operations",
+            "landing_benefits_desc": "Experience seamless integration, automated workflows, and enterprise-level reliability.",
+            "landing_statistics_badge": "By the Numbers",
+            "landing_statistics_title": "Our Impact and Growth",
+            "landing_statistics_desc": "Join hundreds of companies that trust MuSoftwares for their digital transformation.",
+            "landing_testimonials_badge": "Client Success",
+            "landing_testimonials_title": "What Our Clients Say",
+            "landing_testimonials_desc": "Discover how we've helped businesses scale and automate their operations.",
+            "landing_footer_cta_title": "Ready to transform your business?",
+            "landing_footer_cta_desc": "Get in touch with our experts to discuss your project requirements.",
+            "landing_trusted_by": "Trusted by innovative companies",
+            "landing_portfolio_challenge": "The Challenge",
+            "landing_portfolio_solution": "Our Solution",
+            "landing_portfolio_technologies": "Technologies Used"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -15150,7 +15189,10 @@
             "webhook_registered_success_v2": "webhook_registered_success_v2",
             "webhook_send_failed": "webhook_send_failed",
             "webhook_updated_success": "webhook_updated_success",
-            "device_limit_reached": "Device limit reached. You cannot add more devices."
+            "device_limit_reached": "Device limit reached. You cannot add more devices.",
+            "embed_modules": "Embed Modules",
+            "share_referral_desc": "Share your referral link to earn a commission from all payments made by your referrals.",
+            "your_referral_link": "Your Referral Link"
         },
         "payment": {
             "cost_line_already_recorded": "cost_line_already_recorded",

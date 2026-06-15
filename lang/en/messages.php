@@ -38,4 +38,7 @@ return [
     'webhook_send_failed' => 'webhook_send_failed',
     'webhook_updated_success' => 'webhook_updated_success',
     'device_limit_reached' => 'Device limit reached. You cannot add more devices.',
+    'embed_modules' => 'Embed Modules',
+    'share_referral_desc' => 'Share your referral link to earn a commission from all payments made by your referrals.',
+    'your_referral_link' => 'Your Referral Link',
 ];

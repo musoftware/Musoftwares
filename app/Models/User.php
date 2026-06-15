@@ -509,6 +509,39 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the affiliate commission percentage for this user
+     * Returns the percentage as a multiplier (e.g., 1.01 for 1%)
+     */
+    public function getAffiliateCommissionPercentage()
+    {
+        $pct = $this->affiliate_commission_percentage ?? 1;
+        return (float) $pct / 100.0 + 1;
+    }
+
+    /**
+     * Check if commission should be added to invoice total
+     */
+    public function shouldAddCommissionToTotal()
+    {
+        return $this->add_commission_to_total ?? false;
+    }
+
+    /**
+     * Calculate commission amount based on the base amount.
+     */
+    public function calculateCommissionAmount($baseAmount, $currencyId = null, $referredUser = null)
+    {
+        $commissionPercentage = $this->getAffiliateCommissionPercentage();
+        $commissionAmount = $baseAmount * ($commissionPercentage - 1);
+
+        if ($currencyId && $currencyId != $this->currency_id) {
+            $commissionAmount = \App\Models\CurrenciesExchange::RateToday($commissionAmount, $this->currency_id, $currencyId);
+        }
+
+        return round($commissionAmount, 2);
+    }
+
+    /**
      * Legacy referral calculation method.
      * Preserved to prevent undefined method errors in Invoice.php.
      */

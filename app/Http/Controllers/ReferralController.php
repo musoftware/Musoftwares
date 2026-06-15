@@ -38,7 +38,8 @@ class ReferralController extends Controller
         }
 
         return Inertia::render('Client/Dashboard/Referrals/Index', [
-            'referral' => $referral
+            'referral' => $referral,
+            'commission_percentage' => $user->getAffiliateCommissionPercentage()
         ]);
     }
 

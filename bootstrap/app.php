@@ -45,6 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'erp.team.permissions' => \Modules\ERP\Http\Middleware\EnforceTeamMemberPermissions::class,
             'reseller.sharing' => \App\Http\Middleware\ResellerSharingGuard::class,
             'force.json' => \App\Http\Middleware\ForceJsonRequest::class,
+            'embed' => \App\Http\Middleware\VerifyEmbedKey::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
