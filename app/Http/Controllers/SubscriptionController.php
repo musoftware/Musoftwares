@@ -360,7 +360,7 @@ class SubscriptionController extends Controller
         return back()->withErrors(['error' => 'Custom plans not supported in legacy system.']);
     }
 
-    public function calculateCustomPrice(Request $request)
+    public function calculateCustomPrice(Request $request, \App\Services\IpGeolocationService $geoService)
     {
         $request->validate([
             'items' => 'nullable|array',
@@ -368,17 +368,29 @@ class SubscriptionController extends Controller
         ]);
 
         $user = Auth::user();
-        $currencyId = 1; // Default to USD
-        $currencyCode = 'USD';
         
-        if ($user) {
-            $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
-            $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
-            
-            $currencyId = $user->currency_id ?: $egpCurrencyId;
-            $userCurrency = \App\Models\Currency::find($currencyId);
-            $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
+        $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
+        $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
+        
+        $currencyId = null;
+        
+        if ($user && $user->currency_id) {
+            $currencyId = $user->currency_id;
+        } else {
+            $ipCurrencyCode = $geoService->getCurrencyCodeForIp($request->ip());
+            if ($ipCurrencyCode) {
+                $ipCurrency = \App\Models\Currency::where('currency', $ipCurrencyCode)->first();
+                if ($ipCurrency) {
+                    $currencyId = $ipCurrency->id;
+                }
+            }
+            if (!$currencyId) {
+                $currencyId = $usdCurrencyId;
+            }
         }
+        
+        $userCurrency = \App\Models\Currency::find($currencyId);
+        $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
 
         $items = $request->input('items', []);
         $billingCycle = $request->input('billing_cycle', '1_month');
