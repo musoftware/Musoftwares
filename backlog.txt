@@ -1,0 +1,254 @@
+<USER_REQUEST>
+@[d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\resources\js\Pages\Public] لو هدفك تحويل التحليل السابق إلى Epic/Stories داخل Jira لتحسين موقع MuSoftwares، فده Backlog مرتب حسب الأولوية:
+
+# EPIC 1: Improve Homepage Conversion
+
+## Story 1.1 – Redesign Hero Section
+
+**Description**
+Replace generic headline with a value-focused proposition that clearly communicates business outcomes.
+
+**Acceptance Criteria**
+
+* New headline focuses on business value.
+* Subheadline explains primary services.
+* CTA visible above the fold.
+* Mobile responsive.
+
+**Priority:** Highest
+
+---
+
+## Story 1.2 – Add Primary CTA System
+
+**Description**
+Create a consistent CTA strategy across the website.
+
+**Acceptance Criteria**
+
+* Sticky CTA button on desktop.
+* CTA appears in Hero.
+* CTA appears before Footer.
+* Contact form connected.
+
+**Priority:** Highest
+
+---
+
+## Story 1.3 – Add Trust Indicators
+
+**Description**
+Display company achievements and credibility metrics.
+
+**Acceptance Criteria**
+
+* Statistics section added.
+* Support configurable values.
+* Animated counters.
+* Responsive layout.
+
+**Priority:** High
+
+---
+
+# EPIC 2: Build Social Proof
+
+## Story 2.1 – Testimonials Section
+
+**Description**
+Display client reviews and success feedback.
+
+**Acceptance Criteria**
+
+* Support multiple testimonials.
+* Client name and company.
+* Carousel component.
+* Admin manageable.
+
+**Priority:** Highest
+
+---
+
+## Story 2.2 – Client Logos Section
+
+**Description**
+Display companies served by MuSoftwares.
+
+**Acceptance Criteria**
+
+* Responsive logo grid.
+* Lazy loading.
+* Hover states.
+
+**Priority:** High
+
+---
+
+# EPIC 3: Portfolio Transformation
+
+## Story 3.1 – Convert Portfolio to Case Studies
+
+**Description**
+Transform projects from screenshots into business case studies.
+
+**Acceptance Criteria**
+Each project includes:
+
+* Challenge
+* Solution
+* Technologie
+<truncated 3278 bytes>
+ل من "شركة تعرض شغلها" إلى "شركة تبيع خدماتها وتولد Leads".
+
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-15T03:23:16+03:00.
+
+The user's current state is as follows:
+Active Document: d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\musoftwares.com\mermaids\financial_calculations.mmd (LANGUAGE_UNSPECIFIED)
+Cursor is on line: 1
+Other open documents:
+- d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\musoftwares.com\mermaids\architecture.mmd (LANGUAGE_UNSPECIFIED)
+- d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\musoftwares.com\mermaids\prd_use_cases.mmd (LANGUAGE_UNSPECIFIED)
+- d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\musoftwares.com\mermaids\workflow.mmd (LANGUAGE_UNSPECIFIED)
+- d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\musoftwares.com\generate_blades_mermaids.php (LANGUAGE_PHP)
+- d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\musoftwares.com\generate_controllers_mermaids.php (LANGUAGE_PHP)
+Running terminal commands:
+- php artisan serve (in d:\Projects\1AOrganized\PythonProjects\HossamSakr\WhatsappRegistationSystem\laravel, running for 11h5m50s)
+- d:\Projects\1AOrganized\PythonProjects\HossamSakr\WhatsappRegistrationWorkers... (in d:\Projects\1AOrganized\PythonProjects\HossamSakr\WhatsappRegistrationWorkers\otpjob, running for 2h38m13s)
+
+The user has mentioned some items in the form @[ITEM]. Here is extra information about the items that were mentioned by the user, in the order that they appear:
+
+@[d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\resources\js\Pages\Public] is a [File]:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\resources\js\Pages\Public
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from None to Gemini 3.1 Pro (High). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>
+<USER_REQUEST>
+@[d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\resources\js\Pages\Public] لو هدفك تحويل التحليل السابق إلى Epic/Stories داخل Jira لتحسين موقع MuSoftwares، فده Backlog مرتب حسب الأولوية:
+
+# EPIC 1: Improve Homepage Conversion
+
+## Story 1.1 – Redesign Hero Section
+
+**Description**
+Replace generic headline with a value-focused proposition that clearly communicates business outcomes.
+
+**Acceptance Criteria**
+
+* New headline focuses on business value.
+* Subheadline explains primary services.
+* CTA visible above the fold.
+* Mobile responsive.
+
+**Priority:** Highest
+
+---
+
+## Story 1.2 – Add Primary CTA System
+
+**Description**
+Create a consistent CTA strategy across the website.
+
+**Acceptance Criteria**
+
+* Sticky CTA button on desktop.
+* CTA appears in Hero.
+* CTA appears before Footer.
+* Contact form connected.
+
+**Priority:** Highest
+
+---
+
+## Story 1.3 – Add Trust Indicators
+
+**Description**
+Display company achievements and credibility metrics.
+
+**Acceptance Criteria**
+
+* Statistics section added.
+* Support configurable values.
+* Animated counters.
+* Responsive layout.
+
+**Priority:** High
+
+---
+
+# EPIC 2: Build Social Proof
+
+## Story 2.1 – Testimonials Section
+
+**Description**
+Display client reviews and success feedback.
+
+**Acceptance Criteria**
+
+* Support multiple testimonials.
+* Client name and company.
+* Carousel component.
+* Admin manageable.
+
+**Priority:** Highest
+
+---
+
+## Story 2.2 – Client Logos Section
+
+**Description**
+Display companies served by MuSoftwares.
+
+**Acceptance Criteria**
+
+* Responsive logo grid.
+* Lazy loading.
+* Hover states.
+
+**Priority:** High
+
+---
+
+# EPIC 3: Portfolio Transformation
+
+## Story 3.1 – Convert Portfolio to Case Studies
+
+**Description**
+Transform projects from screenshots into business case studies.
+
+**Acceptance Criteria**
+Each project includes:
+
+* Challenge
+* Solution
+* Technologie
+<truncated 3278 bytes>
+ل من "شركة تعرض شغلها" إلى "شركة تبيع خدماتها وتولد Leads".
+
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-15T03:23:16+03:00.
+
+The user's current state is as follows:
+Active Document: d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\musoftwares.com\mermaids\financial_calculations.mmd (LANGUAGE_UNSPECIFIED)
+Cursor is on line: 1
+Other open documents:
+- d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\musoftwares.com\mermaids\architecture.mmd (LANGUAGE_UNSPECIFIED)
+- d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\musoftwares.com\mermaids\prd_use_cases.mmd (LANGUAGE_UNSPECIFIED)
+- d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\musoftwares.com\mermaids\workflow.mmd (LANGUAGE_UNSPECIFIED)
+- d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\musoftwares.com\generate_blades_mermaids.php (LANGUAGE_PHP)
+- d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\musoftwares.com\generate_controllers_mermaids.php (LANGUAGE_PHP)
+Running terminal commands:
+- php artisan serve (in d:\Projects\1AOrganized\PythonProjects\HossamSakr\WhatsappRegistationSystem\laravel, running for 11h5m50s)
+- d:\Projects\1AOrganized\PythonProjects\HossamSakr\WhatsappRegistrationWorkers... (in d:\Projects\1AOrganized\PythonProjects\HossamSakr\WhatsappRegistrationWorkers\otpjob, running for 2h38m13s)
+
+The user has mentioned some items in the form @[ITEM]. Here is extra information about the items that were mentioned by the user, in the order that they appear:
+
+@[d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\resources\js\Pages\Public] is a [File]:
+d:\Projects\1AOrganized\PhpProject\MusoftwareBusiness\Musoftwares\resources\js\Pages\Public
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from None to Gemini 3.1 Pro (High). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>
