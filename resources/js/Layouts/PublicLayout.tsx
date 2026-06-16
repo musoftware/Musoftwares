@@ -91,15 +91,15 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
             items: servicesItems
         },
         {
-            id: 'solutions',
-            label: 'Solutions',
-            href: '/solutions',
+            id: 'saas',
+            label: 'SaaS Tools',
+            href: '/platforms',
             items: [
-                { title: 'Healthcare', desc: 'Secure medical operations', href: '/solutions/healthcare' },
-                { title: 'Education', desc: 'Digital campus platforms', href: '/solutions/education' },
-                { title: 'E-commerce', desc: 'High-volume retail systems', href: '/solutions/ecommerce' },
-                { title: 'Real Estate', desc: 'Property management infrastructure', href: '/solutions/real-estate' },
-                { title: 'Finance', desc: 'Compliant financial platforms', href: '/solutions/finance' },
+                { title: 'MU ERP', desc: 'Enterprise Resource Planning & Automation', href: '/platforms/erp' },
+                { title: 'MU CRM', desc: 'Customer Relationship Management', href: '/platforms/crm' },
+                { title: 'Smart Booking', desc: 'Advanced scheduling & calendars', href: '/pricing' },
+                { title: 'Affiliate & POS', desc: 'Multi-vendor e-commerce & retail', href: '/pricing' },
+                { title: 'Gold Saver', desc: 'Live gold portfolio management', href: '/pricing' },
             ]
         },
         {
@@ -372,15 +372,15 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             </div>
                         </div>
 
-                        {/* Solutions */}
+                        {/* SaaS Tools */}
                         <div>
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">Solutions</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">SaaS Tools</h3>
                             <ul className="space-y-4">
-                                <li><Link href="/solutions" className="text-sm hover:text-slate-900 transition-colors">Healthcare</Link></li>
-                                <li><Link href="/solutions" className="text-sm hover:text-slate-900 transition-colors">Real Estate</Link></li>
-                                <li><Link href="/solutions" className="text-sm hover:text-slate-900 transition-colors">Education</Link></li>
-                                <li><Link href="/solutions" className="text-sm hover:text-slate-900 transition-colors">E-commerce</Link></li>
-                                <li><Link href="/solutions" className="text-sm hover:text-slate-900 transition-colors">Finance</Link></li>
+                                <li><Link href="/platforms/erp" className="text-sm hover:text-slate-900 transition-colors">MU ERP</Link></li>
+                                <li><Link href="/platforms/crm" className="text-sm hover:text-slate-900 transition-colors">MU CRM</Link></li>
+                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">Smart Booking</Link></li>
+                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">Affiliate & POS</Link></li>
+                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">Gold Saver</Link></li>
                             </ul>
                         </div>
 
@@ -408,7 +408,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                         <div>
                             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">Resources</h3>
                             <ul className="space-y-4">
-                                <li><Link href="/solutions" className="text-sm hover:text-slate-900 transition-colors">Case Studies</Link></li>
+                                <li><Link href="/portfolio" className="text-sm hover:text-slate-900 transition-colors">Case Studies</Link></li>
                                 <li><a href="mailto:admin@musoftwares.com" className="text-sm hover:text-slate-900 transition-colors">Documentation</a></li>
                                 <li><a href="mailto:admin@musoftwares.com" className="text-sm hover:text-slate-900 transition-colors">API Reference</a></li>
                                 <li><Link href="/company" className="text-sm hover:text-slate-900 transition-colors">Security</Link></li>

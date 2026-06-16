@@ -1,11 +1,49 @@
+import { useRef } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Check, Info, ArrowRight } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { __ } from '@/lib/i18n';
 import PricingBuilder from '@/Components/PricingBuilder';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Pricing({ currency = 'USD', serviceItems = [] }) {
+    const mainRef = useRef(null);
+
+    useGSAP(() => {
+        const sections = gsap.utils.toArray('.reveal-section');
+        sections.forEach((section) => {
+            const elements = section.querySelectorAll('.gsap-fade-up');
+            gsap.fromTo(elements, 
+                { opacity: 0, y: 20 },
+                {
+                    opacity: 1, 
+                    y: 0, 
+                    duration: 0.7,
+                    stagger: 0.08,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top 85%",
+                        toggleActions: "play none none reverse"
+                    }
+                }
+            );
+        });
+
+        document.documentElement.style.scrollSnapType = 'y proximity';
+        document.documentElement.style.overflowY = 'scroll';
+        
+        return () => {
+            document.documentElement.style.scrollSnapType = '';
+            document.documentElement.style.overflowY = '';
+        };
+    }, { scope: mainRef });
+
     return (
         <PublicLayout>
             <Head>
@@ -13,147 +51,161 @@ export default function Pricing({ currency = 'USD', serviceItems = [] }) {
                 <meta name="description" content={__('frontend.pricing.meta_description')} />
             </Head>
 
-            <section className="pt-32 pb-16 lg:pt-48 lg:pb-24 bg-white border-b border-slate-100">
-                <div className="max-w-[90rem] mx-auto px-6 lg:px-8">
-                    <div className="text-center max-w-3xl mx-auto mb-20">
-                        <h1 className="text-5xl lg:text-7xl font-extrabold text-slate-900 tracking-tight leading-[1.1] mb-6">
-                            {__('frontend.pricing.title')}
-                        </h1>
-                        <p className="text-xl text-slate-500 font-light">
-                            {__('frontend.pricing.subtitle')}
-                        </p>
-                    </div>
+            <style>{`
+                .snap-section { scroll-snap-align: start; }
+                html { scroll-behavior: smooth; }
+            `}</style>
 
-                    {/* SaaS Subscriptions Section */}
-                    <div className="mb-12">
-                        <h2 className="text-3xl font-bold text-slate-900 mb-4 text-center">{__('frontend.pricing.saas_plans')}</h2>
-                        <p className="text-slate-500 font-light text-center mb-12">{__('frontend.pricing.saas_subtitle')}</p>
-                        
-                        <div className="max-w-7xl mx-auto">
-                            <PricingBuilder 
-                                serviceItems={serviceItems} 
-                                currency={currency} 
-                                isNewSystem={true} 
-                            />
+            <div ref={mainRef} className="w-full bg-[#fafafa] text-[#111111] font-sans selection:bg-[#111111] selection:text-white overflow-x-hidden">
+                
+                {/* Hero Section */}
+                <section className="snap-section pt-32 pb-16 lg:pt-48 lg:pb-24 bg-[#fafafa] border-b border-[#e5e5e5] reveal-section">
+                    <div className="max-w-[80rem] mx-auto px-6 lg:px-8">
+                        <div className="text-center max-w-3xl mx-auto mb-20">
+                            <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-8 bg-white mx-auto">
+                                <span className="flex h-1.5 w-1.5 rounded-full bg-[#111111]"></span>
+                                Pricing
+                            </div>
+                            <h1 className="gsap-fade-up text-5xl lg:text-7xl font-bold text-[#111111] tracking-tight leading-[1.05] mb-6">
+                                {__('frontend.pricing.title')}
+                            </h1>
+                            <p className="gsap-fade-up text-xl text-[#666666] font-normal leading-relaxed">
+                                {__('frontend.pricing.subtitle')}
+                            </p>
+                        </div>
+
+                        {/* SaaS Subscriptions Section */}
+                        <div className="mb-12 gsap-fade-up">
+                            <h2 className="text-2xl font-bold text-[#111111] mb-4 text-center">{__('frontend.pricing.saas_plans')}</h2>
+                            <p className="text-[#666666] text-center mb-12">{__('frontend.pricing.saas_subtitle')}</p>
+                            
+                            <div className="max-w-7xl mx-auto">
+                                {/* Note: PricingBuilder is an external component, its internal styling may need updates separately to perfectly match. We wrap it for now. */}
+                                <PricingBuilder 
+                                    serviceItems={serviceItems} 
+                                    currency={currency} 
+                                    isNewSystem={true} 
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <section className="py-24 lg:py-32 bg-slate-50">
-                <div className="max-w-[90rem] mx-auto px-6 lg:px-8">
-                    <div className="text-center max-w-3xl mx-auto mb-16">
-                        <h2 className="text-4xl font-extrabold text-slate-900 mb-4">{__('frontend.pricing.engineering_blocks')}</h2>
-                        <p className="text-lg text-slate-500 font-light">{__('frontend.pricing.blocks_subtitle')}</p>
-                    </div>
+                <section className="snap-section py-24 lg:py-32 bg-white reveal-section border-b border-[#e5e5e5]">
+                    <div className="max-w-[80rem] mx-auto px-6 lg:px-8">
+                        <div className="text-center max-w-3xl mx-auto mb-16">
+                            <h2 className="gsap-fade-up text-3xl font-bold text-[#111111] mb-4">{__('frontend.pricing.engineering_blocks')}</h2>
+                            <p className="gsap-fade-up text-[#666666]">{__('frontend.pricing.blocks_subtitle')}</p>
+                        </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                        
-                        {/* Maintenance Block */}
-                        <div className="flex flex-col p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 transition-all shadow-sm">
-                            <div className="mb-8">
-                                <h3 className="text-2xl font-bold text-slate-900 mb-2">{__('frontend.pricing.maintenance.title')}</h3>
-                                <p className="text-slate-500 font-light mb-6">{__('frontend.pricing.maintenance.desc')}</p>
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-4xl font-extrabold text-slate-900">{__('frontend.pricing.maintenance.hrs')}</span>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#e5e5e5] border border-[#e5e5e5] max-w-6xl mx-auto">
+                            
+                            {/* Maintenance Block */}
+                            <div className="gsap-fade-up flex flex-col p-10 bg-[#fafafa] transition-colors hover:bg-white relative">
+                                <div className="mb-8">
+                                    <h3 className="text-xl font-bold text-[#111111] mb-2">{__('frontend.pricing.maintenance.title')}</h3>
+                                    <p className="text-[#666666] text-sm leading-relaxed mb-6">{__('frontend.pricing.maintenance.desc')}</p>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-4xl font-bold text-[#111111]">{__('frontend.pricing.maintenance.hrs')}</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <ul className="space-y-4 mb-8">
+                                        <li className="flex gap-3 text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full shrink-0 mt-1.5"></div> {__('frontend.pricing.maintenance.f1')}</li>
+                                        <li className="flex gap-3 text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full shrink-0 mt-1.5"></div> {__('frontend.pricing.maintenance.f2')}</li>
+                                        <li className="flex gap-3 text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full shrink-0 mt-1.5"></div> {__('frontend.pricing.maintenance.f3')}</li>
+                                    </ul>
+                                </div>
+                                <button className="w-full bg-white hover:bg-[#111111] text-[#111111] hover:text-white border border-[#111111] h-12 text-sm font-bold uppercase tracking-widest transition-colors">
+                                    {__('frontend.pricing.maintenance.cta')}
+                                </button>
+                            </div>
+
+                            {/* Implementation Block (Most Popular) */}
+                            <div className="gsap-fade-up flex flex-col p-10 bg-[#111111] text-white relative outline outline-1 outline-[#111111] z-10 scale-[1.02]">
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                                    <span className="bg-white text-[#111111] text-[10px] font-bold uppercase tracking-widest py-1 px-3 border border-[#111111]">
+                                        {__('frontend.pricing.implementation.badge')}
+                                    </span>
+                                </div>
+                                <div className="mb-8 mt-2">
+                                    <h3 className="text-xl font-bold text-white mb-2">{__('frontend.pricing.implementation.title')}</h3>
+                                    <p className="text-[#a0a0a0] text-sm leading-relaxed mb-6">{__('frontend.pricing.implementation.desc')}</p>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-4xl font-bold text-white">{__('frontend.pricing.implementation.hrs')}</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <ul className="space-y-4 mb-8">
+                                        <li className="flex gap-3 text-white text-sm font-semibold"><div className="w-1.5 h-1.5 bg-white rounded-full shrink-0 mt-1.5"></div> {__('frontend.pricing.implementation.f1')}</li>
+                                        <li className="flex gap-3 text-white text-sm font-semibold"><div className="w-1.5 h-1.5 bg-white rounded-full shrink-0 mt-1.5"></div> {__('frontend.pricing.implementation.f2')}</li>
+                                        <li className="flex gap-3 text-white text-sm font-semibold"><div className="w-1.5 h-1.5 bg-white rounded-full shrink-0 mt-1.5"></div> {__('frontend.pricing.implementation.f3')}</li>
+                                    </ul>
+                                </div>
+                                <button className="w-full bg-white hover:bg-[#e5e5e5] text-[#111111] h-12 text-sm font-bold uppercase tracking-widest transition-colors">
+                                    {__('frontend.pricing.implementation.cta')}
+                                </button>
+                            </div>
+
+                            {/* Growth Partner */}
+                            <div className="gsap-fade-up flex flex-col p-10 bg-[#fafafa] transition-colors hover:bg-white relative">
+                                <div className="mb-8">
+                                    <h3 className="text-xl font-bold text-[#111111] mb-2">{__('frontend.pricing.growth.title')}</h3>
+                                    <p className="text-[#666666] text-sm leading-relaxed mb-6">{__('frontend.pricing.growth.desc')}</p>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-4xl font-bold text-[#111111]">{__('frontend.pricing.growth.hrs')}</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <ul className="space-y-4 mb-8">
+                                        <li className="flex gap-3 text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full shrink-0 mt-1.5"></div> {__('frontend.pricing.growth.f1')}</li>
+                                        <li className="flex gap-3 text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full shrink-0 mt-1.5"></div> {__('frontend.pricing.growth.f2')}</li>
+                                        <li className="flex gap-3 text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full shrink-0 mt-1.5"></div> {__('frontend.pricing.growth.f3')}</li>
+                                    </ul>
+                                </div>
+                                <button className="w-full bg-white hover:bg-[#111111] text-[#111111] hover:text-white border border-[#111111] h-12 text-sm font-bold uppercase tracking-widest transition-colors">
+                                    {__('frontend.pricing.growth.cta')}
+                                </button>
+                            </div>
+
+                        </div>
+
+                        {/* Disclaimer */}
+                        <div className="gsap-fade-up mt-16 mb-24 max-w-2xl mx-auto flex items-start sm:items-center gap-4 p-6 bg-[#fafafa] border border-[#e5e5e5]">
+                            <Info className="w-5 h-5 text-[#111111] shrink-0 mt-0.5 sm:mt-0" />
+                            <p className="text-sm text-[#666666] leading-relaxed" dangerouslySetInnerHTML={{ __html: __('frontend.pricing.disclaimer') }}></p>
+                        </div>
+
+                        {/* FAQ Section */}
+                        <div className="max-w-4xl mx-auto pt-10">
+                            <h2 className="gsap-fade-up text-xs font-bold text-[#888888] tracking-widest uppercase mb-12 text-center">{__('frontend.pricing.faq.title')}</h2>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
+                                <div className="gsap-fade-up">
+                                    <h4 className="text-sm font-bold text-[#111111] mb-3">{__('frontend.pricing.faq.q1')}</h4>
+                                    <p className="text-[#666666] text-sm leading-relaxed">{__('frontend.pricing.faq.a1')}</p>
+                                </div>
+                                
+                                <div className="gsap-fade-up">
+                                    <h4 className="text-sm font-bold text-[#111111] mb-3">{__('frontend.pricing.faq.q2')}</h4>
+                                    <p className="text-[#666666] text-sm leading-relaxed">{__('frontend.pricing.faq.a2')}</p>
+                                </div>
+                                
+                                <div className="gsap-fade-up">
+                                    <h4 className="text-sm font-bold text-[#111111] mb-3">{__('frontend.pricing.faq.q3')}</h4>
+                                    <p className="text-[#666666] text-sm leading-relaxed">{__('frontend.pricing.faq.a3')}</p>
+                                </div>
+                                
+                                <div className="gsap-fade-up">
+                                    <h4 className="text-sm font-bold text-[#111111] mb-3">{__('frontend.pricing.faq.q4')}</h4>
+                                    <p className="text-[#666666] text-sm leading-relaxed">{__('frontend.pricing.faq.a4')}</p>
                                 </div>
                             </div>
-                            <div className="flex-1">
-                                <ul className="space-y-4 mb-8">
-                                    <li className="flex gap-3 text-slate-600 font-light"><Check className="w-5 h-5 text-slate-400 shrink-0" /> {__('frontend.pricing.maintenance.f1')}</li>
-                                    <li className="flex gap-3 text-slate-600 font-light"><Check className="w-5 h-5 text-slate-400 shrink-0" /> {__('frontend.pricing.maintenance.f2')}</li>
-                                    <li className="flex gap-3 text-slate-600 font-light"><Check className="w-5 h-5 text-slate-400 shrink-0" /> {__('frontend.pricing.maintenance.f3')}</li>
-                                </ul>
-                            </div>
-                            <Button className="w-full bg-slate-50 hover:bg-slate-100 text-slate-900 border border-slate-200 rounded-full h-12 font-semibold">
-                                {__('frontend.pricing.maintenance.cta')}
-                            </Button>
-                        </div>
-
-                        {/* Implementation Block (Most Popular) */}
-                        <div className="flex flex-col p-8 rounded-3xl bg-slate-900 text-white shadow-xl relative transform md:-translate-y-4">
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                                <span className="bg-slate-100 text-slate-900 text-xs font-bold uppercase tracking-widest py-1 px-3 rounded-full">
-                                    {__('frontend.pricing.implementation.badge')}
-                                </span>
-                            </div>
-                            <div className="mb-8 mt-2">
-                                <h3 className="text-2xl font-bold text-white mb-2">{__('frontend.pricing.implementation.title')}</h3>
-                                <p className="text-slate-400 font-light mb-6">{__('frontend.pricing.implementation.desc')}</p>
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-4xl font-extrabold text-white">{__('frontend.pricing.implementation.hrs')}</span>
-                                </div>
-                            </div>
-                            <div className="flex-1">
-                                <ul className="space-y-4 mb-8">
-                                    <li className="flex gap-3 text-slate-300 font-light"><Check className="w-5 h-5 text-slate-500 shrink-0" /> {__('frontend.pricing.implementation.f1')}</li>
-                                    <li className="flex gap-3 text-slate-300 font-light"><Check className="w-5 h-5 text-slate-500 shrink-0" /> {__('frontend.pricing.implementation.f2')}</li>
-                                    <li className="flex gap-3 text-slate-300 font-light"><Check className="w-5 h-5 text-slate-500 shrink-0" /> {__('frontend.pricing.implementation.f3')}</li>
-                                </ul>
-                            </div>
-                            <Button className="w-full bg-white hover:bg-slate-100 text-slate-900 rounded-full h-12 font-bold">
-                                {__('frontend.pricing.implementation.cta')}
-                            </Button>
-                        </div>
-
-                        {/* Growth Partner */}
-                        <div className="flex flex-col p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 transition-all shadow-sm">
-                            <div className="mb-8">
-                                <h3 className="text-2xl font-bold text-slate-900 mb-2">{__('frontend.pricing.growth.title')}</h3>
-                                <p className="text-slate-500 font-light mb-6">{__('frontend.pricing.growth.desc')}</p>
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-4xl font-extrabold text-slate-900">{__('frontend.pricing.growth.hrs')}</span>
-                                </div>
-                            </div>
-                            <div className="flex-1">
-                                <ul className="space-y-4 mb-8">
-                                    <li className="flex gap-3 text-slate-600 font-light"><Check className="w-5 h-5 text-slate-400 shrink-0" /> {__('frontend.pricing.growth.f1')}</li>
-                                    <li className="flex gap-3 text-slate-600 font-light"><Check className="w-5 h-5 text-slate-400 shrink-0" /> {__('frontend.pricing.growth.f2')}</li>
-                                    <li className="flex gap-3 text-slate-600 font-light"><Check className="w-5 h-5 text-slate-400 shrink-0" /> {__('frontend.pricing.growth.f3')}</li>
-                                </ul>
-                            </div>
-                            <Button className="w-full bg-slate-50 hover:bg-slate-100 text-slate-900 border border-slate-200 rounded-full h-12 font-semibold">
-                                {__('frontend.pricing.growth.cta')}
-                            </Button>
                         </div>
 
                     </div>
-
-                    {/* Disclaimer */}
-                    <div className="mt-16 mb-24 text-center max-w-2xl mx-auto flex items-start sm:items-center justify-center gap-3 p-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                        <Info className="w-5 h-5 text-slate-400 shrink-0 mt-0.5 sm:mt-0" />
-                        <p className="text-sm text-slate-600 font-light text-left sm:text-center" dangerouslySetInnerHTML={{ __html: __('frontend.pricing.disclaimer') }}></p>
-                    </div>
-
-                    {/* FAQ Section */}
-                    <div className="max-w-4xl mx-auto pt-10">
-                        <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">{__('frontend.pricing.faq.title')}</h2>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-                            <div>
-                                <h4 className="text-lg font-bold text-slate-900 mb-2">{__('frontend.pricing.faq.q1')}</h4>
-                                <p className="text-slate-500 font-light leading-relaxed">{__('frontend.pricing.faq.a1')}</p>
-                            </div>
-                            
-                            <div>
-                                <h4 className="text-lg font-bold text-slate-900 mb-2">{__('frontend.pricing.faq.q2')}</h4>
-                                <p className="text-slate-500 font-light leading-relaxed">{__('frontend.pricing.faq.a2')}</p>
-                            </div>
-                            
-                            <div>
-                                <h4 className="text-lg font-bold text-slate-900 mb-2">{__('frontend.pricing.faq.q3')}</h4>
-                                <p className="text-slate-500 font-light leading-relaxed">{__('frontend.pricing.faq.a3')}</p>
-                            </div>
-                            
-                            <div>
-                                <h4 className="text-lg font-bold text-slate-900 mb-2">{__('frontend.pricing.faq.q4')}</h4>
-                                <p className="text-slate-500 font-light leading-relaxed">{__('frontend.pricing.faq.a4')}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </section>
+                </section>
+            </div>
         </PublicLayout>
     );
 }

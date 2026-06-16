@@ -1,670 +1,437 @@
-import { useState, useRef, useEffect } from 'react';
-import { __ } from '@/lib/i18n';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { useRef } from 'react';
+import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Button } from '@/Components/ui/button';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    Monitor, Smartphone, Server, CheckCircle, 
-    ArrowRight, LayoutDashboard, Ticket, FolderKanban, X,
-    Users, MessageSquare, TrendingUp, Calendar, Store, Wrench,
-    Download, MessageCircle, Search, Box, Star, Quote, Zap, Shield, Rocket, ArrowUpRight, BarChart
-} from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/Components/ui/accordion";
+import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
+import { Smartphone, Globe, Bot, Server, CheckCircle2, MessageSquare, ArrowRight, UserCircle, Star, Terminal } from 'lucide-react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 
-const testimonialsData = [
-    { name: 'Ahmed Hassan', company: 'TechVision', text: 'MuSoftwares completely transformed how we handle our internal operations. The ERP system is intuitive and powerful.', rating: 5 },
-    { name: 'Sara El-Sayed', company: 'RetailPro', text: 'The custom POS and inventory system they built for us saved us hundreds of hours every month. Highly recommended.', rating: 5 },
-    { name: 'Mohamed Ali', company: 'Global Logistics', text: 'Excellent team and unparalleled support. Their SaaS solutions are reliable and scale perfectly with our business growth.', rating: 5 },
-    { name: 'Omar Youssef', company: 'StartUp Inc', text: 'They delivered our platform ahead of schedule with exceptional quality. Their attention to detail is truly impressive.', rating: 5 },
-];
+gsap.registerPlugin(ScrollTrigger);
 
-const statisticsData = [
-    { value: '500+', label: 'Projects Delivered' },
-    { value: '99%', label: 'Client Satisfaction' },
-    { value: '24/7', label: 'Support Available' },
-    { value: '50+', label: 'Enterprise Clients' }
-];
+export default function Home() {
+    const mainRef = useRef(null);
+    const phoneNumber = "201015218548";
 
-const clientsData = [
-    { name: "AMC Academy", logo: "/images/clients/amcacademy.png" },
-    { name: "Aswan", logo: "/images/clients/aswan.png" },
-    { name: "Egy Servers", logo: "/images/clients/egy-servers.png" },
-    { name: "Jad Technology", logo: "/images/clients/jad-technology.png" },
-    { name: "Mini Fatora", logo: "/images/clients/mini-fatora.png" },
-    { name: "MIT", logo: "/images/clients/mit.png" },
-    { name: "My Line", logo: "/images/clients/my-line.png" },
-    { name: "OBD Ultra", logo: "/images/clients/obdultra.png" },
-    { name: "Technosoft", logo: "/images/clients/technosoft.png" },
-    { name: "Topline", logo: "/images/clients/topline.png" },
-];
+    useGSAP(() => {
+        const sections = gsap.utils.toArray('.reveal-section');
+        sections.forEach((section) => {
+            const elements = section.querySelectorAll('.gsap-fade-up');
+            gsap.fromTo(elements, 
+                { opacity: 0, y: 30 },
+                {
+                    opacity: 1, 
+                    y: 0, 
+                    duration: 0.8,
+                    stagger: 0.1,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top 85%",
+                        toggleActions: "play none none reverse"
+                    }
+                }
+            );
+        });
+    }, { scope: mainRef });
 
-const fadeUp = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
-};
+    const openWhatsApp = (msg) => {
+        const encodedMessage = encodeURIComponent(msg);
+        window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+    };
 
-const staggerContainer = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: { staggerChildren: 0.1 }
-    }
-};
-
-const portfolioItems = [
-    { img: '/images/portfolio/kbdny.png', titleKey: 'portfolio_kbdny_title', descKey: 'portfolio_kbdny_desc', cat: 'Platform' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/stockmanager.png', titleKey: 'portfolio_stock_manager_title', descKey: 'portfolio_stock_manager_desc', cat: 'ERP' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/minifatora.png', titleKey: 'portfolio_mini_fatora_title', descKey: 'portfolio_mini_fatora_desc', cat: 'SaaS' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/vodafone-crm.jpg', titleKey: 'portfolio_vodafone_crm_title', descKey: 'portfolio_vodafone_crm_desc', cat: 'CRM' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/amcacademy.jpg', titleKey: 'portfolio_amc_academy', descKey: 'portfolio_amc_academy_desc', cat: 'E-Learning' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/projectmanager.png', titleKey: 'portfolio_project_manager', descKey: 'portfolio_project_manager_desc', cat: 'Management' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/telecom-system.png', titleKey: 'portfolio_telecom_system_title', descKey: 'portfolio_telecom_system_desc', cat: 'Platform' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/altayaraa.png', titleKey: 'portfolio_altayaraa_title', descKey: 'portfolio_altayaraa_desc', cat: 'E-Commerce' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/forex-app.png', titleKey: 'portfolio_forex_app_title', descKey: 'portfolio_forex_app_desc', cat: 'Mobile App' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/amcsocial.png', titleKey: 'portfolio_amc_social', descKey: 'portfolio_amc_social_desc', cat: 'Platform' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/nokhpa.png', titleKey: 'portfolio_nokhpa_title', descKey: 'portfolio_nokhpa_desc', cat: 'E-Commerce' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/duplicate-finder.jpg', titleKey: 'portfolio_duplicate_finder_title', descKey: 'portfolio_duplicate_finder_desc', cat: 'Desktop App' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/map-extractor.jpg', titleKey: 'portfolio_map_extractor_title', descKey: 'portfolio_map_extractor_desc', cat: 'Desktop App' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/instagram-manager.png', titleKey: 'portfolio_instagram_manager_title', descKey: 'portfolio_instagram_manager_desc', cat: 'Desktop App' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/whatsapp-sender.png', titleKey: 'portfolio_whatsapp_sender_title', descKey: 'portfolio_whatsapp_sender_desc', cat: 'Desktop App' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/telegram-sender.png', titleKey: 'portfolio_telegram_sender_title', descKey: 'portfolio_telegram_sender_desc', cat: 'Desktop App' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/inbox-sender.png', titleKey: 'portfolio_inbox_sender_title', descKey: 'portfolio_inbox_sender_desc', cat: 'Desktop App' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/heic-converter.png', titleKey: 'portfolio_heic_converter_title', descKey: 'portfolio_heic_converter_desc', cat: 'Desktop App' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/text-studio.jpg', titleKey: 'portfolio_text_studio_title', descKey: 'portfolio_text_studio_desc', cat: 'Desktop App' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/amctasks-downloader.png', titleKey: 'portfolio_amc_tasks_downloader', descKey: 'portfolio_amc_tasks_downloader_desc', cat: 'Desktop App' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/stocktalk.png', titleKey: 'portfolio_stocktalk_ai_title', descKey: 'portfolio_stocktalk_ai_desc', cat: 'AI & Bot' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/forex.png', titleKey: 'portfolio_forex_bot_title', descKey: 'portfolio_forex_bot_desc', cat: 'AI & Bot' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/revFlow.png', titleKey: 'portfolio_revflow_title', descKey: 'portfolio_revflow_desc', cat: 'SaaS' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/chartcash.png', titleKey: 'portfolio_chartcash_title', descKey: 'portfolio_chartcash_desc', cat: 'Dashboard' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/chrome-ext-fb-id.png', titleKey: 'portfolio_fb_id_extractor_title', descKey: 'portfolio_fb_id_extractor_desc', cat: 'Extension' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/khamsat-notifier.jpg', titleKey: 'portfolio_khamsat_notifier_title', descKey: 'portfolio_khamsat_notifier_desc', cat: 'Extension' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/amemailcontrols.png', titleKey: 'portfolio_am_email_controls', descKey: 'portfolio_am_email_controls_desc', cat: 'Extension' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-    { img: '/images/portfolio/amctasks.jpg', titleKey: 'portfolio_amc_tasks', descKey: 'portfolio_amc_tasks_desc', cat: 'ERP' , challenge: 'Faced with operational inefficiencies and scattered data, the client needed a unified system.', solution: 'We built a comprehensive, scalable platform tailored to their workflow.', techs: ['React', 'Laravel', 'PostgreSQL']},
-];
-
-export default function Home({ serviceItems = [], currency = 'USD' }) {
-    const [selectedItem, setSelectedItem] = useState(null);
-    const carouselRef = useRef(null);
-    const testimonialsRef = useRef(null);
-    const [width, setWidth] = useState(0);
-    const [testiWidth, setTestiWidth] = useState(0);
-    const { website_services, locale } = usePage().props;
-
-    useEffect(() => {
-        if (carouselRef.current) {
-            setWidth(carouselRef.current.scrollWidth - carouselRef.current.offsetWidth);
+    const services = [
+        {
+            title: "Mobile Applications",
+            icon: Smartphone,
+            features: ["Native Android", "Native iOS", "Cross Platform"],
+            cta: "Request an App",
+            msg: "Hello Mahmoud, I want to build a mobile app."
+        },
+        {
+            title: "Websites",
+            icon: Globe,
+            features: ["Corporate Sites", "E-commerce", "Dashboards"],
+            cta: "Request a Website",
+            msg: "Hello Mahmoud, I need a professional website."
+        },
+        {
+            title: "Bots & AI",
+            icon: Bot,
+            features: ["Telegram Bots", "WhatsApp Automation", "AI Assistants"],
+            cta: "Request a Bot",
+            msg: "Hello Mahmoud, I am interested in Bot & AI automation."
+        },
+        {
+            title: "Servers & Systems",
+            icon: Server,
+            features: ["VPS Setup", "Deployment", "Infrastructure"],
+            cta: "Request Server Setup",
+            msg: "Hello Mahmoud, I need help with servers and deployment."
         }
-        if (testimonialsRef.current) {
-            setTestiWidth(testimonialsRef.current.scrollWidth - testimonialsRef.current.offsetWidth);
+    ];
+
+    const portfolio = [
+        {
+            name: "ArabiJobs Platform",
+            img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1200",
+            description: "ArabiJobs is a recruitment platform that helps companies post job openings, manage applications, and find qualified candidates. Job seekers can browse opportunities, create profiles, and apply online through a simple and fast experience.",
+            features: [
+                "Job posting and management",
+                "Candidate applications",
+                "Recruiter dashboard",
+                "Search and filtering",
+                "User profiles"
+            ],
+            techs: ["Laravel", "Redis", "MySQL"]
+        },
+        {
+            name: "Business Automation SaaS",
+            img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200",
+            description: "This is a business management tool that helps companies organize their daily operations. Instead of using multiple disconnected apps, teams can manage their tasks, generate reports, and track team performance all in one place.",
+            features: [
+                "Task and project tracking",
+                "Automated daily reporting",
+                "Team collaboration tools",
+                "Custom dashboards",
+                "Role-based access control"
+            ],
+            techs: ["Python", "FastAPI", "React"]
+        },
+        {
+            name: "AMC Academy",
+            img: "/images/portfolio/amcacademy.jpg",
+            description: "AMC Academy is an educational platform designed specifically for students to access high-quality courses, track their learning progress, and interact with instructors. It provides a complete digital learning environment with full administrative control.",
+            features: [
+                "Online course streaming",
+                "Student progress tracking",
+                "Interactive exams & quizzes",
+                "Instructor dashboard",
+                "Secure payment gateway"
+            ],
+            techs: ["React", "Laravel", "PostgreSQL"]
+        },
+        {
+            name: "AmcTasks.com",
+            img: "/images/portfolio/amctasks.jpg",
+            description: "AmcTasks is a specialized team collaboration and project management tool. It replaces messy spreadsheets and disjointed communication by giving teams a centralized hub to assign work, set deadlines, and track overall progress efficiently.",
+            features: [
+                "Team task assignments",
+                "Project progress tracking",
+                "Internal team messaging",
+                "Automated notifications",
+                "File sharing & storage"
+            ],
+            techs: ["Next.js", "Node.js", "MongoDB"]
         }
-    }, [carouselRef.current, testimonialsRef.current]);
+    ];
+
+    const techStack = ["Next.js", "React", "Node.js", "PostgreSQL", "Docker", "VPS", "Telegram APIs", "AI Integrations"];
 
     return (
         <PublicLayout>
             <Head>
-                <title>{__('general.musoftware_unified_workspace') || 'Musoftware'}</title>
-                <meta name="description" content={__('general.landing_hero_subtitle')} />
+                <title>Musoftware | Turning Ideas into Reality</title>
+                <meta name="description" content="Musoftware - We build scalable systems, mobile apps, and robust websites." />
             </Head>
 
-            {/* HERO SECTION */}
-            <section className="relative pt-32 pb-24 lg:pt-48 lg:pb-32 overflow-hidden bg-white">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 via-white to-white opacity-90"></div>
+            <FloatingWhatsAppButton phoneNumber={phoneNumber} defaultMessage="Hello Mahmoud, I want to discuss a new project!" />
+
+            <div ref={mainRef} className="w-full bg-[#fcfcfc] text-[#111111] font-sans selection:bg-[#111111] selection:text-white">
                 
-                <div className="absolute top-20 right-0 -mr-48 opacity-10 pointer-events-none">
-                    <svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
-                        <g stroke="#000" strokeWidth="1" fill="none" fillRule="evenodd">
-                            <path d="M400 0v800M0 400h800M200 0v800M600 0v800M0 200h800M0 600h800" opacity="0.2"/>
-                            <circle cx="400" cy="400" r="200" strokeDasharray="5,5" />
-                            <circle cx="400" cy="400" r="300" strokeDasharray="5,5" />
-                            <path d="M200 200l400 400M200 600L600 200" />
-                        </g>
-                    </svg>
-                </div>
+                {/* 1. Service Grid (Hero Replacement) */}
+                <section className="pt-32 pb-20 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
+                    <div className="text-center mb-16">
+                        <h1 className="gsap-fade-up text-5xl md:text-6xl font-extrabold tracking-tight mb-6 text-[#111111]">
+                            What can we build for you?
+                        </h1>
+                        <p className="gsap-fade-up text-xl text-[#666666] max-w-2xl mx-auto leading-relaxed">
+                            Stop wrestling with disjointed tools. We engineer highly cohesive and horizontally scalable software tailored to your business needs.
+                        </p>
+                    </div>
 
-                <div className="max-w-[90rem] mx-auto px-6 lg:px-8 relative z-10 text-center">
-                    <div className="max-w-4xl mx-auto">
-                        <motion.div 
-                            initial="hidden"
-                            animate="visible"
-                            variants={staggerContainer}
-                        >
-                            <motion.h1 variants={fadeUp} className="text-5xl lg:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.1] mb-8">
-                                {__('general.landing_hero_title')}
-                            </motion.h1>
-                            <motion.p variants={fadeUp} className="text-xl lg:text-2xl text-slate-500 leading-relaxed font-light mb-12 max-w-2xl mx-auto">
-                                {__('general.landing_hero_subtitle')}
-                            </motion.p>
-                            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {services.map((service, idx) => (
+                            <div key={idx} className="gsap-fade-up bg-white p-8 border border-[#e5e5e5] rounded-xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-10px_rgba(0,0,0,0.1)] transition-all flex flex-col h-full group">
+                                <div className="w-16 h-16 bg-[#f4f4f5] group-hover:bg-[#111111] transition-colors rounded-full flex items-center justify-center mb-6">
+                                    <service.icon className="w-8 h-8 text-[#111111] group-hover:text-white transition-colors" />
+                                </div>
+                                <h3 className="text-2xl font-bold mb-4">{service.title}</h3>
+                                <ul className="space-y-3 mb-8 flex-grow">
+                                    {service.features.map((feature, i) => (
+                                        <li key={i} className="flex items-center gap-3 text-[#444444]">
+                                            <CheckCircle2 className="w-4 h-4 text-[#111111]" />
+                                            <span className="text-sm font-medium">{feature}</span>
+                                        </li>
+                                    ))}
+                                </ul>
                                 <Button 
-                                    onClick={() => window.dispatchEvent(new Event('open-guest-ticket'))}
-                                    size="lg" 
-                                    className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white rounded-full px-10 h-14 text-base font-semibold transition-all shadow-lg hover:shadow-xl"
+                                    onClick={() => openWhatsApp(service.msg)}
+                                    className="w-full bg-[#111111] hover:bg-[#333333] text-white rounded-lg py-6 text-sm font-bold tracking-wide uppercase transition-all"
                                 >
-                                    {__('general.submit_guest_ticket') || 'Submit Guest Ticket'} <ArrowRight className="ml-2 w-5 h-5" />
+                                    {service.cta}
                                 </Button>
-                                <Link href="/platforms">
-                                    <Button size="lg" variant="outline" className="w-full sm:w-auto hover:bg-slate-50 text-slate-900 border-slate-200 rounded-full px-10 h-14 text-base font-semibold transition-all">
-                                        {__('general.landing_hero_secondary_cta')}
-                                    </Button>
-                                </Link>
-                            </motion.div>
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
-
-            {/* CLIENT LOGOS SECTION */}
-            <section className="py-12 bg-white border-t border-slate-100 overflow-hidden">
-                <div className="max-w-[90rem] mx-auto px-6 lg:px-8">
-                    <p className="text-center text-sm font-semibold text-slate-400 uppercase tracking-widest mb-8">
-                        {__('general.landing_trusted_by')}
-                    </p>
-                    
-                    {/* Marquee Container */}
-                    <div className="relative flex overflow-x-hidden group">
-                        <motion.div
-                            className="flex items-center gap-12 sm:gap-24 pr-12 sm:pr-24"
-                            animate={{ x: ["0%", "-50%"] }}
-                            transition={{ repeat: Infinity, ease: "linear", duration: 25 }}
-                        >
-                            {/* We render the array twice to create a seamless infinite loop */}
-                            {[...clientsData, ...clientsData].map((client, index) => (
-                                <img 
-                                    key={`client-${index}`} 
-                                    src={client.logo} 
-                                    alt={client.name} 
-                                    className="h-10 md:h-12 w-auto object-contain shrink-0 opacity-50 grayscale hover:grayscale-0 transition-all duration-300" 
-                                />
-                            ))}
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
-
-            {/* PROBLEM SECTION */}
-            <section className="py-24 lg:py-32 bg-slate-50 relative border-t border-slate-100">
-                <div className="max-w-[90rem] mx-auto px-6 lg:px-8">
-                    <div className="mb-16 text-center max-w-3xl mx-auto">
-                        <p className="text-sm font-semibold text-rose-500 uppercase tracking-widest mb-4">
-                            {__('general.landing_problem_badge')}
-                        </p>
-                        <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-6">
-                            {__('general.landing_problem_title')}
-                        </h2>
-                        <p className="text-xl text-slate-500 font-light leading-relaxed">
-                            {__('general.landing_problem_desc')}
-                        </p>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm relative overflow-hidden group hover:border-rose-200 hover:shadow-md transition-all duration-300">
-                            <div className="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center mb-6">
-                                <Server className="w-6 h-6 text-rose-500" />
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Fragmented Tools</h3>
-                            <p className="text-slate-500 leading-relaxed">Using different platforms for CRM, accounting, and task management creates data silos.</p>
-                        </div>
-                        <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm relative overflow-hidden group hover:border-amber-200 hover:shadow-md transition-all duration-300">
-                            <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center mb-6">
-                                <Monitor className="w-6 h-6 text-amber-500" />
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Manual Processes</h3>
-                            <p className="text-slate-500 leading-relaxed">Wasting hundreds of hours on manual data entry and repetitive administrative tasks.</p>
-                        </div>
-                        <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm relative overflow-hidden group hover:border-blue-200 hover:shadow-md transition-all duration-300">
-                            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-6">
-                                <BarChart className="w-6 h-6 text-blue-500" />
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Lack of Visibility</h3>
-                            <p className="text-slate-500 leading-relaxed">Unable to make quick decisions due to scattered metrics and delayed reporting.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* SERVICES SECTION */}
-            <section id="services" className="py-24 lg:py-32 bg-white relative border-t border-slate-100">
-                <div className="max-w-[90rem] mx-auto px-6 lg:px-8">
-                    <div className="mb-20 text-center">
-                        <p className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-4">
-                            {__('general.landing_services_badge')}
-                        </p>
-                        <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
-                            {__('general.landing_services_title')}
-                        </h2>
-                        <p className="text-xl text-slate-500 font-light max-w-2xl mx-auto">
-                            {__('general.landing_services_desc')}
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {website_services && website_services.length > 0 ? (
-                            website_services.map((service) => (
-                                <Link href={route('website-services.show', service.slug)} key={service.id} className="group bg-white rounded-3xl p-10 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 block text-left">
-                                    <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-8 text-slate-700 group-hover:bg-slate-900 transition-all duration-300 overflow-hidden">
-                                        {(locale === 'ar' ? service.primary_image_ar : service.primary_image_en) ? (
-                                            <img src={`/${locale === 'ar' ? service.primary_image_ar : service.primary_image_en}`} alt={locale === 'ar' ? service.title_ar : service.title_en} className="w-full h-full object-cover group-hover:opacity-90" />
-                                        ) : (
-                                            <Box className="w-7 h-7 group-hover:text-white" />
-                                        )}
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-slate-900 mb-4">{locale === 'ar' ? service.title_ar : service.title_en}</h3>
-                                    <p className="text-lg text-slate-500 font-light leading-relaxed">
-                                        {locale === 'ar' ? (service.description_ar || service.subtitle_ar || '') : (service.description_en || service.subtitle_en || '')}
-                                    </p>
-                                </Link>
-                            ))
-                        ) : (
-                            <p className="col-span-1 md:col-span-3 text-center text-slate-500 py-12">No services available.</p>
-                        )}
-                    </div>
-                </div>
-            </section>
-
-            {/* SAAS SECTION */}
-            <section className="py-24 lg:py-32 bg-slate-50 relative border-t border-slate-200">
-                <div className="max-w-[90rem] mx-auto px-6 lg:px-8">
-                    <div className="text-center max-w-3xl mx-auto mb-16">
-                        <p className="text-sm font-semibold text-emerald-600 uppercase tracking-widest mb-4">
-                            {__('general.landing_saas_badge')}
-                        </p>
-                        <h2 className="text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight mb-6">
-                            {__('general.landing_saas_title')}
-                        </h2>
-                        <p className="text-xl text-slate-600 font-light leading-relaxed">
-                            {__('general.landing_saas_desc')}
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {/* 1. ERP - Spans 2 columns & 2 rows on large screens */}
-                        <div className="group bg-white rounded-3xl p-10 border border-slate-200 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-500 md:col-span-2 md:row-span-2 relative overflow-hidden">
-                            <div className="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-all duration-500"></div>
-                            <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
-                                <Server className="w-8 h-8 text-emerald-600" />
-                            </div>
-                            <h3 className="text-3xl font-bold text-slate-900 mb-4">{__('general.module_erp_title')}</h3>
-                            <p className="text-slate-600 leading-relaxed text-lg max-w-md">
-                                {__('general.module_erp_desc')}
-                            </p>
-                            <div className="mt-8 pt-8 border-t border-slate-100 grid grid-cols-2 gap-4">
-                                <div>
-                                    <p className="font-semibold text-slate-900 mb-1">Invoicing & Billing</p>
-                                    <p className="text-sm text-slate-500">Multi-currency financial tracking</p>
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-slate-900 mb-1">Project Management</p>
-                                    <p className="text-sm text-slate-500">Timers, tasks, and team collaboration</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 2. CRM */}
-                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-500 relative overflow-hidden">
-                            <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-all duration-500"></div>
-                            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                                <Users className="w-7 h-7 text-blue-600" />
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_crm_title')}</h3>
-                            <p className="text-slate-600 leading-relaxed text-sm relative z-10">
-                                {__('general.module_crm_desc')}
-                            </p>
-                        </div>
-
-                        {/* 3. SMS Gateway */}
-                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-indigo-500/50 hover:shadow-2xl hover:shadow-indigo-900/5 transition-all duration-500 relative overflow-hidden">
-                            <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all duration-500"></div>
-                            <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                                <MessageSquare className="w-7 h-7 text-indigo-600" />
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_sms_title')}</h3>
-                            <p className="text-slate-600 leading-relaxed text-sm relative z-10">
-                                {__('general.module_sms_desc')}
-                            </p>
-                        </div>
-
-                        {/* 4. Gold Saver */}
-                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-amber-500/50 hover:shadow-2xl hover:shadow-amber-900/5 transition-all duration-500 relative overflow-hidden xl:row-span-2">
-                            <div className="absolute top-0 right-0 w-full h-32 bg-gradient-to-b from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                            <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
-                                <TrendingUp className="w-7 h-7 text-amber-600" />
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3 relative z-10">{__('general.module_gold_title')}</h3>
-                            <p className="text-slate-600 leading-relaxed text-sm relative z-10">
-                                {__('general.module_gold_desc')}
-                            </p>
-                        </div>
-
-                        {/* 5. Booking */}
-                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-rose-500/50 hover:shadow-2xl hover:shadow-rose-900/5 transition-all duration-500 relative overflow-hidden">
-                            <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                                <Calendar className="w-7 h-7 text-rose-600" />
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_booking_title')}</h3>
-                            <p className="text-slate-600 leading-relaxed text-sm">
-                                {__('general.module_booking_desc')}
-                            </p>
-                        </div>
-
-                        {/* 6. POS */}
-                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-teal-500/50 hover:shadow-2xl hover:shadow-teal-900/5 transition-all duration-500 relative overflow-hidden">
-                            <div className="w-14 h-14 bg-teal-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                                <Store className="w-7 h-7 text-teal-600" />
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_pos_title')}</h3>
-                            <p className="text-slate-600 leading-relaxed text-sm">
-                                {__('general.module_pos_desc')}
-                            </p>
-                        </div>
-
-                        {/* 7. Tools & Addons */}
-                        <div className="group bg-white rounded-3xl p-8 border border-slate-200 hover:border-violet-500/50 hover:shadow-2xl hover:shadow-violet-900/5 transition-all duration-500 md:col-span-2 xl:col-span-3 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center gap-8">
-                            <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-violet-500/5 rounded-full blur-3xl group-hover:bg-violet-500/10 transition-all duration-500"></div>
-                            <div className="flex-1 relative z-10">
-                                <div className="w-14 h-14 bg-violet-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                                    <Wrench className="w-7 h-7 text-violet-600" />
-                                </div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-3">{__('general.module_tools_title')}</h3>
-                                <p className="text-slate-600 leading-relaxed text-sm">
-                                    {__('general.module_tools_desc')}
-                                </p>
-                            </div>
-                            <div className="flex gap-4 opacity-50 group-hover:opacity-100 transition-opacity duration-500 relative z-10">
-                                <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center shadow-sm"><Download className="w-5 h-5 text-slate-500" /></div>
-                                <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center shadow-sm"><MessageCircle className="w-5 h-5 text-slate-500" /></div>
-                                <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center shadow-sm"><Search className="w-5 h-5 text-slate-500" /></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* BENEFITS SECTION */}
-            <section className="py-24 lg:py-32 bg-white relative border-t border-slate-100">
-                <div className="max-w-[90rem] mx-auto px-6 lg:px-8">
-                    <div className="mb-16 text-center max-w-3xl mx-auto">
-                        <p className="text-sm font-semibold text-emerald-600 uppercase tracking-widest mb-4">
-                            {__('general.landing_benefits_badge')}
-                        </p>
-                        <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-6">
-                            {__('general.landing_benefits_title')}
-                        </h2>
-                        <p className="text-xl text-slate-500 font-light leading-relaxed">
-                            {__('general.landing_benefits_desc')}
-                        </p>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                        <div className="space-y-8">
-                            <div className="flex gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center flex-shrink-0 border border-slate-100">
-                                    <Zap className="w-6 h-6 text-emerald-500" />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-900 mb-2">Automated Workflows</h3>
-                                    <p className="text-slate-500 leading-relaxed">Eliminate repetitive tasks with intelligent automation that connects all your departments seamlessly.</p>
-                                </div>
-                            </div>
-                            <div className="flex gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center flex-shrink-0 border border-slate-100">
-                                    <Shield className="w-6 h-6 text-blue-500" />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-900 mb-2">Enterprise Security</h3>
-                                    <p className="text-slate-500 leading-relaxed">Bank-grade encryption, role-based access control, and continuous security monitoring for your data.</p>
-                                </div>
-                            </div>
-                            <div className="flex gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center flex-shrink-0 border border-slate-100">
-                                    <Rocket className="w-6 h-6 text-violet-500" />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-900 mb-2">Scalable Architecture</h3>
-                                    <p className="text-slate-500 leading-relaxed">Built on a robust infrastructure that scales effortlessly from small teams to large enterprises.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="relative">
-                            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/10 to-blue-500/10 rounded-3xl blur-3xl"></div>
-                            <div className="relative bg-slate-900 rounded-3xl p-8 border border-slate-800 shadow-2xl">
-                                <div className="flex items-center gap-3 mb-6 border-b border-slate-800 pb-4">
-                                    <div className="w-3 h-3 rounded-full bg-rose-500"></div>
-                                    <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-                                    <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                                </div>
-                                <div className="space-y-4">
-                                    <div className="h-4 bg-slate-800 rounded-md w-3/4"></div>
-                                    <div className="h-4 bg-slate-800 rounded-md w-full"></div>
-                                    <div className="h-4 bg-slate-800 rounded-md w-5/6"></div>
-                                    <div className="grid grid-cols-2 gap-4 mt-8">
-                                        <div className="h-24 bg-slate-800/50 rounded-xl border border-slate-800"></div>
-                                        <div className="h-24 bg-slate-800/50 rounded-xl border border-slate-800"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* STATISTICS SECTION */}
-            <section className="py-20 bg-slate-900 relative border-t border-slate-800">
-                <div className="max-w-[90rem] mx-auto px-6 lg:px-8">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-slate-800/50">
-                        {statisticsData.map((stat, i) => (
-                            <div key={i} className="text-center px-4">
-                                <div className="text-4xl md:text-5xl font-extrabold text-white mb-2 tracking-tight">
-                                    {stat.value}
-                                </div>
-                                <div className="text-sm md:text-base font-medium text-slate-400 uppercase tracking-wider">
-                                    {stat.label}
-                                </div>
                             </div>
                         ))}
                     </div>
-                </div>
-            </section>
+                </section>
 
-            {/* PORTFOLIO SECTION */}
-            <section className="py-24 lg:py-32 bg-slate-900 text-white relative border-y border-slate-800 overflow-hidden">
-                <div className="max-w-[90rem] mx-auto px-6 lg:px-8 text-center">
-                    <p className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-4">
-                        {__('general.landing_portfolio_badge')}
-                    </p>
-                    <h2 className="text-4xl font-extrabold tracking-tight mb-4 text-white">
-                        {__('general.landing_portfolio_title')}
-                    </h2>
-                    <p className="text-xl text-slate-400 font-light max-w-2xl mx-auto mb-16">
-                        {__('general.landing_portfolio_desc')}
-                    </p>
+                {/* 2. Trust Section */}
+                <section className="py-20 bg-[#111111] text-white reveal-section border-t border-b border-[#222222]">
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+                            <div className="gsap-fade-up flex flex-col items-center">
+                                <span className="text-5xl font-extrabold mb-3 text-white">100<span className="text-[#888888]">+</span></span>
+                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">Projects Delivered</span>
+                            </div>
+                            <div className="gsap-fade-up flex flex-col items-center">
+                                <span className="text-5xl font-extrabold mb-3 text-white">50<span className="text-[#888888]">+</span></span>
+                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">Happy Clients</span>
+                            </div>
+                            <div className="gsap-fade-up flex flex-col items-center">
+                                <span className="text-5xl font-extrabold mb-3 text-white">10<span className="text-[#888888]">+</span></span>
+                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">Years Experience</span>
+                            </div>
+                            <div className="gsap-fade-up flex flex-col items-center">
+                                <span className="text-5xl font-extrabold mb-3 text-white">&lt;1<span className="text-[#888888]">hr</span></span>
+                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">Avg Response Time</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                    <div className="mb-12 cursor-grab active:cursor-grabbing">
-                        <motion.div ref={carouselRef} className="overflow-hidden">
-                            <motion.div 
-                                drag="x" 
-                                dragConstraints={{ right: 0, left: -width }} 
-                                className="flex gap-8"
-                            >
-                                {portfolioItems.map((item, index) => (
-                                    <motion.div 
-                                        key={index} 
-                                        className="min-w-[300px] md:min-w-[400px] h-[250px] md:h-[300px] rounded-3xl overflow-hidden relative group cursor-pointer border border-slate-700 shadow-xl"
-                                        onClick={() => setSelectedItem(item)}
-                                    >
-                                        <img src={item.img} alt={`Portfolio ${index + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none" />
-                                        <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none flex flex-col justify-end p-6 text-left">
-                                            <span className="text-emerald-400 text-sm font-semibold tracking-wider uppercase mb-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                                                {item.cat}
-                                            </span>
-                                            <h3 className="text-xl font-bold text-white mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
-                                                {__(`general.${item.titleKey}`)}
-                                            </h3>
-                                            <p className="text-slate-300 text-sm line-clamp-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">
-                                                {__(`general.${item.descKey}`)}
-                                            </p>
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </motion.div>
-                        </motion.div>
+                {/* 3. Story-Format Portfolio */}
+                <section className="py-24 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
+                    <div className="mb-16">
+                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">Our Success Stories</h2>
+                        <p className="gsap-fade-up text-lg text-[#666666]">Real problems. Engineered solutions. Measurable results.</p>
                     </div>
 
-                    <Link href={route('portfolio')}>
-                        <Button variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white rounded-full px-8 h-12">
-                            {__('general.landing_portfolio_view_all')} <ArrowRight className="ml-2 w-4 h-4" />
-                        </Button>
-                    </Link>
-                </div>
-            </section>
-
-            {/* TESTIMONIALS SECTION */}
-            <section className="py-24 lg:py-32 bg-slate-50 relative border-y border-slate-200 overflow-hidden">
-                <div className="max-w-[90rem] mx-auto px-6 lg:px-8 text-center mb-16">
-                    <p className="text-sm font-semibold text-blue-600 uppercase tracking-widest mb-4">
-                        {__('general.landing_testimonials_badge')}
-                    </p>
-                    <h2 className="text-4xl font-extrabold tracking-tight mb-4 text-slate-900">
-                        {__('general.landing_testimonials_title')}
-                    </h2>
-                    <p className="text-xl text-slate-600 font-light max-w-2xl mx-auto">
-                        {__('general.landing_testimonials_desc')}
-                    </p>
-                </div>
-
-                <div className="max-w-[90rem] mx-auto px-6 lg:px-8 cursor-grab active:cursor-grabbing">
-                    <motion.div ref={testimonialsRef} className="overflow-hidden">
-                        <motion.div 
-                            drag="x" 
-                            dragConstraints={{ right: 0, left: -testiWidth }} 
-                            className="flex gap-6"
-                        >
-                            {testimonialsData.map((testi, index) => (
-                                <motion.div 
-                                    key={index} 
-                                    className="min-w-[320px] md:min-w-[400px] bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex flex-col hover:border-blue-200 transition-colors"
-                                >
-                                    <div className="flex gap-1 mb-6">
-                                        {[...Array(testi.rating)].map((_, i) => (
-                                            <Star key={i} className="w-5 h-5 text-amber-400 fill-amber-400" />
-                                        ))}
-                                    </div>
-                                    <Quote className="w-10 h-10 text-slate-200 mb-4" />
-                                    <p className="text-slate-600 text-lg italic leading-relaxed mb-8 flex-1">
-                                        "{testi.text}"
-                                    </p>
-                                    <div className="flex items-center gap-4 mt-auto">
-                                        <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-lg border border-slate-200">
-                                            {testi.name.charAt(0)}
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-slate-900">{testi.name}</h4>
-                                            <p className="text-sm text-slate-500">{testi.company}</p>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* FINAL CTA / CONTACT */}
-            <section className="py-24 lg:py-32 bg-white text-center">
-                <div className="max-w-3xl mx-auto px-6">
-                    <h2 className="text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight mb-8">
-                        {__('general.landing_footer_cta_title')}
-                    </h2>
-                    <p className="text-xl text-slate-500 font-light mb-10 max-w-2xl mx-auto">
-                        {__('general.landing_footer_cta_desc')}
-                    </p>
-                    <Button 
-                        onClick={() => window.dispatchEvent(new Event('open-guest-ticket'))}
-                        size="lg" 
-                        className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-12 h-16 text-lg font-bold shadow-xl hover:shadow-2xl transition-all"
-                    >
-                        {__('general.submit_guest_ticket') || 'Submit Guest Ticket'}
-                    </Button>
-                </div>
-            </section>
-
-            <AnimatePresence>
-                {selectedItem && (
-                    <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 md:p-8 backdrop-blur-sm"
-                        onClick={() => setSelectedItem(null)}
-                    >
-                        <button 
-                            className="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors z-[60]"
-                            onClick={(e) => { e.stopPropagation(); setSelectedItem(null); }}
-                        >
-                            <X className="w-8 h-8" />
-                        </button>
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden max-w-5xl w-full max-h-full flex flex-col shadow-2xl"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="flex-1 overflow-auto min-h-0 bg-slate-950 p-2 md:p-6 flex items-center justify-center relative">
-                                <img 
-                                    src={selectedItem.img} 
-                                    alt="Fullscreen Portfolio" 
-                                    className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-xl" 
-                                />
-                            </div>
-                            <div className="p-6 md:p-8 bg-slate-900 border-t border-slate-800 text-left overflow-y-auto max-h-[50vh]">
-                                <span className="text-emerald-400 text-sm font-semibold tracking-wider uppercase mb-2 block">
-                                    {selectedItem.cat}
-                                </span>
-                                <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">
-                                    {__(`general.${selectedItem.titleKey}`)}
-                                </h3>
-                                <p className="text-slate-400 text-base md:text-lg max-w-3xl leading-relaxed mb-8">
-                                    {__(`general.${selectedItem.descKey}`)}
-                                </p>
-                                
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 border-t border-slate-800 pt-8">
-                                    <div>
-                                        <h4 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                                            <Box className="w-5 h-5 text-rose-400" /> {__('general.landing_portfolio_challenge')}
-                                        </h4>
-                                        <p className="text-slate-400 leading-relaxed text-sm">
-                                            {selectedItem.challenge}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <h4 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                                            <Zap className="w-5 h-5 text-emerald-400" /> {__('general.landing_portfolio_solution')}
-                                        </h4>
-                                        <p className="text-slate-400 leading-relaxed text-sm">
-                                            {selectedItem.solution}
-                                        </p>
-                                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        {portfolio.map((project, idx) => (
+                            <div key={idx} className="gsap-fade-up bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] flex flex-col hover:border-[#111111] transition-colors duration-500">
+                                <div className="h-64 overflow-hidden bg-[#f4f4f5]">
+                                    <img src={project.img} alt={project.name} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
                                 </div>
-                                
-                                <div className="border-t border-slate-800 pt-6">
-                                    <h4 className="text-sm font-bold text-slate-300 mb-4 uppercase tracking-wider">
-                                        {__('general.landing_portfolio_technologies')}
-                                    </h4>
-                                    <div className="flex flex-wrap gap-2">
-                                        {selectedItem.techs && selectedItem.techs.map((tech, i) => (
-                                            <span key={i} className="px-3 py-1 bg-slate-800 border border-slate-700 text-slate-300 text-xs font-semibold rounded-full">
+                                <div className="p-8 lg:p-10 flex flex-col flex-grow">
+                                    <h3 className="text-2xl font-bold mb-4 text-[#111111]">{project.name}</h3>
+                                    <p className="text-[#666666] leading-relaxed text-[15px] mb-8">{project.description}</p>
+                                    
+                                    <div className="mb-8 flex-grow">
+                                        <h4 className="font-bold text-[#111111] uppercase text-xs tracking-widest mb-4">Key Features</h4>
+                                        <ul className="space-y-3">
+                                            {project.features.map((feature, i) => (
+                                                <li key={i} className="flex items-start gap-3 text-[#444444]">
+                                                    <CheckCircle2 className="w-4 h-4 text-[#111111] mt-0.5 shrink-0" />
+                                                    <span className="text-sm font-medium">{feature}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-2 mb-8">
+                                        {project.techs.map((tech, i) => (
+                                            <span key={i} className="bg-[#f4f4f5] border border-[#e5e5e5] px-3 py-1 rounded-md text-[11px] font-bold text-[#111111] uppercase tracking-wider">
                                                 {tech}
                                             </span>
                                         ))}
                                     </div>
+
+                                    <Button 
+                                        onClick={() => openWhatsApp(`Hello Mahmoud, I am interested in a project similar to ${project.name}`)}
+                                        variant="outline"
+                                        className="mt-auto w-full border-[#e5e5e5] text-[#111111] hover:bg-[#111111] hover:text-white rounded-xl py-7 text-sm font-bold tracking-wide uppercase transition-all duration-300 flex items-center justify-center gap-3"
+                                    >
+                                        I want a similar project <ArrowRight className="w-4 h-4" />
+                                    </Button>
                                 </div>
                             </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                        ))}
+                    </div>
+                </section>
 
+                {/* 4. Social Proof */}
+                <section className="py-24 bg-[#fafafa] border-y border-[#e5e5e5] px-6 lg:px-8 reveal-section">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center mb-16">
+                            <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">Real Experiences</h2>
+                            <p className="gsap-fade-up text-lg text-[#666666]">Don't just take our word for it.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {[
+                                "Working with Mahmoud was a game changer for our business. The technical delivery was flawless, and the communication was always clear and direct.",
+                                "We had a complex ERP requirement and were tired of generic agencies. Mahmoud built exactly what we needed with incredible precision.",
+                                "Fast, secure, and reliable. The bot automation saved us hundreds of hours every month. Highly recommended for any serious business."
+                            ].map((testimonial, idx) => (
+                                <div key={idx} className="gsap-fade-up bg-white p-10 rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-[#e5e5e5] hover:-translate-y-1 transition-transform duration-300">
+                                    <div className="flex text-yellow-400 mb-6">
+                                        <Star className="w-4 h-4 fill-current mr-1" />
+                                        <Star className="w-4 h-4 fill-current mr-1" />
+                                        <Star className="w-4 h-4 fill-current mr-1" />
+                                        <Star className="w-4 h-4 fill-current mr-1" />
+                                        <Star className="w-4 h-4 fill-current" />
+                                    </div>
+                                    <p className="text-[#444444] text-base leading-loose italic mb-8">
+                                        "{testimonial}"
+                                    </p>
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-[#f4f4f5] rounded-full flex items-center justify-center border border-[#e5e5e5]">
+                                            <UserCircle className="w-7 h-7 text-[#888888]" />
+                                        </div>
+                                        <div>
+                                            <h5 className="font-bold text-[#111111]">Verified Client</h5>
+                                            <span className="text-[11px] font-semibold text-[#888888] uppercase tracking-wider">Business Owner</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* 5. Process Section */}
+                <section className="py-24 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
+                    <div className="text-center mb-20">
+                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">How to Start?</h2>
+                        <p className="gsap-fade-up text-lg text-[#666666]">A simple, transparent 4-step process.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 relative">
+                        {/* Connecting Line */}
+                        <div className="hidden md:block absolute top-10 left-[10%] right-[10%] h-[2px] bg-[#f0f0f0] z-0"></div>
+                        
+                        {[
+                            { step: "01", title: "Send Your Idea", desc: "Reach out via WhatsApp with a brief overview of what you want to build." },
+                            { step: "02", title: "Discuss Details", desc: "We review the technical feasibility and align on your business goals." },
+                            { step: "03", title: "Receive Offer", desc: "You get a clear proposal detailing timeline, cost, and architecture." },
+                            { step: "04", title: "Execution Begins", desc: "We start coding and keep you updated every step of the way." }
+                        ].map((item, idx) => (
+                            <div key={idx} className="gsap-fade-up relative z-10 flex flex-col items-center text-center">
+                                <div className="w-20 h-20 bg-white border-2 border-[#111111] text-[#111111] rounded-full flex items-center justify-center text-2xl font-bold mb-8 shadow-sm">
+                                    {item.step}
+                                </div>
+                                <h3 className="text-xl font-bold mb-4">{item.title}</h3>
+                                <p className="text-[#666666] leading-relaxed text-[15px]">{item.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* 6. About Mahmoud */}
+                <section className="py-24 bg-[#111111] text-white px-6 lg:px-8 reveal-section">
+                    <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-16">
+                        <div className="gsap-fade-up w-56 h-56 md:w-72 md:h-72 rounded-full bg-[#1a1a1a] border border-[#333333] overflow-hidden flex-shrink-0 flex items-center justify-center relative">
+                            {/* Inner subtle glow */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-[#333333]/20 to-transparent"></div>
+                            <UserCircle className="w-28 h-28 text-[#555555] relative z-10" />
+                        </div>
+                        <div className="text-center md:text-left flex-1">
+                            <h2 className="gsap-fade-up text-4xl lg:text-5xl font-extrabold mb-4">About Eng. Mahmoud</h2>
+                            <h3 className="gsap-fade-up text-[#888888] text-sm font-bold mb-8 uppercase tracking-[0.2em]">
+                                Software Architect & Developer
+                            </h3>
+                            <p className="gsap-fade-up text-lg leading-loose text-[#d4d4d4] mb-10 max-w-2xl">
+                                I believe in direct communication and engineering excellence. You aren't dealing with a faceless agency; you are working directly with the architect building your system. My philosophy is simple: focus on quality, ensure absolute clarity, and deliver highly scalable solutions that drive real business value.
+                            </p>
+                            <Button 
+                                onClick={() => openWhatsApp("Hello Engineer Mahmoud, I read your profile and would like to discuss a project.")}
+                                className="gsap-fade-up bg-white text-[#111111] hover:bg-[#e5e5e5] rounded-xl px-10 py-7 text-sm font-bold tracking-wide uppercase transition-colors inline-flex items-center gap-3"
+                            >
+                                Let's Work Together <ArrowRight className="w-5 h-5" />
+                            </Button>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 7 & 8. FAQ and Tech Kitchen */}
+                <section className="py-24 px-6 lg:px-8 max-w-4xl mx-auto reveal-section">
+                    <div className="text-center mb-16">
+                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">Curious Questions</h2>
+                        <p className="gsap-fade-up text-lg text-[#666666]">Everything you need to know before we start.</p>
+                    </div>
+
+                    <div className="gsap-fade-up mb-16">
+                        <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="item-1" className="border-[#e5e5e5] py-2">
+                                <AccordionTrigger className="text-xl font-bold hover:no-underline text-[#111111]">Why are there no fixed prices?</AccordionTrigger>
+                                <AccordionContent className="text-[#666666] leading-relaxed text-base pt-2 pb-6">
+                                    Every project has its own unique requirements, scale, and technical challenges. We provide custom quotes based on exactly what you need to succeed, avoiding bloated generic packages.
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-2" className="border-[#e5e5e5] py-2">
+                                <AccordionTrigger className="text-xl font-bold hover:no-underline text-[#111111]">What technologies do you use?</AccordionTrigger>
+                                <AccordionContent className="text-[#666666] leading-relaxed text-base pt-2 pb-6">
+                                    We use the right technology for the job, not just the most popular framework. Our stack is chosen based on scalability, security, and performance requirements for your specific use case.
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-3" className="border-[#e5e5e5] py-2">
+                                <AccordionTrigger className="text-xl font-bold hover:no-underline text-[#111111]">I don't know programming, what should I do?</AccordionTrigger>
+                                <AccordionContent className="text-[#666666] leading-relaxed text-base pt-2 pb-6">
+                                    Don't worry! Just explain your business idea and goals in plain language. We will handle all the technical architecture, development, and deployment for you.
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-4" className="border-[#e5e5e5] py-2">
+                                <AccordionTrigger className="text-xl font-bold hover:no-underline text-[#111111]">How long does execution take?</AccordionTrigger>
+                                <AccordionContent className="text-[#666666] leading-relaxed text-base pt-2 pb-6">
+                                    The timeline depends entirely on the project's size and complexity. After our initial discussion, you will receive a detailed roadmap with clear milestones.
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </div>
+
+                    {/* Tech Kitchen */}
+                    <div className="gsap-fade-up bg-white rounded-2xl p-8 border-2 border-[#111111] shadow-[8px_8px_0px_0px_rgba(17,17,17,1)]">
+                        <Accordion type="single" collapsible className="w-full border-none">
+                            <AccordionItem value="tech-1" className="border-none">
+                                <AccordionTrigger className="text-xl font-bold hover:no-underline px-2 text-[#111111]">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-[#111111] text-white rounded-md flex items-center justify-center">
+                                            <Terminal className="w-5 h-5" />
+                                        </div>
+                                        Under the Hood... What powers your project?
+                                    </div>
+                                </AccordionTrigger>
+                                <AccordionContent className="px-2 pt-6">
+                                    <p className="text-[#666666] mb-8 leading-relaxed">For the technical folks, here is a glimpse of our battle-tested stack:</p>
+                                    <div className="flex flex-wrap gap-3">
+                                        {techStack.map((tech, idx) => (
+                                            <span key={idx} className="bg-[#f4f4f5] border border-[#e5e5e5] px-5 py-2.5 rounded-lg text-sm font-bold text-[#111111]">
+                                                {tech}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </div>
+                </section>
+
+                {/* 9. Final CTA */}
+                <section className="py-32 bg-[#25D366] text-white text-center reveal-section px-6 relative overflow-hidden">
+                    {/* Background subtle pattern or gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1DA851]/20"></div>
+                    
+                    <div className="max-w-4xl mx-auto relative z-10">
+                        <h2 className="gsap-fade-up text-5xl md:text-7xl font-extrabold tracking-tight mb-8 drop-shadow-sm">
+                            Ready to turn your idea into a real project?
+                        </h2>
+                        <p className="gsap-fade-up text-xl md:text-2xl text-[#e8fceb] mb-12 max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-sm">
+                            Don't wait. Let's start the conversation and build something amazing together.
+                        </p>
+                        <Button 
+                            onClick={() => openWhatsApp("Hello Mahmoud, I'm ready to start!")}
+                            size="lg" 
+                            className="gsap-fade-up bg-white text-[#1DA851] hover:bg-[#f4f4f5] rounded-full px-12 h-20 text-xl font-bold tracking-wide transition-all duration-300 hover:scale-105 shadow-2xl flex items-center justify-center gap-3 mx-auto border-4 border-white/20 bg-clip-padding"
+                        >
+                            <MessageSquare className="w-7 h-7" /> Start the Conversation Now
+                        </Button>
+                    </div>
+                </section>
+
+            </div>
         </PublicLayout>
     );
 }
