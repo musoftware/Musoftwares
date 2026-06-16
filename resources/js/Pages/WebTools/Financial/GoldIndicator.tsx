@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head } from '@inertiajs/react';
-import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
+import WebToolsLayout from '@/Layouts/WebToolsLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend, LineChart, Line } from 'recharts';
 import { LineChart as LineChartIcon, Activity, TrendingUp, DollarSign, ArrowUpRight, ArrowDownRight, Gem } from 'lucide-react';
@@ -41,7 +41,7 @@ export default function GoldIndicator() {
     const [timeframe, setTimeframe] = useState('1m');
 
     return (
-        <ToolsPublicLayout title="Gold Indicator" activeNav="explore">
+        <WebToolsLayout title="Gold Indicator" activeNav="explore">
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6">
                 <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
@@ -247,6 +247,6 @@ export default function GoldIndicator() {
                     </CardContent>
                 </Card>
             </div>
-        </ToolsPublicLayout>
+        </WebToolsLayout>
     );
 }

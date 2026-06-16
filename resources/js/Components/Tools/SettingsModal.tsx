@@ -17,6 +17,8 @@ interface SettingsModalProps {
     onToggleOneClick: () => void;
     runtimeHost: string;
     onRuntimeHostChange: (host: string) => void;
+    zIndex: number;
+    onFocus: () => void;
 }
 
 const DEFAULT_WALLPAPERS = [
@@ -27,8 +29,16 @@ const DEFAULT_WALLPAPERS = [
     'https://images.unsplash.com/photo-1506744626753-143d4eb2c842?q=80&w=2560&auto=format&fit=crop',
 ];
 
-export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayerTimes, wallpaperUrl, onWallpaperChange, prayerCity, prayerCountry, prayerMethod, onPrayerSettingsChange, openWithOneClick, onToggleOneClick, runtimeHost, onRuntimeHostChange }: SettingsModalProps) {
+import { WindowModal } from './WindowModal';
+
+export function SettingsModal({ 
+    isOpen, onClose, showPrayerTimes, onTogglePrayerTimes, wallpaperUrl, 
+    onWallpaperChange, prayerCity, prayerCountry, prayerMethod, 
+    onPrayerSettingsChange, openWithOneClick, onToggleOneClick, 
+    runtimeHost, onRuntimeHostChange, zIndex, onFocus 
+}: SettingsModalProps) {
     const [wallpapers, setWallpapers] = useState<string[]>([]);
+    const [isMaximized, setIsMaximized] = useState(false);
 
     useEffect(() => {
         if (isOpen && wallpapers.length === 0) {
@@ -49,22 +59,21 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
     const displayWallpapers = wallpapers.length > 0 ? wallpapers : DEFAULT_WALLPAPERS;
 
     return (
-        <div 
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-            onClick={onClose}
+        <WindowModal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={__('general.desktop_settings')}
+            isMaximized={isMaximized}
+            onMinimize={() => {}} // No minimize for settings
+            onMaximize={() => setIsMaximized(!isMaximized)}
+            zIndex={zIndex}
+            onFocus={onFocus}
+            width="w-[700px]"
+            height="h-[600px]"
+            initialX={150}
+            initialY={100}
         >
-            <div 
-                className="w-full max-w-2xl bg-[#1c1c1c] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="h-12 border-b border-white/10 flex items-center justify-between px-4 bg-white/5">
-                    <div className="flex items-center gap-2 text-white font-medium">
-                        <SettingsIcon className="w-4 h-4 text-slate-400" />{__('general.desktop_settings')}</div>
-                    <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-md text-slate-400 hover:text-white transition-colors">
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
-
+            <div className="flex flex-col h-full bg-[#1c1c1c] overflow-y-auto">
                 <div className="p-6 flex flex-col gap-8 text-white">
                     {/* Widget Settings */}
                     <div>
@@ -195,6 +204,6 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
                     </div>
                 </div>
             </div>
-        </div>
+        </WindowModal>
     );
 }

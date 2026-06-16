@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
-import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
+import WebToolsLayout from '@/Layouts/WebToolsLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
@@ -191,7 +191,7 @@ export default function JsObfuscator() {
     };
 
     return (
-        <ToolsPublicLayout title="JavaScript Obfuscator Online" activeNav="explore">
+        <WebToolsLayout title="JavaScript Obfuscator Online" activeNav="explore">
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6">
                 <div className="text-center mb-10">
                     <div className="inline-flex items-center justify-center p-3 bg-red-100 text-red-700 rounded-2xl mb-4">
@@ -434,6 +434,6 @@ export default function JsObfuscator() {
                     </Card>
                 </div>
             </div>
-        </ToolsPublicLayout>
+        </WebToolsLayout>
     );
 }

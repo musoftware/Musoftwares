@@ -75,32 +75,6 @@ export default function Home() {
 
     const portfolio = [
         {
-            name: "ArabiJobs Platform",
-            img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1200",
-            description: "ArabiJobs is a recruitment platform that helps companies post job openings, manage applications, and find qualified candidates. Job seekers can browse opportunities, create profiles, and apply online through a simple and fast experience.",
-            features: [
-                "Job posting and management",
-                "Candidate applications",
-                "Recruiter dashboard",
-                "Search and filtering",
-                "User profiles"
-            ],
-            techs: ["Laravel", "Redis", "MySQL"]
-        },
-        {
-            name: "Business Automation SaaS",
-            img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200",
-            description: "This is a business management tool that helps companies organize their daily operations. Instead of using multiple disconnected apps, teams can manage their tasks, generate reports, and track team performance all in one place.",
-            features: [
-                "Task and project tracking",
-                "Automated daily reporting",
-                "Team collaboration tools",
-                "Custom dashboards",
-                "Role-based access control"
-            ],
-            techs: ["Python", "FastAPI", "React"]
-        },
-        {
             name: "AMC Academy",
             img: "/images/portfolio/amcacademy.jpg",
             description: "AMC Academy is an educational platform designed specifically for students to access high-quality courses, track their learning progress, and interact with instructors. It provides a complete digital learning environment with full administrative control.",
@@ -125,10 +99,55 @@ export default function Home() {
                 "Analytics and export tools"
             ],
             techs: ["Laravel", "Redis", "Firebase"]
+        },
+        {
+            name: "Your Next Project?",
+            isPromotional: true,
+            description: "Are you ready to build something exceptional? We have the engineering power to turn your complex business logic into a scalable reality.",
+            features: [
+                "Custom Architecture",
+                "Scalable Infrastructure",
+                "Direct Communication",
+                "Ongoing Support"
+            ],
+            techs: ["Future-proof"]
         }
     ];
 
-    const techStack = ["Next.js", "React", "Node.js", "PostgreSQL", "Docker", "VPS", "Telegram APIs", "AI Integrations"];
+    const techCategories = [
+        {
+            title: "Frontend",
+            techs: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Shadcn UI"]
+        },
+        {
+            title: "Backend",
+            techs: ["Node.js", "Express.js", "NestJS", "Laravel", "PHP"]
+        },
+        {
+            title: "Databases & Caching",
+            techs: ["PostgreSQL", "MySQL", "Redis", "SQLite"]
+        },
+        {
+            title: "Infrastructure & DevOps",
+            techs: ["Docker", "VPS", "Nginx", "Linux", "CI/CD Pipelines", "Cloud Deployments"]
+        },
+        {
+            title: "Automation & Integrations",
+            techs: ["Telegram APIs", "WhatsApp Integrations", "Payment Gateways", "Email Services", "Webhooks"]
+        },
+        {
+            title: "AI & Data",
+            techs: ["OpenAI APIs", "AI Agents", "Chatbots", "Vector Databases", "RAG Systems"]
+        },
+        {
+            title: "Mobile",
+            techs: ["React Native", "Expo", "Android Deployment"]
+        },
+        {
+            title: "Tools & Workflow",
+            techs: ["Git", "GitHub", "Postman", "Prisma", "REST APIs"]
+        }
+    ];
 
     return (
         <PublicLayout>
@@ -211,9 +230,16 @@ export default function Home() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                         {portfolio.map((project, idx) => (
-                            <div key={idx} className="gsap-fade-up bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] flex flex-col hover:border-[#111111] transition-colors duration-500">
-                                <div className="h-64 overflow-hidden bg-[#f4f4f5]">
-                                    <img src={project.img} alt={project.name} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
+                            <div key={idx} className={`gsap-fade-up flex flex-col bg-white rounded-2xl overflow-hidden shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-10px_rgba(0,0,0,0.1)] transition-all duration-300 border ${project.isPromotional ? 'border-[#111111] border-2 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.15)]' : 'border-[#e5e5e5]'}`}>
+                                <div className="h-56 overflow-hidden relative bg-[#f4f4f5]">
+                                    {project.isPromotional ? (
+                                        <div className="absolute inset-0 bg-[#111111] text-white flex flex-col items-center justify-center p-6 text-center">
+                                            <span className="text-sm font-bold uppercase tracking-widest text-[#a3a3a3] mb-2">Reserved for</span>
+                                            <span className="text-3xl font-extrabold">Your Vision</span>
+                                        </div>
+                                    ) : (
+                                        <img src={project.img} alt={project.name} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
+                                    )}
                                 </div>
                                 <div className="p-8 lg:p-10 flex flex-col flex-grow">
                                     <h3 className="text-2xl font-bold mb-4 text-[#111111]">{project.name}</h3>
@@ -240,15 +266,21 @@ export default function Home() {
                                     </div>
 
                                     <Button 
-                                        onClick={() => openWhatsApp(`Hello Mahmoud, I am interested in a project similar to ${project.name}`)}
+                                        onClick={() => openWhatsApp(project.isPromotional ? "Hello Mahmoud, I'm ready to start my next project." : `Hello Mahmoud, I am interested in a project similar to ${project.name}`)}
                                         variant="outline"
-                                        className="mt-auto w-full border-[#e5e5e5] text-[#111111] hover:bg-[#111111] hover:text-white rounded-xl py-7 text-sm font-bold tracking-wide uppercase transition-all duration-300 flex items-center justify-center gap-3"
+                                        className={`mt-auto w-full rounded-xl py-7 text-sm font-bold tracking-wide uppercase transition-all duration-300 flex items-center justify-center gap-3 ${project.isPromotional ? 'bg-[#111111] text-white hover:bg-[#333333]' : 'border-[#e5e5e5] text-[#111111] hover:bg-[#111111] hover:text-white'}`}
                                     >
-                                        I want a similar project <ArrowRight className="w-4 h-4" />
+                                        {project.isPromotional ? "Start Your Project" : "I want a similar project"} <ArrowRight className="w-4 h-4" />
                                     </Button>
                                 </div>
                             </div>
                         ))}
+                    </div>
+
+                    <div className="mt-16 text-center">
+                        <Link href="/portfolio" className="inline-flex items-center gap-3 px-8 py-5 bg-[#f4f4f5] hover:bg-[#e5e5e5] text-[#111111] rounded-xl text-sm font-bold uppercase tracking-widest transition-colors duration-300">
+                            View All Projects <ArrowRight className="w-5 h-5" />
+                        </Link>
                     </div>
                 </section>
 
@@ -395,12 +427,25 @@ export default function Home() {
                                     </div>
                                 </AccordionTrigger>
                                 <AccordionContent className="px-2 pt-6">
-                                    <p className="text-[#666666] mb-8 leading-relaxed">For the technical folks, here is a glimpse of our battle-tested stack:</p>
-                                    <div className="flex flex-wrap gap-3">
-                                        {techStack.map((tech, idx) => (
-                                            <span key={idx} className="bg-[#f4f4f5] border border-[#e5e5e5] px-5 py-2.5 rounded-lg text-sm font-bold text-[#111111]">
-                                                {tech}
-                                            </span>
+                                    <p className="text-[#666666] mb-4 text-base font-medium">For the curious minds, here's some of the tech we use depending on the project's needs:</p>
+                                    <p className="text-[#111111] font-bold text-lg mb-8 leading-relaxed">
+                                        We don't lock projects into a specific stack. We choose the tools that make the most sense for the job.
+                                    </p>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-10">
+                                        {techCategories.map((category, idx) => (
+                                            <div key={idx} className="flex flex-col">
+                                                <h4 className="text-[#888888] font-bold text-xs uppercase tracking-widest mb-4 border-b border-[#e5e5e5] pb-2">
+                                                    {category.title}
+                                                </h4>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {category.techs.map((tech, tIdx) => (
+                                                        <span key={tIdx} className="bg-[#f4f4f5] border border-[#e5e5e5] px-3 py-1.5 rounded-md text-[11px] font-bold text-[#111111]">
+                                                            {tech}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         ))}
                                     </div>
                                 </AccordionContent>

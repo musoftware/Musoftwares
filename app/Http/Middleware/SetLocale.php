@@ -20,12 +20,20 @@ class SetLocale
     {
         if ($request->has('lang')) {
             $lang = $request->get('lang');
+            // Prevent 'ar' for now
+            if ($lang === 'ar') {
+                $lang = 'en';
+            }
             if (in_array($lang, ['en', 'ar'])) {
                 Session::put('locale', $lang);
             }
         }
 
         $locale = Session::get('locale', config('app.locale'));
+        // Prevent 'ar' for now
+        if ($locale === 'ar') {
+            $locale = 'en';
+        }
         App::setLocale($locale);
 
         return $next($request);

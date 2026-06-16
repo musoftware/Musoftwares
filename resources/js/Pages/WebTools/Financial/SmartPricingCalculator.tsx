@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Head } from '@inertiajs/react';
-import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
+import WebToolsLayout from '@/Layouts/WebToolsLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -58,7 +58,7 @@ export default function SmartPricingCalculator() {
     const formatMoney = (val: number) => val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     return (
-        <ToolsPublicLayout title="Smart Pricing Calculator" activeNav="explore">
+        <WebToolsLayout title="Smart Pricing Calculator" activeNav="explore">
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6">
                 <div className="mb-8">
                     <span className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-sm font-medium mb-3">
@@ -238,6 +238,6 @@ export default function SmartPricingCalculator() {
                     </div>
                 </div>
             </div>
-        </ToolsPublicLayout>
+        </WebToolsLayout>
     );
 }

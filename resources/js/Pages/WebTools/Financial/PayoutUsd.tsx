@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Head } from '@inertiajs/react';
-import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
+import WebToolsLayout from '@/Layouts/WebToolsLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -92,7 +92,7 @@ export default function PayoutUsd() {
         new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(val);
 
     return (
-        <ToolsPublicLayout title="USD Payout Tool" activeNav="explore">
+        <WebToolsLayout title="USD Payout Tool" activeNav="explore">
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6">
                 <div className="mb-8">
                     <span className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium mb-3">
@@ -230,6 +230,6 @@ export default function PayoutUsd() {
                     </div>
                 </div>
             </div>
-        </ToolsPublicLayout>
+        </WebToolsLayout>
     );
 }

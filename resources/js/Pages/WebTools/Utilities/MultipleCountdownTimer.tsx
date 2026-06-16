@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Head } from '@inertiajs/react';
-import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
+import WebToolsLayout from '@/Layouts/WebToolsLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -131,7 +131,7 @@ export default function MultipleCountdownTimer() {
     };
 
     return (
-        <ToolsPublicLayout title="Multiple Countdown Timer" activeNav="explore">
+        <WebToolsLayout title="Multiple Countdown Timer" activeNav="explore">
             <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6">
                 <div className="text-center mb-10">
                     <div className="inline-flex items-center justify-center p-3 bg-indigo-100 text-indigo-700 rounded-2xl mb-4">
@@ -259,6 +259,6 @@ export default function MultipleCountdownTimer() {
                     </Card>
                 </div>
             </div>
-        </ToolsPublicLayout>
+        </WebToolsLayout>
     );
 }
