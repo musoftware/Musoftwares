@@ -91,7 +91,7 @@ export function DesktopIcon({
             onDrop={(e) => id && onDrop?.(e, id)}
             onDragLeave={onDragLeave}
             style={style}
-            className={`flex flex-col items-center gap-1 w-24 p-2 rounded-lg hover:bg-white/20 active:bg-white/30 cursor-pointer transition-all group select-none ${style?.position === 'absolute' ? 'absolute' : 'relative'} ${isDragOver ? 'bg-white/30 scale-105 outline outline-2 outline-blue-400' : ''} ${isSelected ? 'bg-white/20 ring-1 ring-white/50' : ''} ${className}`}
+            className={`flex flex-col items-center gap-1 w-24 p-2 rounded-lg hover:bg-white/20 active:bg-white/30 cursor-pointer transition-all group select-none ${style?.position === 'absolute' ? 'absolute' : 'relative'} ${isDragOver ? 'bg-white/30 scale-105 outline outline-2 outline-blue-400' : ''} ${isSelected ? 'bg-blue-500/40 ring-1 ring-blue-300' : ''} ${className}`}
         >
             <div className={`w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md shadow-lg border border-white/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform ${!isOwned ? 'grayscale opacity-75' : ''}`}>
                 {iconUrl ? (

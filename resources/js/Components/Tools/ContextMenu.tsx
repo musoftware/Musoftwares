@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Pencil, Copy, Trash2, Settings, MonitorUp, LayoutGrid, FolderPlus, ArrowRightLeft } from 'lucide-react';
+import { Pencil, Copy, Trash2, Settings, MonitorUp, LayoutGrid, FolderPlus, ArrowRightLeft, RotateCcw, Layers } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
 export type ContextMenuType = 'desktop' | 'icon' | 'folder';
@@ -80,6 +80,12 @@ export function ContextMenu({ menu, onClose, onAction }: ContextMenuProps) {
                         <FolderPlus className="w-4 h-4 text-blue-400" />{__('general.new_folder')}</button>
                     <button onClick={(e) => handleAction(e, 'auto_arrange')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-left">
                         <LayoutGrid className="w-4 h-4 text-emerald-400" />{__('general.auto_arrange')}</button>
+                    <button onClick={(e) => handleAction(e, 'categorize_icons')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-left">
+                        <Layers className="w-4 h-4 text-indigo-400" /> Categorize Icons
+                    </button>
+                    <button onClick={(e) => handleAction(e, 'reset_positions')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-left text-rose-400">
+                        <RotateCcw className="w-4 h-4" /> Reset Positions
+                    </button>
                     <div className="h-px bg-white/10 my-1 mx-2"></div>
                     <button onClick={(e) => handleAction(e, 'settings')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-left">
                         <Settings className="w-4 h-4 text-slate-400" /> Settings
