@@ -5,7 +5,7 @@ import {
     UploadCloud, Download, Save, RefreshCw, Filter, 
     XCircle, CheckCircle, Trash2, Plus, Minus,
     ChevronLeft, ChevronRight, Wand2, Layers, SplitSquareHorizontal,
-    FileSpreadsheet, FileIcon
+    FileSpreadsheet, FileIcon, Settings
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { __ } from '@/lib/i18n';
@@ -18,16 +18,46 @@ interface FieldFilterState {
     keywords: string[];
 }
 
+export type TransformOperation = {
+    id: string;
+    type: 'replace' | 'prefix' | 'suffix' | 'double';
+    column: string;
+    text1: string; // find text or addition text
+    text2?: string; // replace text
+};
+
+const processInChunks = async <T, R>(
+    items: T[], 
+    processor: (chunk: T[]) => R[], 
+    onProgress?: (percent: number) => void,
+    chunkSize = 5000
+): Promise<R[]> => {
+    const results: R[] = [];
+    for (let i = 0; i < items.length; i += chunkSize) {
+        const chunk = items.slice(i, i + chunkSize);
+        const chunkResult = processor(chunk);
+        for(let j=0; j<chunkResult.length; j++) results.push(chunkResult[j]);
+        if (onProgress) {
+            onProgress(Math.floor((Math.min(i + chunkSize, items.length) / items.length) * 100));
+        }
+        await new Promise(resolve => setTimeout(resolve, 0));
+    }
+    return results;
+};
+
 export default function ExcelMergerRunner() {
     const [status, setStatus] = useState<'idle' | 'running' | 'done' | 'error'>('idle');
     const [progressMsg, setProgressMsg] = useState('');
     const [progressPercent, setProgressPercent] = useState(0);
+
+    const [csvEncoding, setCsvEncoding] = useState('utf-8');
 
     const [originalData, setOriginalData] = useState<any[][]>([]);
     const [filteredData, setFilteredData] = useState<any[][]>([]);
     const [headers, setHeaders] = useState<string[]>([]);
     
     const [fieldFilters, setFieldFilters] = useState<Record<string, FieldFilterState>>({});
+    const [transformations, setTransformations] = useState<TransformOperation[]>([]);
     
     // Transform State
     const [replaceFindText, setReplaceFindText] = useState('');
@@ -61,7 +91,16 @@ export default function ExcelMergerRunner() {
 
         try {
             const arrayBuffer = await file.arrayBuffer();
-            const workbook = read(arrayBuffer, { type: 'array' });
+            let workbook;
+            
+            if (file.name.toLowerCase().endsWith('.csv')) {
+                const decoder = new TextDecoder(csvEncoding);
+                const csvString = decoder.decode(arrayBuffer);
+                workbook = read(csvString, { type: 'string' });
+            } else {
+                workbook = read(arrayBuffer, { type: 'array' });
+            }
+            
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
             
@@ -73,7 +112,6 @@ export default function ExcelMergerRunner() {
             if (jsonData.length > 0) {
                 const rawHeaders = jsonData[0].map(String);
                 
-                // Ensure unique headers
                 const uniqueHeaders: string[] = [];
                 rawHeaders.forEach((h, i) => {
                     let newH = h || `Column ${i+1}`;
@@ -96,6 +134,7 @@ export default function ExcelMergerRunner() {
                 const dataRows = jsonData.slice(1);
                 setOriginalData(dataRows);
                 setFilteredData(dataRows);
+                setTransformations([]);
                 setPage(1);
             }
             
@@ -118,15 +157,50 @@ export default function ExcelMergerRunner() {
         }));
     };
 
-    const handleApplyFilter = () => {
+    const applyPipeline = async (currentData = originalData, currentFilters = fieldFilters, currentTransforms = transformations) => {
         setStatus('running');
+        setProgressMsg('Applying transformations...');
+        setProgressPercent(0);
+
+        let data = currentData;
+
+        // 1. Transformations
+        if (currentTransforms.length > 0) {
+            const colIndices = currentTransforms.map(t => headers.indexOf(t.column));
+            data = await processInChunks(currentData, (chunk) => {
+                return chunk.map(row => {
+                    const newRow = [...row];
+                    for (let i = 0; i < currentTransforms.length; i++) {
+                        const t = currentTransforms[i];
+                        const colIdx = colIndices[i];
+                        if (colIdx === -1) continue;
+                        
+                        const val = String(newRow[colIdx] || '');
+                        if (t.type === 'replace') {
+                            newRow[colIdx] = val.split(t.text1).join(t.text2 || '');
+                        } else if (t.type === 'prefix') {
+                            newRow[colIdx] = t.text1 + val;
+                        } else if (t.type === 'suffix') {
+                            newRow[colIdx] = val + t.text1;
+                        } else if (t.type === 'double') {
+                            newRow[colIdx] = t.text1 + val + t.text1;
+                        }
+                    }
+                    return newRow;
+                });
+            }, setProgressPercent, 2000);
+        }
+
         setProgressMsg('Applying filters...');
-        
-        setTimeout(() => {
-            const newData = originalData.filter((row) => {
+        setProgressPercent(0);
+
+        // 2. Filters
+        const filtered = await processInChunks(data, (chunk) => {
+            return chunk.filter((row) => {
                 for (let i = 0; i < headers.length; i++) {
                     const header = headers[i];
-                    const filter = fieldFilters[header];
+                    const filter = currentFilters[header];
+                    if (!filter) continue;
                     const cellValue = String(row[i] || '');
 
                     let match = false;
@@ -157,88 +231,94 @@ export default function ExcelMergerRunner() {
                 }
                 return true;
             });
+        }, setProgressPercent, 2000);
 
-            setFilteredData(newData);
-            setPage(1);
-            setStatus('idle');
-            setProgressMsg(`Filtered to ${newData.length} rows.`);
-        }, 50);
+        setFilteredData(filtered);
+        setPage(1);
+        setStatus('idle');
+        setProgressPercent(100);
+        setProgressMsg(`Completed. ${filtered.length} rows remaining.`);
+    };
+
+    const handleApplyFilter = () => {
+        applyPipeline(originalData, fieldFilters, transformations);
     };
 
     const handleClearFilter = () => {
-        setFilteredData(originalData);
-        setPage(1);
-        setProgressMsg(`Filters cleared. Restored ${originalData.length} rows.`);
-        
         const resetFilters = { ...fieldFilters };
         Object.keys(resetFilters).forEach(h => resetFilters[h].keywords = []);
         setFieldFilters(resetFilters);
+        applyPipeline(originalData, resetFilters, transformations);
     };
 
-    const handleDistinct = () => {
+    const handleClearAll = () => {
+        setOriginalData([]);
+        setFilteredData([]);
+        setHeaders([]);
+        setFieldFilters({});
+        setTransformations([]);
+        setProgressPercent(0);
+        setProgressMsg('All data cleared.');
+        setStatus('idle');
+    };
+
+    const handleDistinct = async () => {
         setStatus('running');
         setProgressMsg('Removing duplicates...');
+        setProgressPercent(0);
         
-        setTimeout(() => {
-            const seen = new Set();
-            const unique: any[][] = [];
-            filteredData.forEach(row => {
+        const seen = new Set();
+        
+        const unique = await processInChunks(filteredData, (chunk) => {
+            const chunkUnique: any[][] = [];
+            chunk.forEach(row => {
                 const key = JSON.stringify(row);
                 if (!seen.has(key)) {
                     seen.add(key);
-                    unique.push(row);
+                    chunkUnique.push(row);
                 }
             });
-            setFilteredData(unique);
-            setPage(1);
-            setStatus('idle');
-            setProgressMsg(`Removed duplicates. ${unique.length} rows remaining.`);
-        }, 50);
+            return chunkUnique;
+        }, setProgressPercent, 5000);
+
+        setFilteredData(unique);
+        setPage(1);
+        setStatus('idle');
+        setProgressMsg(`Removed duplicates. ${unique.length} rows remaining.`);
+    };
+
+    const addTransformation = (t: Omit<TransformOperation, 'id'>) => {
+        const newTransforms = [...transformations, { ...t, id: Math.random().toString(36).substring(7) }];
+        setTransformations(newTransforms);
+        applyPipeline(originalData, fieldFilters, newTransforms);
+    };
+
+    const removeTransformation = (id: string) => {
+        const newTransforms = transformations.filter(t => t.id !== id);
+        setTransformations(newTransforms);
+        applyPipeline(originalData, fieldFilters, newTransforms);
     };
 
     const applyReplace = () => {
         if (!replaceColumn || !replaceFindText) return;
-        const colIdx = headers.indexOf(replaceColumn);
-        if (colIdx === -1) return;
-
-        setStatus('running');
-        setTimeout(() => {
-            const newData = [...filteredData];
-            for (let r = 0; r < newData.length; r++) {
-                newData[r] = [...newData[r]];
-                newData[r][colIdx] = String(newData[r][colIdx]).split(replaceFindText).join(replaceWithText);
-            }
-            setFilteredData(newData);
-            setOriginalData(newData);
-            setStatus('idle');
-            setProgressMsg('Replace applied.');
-        }, 50);
+        addTransformation({
+            type: 'replace',
+            column: replaceColumn,
+            text1: replaceFindText,
+            text2: replaceWithText
+        });
+        setReplaceFindText('');
+        setReplaceWithText('');
     };
 
     const applyAddition = () => {
         if (!additionColumn || !additionText) return;
-        const colIdx = headers.indexOf(additionColumn);
-        if (colIdx === -1) return;
-
-        setStatus('running');
-        setTimeout(() => {
-            const newData = [...filteredData];
-            for (let r = 0; r < newData.length; r++) {
-                newData[r] = [...newData[r]];
-                const val = String(newData[r][colIdx]);
-                if (additionPos === 'Left') {
-                    newData[r][colIdx] = additionText + val;
-                } else if (additionPos === 'Right') {
-                    newData[r][colIdx] = val + additionText;
-                } else if (additionPos === 'Double') {
-                    newData[r][colIdx] = additionText + val + additionText;
-                }
-            }
-            setFilteredData(newData);
-            setOriginalData(newData);
-            setStatus('idle');
-            setProgressMsg('Addition applied.');
-        }, 50);
+        addTransformation({
+            type: additionPos.toLowerCase() as any,
+            column: additionColumn,
+            text1: additionText
+        });
+        setAdditionText('');
     };
 
     const exportData = (onlyCheckedColumns: boolean) => {
@@ -287,7 +367,15 @@ export default function ExcelMergerRunner() {
                 setProgressMsg(`Merging file ${i + 1} of ${mergeFiles.length}...`);
                 const file = mergeFiles[i];
                 const arrayBuffer = await file.arrayBuffer();
-                const workbook = read(arrayBuffer, { type: 'array' });
+                let workbook;
+                
+                if (file.name.toLowerCase().endsWith('.csv')) {
+                    const decoder = new TextDecoder(csvEncoding);
+                    workbook = read(decoder.decode(arrayBuffer), { type: 'string' });
+                } else {
+                    workbook = read(arrayBuffer, { type: 'array' });
+                }
+                
                 const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                 const jsonData = utils.sheet_to_json(worksheet, { header: 1, defval: '' }) as any[][];
                 
@@ -313,21 +401,39 @@ export default function ExcelMergerRunner() {
                         initFilters[h] = { checked: true, rule: 'contains', keywords: [] };
                     });
                     setFieldFilters(initFilters);
+                    
+                    const dataRows = jsonData.slice(1).filter(r => r.some(c => c !== ''));
+                    combinedRows = [...combinedRows, ...dataRows];
+                } else {
+                    const currentFileHeaders = jsonData[0].map(String);
+                    const dataRows = jsonData.slice(1).filter(r => r.some(c => c !== ''));
+                    
+                    // Map headers to primary file
+                    const mappedRows = dataRows.map(row => {
+                        const mappedRow = new Array(firstFileHeaders.length).fill('');
+                        currentFileHeaders.forEach((h, colIdx) => {
+                            const primaryIdx = firstFileHeaders.indexOf(h);
+                            if (primaryIdx !== -1) {
+                                mappedRow[primaryIdx] = row[colIdx];
+                            }
+                        });
+                        return mappedRow;
+                    });
+                    
+                    combinedRows = [...combinedRows, ...mappedRows];
                 }
-
-                const dataRows = jsonData.slice(1).filter(r => r.some(c => c !== ''));
-                
-                // If subsequent files have different columns, they will map index-to-index blindly
-                // just like a fast combiner.
-                combinedRows = [...combinedRows, ...dataRows];
             }
 
             setOriginalData(combinedRows);
-            setFilteredData(combinedRows);
+            setTransformations([]);
+            setFieldFilters(prev => {
+                const resetFilters = { ...prev };
+                Object.keys(resetFilters).forEach(h => resetFilters[h].keywords = []);
+                return resetFilters;
+            });
+            applyPipeline(combinedRows, {}, []); // will reset filters properly
             setPage(1);
             setMergeFiles([]);
-            setStatus('idle');
-            setProgressMsg(`Successfully merged ${mergeFiles.length} files. Total ${combinedRows.length} rows.`);
         } catch (e) {
             console.error(e);
             setStatus('error');
@@ -385,6 +491,11 @@ export default function ExcelMergerRunner() {
                 <div className="flex items-center gap-2 overflow-x-auto pr-4">
                     <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" accept=".xlsx,.xls,.csv" />
                     
+                    <select value={csvEncoding} onChange={(e) => setCsvEncoding(e.target.value)} className="h-8 text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 rounded-md px-2 outline-none">
+                        <option value="utf-8">UTF-8</option>
+                        <option value="windows-1256">Windows-1256 (Arabic)</option>
+                    </select>
+
                     <Button onClick={() => fileInputRef.current?.click()} size="sm" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold border border-indigo-200 gap-1.5 shrink-0">
                         <UploadCloud className="w-4 h-4" /> Upload
                     </Button>
@@ -392,13 +503,16 @@ export default function ExcelMergerRunner() {
                     <div className="h-6 w-px bg-slate-200 mx-2 shrink-0" />
 
                     <Button onClick={handleApplyFilter} disabled={headers.length === 0} size="sm" className="bg-slate-800 text-white hover:bg-slate-700 font-bold gap-1.5 shrink-0">
-                        <Filter className="w-4 h-4" /> Apply Filter
+                        <Filter className="w-4 h-4" /> Apply Pipeline
                     </Button>
                     <Button onClick={handleClearFilter} disabled={headers.length === 0} variant="outline" size="sm" className="font-bold gap-1.5 shrink-0">
-                        <RefreshCw className="w-4 h-4" /> Clear Filter
+                        <RefreshCw className="w-4 h-4" /> Clear Filters
                     </Button>
                     <Button onClick={handleDistinct} disabled={headers.length === 0} variant="outline" size="sm" className="font-bold shrink-0">
                         Distinct
+                    </Button>
+                    <Button onClick={handleClearAll} disabled={headers.length === 0} size="sm" className="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold shrink-0">
+                        Clear All
                     </Button>
 
                     <div className="h-6 w-px bg-slate-200 mx-2 shrink-0" />
@@ -435,6 +549,7 @@ export default function ExcelMergerRunner() {
                         ) : (
                             headers.map((h, i) => {
                                 const filter = fieldFilters[h];
+                                if (!filter) return null;
                                 return (
                                     <div key={i} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                                         <div className="bg-indigo-600 text-white px-3 py-2 flex items-center justify-between">
@@ -530,7 +645,27 @@ export default function ExcelMergerRunner() {
                     </div>
 
                     <div className="p-4 bg-white border-t border-slate-200 shrink-0 space-y-4">
-                        <div className="space-y-2">
+                        {transformations.length > 0 && (
+                            <div className="space-y-2">
+                                <h4 className="text-xs font-black text-emerald-700 uppercase flex items-center gap-1">
+                                    <Settings className="w-3.5 h-3.5" /> Active Transformations
+                                </h4>
+                                <div className="space-y-1 max-h-24 overflow-y-auto border border-emerald-100 rounded p-1 bg-emerald-50/50">
+                                    {transformations.map(t => (
+                                        <div key={t.id} className="flex items-center justify-between bg-white text-[10px] p-1.5 rounded border border-emerald-100">
+                                            <span className="truncate font-medium text-emerald-800">
+                                                [{t.column}] {t.type} {t.text1} {t.text2 ? `-> ${t.text2}` : ''}
+                                            </span>
+                                            <button onClick={() => removeTransformation(t.id)} className="text-rose-400 hover:text-rose-600 ml-2 shrink-0">
+                                                <Minus className="w-3 h-3" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="space-y-2 pt-3 border-t border-slate-100">
                             <h4 className="text-xs font-black text-slate-800 uppercase flex items-center gap-1">
                                 <Wand2 className="w-3.5 h-3.5" /> Find & Replace
                             </h4>
@@ -543,7 +678,7 @@ export default function ExcelMergerRunner() {
                                     <option value="">Column...</option>
                                     {headers.map(h => <option key={h} value={h}>{h}</option>)}
                                 </select>
-                                <Button onClick={applyReplace} size="sm" className="h-auto py-1 bg-indigo-600 hover:bg-indigo-700 text-[11px]">Replace</Button>
+                                <Button onClick={applyReplace} disabled={!replaceColumn || !replaceFindText} size="sm" className="h-auto py-1 bg-indigo-600 hover:bg-indigo-700 text-[11px]">Replace</Button>
                             </div>
                         </div>
 
@@ -564,7 +699,7 @@ export default function ExcelMergerRunner() {
                                     <option value="">Column...</option>
                                     {headers.map(h => <option key={h} value={h}>{h}</option>)}
                                 </select>
-                                <Button onClick={applyAddition} size="sm" className="h-auto py-1 bg-indigo-600 hover:bg-indigo-700 text-[11px]">Add</Button>
+                                <Button onClick={applyAddition} disabled={!additionColumn || !additionText} size="sm" className="h-auto py-1 bg-indigo-600 hover:bg-indigo-700 text-[11px]">Add</Button>
                             </div>
                         </div>
 
@@ -681,7 +816,7 @@ export default function ExcelMergerRunner() {
                                 <h3 className="text-sm font-bold text-slate-800 mb-1">
                                     {mergeActive ? 'Drop files here...' : 'Drag & drop Excel or CSV files to merge'}
                                 </h3>
-                                <p className="text-xs font-medium text-slate-500">Files will be merged vertically and loaded into the main grid.</p>
+                                <p className="text-xs font-medium text-slate-500">Files will be merged vertically. Columns will be correctly mapped by Header Name.</p>
                             </div>
 
                             {mergeFiles.length > 0 && (
