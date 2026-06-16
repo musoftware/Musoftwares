@@ -203,6 +203,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     const [lassoStart, setLassoStart] = useState<{ x: number, y: number } | null>(null);
     const [lassoEnd, setLassoEnd] = useState<{ x: number, y: number } | null>(null);
     const [isLassoing, setIsLassoing] = useState(false);
+    const wasLassoingRef = useRef(false);
 
     // Prayer Times State
     const [showPrayerTimes, setShowPrayerTimes] = useState(() => {
@@ -437,6 +438,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
         const currentY = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
         
         setLassoEnd({ x: currentX, y: currentY });
+        wasLassoingRef.current = true;
         
         const minX = Math.min(lassoStart.x, currentX);
         const maxX = Math.max(lassoStart.x, currentX);
@@ -503,6 +505,16 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
             case 'auto_arrange':
                 handleAutoArrange();
                 break;
+            case 'categorize_icons':
+                if (window.confirm('Group all loose desktop tools into category folders?')) {
+                    handleCategorizeIcons();
+                }
+                break;
+            case 'reset_positions':
+                if (window.confirm('Are you sure you want to reset all icon positions? This will rearrange them sequentially.')) {
+                    handleResetPositions();
+                }
+                break;
             case 'settings':
                 setIsSettingsModalOpen(true);
                 setMaxZIndex(prev => {
@@ -553,6 +565,74 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
             const y = index % MAX_ROWS;
             return { ...item, x, y };
         });
+        setDesktopItems(rearranged);
+    };
+
+    const handleResetPositions = () => {
+        const rearranged = [...desktopItems].map((item, index) => {
+            const x = Math.floor(index / MAX_ROWS);
+            const y = index % MAX_ROWS;
+            return { ...item, x, y };
+        });
+        setDesktopItems(rearranged);
+    };
+
+    const handleCategorizeIcons = () => {
+        let items = [...desktopItems];
+        
+        // Find all loose tools
+        const looseTools = items.filter(i => i.type === 'tool');
+        
+        looseTools.forEach(toolItem => {
+            if (!toolItem.toolSlug) return;
+            const toolData = tools.data.find(t => t.slug === toolItem.toolSlug);
+            if (!toolData || !toolData.category_label) return;
+            
+            const categoryName = toolData.category_label;
+            
+            // Check if folder exists
+            let folderIndex = items.findIndex(i => i.type === 'folder' && i.name === categoryName);
+            
+            if (folderIndex === -1) {
+                const { x, y } = findNextAvailableCell(items);
+                const newFolder: DesktopItem = {
+                    id: `folder-cat-${Date.now()}-${Math.random()}`,
+                    type: 'folder',
+                    name: categoryName,
+                    childrenSlugs: [],
+                    x,
+                    y
+                };
+                items.push(newFolder);
+                folderIndex = items.length - 1;
+            }
+            
+            // Move tool to folder
+            const folder = items[folderIndex];
+            if (!folder.childrenSlugs) folder.childrenSlugs = [];
+            
+            // Avoid duplicates
+            if (!folder.childrenSlugs.includes(toolItem.toolSlug)) {
+                folder.childrenSlugs.push(toolItem.toolSlug);
+            }
+            
+            // Remove from desktop
+            items = items.filter(i => i.id !== toolItem.id);
+            // Re-find folder index because items array length changed
+            folderIndex = items.findIndex(i => i.id === folder.id);
+        });
+        
+        // Clean up empty spaces by auto-arranging the remaining items
+        const sorted = [...items].sort((a, b) => {
+            if (a.type !== b.type) return a.type === 'folder' ? -1 : 1;
+            return a.name.localeCompare(b.name);
+        });
+        const rearranged = sorted.map((item, index) => {
+            const x = Math.floor(index / MAX_ROWS);
+            const y = index % MAX_ROWS;
+            return { ...item, x, y };
+        });
+        
         setDesktopItems(rearranged);
     };
 
@@ -935,11 +1015,20 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
         <div 
             className="h-screen w-screen overflow-hidden bg-slate-900 bg-cover bg-center flex flex-col font-['Inter',sans-serif]"
             style={{ backgroundImage: wallpaperUrl ? `url(${wallpaperUrl})` : 'none' }}
-            onClick={() => {
+            onClick={(e) => {
                 setIsStartMenuOpen(false);
-                setSelectedItemIds([]);
                 setContextMenu(null);
                 setEditingItemId(null);
+                
+                if (wasLassoingRef.current) {
+                    wasLassoingRef.current = false;
+                    return;
+                }
+                
+                // Only clear selection if we directly clicked the desktop background
+                if (!(e.target as HTMLElement).closest('.desktop-item-container')) {
+                    setSelectedItemIds([]);
+                }
             }}
             onContextMenu={handleDesktopContextMenu}
             onTouchStart={handleDesktopTouchStart}
@@ -990,6 +1079,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 isOwned={subscribedSlugs.includes(toolData.slug)}
                                 isFeatured={toolData.is_featured}
                                 onClick={(e) => {
+                                    e.stopPropagation();
                                     if (e.ctrlKey) {
                                         setSelectedItemIds(prev => prev.includes(item.id) ? prev.filter(i => i !== item.id) : [...prev, item.id]);
                                     } else {
@@ -1038,6 +1128,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 name={item.name}
                                 childrenTools={childrenTools}
                                 onClick={(e) => {
+                                    e.stopPropagation();
                                     if (e.ctrlKey) {
                                         setSelectedItemIds(prev => prev.includes(item.id) ? prev.filter(i => i !== item.id) : [...prev, item.id]);
                                     } else {
