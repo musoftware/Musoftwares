@@ -116,15 +116,15 @@ export default function Home() {
         {
             name: "AmcTasks.com",
             img: "/images/portfolio/amctasks.jpg",
-            description: "AmcTasks is a specialized team collaboration and project management tool. It replaces messy spreadsheets and disjointed communication by giving teams a centralized hub to assign work, set deadlines, and track overall progress efficiently.",
+            description: "AmcTasks is a powerful social media automation platform designed to help businesses manage their online presence. Instead of jumping between different apps, you can schedule posts across multiple platforms, set up recurring content, and manage hundreds of Facebook comments automatically from a single dashboard.",
             features: [
-                "Team task assignments",
-                "Project progress tracking",
-                "Internal team messaging",
-                "Automated notifications",
-                "File sharing & storage"
+                "Social media post scheduling",
+                "Automated bulk comment replies",
+                "SMS marketing campaigns",
+                "Recurring content automation",
+                "Analytics and export tools"
             ],
-            techs: ["Next.js", "Node.js", "MongoDB"]
+            techs: ["Laravel", "Redis", "Firebase"]
         }
     ];
 
@@ -325,8 +325,8 @@ export default function Home() {
                     <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-16">
                         <div className="gsap-fade-up w-56 h-56 md:w-72 md:h-72 rounded-full bg-[#1a1a1a] border border-[#333333] overflow-hidden flex-shrink-0 flex items-center justify-center relative">
                             {/* Inner subtle glow */}
-                            <div className="absolute inset-0 bg-gradient-to-tr from-[#333333]/20 to-transparent"></div>
-                            <UserCircle className="w-28 h-28 text-[#555555] relative z-10" />
+                            <div className="absolute inset-0 bg-gradient-to-tr from-[#333333]/20 to-transparent z-10 pointer-events-none"></div>
+                            <img src="/images/mahmoud-photo.jpg" alt="Eng. Mahmoud" className="w-full h-full object-cover relative z-0" />
                         </div>
                         <div className="text-center md:text-left flex-1">
                             <h2 className="gsap-fade-up text-4xl lg:text-5xl font-extrabold mb-4">About Eng. Mahmoud</h2>
