@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Head, usePage, router } from '@inertiajs/react';
-import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
+import WebToolsLayout from '@/Layouts/WebToolsLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -108,7 +108,7 @@ export default function Calculator({ input, result, amount_to_pay, calculation_t
     };
 
     return (
-        <ToolsPublicLayout title="Payment Calculator" activeNav="explore">
+        <WebToolsLayout title="Payment Calculator" activeNav="explore">
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6">
                 <div className="mb-8">
                     <span className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-sm font-medium mb-3">
@@ -346,6 +346,6 @@ export default function Calculator({ input, result, amount_to_pay, calculation_t
                     </div>
                 </div>
             </div>
-        </ToolsPublicLayout>
+        </WebToolsLayout>
     );
 }

@@ -3,7 +3,7 @@
     "alias": "tools",
     "description": "Downloadable Python Tools Marketplace — subscribe, license, download, activate.",
     "keywords": ["marketplace", "tools", "downloads", "licenses"],
-    "priority": 0,
+    "priority": 99,
     "providers": [
         "Modules\\Tools\\Providers\\ToolsServiceProvider"
     ],

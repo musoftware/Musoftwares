@@ -179,6 +179,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     const [openFolderId, setOpenFolderId] = useState<string | null>(null);
     const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+    const [settingsZIndex, setSettingsZIndex] = useState(10);
     const [wallpaperUrl, setWallpaperUrl] = useState(workspaceSettings?.wallpaperUrl || DEFAULT_WALLPAPER_URL);
     const [openWithOneClick, setOpenWithOneClick] = useState(workspaceSettings?.openWithOneClick || false);
     const [runtimeHost, setRuntimeHost] = useState(workspaceSettings?.runtimeHost || '127.0.0.1');
@@ -197,6 +198,11 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
     const [editingItemId, setEditingItemId] = useState<string | null>(null);
     const [clipboard, setClipboard] = useState<DesktopItem[]>([]);
+
+    // Lasso Selection State
+    const [lassoStart, setLassoStart] = useState<{ x: number, y: number } | null>(null);
+    const [lassoEnd, setLassoEnd] = useState<{ x: number, y: number } | null>(null);
+    const [isLassoing, setIsLassoing] = useState(false);
 
     // Prayer Times State
     const [showPrayerTimes, setShowPrayerTimes] = useState(() => {
@@ -403,6 +409,61 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
         if (touchTimer.current) clearTimeout(touchTimer.current);
     };
 
+    // Lasso Logic
+    const handleDesktopMouseDown = (e: React.MouseEvent) => {
+        if (e.button !== 0 || isMobile) return;
+        if ((e.target as HTMLElement).closest('.desktop-item-container')) return;
+        
+        const container = e.currentTarget as HTMLElement;
+        const rect = container.getBoundingClientRect();
+        const startX = e.clientX - rect.left;
+        const startY = e.clientY - rect.top;
+        
+        setLassoStart({ x: startX, y: startY });
+        setLassoEnd({ x: startX, y: startY });
+        setIsLassoing(true);
+        
+        if (!e.ctrlKey) {
+            setSelectedItemIds([]);
+        }
+    };
+
+    const handleDesktopMouseMove = (e: React.MouseEvent) => {
+        if (!isLassoing || !lassoStart) return;
+        
+        const container = e.currentTarget as HTMLElement;
+        const rect = container.getBoundingClientRect();
+        const currentX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+        const currentY = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
+        
+        setLassoEnd({ x: currentX, y: currentY });
+        
+        const minX = Math.min(lassoStart.x, currentX);
+        const maxX = Math.max(lassoStart.x, currentX);
+        const minY = Math.min(lassoStart.y, currentY);
+        const maxY = Math.max(lassoStart.y, currentY);
+        
+        const newSelectedIds = desktopItems.filter(item => {
+            const itemLeft = (item.x || 0) * CELL_WIDTH;
+            const itemTop = (item.y || 0) * CELL_HEIGHT;
+            const itemRight = itemLeft + CELL_WIDTH;
+            const itemBottom = itemTop + CELL_HEIGHT;
+            
+            return !(itemRight < minX || itemLeft > maxX || itemBottom < minY || itemTop > maxY);
+        }).map(i => i.id);
+        
+        // In a real app we'd merge if ctrlKey is held, but this is simple override
+        setSelectedItemIds(newSelectedIds);
+    };
+
+    const handleDesktopMouseUp = (e: React.MouseEvent) => {
+        if (isLassoing) {
+            setIsLassoing(false);
+            setLassoStart(null);
+            setLassoEnd(null);
+        }
+    };
+
     const handleItemTouchStart = (e: React.TouchEvent, id: string, type: 'icon' | 'folder') => {
         e.stopPropagation();
         if (touchTimer.current) clearTimeout(touchTimer.current);
@@ -444,6 +505,11 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                 break;
             case 'settings':
                 setIsSettingsModalOpen(true);
+                setMaxZIndex(prev => {
+                    const nextZ = prev + 1;
+                    setSettingsZIndex(nextZ);
+                    return nextZ;
+                });
                 break;
             case 'open':
                 if (targetId) {
@@ -630,7 +696,18 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     // Drag and Drop Logic
     const handleDragStart = (e: React.DragEvent, id: string, sourceFolderId?: string) => {
         e.stopPropagation();
-        const payload = sourceFolderId ? `fromFolder:${sourceFolderId}:${id}` : id;
+        
+        let dragIds = selectedItemIds;
+        if (!selectedItemIds.includes(id)) {
+            dragIds = [id];
+            setSelectedItemIds([id]);
+        }
+        
+        const payload = JSON.stringify({
+            ids: dragIds,
+            sourceFolderId: sourceFolderId || null
+        });
+        
         e.dataTransfer.setData('text/plain', payload);
         e.dataTransfer.effectAllowed = 'move';
         setDraggedItemId(id);
@@ -654,77 +731,90 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
         e.stopPropagation();
         setDragOverItemId(null);
         
-        const payload = e.dataTransfer.getData('text/plain');
-        if (!payload || payload === targetId) return;
+        try {
+            const payloadStr = e.dataTransfer.getData('text/plain');
+            
+            // legacy single ID fallback
+            if (!payloadStr.startsWith('{')) {
+                // handle legacy drop (if needed) but we can just return for safety
+                if (!payloadStr.startsWith('fromFolder:')) return; 
+            }
 
-        if (payload.startsWith('fromFolder:')) {
-            const [, folderId, toolSlug] = payload.split(':');
+            let payload: { ids: string[], sourceFolderId: string | null } = { ids: [], sourceFolderId: null };
+            
+            if (payloadStr.startsWith('fromFolder:')) {
+                const [, folderId, toolSlug] = payloadStr.split(':');
+                payload = { ids: [toolSlug], sourceFolderId: folderId };
+            } else {
+                payload = JSON.parse(payloadStr);
+            }
+            
+            if (!payload || !payload.ids) return;
+
+            const { ids, sourceFolderId } = payload;
+            
+            // if dropping an item on itself, ignore
+            if (ids.includes(targetId)) return;
+            
             setDesktopItems(prevItems => {
                 const items = [...prevItems];
-                const sourceFolder = items.find(i => i.id === folderId);
                 const targetIndex = items.findIndex(i => i.id === targetId);
+                if (targetIndex === -1) return prevItems;
                 const targetItem = items[targetIndex];
-
-                if (sourceFolder && sourceFolder.childrenSlugs) {
-                    sourceFolder.childrenSlugs = sourceFolder.childrenSlugs.filter(s => s !== toolSlug);
-                    
-                    if (targetItem && targetItem.type === 'folder') {
-                        targetItem.childrenSlugs = [...(targetItem.childrenSlugs || []), toolSlug];
-                    } else if (targetItem && targetItem.type === 'tool') {
-                        const newFolder: DesktopItem = {
-                            id: `folder-${Date.now()}`,
-                            type: 'folder',
-                            name: 'Folder',
-                            childrenSlugs: [targetItem.toolSlug!, toolSlug],
-                            x: targetItem.x,
-                            y: targetItem.y
+                
+                if (sourceFolderId) {
+                    const sourceFolderIndex = items.findIndex(i => i.id === sourceFolderId);
+                    if (sourceFolderIndex > -1) {
+                        const sourceFolder = items[sourceFolderIndex];
+                        items[sourceFolderIndex] = {
+                            ...sourceFolder,
+                            childrenSlugs: (sourceFolder.childrenSlugs || []).filter(s => !ids.includes(s))
                         };
-                        items.splice(targetIndex, 1, newFolder);
+                        
+                        if (targetItem.type === 'folder') {
+                            items[targetIndex] = {
+                                ...targetItem,
+                                childrenSlugs: [...(targetItem.childrenSlugs || []), ...ids]
+                            };
+                        } else if (targetItem.type === 'tool') {
+                            const newFolder: DesktopItem = {
+                                id: `folder-${Date.now()}`,
+                                type: 'folder',
+                                name: 'New Folder',
+                                childrenSlugs: [targetItem.toolSlug!, ...ids],
+                                x: targetItem.x,
+                                y: targetItem.y
+                            };
+                            items.splice(targetIndex, 1, newFolder);
+                        }
                     }
+                } else {
+                    const sourceItems = items.filter(i => ids.includes(i.id) && i.type === 'tool');
+                    if (sourceItems.length === 0) return prevItems;
+                    
+                    const remainingItems = items.filter(i => !ids.includes(i.id));
+                    const newTargetIndex = remainingItems.findIndex(i => i.id === targetId);
+                    
+                    if (targetItem.type === 'folder') {
+                        remainingItems[newTargetIndex] = {
+                            ...targetItem,
+                            childrenSlugs: [...(targetItem.childrenSlugs || []), ...sourceItems.map(i => i.toolSlug!)]
+                        };
+                    } else if (targetItem.type === 'tool') {
+                        remainingItems[newTargetIndex] = {
+                            ...targetItem,
+                            type: 'folder',
+                            name: 'New Folder',
+                            childrenSlugs: [targetItem.toolSlug!, ...sourceItems.map(i => i.toolSlug!)]
+                        };
+                    }
+                    return remainingItems;
                 }
                 return items;
             });
-            setDraggedItemId(null);
-            return;
+        } catch(err) {
+            console.error(err);
         }
-
-        setDesktopItems(prevItems => {
-            const items = [...prevItems];
-            const sourceIndex = items.findIndex(i => i.id === payload);
-            const targetIndex = items.findIndex(i => i.id === targetId);
-
-            if (sourceIndex === -1 || targetIndex === -1) return prevItems;
-
-            const sourceItem = items[sourceIndex];
-            const targetItem = items[targetIndex];
-
-            if (sourceItem.type === 'tool' && targetItem.type === 'tool') {
-                items.splice(sourceIndex, 1);
-                const targetIndexUpdated = items.findIndex(i => i.id === targetId);
-                items[targetIndexUpdated] = {
-                    ...items[targetIndexUpdated],
-                    type: 'folder',
-                    name: 'New Folder',
-                    childrenSlugs: [sourceItem.toolSlug!, items[targetIndexUpdated].toolSlug!]
-                };
-            } else if (sourceItem.type === 'tool' && targetItem.type === 'folder') {
-                items.splice(sourceIndex, 1);
-                const targetIndexUpdated = items.findIndex(i => i.id === targetId);
-                items[targetIndexUpdated] = {
-                    ...items[targetIndexUpdated],
-                    childrenSlugs: [...(items[targetIndexUpdated].childrenSlugs || []), sourceItem.toolSlug!]
-                };
-            } else {
-                const tempX = targetItem.x;
-                const tempY = targetItem.y;
-                targetItem.x = sourceItem.x;
-                targetItem.y = sourceItem.y;
-                sourceItem.x = tempX;
-                sourceItem.y = tempY;
-            }
-
-            return items;
-        });
         setDraggedItemId(null);
     };
 
@@ -740,61 +830,97 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
         const gridX = Math.max(0, Math.floor(dropX / CELL_WIDTH));
         const gridY = Math.max(0, Math.floor(dropY / CELL_HEIGHT));
 
-        const payload = e.dataTransfer.getData('text/plain');
-        
-        if (payload.startsWith('fromFolder:')) {
-            const [, folderId, toolSlug] = payload.split(':');
+        try {
+            const payloadStr = e.dataTransfer.getData('text/plain');
+            
+            let payload: { ids: string[], sourceFolderId: string | null } = { ids: [], sourceFolderId: null };
+            
+            if (payloadStr.startsWith('fromFolder:')) {
+                const [, folderId, toolSlug] = payloadStr.split(':');
+                payload = { ids: [toolSlug], sourceFolderId: folderId };
+            } else if (payloadStr.startsWith('{')) {
+                payload = JSON.parse(payloadStr);
+            } else {
+                payload = { ids: [payloadStr], sourceFolderId: null };
+            }
+
+            if (!payload || !payload.ids) return;
+
+            const { ids, sourceFolderId } = payload;
+            
             setDesktopItems(prevItems => {
                 const items = [...prevItems];
-                const sourceFolderIndex = items.findIndex(i => i.id === folderId);
                 
-                if (sourceFolderIndex > -1) {
-                    const sourceFolder = items[sourceFolderIndex];
-                    items[sourceFolderIndex] = {
-                        ...sourceFolder,
-                        childrenSlugs: (sourceFolder.childrenSlugs || []).filter(s => s !== toolSlug)
-                    };
-                    
-                    const toolData = tools.data.find(t => t.slug === toolSlug);
-                    
-                    let finalX = gridX, finalY = gridY;
-                    const occupantIndex = items.findIndex(i => i.x === finalX && i.y === finalY);
-                    if (occupantIndex > -1) {
-                        const { x, y } = findNextAvailableCell(items);
-                        finalX = x;
-                        finalY = y;
-                    }
-
-                    if (toolData) {
-                        items.push({
-                            id: `tool-${toolSlug}`,
-                            type: 'tool',
-                            name: toolData.title,
-                            toolSlug: toolSlug,
-                            x: finalX,
-                            y: finalY
+                if (sourceFolderId) {
+                    const sourceFolderIndex = items.findIndex(i => i.id === sourceFolderId);
+                    if (sourceFolderIndex > -1) {
+                        const sourceFolder = items[sourceFolderIndex];
+                        items[sourceFolderIndex] = {
+                            ...sourceFolder,
+                            childrenSlugs: (sourceFolder.childrenSlugs || []).filter(s => !ids.includes(s))
+                        };
+                        
+                        let currentGridX = gridX;
+                        let currentGridY = gridY;
+                        
+                        ids.forEach((slug: string) => {
+                            const toolData = tools.data.find(t => t.slug === slug);
+                            if (toolData) {
+                                let finalX = currentGridX, finalY = currentGridY;
+                                const occupantIndex = items.findIndex(i => i.x === finalX && i.y === finalY);
+                                if (occupantIndex > -1) {
+                                    const { x, y } = findNextAvailableCell(items);
+                                    finalX = x;
+                                    finalY = y;
+                                }
+                                items.push({
+                                    id: `tool-${slug}-${Date.now()}-${Math.random()}`,
+                                    type: 'tool',
+                                    name: toolData.title,
+                                    toolSlug: slug,
+                                    x: finalX,
+                                    y: finalY
+                                });
+                                currentGridX++;
+                                if (currentGridX >= Math.max(1, Math.floor(rect.width / CELL_WIDTH))) {
+                                    currentGridX = 0;
+                                    currentGridY++;
+                                }
+                            }
                         });
                     }
+                } else {
+                    let currentGridX = gridX;
+                    let currentGridY = gridY;
+                    
+                    ids.forEach((id: string) => {
+                        const itemIndex = items.findIndex(i => i.id === id);
+                        if (itemIndex > -1) {
+                            let finalX = currentGridX;
+                            let finalY = currentGridY;
+                            const occupantIndex = items.findIndex(i => i.x === finalX && i.y === finalY && !ids.includes(i.id));
+                            
+                            if (occupantIndex > -1) {
+                                const { x, y } = findNextAvailableCell(items);
+                                finalX = x;
+                                finalY = y;
+                            }
+                            
+                            items[itemIndex] = { ...items[itemIndex], x: finalX, y: finalY };
+                            
+                            currentGridX++;
+                            if (currentGridX >= Math.max(1, Math.floor(rect.width / CELL_WIDTH))) {
+                                currentGridX = 0;
+                                currentGridY++;
+                            }
+                        }
+                    });
                 }
                 return items;
             });
-        } else {
-            // Move item to grid position
-            setDesktopItems(prevItems => {
-                const items = [...prevItems];
-                const itemIndex = items.findIndex(i => i.id === payload);
-                if (itemIndex > -1) {
-                    const occupantIndex = items.findIndex(i => i.x === gridX && i.y === gridY && i.id !== payload);
-                    if (occupantIndex > -1) {
-                        // Swap with occupant
-                        const occupant = items[occupantIndex];
-                        occupant.x = items[itemIndex].x;
-                        occupant.y = items[itemIndex].y;
-                    }
-                    items[itemIndex] = { ...items[itemIndex], x: gridX, y: gridY };
-                }
-                return items;
-            });
+            
+        } catch (err) {
+           console.error(err);
         }
         setDraggedItemId(null);
     };
@@ -827,7 +953,23 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                 className={`flex-1 p-4 md:p-6 overflow-x-hidden relative ${isMobile ? 'grid grid-cols-3 sm:grid-cols-4 gap-y-6 gap-x-2 overflow-y-auto content-start z-10' : 'overflow-hidden'}`}
                 onDragOver={(e) => { if (!isMobile) e.preventDefault(); }}
                 onDrop={(e) => { if (!isMobile) handleDesktopDrop(e); }}
+                onMouseDown={handleDesktopMouseDown}
+                onMouseMove={handleDesktopMouseMove}
+                onMouseUp={handleDesktopMouseUp}
+                onMouseLeave={handleDesktopMouseUp}
             >
+                {/* Lasso Box */}
+                {isLassoing && lassoStart && lassoEnd && !isMobile && (
+                    <div 
+                        className="absolute bg-blue-500/30 border border-blue-400 pointer-events-none z-50"
+                        style={{
+                            left: Math.min(lassoStart.x, lassoEnd.x),
+                            top: Math.min(lassoStart.y, lassoEnd.y),
+                            width: Math.abs(lassoEnd.x - lassoStart.x),
+                            height: Math.abs(lassoEnd.y - lassoStart.y),
+                        }}
+                    />
+                )}
                 {desktopItems.map((item) => {
                     const style: React.CSSProperties = isMobile ? { position: 'relative' } : {
                         position: 'absolute',
@@ -865,7 +1007,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 onDragStart={(e) => handleDragStart(e, item.id)}
                                 onDragEnd={() => setDraggedItemId(null)}
                                 style={style}
-                                className={draggedItemId === item.id ? 'opacity-50 scale-95' : 'hover:scale-105 transition-transform'}
+                                className={`desktop-item-container ${draggedItemId === item.id ? 'opacity-50 scale-95' : 'hover:scale-105 transition-transform'}`}
                                 isSelected={selectedItemIds.includes(item.id)}
                                 isEditing={editingItemId === item.id}
                                 onRenameSubmit={(newName) => {
@@ -917,7 +1059,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 onDrop={(e) => handleDropOnItem(e, item.id)}
                                 isDragOver={dragOverItemId === item.id}
                                 style={style}
-                                className={draggedItemId === item.id ? 'opacity-50 scale-95' : 'hover:scale-105 transition-transform'}
+                                className={`desktop-item-container ${draggedItemId === item.id ? 'opacity-50 scale-95' : 'hover:scale-105 transition-transform'}`}
                                 isSelected={selectedItemIds.includes(item.id)}
                                 isEditing={editingItemId === item.id}
                                 onRenameSubmit={(newName) => handleRenameFolder(item.id, newName)}
@@ -980,7 +1122,15 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 <span className="text-sm font-medium">{showPrayerTimes ? 'Hide Prayer Times' : 'Show Prayer Times'}</span>
                             </button>
                             <button 
-                                onClick={() => setIsSettingsModalOpen(true)}
+                                onClick={() => { 
+                                    setIsSettingsModalOpen(true); 
+                                    setIsStartMenuOpen(false);
+                                    setMaxZIndex(prev => {
+                                        const nextZ = prev + 1;
+                                        setSettingsZIndex(nextZ);
+                                        return nextZ;
+                                    });
+                                }}
                                 className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/10 text-slate-200 transition-colors text-left mt-1"
                             >
                                 <span className="text-lg">⚙️</span>
@@ -1207,6 +1357,14 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
             <SettingsModal 
                 isOpen={isSettingsModalOpen}
                 onClose={() => setIsSettingsModalOpen(false)}
+                zIndex={settingsZIndex}
+                onFocus={() => {
+                    setMaxZIndex(prev => {
+                        const nextZ = prev + 1;
+                        setSettingsZIndex(nextZ);
+                        return nextZ;
+                    });
+                }}
                 showPrayerTimes={showPrayerTimes}
                 onTogglePrayerTimes={() => {
                     const newValue = !showPrayerTimes;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
-import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
+import WebToolsLayout from '@/Layouts/WebToolsLayout';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { CheckCircle2, Lock, ArrowRight, Smartphone, AlertCircle } from 'lucide-react';
@@ -13,7 +13,7 @@ interface WithdrawInstapayPayLinkProps {
 
 export default function WithdrawInstapayPayLink({ payLink, userId, whatsappSent }: WithdrawInstapayPayLinkProps) {
     return (
-        <ToolsPublicLayout title="Complete Payment" activeNav="explore">
+        <WebToolsLayout title="Complete Payment" activeNav="explore">
             <div className="max-w-3xl mx-auto py-16 px-4 sm:px-6">
                 <Card className="border-slate-200 shadow-lg overflow-hidden border-t-4 border-t-purple-500">
                     <CardContent className="p-8 sm:p-12 text-center">
@@ -60,6 +60,6 @@ export default function WithdrawInstapayPayLink({ payLink, userId, whatsappSent 
                     </CardContent>
                 </Card>
             </div>
-        </ToolsPublicLayout>
+        </WebToolsLayout>
     );
 }

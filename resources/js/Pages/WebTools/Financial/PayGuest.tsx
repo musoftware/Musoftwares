@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head, useForm } from '@inertiajs/react';
-import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
+import WebToolsLayout from '@/Layouts/WebToolsLayout';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -34,7 +34,7 @@ export default function PayGuest({ payGuestCurrencies = [] }: PayGuestProps) {
     };
 
     return (
-        <ToolsPublicLayout title="Pay as Guest" activeNav="explore">
+        <WebToolsLayout title="Pay as Guest" activeNav="explore">
             <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6">
                 <div className="mb-8 text-center">
                     <div className="inline-flex items-center justify-center p-3 bg-indigo-100 rounded-2xl text-indigo-600 mb-4">
@@ -197,6 +197,6 @@ export default function PayGuest({ payGuestCurrencies = [] }: PayGuestProps) {
                     </div>
                 </div>
             </div>
-        </ToolsPublicLayout>
+        </WebToolsLayout>
     );
 }

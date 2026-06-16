@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head } from '@inertiajs/react';
-import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
+import WebToolsLayout from '@/Layouts/WebToolsLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -89,7 +89,7 @@ export default function CoordinatesConverter() {
     };
 
     return (
-        <ToolsPublicLayout title="Decimal to Degrees Converter (DMS)" activeNav="explore">
+        <WebToolsLayout title="Decimal to Degrees Converter (DMS)" activeNav="explore">
             <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6">
                 <div className="text-center mb-10">
                     <div className="inline-flex items-center justify-center p-3 bg-blue-100 text-blue-700 rounded-2xl mb-4">
@@ -261,6 +261,6 @@ export default function CoordinatesConverter() {
                     </div>
                 </div>
             </div>
-        </ToolsPublicLayout>
+        </WebToolsLayout>
     );
 }

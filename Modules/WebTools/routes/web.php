@@ -31,6 +31,8 @@ Route::prefix('tools')->name('tools.')->group(function () {
     Route::get('/smart-pricing-calculator', [SmartPricingCalculatorController::class, 'index'])->name('smart-pricing-calculator');
     Route::post('/smart-pricing-calculator', [SmartPricingCalculatorController::class, 'process'])->name('smart-pricing-calculator.process');
     
+    Route::redirect('/instapay-calculator', '/tools/withdraw-instapay', 301);
+    
     Route::get('/withdraw-instapay', [WithdrawInstapayController::class, 'index'])->name('withdraw-instapay');
     Route::post('/withdraw-instapay', [WithdrawInstapayController::class, 'process'])->name('withdraw-instapay.process');
     Route::post('/withdraw-instapay/signup', [WithdrawInstapayController::class, 'signup'])->name('withdraw-instapay.signup')->middleware('throttle:10,1');

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
+import WebToolsLayout from '@/Layouts/WebToolsLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -61,7 +61,7 @@ export default function WithdrawInstapay({
     };
 
     return (
-        <ToolsPublicLayout title="InstaPay & Vodafone Cash" activeNav="explore">
+        <WebToolsLayout title="InstaPay & Vodafone Cash" activeNav="explore">
             <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6">
                 <div className="mb-8 text-center">
                     <div className="inline-flex items-center justify-center p-3 bg-purple-100 rounded-2xl text-purple-600 mb-4">
@@ -320,6 +320,6 @@ export default function WithdrawInstapay({
                     </div>
                 )}
             </div>
-        </ToolsPublicLayout>
+        </WebToolsLayout>
     );
 }
