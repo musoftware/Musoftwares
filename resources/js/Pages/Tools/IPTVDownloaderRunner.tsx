@@ -1,27 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-    Tv, List, Bookmark, Download, Settings, Plus, Play, Square,
-    Trash2, Search, ArrowRight, CheckCircle2, AlertCircle, RefreshCw,
-    Folder, HardDrive, ShieldCheck, HelpCircle, Star, Terminal, ChevronRight
+    Search, Play, Square, AlertCircle, RefreshCw, Server, User, Key,
+    Folder, Tv, Terminal, Download, Trash2, List
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
-import { Card } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Badge } from '@/Components/ui/badge';
-import { Switch } from '@/Components/ui/switch';
-import { Textarea } from '@/Components/ui/textarea';
+import { Checkbox } from '@/Components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
+import { ScrollArea } from '@/Components/ui/scroll-area';
 import { __ } from '@/lib/i18n';
 
 const getRuntimeHost = () => typeof window !== 'undefined' ? ((window as any).MUSOFTWARE_RUNTIME_HOST || '127.0.0.1') : '127.0.0.1';
 const getRuntimeHttp = () => `http://${getRuntimeHost()}:18400`;
 const getWsUrl       = () => `ws://${getRuntimeHost()}:18401/ws`;
 
-// ── Custom WebSocket Hook for Generic RPC + Broadcasts ────────────────────────
 function useRuntimeRPC(pluginSlug: string) {
     const [ws, setWs] = useState<WebSocket | null>(null);
     const [connected, setConnected] = useState(false);
-    const [activeTasks, setActiveTasks] = useState<any[]>([]);
     const pendingRequests = useRef(new Map());
     const onMessageCallbacks = useRef<Set<((...args: any[]) => any)>>(new Set());
 
@@ -34,7 +30,6 @@ function useRuntimeRPC(pluginSlug: string) {
 
             socket.onopen = () => {
                 setConnected(true);
-                // Ping to keep alive
                 const pingInterval = setInterval(() => {
                     if (socket.readyState === WebSocket.OPEN) {
                         socket.send(JSON.stringify({ type: 'ping' }));
@@ -53,7 +48,6 @@ function useRuntimeRPC(pluginSlug: string) {
                 try {
                     const msg = JSON.parse(event.data);
                     
-                    // Route WebSocket RPC Responses
                     if (msg.type === 'plugin_rpc_res' || msg.type === 'plugin_rpc_error') {
                         const resolver = pendingRequests.current.get(msg.requestId);
                         if (resolver) {
@@ -63,21 +57,14 @@ function useRuntimeRPC(pluginSlug: string) {
                         }
                     }
 
-                    if (msg.event === 'runtime.ready') {
-                        setActiveTasks(msg.data?.activeTasks ?? []);
-                    }
-
-                    // Feed raw broadcast events to sub-components
                     for (const cb of onMessageCallbacks.current) {
                         cb(msg);
                     }
-
                 } catch (err) { /* empty */ }
             };
         };
 
         connect();
-
         setWs(socket!);
 
         return () => {
@@ -104,7 +91,6 @@ function useRuntimeRPC(pluginSlug: string) {
                 payload: { plugin: pluginSlug, action, data }
             }));
 
-            // Auto-timeout after 30s
             setTimeout(() => {
                 if (pendingRequests.current.has(requestId)) {
                     pendingRequests.current.get(requestId).reject(new Error('Local engine request timed out'));
@@ -121,62 +107,105 @@ function useRuntimeRPC(pluginSlug: string) {
         };
     };
 
-    return { connected, callRPC, subscribeToEvents, activeTasks };
+    return { connected, callRPC, subscribeToEvents };
 }
 
 export default function IPTVDownloaderRunner() {
     const { connected, callRPC, subscribeToEvents } = useRuntimeRPC('iptv-downloader');
 
-    // Navigation & Workspace State
-    const [activeWorkspace, setActiveWorkspace] = useState<'dashboard' | 'playlists' | 'browser' | 'downloads'>('dashboard');
-    
-    // Playlists & Parsing
-    const [playlists, setPlaylists] = useState<any[]>([]);
-    const [playlistType, setPlaylistType] = useState<'m3u' | 'xtream'>('m3u');
-    const [playlistName, setPlaylistName] = useState('');
-    const [playlistUrl, setPlaylistUrl] = useState('');
+    // Connection Info State
+    const [connectionType, setConnectionType] = useState<'xtream' | 'm3u'>('xtream');
     const [xtreamHost, setXtreamHost] = useState('');
     const [xtreamUser, setXtreamUser] = useState('');
     const [xtreamPass, setXtreamPass] = useState('');
-    const [isParsing, setIsParsing] = useState(false);
-    const [parseError, setParseError] = useState('');
+    const [m3uUrl, setM3uUrl] = useState('');
+    const [isConnecting, setIsConnecting] = useState(false);
+    const [connectionError, setConnectionError] = useState('');
+    const [activePlaylistId, setActivePlaylistId] = useState<string>('');
+    const [saveData, setSaveData] = useState(true);
 
-    // Browser State
-    const [selectedPlaylistId, setSelectedPlaylistId] = useState<string>('');
-    const [streamType, setStreamType] = useState<'live' | 'vod' | 'series'>('live');
-    const [groups, setGroups] = useState<any[]>([]);
-    const [selectedGroup, setSelectedGroup] = useState<string>('');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
-    const [channels, setChannels] = useState<any[]>([]);
-    const [totalChannelsCount, setTotalChannelsCount] = useState(0);
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 50;
-
-    // Downloads State
-    const [downloads, setDownloads] = useState<any[]>([]);
-    const [downloadTasks, setDownloadTasks] = useState<Record<string, any>>({});
-    const [taskLogs, setTaskLogs] = useState<Record<string, string[]>>({});
-    const [showLogsTaskId, setShowLogsTaskId] = useState<string | null>(null);
-
-    // Record Config Panel
-    const [showRecordConfig, setShowRecordConfig] = useState<any | null>(null);
-    const [recordDurationPreset, setRecordDurationPreset] = useState<number>(0); // 0 = unlimited VOD / LIVE
-    const [recordDurationCustom, setRecordDurationCustom] = useState<string>('');
-
-    // Load initial data
+    // Load saved connection info when connected
     useEffect(() => {
-        if (connected) {
-            fetchPlaylists();
-            fetchDownloads();
-        }
+        if (!connected) return;
+
+        callRPC('get_settings').then((res: any) => {
+            const settings = res.settings || {};
+            
+            if (settings.iptv_saveData !== undefined) {
+                setSaveData(settings.iptv_saveData === 'true');
+            }
+            
+            if (settings.iptv_saveData !== 'false') {
+                if (settings.iptv_connectionType === 'xtream' || settings.iptv_connectionType === 'm3u') {
+                    setConnectionType(settings.iptv_connectionType);
+                }
+                if (settings.iptv_xtreamHost) setXtreamHost(settings.iptv_xtreamHost);
+                if (settings.iptv_xtreamUser) setXtreamUser(settings.iptv_xtreamUser);
+                if (settings.iptv_xtreamPass) setXtreamPass(settings.iptv_xtreamPass);
+                if (settings.iptv_m3uUrl) setM3uUrl(settings.iptv_m3uUrl);
+            }
+        }).catch((err) => {
+            console.error('Failed to load settings:', err);
+        });
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [connected]);
 
-    // Live WebSocket Event Subscriber
+    // Save connection info when it changes
+    useEffect(() => {
+        if (!connected) return;
+
+        const timer = setTimeout(() => {
+            const settingsToSave: Record<string, string> = {
+                iptv_saveData: saveData.toString()
+            };
+
+            if (saveData) {
+                settingsToSave.iptv_connectionType = connectionType;
+                settingsToSave.iptv_xtreamHost = xtreamHost;
+                settingsToSave.iptv_xtreamUser = xtreamUser;
+                settingsToSave.iptv_xtreamPass = xtreamPass;
+                settingsToSave.iptv_m3uUrl = m3uUrl;
+            } else {
+                settingsToSave.iptv_connectionType = '';
+                settingsToSave.iptv_xtreamHost = '';
+                settingsToSave.iptv_xtreamUser = '';
+                settingsToSave.iptv_xtreamPass = '';
+                settingsToSave.iptv_m3uUrl = '';
+            }
+
+            callRPC('save_settings', { settings: settingsToSave }).catch((err) => {
+                console.error('Failed to save settings:', err);
+            });
+        }, 500);
+
+        return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [connectionType, xtreamHost, xtreamUser, xtreamPass, m3uUrl, saveData, connected]);
+
+    // Categories State
+    const [groups, setGroups] = useState<any[]>([]);
+    const [selectedGroup, setSelectedGroup] = useState<string>('');
+    const [showLive, setShowLive] = useState(true);
+    const [showMovies, setShowMovies] = useState(true);
+    const [showSeries, setShowSeries] = useState(true);
+
+    // Content State
+    const [channels, setChannels] = useState<any[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedChannels, setSelectedChannels] = useState<Set<string>>(new Set());
+
+    // Downloader Queue State
+    const [downloadQueue, setDownloadQueue] = useState<any[]>([]);
+    const [selectedQueueItems, setSelectedQueueItems] = useState<Set<string>>(new Set());
+    const [downloadTasks, setDownloadTasks] = useState<Record<string, any>>({});
+    
+    // Logs State
+    const [logs, setLogs] = useState<string[]>([]);
+    const logsEndRef = useRef<HTMLDivElement>(null);
+
+    // Listen for Runtime broadcasts
     useEffect(() => {
         const unsubscribe = subscribeToEvents((msg: any) => {
-            // Task Progress Broadcast
             if (msg.event === 'task.progress') {
                 const { taskId, percent, message } = msg.data;
                 setDownloadTasks(prev => ({
@@ -190,35 +219,31 @@ export default function IPTVDownloaderRunner() {
                 }));
             }
 
-            // Task Log Broadcast
             if (msg.event === 'task.log') {
-                const { taskId, level, message } = msg.data;
-                setTaskLogs(prev => ({
-                    ...prev,
-                    [taskId]: [...(prev[taskId] || []), `[${level.toUpperCase()}] ${message}`].slice(-200) // limit log history buffer
-                }));
+                const { level, message } = msg.data;
+                const time = new Date().toLocaleTimeString();
+                setLogs(prev => [...prev, `[${time}] [${level.toUpperCase()}] ${message}`].slice(-1000));
             }
 
-            // Task Done Broadcast
             if (msg.event === 'task.done') {
                 const { taskId } = msg.data;
                 setDownloadTasks(prev => {
                     const copy = { ...prev };
-                    delete copy[taskId];
+                    if (copy[taskId]) copy[taskId].status = 'done';
                     return copy;
                 });
-                fetchDownloads();
             }
 
-            // Task Error Broadcast
             if (msg.event === 'task.error') {
-                const { taskId, error } = msg.data;
+                const { taskId } = msg.data;
                 setDownloadTasks(prev => {
                     const copy = { ...prev };
-                    delete copy[taskId];
+                    if (copy[taskId]) {
+                        copy[taskId].status = 'error';
+                        copy[taskId].message = 'Error';
+                    }
                     return copy;
                 });
-                fetchDownloads();
             }
         });
 
@@ -226,223 +251,219 @@ export default function IPTVDownloaderRunner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [subscribeToEvents]);
 
-    // Fetch lists helper
-    const fetchPlaylists = async () => {
-        try {
-            const res: any = await callRPC('list_playlists');
-            setPlaylists(res.playlists);
-            if (res.playlists.length > 0 && !selectedPlaylistId) {
-                setSelectedPlaylistId(res.playlists[0].id);
-            }
-        } catch (err) { /* empty */ }
-    };
-
-    const fetchDownloads = async () => {
-        try {
-            const res: any = await callRPC('list_downloads');
-            setDownloads(res.downloads);
-        } catch (err) { /* empty */ }
-    };
-
-    // Load browser schema dynamically
+    // Auto scroll logs
     useEffect(() => {
-        if (connected && selectedPlaylistId) {
+        logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [logs]);
+
+    // Load groups when playlist changes
+    useEffect(() => {
+        if (connected && activePlaylistId) {
             fetchGroups();
-            setCurrentPage(1);
-            fetchChannels(1);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedPlaylistId, selectedGroup, searchQuery, bookmarkedOnly, streamType, connected]);
+    }, [activePlaylistId]);
+
+    // Load channels when group/filters change
+    useEffect(() => {
+        if (connected && activePlaylistId) {
+            fetchChannels();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedGroup, showLive, showMovies, showSeries]);
+
+    const handleConnect = async () => {
+        setIsConnecting(true);
+        setConnectionError('');
+        try {
+            const name = 'Playlist_' + Math.random().toString(36).substring(7);
+            
+            // First clear old playlists to mimic a fresh connection
+            const existingRes: any = await callRPC('list_playlists');
+            for (const pl of existingRes.playlists) {
+                await callRPC('delete_playlist', { id: pl.id });
+            }
+
+            if (connectionType === 'xtream') {
+                if (!xtreamHost || !xtreamUser || !xtreamPass) {
+                    throw new Error('Please fill all Xtream fields');
+                }
+                await callRPC('add_xtream_playlist', { name, host: xtreamHost, username: xtreamUser, password: xtreamPass });
+            } else {
+                if (!m3uUrl) throw new Error('Please enter M3U URL');
+                await callRPC('add_playlist', { name, url: m3uUrl });
+            }
+            
+            const updatedRes: any = await callRPC('list_playlists');
+            if (updatedRes.playlists.length > 0) {
+                setActivePlaylistId(updatedRes.playlists[0].id);
+                setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] [INFO] Connected successfully to server.`]);
+            }
+        } catch (err: any) {
+            setConnectionError(err.message || 'Connection failed');
+        } finally {
+            setIsConnecting(false);
+        }
+    };
 
     const fetchGroups = async () => {
         try {
-            const res: any = await callRPC('list_groups', { playlistId: selectedPlaylistId });
+            const res: any = await callRPC('list_groups', { playlistId: activePlaylistId });
             setGroups(res.groups);
+            if (res.groups.length > 0) setSelectedGroup('');
         } catch (err) { /* empty */ }
     };
 
-    const fetchChannels = async (page = currentPage) => {
+    const fetchChannels = async () => {
         try {
-            const offset = (page - 1) * itemsPerPage;
-            const res: any = await callRPC('list_channels', {
-                playlistId: selectedPlaylistId,
-                groupTitle: selectedGroup,
-                searchQuery: searchQuery,
-                bookmarkedOnly: bookmarkedOnly,
-                streamType: streamType,
-                limit: itemsPerPage,
-                offset: offset
-            });
-            setChannels(res.channels);
-            setTotalChannelsCount(res.totalCount);
-        } catch (err) { /* empty */ }
-    };
+            const allowedStreamTypes: string[] = [];
+            if (showLive) allowedStreamTypes.push('live');
+            if (showMovies) allowedStreamTypes.push('vod');
+            if (showSeries) allowedStreamTypes.push('series');
 
-    const handlePageChange = (newPage: number) => {
-        setCurrentPage(newPage);
-        fetchChannels(newPage);
-    };
-
-    // ── Playlist Actions ──────────────────────────────────────────────────────
-    const handleAddPlaylist = async () => {
-        if (!playlistName || !playlistUrl) {
-            setParseError('Please specify playlist name and target URL');
-            return;
-        }
-        setIsParsing(true);
-        setParseError('');
-        try {
-            await callRPC('add_playlist', { name: playlistName, url: playlistUrl });
-            setPlaylistName('');
-            setPlaylistUrl('');
-            fetchPlaylists();
-            setActiveWorkspace('browser');
-        } catch (err: any) {
-            setParseError(err.message || 'Failed to parse playlist URL');
-        } finally {
-            setIsParsing(false);
-        }
-    };
-
-    const handleAddXtreamPlaylist = async () => {
-        if (!playlistName || !xtreamHost || !xtreamUser || !xtreamPass) {
-            setParseError('Please fill all Xtream fields');
-            return;
-        }
-        setIsParsing(true);
-        setParseError('');
-        try {
-            await callRPC('add_xtream_playlist', { name: playlistName, host: xtreamHost, username: xtreamUser, password: xtreamPass });
-            setPlaylistName('');
-            setXtreamHost('');
-            setXtreamUser('');
-            setXtreamPass('');
-            fetchPlaylists();
-            setActiveWorkspace('browser');
-        } catch (err: any) {
-            setParseError(err.message || 'Failed to parse Xtream playlist');
-        } finally {
-            setIsParsing(false);
-        }
-    };
-
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        const name = file.name.replace(/\.[^/.]+$/, "");
-        setIsParsing(true);
-        setParseError('');
-
-        const reader = new FileReader();
-        reader.onload = async () => {
-            try {
-                await callRPC('add_playlist', {
-                    name: name,
-                    base64: reader.result
-                });
-                fetchPlaylists();
-                setActiveWorkspace('browser');
-            } catch (err: any) {
-                setParseError(err.message || 'Failed parsing local playlist');
-            } finally {
-                setIsParsing(false);
-            }
-        };
-        reader.readAsDataURL(file);
-    };
-
-    const handleDeletePlaylist = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this playlist and all associated channels?')) return;
-        try {
-            await callRPC('delete_playlist', { id });
-            if (selectedPlaylistId === id) {
-                setSelectedPlaylistId('');
+            // if none checked, return empty
+            if (allowedStreamTypes.length === 0) {
                 setChannels([]);
+                return;
             }
-            fetchPlaylists();
-        } catch (err) { /* empty */ }
-    };
 
-    // ── Channel Actions ───────────────────────────────────────────────────────
-    const handleToggleBookmark = async (channelId: string) => {
-        try {
-            await callRPC('toggle_bookmark', { channelId });
-            // local update to state to prevent fully reloading channels list
-            setChannels(prev => prev.map(ch => ch.id === channelId ? { ...ch, bookmarked: ch.bookmarked === 1 ? 0 : 1 } : ch));
-        } catch (err) { /* empty */ }
-    };
-
-    // ── Download Workers Controls ─────────────────────────────────────────────
-    const triggerDownload = async () => {
-        if (!showRecordConfig) return;
-        const channel = showRecordConfig;
-        
-        let finalDuration = recordDurationPreset;
-        if (recordDurationPreset === -1) {
-            // custom input
-            finalDuration = parseInt(recordDurationCustom, 10) || 0;
-        }
-
-        setShowRecordConfig(null);
-        setActiveWorkspace('downloads');
-
-        try {
-            const response = await fetch(`${getRuntimeHttp()}/plugins/iptv-downloader/run`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    params: {
-                        channelName: channel.name,
-                        url: channel.url,
-                        durationSeconds: finalDuration
-                    }
-                })
-            });
-            const json = await response.json();
-            if (!response.ok) throw new Error(json.error || 'Failed starting download worker');
+            // We do a combined fetch or just the first matched type for simplicity in UI clone
+            // The API allows one streamType, so we fetch one by one and combine, or just rely on backend filter
+            // Assuming we fetch all and filter in frontend for speed of UI clone if it's manageable
             
-            // Add a temporary local loading task record
-            setDownloadTasks(prev => ({
-                ...prev,
-                [json.taskId]: {
-                    id: json.taskId,
-                    channel_name: channel.name,
-                    url: channel.url,
-                    percent: 0,
-                    message: 'Initializing...',
-                    status: 'downloading'
-                }
+            // Actually, the easiest is to fetch with no streamType and let the DB return everything, then filter here or backend.
+            // But if the backend requires streamType, we will fetch 'live', 'vod', 'series' sequentially
+            let all: any[] = [];
+            for (const type of allowedStreamTypes) {
+                const res: any = await callRPC('list_channels', {
+                    playlistId: activePlaylistId,
+                    groupTitle: selectedGroup,
+                    searchQuery: searchQuery,
+                    streamType: type,
+                    limit: 500, // Fetch top 500 for UI replication
+                    offset: 0
+                });
+                all = [...all, ...res.channels];
+            }
+            setChannels(all);
+            setSelectedChannels(new Set()); // Reset selections on new load
+        } catch (err) { /* empty */ }
+    };
+
+    const handleSearch = () => {
+        if (connected && activePlaylistId) {
+            fetchChannels();
+        }
+    };
+
+    const handleToggleChannelSelection = (id: string) => {
+        setSelectedChannels(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
+
+    const handleSelectAllChannels = (checked: boolean) => {
+        if (checked) {
+            setSelectedChannels(new Set(channels.map(c => c.id)));
+        } else {
+            setSelectedChannels(new Set());
+        }
+    };
+
+    const handleAddToQueue = () => {
+        const selected = channels.filter(c => selectedChannels.has(c.id));
+        setDownloadQueue(prev => {
+            const existingIds = new Set(prev.map(item => item.id));
+            const newItems = selected.filter(s => !existingIds.has(s.id)).map(item => ({
+                id: item.id,
+                name: item.name,
+                url: item.url,
+                type: item.stream_type,
+                status: 'queued', // queued, downloading, done, error
+                percent: 0,
+                message: 'Waiting...'
             }));
-            
-            fetchDownloads();
-        } catch (err: any) {
-            alert('Error initiating stream: ' + err.message);
+            return [...prev, ...newItems];
+        });
+        
+        setSelectedChannels(new Set());
+    };
+
+    const handleToggleQueueSelection = (id: string) => {
+        setSelectedQueueItems(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
+
+    const handleSelectAllQueue = (checked: boolean) => {
+        if (checked) {
+            setSelectedQueueItems(new Set(downloadQueue.map(q => q.id)));
+        } else {
+            setSelectedQueueItems(new Set());
         }
     };
 
-    const handleStopTask = async (taskId: string) => {
-        try {
-            await fetch(`${getRuntimeHttp()}/tasks/${taskId}/stop`, { method: 'POST' });
-            setDownloadTasks(prev => {
-                const copy = { ...prev };
-                delete copy[taskId];
-                return copy;
+    const handleStartDownload = async () => {
+        const toDownload = downloadQueue.filter(q => selectedQueueItems.has(q.id) && q.status !== 'downloading' && q.status !== 'done');
+        
+        for (const item of toDownload) {
+            try {
+                const response = await fetch(`${getRuntimeHttp()}/plugins/iptv-downloader/run`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        params: {
+                            channelName: item.name,
+                            url: item.url,
+                            durationSeconds: 0 // Full download
+                        }
+                    })
+                });
+                const json = await response.json();
+                if (!response.ok) throw new Error(json.error || 'Failed');
+                
+                // Track task mapping
+                setDownloadTasks(prev => ({
+                    ...prev,
+                    [json.taskId]: {
+                        id: json.taskId,
+                        queueId: item.id,
+                        percent: 0,
+                        message: 'Initializing...',
+                        status: 'downloading'
+                    }
+                }));
+                
+                // Update queue status
+                setDownloadQueue(prev => prev.map(q => q.id === item.id ? { ...q, status: 'downloading', message: 'Starting...' } : q));
+
+            } catch (err: any) {
+                setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] [ERROR] Failed to start download for ${item.name}: ${err.message}`]);
+            }
+        }
+    };
+
+    // Sync task progress to download queue UI
+    useEffect(() => {
+        if (Object.keys(downloadTasks).length > 0) {
+            setDownloadQueue(prevQueue => {
+                return prevQueue.map(q => {
+                    // Find if there's a task for this queue item
+                    const task = Object.values(downloadTasks).find((t: any) => t.queueId === q.id);
+                    if (task) {
+                        return { ...q, percent: task.percent, message: task.message, status: task.status };
+                    }
+                    return q;
+                });
             });
-            fetchDownloads();
-        } catch (err) { /* empty */ }
-    };
-
-    const handleDeleteDownloadHistory = async (id: string) => {
-        try {
-            await callRPC('delete_download', { id });
-            fetchDownloads();
-        } catch (err) { /* empty */ }
-    };
-
-    // Derived quick metrics for dashboard
-    const bookmarkedCount = channels.filter(ch => ch.bookmarked === 1).length;
-    const activeDownloadsCount = Object.keys(downloadTasks).length;
+        }
+    }, [downloadTasks]);
 
     if (!connected) {
         return (
@@ -455,677 +476,263 @@ export default function IPTVDownloaderRunner() {
                         <h3 className="font-bold text-slate-800">{__('general.linking_runtime_engine')}</h3>
                         <p className="text-xs text-slate-500 leading-relaxed">{__('general.ensure_the_musoftware_desktop_client_is_running_on_your_computer_to_activate_local_playback_and_recording_services')}</p>
                     </div>
-                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div className="w-1/2 h-full bg-indigo-600 rounded-full animate-infinite-loading" />
-                    </div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#F9FAFB] text-slate-900 font-sans flex antialiased">
-            {/* Dashboard Sidebar Navigation */}
-            <aside className="w-60 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 sticky top-0 h-screen z-10">
-                <div className="p-5 space-y-6">
-                    <div className="flex items-center gap-2.5 px-1.5">
-                        <div className="w-8 h-8 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100">
-                            <Tv className="w-4.5 h-4.5 text-white" />
+        <div className="flex flex-col h-screen bg-[#F0F0F0] text-sm font-sans overflow-hidden">
+            
+            {/* Split Container Equivalent (Top area) */}
+            <div className="flex-1 flex flex-row overflow-hidden border-b border-slate-300">
+                
+                {/* Left Panel */}
+                <div className="w-80 flex flex-col border-r border-slate-300 bg-white">
+                    
+                    {/* Connection Info GroupBox */}
+                    <div className="m-2 p-3 border border-slate-300 rounded-md">
+                        <div className="flex items-center justify-between mb-3">
+                            <span className="text-xs font-bold text-slate-700">Connection Info</span>
+                            <div className="flex gap-2">
+                                <Button variant="ghost" className={`h-6 px-2 py-0 text-[10px] ${connectionType === 'xtream' ? 'bg-slate-100 font-bold' : ''}`} onClick={() => setConnectionType('xtream')}>Xtream</Button>
+                                <Button variant="ghost" className={`h-6 px-2 py-0 text-[10px] ${connectionType === 'm3u' ? 'bg-slate-100 font-bold' : ''}`} onClick={() => setConnectionType('m3u')}>M3U</Button>
+                            </div>
                         </div>
-                        <div>
-                            <span className="font-bold text-sm tracking-tight leading-none block">{__('general.iptv_recorder')}</span>
-                            <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mt-0.5 block">{__('general.desktop_sdk')}</span>
+
+                        {connectionType === 'xtream' ? (
+                            <div className="space-y-2.5">
+                                <div className="flex items-center gap-2">
+                                    <Label className="w-16 text-right text-xs">Server</Label>
+                                    <Input value={xtreamHost} onChange={e => setXtreamHost(e.target.value)} className="h-7 text-xs flex-1 rounded-sm" />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Label className="w-16 text-right text-xs">Username</Label>
+                                    <Input value={xtreamUser} onChange={e => setXtreamUser(e.target.value)} className="h-7 text-xs flex-1 rounded-sm" />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Label className="w-16 text-right text-xs">Password</Label>
+                                    <Input type="password" value={xtreamPass} onChange={e => setXtreamPass(e.target.value)} className="h-7 text-xs flex-1 rounded-sm" />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="space-y-2.5">
+                                <div className="flex items-center gap-2">
+                                    <Label className="w-16 text-right text-xs">URL / Path</Label>
+                                    <Input value={m3uUrl} onChange={e => setM3uUrl(e.target.value)} placeholder="http://..." className="h-7 text-xs flex-1 rounded-sm" />
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="mt-3 flex items-center justify-between">
+                            <div className="flex items-center space-x-1.5 ml-2">
+                                <Checkbox id="chkSaveData" checked={saveData} onCheckedChange={(c) => setSaveData(c as boolean)} />
+                                <Label htmlFor="chkSaveData" className="text-xs cursor-pointer text-slate-600">Save Data</Label>
+                            </div>
+                            <Button 
+                                onClick={handleConnect} 
+                                disabled={isConnecting}
+                                className="h-7 bg-[#2ECC71] hover:bg-[#27AE60] text-white px-8 rounded-sm text-xs shadow-sm"
+                            >
+                                {isConnecting ? <RefreshCw className="w-3 h-3 animate-spin mr-2" /> : null}
+                                Connect
+                            </Button>
                         </div>
+                        {connectionError && <div className="mt-2 text-xs text-red-500 font-bold">{connectionError}</div>}
                     </div>
 
-                    <nav className="space-y-1">
-                        <Button
-                            variant="ghost"
-                            onClick={() => setActiveWorkspace('dashboard')}
-                            className={`w-full justify-start gap-3 h-11 text-xs tracking-wide ${activeWorkspace === 'dashboard' ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-slate-500 font-medium'}`}
-                        >
-                            <Star className="w-4 h-4" />{__('general.overview_dashboard')}</Button>
-                        <Button
-                            variant="ghost"
-                            onClick={() => setActiveWorkspace('playlists')}
-                            className={`w-full justify-start gap-3 h-11 text-xs tracking-wide ${activeWorkspace === 'playlists' ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-slate-500 font-medium'}`}
-                        >
-                            <List className="w-4 h-4" />{__('general.manage_playlists')}</Button>
-                        <Button
-                            variant="ghost"
-                            onClick={() => setActiveWorkspace('browser')}
-                            className={`w-full justify-start gap-3 h-11 text-xs tracking-wide ${activeWorkspace === 'browser' ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-slate-500 font-medium'}`}
-                        >
-                            <Tv className="w-4 h-4" />{__('general.channel_browser')}</Button>
-                        <Button
-                            variant="ghost"
-                            onClick={() => setActiveWorkspace('downloads')}
-                            className={`w-full justify-start gap-3 h-11 text-xs tracking-wide ${activeWorkspace === 'downloads' ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-slate-500 font-medium'}`}
-                        >
-                            <Download className="w-4 h-4" />
-                            <span className="flex-1 text-left">{__('general.downloads_recs')}</span>
-                            {activeDownloadsCount > 0 && (
-                                <Badge variant="destructive" className="animate-pulse text-[9px] px-2 py-0.5 uppercase">
-                                    {activeDownloadsCount} Active
-                                </Badge>
-                            )}
-                        </Button>
-                    </nav>
-                </div>
-
-                <div className="p-4 border-t border-slate-100 bg-slate-50/50">
-                    <div className="flex items-center gap-3 px-1.5 py-1">
-                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse border-2 border-white shadow-sm shadow-emerald-200" />
-                        <div>
-                            <span className="text-[10px] font-black uppercase text-slate-800 tracking-wider">{__('general.engine_connected')}</span>
-                            <span className="text-[9px] text-slate-400 block mt-0.5">{__('general.local_sqlite_workers_ready')}</span>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-
-            {/* Main Application Area */}
-            <main className="flex-1 flex flex-col min-w-0">
-                {/* Top header bar */}
-                <header className="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-8 sticky top-0 z-10">
-                    <div className="flex items-center gap-3">
-                        <span className="font-extrabold text-sm capitalize text-slate-900">{activeWorkspace} Workspace</span>
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-                        <span className="text-xs text-slate-400 font-semibold">{playlists.length} Playlists loaded</span>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-150">
-                            <HardDrive className="w-3.5 h-3.5 text-slate-500" />
-                            <span className="text-[10px] font-bold text-slate-600 uppercase">storage/downloads/</span>
-                        </div>
-                    </div>
-                </header>
-
-                <div className="flex-1 p-8 max-w-6xl w-full mx-auto space-y-6">
-                    {/* WORKSPACE 1: DASHBOARD OVERVIEW */}
-                    {activeWorkspace === 'dashboard' && (
-                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h1 className="text-2xl font-black tracking-tight text-slate-900">{__('general.workspace_dashboard')}</h1>
-                                    <p className="text-sm text-slate-400 mt-1">{__('general.manage_and_record_local_streams_directly_on_your_hard_drive')}</p>
-                                </div>
+                    {/* Categories GroupBox */}
+                    <div className="m-2 mt-0 p-3 border border-slate-300 rounded-md flex-1 flex flex-col min-h-0">
+                        <span className="text-xs font-bold text-slate-700 mb-2 block">Categories</span>
+                        
+                        <div className="flex items-center gap-3 mb-3 pb-2 border-b border-slate-200">
+                            <div className="flex items-center space-x-1.5">
+                                <Checkbox id="chkLive" checked={showLive} onCheckedChange={(c) => setShowLive(c as boolean)} />
+                                <Label htmlFor="chkLive" className="text-xs cursor-pointer">Live</Label>
                             </div>
-
-                            {/* Core Dashboard Cards Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
-                                    <div className="w-10 h-10 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-center justify-center">
-                                        <List className="w-5 h-5 text-indigo-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">{__('general.loaded_playlists')}</p>
-                                        <p className="text-2xl font-extrabold text-slate-900 mt-1">{playlists.length}</p>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
-                                    <div className="w-10 h-10 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-center">
-                                        <Bookmark className="w-5 h-5 text-rose-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">{__('general.bookmarked_channels')}</p>
-                                        <p className="text-2xl font-extrabold text-slate-900 mt-1">
-                                            {playlists.reduce((acc, curr) => acc + (curr.bookmarkedCount || 0), 0)}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
-                                    <div className="w-10 h-10 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center justify-center">
-                                        <Download className="w-5 h-5 text-emerald-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">{__('general.downloads_history_1')}</p>
-                                        <p className="text-2xl font-extrabold text-slate-900 mt-1">{downloads.length}</p>
-                                    </div>
-                                </div>
+                            <div className="flex items-center space-x-1.5">
+                                <Checkbox id="chkMovies" checked={showMovies} onCheckedChange={(c) => setShowMovies(c as boolean)} />
+                                <Label htmlFor="chkMovies" className="text-xs cursor-pointer">Movies</Label>
                             </div>
-
-                            {/* Help & Info */}
-                            <div className="bg-gradient-to-tr from-slate-900 to-indigo-950 text-white rounded-3xl p-8 relative overflow-hidden border border-indigo-950 shadow-xl shadow-indigo-100">
-                                <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl" />
-                                <div className="relative z-10 max-w-xl space-y-4">
-                                    <div className="flex items-center gap-2 text-[10px] font-black text-indigo-400 tracking-widest uppercase">
-                                        <ShieldCheck className="w-4 h-4" />{__('general.apple_grade_architecture')}</div>
-                                    <h2 className="text-xl font-bold tracking-tight">{__('general.zero_install_stream_recording')}</h2>
-                                    <p className="text-sm text-slate-400 leading-relaxed">{__('general.our_native_javascript_engine_parses_live_hls_indexes_m3u8_tracks_duplicates_and_writes_seamless_ts_stream_chunks_natively_no_ffmpeg_setup_or_complex_local_drivers_required')}</p>
-                                    <div className="flex gap-4 pt-2">
-                                        <Button 
-                                            onClick={() => setActiveWorkspace('playlists')} 
-                                            variant="secondary"
-                                            className="text-xs font-extrabold uppercase h-10 px-6 shadow-md"
-                                        >{__('general.add_m3u_playlist')}</Button>
-                                        <Button 
-                                            onClick={() => setActiveWorkspace('browser')} 
-                                            className="bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-extrabold uppercase h-10 px-6 border border-indigo-500/30"
-                                        >{__('general.browse_channels')}</Button>
-                                    </div>
-                                </div>
+                            <div className="flex items-center space-x-1.5">
+                                <Checkbox id="chkSeries" checked={showSeries} onCheckedChange={(c) => setShowSeries(c as boolean)} />
+                                <Label htmlFor="chkSeries" className="text-xs cursor-pointer">Series</Label>
                             </div>
                         </div>
-                    )}
 
-                    {/* WORKSPACE 2: MANAGE PLAYLISTS */}
-                    {activeWorkspace === 'playlists' && (
-                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div>
-                                <h1 className="text-2xl font-black tracking-tight text-slate-900">{__('general.manage_iptv_playlists')}</h1>
-                                <p className="text-sm text-slate-400 mt-1">{__('general.import_online_playlists_or_load_raw_local_m3u_files')}</p>
-                            </div>
-
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                {/* Left form box */}
-                                <div className="lg:col-span-1 space-y-6">
-                                    <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-5">
-                                        <h3 className="font-extrabold text-slate-800 text-sm">{__('general.add_new_playlist')}</h3>
-
-                                        <div className="flex bg-slate-100 p-1 rounded-xl">
-                                            <Button variant="ghost" onClick={() => setPlaylistType('m3u')} className={`flex-1 h-8 text-[10px] font-bold uppercase rounded-lg ${playlistType === 'm3u' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>{__('general.m3u_url_file')}</Button>
-                                            <Button variant="ghost" onClick={() => setPlaylistType('xtream')} className={`flex-1 h-8 text-[10px] font-bold uppercase rounded-lg ${playlistType === 'xtream' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>{__('general.xtream_api')}</Button>
-                                        </div>
-
-                                        <div className="space-y-4">
-                                            <div className="space-y-1.5">
-                                                <Label className="text-[10px] font-black text-slate-400 uppercase">{__('general.playlist_name')}</Label>
-                                                <Input type="text" value={playlistName} onChange={e => setPlaylistName(e.target.value)} placeholder={__('general.e_g_premium_hd_us')} />
-                                            </div>
-
-                                            {playlistType === 'm3u' ? (
-                                                <div className="space-y-1.5">
-                                                    <Label className="text-[10px] font-black text-slate-400 uppercase">{__('general.m3u_playlist_url')}</Label>
-                                                    <Input type="url" value={playlistUrl} onChange={e => setPlaylistUrl(e.target.value)} placeholder={__('general.http_example_com_get_php_auth')} className="font-mono" />
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    <div className="space-y-1.5">
-                                                        <Label className="text-[10px] font-black text-slate-400 uppercase">{__('general.server_host_url')}</Label>
-                                                        <Input type="url" value={xtreamHost} onChange={e => setXtreamHost(e.target.value)} placeholder={__('general.http_example_com_8080')} className="font-mono" />
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        <div className="space-y-1.5">
-                                                            <Label className="text-[10px] font-black text-slate-400 uppercase">Username</Label>
-                                                            <Input type="text" value={xtreamUser} onChange={e => setXtreamUser(e.target.value)} className="font-mono" />
-                                                        </div>
-                                                        <div className="space-y-1.5">
-                                                            <Label className="text-[10px] font-black text-slate-400 uppercase">Password</Label>
-                                                            <Input type="password" value={xtreamPass} onChange={e => setXtreamPass(e.target.value)} className="font-mono" />
-                                                        </div>
-                                                    </div>
-                                                </>
-                                            )}
-                                        </div>
-
-                                        {parseError && (
-                                            <div className="flex items-start gap-2.5 bg-rose-50 border border-rose-200 rounded-2xl p-4">
-                                                <AlertCircle className="w-4 h-4 text-rose-500 mt-0.5 shrink-0" />
-                                                <p className="text-xs text-rose-700 font-bold leading-relaxed">{parseError}</p>
-                                            </div>
-                                        )}
-
-                                        {playlistType === 'm3u' ? (
-                                            <>
-                                                <Button onClick={handleAddPlaylist} disabled={isParsing || !playlistName.trim() || !playlistUrl.trim()} className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-xs font-black uppercase">
-                                                    {isParsing ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
-                                                    {isParsing ? 'Parsing Playlist...' : 'Import Playlist URL'}
-                                                </Button>
-                                                <div className="relative flex items-center justify-center my-4">
-                                                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100" /></div>
-                                                    <span className="relative px-3 bg-white text-[9px] font-bold text-slate-400 uppercase">{__('general.or_upload_file')}</span>
-                                                </div>
-                                                <Label className="w-full flex flex-col items-center justify-center py-5 border border-dashed border-slate-200 rounded-2xl hover:bg-slate-50/50 transition-all cursor-pointer">
-                                                    <Folder className="w-6 h-6 text-slate-400 mb-1.5" />
-                                                    <span className="text-[10px] font-bold text-slate-700">{__('general.choose_m3u_playlist_file')}</span>
-                                                    <span className="text-[9px] text-slate-400 mt-0.5">{__('general.loads_directly_to_local_database')}</span>
-                                                    <Input type="file" accept=".m3u,.m3u8,.txt" onChange={handleFileUpload} className="hidden" />
-                                                </Label>
-                                            </>
-                                        ) : (
-                                            <Button onClick={handleAddXtreamPlaylist} disabled={isParsing || !playlistName.trim() || !xtreamHost.trim() || !xtreamUser.trim() || !xtreamPass.trim()} className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-xs font-black uppercase">
-                                                {isParsing ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
-                                                {isParsing ? 'Authenticating...' : 'Add Xtream Playlist'}
-                                            </Button>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Right list */}
-                                <div className="lg:col-span-2 space-y-4">
-                                    <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
-                                        <h3 className="font-extrabold text-slate-800 text-sm">{__('general.loaded_playlists')}</h3>
-                                        
-                                        {playlists.length === 0 ? (
-                                            <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl">
-                                                <Tv className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                                <h3 className="text-xs font-bold text-slate-900">{__('general.no_playlists_installed')}</h3>
-                                                <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">{__('general.input_a_streaming_subscription_url_or_load_an_m3u_file_to_index_television_channels_locally')}</p>
-                                            </div>
-                                        ) : (
-                                            <div className="divide-y divide-slate-100">
-                                                {playlists.map(pl => (
-                                                    <div key={pl.id} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4 group">
-                                                        <div className="flex items-center gap-3.5">
-                                                            <div className="w-10 h-10 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center">
-                                                                <Tv className="w-5 h-5 text-indigo-600" />
-                                                            </div>
-                                                            <div>
-                                                                <h4 className="font-bold text-slate-800 text-xs leading-none">{pl.name}</h4>
-                                                                <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500 mt-2">
-                                                                    <span>{pl.total_channels.toLocaleString()} Channels</span>
-                                                                    <span>•</span>
-                                                                    <span className="text-rose-500">{pl.bookmarkedCount} Bookmarked</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="flex items-center gap-2">
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() => { setSelectedPlaylistId(pl.id); setActiveWorkspace('browser'); }}
-                                                                className="h-8 text-[10px] font-bold uppercase"
-                                                            >{__('general.open_browser')}</Button>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                onClick={() => handleDeletePlaylist(pl.id)}
-                                                                className="h-8 w-8 text-slate-400 hover:text-rose-600 hover:bg-rose-50"
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* WORKSPACE 3: CHANNEL BROWSER */}
-                    {activeWorkspace === 'browser' && (
-                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <div>
-                                    <h1 className="text-2xl font-black tracking-tight text-slate-900">{__('general.channel_index_browser')}</h1>
-                                    <p className="text-sm text-slate-400 mt-1">{__('general.search_channels_toggle_bookmarks_and_initiate_recordings')}</p>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <select
-                                        value={selectedPlaylistId}
-                                        onChange={(e: any) => { setSelectedPlaylistId(e.target.value); setSelectedGroup(''); }}
-                                        className="h-9 w-48 min-w-0 rounded-lg border border-input bg-white px-2.5 py-1 text-sm font-bold transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                        <div className="flex-1 border border-slate-300 bg-white overflow-hidden">
+                            <ScrollArea className="h-full">
+                                <div className="divide-y divide-slate-100">
+                                    <div 
+                                        className={`px-3 py-1.5 text-xs cursor-pointer hover:bg-slate-50 ${selectedGroup === '' ? 'bg-[#007ACC] text-white font-bold' : ''}`}
+                                        onClick={() => setSelectedGroup('')}
                                     >
-                                        <option value="">{__('general.select_playlist')}</option>
-                                        {playlists.map(pl => <option key={pl.id} value={pl.id}>{pl.name}</option>)}
-                                    </select>
-
-                                    <Button
-                                        variant={bookmarkedOnly ? "destructive" : "outline"}
-                                        onClick={() => setBookmarkedOnly(!bookmarkedOnly)}
-                                        className="font-bold gap-1.5"
-                                    >
-                                        <Star className={`w-3.5 h-3.5 ${bookmarkedOnly ? 'fill-white' : ''}`} />{__('general.favorites_only')}</Button>
-                                </div>
-                            </div>
-
-                            {/* Stream Type Tabs */}
-                            {playlists.length > 0 && selectedPlaylistId && (
-                                <div className="flex border-b border-slate-200">
-                                    <Button variant="ghost" onClick={() => { setStreamType('live'); setSelectedGroup(''); }} className={`px-6 py-3 rounded-none h-auto text-xs font-bold uppercase border-b-2 ${streamType === 'live' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>{__('general.live_tv')}</Button>
-                                    <Button variant="ghost" onClick={() => { setStreamType('vod'); setSelectedGroup(''); }} className={`px-6 py-3 rounded-none h-auto text-xs font-bold uppercase border-b-2 ${streamType === 'vod' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>Movies (VOD)</Button>
-                                    <Button variant="ghost" onClick={() => { setStreamType('series'); setSelectedGroup(''); }} className={`px-6 py-3 rounded-none h-auto text-xs font-bold uppercase border-b-2 ${streamType === 'series' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>Series</Button>
-                                </div>
-                            )}
-
-                            {playlists.length === 0 ? (
-                                <Card className="py-20 text-center border-dashed">
-                                    <Tv className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                    <h3 className="text-xs font-bold text-slate-900">{__('general.no_playlists_registered')}</h3>
-                                    <Button onClick={() => setActiveWorkspace('playlists')} className="mt-4 uppercase font-bold text-xs">{__('general.go_install_playlist')}</Button>
-                                </Card>
-                            ) : (
-                                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                                    {/* Sidebar Categories Column */}
-                                    <div className="lg:col-span-1 space-y-4">
-                                        <Card className="p-5 space-y-4">
-                                            <h3 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Categories</h3>
-                                            
-                                            <div className="relative">
-                                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                                                <Input
-                                                    type="text"
-                                                    value={searchQuery}
-                                                    onChange={e => setSearchQuery(e.target.value)}
-                                                    placeholder={__('general.search_channels')}
-                                                    className="pl-9 h-10 text-xs font-semibold bg-slate-50"
-                                                />
-                                            </div>
-
-                                            <div className="max-h-[50vh] overflow-y-auto space-y-1 pr-1.5 scrollbar-thin">
-                                                <Button
-                                                    variant="ghost"
-                                                    onClick={() => setSelectedGroup('')}
-                                                    className={`w-full justify-between h-auto py-2 text-xs font-bold ${selectedGroup === '' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
-                                                >
-                                                    <span>{__('general.all_groups')}</span>
-                                                    <Badge variant="secondary" className="text-[10px] bg-slate-200/50">{totalChannelsCount}</Badge>
-                                                </Button>
-                                                
-                                                {groups.map(g => (
-                                                    <Button
-                                                        variant="ghost"
-                                                        key={g.name}
-                                                        onClick={() => setSelectedGroup(g.name)}
-                                                        className={`w-full justify-between h-auto py-2 text-xs font-bold ${selectedGroup === g.name ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
-                                                    >
-                                                        <span className="truncate">{g.name}</span>
-                                                        <Badge variant="secondary" className="text-[10px] bg-slate-200/50">{g.count}</Badge>
-                                                    </Button>
-                                                ))}
-                                            </div>
-                                        </Card>
+                                        All Categories
                                     </div>
-
-                                    {/* Channels List Area */}
-                                    <div className="lg:col-span-3 space-y-4">
-                                        <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-                                            {channels.length === 0 ? (
-                                                <div className="py-24 text-center">
-                                                    <Search className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                                    <h3 className="text-xs font-bold text-slate-900">{__('general.no_matching_channels')}</h3>
-                                                    <p className="text-xs text-slate-500 mt-1">{__('general.try_relaxing_filters_or_changing_search_criteria')}</p>
-                                                </div>
-                                            ) : (
-                                                <div className="divide-y divide-slate-100">
-                                                    {channels.map(ch => (
-                                                        <div key={ch.id} className="p-4 flex items-center justify-between gap-4 hover:bg-slate-50/50 transition-colors">
-                                                            <div className="flex items-center gap-3 min-w-0">
-                                                                <div className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-xl overflow-hidden flex items-center justify-center shrink-0">
-                                                                    {ch.logo ? (
-                                                                        <img src={ch.logo} alt={ch.name} className="w-full h-full object-contain" onError={(e: any) => { e.target.src = ''; }} />
-                                                                    ) : (
-                                                                        <Tv className="w-4.5 h-4.5 text-slate-400" />
-                                                                    )}
-                                                                </div>
-
-                                                                <div className="min-w-0">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <h4 className="font-bold text-slate-800 text-xs truncate leading-none">{ch.name}</h4>
-                                                                        <Button variant="ghost" size="icon" onClick={() => handleToggleBookmark(ch.id)} className="h-6 w-6 text-slate-300 hover:text-rose-500 hover:bg-rose-50 shrink-0">
-                                                                            <Star className={`w-3.5 h-3.5 ${ch.bookmarked === 1 ? 'text-rose-500 fill-rose-500' : ''}`} />
-                                                                        </Button>
-                                                                    </div>
-                                                                    <span className="text-[10px] font-bold text-indigo-600 block mt-1.5 truncate uppercase">{ch.group_title}</span>
-                                                                </div>
-                                                            </div>
-
-                                                            <Button
-                                                                size="sm"
-                                                                onClick={() => setShowRecordConfig(ch)}
-                                                                className="h-8 bg-indigo-600 text-white text-[10px] font-black uppercase hover:bg-indigo-700 shrink-0 gap-1"
-                                                            >
-                                                                <Play className="w-3 h-3 fill-white" /> Record
-                                                            </Button>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
+                                    {groups.map((g, i) => (
+                                        <div 
+                                            key={i}
+                                            className={`px-3 py-1.5 text-xs cursor-pointer hover:bg-slate-50 ${selectedGroup === g.title ? 'bg-[#007ACC] text-white font-bold' : ''}`}
+                                            onClick={() => setSelectedGroup(g.title)}
+                                        >
+                                            {g.title}
                                         </div>
-
-                                        {/* Pagination panel */}
-                                        {totalChannelsCount > itemsPerPage && (
-                                            <div className="flex items-center justify-between bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                                                    disabled={currentPage === 1}
-                                                    className="uppercase font-bold text-xs"
-                                                >
-                                                    Previous
-                                                </Button>
-                                                <span className="text-[11px] font-bold text-slate-500">
-                                                    Page {currentPage} of {Math.ceil(totalChannelsCount / itemsPerPage)}
-                                                </span>
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => handlePageChange(Math.min(Math.ceil(totalChannelsCount / itemsPerPage), currentPage + 1))}
-                                                    disabled={currentPage >= Math.ceil(totalChannelsCount / itemsPerPage)}
-                                                    className="uppercase font-bold text-xs"
-                                                >
-                                                    Next
-                                                </Button>
-                                            </div>
-                                        )}
-                                    </div>
+                                    ))}
                                 </div>
-                            )}
+                            </ScrollArea>
                         </div>
-                    )}
+                    </div>
 
-                    {/* WORKSPACE 4: DOWNLOADS & RECORDS */}
-                    {activeWorkspace === 'downloads' && (
-                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div>
-                                <h1 className="text-2xl font-black tracking-tight text-slate-900">{__('general.downloads_recordings')}</h1>
-                                <p className="text-sm text-slate-400 mt-1">{__('general.track_active_stream_recording_sessions_and_review_files_saved_locally')}</p>
-                            </div>
-
-                            {/* Active recording progress cards */}
-                            {Object.keys(downloadTasks).length > 0 && (
-                                <div className="space-y-4">
-                                    <h3 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider">{__('general.active_capture_sessions')}</h3>
-                                    
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {Object.values(downloadTasks).map(task => (
-                                            <div key={task.id} className="bg-white border border-slate-200 rounded-3xl p-6 shadow-md relative overflow-hidden space-y-4 border-l-4 border-l-indigo-600">
-                                                <div className="flex items-start justify-between gap-4">
-                                                    <div className="min-w-0">
-                                                        <h4 className="font-extrabold text-slate-950 text-sm truncate leading-none">{task.channel_name}</h4>
-                                                        <p className="text-[10px] font-mono text-slate-400 truncate mt-2">{task.url}</p>
-                                                    </div>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => handleStopTask(task.id)}
-                                                        className="h-7 bg-rose-50 hover:bg-rose-100 text-rose-600 border-rose-100 text-[9px] font-bold uppercase gap-1 shrink-0"
-                                                    >
-                                                        <Square className="w-2.5 h-2.5 fill-rose-600" />{__('general.stop_rec')}</Button>
-                                                </div>
-
-                                                <div className="space-y-1.5">
-                                                    <div className="flex justify-between text-[10px] font-bold text-slate-500">
-                                                        <span>{task.message}</span>
-                                                        <span>{task.percent}%</span>
-                                                    </div>
-                                                    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                                                        <div
-                                                            className="h-full bg-indigo-600 transition-all duration-500 rounded-full"
-                                                            style={{ width: `${task.percent}%` }}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex items-center justify-between pt-1 border-t border-slate-50">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => setShowLogsTaskId(showLogsTaskId === task.id ? null : task.id)}
-                                                        className="h-6 text-[9px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-wider gap-1 px-2"
-                                                    >
-                                                        <Terminal className="w-3.5 h-3.5" />
-                                                        {showLogsTaskId === task.id ? 'Hide Logs console' : 'View execution logs'}
-                                                    </Button>
-                                                    <span className="text-[9px] px-2 py-0.5 bg-indigo-50 border border-indigo-100 rounded text-indigo-700 font-bold uppercase tracking-wider leading-none">{__('general.recording_live')}</span>
-                                                </div>
-
-                                                {/* Logs Terminal view */}
-                                                {showLogsTaskId === task.id && (
-                                                    <div className="mt-4 p-3 bg-slate-900 rounded-xl max-h-48 overflow-y-auto font-mono text-[10px] text-slate-300 shadow-inner space-y-1">
-                                                        <div className="text-slate-500 select-none">Stream worker terminal stdout capture</div>
-                                                        {(task.logs && task.logs.length > 0) ? task.logs.map((logLine: string, idx: number) => (
-                                                            <p key={idx}>{logLine}</p>
-                                                        )) : <p className="text-slate-500">{__('general.awaiting_stream_packets')}</p>}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Completed History List */}
-                            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
-                                <h3 className="font-extrabold text-slate-800 text-sm">{__('general.download_history_archive')}</h3>
-
-                                {downloads.length === 0 ? (
-                                    <div className="py-20 text-center">
-                                        <Download className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                        <h3 className="text-xs font-bold text-slate-900 font-semibold">{__('general.no_recordings_yet')}</h3>
-                                        <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">{__('general.active_and_completed_recording_files_appear_here_trigger_a_capture_session_to_begin')}</p>
-                                    </div>
-                                ) : (
-                                    <div className="divide-y divide-slate-100">
-                                        {downloads.map(dl => {
-                                            const isDone = dl.status === 'completed';
-                                            const isFailed = dl.status === 'failed';
-                                            const isStopped = dl.status === 'stopped';
-                                            const isDl = dl.status === 'downloading';
-
-                                            return (
-                                                <div key={dl.id} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4 group">
-                                                    <div className="flex items-center gap-3.5 min-w-0">
-                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
-                                                            isDone ? 'bg-emerald-50 border-emerald-100 text-emerald-600' :
-                                                            isFailed ? 'bg-rose-50 border-rose-100 text-rose-600' :
-                                                            isStopped ? 'bg-amber-50 border-amber-100 text-amber-600' :
-                                                            'bg-indigo-50 border-indigo-100 text-indigo-600'
-                                                        }`}>
-                                                            {isDone ? <CheckCircle2 className="w-5 h-5" /> :
-                                                             isFailed ? <AlertCircle className="w-5 h-5" /> :
-                                                             <Download className="w-5 h-5 animate-pulse" />}
-                                                        </div>
-
-                                                        <div className="min-w-0">
-                                                            <h4 className="font-bold text-slate-800 text-xs leading-none truncate">{dl.channel_name}</h4>
-                                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[9px] font-bold text-slate-400 mt-2 truncate">
-                                                                <span className={`capitalize px-2 py-0.5 rounded border ${
-                                                                    isDone ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                                                                    isFailed ? 'bg-rose-50 text-rose-700 border-rose-100' :
-                                                                    isStopped ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                                                                    'bg-indigo-50 text-indigo-700 border-indigo-100'
-                                                                }`}>
-                                                                    {dl.status}
-                                                                </span>
-                                                                <span>•</span>
-                                                                <span>{ (dl.size_bytes / (1024 * 1024)).toFixed(1) } MB</span>
-                                                                <span>•</span>
-                                                                <span>{dl.duration}s capture duration</span>
-                                                                <span>•</span>
-                                                                <span className="font-mono truncate">{dl.file_path}</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="flex items-center gap-2 shrink-0">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => handleDeleteDownloadHistory(dl.id)}
-                                                            className="h-8 w-8 text-slate-400 hover:text-rose-600 hover:bg-rose-50"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
                 </div>
-            </main>
 
-            {/* RECORD CONFIGURATION POPUP MODAL */}
-            {showRecordConfig && (
-                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center font-sans p-4 animate-in fade-in duration-200">
-                    <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-sm shadow-xl space-y-6 animate-in scale-in duration-200">
-                        <div className="flex justify-between items-start gap-4">
-                            <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center">
-                                    <Tv className="w-4.5 h-4.5 text-indigo-600" />
-                                </div>
-                                <div>
-                                    <h3 className="font-extrabold text-slate-950 text-sm">{__('general.configure_stream_recording')}</h3>
-                                    <span className="text-[10px] text-slate-400 block font-semibold mt-0.5">{showRecordConfig.name}</span>
-                                </div>
-                            </div>
-                            <Button variant="ghost" size="sm" onClick={() => setShowRecordConfig(null)} className="text-slate-400 hover:text-slate-800 text-xs font-bold px-2 h-6">
-                                Close
+                {/* Right Panel */}
+                <div className="flex-1 flex flex-col p-2 bg-[#F0F0F0]">
+                    <div className="border border-slate-300 rounded-md flex-1 flex flex-col min-h-0 p-3 bg-white">
+                        <span className="text-xs font-bold text-slate-700 mb-2 block">Content</span>
+
+                        {/* Search Box */}
+                        <div className="flex items-center gap-2 mb-3">
+                            <Input 
+                                value={searchQuery} 
+                                onChange={e => setSearchQuery(e.target.value)} 
+                                onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                                className="h-7 text-xs flex-1 rounded-sm" 
+                            />
+                            <Button onClick={handleSearch} className="h-7 text-xs px-6 rounded-sm bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300">
+                                Search
                             </Button>
                         </div>
 
-                        {/* Presets and Custom timing selector */}
-                        <div className="space-y-4">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wide">{__('general.recording_duration')}</label>
-                            
-                            <div className="grid grid-cols-2 gap-2.5">
-                                {[
-                                    { l: 'Full VOD / Live Unlim.', v: 0 },
-                                    { l: '60 Seconds Test', v: 60 },
-                                    { l: '5 Minutes Loop', v: 300 },
-                                    { l: '1 Hour Broadcast', v: 3600 },
-                                ].map(p => (
-                                    <Button
-                                        variant={recordDurationPreset === p.v ? "default" : "outline"}
-                                        key={p.v}
-                                        onClick={() => setRecordDurationPreset(p.v)}
-                                        className={`h-auto py-2.5 text-[10px] font-bold ${recordDurationPreset === p.v ? 'bg-indigo-600 hover:bg-indigo-700' : 'text-slate-600 hover:bg-slate-100'}`}
-                                    >
-                                        {p.l}
-                                    </Button>
-                                ))}
-                                <Button
-                                    variant={recordDurationPreset === -1 ? "default" : "outline"}
-                                    onClick={() => setRecordDurationPreset(-1)}
-                                    className={`h-auto py-2.5 text-[10px] font-bold col-span-2 ${recordDurationPreset === -1 ? 'bg-indigo-600 hover:bg-indigo-700' : 'text-slate-600 hover:bg-slate-100'}`}
-                                >{__('general.custom_seconds_duration')}</Button>
+                        {/* Action Panel */}
+                        <div className="flex items-center justify-between py-2 border-t border-slate-200 mb-2">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox 
+                                    id="chkSelectAllContent" 
+                                    checked={selectedChannels.size === channels.length && channels.length > 0} 
+                                    onCheckedChange={(c) => handleSelectAllChannels(c as boolean)} 
+                                />
+                                <Label htmlFor="chkSelectAllContent" className="text-xs font-semibold cursor-pointer">Select All</Label>
                             </div>
-
-                            {recordDurationPreset === -1 && (
-                                <div className="space-y-1.5 animate-in slide-in-from-top-2 duration-200">
-                                    <Input
-                                        type="number"
-                                        value={recordDurationCustom}
-                                        onChange={e => setRecordDurationCustom(e.target.value)}
-                                        placeholder={__('general.enter_duration_in_seconds_e_g_180')}
-                                        className="bg-slate-50 font-semibold"
-                                    />
-                                </div>
-                            )}
+                            <Button 
+                                onClick={handleAddToQueue}
+                                disabled={selectedChannels.size === 0}
+                                className="h-7 bg-[#E67E22] hover:bg-[#D35400] text-white px-6 rounded-sm text-xs font-bold shadow-sm"
+                            >
+                                Add to queue
+                            </Button>
                         </div>
 
-                        <Button
-                            onClick={triggerDownload}
-                            className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-xs font-black uppercase"
-                        >
-                            <Play className="w-4 h-4 fill-white mr-2" />{__('general.start_capture_session')}</Button>
+                        {/* Content List */}
+                        <div className="flex-1 border border-slate-300 bg-white overflow-hidden flex flex-col">
+                            {/* Header row */}
+                            <div className="flex border-b border-slate-200 bg-slate-50 px-2 py-1.5">
+                                <div className="w-8"></div>
+                                <div className="flex-1 text-xs font-bold text-slate-600">Name</div>
+                            </div>
+                            {/* Body */}
+                            <ScrollArea className="flex-1">
+                                {channels.map((ch) => (
+                                    <div 
+                                        key={ch.id} 
+                                        className={`flex items-center border-b border-slate-100 px-2 py-1.5 hover:bg-slate-50 cursor-pointer ${selectedChannels.has(ch.id) ? 'bg-indigo-50/50' : ''}`}
+                                        onClick={() => handleToggleChannelSelection(ch.id)}
+                                    >
+                                        <div className="w-8 flex items-center justify-center">
+                                            <Checkbox 
+                                                checked={selectedChannels.has(ch.id)} 
+                                                onCheckedChange={() => handleToggleChannelSelection(ch.id)} 
+                                            />
+                                        </div>
+                                        <div className="flex-1 text-xs truncate">
+                                            {ch.name}
+                                        </div>
+                                    </div>
+                                ))}
+                                {channels.length === 0 && !isConnecting && activePlaylistId && (
+                                    <div className="text-center py-10 text-slate-400 text-xs italic">No items found in this category.</div>
+                                )}
+                            </ScrollArea>
+                        </div>
+
                     </div>
                 </div>
-            )}
+
+            </div>
+
+            {/* Bottom Tab Control */}
+            <div className="h-64 border-t border-slate-300 bg-[#F0F0F0] flex flex-col p-2 pt-0">
+                <Tabs defaultValue="downloader" className="w-full flex-1 flex flex-col">
+                    <TabsList className="h-8 justify-start bg-transparent rounded-none px-0 gap-1 border-b border-slate-300 w-full mb-2">
+                        <TabsTrigger value="downloader" className="data-[state=active]:bg-white data-[state=active]:border-t data-[state=active]:border-x data-[state=active]:border-slate-300 border border-transparent border-b-0 rounded-t-sm text-xs px-6 h-full data-[state=active]:shadow-none relative z-10 data-[state=active]:-mb-px">
+                            Downloader
+                        </TabsTrigger>
+                        <TabsTrigger value="log" className="data-[state=active]:bg-white data-[state=active]:border-t data-[state=active]:border-x data-[state=active]:border-slate-300 border border-transparent border-b-0 rounded-t-sm text-xs px-6 h-full data-[state=active]:shadow-none relative z-10 data-[state=active]:-mb-px">
+                            Log
+                        </TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="downloader" className="flex-1 m-0 flex flex-col min-h-0 data-[state=active]:flex bg-white border border-slate-300 p-2">
+                        <div className="flex-1 border border-slate-300 flex flex-col min-h-0">
+                            {/* Header */}
+                            <div className="flex border-b border-slate-200 bg-slate-50 px-2 py-1.5">
+                                <div className="w-8"></div>
+                                <div className="w-1/2 text-xs font-bold text-slate-600 border-r border-slate-200 px-2">Name</div>
+                                <div className="flex-1 text-xs font-bold text-slate-600 px-2">Progress / Status</div>
+                            </div>
+                            {/* Body */}
+                            <ScrollArea className="flex-1 bg-white">
+                                {downloadQueue.map((q) => (
+                                    <div 
+                                        key={q.id} 
+                                        className={`flex items-center border-b border-slate-100 px-2 py-1.5 hover:bg-slate-50 cursor-pointer ${selectedQueueItems.has(q.id) ? 'bg-indigo-50/50' : ''}`}
+                                        onClick={() => handleToggleQueueSelection(q.id)}
+                                    >
+                                        <div className="w-8 flex items-center justify-center">
+                                            <Checkbox 
+                                                checked={selectedQueueItems.has(q.id)} 
+                                                onCheckedChange={() => handleToggleQueueSelection(q.id)} 
+                                            />
+                                        </div>
+                                        <div className="w-1/2 text-xs truncate border-r border-slate-100 px-2 flex items-center gap-2">
+                                            {q.name}
+                                        </div>
+                                        <div className="flex-1 text-xs truncate px-2 text-slate-600 font-mono">
+                                            {q.status === 'downloading' ? `[${q.percent}%] ${q.message}` : q.message}
+                                        </div>
+                                    </div>
+                                ))}
+                            </ScrollArea>
+                        </div>
+                        <div className="h-10 mt-2 flex items-center border-t border-slate-200 pt-2 relative">
+                            <Button 
+                                onClick={handleStartDownload}
+                                disabled={selectedQueueItems.size === 0}
+                                className="bg-[#007ACC] hover:bg-[#005A9E] text-white font-bold h-7 px-6 rounded-sm text-xs shadow-sm absolute left-0"
+                            >
+                                Start Download
+                            </Button>
+                            
+                            <div className="flex items-center space-x-2 absolute left-[150px]">
+                                <Checkbox 
+                                    id="chkSelectAllQueue" 
+                                    checked={selectedQueueItems.size === downloadQueue.length && downloadQueue.length > 0} 
+                                    onCheckedChange={(c) => handleSelectAllQueue(c as boolean)} 
+                                />
+                                <Label htmlFor="chkSelectAllQueue" className="text-xs cursor-pointer">Select All</Label>
+                            </div>
+                        </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="log" className="flex-1 m-0 data-[state=active]:flex flex-col min-h-0 bg-white border border-slate-300">
+                        <div className="flex-1 font-mono text-[11px] overflow-auto p-2 text-slate-800 leading-relaxed bg-[#FAFAFA]">
+                            {logs.map((log, i) => (
+                                <div key={i} className={`whitespace-pre-wrap ${log.includes('[ERROR]') ? 'text-red-600 font-bold' : ''}`}>{log}</div>
+                            ))}
+                            <div ref={logsEndRef} />
+                        </div>
+                    </TabsContent>
+                </Tabs>
+            </div>
         </div>
     );
 }

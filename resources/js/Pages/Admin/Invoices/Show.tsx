@@ -51,7 +51,7 @@ export default function Show({ invoice }: { invoice: any }) {
     const [showPayServiceModal, setShowPayServiceModal] = useState(false);
     const [payServiceForm, setPayServiceForm] = useState({
         service_amount: '0',
-        currency: String(invoice.currency_id), // Default to invoice's currency
+        currency: String(invoice.currency_id || 1), // Default to invoice's currency
         service_pay_source: 'wallet',
         service_pay_dest: 'cib_swype',
         service_revenue: '0'
@@ -1185,6 +1185,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                     <option value="wallet">{__('general.wallet')}</option>
                                     <option value="cash">{__('general.cash')}</option>
                                     <option value="cib_swype">{__('general.cib_swype')}</option>
+                                    <option value="cib">CIB</option>
                                     <option value="bank_transfer">{__('general.bank_transfer')}</option>
                                     <option value="paypal">{__('general.paypal')}</option>
                                 </select>
@@ -1199,6 +1200,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                     <option value="wallet">{__('general.wallet')}</option>
                                     <option value="cash">{__('general.cash')}</option>
                                     <option value="cib_swype">{__('general.cib_swype')}</option>
+                                    <option value="cib">CIB</option>
                                     <option value="bank_transfer">{__('general.bank_transfer')}</option>
                                     <option value="paypal">{__('general.paypal')}</option>
                                 </select>
