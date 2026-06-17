@@ -79,6 +79,8 @@ class CurrenciesExchange extends Model
 
     public static function RateToday($amount, $cur1, $cur2)
     {
+        $cur1 = (string) $cur1;
+        $cur2 = (string) $cur2;
         if (trim($cur1) == trim($cur2)) {
             return round($amount, 2);
         }
@@ -92,9 +94,25 @@ class CurrenciesExchange extends Model
                 ->first();
 
             if ($ex != null) {
-                static::$memoryCache[$cacheKey] = $ex->rate;
-            } else {
-                static::$memoryCache[$cacheKey] = static::Rate(date('Y-m-d'), $cur1, $cur2);
+                // Security check for corrupted DB entries where EGP->USD is mistakenly entered as 40+ instead of 0.02
+                if ($ex->rate > 1 && $cur1 != 1 && $cur2 == 1) {
+                    $ex = null; // Ignore this corrupted row, let it fallback to 1 / (USD->EGP)
+                } else {
+                    static::$memoryCache[$cacheKey] = $ex->rate;
+                }
+            }
+            
+            if ($ex == null) {
+                $reverse = CurrenciesExchange::where('currency1', trim($cur2))
+                    ->where('currency2', trim($cur1))
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+
+                if ($reverse != null && $reverse->rate > 0) {
+                    static::$memoryCache[$cacheKey] = 1 / $reverse->rate;
+                } else {
+                    static::$memoryCache[$cacheKey] = static::Rate(date('Y-m-d'), $cur1, $cur2);
+                }
             }
         }
 
@@ -103,6 +121,8 @@ class CurrenciesExchange extends Model
 
     public static function RateTodayNoRound($amount, $cur1, $cur2)
     {
+        $cur1 = (string) $cur1;
+        $cur2 = (string) $cur2;
         if (trim($cur1) == trim($cur2)) {
             return number_format($amount, 9, '.', '');
         }
@@ -118,7 +138,16 @@ class CurrenciesExchange extends Model
             if ($ex != null) {
                 static::$memoryCache[$cacheKey] = $ex->rate;
             } else {
-                static::$memoryCache[$cacheKey] = static::Rate(date('Y-m-d'), $cur1, $cur2);
+                $reverse = CurrenciesExchange::where('currency1', trim($cur2))
+                    ->where('currency2', trim($cur1))
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+
+                if ($reverse != null && $reverse->rate > 0) {
+                    static::$memoryCache[$cacheKey] = 1 / $reverse->rate;
+                } else {
+                    static::$memoryCache[$cacheKey] = static::Rate(date('Y-m-d'), $cur1, $cur2);
+                }
             }
         }
 
@@ -127,6 +156,8 @@ class CurrenciesExchange extends Model
 
     public static function RateByDate($date, $amount, $cur1, $cur2)
     {
+        $cur1 = (string) $cur1;
+        $cur2 = (string) $cur2;
         if ($cur1 == $cur2) {
             return 1 * $amount;
         }
@@ -146,23 +177,39 @@ class CurrenciesExchange extends Model
             }
 
             if ($ex == null) {
-                try {
-                    Artisan::call('currency:fetch-rates');
-                    $ex = CurrenciesExchange::where('currency1', trim($cur1))
-                        ->where('currency2', trim($cur2))
-                        ->where('date_string', trim($date_str))
-                        ->first();
-                    if ($ex == null) {
+                $reverse = CurrenciesExchange::where('currency1', trim($cur2))
+                    ->where('currency2', trim($cur1))
+                    ->where('date_string', trim($date_str))
+                    ->first();
+
+                if ($reverse == null) {
+                    $reverse = CurrenciesExchange::where('currency1', trim($cur2))
+                        ->where('currency2', trim($cur1))
+                        ->orderByDesc('date_string')->first();
+                }
+
+                if ($reverse != null && $reverse->rate > 0) {
+                    static::$memoryCache[$cacheKey] = 1 / $reverse->rate;
+                } else {
+                    try {
+                        Artisan::call('currency:fetch-rates');
                         $ex = CurrenciesExchange::where('currency1', trim($cur1))
                             ->where('currency2', trim($cur2))
-                            ->orderByDesc('date_string')->first();
+                            ->where('date_string', trim($date_str))
+                            ->first();
+                        if ($ex == null) {
+                            $ex = CurrenciesExchange::where('currency1', trim($cur1))
+                                ->where('currency2', trim($cur2))
+                                ->orderByDesc('date_string')->first();
+                        }
+                    } catch (\Exception $e) {
+                        // Ignore command failure
                     }
-                } catch (\Exception $e) {
-                    // Ignore command failure
+                    static::$memoryCache[$cacheKey] = $ex ? $ex->rate : 1.0;
                 }
+            } else {
+                static::$memoryCache[$cacheKey] = $ex->rate;
             }
-
-            static::$memoryCache[$cacheKey] = $ex ? $ex->rate : 1.0;
         }
 
         $rate = static::$memoryCache[$cacheKey];
@@ -172,6 +219,8 @@ class CurrenciesExchange extends Model
 
     public static function RateByDateNoRound($date, $amount, $cur1, $cur2)
     {
+        $cur1 = (string) $cur1;
+        $cur2 = (string) $cur2;
         if ($cur1 == $cur2) {
             return 1 * $amount;
         }
@@ -191,14 +240,30 @@ class CurrenciesExchange extends Model
             }
 
             if ($ex == null) {
-                if ($date_str == '1970-01-01') {
-                    $ex = CurrenciesExchange::where('currency1', trim($cur1))
-                        ->where('currency2', trim($cur2))
-                        ->orderBy('id')->first();
-                }
-            }
+                $reverse = CurrenciesExchange::where('currency1', trim($cur2))
+                    ->where('currency2', trim($cur1))
+                    ->where('date_string', trim($date_str))
+                    ->first();
 
-            static::$memoryCache[$cacheKey] = $ex ? $ex->rate : 1.0;
+                if ($reverse == null) {
+                    $reverse = CurrenciesExchange::where('currency1', trim($cur2))
+                        ->where('currency2', trim($cur1))
+                        ->orderByDesc('date_string')->first();
+                }
+
+                if ($reverse != null && $reverse->rate > 0) {
+                    static::$memoryCache[$cacheKey] = 1 / $reverse->rate;
+                } else {
+                    if ($date_str == '1970-01-01') {
+                        $ex = CurrenciesExchange::where('currency1', trim($cur1))
+                            ->where('currency2', trim($cur2))
+                            ->orderBy('id')->first();
+                    }
+                    static::$memoryCache[$cacheKey] = $ex ? $ex->rate : 1.0;
+                }
+            } else {
+                static::$memoryCache[$cacheKey] = $ex->rate;
+            }
         }
 
         $rate = static::$memoryCache[$cacheKey];
@@ -209,6 +274,8 @@ class CurrenciesExchange extends Model
 
     public static function Rate($date, $cur1, $cur2)
     {
+        $cur1 = (string) $cur1;
+        $cur2 = (string) $cur2;
         if ($cur1 == $cur2) {
             return 1;
         }
@@ -228,7 +295,27 @@ class CurrenciesExchange extends Model
                     ->first();
             }
 
-            static::$memoryCache[$cacheKey] = $ex ? $ex->rate : 1;
+            if ($ex == null) {
+                $reverse = CurrenciesExchange::where('currency1', trim($cur2))
+                    ->where('currency2', trim($cur1))
+                    ->where('date_string', trim($date))
+                    ->first();
+
+                if ($reverse == null) {
+                    $reverse = CurrenciesExchange::where('currency1', trim($cur2))
+                        ->where('currency2', trim($cur1))
+                        ->where('date_string', date('Y-m-d', strtotime($date) - (24 * 60 * 60)))
+                        ->first();
+                }
+
+                if ($reverse != null && $reverse->rate > 0) {
+                    static::$memoryCache[$cacheKey] = 1 / $reverse->rate;
+                } else {
+                    static::$memoryCache[$cacheKey] = 1;
+                }
+            } else {
+                static::$memoryCache[$cacheKey] = $ex->rate;
+            }
         }
 
         return static::$memoryCache[$cacheKey];

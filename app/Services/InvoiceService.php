@@ -91,10 +91,14 @@ class InvoiceService
 
             // Recalculate invoice totals via helper or model methods if necessary
             $invoice = $invoice->fresh();
+            
+            // Recalculate cost column based on current cost lines
+            $invoice->cost = (float) InvoiceCostLine::where('invoice_id', $invoice->id)->sum('amount');
+            
             if ($invoice->status === 'unpaid') {
                 $invoice->unpaid = $invoice->total();
-                $invoice->save();
             }
+            $invoice->save();
         });
     }
 

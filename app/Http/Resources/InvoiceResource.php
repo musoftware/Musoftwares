@@ -48,7 +48,7 @@ class InvoiceResource extends JsonResource
             'cost' => $this->cost ?? 0,
             
             // Reference Data
-            'currencies' => \App\Models\Currency::all()->pluck('currency', 'id')->toArray(),
+            'currencies' => (object) \App\Models\Currency::all()->pluck('currency', 'id')->toArray(),
 
             // Pricing Insights
             'fair_price' => $this->calculateFairPrice(),

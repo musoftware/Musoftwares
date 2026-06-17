@@ -661,10 +661,10 @@ class InvoiceController extends Controller
                 'project_name' => $item->invoice->project ? $item->invoice->project->name : null,
                 'date' => $item->invoice->date() ?? null,
             ],
-            'invoice_currency' => $item->invoice->currency()->first() ? [
-                'id' => $item->invoice->currency()->first()->id,
-                'currency' => $item->invoice->currency()->first()->currency,
-                'symbol' => $item->invoice->currency()->first()->symbol,
+            'invoice_currency' => ($curr = \App\Models\Currency::find($item->invoice->currency_id)) ? [
+                'id' => $curr->id,
+                'currency' => $curr->currency,
+                'symbol' => $curr->symbol,
             ] : null,
             'timers' => $timers->values()->all(),
             'total_seconds' => $totalSeconds,
@@ -776,7 +776,7 @@ class InvoiceController extends Controller
             'total' => round($calc['total'], 2),
             'total_usd' => round($calc['total_usd'], 2),
             'invoice_currency_id' => $invoice->currency_id,
-            'invoice_currency' => $invoice->currency()->first() ? $invoice->currency()->first()->currency : null,
+            'invoice_currency' => ($curr = \App\Models\Currency::find($invoice->currency_id)) ? $curr->currency : null,
         ]);
     }
 
@@ -855,8 +855,7 @@ class InvoiceController extends Controller
             default: $total = round($cost / (1 - 0.0175), 2); break;
         }
 
-        $total_usd = \App\Models\CurrenciesExchange::RateToday($cost, $invoice->currency_id, 1);
-        $total_usd = round($total_usd / (1 - 0.20), 2);
+        $total_usd = $total;
 
         return [
             'cost' => $cost,
@@ -889,7 +888,7 @@ class InvoiceController extends Controller
         );
 
         $cost = round((float) $calc['cost'], 3);
-        $total = round((float) $calc['total']); 
+        $total = round((float) $calc['total'], 2); 
 
         $item = new \App\Models\InvoiceItem();
         $item->invoice_id = $invoice->id;

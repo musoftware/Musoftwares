@@ -435,6 +435,8 @@ export default function Index({ clients, filters, stats }) {
                                     <pre className="whitespace-pre-wrap font-sans text-sm text-slate-700">
 {`Hello, ${resetPasswordState.client?.name} 
 Here is your login details:
+URL:
+https://www.musoftwares.com/
 Email:
 ${resetPasswordState.client?.email}
 Password:
