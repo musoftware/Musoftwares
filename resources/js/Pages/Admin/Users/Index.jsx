@@ -300,6 +300,13 @@ export default function Index({ clients, filters, stats }) {
                 </div>
             )}
 
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-800">{__('general.clients_list') || 'Clients List'}</h2>
+                <Link href="/admin/users/create">
+                    <Button>{__('general.create_account') || 'Create User'}</Button>
+                </Link>
+            </div>
+            
             <div className="mb-6">
                 <DataTable
                     columns={columns}
