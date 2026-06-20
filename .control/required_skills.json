@@ -1,0 +1,30 @@
+[
+  {
+    "name": "frontend_styling_and_ux",
+    "description": "Enforces Shadcn UI, Tailwind CSS 4.3, mobile parity, and premium UX. Requires full-width pages for ERP Add/Edit forms (no modals/sheets) and prohibits native browser prompts or alerts."
+  },
+  {
+    "name": "frontend_architecture",
+    "description": "Covers React 18.2, Inertia.js 2.0, TypeScript 5.0, Zustand state management, and real-time updates handling (WebSockets/SSE with graceful degradation)."
+  },
+  {
+    "name": "backend_architecture",
+    "description": "Strict Laravel 12 modular architecture using nwidart/laravel-modules. Enforces thin controllers and services, and strict isolation between domains (e.g., ERP vs. CRM)."
+  },
+  {
+    "name": "i18n_localization",
+    "description": "Mandates zero hardcoded strings. All UI text must be translatable via modular PHP arrays, explicitly forbidding global JSON translation files."
+  },
+  {
+    "name": "financial_and_currency_handling",
+    "description": "Prohibits hardcoded currencies. Enforces dynamic formatting of monetary values based on the business's or client's active currency using global formatter utilities."
+  },
+  {
+    "name": "validation_and_security",
+    "description": "Requires tri-path validation (Happy path, Edge cases, Security limits). Enforces strict subscription gating, data leak prevention, and prohibits exposing the Laravel footprint."
+  },
+  {
+    "name": "testing_and_comprehensive_edits",
+    "description": "Enforces complete cross-stack sweeps for every change, ensuring frontend and backend remain synced. Requires unit, feature, and Playwright E2E tests for stability."
+  }
+]

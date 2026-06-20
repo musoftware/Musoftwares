@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class WalletTransaction extends Model
+class JournalEntry extends Model
 {
     protected $guarded = [];
 
-    public function wallet()
+    public function lines()
     {
-        return $this->belongsTo(Wallet::class);
+        return $this->hasMany(JournalEntryLine::class);
     }
 }

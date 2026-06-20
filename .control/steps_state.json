@@ -8,7 +8,7 @@
     {
         "id": "Phase1",
         "name": "Phase 1: Foundation & Public",
-        "status": "pending",
+        "status": "running",
         "dependencies": [
             "Core"
         ]
