@@ -10,7 +10,7 @@ use App\Http\Controllers\HomeController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/portfolio', [HomeController::class, 'portfolio'])->name('portfolio');
 Route::get('/portfolio/{slug}', [HomeController::class, 'portfolioShow'])->name('portfolio.show');
-Route::get('/website-services/{slug}', [HomeController::class, 'websiteServiceShow'])->name('website-services.show');
+Route::get('/services/{slug}', [HomeController::class, 'websiteServiceShow'])->name('website-services.show');
 
 // Public Contract Links
 Route::get('/c/{uuid}', [\App\Http\Controllers\Frontend\ClientContractController::class, 'show'])->name('client.contract.show');
