@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { Copy, Mail, MessageCircle, ChevronDown, Key, Wallet, FileText, Briefcase, Trash2, Edit, ShieldCheck, Plus } from 'lucide-react';
+import { Copy, Mail, MessageCircle, ChevronDown, Key, Wallet, FileText, Briefcase, Trash2, Edit, ShieldCheck, Plus, TrendingUp, TrendingDown, RefreshCcw } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import HiddenAmount from '@/Components/HiddenAmount';
 import {
@@ -27,7 +27,7 @@ import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import UserLoansTab from './UserLoansTab';
 
-export default function Show({ client, loans = [], stats = {}, wallets, modulePlans = [], subscriptions = [] }) {
+export default function Show({ auth, client, loans = [], stats = {}, modulePlans = [], subscriptions = [] }) {
     const [isLoginAsLoading, setIsLoginAsLoading] = useState(false);
     const [isResetPassOpen, setIsResetPassOpen] = useState(false);
     const [newPassword, setNewPassword] = useState('');
@@ -37,6 +37,17 @@ export default function Show({ client, loans = [], stats = {}, wallets, modulePl
     // New Modal States
     const [isDeleteUserOpen, setIsDeleteUserOpen] = useState(false);
     const [isActivateMembershipOpen, setIsActivateMembershipOpen] = useState(false);
+    const [isFinanceModalOpen, setIsFinanceModalOpen] = useState(false);
+    const [isRecalcLoading, setIsRecalcLoading] = useState(false);
+
+    const handleRecalcBalance = () => {
+        if (!confirm('Recalculate balance from transactions? This will update user_balance to match the sum of all transactions.')) return;
+        setIsRecalcLoading(true);
+        router.post(`/admin/transactions/recalc-balance/${client.id}`, {}, {
+            onSuccess: () => { setIsRecalcLoading(false); },
+            onError:   () => { setIsRecalcLoading(false); alert('Failed to recalculate balance.'); },
+        });
+    };
 
 
 
@@ -243,11 +254,9 @@ export default function Show({ client, loans = [], stats = {}, wallets, modulePl
                                             <span>Invoices</span>
                                         </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                        <Link href={`/admin/finance?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
-                                            <Wallet className="mr-2 h-4 w-4" />
-                                            <span>{__('general.all_transactions')}</span>
-                                        </Link>
+                                    <DropdownMenuItem onClick={() => setIsFinanceModalOpen(true)}>
+                                        <Wallet className="mr-2 h-4 w-4" />
+                                        <span>{__('general.all_transactions')}</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
                                 
@@ -294,6 +303,14 @@ export default function Show({ client, loans = [], stats = {}, wallets, modulePl
                                             <FileText className="mr-2 h-4 w-4" />
                                             <span>{__('general.due_balance_sheet')}</span>
                                         </a>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={handleRecalcBalance}
+                                        disabled={isRecalcLoading}
+                                        className="text-amber-700 focus:bg-amber-50 focus:text-amber-800"
+                                    >
+                                        <RefreshCcw className={`mr-2 h-4 w-4 ${isRecalcLoading ? 'animate-spin' : ''}`} />
+                                        <span>{isRecalcLoading ? 'Recalculating...' : 'Recalc Balance'}</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
                             </div>
@@ -470,6 +487,29 @@ ${newPassword}`}
                             <Button type="submit">{__('general.save_changes')}</Button>
                         </DialogFooter>
                     </form>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isFinanceModalOpen} onOpenChange={setIsFinanceModalOpen}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>{__('general.all_transactions')}</DialogTitle>
+                        <DialogDescription>{__('general.view_user_financial_transactions')}</DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4 flex flex-col gap-4">
+                        <Link href={`/admin/transactions?user=${client.id}`} className="w-full">
+                            <Button className="w-full justify-start h-12" variant="outline" onClick={() => setIsFinanceModalOpen(false)}>
+                                <TrendingUp className="mr-2 h-5 w-5 text-green-600" />
+                                Income Transactions
+                            </Button>
+                        </Link>
+                        <Link href={`/admin/finance?client_id=${client.id}`} className="w-full">
+                            <Button className="w-full justify-start h-12" variant="outline" onClick={() => setIsFinanceModalOpen(false)}>
+                                <TrendingDown className="mr-2 h-5 w-5 text-red-600" />
+                                Cost Transactions
+                            </Button>
+                        </Link>
+                    </div>
                 </DialogContent>
             </Dialog>
 
@@ -790,47 +830,7 @@ ${newPassword}`}
                         )}
                     </div>
 
-                    {/* Wallets & Transactions */}
-                    {wallets.map((wallet) => (
-                        <div key={wallet.id} className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200">
-                            <div className="flex justify-between items-end mb-4 border-b pb-2">
-                                <div>
-                                    <h2 className="text-xl font-bold font-sora text-slate-900">Wallet ({wallet.context})</h2>
-                                </div>
-                                <span className="text-3xl font-bold text-slate-900 font-jetbrains">
-                                    {formatCurrency(wallet.balance, wallet.currency)}
-                                </span>
-                            </div>
 
-                            <h3 className="mb-3 text-sm font-bold tracking-wider text-slate-500 uppercase">{__('general.transaction_history')}</h3>
-                            {wallet.transactions && wallet.transactions.length > 0 ? (
-                                <div className="overflow-x-auto">
-                                <table className="w-full text-left text-sm">
-                                    <thead className="bg-slate-50 border-b border-slate-200">
-                                        <tr>
-                                            <th className="p-3 font-bold text-slate-600">Date</th>
-                                            <th className="p-3 font-bold text-slate-600">Description</th>
-                                            <th className="p-3 text-right font-bold text-slate-600">Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {wallet.transactions.map((tx) => (
-                                            <tr key={tx.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                                <td className="p-3 text-slate-500">{new Date(tx.created_at).toLocaleString()}</td>
-                                                <td className="p-3 text-slate-900">{tx.description}</td>
-                                                <td className={`p-3 text-right font-jetbrains font-medium ${tx.type === 'credit' ? 'text-green-600' : 'text-slate-900'}`}>
-                                                    {formatCurrency(tx.type === 'credit' ? Math.abs(tx.amount) : -Math.abs(tx.amount), wallet.currency)}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                                </div>
-                            ) : (
-                                <p className="text-sm text-slate-500 italic p-4 bg-slate-50 rounded-md">{__('general.no_transactions_found_in_this_wallet')}</p>
-                            )}
-                        </div>
-                    ))}
                 </div>
             </div>
 

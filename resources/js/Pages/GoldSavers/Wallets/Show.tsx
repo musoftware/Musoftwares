@@ -13,7 +13,8 @@ import {
 } from "@/Components/ui/select";
 import { formatNumber } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
-import { ArrowLeft, Wallet, TrendingUp, TrendingDown, Settings, MoreHorizontal, Trash, Edit } from 'lucide-react';
+import { ArrowLeft, Wallet, TrendingUp, TrendingDown, Settings, MoreHorizontal, Trash, Edit, Coins } from 'lucide-react';
+import { Label } from '@/Components/ui/label';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
 
 interface GoldTransaction {
@@ -60,6 +61,13 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
     const [isCreatingTx, setIsCreatingTx] = useState(false);
     const [isEditingWallet, setIsEditingWallet] = useState(false);
     const [editingTx, setEditingTx] = useState<GoldTransaction | null>(null);
+
+    const [prices, setPrices] = useState<Record<string, number>>({
+        '18': latestPrice?.price_gram_18k ? parseFloat(latestPrice.price_gram_18k) : 0,
+        '21': latestPrice?.price_gram_21k ? parseFloat(latestPrice.price_gram_21k) : 0,
+        '22': latestPrice?.price_gram_24k ? parseFloat(latestPrice.price_gram_24k) * (22/24) : 0,
+        '24': latestPrice?.price_gram_24k ? parseFloat(latestPrice.price_gram_24k) : 0,
+    });
     
     const [newTx, setNewTx] = useState({
         type: 'buy',
@@ -77,6 +85,13 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
         target_grams: wallet.target_grams || '',
         target_amount: wallet.target_amount || '',
     });
+
+    const calculatedCurrentValue = Object.entries(karatBalances || {}).reduce((sum, [karat, grams]) => {
+        return sum + (grams * (prices[karat] || 0));
+    }, 0);
+
+    const calculatedProfitAmount = calculatedCurrentValue - wallet.balance_amount;
+    const isProfit = calculatedProfitAmount >= 0;
 
     const handleCreateTransaction = (e: React.FormEvent) => {
         e.preventDefault();
@@ -227,6 +242,31 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                         </Card>
                     )}
 
+                    {/* Today's Prices */}
+                    <Card className="mb-6 border-slate-200 shadow-sm">
+                        <CardContent className="p-6">
+                            <div className="flex items-center gap-2 mb-4">
+                                <div className="bg-amber-100 p-2 rounded-lg text-amber-700">
+                                    <Coins className="w-5 h-5" />
+                                </div>
+                                <h3 className="font-semibold text-slate-900">{__('gold_saver.todays_prices_egp')} ({wallet.currency})</h3>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {Object.entries(prices).map(([carat, price]) => (
+                                    <div key={carat} className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                        <Label className="text-xs text-slate-500 mb-1 block">{carat}k</Label>
+                                        <Input 
+                                            type="number" 
+                                            value={price || ''} 
+                                            onChange={e => setPrices({...prices, [carat]: parseFloat(e.target.value) || 0})}
+                                            className="font-bold text-slate-900 bg-white"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <Card className="bg-slate-50 border-slate-200 shadow-none">
                             <CardHeader className="pb-2">
@@ -255,34 +295,22 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                             </CardContent>
                         </Card>
                         
-                        {gamification && latestPrice ? (
-                            <Card className={gamification.isProfit ? "bg-green-50 border-green-200 shadow-none" : "bg-red-50 border-red-200 shadow-none"}>
-                                <CardHeader className="pb-2">
-                                    <CardTitle className={`text-sm font-medium ${gamification.isProfit ? 'text-green-700' : 'text-red-700'}`}>
-                                        {__('general.current_value')}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className={`text-3xl font-bold ${gamification.isProfit ? 'text-green-700' : 'text-red-700'}`}>
-                                        {formatNumber(gamification.currentValue)} <span className="text-lg opacity-70">{wallet.currency}</span>
-                                    </div>
-                                    <div className={`text-xs mt-1 font-semibold flex items-center gap-1 ${gamification.isProfit ? 'text-green-600' : 'text-red-600'}`}>
-                                        {gamification.isProfit ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                                        {gamification.isProfit ? '+' : ''}{formatNumber(gamification.profitAmount)} {wallet.currency}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ) : (
-                            <Card className="bg-slate-50 border-slate-200 shadow-none">
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-sm font-medium text-slate-500">{__('general.current_value')}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="text-3xl font-bold text-slate-400">---</div>
-                                    <p className="text-xs text-slate-400 mt-1">{__('general.requires_live_prices_addon')}</p>
-                                </CardContent>
-                            </Card>
-                        )}
+                        <Card className={isProfit ? "bg-green-50 border-green-200 shadow-none" : "bg-red-50 border-red-200 shadow-none"}>
+                            <CardHeader className="pb-2">
+                                <CardTitle className={`text-sm font-medium ${isProfit ? 'text-green-700' : 'text-red-700'}`}>
+                                    {__('general.current_value')}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className={`text-3xl font-bold ${isProfit ? 'text-green-700' : 'text-red-700'}`}>
+                                    {formatNumber(calculatedCurrentValue)} <span className="text-lg opacity-70">{wallet.currency}</span>
+                                </div>
+                                <div className={`text-xs mt-1 font-semibold flex items-center gap-1 ${isProfit ? 'text-green-600' : 'text-red-600'}`}>
+                                    {isProfit ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                                    {isProfit ? '+' : ''}{formatNumber(calculatedProfitAmount)} {wallet.currency}
+                                </div>
+                            </CardContent>
+                        </Card>
 
                         <Card className="bg-slate-50 border-slate-200 shadow-none">
                             <CardHeader className="pb-2">
@@ -420,7 +448,12 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {wallet.transactions.map((tx) => (
+                                            {wallet.transactions.map((tx) => {
+                                                const currentGramPrice = prices[String(tx.karat)] || 0;
+                                                const txCurrentValue = tx.grams * currentGramPrice;
+                                                const txProfitLoss = tx.type === 'buy' ? txCurrentValue - tx.total_amount : 0;
+
+                                                return (
                                                 <tr key={tx.id} className="border-b hover:bg-gray-50">
                                                     <td className="px-4 py-3 font-medium whitespace-nowrap">
                                                         {new Date(tx.transaction_date).toLocaleDateString()}
@@ -442,13 +475,13 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                                     <td className="px-4 py-3">{formatNumber(tx.fees)}</td>
                                                     <td className="px-4 py-3 font-semibold">{formatNumber(tx.total_amount)} {wallet.currency}</td>
                                                     <td className="px-4 py-3 font-semibold">
-                                                        {tx.current_value !== undefined ? (
+                                                        {currentGramPrice > 0 ? (
                                                             <div className="flex flex-col">
-                                                                <span>{formatNumber(tx.current_value)} {wallet.currency}</span>
-                                                                {tx.type === 'buy' && tx.profit_loss !== undefined && (
-                                                                    <span className={`text-xs ${tx.profit_loss >= 0 ? 'text-green-600' : 'text-red-600'} flex items-center`}>
-                                                                        {tx.profit_loss >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
-                                                                        {tx.profit_loss >= 0 ? '+' : ''}{formatNumber(tx.profit_loss)}
+                                                                <span>{formatNumber(txCurrentValue)} {wallet.currency}</span>
+                                                                {tx.type === 'buy' && (
+                                                                    <span className={`text-xs ${txProfitLoss >= 0 ? 'text-green-600' : 'text-red-600'} flex items-center`}>
+                                                                        {txProfitLoss >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
+                                                                        {txProfitLoss >= 0 ? '+' : ''}{formatNumber(txProfitLoss)}
                                                                     </span>
                                                                 )}
                                                             </div>
@@ -485,7 +518,8 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                                         </Dialog>
                                                     </td>
                                                 </tr>
-                                            ))}
+                                                );
+                                            })}
                                         </tbody>
                                     </table>
                                 </div>

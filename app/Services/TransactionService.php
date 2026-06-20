@@ -18,9 +18,10 @@ class TransactionService
         $q = Transaction::with(['user', 'project']);
 
         $this->applyFilters($q, $filters);
-        
-        $q->whereIn('type', ['received', 'refunded', 'send']);
-        
+
+        // No type filter — show ALL transaction types so admin sees the full picture
+        // (earned, used, received, refunded, send, timer-received, etc.)
+
         return $q->orderBy('created_at', 'desc')->paginate(50);
     }
 

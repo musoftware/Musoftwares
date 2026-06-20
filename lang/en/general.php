@@ -5887,4 +5887,10 @@ return [
     'landing_portfolio_challenge' => 'The Challenge',
     'landing_portfolio_solution' => 'Our Solution',
     'landing_portfolio_technologies' => 'Technologies Used',
+    
+    // User Creation
+    'clients_list' => 'Clients List',
+    'create_a_new_user_account_in_the_platform' => 'Create a new user account in the platform.',
+    'leave_blank_for_random' => 'Leave blank for a random password',
+    'view_user_financial_transactions' => 'View User Financial Transactions',
 ];

@@ -7176,7 +7176,11 @@
             "landing_trusted_by": "موثوق من قبل شركات مبتكرة",
             "landing_portfolio_challenge": "التحدي",
             "landing_portfolio_solution": "الحل الذي قدمناه",
-            "landing_portfolio_technologies": "التقنيات المستخدمة"
+            "landing_portfolio_technologies": "التقنيات المستخدمة",
+            "clients_list": "قائمة العملاء",
+            "create_a_new_user_account_in_the_platform": "إنشاء حساب مستخدم جديد في المنصة.",
+            "leave_blank_for_random": "اتركه فارغاً لإنشاء كلمة مرور عشوائية",
+            "view_user_financial_transactions": "عرض المعاملات المالية للمستخدم"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -7322,7 +7326,8 @@
             "recent_transactions": "المعاملات الأخيرة",
             "no_transactions_found_for_this_period": "لم يتم العثور على معاملات لهذه الفترة.",
             "download_a_pdf_summary_of": "Download a PDF summary of your gold savings and performance.",
-            "unlock_the_ability_to_download": "Unlock the ability to download comprehensive PDF reports of your gold investments, performance metrics, and historical growth."
+            "unlock_the_ability_to_download": "Unlock the ability to download comprehensive PDF reports of your gold investments, performance metrics, and historical growth.",
+            "todays_prices_egp": "أسعار الذهب اليوم"
         },
         "landing_legal": {
             "legal_center": "المركز القانوني",
@@ -14937,7 +14942,11 @@
             "landing_trusted_by": "Trusted by innovative companies",
             "landing_portfolio_challenge": "The Challenge",
             "landing_portfolio_solution": "Our Solution",
-            "landing_portfolio_technologies": "Technologies Used"
+            "landing_portfolio_technologies": "Technologies Used",
+            "clients_list": "Clients List",
+            "create_a_new_user_account_in_the_platform": "Create a new user account in the platform.",
+            "leave_blank_for_random": "Leave blank for a random password",
+            "view_user_financial_transactions": "View User Financial Transactions"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -15083,7 +15092,8 @@
             "recent_transactions": "Recent Transactions",
             "no_transactions_found_for_this_period": "No transactions found for this period.",
             "download_a_pdf_summary_of": "Download a PDF summary of your gold savings and performance.",
-            "unlock_the_ability_to_download": "Unlock the ability to download comprehensive PDF reports of your gold investments, performance metrics, and historical growth."
+            "unlock_the_ability_to_download": "Unlock the ability to download comprehensive PDF reports of your gold investments, performance metrics, and historical growth.",
+            "todays_prices_egp": "Today's Gold Prices"
         },
         "landing_legal": {
             "legal_center": "Legal Center",
