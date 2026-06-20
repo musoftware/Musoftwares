@@ -74,10 +74,30 @@ class RuntimeAuthController extends Controller
             expiresAt:  null, // long-lived — user can revoke from /settings/tokens
         );
 
-        return response()->json([
-            'token'    => $token->plainTextToken,
-            'userId'   => (string) $user->id,
-            'userName' => $user->name,
+        $plainTextToken = $token->plainTextToken;
+
+        try {
+            $response = Http::post("http://127.0.0.1:{$port}/auth/callback", [
+                'device_code' => $code,
+                'token' => $plainTextToken,
+                'userId' => (string) $user->id,
+            ]);
+
+            if (!$response->successful()) {
+                throw new \Exception('Local agent returned error status');
+            }
+        } catch (\Exception $e) {
+            // Revoke the newly created token if we can't send it to the agent
+            $token->accessToken->delete();
+            return back()->withErrors(['callback' => 'Could not connect to the local runtime agent. Please make sure the runtime application is running and try again.']);
+        }
+
+        return Inertia::render('Tools/RuntimeConnect', [
+            'code'      => $code,
+            'port'      => $port,
+            'userName'  => $user->name,
+            'userEmail' => $user->email,
+            'success'   => true,
         ]);
     }
 }
