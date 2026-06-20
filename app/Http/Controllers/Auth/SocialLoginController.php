@@ -77,15 +77,47 @@ class SocialLoginController extends Controller
 
             $googleUser = $userInfoResponse->json();
             
-            // Find existing user by email, or create a new one with a random password
-            $user = User::firstOrCreate(
-                ['email' => $googleUser['email']],
-                [
+            $user = User::where('email', $googleUser['email'])->first();
+            if (!$user) {
+                $user = User::create([
                     'name' => $googleUser['name'] ?? 'Google User',
+                    'email' => $googleUser['email'],
                     'password' => bcrypt(Str::random(16)),
                     'email_verified_at' => now(), // Assume Google emails are verified
-                ]
-            );
+                ]);
+
+                // Auto-assign currency based on GeoIP
+                $detectedCountry = null;
+                $geoDbPath = storage_path('app/geoip.mmdb');
+                if (file_exists($geoDbPath)) {
+                    try {
+                        $reader = new \GeoIp2\Database\Reader($geoDbPath);
+                        $ip = $request->ip();
+                        if ($ip !== '127.0.0.1' && $ip !== '::1') {
+                            $record = $reader->city($ip);
+                            if ($record && $record->country->name) {
+                                $detectedCountry = $record->country->name;
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        // Ignore if IP not found in DB or DB missing
+                    }
+                }
+
+                $mappedCurrencyCode = config('geo_currency.mapping.' . $detectedCountry, 'USD');
+                $currency = \App\Models\Currency::where('currency', $mappedCurrencyCode)->first();
+
+                if (!$currency) {
+                    $currency = \App\Models\Currency::where('currency', 'USD')->first(); // fallback to default
+                }
+
+                if ($currency) {
+                    $user->currency_id = $currency->id;
+                    $user->save();
+                }
+
+                event(new \Illuminate\Auth\Events\Registered($user));
+            }
 
             Auth::login($user, true);
 
