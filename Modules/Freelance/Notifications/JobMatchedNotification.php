@@ -43,7 +43,7 @@ class JobMatchedNotification extends Notification implements ShouldQueue
         return (new FcmMessage(notification: new FcmNotification(
                 title: __('freelance.new_job_matched_skills'),
                 body: __('freelance.new_job_matched_body', ['title' => $this->job->title]),
-                image: 'https://musoftwares.com/icon.png' // Optional: path to your app icon
+                image: 'https://www.musoftwares.com/icon.png' // Optional: path to your app icon
             )))
             ->data([
                 'job_id' => (string) $this->job->id,

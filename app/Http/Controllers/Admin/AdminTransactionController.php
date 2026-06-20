@@ -70,6 +70,21 @@ class AdminTransactionController extends Controller
         $filters = $request->only(['user', 'project', 'currency', 'month', 'year', 'type']);
         $type = $filters['type'] ?? 'income'; // income, cost, revenue
 
+        $filteredUser = null;
+        if (!empty($filters['user'])) {
+            $u = User::find($filters['user']);
+            if ($u) {
+                $filteredUser = [
+                    'id' => $u->id,
+                    'name' => $u->name,
+                    'email' => $u->email,
+                    'avatar_url' => $u->avatar_url,
+                    'available_balance' => $u->available_balance(),
+                    'currency' => $u->currency,
+                ];
+            }
+        }
+
         if ($type === 'income') {
             $transactions = $this->transactionService->getIncomeTransactions($filters)
                                  ->withQueryString()
@@ -78,6 +93,7 @@ class AdminTransactionController extends Controller
             return Inertia::render('Admin/Transactions/Income', [
                 'transactions' => $transactions,
                 'filters' => $filters,
+                'filteredUser' => $filteredUser,
             ]);
         } elseif ($type === 'cost') {
             // Reusing TransactionResource or create CostTransactionResource if needed
@@ -88,6 +104,7 @@ class AdminTransactionController extends Controller
             return Inertia::render('Admin/Transactions/Cost', [
                 'transactions' => $transactions,
                 'filters' => $filters,
+                'filteredUser' => $filteredUser,
             ]);
         } elseif ($type === 'revenue') {
             // Detailed revenue logic
@@ -98,12 +115,14 @@ class AdminTransactionController extends Controller
                 'income' => $income->through(fn($t) => (new TransactionResource($t))->resolve()),
                 'cost' => $cost->through(fn($t) => (new TransactionResource($t))->resolve()),
                 'filters' => $filters,
+                'filteredUser' => $filteredUser,
                 'businessCurrency' => \App\Helpers\CurrencyHelper::getBusinessCurrency(),
             ]);
         }
 
         return Inertia::render('Admin/Transactions/Index', [
             'filters' => $filters,
+            'filteredUser' => $filteredUser,
         ]);
     }
 

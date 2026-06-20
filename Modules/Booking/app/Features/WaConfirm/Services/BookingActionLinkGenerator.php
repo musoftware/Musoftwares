@@ -21,7 +21,7 @@ class BookingActionLinkGenerator
         // 1. Generate the secure token
         $token = $this->tokenManager->generateActionToken($confirmation, $actionType);
 
-        // 2. Build the URL (e.g. https://musoftwares.com/api/booking/wa/action/{raw_token})
+        // 2. Build the URL (e.g. https://www.musoftwares.com/api/booking/wa/action/{raw_token})
         // The raw_token was temporarily attached to the model by the TokenManager
         return url("/api/booking/wa/action/{$token->raw_token}");
     }

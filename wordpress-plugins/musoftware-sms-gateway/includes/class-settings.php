@@ -71,7 +71,7 @@ class Musoftware_Sms_Gateway_Settings {
             return;
         }
 
-        $base_url = get_option( 'musoftware_sms_gateway_base_url', 'https://musoftwares.com' );
+        $base_url = get_option( 'musoftware_sms_gateway_base_url', 'https://www.musoftwares.com' );
         $secret_key = get_option( 'musoftware_sms_gateway_secret_key', '' );
         $publishable_key = get_option( 'musoftware_sms_gateway_publishable_key', '' );
         $webhook_secret  = get_option( 'musoftware_sms_gateway_webhook_secret', '' );
@@ -96,7 +96,7 @@ class Musoftware_Sms_Gateway_Settings {
                         <th scope="row"><label for="musoftware_sms_gateway_base_url"><?php _e( 'API Base URL', 'musoftware-sms-gateway' ); ?></label></th>
                         <td>
                             <input type="text" name="musoftware_sms_gateway_base_url" id="musoftware_sms_gateway_base_url" value="<?php echo esc_attr( $base_url ); ?>" class="regular-text" />
-                            <p class="description"><?php _e( 'The base URL of the Laravel ERP (e.g. https://musoftwares.com).', 'musoftware-sms-gateway' ); ?></p>
+                            <p class="description"><?php _e( 'The base URL of the Laravel ERP (e.g. https://www.musoftwares.com).', 'musoftware-sms-gateway' ); ?></p>
                         </td>
                     </tr>
                     <tr>

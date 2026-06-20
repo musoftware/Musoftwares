@@ -10,6 +10,7 @@ import { ChevronDown, MoreHorizontal, Trash } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
  // Example for translations if applicable
 import { __ } from '@/lib/i18n';
+import TransactionUserCard from './Components/TransactionUserCard';
 
 const TransactionActions = ({ tx, type }) => {
     const [isOpen, setIsOpen] = React.useState(false);
@@ -44,7 +45,7 @@ const TransactionActions = ({ tx, type }) => {
     );
 };
 
-export default function Income({ transactions, filters }) {
+export default function Income({ transactions, filters, filteredUser }) {
     const handleSearch = (search) => {
         router.get(
             '/admin/transactions',
@@ -148,6 +149,8 @@ export default function Income({ transactions, filters }) {
 
     return (
         <AdminSidebarLayout title={__('erp.income_transactions')} header={__('erp.transactions')}>
+            {filteredUser && <TransactionUserCard user={filteredUser} />}
+            
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h2 className="text-lg font-semibold text-slate-900">{__('erp.income_transactions')}</h2>

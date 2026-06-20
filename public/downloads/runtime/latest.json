@@ -1,6 +1,6 @@
 {
-  "version": "2026.06.20.1",
-  "latest": "2026.06.20.1",
+  "version": "2026.06.20.4",
+  "latest": "2026.06.20.4",
   "minimum_supported": "1.0.0",
   "channel": "stable",
   "released_at": "2026-06-20",
@@ -10,6 +10,20 @@
     "linux": "/downloads/runtime/linux/musoftware-runtime-linux"
   },
   "changelog": [
+    {
+      "version": "2026.06.20.4",
+      "date": "2026-06-20",
+      "notes": [
+        "Auto-generated release"
+      ]
+    },
+    {
+      "version": "2026.06.20.3",
+      "date": "2026-06-20",
+      "notes": [
+        "Auto-generated release"
+      ]
+    },
     {
       "version": "2026.06.20.2",
       "date": "2026-06-20",
