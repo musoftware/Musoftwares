@@ -227,7 +227,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                 <CardContent className="space-y-6 px-8 py-6">
                                     {/* Country Combobox Selector */}
                                     <div className="space-y-2">
-                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Country</label>
+                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{__('general.country')}</label>
                                         <PremiumCombobox
                                             value={formData.country}
                                             onChange={(val) => setFormData(prev => ({ ...prev, country: String(val), city: '' }))}
