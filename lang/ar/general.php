@@ -5726,4 +5726,6 @@ return [
     'you_are_receiving_this_email_because_we_received_a_password_reset_request_for_your_account' => 'أنت تتلقى هذه الرسالة لأننا تلقينا طلب إعادة تعيين كلمة المرور لحسابك.',
     'this_password_reset_link_will_expire_in_minutes' => 'ستنتهي صلاحية رابط إعادة تعيين كلمة المرور هذا خلال :count دقيقة.',
     'if_you_did_not_request_a_password_reset_no_further_action_is_required' => 'إذا لم تطلب إعادة تعيين كلمة المرور، فلا يلزم اتخاذ أي إجراء آخر.',
+    'show_password' => 'إظهار كلمة المرور',
+    'hide_password' => 'إخفاء كلمة المرور',
 ];
