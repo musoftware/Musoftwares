@@ -2,25 +2,26 @@ import React from 'react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 
 export default function About({ canLogin, canRegister }) {
     return (
         <PublicLayout auth={{ user: null }}>
-            <Head title="About Us - musoftware" />
+            <Head title={__('landing_company.about_meta_title')} />
 
             <section className="relative pt-32 pb-24 overflow-hidden bg-white">
                 <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="max-w-4xl">
                         <h1 className="text-5xl sm:text-7xl font-extrabold text-slate-900 tracking-tight mb-8">
-                            Our Enterprise Vision
+                            {__('landing_company.about_title')}
                         </h1>
                         <p className="text-xl text-slate-600 font-light mb-12 max-w-2xl leading-relaxed">
-                            musoftware was founded with a single premise: complex businesses require simple, scalable, and secure infrastructure. We are an engineering-first software company.
+                            {__('landing_company.about_subtitle')}
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4">
                             <Link href="/company/careers">
                                 <Button size="lg" className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white rounded-full px-10 h-14 text-base font-semibold transition-all">
-                                    Join Our Team
+                                    {__('landing_company.about_join_team')}
                                 </Button>
                             </Link>
                         </div>
@@ -32,16 +33,16 @@ export default function About({ canLogin, canRegister }) {
                 <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                         <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-4">Engineering First</h3>
-                            <p className="text-slate-600 font-light">We prioritize clean architecture, robust testing, and scalable performance over marketing buzzwords.</p>
+                            <h3 className="text-xl font-bold text-slate-900 mb-4">{__('landing_company.about_engineering_first_title')}</h3>
+                            <p className="text-slate-600 font-light">{__('landing_company.about_engineering_first_body')}</p>
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-4">Long-Term Partnerships</h3>
-                            <p className="text-slate-600 font-light">We do not just build software; we maintain, scale, and secure it for the lifetime of your business.</p>
+                            <h3 className="text-xl font-bold text-slate-900 mb-4">{__('landing_company.about_long_term_title')}</h3>
+                            <p className="text-slate-600 font-light">{__('landing_company.about_long_term_body')}</p>
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-4">Data Sovereignty</h3>
-                            <p className="text-slate-600 font-light">You own your data. We provide the tools to export, manage, and secure it at all times.</p>
+                            <h3 className="text-xl font-bold text-slate-900 mb-4">{__('landing_company.about_data_sovereignty_title')}</h3>
+                            <p className="text-slate-600 font-light">{__('landing_company.about_data_sovereignty_body')}</p>
                         </div>
                     </div>
                 </div>
