@@ -87,7 +87,10 @@ export default function OnboardingWizard({ user, countries }: Props) {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => setSaveStatus('saved'),
-                onError: () => setSaveStatus('idle'),
+                onError: (backendErrors) => {
+                    setSaveStatus('idle');
+                    setErrors(prev => ({ ...prev, ...backendErrors }));
+                },
             });
         }, 800);
 
@@ -141,6 +144,9 @@ export default function OnboardingWizard({ user, countries }: Props) {
                 });
             },
             onFinish: () => setSaving(false),
+            onError: (backendErrors) => {
+                setErrors(prev => ({ ...prev, ...backendErrors }));
+            },
         });
     };
 
