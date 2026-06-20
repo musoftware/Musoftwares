@@ -5718,4 +5718,5 @@ return [
     'create_a_new_user_account_in_the_platform' => 'إنشاء حساب مستخدم جديد في المنصة.',
     'leave_blank_for_random' => 'اتركه فارغاً لإنشاء كلمة مرور عشوائية',
     'view_user_financial_transactions' => 'عرض المعاملات المالية للمستخدم',
+    'used' => 'مستخدم',
 ];

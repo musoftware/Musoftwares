@@ -184,6 +184,19 @@ class TimerHelper
             0);
     }
 
+    public function addUsedTransaction(Request $request, $client, $project, $item)
+    {
+        if ($item['amount'] == 0) return 0;
+
+        $this->addTransaction($request, $client, $project,
+            -1 * abs($item['amount']),
+            ($item['reason']), ($item['fee'] ?? 0),
+            'used',
+            isset($item['is_used']) && $item['is_used'] == '1');
+
+        return 1;
+    }
+
     public function addSend(Request $request, $client, $project, $item)
     {
 

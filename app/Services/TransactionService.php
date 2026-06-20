@@ -74,6 +74,8 @@ class TransactionService
                     $added += TimerHelper::instance()->addEarned($request, $user, $itemProject, $item);
                 } elseif ($type === 'send') {
                     $added += TimerHelper::instance()->addSend($request, $user, $itemProject, $item);
+                } elseif ($type === 'used') {
+                    $added += TimerHelper::instance()->addUsedTransaction($request, $user, $itemProject, $item);
                 }
             }
 

@@ -6,7 +6,8 @@ import { formatMoney as formatCurrency } from '@/lib/utils';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
-import { MoreHorizontal, Trash } from 'lucide-react';
+import { ChevronDown, MoreHorizontal, Trash } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
  // Example for translations if applicable
 import { __ } from '@/lib/i18n';
 
@@ -159,12 +160,32 @@ export default function Income({ transactions, filters }) {
                     <Button variant="outline" asChild>
                         <Link href="/admin/transactions/create?type=earn">{__('general.earn')}</Link>
                     </Button>
-                    <Button variant="outline" asChild>
-                        <Link href="/admin/transactions/create?type=refund">{__('general.refund')}</Link>
-                    </Button>
-                    <Button variant="outline" asChild>
-                        <Link href="/admin/transactions/create?type=send">{__('general.send')}</Link>
-                    </Button>
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="gap-2">
+                                {__('general.more') || 'More'}
+                                <ChevronDown className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                                <Link href="/admin/transactions/create?type=used" className="w-full cursor-pointer">
+                                    {__('general.used') || 'Used'}
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/admin/transactions/create?type=refund" className="w-full cursor-pointer">
+                                    {__('general.refund')}
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/admin/transactions/create?type=send" className="w-full cursor-pointer">
+                                    {__('general.send')}
+                                </Link>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
 
