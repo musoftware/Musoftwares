@@ -16,7 +16,7 @@ class OnboardingTest extends TestCase
             'onboarding_completed' => false,
         ]);
 
-        $response = $this->actingAs($user)->get('/onboarding-wizard');
+        $response = $this->actingAs($user)->get('/onboarding');
 
         $response->assertStatus(200);
     }
@@ -27,7 +27,7 @@ class OnboardingTest extends TestCase
             'onboarding_completed' => true,
         ]);
 
-        $response = $this->actingAs($user)->get('/onboarding-wizard');
+        $response = $this->actingAs($user)->get('/onboarding');
 
         $response->assertRedirect(route('dashboard', absolute: false));
     }
@@ -38,7 +38,7 @@ class OnboardingTest extends TestCase
             'onboarding_completed' => false,
         ]);
 
-        $response = $this->actingAs($user)->post('/onboarding-wizard', [
+        $response = $this->actingAs($user)->post('/onboarding', [
             'action' => 'autosave',
             'step' => 1,
             'country' => 'United States',
@@ -60,7 +60,7 @@ class OnboardingTest extends TestCase
             'onboarding_completed' => false,
         ]);
 
-        $response = $this->actingAs($user)->post('/onboarding-wizard', [
+        $response = $this->actingAs($user)->post('/onboarding', [
             'action' => 'complete',
             'step' => 2,
             'country' => 'United States',
@@ -86,6 +86,6 @@ class OnboardingTest extends TestCase
 
         $response = $this->actingAs($user)->get('/dashboard');
 
-        $response->assertRedirect('/onboarding-wizard');
+        $response->assertRedirect('/onboarding');
     }
 }

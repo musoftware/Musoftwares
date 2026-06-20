@@ -43,7 +43,7 @@ class EnforceFreelanceDomain
                 'device-tokens',
                 'notifications',
                 'build',
-                'onboarding-wizard',
+                'onboarding',
                 'product-tour',
             ];
 
