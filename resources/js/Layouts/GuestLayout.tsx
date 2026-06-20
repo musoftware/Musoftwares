@@ -32,9 +32,9 @@ export default function Guest({ children }: PropsWithChildren) {
                 <div className="flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-500 border-t border-zinc-200/60 dark:border-zinc-800/60 pt-6">
                     <span>© Musoftware Inc.</span>
                     <div className="flex space-x-6 text-zinc-500 dark:text-zinc-400">
-                        <span className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer">Help</span>
-                        <Link href="/privacy-policy" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer">Privacy</Link>
-                        <Link href="/terms-of-service" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer">Terms</Link>
+                        <span className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer">{__('general.help') || 'Help'}</span>
+                        <Link href="/privacy-policy" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer">{__('general.privacy') || 'Privacy'}</Link>
+                        <Link href="/terms-of-service" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer">{__('general.terms') || 'Terms'}</Link>
                     </div>
                 </div>
             </div>

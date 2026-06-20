@@ -44,7 +44,7 @@ export default function Register() {
                             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                             <path d="M1 1h22v22H1z" fill="none"/>
                         </svg>
-                        <span>{__('general.continue_with_google') || 'Continue with Google'}</span>
+                        <span>{__('general.continue_with_google')}</span>
                     </a>
                 </div>
 
@@ -54,7 +54,7 @@ export default function Register() {
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
                         <span className="bg-white px-2 text-zinc-500 dark:bg-zinc-950 dark:text-zinc-400">
-                            {__('general.or_continue_with') || 'Or continue with email'}
+                            {__('general.or_continue_with')}
                         </span>
                     </div>
                 </div>
