@@ -35,7 +35,7 @@ export default function ConfirmPassword() {
                 <form onSubmit={submit} className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="password" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                            Password
+                            {__('general.password')}
                         </Label>
                         <div className="relative">
                             <Input
