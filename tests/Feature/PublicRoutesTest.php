@@ -8,6 +8,8 @@ use App\Models\User;
 
 class PublicRoutesTest extends TestCase
 {
+    use \Illuminate\Foundation\Testing\RefreshDatabase;
+
     public function test_home_page_returns_a_successful_response()
     {
         $response = $this->get('/');

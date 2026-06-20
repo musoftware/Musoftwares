@@ -16,7 +16,7 @@
     {
         "id": "Auth",
         "name": "Authentication Module",
-        "status": "done",
+        "status": "running",
         "dependencies": []
     },
     {
