@@ -1,49 +1,149 @@
-import React from 'react';
+import { useRef } from 'react';
+import { Head } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Building2, Database, Briefcase, ArrowRight, CheckCircle2 } from 'lucide-react';
+import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 import { Button } from '@/Components/ui/button';
-import { __ } from '@/lib/i18n';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 
-export default function Erp({ canLogin, canRegister }) {
+gsap.registerPlugin(ScrollTrigger);
+
+export default function Erp({ auth }) {
+    const mainRef = useRef(null);
+    const phoneNumber = "201015218548";
+
+    useGSAP(() => {
+        const sections = gsap.utils.toArray('.reveal-section');
+        sections.forEach((section) => {
+            const elements = section.querySelectorAll('.gsap-fade-up');
+            gsap.fromTo(elements, 
+                { opacity: 0, y: 30 },
+                {
+                    opacity: 1, 
+                    y: 0, 
+                    duration: 0.8,
+                    stagger: 0.1,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top 85%",
+                        toggleActions: "play none none reverse"
+                    }
+                }
+            );
+        });
+    }, { scope: mainRef });
+
+    const openWhatsApp = (msg) => {
+        const encodedMessage = encodeURIComponent(msg);
+        window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+    };
+
+    const features = [
+        {
+            title: "Financial Ledger",
+            icon: Database,
+            desc: "Accurate, real-time tracking of income, expenses, and ledger history. Stop guessing about your cash flow.",
+            bullets: ["Multi-currency support", "Expense tracking", "Invoice generation"]
+        },
+        {
+            title: "Inventory Control",
+            icon: Building2,
+            desc: "Monitor stock levels, predict shortages, and automate procurement cycles across multiple warehouses.",
+            bullets: ["Multi-branch stock", "Low stock alerts", "Supplier management"]
+        },
+        {
+            title: "HR & Payroll",
+            icon: Briefcase,
+            desc: "Manage employee records, time tracking, and complex payroll calculations natively within the system.",
+            bullets: ["Attendance tracking", "Automated payslips", "Leave management"]
+        }
+    ];
+
     return (
-        <PublicLayout auth={{ user: null }}>
-            <Head title={__('general.mu_erp_enterprise_resource_planning')} />
+        <PublicLayout auth={auth}>
+            <Head>
+                <title>ERP Platform | Musoftware</title>
+                <meta name="description" content="A complete suite to manage financials, operations, and supply chains." />
+            </Head>
 
-            <section className="relative pt-32 pb-24 overflow-hidden bg-white">
-                <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 relative z-10">
+            <FloatingWhatsAppButton phoneNumber={phoneNumber} defaultMessage="Hello Mahmoud, I want to discuss an ERP Platform." />
+
+            <div ref={mainRef} className="w-full bg-[#fcfcfc] text-[#111111] font-sans selection:bg-[#111111] selection:text-white overflow-x-hidden">
+                
+                {/* Hero Section */}
+                <section className="pt-32 pb-24 lg:pt-48 lg:pb-32 px-6 lg:px-8 max-w-7xl mx-auto reveal-section border-b border-[#e5e5e5]">
                     <div className="max-w-4xl">
-                        <h1 className="text-5xl sm:text-7xl font-extrabold text-slate-900 tracking-tight mb-8">
-                            {__('general.enterprise_resource_planning')}</h1>
-                        <p className="text-xl text-slate-600 font-light mb-12 max-w-2xl leading-relaxed">
-                            {__('general.a_complete_suite_to_manage_financials_op')}</p>
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <a href="mailto:admin@musoftwares.com">
-                                <Button size="lg" className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white rounded-full px-10 h-14 text-base font-semibold transition-all">
-                                    {__('general.contact_sales')}</Button>
-                            </a>
+                        <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-8 bg-white">
+                            <span className="flex h-1.5 w-1.5 rounded-full bg-[#111111]"></span>
+                            Platform
                         </div>
+                        <h1 className="gsap-fade-up text-5xl lg:text-7xl font-extrabold text-[#111111] tracking-tight leading-[1.05] mb-6">
+                            Enterprise Resource Planning.
+                        </h1>
+                        <p className="gsap-fade-up text-xl text-[#666666] font-normal leading-relaxed max-w-2xl mb-10">
+                            A complete suite to manage financials, operations, and supply chains. Gain total visibility and control over your core business functions.
+                        </p>
+                        <Button 
+                            onClick={() => openWhatsApp("Hello Mahmoud, I want to discuss an ERP Platform.")}
+                            className="gsap-fade-up bg-[#111111] text-white hover:bg-[#333333] rounded-xl px-8 py-6 text-sm font-bold uppercase tracking-wide transition-all"
+                        >
+                            Discuss Your Needs
+                        </Button>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <section className="py-24 bg-slate-50 border-t border-slate-100">
-                <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                        <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-4">{__('general.financial_ledger')}</h3>
-                            <p className="text-slate-600 font-light">{__('general.accurate_realtime_tracking_of_income_exp')}</p>
-                        </div>
-                        <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-4">{__('general.inventory_control')}</h3>
-                            <p className="text-slate-600 font-light">{__('general.monitor_stock_levels_predict_shortages_a')}</p>
-                        </div>
-                        <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-4">{__('general.hr_payroll')}</h3>
-                            <p className="text-slate-600 font-light">{__('general.manage_employee_records_time_tracking_an')}</p>
-                        </div>
+                {/* Features Grid */}
+                <section className="py-24 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
+                    <div className="text-center mb-16">
+                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">ERP Modules</h2>
+                        <p className="gsap-fade-up text-lg text-[#666666]">A unified operating system for your enterprise.</p>
                     </div>
-                </div>
-            </section>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {features.map((feature, idx) => (
+                            <div key={idx} className="gsap-fade-up bg-white p-8 lg:p-10 border border-[#e5e5e5] rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:border-[#111111] transition-all flex flex-col h-full group">
+                                <div className="w-14 h-14 bg-[#f4f4f5] group-hover:bg-[#111111] transition-colors rounded-xl flex items-center justify-center mb-8">
+                                    <feature.icon className="w-6 h-6 text-[#111111] group-hover:text-white transition-colors" />
+                                </div>
+                                <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
+                                <p className="text-[#666666] leading-relaxed text-[15px] mb-8 flex-grow">
+                                    {feature.desc}
+                                </p>
+                                <ul className="space-y-3 pt-6 border-t border-[#f4f4f5]">
+                                    {feature.bullets.map((bullet, i) => (
+                                        <li key={i} className="flex items-center gap-3 text-[#444444]">
+                                            <CheckCircle2 className="w-4 h-4 text-[#111111]" />
+                                            <span className="text-sm font-medium">{bullet}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* CTA Section */}
+                <section className="py-32 bg-[#111111] text-white text-center reveal-section px-6">
+                    <div className="max-w-3xl mx-auto">
+                        <h2 className="gsap-fade-up text-4xl md:text-5xl font-extrabold mb-6">
+                            Ready to unify your operations?
+                        </h2>
+                        <p className="gsap-fade-up text-xl text-[#a3a3a3] mb-12 leading-relaxed">
+                            Stop using disjointed software that slows you down. Bring everything into one dashboard.
+                        </p>
+                        <Button 
+                            onClick={() => openWhatsApp("Hello Mahmoud, I need a unified ERP system.")}
+                            className="gsap-fade-up bg-white text-[#111111] hover:bg-[#e5e5e5] rounded-xl px-10 py-7 text-sm font-bold tracking-wide uppercase transition-all flex items-center justify-center gap-3 mx-auto"
+                        >
+                            Book a Consultation <ArrowRight className="w-4 h-4" />
+                        </Button>
+                    </div>
+                </section>
+
+            </div>
         </PublicLayout>
     );
 }
