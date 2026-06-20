@@ -5719,4 +5719,11 @@ return [
     'leave_blank_for_random' => 'اتركه فارغاً لإنشاء كلمة مرور عشوائية',
     'view_user_financial_transactions' => 'عرض المعاملات المالية للمستخدم',
     'used' => 'مستخدم',
+
+    // Password Reset
+    'reset_password_notification' => 'إشعار إعادة تعيين كلمة المرور',
+    'hello' => 'مرحباً',
+    'you_are_receiving_this_email_because_we_received_a_password_reset_request_for_your_account' => 'أنت تتلقى هذه الرسالة لأننا تلقينا طلب إعادة تعيين كلمة المرور لحسابك.',
+    'this_password_reset_link_will_expire_in_minutes' => 'ستنتهي صلاحية رابط إعادة تعيين كلمة المرور هذا خلال :count دقيقة.',
+    'if_you_did_not_request_a_password_reset_no_further_action_is_required' => 'إذا لم تطلب إعادة تعيين كلمة المرور، فلا يلزم اتخاذ أي إجراء آخر.',
 ];
