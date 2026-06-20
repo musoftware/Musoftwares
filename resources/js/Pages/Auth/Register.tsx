@@ -27,7 +27,7 @@ export default function Register() {
 
     return (
         <GuestLayout>
-            <Head title="Register" />
+            <Head title={__('general.register')} />
 
             <div className="space-y-6">
                 <div className="space-y-1.5">
@@ -98,7 +98,7 @@ export default function Register() {
 
                     <div className="space-y-2">
                         <Label htmlFor="password" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                            Password
+                            {__('general.password')}
                         </Label>
                         <div className="relative">
                             <Input
@@ -164,7 +164,7 @@ export default function Register() {
 
                 <div className="text-center pt-4 border-t border-zinc-100 dark:border-zinc-800/80 mt-6">
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">
-                        Already registered?{' '}
+                        {__('general.already_registered')}{' '}
                         <Link
                             href={route('login')}
                             className="font-medium text-zinc-900 hover:underline dark:text-zinc-100"

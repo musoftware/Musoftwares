@@ -91,7 +91,7 @@ export default function Login({
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
                             <Label htmlFor="password" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                                Password
+                                {__('general.password')}
                             </Label>
                             {canResetPassword && (
                                 <Link
@@ -158,7 +158,7 @@ export default function Login({
 
                 <div className="text-center pt-4 border-t border-zinc-100 dark:border-zinc-800/80 mt-6">
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">
-                        Don't have an account?{' '}
+                        {__('general.dont_have_account')}{' '}
                         <Link
                             href={route('register')}
                             className="font-medium text-zinc-900 hover:underline dark:text-zinc-100"

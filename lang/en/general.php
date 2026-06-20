@@ -5894,4 +5894,6 @@ return [
     'leave_blank_for_random' => 'Leave blank for a random password',
     'view_user_financial_transactions' => 'View User Financial Transactions',
     'used' => 'Used',
+    'already_registered' => 'Already registered?',
+    'dont_have_account' => 'Don\'t have an account?',
 ];
