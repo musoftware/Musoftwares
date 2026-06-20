@@ -6,8 +6,9 @@ import { formatMoney as formatCurrency } from '@/lib/utils';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { __ } from '@/lib/i18n';
+import TransactionUserCard from './Components/TransactionUserCard';
 
-export default function Revenue({ income, cost, filters, businessCurrency }) {
+export default function Revenue({ income, cost, filters, businessCurrency, filteredUser }) {
     const handleSearch = (search) => {
         router.get(
             '/admin/transactions',
@@ -73,6 +74,8 @@ export default function Revenue({ income, cost, filters, businessCurrency }) {
 
     return (
         <AdminSidebarLayout title={__('general.revenue')} header={__('erp.transactions')}>
+            {filteredUser && <TransactionUserCard user={filteredUser} />}
+            
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h2 className="text-lg font-semibold text-slate-900">{__('general.revenue_summary')}</h2>

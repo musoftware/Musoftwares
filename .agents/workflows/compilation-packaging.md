@@ -153,7 +153,7 @@ Musoftware applies strict Semantic Versioning (`MAJOR.MINOR.PATCH`) to preserve 
 - **PATCH**: Backward-compatible bug fixes and stability tweaks.
 
 ### Update Pipeline Flow
-1. **Check**: The Runtime Agent queries `https://musoftwares.com/api/runtime/latest` hourly.
+1. **Check**: The Runtime Agent queries `https://www.musoftwares.com/api/runtime/latest` hourly.
 2. **Determine**: If a newer version is available and meets the local user's update group, the runtime downloads the signed installer in the background.
 3. **Execute**: The runtime initiates a silent installer run:
    ```bash

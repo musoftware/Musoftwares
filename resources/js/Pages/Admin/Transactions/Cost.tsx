@@ -8,6 +8,7 @@ import { Button } from '@/Components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
 import { MoreHorizontal, Trash } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import TransactionUserCard from './Components/TransactionUserCard';
 
 const TransactionActions = ({ tx, type }) => {
     const [isOpen, setIsOpen] = React.useState(false);
@@ -42,7 +43,7 @@ const TransactionActions = ({ tx, type }) => {
     );
 };
 
-export default function Cost({ transactions, filters }) {
+export default function Cost({ transactions, filters, filteredUser }) {
     const handleSearch = (search) => {
         router.get(
             '/admin/transactions',
@@ -130,6 +131,7 @@ export default function Cost({ transactions, filters }) {
 
     return (
         <AdminSidebarLayout title={__('erp.cost_transactions')} header={__('erp.transactions')}>
+            {filteredUser && <TransactionUserCard user={filteredUser} />}
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h2 className="text-lg font-semibold text-slate-900">{__('erp.cost_transactions')}</h2>
