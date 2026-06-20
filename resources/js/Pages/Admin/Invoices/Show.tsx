@@ -1230,19 +1230,19 @@ export default function Show({ invoice }: { invoice: any }) {
                                     <div className="flex justify-between">
                                         <span className="text-gray-500">{__('general.service_cost')}</span>
                                         <span className="font-medium text-red-600">
-                                            {formatCurrency(payServicePreview.cost, { code: payServicePreview.invoice_currency })}
+                                            {formatCurrency(payServicePreview.cost, payServicePreview.invoice_currency)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between font-semibold border-t pt-2 mt-2">
                                         <span className="text-gray-700">{__('general.invoice_total_addition')}</span>
                                         <span className="text-green-600">
-                                            {formatCurrency(payServicePreview.total, { code: payServicePreview.invoice_currency })}
+                                            {formatCurrency(payServicePreview.total, payServicePreview.invoice_currency)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between text-xs text-gray-400 mt-1">
                                         <span>{__('general.business_currency_total')}</span>
                                         <span>
-                                            {formatCurrency(payServicePreview.total_usd, { code: 'USD' })} {/* Assuming USD as base for display purpose here */}
+                                            {formatCurrency(payServicePreview.total_usd, 'USD')} {/* Assuming USD as base for display purpose here */}
                                         </span>
                                     </div>
                                 </div>

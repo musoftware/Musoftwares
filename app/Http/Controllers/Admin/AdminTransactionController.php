@@ -111,7 +111,7 @@ class AdminTransactionController extends Controller
     {
         $request->validate([
             'user' => 'required|exists:users,id',
-            'type' => 'required|in:timer-received,timer-due,out-timer-received,refund,earned,send',
+            'type' => 'required|in:timer-received,timer-due,out-timer-received,refund,earned,send,used',
             'data' => 'required|array',
         ]);
 

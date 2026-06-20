@@ -31,6 +31,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
         if (type === 'refund') return 'refund';
         if (type === 'charge') return 'timer-due';
         if (type === 'earn' || type === 'earned') return 'earned';
+        if (type === 'used') return 'used';
         return 'timer-received';
     };
 
@@ -172,7 +173,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                     <div className="xl:col-span-9 order-1 xl:order-2">
 
                 <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-                    <TabsList className="grid w-full grid-cols-5 mb-6">
+                    <TabsList className="grid w-full grid-cols-6 mb-6">
                         <TabsTrigger value="timer-received" className="flex items-center gap-2">
                             <ArrowDownLeft className="h-4 w-4 text-green-500" />
                             <span className="hidden sm:inline">Receive</span>
@@ -192,6 +193,10 @@ export default function Create({ user, selectedProject, type, currencies, busine
                         <TabsTrigger value="earned" className="flex items-center gap-2">
                             <Coins className="h-4 w-4 text-purple-500" />
                             <span className="hidden sm:inline">{__('general.add_earn')}</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="used" className="flex items-center gap-2">
+                            <ArrowUpRight className="h-4 w-4 text-gray-500" />
+                            <span className="hidden sm:inline">{__('general.used') || 'Used'}</span>
                         </TabsTrigger>
                     </TabsList>
 

@@ -1,15 +1,29 @@
 {
-  "version": "2026.06.09.1",
-  "latest": "2026.06.09.1",
+  "version": "2026.06.20.1",
+  "latest": "2026.06.20.1",
   "minimum_supported": "1.0.0",
   "channel": "stable",
-  "released_at": "2026-06-09",
+  "released_at": "2026-06-20",
   "downloads": {
     "windows": "/downloads/runtime/windows/musoftware-runtime-win.exe",
     "macos": "/downloads/runtime/macos/musoftware-runtime-mac",
     "linux": "/downloads/runtime/linux/musoftware-runtime-linux"
   },
   "changelog": [
+    {
+      "version": "2026.06.20.2",
+      "date": "2026-06-20",
+      "notes": [
+        "Auto-generated release"
+      ]
+    },
+    {
+      "version": "2026.06.20.1",
+      "date": "2026-06-20",
+      "notes": [
+        "Auto-generated release"
+      ]
+    },
     {
       "version": "2026.06.09.1",
       "date": "2026-06-09",

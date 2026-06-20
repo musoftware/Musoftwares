@@ -7180,7 +7180,8 @@
             "clients_list": "قائمة العملاء",
             "create_a_new_user_account_in_the_platform": "إنشاء حساب مستخدم جديد في المنصة.",
             "leave_blank_for_random": "اتركه فارغاً لإنشاء كلمة مرور عشوائية",
-            "view_user_financial_transactions": "عرض المعاملات المالية للمستخدم"
+            "view_user_financial_transactions": "عرض المعاملات المالية للمستخدم",
+            "used": "مستخدم"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -14946,7 +14947,8 @@
             "clients_list": "Clients List",
             "create_a_new_user_account_in_the_platform": "Create a new user account in the platform.",
             "leave_blank_for_random": "Leave blank for a random password",
-            "view_user_financial_transactions": "View User Financial Transactions"
+            "view_user_financial_transactions": "View User Financial Transactions",
+            "used": "Used"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
