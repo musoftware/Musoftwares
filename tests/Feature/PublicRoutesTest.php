@@ -89,6 +89,6 @@ class PublicRoutesTest extends TestCase
         $service->subtitle_en = 'sub';
         $service->save();
 
-        $this->get('/website-services/test-service')->assertStatus(200);
+        $this->get('/services/test-service')->assertStatus(200);
     }
 }
