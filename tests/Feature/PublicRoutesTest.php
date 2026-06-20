@@ -4,8 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\BlogArticle;
-use App\Models\User;
-
+use App\Models\WebsiteService;
 class PublicRoutesTest extends TestCase
 {
     use \Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,6 +21,12 @@ class PublicRoutesTest extends TestCase
         $this->get('/platforms/crm')->assertStatus(200);
         $this->get('/platforms/erp')->assertStatus(200);
         $this->get('/platforms/cloud')->assertStatus(200);
+    }
+
+    public function test_portfolio_page_returns_successful_response()
+    {
+        $this->get('/portfolio')->assertStatus(200);
+        $this->get('/portfolio/test-slug')->assertStatus(200);
     }
 
     public function test_solutions_pages_return_successful_response()
@@ -61,15 +66,29 @@ class PublicRoutesTest extends TestCase
 
     public function test_blog_show_returns_successful_response()
     {
-        $user = User::factory()->create();
         $article = clone(new BlogArticle());
         $article->title = 'Test Article';
         $article->slug = 'test-article';
         $article->content = 'This is a test article.';
-        $article->author_id = $user->id;
+        $article->is_published = true;
         $article->published_at = now();
         $article->save();
 
         $this->get('/blog/test-article')->assertStatus(200);
+    }
+
+    public function test_website_service_show_returns_successful_response()
+    {
+        $service = new WebsiteService();
+        $service->title_en = 'Test Service';
+        $service->title_ar = 'Test Service AR';
+        $service->slug = 'test-service';
+        $service->description_ar = 'desc';
+        $service->description_en = 'desc';
+        $service->subtitle_ar = 'sub';
+        $service->subtitle_en = 'sub';
+        $service->save();
+
+        $this->get('/website-services/test-service')->assertStatus(200);
     }
 }
