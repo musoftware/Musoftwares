@@ -8,7 +8,7 @@
     {
         "id": "Phase1",
         "name": "Phase 1: Foundation & Public",
-        "status": "running",
+        "status": "done",
         "dependencies": [
             "Core"
         ]
@@ -16,13 +16,13 @@
     {
         "id": "Auth",
         "name": "Authentication Module",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Auth1",
         "name": "Implement Login/Register",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Auth"
         ]
@@ -30,25 +30,25 @@
     {
         "id": "Auth2",
         "name": "Setup Password Recovery",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Auth3",
         "name": "Develop Onboarding Wizard",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Public",
         "name": "Public & Marketing Pages",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Pub1",
         "name": "Setup Home & Info Routes",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Public"
         ]
@@ -56,19 +56,19 @@
     {
         "id": "Pub2",
         "name": "Create Legal & Company Pages",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Pub3",
         "name": "Build Platform & Solution Pages",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Pub4",
         "name": "Implement Blog System",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
