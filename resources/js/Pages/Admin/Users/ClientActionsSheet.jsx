@@ -38,7 +38,7 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-xl p-0 overflow-hidden bg-slate-50 border-slate-200 shadow-2xl rounded-xl">
+            <DialogContent className="sm:max-w-xl p-0 overflow-hidden bg-slate-50 border-slate-200 shadow-2xl rounded-xl flex flex-col max-h-[90dvh]">
                 <DialogHeader className="bg-slate-950 p-6 text-left space-y-0 border-b border-slate-800">
                     <div className="flex items-center gap-4">
                         <Avatar className="h-12 w-12 bg-white/10 text-white">
@@ -57,7 +57,7 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                     </div>
                 </DialogHeader>
 
-                <div className="p-6">
+                <div className="p-6 overflow-y-auto flex-1">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Finance & Billing Column */}
                         <div>

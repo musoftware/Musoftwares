@@ -5,12 +5,15 @@ import {
     ChevronLeft,
     ChevronRight,
     ChevronUp,
+    Filter,
 } from 'lucide-react';
 import { SearchInput } from './SearchInput';
 import { SkeletonTable } from './SkeletonLoaders';
 import { EmptyState } from './EmptyState';
 import { Link, router } from '@inertiajs/react';
 import { __ } from '@/lib/i18n';
+import { Popover, PopoverContent, PopoverTrigger } from './popover';
+import { buttonVariants } from './button';
 
 // ── Column format A: legacy {key, label, render?, sortable?}
 export interface ColumnDefKey {
@@ -110,7 +113,7 @@ export function DataTable({
             {(onSearch || filters?.extra) && (
                 <div className="flex items-center justify-between gap-4 border-b border-slate-100 p-4">
                     {onSearch && (
-                        <div className="w-full max-w-sm">
+                        <div className="w-full sm:max-w-sm">
                             <SearchInput
                                 value={filters?.search || ''}
                                 onChange={onSearch}
@@ -120,9 +123,29 @@ export function DataTable({
                         </div>
                     )}
                     {filters?.extra && (
-                        <div className="flex items-center gap-2">
-                            {filters.extra}
-                        </div>
+                        <>
+                            {/* Desktop inline filters */}
+                            <div className="hidden sm:flex items-center gap-2">
+                                {filters.extra}
+                            </div>
+                            
+                            {/* Mobile Popover filters */}
+                            <div className="sm:hidden flex items-center">
+                                <Popover>
+                                    <PopoverTrigger className={cn(buttonVariants({ variant: "outline", size: "icon" }), "h-9 w-9 shrink-0 text-slate-500")}>
+                                        <Filter className="h-4 w-4" />
+                                    </PopoverTrigger>
+                                    <PopoverContent align="end" className="w-[280px]">
+                                        <div className="space-y-4">
+                                            <h4 className="font-medium text-sm text-slate-900">{__('general.filters') || 'Filters'}</h4>
+                                            <div className="flex flex-col gap-3 [&_select]:w-full [&_.flex]:flex-col [&_.flex]:items-start [&_.flex]:w-full">
+                                                {filters.extra}
+                                            </div>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                        </>
                     )}
                 </div>
             )}
