@@ -21,7 +21,7 @@ export function ClientActionModal({ client, isOpen, onClose, onDelete, auth }: C
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-3xl">
+            <DialogContent className="sm:max-w-3xl flex flex-col max-h-[90dvh]">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-3">
                         <div className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 text-slate-700 text-sm font-bold">
@@ -34,7 +34,7 @@ export function ClientActionModal({ client, isOpen, onClose, onDelete, auth }: C
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2 overflow-y-auto flex-1">
                     {/* Finance Column */}
                     <div>
                         <h4 className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-3 px-1">{__('general.finance')}</h4>
