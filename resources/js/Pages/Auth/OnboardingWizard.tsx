@@ -102,13 +102,13 @@ export default function OnboardingWizard({ user, countries }: Props) {
     const validateStep = (currentStep: number) => {
         const newErrors: Record<string, string> = {};
         if (currentStep === 1) {
-            if (!formData.country) newErrors.country = 'Country is required.';
-            if (!formData.city || formData.city.trim() === '') newErrors.city = 'City is required.';
+            if (!formData.country) newErrors.country = __('validation.country_required');
+            if (!formData.city || formData.city.trim() === '') newErrors.city = __('validation.city_required');
         } else if (currentStep === 2) {
             if (!formData.mobile_1 || formData.mobile_1.trim() === '') {
-                newErrors.mobile_1 = 'Primary mobile number is required.';
+                newErrors.mobile_1 = __('validation.primary_mobile_required');
             } else if (formData.mobile_1.length < 7) {
-                newErrors.mobile_1 = 'Please enter a valid phone number.';
+                newErrors.mobile_1 = __('validation.invalid_phone_number');
             }
         } else if (currentStep === 3) {
             // Step 3 validation (if needed in the future)
@@ -195,8 +195,8 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                     {s < step ? <Check className="w-3.5 h-3.5" /> : s}
                                 </div>
                                 <span className={`hidden sm:inline-block text-xs font-medium ${s === step ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}>
-                                    {s === 1 && (__('general.location') || 'Location')}
-                                    {s === 2 && (__('general.contact') || 'Contact')}
+                                    {s === 1 && __('general.location')}
+                                    {s === 2 && __('general.contact')}
                                 </span>
                                 {s < 2 && <ChevronRight className="w-3.5 h-3.5 text-muted-foreground mx-1" />}
                             </div>
@@ -208,7 +208,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                         <div className={`w-2 h-2 rounded-full ${saveStatus === 'saving' ? 'bg-amber-500 animate-pulse' :
                                 saveStatus === 'saved' ? 'bg-emerald-500' : 'bg-muted-foreground'
                             }`} />
-                        <span>{saveStatus === 'saving' ? __('general.saving_progress') || 'Saving progress...' : saveStatus === 'saved' ? __('general.saved') || 'Saved' : __('general.ready') || 'Ready'}</span>
+                        <span>{saveStatus === 'saving' ? __('general.saving_progress') : saveStatus === 'saved' ? __('general.saved') : __('general.ready')}</span>
                     </div>
                 </div>
 
@@ -239,7 +239,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                             onChange={(val) => setFormData(prev => ({ ...prev, country: String(val), city: '' }))}
                                             options={countries}
                                             placeholder={__('general.select_a_country')}
-                                            searchPlaceholder={__('general.search_country') || "Search country..."}
+                                            searchPlaceholder={__('general.search_country')}
                                         />
                                         {errors.country && <span className="text-xs text-destructive mt-1 block">{errors.country}</span>}
                                     </div>
@@ -252,7 +252,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                             onChange={(val) => setFormData(prev => ({ ...prev, city: String(val) }))}
                                             options={uniqueCities}
                                             placeholder={__('general.select_a_city')}
-                                            searchPlaceholder={__('general.search_or_enter_custom_city') || "Search or enter custom city..."}
+                                            searchPlaceholder={__('general.search_or_enter_custom_city')}
                                             icon={<MapPin className="w-4 h-4" />}
                                             allowCustomValue={true}
                                         />
@@ -329,7 +329,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                 <CardFooter className="border-t px-8 py-4 flex items-center justify-between bg-muted/30">
                                     <Button onClick={prevStep} variant="outline" size="lg" className="h-11 px-5 rounded-xl font-medium">
                                         <ArrowLeft className="w-4 h-4 mr-2" />
-                                        {__('general.back') || 'Back'}
+                                        {__('general.back')}
                                     </Button>
                                     <Button onClick={handleComplete} size="lg" className="h-11 px-8 rounded-xl font-medium shadow-md" disabled={saving}>
                                         {saving ? (
