@@ -1,0 +1,340 @@
+[
+    {
+        "id": "Core",
+        "name": "Musoftwares Ecosystem Core",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "Phase1",
+        "name": "Phase 1: Foundation & Public",
+        "status": "pending",
+        "dependencies": [
+            "Core"
+        ]
+    },
+    {
+        "id": "Auth",
+        "name": "Authentication Module",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Auth1",
+        "name": "Implement Login/Register",
+        "status": "pending",
+        "dependencies": [
+            "Auth"
+        ]
+    },
+    {
+        "id": "Auth2",
+        "name": "Setup Password Recovery",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Auth3",
+        "name": "Develop Onboarding Wizard",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Public",
+        "name": "Public & Marketing Pages",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Pub1",
+        "name": "Setup Home & Info Routes",
+        "status": "pending",
+        "dependencies": [
+            "Public"
+        ]
+    },
+    {
+        "id": "Pub2",
+        "name": "Create Legal & Company Pages",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Pub3",
+        "name": "Build Platform & Solution Pages",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Pub4",
+        "name": "Implement Blog System",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Phase2",
+        "name": "Phase 2: Management & Portals",
+        "status": "pending",
+        "dependencies": [
+            "Phase1"
+        ]
+    },
+    {
+        "id": "Admin",
+        "name": "Admin Panel",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Adm1",
+        "name": "Build Dashboard",
+        "status": "pending",
+        "dependencies": [
+            "Admin"
+        ]
+    },
+    {
+        "id": "Adm2",
+        "name": "Setup Content & Financial Reports",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Adm3",
+        "name": "Create Overseers",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Adm4",
+        "name": "Develop Users & Transactions Mgmt",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Adm5",
+        "name": "Configure System Settings",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Client",
+        "name": "Client Portal",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Cli1",
+        "name": "Setup Dashboard & Notifications",
+        "status": "pending",
+        "dependencies": [
+            "Client"
+        ]
+    },
+    {
+        "id": "Cli2",
+        "name": "Implement Financials & Billing",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Cli3",
+        "name": "Build Chat & Support Tickets",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Cli4",
+        "name": "Develop Settings & Profile Mgmt",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Phase3",
+        "name": "Phase 3: Core Business Modules",
+        "status": "pending",
+        "dependencies": [
+            "Phase2"
+        ]
+    },
+    {
+        "id": "ERP",
+        "name": "ERP Module",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ERP1",
+        "name": "Setup Dashboard & Config",
+        "status": "pending",
+        "dependencies": [
+            "ERP"
+        ]
+    },
+    {
+        "id": "ERP2",
+        "name": "Implement Client Management",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ERP3",
+        "name": "Build Full-Page Invoices & Billing",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ERP4",
+        "name": "Develop Financial Control",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ERP5",
+        "name": "Create Inventory & POS",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ERP6",
+        "name": "Setup HR & Project Mgmt",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "CRM",
+        "name": "CRM Module",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "CRM1",
+        "name": "Build Role-Based Dashboards",
+        "status": "pending",
+        "dependencies": [
+            "CRM"
+        ]
+    },
+    {
+        "id": "CRM2",
+        "name": "Implement Leads & Pipelines",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "CRM3",
+        "name": "Develop Campaigns & Sequences",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "CRM4",
+        "name": "Setup Config & Integrations",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Phase4",
+        "name": "Phase 4: Specialized Domains & External",
+        "status": "pending",
+        "dependencies": [
+            "Phase3"
+        ]
+    },
+    {
+        "id": "Freelance",
+        "name": "Freelance & iSaaS",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Free1",
+        "name": "Build Landing & Core Pages",
+        "status": "pending",
+        "dependencies": [
+            "Freelance"
+        ]
+    },
+    {
+        "id": "Free2",
+        "name": "Implement Jobs & Freelancers Browse",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Free3",
+        "name": "Develop Job Management",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Free4",
+        "name": "Setup Contracts & Proposals",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Tools",
+        "name": "Tools & WebTools",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Tool1",
+        "name": "Implement Tool Runners",
+        "status": "pending",
+        "dependencies": [
+            "Tools"
+        ]
+    },
+    {
+        "id": "Tool2",
+        "name": "Build Tools Portal & Licenses",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Tool3",
+        "name": "Develop Utility WebTools",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Ext",
+        "name": "External Modules & Addons",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Ext1",
+        "name": "Setup External Marketplace",
+        "status": "pending",
+        "dependencies": [
+            "Ext"
+        ]
+    },
+    {
+        "id": "Ext2",
+        "name": "Implement Booking System",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Ext3",
+        "name": "Develop Affiliate POS",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Ext4",
+        "name": "Build SMS Gateway",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Ext5",
+        "name": "Create GoldSavers",
+        "status": "pending",
+        "dependencies": []
+    }
+]
