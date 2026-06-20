@@ -22,7 +22,14 @@ This skill provides comprehensive guidelines and strict rules for all frontend i
 - **NO Native Prompts or Alerts**: The use of `alert()`, `confirm()`, or `prompt()` is strictly prohibited.
 - Always use custom Shadcn alert dialogs and confirmation modals for destructive actions (e.g., deletions) or important notifications.
 
-### 4. General Frontend Architecture
+### 4. Module-Specific UX Edge Cases
+- **Admin Panel**: Extremely complex data tables require virtualization or strict pagination. Bulk action confirmations are mandatory. Impersonation functionality must have a persistent floating exit button.
+- **CRM Module**: Kanban boards (`PipelineBoard.tsx`) must support smooth drag-and-drop. Embedded form widgets (`LeadCaptureForm.jsx`) must be extremely lightweight and resistant to CSS bleed.
+- **ERP Module**: Forms handling thousands of products or nested line items must not lock the UI thread.
+- **Freelance / iSaaS**: Escrow UI elements must clearly indicate hold states to prevent trust issues. Multi-step proposal submissions must be frictionless.
+- **Tools & WebTools**: Runners must provide highly responsive progress indicators (Spinners/Progress bars). Strict validation against timeouts and clear visibility into Background Task states.
+
+### 5. General Frontend Architecture
 - **i18n Localization**: Zero hardcoded English strings. All text must be translatable via modular PHP arrays (do not use global JSON).
 - **Multi-Currency System**: Currencies must dynamically format based on the business's or client's active currency. No hardcoded currency symbols (e.g., `$`).
 - **Tri-Path Validation**: Handle the Happy Path, Edge Cases (e.g., invalid data, network drops), and Security Limits (rate limiting, permissions) on every interactive route.
