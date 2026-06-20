@@ -105,11 +105,6 @@ class UsersController extends Controller
             ->take(2)
             ->implode('');
 
-        $walletData = [
-            'balance'  => (float) $user->available_balance(),
-            'currency' => $user->currency_name(),
-        ];
-
         $stats = [
             'tickets_total'  => $user->tickets()->count(),
             'tickets_open'   => $user->tickets()->where('ticket_status', 'open')->count(),
@@ -138,16 +133,6 @@ class UsersController extends Controller
 
         $userDetail = (new UserResource($user))->resolve();
 
-        $transactions = $user->transactions()->latest()->take(10)->get()->map(function($tx) {
-            return [
-                'id' => $tx->id,
-                'type' => $tx->type,
-                'amount' => $tx->amount,
-                'description' => $tx->reason ?? $tx->type,
-                'created_at' => $tx->created_at,
-            ];
-        });
-
         $modulePlans = \App\Models\ModulePlan::where('is_active', true)->get();
         $subscriptions = $user->subscriptions()->orderBy('expires_at', 'desc')->get();
         $currencies = \App\Models\Currency::all();
@@ -159,15 +144,7 @@ class UsersController extends Controller
             'stats'  => $stats,
             'modulePlans' => $modulePlans,
             'subscriptions' => $subscriptions,
-            'wallets' => [
-                [
-                    'id' => 'main',
-                    'context' => 'Main Wallet',
-                    'balance' => $walletData['balance'],
-                    'currency' => $walletData['currency'],
-                    'transactions' => $transactions,
-                ]
-            ],
+
         ]);
     }
 

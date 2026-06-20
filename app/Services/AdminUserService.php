@@ -77,8 +77,13 @@ class AdminUserService
         if ($request->has('usd_type')) $user->usd_type = $request->input('usd_type');
         
         if ($request->has('subscription_date')) $user->subscription_date = $request->input('subscription_date');
-        if ($request->has('subscription_plan')) $user->plan_id = $request->input('subscription_plan');
-        if ($request->has('postpaid_limit')) $user->postpaid_limit = $request->input('postpaid_limit');
+        if ($request->has('subscription_plan')) {
+            $user->plan_id = $request->input('subscription_plan') ?: null;
+        }
+        if ($request->has('postpaid_limit')) {
+            $val = $request->input('postpaid_limit');
+            $user->postpaid_limit = ($val === null || $val === '') ? 100 : $val;
+        }
         if ($request->has('subscription_force')) $user->subscription_force = $request->boolean('subscription_force');
         
         if ($request->has('client_taxable')) $user->client_taxable = $request->boolean('client_taxable');

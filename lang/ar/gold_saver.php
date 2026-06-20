@@ -145,4 +145,5 @@ return [
   'no_transactions_found_for_this_period' => 'لم يتم العثور على معاملات لهذه الفترة.',
   'download_a_pdf_summary_of' => 'Download a PDF summary of your gold savings and performance.',
   'unlock_the_ability_to_download' => 'Unlock the ability to download comprehensive PDF reports of your gold investments, performance metrics, and historical growth.',
+    'todays_prices_egp' => 'أسعار الذهب اليوم',
 ];

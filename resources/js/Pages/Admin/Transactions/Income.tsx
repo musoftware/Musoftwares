@@ -89,11 +89,18 @@ export default function Income({ transactions, filters }) {
         {
             key: 'type',
             label: __('general.type'),
-            render: (tx) => (
-                <Badge variant={tx.type === 'refunded' || tx.type === 'send' ? 'destructive' : 'default'} className="uppercase">
-                    {__(tx.type)}
-                </Badge>
-            )
+            render: (tx) => {
+                const creditTypes = ['earned', 'received', 'sent'];
+                const debitTypes  = ['used', 'refunded', 'send'];
+                const variant = creditTypes.includes(tx.type) ? 'default'
+                              : debitTypes.includes(tx.type)  ? 'destructive'
+                              : 'secondary';
+                return (
+                    <Badge variant={variant} className="uppercase">
+                        {tx.type}
+                    </Badge>
+                );
+            }
         },
         {
             key: 'amount',

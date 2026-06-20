@@ -479,6 +479,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/transactions/transfer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'transfer'])->name('transactions.transfer');
     Route::post('/transactions/transfer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'start_transfer'])->name('transactions.start_transfer');
     Route::post('/project/current_timer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'current_timer'])->name('project.current_timer');
+    Route::post('/transactions/recalc-balance/{user_id}', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'regenerate'])->name('transactions.recalc-balance');
     // ── Google Calendar Integrations ─────────────────────────────────
     Route::prefix('google-calendar')->name('google-calendar.')->group(function () {
         Route::get('/connect', [\App\Http\Controllers\Admin\GoogleCalendarIntegrationController::class, 'connect'])->name('connect');
