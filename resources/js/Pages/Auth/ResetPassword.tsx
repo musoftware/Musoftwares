@@ -76,7 +76,7 @@ export default function ResetPassword({
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-3 top-3 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
-                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                aria-label={showPassword ? __('general.hide_password') : __('general.show_password')}
                             >
                                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
