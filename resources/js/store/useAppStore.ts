@@ -1,15 +1,23 @@
 import { create } from 'zustand';
+import { subscribeWithSelector } from 'zustand/middleware';
 
-interface AppState {
+export interface AppState {
     theme: 'light' | 'dark' | 'system';
-    setTheme: (theme: 'light' | 'dark' | 'system') => void;
     sidebarOpen: boolean;
+}
+
+export interface AppActions {
+    setTheme: (theme: 'light' | 'dark' | 'system') => void;
     toggleSidebar: () => void;
 }
 
-export const useAppStore = create<AppState>((set) => ({
-    theme: 'system',
-    setTheme: (theme) => set({ theme }),
-    sidebarOpen: false,
-    toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-}));
+export type AppStore = AppState & AppActions;
+
+export const useAppStore = create<AppStore>()(
+    subscribeWithSelector((set) => ({
+        theme: 'system',
+        sidebarOpen: false,
+        setTheme: (theme) => set({ theme }),
+        toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+    }))
+);
