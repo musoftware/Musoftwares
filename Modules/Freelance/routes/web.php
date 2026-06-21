@@ -38,7 +38,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:freelance'])-
     Route::get('/contracts', [\Modules\Freelance\Http\Controllers\ContractController::class, 'index'])->name('contracts.index');
     Route::get('/contracts/{contract}', [\Modules\Freelance\Http\Controllers\ContractController::class, 'show'])->name('contracts.show');
     Route::post('/contracts/{contract}/complete', [\Modules\Freelance\Http\Controllers\ContractController::class, 'complete'])->name('contracts.complete');
-    Route::post('/contracts/{contract}/dispute', [\Modules\Freelance\Http\Controllers\ContractController::class, 'dispute'])->name('contracts.dispute');
+    Route::post('/contracts/{contract}/deliver', [\Modules\Freelance\Http\Controllers\ContractController::class, 'deliver'])->name('contracts.deliver');
     Route::post('/contracts/{contract}/reviews', [\Modules\Freelance\Http\Controllers\ReviewController::class, 'store'])->name('contracts.reviews.store');
 });
 

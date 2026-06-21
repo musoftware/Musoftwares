@@ -134,9 +134,23 @@ export default function InvoicePay({
                                     </div>
                                     <h1 className="text-2xl font-bold font-mono tracking-tight">{invoice.invoice_number}</h1>
                                 </div>
-                                <div className="text-right sm:text-right space-y-1.5">
-                                    <span className="text-xs text-slate-400 block uppercase tracking-wider font-semibold">{__('general.status')}</span>
-                                    <StatusBadge status={invoice.status} />
+                                <div className="text-right sm:text-right space-y-2 flex flex-col items-end">
+                                    <div className="space-y-1.5">
+                                        <span className="text-xs text-slate-400 block uppercase tracking-wider font-semibold">{__('general.status')}</span>
+                                        <StatusBadge status={invoice.status} />
+                                    </div>
+                                    <a
+                                        href={route('billing.invoices.pdf', invoice.uuid)}
+                                        className={buttonVariants({
+                                            variant: 'outline',
+                                            size: 'sm',
+                                            className: 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white mt-1'
+                                        })}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        <FileText className="w-3.5 h-3.5 mr-1.5" /> {__('general.download_pdf')}
+                                    </a>
                                 </div>
                             </div>
 

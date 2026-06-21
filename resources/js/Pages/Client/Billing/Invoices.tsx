@@ -7,7 +7,7 @@ import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { DateDisplay } from '@/Components/ui/DateDisplay';
 import { buttonVariants } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
-import { FileText, CreditCard, Wallet, AlertCircle, Eye } from 'lucide-react';
+import { FileText, CreditCard, Wallet, AlertCircle, Eye, Download } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
 interface Invoice {
@@ -166,6 +166,19 @@ export default function Invoices({
                             <Eye className="h-4 w-4" />
                         </Link>
                     )}
+                    <a
+                        href={route('billing.invoices.pdf', row.uuid)}
+                        className={buttonVariants({
+                            variant: 'ghost',
+                            size: 'icon-sm',
+                            className: 'text-slate-400 hover:text-slate-600 inline-flex items-center justify-center'
+                        })}
+                        target="_blank"
+                        rel="noreferrer"
+                        title={__('general.download')}
+                    >
+                        <Download className="h-4 w-4" />
+                    </a>
                 </div>
             ),
         },

@@ -27,35 +27,6 @@ class CompleteContractAction
             ]);
             $contract->job->update(['status' => 'completed']);
 
-            $freelancer = User::findOrFail($contract->freelancer_id);
-            $clientModel = User::findOrFail($client->id); // Ensure we have latest from DB for locking
-
-            if ($contract->amount > 0) {
-                // Deduct from client
-                $clientModel->decrement('user_balance', $contract->amount);
-                
-                // Add to freelancer
-                $freelancer->increment('user_balance', $contract->amount);
-                
-                // Client transaction record
-                \App\Models\Transaction::create([
-                    'user_id' => $clientModel->id,
-                    'amount' => $contract->amount,
-                    'type' => 'used',
-                    'reason' => "Paid for completed freelance contract #{$contract->id}",
-                    'currency_id' => $contract->currency_id ?? $clientModel->currency_id
-                ]);
-                
-                // Freelancer transaction record
-                \App\Models\Transaction::create([
-                    'user_id' => $freelancer->id,
-                    'amount' => $contract->amount,
-                    'type' => 'earned',
-                    'reason' => "Earned from completed freelance contract #{$contract->id}",
-                    'currency_id' => $contract->currency_id ?? $freelancer->currency_id
-                ]);
-            }
-
             // Refund points for all other pending proposals
             app(\Modules\Freelance\Domains\Proposal\Actions\RejectPendingProposalsAction::class)
                 ->execute($contract->job, 'Job Completed');

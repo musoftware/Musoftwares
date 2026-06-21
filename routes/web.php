@@ -245,6 +245,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->prefix('billing')->name('
     Route::post('/invoices/{uuid}/pay', [\App\Http\Controllers\Billing\InvoiceController::class, 'processPayment'])->name('invoices.pay.process');
     Route::get('/invoices/payment/success', [\App\Http\Controllers\Billing\InvoiceController::class, 'paymentSuccess'])->name('invoices.payment.success');
     Route::get('/invoices/payment/failure', [\App\Http\Controllers\Billing\InvoiceController::class, 'paymentFailure'])->name('invoices.payment.failure');
+    Route::get('/invoices/{uuid}/pdf', [\App\Http\Controllers\Billing\InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
 });
 
 // Platform invoice payment webhook (unprotected)
@@ -609,7 +610,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::post('jobs/{job}/force-refund', [\App\Http\Controllers\Admin\FreelanceJobController::class, 'forceRefund'])->name('jobs.force-refund');
         Route::resource('contracts', \App\Http\Controllers\Admin\FreelanceContractController::class)->only(['index', 'show', 'destroy']);
         Route::post('contracts/{contract}/status', [\App\Http\Controllers\Admin\FreelanceContractController::class, 'updateStatus'])->name('contracts.status');
-        Route::post('contracts/{contract}/resolve-dispute', [\App\Http\Controllers\Admin\FreelanceContractController::class, 'resolveDispute'])->name('contracts.resolve-dispute');
         Route::resource('proposals', \App\Http\Controllers\Admin\FreelanceProposalController::class)->only(['index', 'show', 'destroy']);
     });
 

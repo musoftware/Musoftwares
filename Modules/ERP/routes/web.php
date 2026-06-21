@@ -168,6 +168,14 @@ Route::middleware(['web', 'auth:web,erp_team', 'tenant.active'])
             Route::post('payslips/{id}/items', [\Modules\ERP\Http\Controllers\PayrollController::class, 'updatePayslipItems'])->name('payslips.items.update');
             Route::post('payslips/{id}/mark-paid', [\Modules\ERP\Http\Controllers\PayrollController::class, 'markAsPaid'])->name('payslips.mark_paid');
         });
+
+        // ── Team Member Portal ──
+        Route::prefix('team/portal')->name('team.portal.')->group(function () {
+            Route::get('/', [\Modules\ERP\Http\Controllers\Team\TeamPortalController::class, 'index'])->name('index');
+            Route::post('clock-in', [\Modules\ERP\Http\Controllers\Team\TeamPortalController::class, 'clockIn'])->name('clock-in');
+            Route::post('clock-out', [\Modules\ERP\Http\Controllers\Team\TeamPortalController::class, 'clockOut'])->name('clock-out');
+            Route::post('leave-request', [\Modules\ERP\Http\Controllers\Team\TeamPortalController::class, 'requestLeave'])->name('leave-request');
+        });
     });
 
 Route::middleware(['web', 'auth', 'admin'])

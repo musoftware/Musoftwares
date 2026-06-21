@@ -85,4 +85,13 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', 
         
         // ── Sequences
         Route::resource('sequences', \Modules\CRM\Http\Controllers\SequenceController::class);
+
+        // ── Customers
+        Route::get('/customers', [\Modules\CRM\Http\Controllers\CustomerController::class, 'index'])->name('customers.index');
+        Route::get('/customers/{customer}', [\Modules\CRM\Http\Controllers\CustomerController::class, 'show'])->name('customers.show');
+        Route::delete('/customers/{customer}', [\Modules\CRM\Http\Controllers\CustomerController::class, 'destroy'])->name('customers.destroy');
+        Route::post('/customers/{customer}/notes', [\Modules\CRM\Http\Controllers\CustomerController::class, 'addNote'])->name('customers.notes.store');
+
+        // ── Pipelines
+        Route::resource('pipelines', \Modules\CRM\Http\Controllers\PipelineController::class);
 });

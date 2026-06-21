@@ -43,6 +43,12 @@ class BlogArticle extends Model
             }
         });
 
+        static::updating(function ($article) {
+            if (empty($article->slug)) {
+                $article->slug = static::generateUniqueSlug($article->title);
+            }
+        });
+
         static::saving(function ($article) {
             if ($article->is_published && empty($article->published_at)) {
                 $article->published_at = now();

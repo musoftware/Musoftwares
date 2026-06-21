@@ -96,4 +96,24 @@ class ProfileTest extends TestCase
 
         $this->assertNotNull($user->fresh());
     }
+
+    public function test_impersonator_cannot_delete_account(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('admin'); // Assuming Spatie roles
+
+        $user = User::factory()->create();
+
+        // Simulate impersonation session
+        $response = $this
+            ->actingAs($user)
+            ->withSession(['impersonator_id' => $admin->id])
+            ->delete('/profile', [
+                'password' => 'password', // Even with correct password
+            ]);
+
+        $response->assertForbidden();
+
+        $this->assertNotNull($user->fresh());
+    }
 }

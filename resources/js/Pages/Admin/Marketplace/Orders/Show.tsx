@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
@@ -8,20 +8,19 @@ import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
 export default function Show({ order }) {
-    const { post, processing } = useForm({
-        action: '',
-    });
-
-
+    const [processing, setProcessing] = React.useState(false);
 
     const handleAction = (actionType) => {
         if (!confirm(`Are you sure you want to ${actionType.replace('_', ' ')}? This action cannot be undone.`)) {
             return;
         }
 
-        post(`/admin/marketplace/orders/${order.id}/dispute`, {
-            
+        setProcessing(true);
+        router.post(`/admin/marketplace/orders/${order.id}/dispute`, {
+            action: actionType
+        }, {
             preserveScroll: true,
+            onFinish: () => setProcessing(false)
         });
     };
 

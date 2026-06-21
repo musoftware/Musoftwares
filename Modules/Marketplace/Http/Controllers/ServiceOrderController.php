@@ -79,9 +79,16 @@ class ServiceOrderController extends Controller
         DB::beginTransaction();
 
         try {
+            // Lock buyer to prevent concurrent balance deductions
+            $lockedBuyer = \App\Models\User::where('id', $buyer->id)->lockForUpdate()->first();
+            if ($lockedBuyer->user_balance < $package->price) {
+                DB::rollBack();
+                return redirect()->back()->withErrors(['error' => 'Insufficient balance.']);
+            }
+
             // Create Order
             $order = ServiceOrder::create([
-                'buyer_id' => $buyer->id,
+                'buyer_id' => $lockedBuyer->id,
                 'seller_id' => $seller_id,
                 'package_id' => $package->id,
                 'amount' => $package->price,

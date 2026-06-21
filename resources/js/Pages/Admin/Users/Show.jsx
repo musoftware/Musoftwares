@@ -84,11 +84,15 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
 
 
 
+    const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
+
     const submitDeleteUser = (e) => {
         e.preventDefault();
+        if (deleteConfirmationText !== 'DELETE') return;
         router.delete(`/admin/users/${client.id}`, {
             onSuccess: () => {
                 setIsDeleteUserOpen(false);
+                setDeleteConfirmationText("");
             }
         });
     };
@@ -332,9 +336,18 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                 {__('general.this_action_cannot_be_undone_all_data_related_to_this_user_will_be_permanently_removed')}
                             </p>
                         </div>
+                        <div className="py-4">
+                            <Label className="mb-2 block">Type "DELETE" to confirm</Label>
+                            <Input 
+                                type="text" 
+                                value={deleteConfirmationText}
+                                onChange={(e) => setDeleteConfirmationText(e.target.value)}
+                                placeholder="DELETE"
+                            />
+                        </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsDeleteUserOpen(false)}>{__('general.cancel')}</Button>
-                            <Button type="submit" variant="destructive">{__('general.delete_user')}</Button>
+                            <Button type="submit" variant="destructive" disabled={deleteConfirmationText !== 'DELETE'}>{__('general.delete_user')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

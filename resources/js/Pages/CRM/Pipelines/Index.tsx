@@ -1,34 +1,22 @@
 import React from 'react';
-import ERPLayout from '@/Layouts/ERPLayout';
+import CrmLayout from '@/Layouts/CrmLayout';
 import { Head } from '@inertiajs/react';
-import { KanbanBoard } from '../Components/KanbanBoard';
+import PipelineBoard from '../Components/Kanban/PipelineBoard';
 import { __ } from '@/lib/i18n';
 
-export default function PipelinesIndex({ pipelines }: { pipelines: any[] }) {
+export default function PipelinesIndex() {
     return (
-        <ERPLayout title="Pipelines">
+        <CrmLayout title={__('crm.pipelines')} activeMenu="pipelines">
             <Head title={__('crm.pipelines')} />
-            <div className="p-6">
-                <div className="mb-6 flex justify-between items-center">
+            <div className="p-6 h-[calc(100vh-100px)] flex flex-col">
+                <div className="mb-6 flex justify-between items-center shrink-0">
                     <h1 className="text-2xl font-bold">{__('crm.pipelines')}</h1>
-                    {/* Action button to create pipeline */}
                 </div>
 
-                <div className="mt-4">
-                    {pipelines.length === 0 ? (
-                        <div className="text-center py-10 bg-white rounded shadow">
-                            <p className="text-gray-500">{__('crm.no_pipelines_found')}</p>
-                        </div>
-                    ) : (
-                        pipelines.map((pipeline) => (
-                            <div key={pipeline.id} className="mb-10">
-                                <h2 className="text-xl font-semibold mb-4">{pipeline.name}</h2>
-                                <KanbanBoard pipeline={pipeline} />
-                            </div>
-                        ))
-                    )}
+                <div className="flex-1 overflow-hidden">
+                    <PipelineBoard />
                 </div>
             </div>
-        </ERPLayout>
+        </CrmLayout>
     );
 }

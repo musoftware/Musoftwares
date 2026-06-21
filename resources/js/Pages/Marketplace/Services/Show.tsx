@@ -5,8 +5,8 @@ import { __ } from '@/lib/i18n';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Show({ service }: any) {
-    const { auth } = usePage().props as any;
-    const displayBalance = auth?.user?.wallet_balance || 0;
+    const { auth, wallet } = usePage().props as any;
+    const displayBalance = wallet?.balance || auth?.user?.user_balance || 0;
 
     const [activeTab, setActiveTab] = useState<'overview' | 'reviews'>(
         'overview',
@@ -18,10 +18,15 @@ export default function Show({ service }: any) {
     const [selectedPackageId, setSelectedPackageId] = useState<number | null>(
         sortedPackages.length > 0 ? sortedPackages[0].id : null,
     );
+    const [processing, setProcessing] = useState(false);
 
     const handleBuyNow = (packageId: number) => {
+        if (processing) return;
+        setProcessing(true);
         router.post(route('marketplace.orders.store'), {
             package_id: packageId,
+        }, {
+            onFinish: () => setProcessing(false)
         });
     };
 
@@ -292,7 +297,8 @@ export default function Show({ service }: any) {
                                                 {displayBalance >= selectedPackage.price ? (
                                                     <button
                                                         onClick={() => handleBuyNow(selectedPackage.id)}
-                                                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-3 font-bold text-white transition hover:bg-indigo-700"
+                                                        disabled={processing}
+                                                        className={`flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-3 font-bold text-white transition ${processing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700'}`}
                                                     >
                                                         {__('general.continue')} — {formatCurrency(selectedPackage.price, selectedPackage.currency)}
                                                         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

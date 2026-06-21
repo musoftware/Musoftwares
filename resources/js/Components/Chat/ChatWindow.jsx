@@ -16,6 +16,8 @@ export default function ChatWindow({
     const [typingUsers, setTypingUsers] = useState([]);
     const [fetchError, setFetchError] = useState(null);
 
+    const [isConnected, setIsConnected] = useState(true);
+
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
     const typingTimeoutsRef = useRef({});
@@ -57,6 +59,7 @@ export default function ChatWindow({
         }
     };
 
+    // Real-time events connection
     useEffect(() => {
         if (!conversationId) return;
 
@@ -101,11 +104,26 @@ export default function ChatWindow({
                         }, 2000);
                     }
                 });
+
+            // Connection state monitoring for graceful degradation
+            if (window.Echo.connector.pusher) {
+                const handleStateChange = (states) => {
+                    if (states.current === 'connected') {
+                        setIsConnected(true);
+                    } else if (states.current === 'disconnected' || states.current === 'unavailable') {
+                        setIsConnected(false);
+                    }
+                };
+                window.Echo.connector.pusher.connection.bind('state_change', handleStateChange);
+            }
         }
 
         return () => {
             if (window.Echo) {
                 window.Echo.leave(`conversation.${conversationId}`);
+                if (window.Echo.connector.pusher) {
+                    window.Echo.connector.pusher.connection.unbind('state_change');
+                }
             }
             // Clear all typing timeouts
             // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -113,6 +131,17 @@ export default function ChatWindow({
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conversationId]);
+
+    // Polling fallback when offline
+    useEffect(() => {
+        let pollInterval;
+        if (!isConnected && conversationId) {
+            pollInterval = setInterval(() => {
+                fetchMessages();
+            }, 5000); // Poll every 5 seconds
+        }
+        return () => clearInterval(pollInterval);
+    }, [isConnected, conversationId]);
 
     const handleFocus = () => {
         markAsRead();
@@ -224,16 +253,23 @@ export default function ChatWindow({
             tabIndex="0"
         >
             {/* Header */}
-            <div className="flex items-center gap-3 border-b bg-gray-50 p-4">
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 font-bold text-indigo-700">
-                    {chatTitle.charAt(0)}
+            <div className="flex flex-col border-b bg-gray-50">
+                <div className="flex items-center gap-3 p-4">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 font-bold text-indigo-700">
+                        {chatTitle.charAt(0)}
+                    </div>
+                    <div>
+                        <h3 className="font-semibold text-gray-900">{chatTitle}</h3>
+                        <p className="text-xs text-gray-500">
+                            {readOnly ? 'Read Only' : 'Active'}
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <h3 className="font-semibold text-gray-900">{chatTitle}</h3>
-                    <p className="text-xs text-gray-500">
-                        {readOnly ? 'Read Only' : 'Active'}
-                    </p>
-                </div>
+                {!isConnected && (
+                    <div className="bg-yellow-50 px-4 py-1.5 text-xs text-yellow-700 font-medium flex items-center justify-center border-t border-yellow-100">
+                        ⚠️ Real-time connection lost. Switched to polling mode. Messages might be delayed.
+                    </div>
+                )}
             </div>
 
             {/* Messages Area */}

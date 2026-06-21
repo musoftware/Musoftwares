@@ -55,7 +55,7 @@ class ERPTodoItem extends Model
         'sort_index', 'paused',
         'cost', 'cost_currency', 'is_paid',
         'start_at', 'end_at',
-        'tags', 'parent_id', 'assigned_to',
+        'tags', 'parent_id', 'assigned_to', 'assigned_team_member_id',
     ];
 
     protected $casts = [
@@ -89,6 +89,11 @@ class ERPTodoItem extends Model
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function assigneeTeamMember(): BelongsTo
+    {
+        return $this->belongsTo(TeamMember::class, 'assigned_team_member_id');
     }
 
     // ── Business Logic ───────────────────────────────────────────────
