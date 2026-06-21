@@ -44,6 +44,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $user ? array_merge($user->toArray(), [
                     'role' => strtolower($user->roles->first()->name ?? 'user'),
                     'roles' => $user->roles->pluck('name')->map(fn($r) => strtolower($r))->toArray(),
+                    'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
                 ]) : null,
                 'team_member' => \Illuminate\Support\Facades\Auth::guard('erp_team')->user(),
                 'crm_team_member' => \Illuminate\Support\Facades\Auth::guard('crm_team')->user(),
