@@ -11,6 +11,8 @@ This skill defines the mandatory architectural constraints and workflows for bac
 - **Strict Domain Isolation:** The system is divided into distinct modules (e.g., `ERP`, `CRM`, `Marketplace`, `Freelance`). 
 - **No Cross-Domain Leakage:** You must maintain complete logical separation between these domains. Never mix logic or create tight couplings between strictly separated modules.
 - **Module Independence:** Each module should encapsulate its own controllers, models, services, events, and routes.
+- **ABSOLUTE PROHIBITION — Direct Cross-Module Model Imports:** Never import or instantiate a model from another module directly inside a Controller, Service, or Command (e.g., Booking module importing an ERP model).
+- **The Event Bus Pattern:** Modules communicate *only* via Laravel Events. The emitting module fires an event and has zero knowledge of what other modules do with it. Cross-module listeners must be registered with a `class_exists()` guard.
 
 ## 2. Thin Architecture
 - **Thin Controllers:** Controllers should only handle HTTP request validation, authorization, and returning responses. They must not contain business logic.

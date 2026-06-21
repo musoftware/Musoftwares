@@ -34,28 +34,20 @@ When adding a new feature, append it to the `addons` array. You must provide:
 
 ## 2. Backend Enforcement (Laravel)
 
-### Feature Flags
-In your controllers, middleware, or services, restrict access to the addon using the `feature()` helper function. This function checks if the current workspace has purchased the specified addon.
+### Route Middleware Standard
+Modules and Addons must be protected at the routing layer using the standard `subscription:` middleware. **Never use the legacy `feature:` middleware.**
 
-**Controller/Middleware Example:**
+**Route Definition Example:**
 ```php
-use App\Http\Controllers\Controller;
-
-class WaReminderLogController extends Controller
-{
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            if (!feature('booking-wa-reminders')) {
-                return response()->json([
-                    'message' => 'Feature locked. Upgrade to enable WhatsApp reminders.'
-                ], 403);
-            }
-            return $next($request);
-        });
-    }
-}
+// Protect a whole route group with the subscription middleware
+Route::middleware(['auth', 'verified', 'subscription:booking-wa-reminders'])
+    ->prefix('wa-reminders')
+    ->group(function () {
+        Route::get('logs', [WaReminderLogController::class, 'index']);
+    });
 ```
+
+*(Note: The `feature('addon-key')` helper is still used inside controllers/services for inline boolean checks, but routing should use the standard middleware).*
 
 ### Usage Limits
 If your feature relies on usage limits (e.g., number of SMS messages, number of team members), use the `canUse()` helper.

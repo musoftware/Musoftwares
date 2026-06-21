@@ -3,8 +3,10 @@
 namespace Modules\ERP\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Event;
 use Modules\ERP\Console\ProcessRecurringEntries;
 use Modules\ERP\Services\RecurringService;
+use Modules\ERP\Listeners\SyncBookingClientToErpListener;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -29,6 +31,16 @@ class ERPServiceProvider extends ServiceProvider
             $this->commands([
                 ProcessRecurringEntries::class,
             ]);
+        }
+
+        // ── Cross-Module Event Listeners ──────────────────────────────────
+        // The ERP module listens for Booking events only if Booking is loaded.
+        // This keeps both modules independently deployable SaaS products.
+        if (class_exists(\Modules\Booking\Events\BookingConfirmed::class)) {
+            Event::listen(
+                \Modules\Booking\Events\BookingConfirmed::class,
+                SyncBookingClientToErpListener::class
+            );
         }
 
         $this->registerExceptionRenderers();

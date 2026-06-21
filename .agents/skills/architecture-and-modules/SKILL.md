@@ -67,6 +67,9 @@ Standardizes how business domains are structured as independent Laravel Modules.
 
 ## Rules
 - Register Event Listeners and Policies in the Module's `Providers/{ModuleName}ServiceProvider.php`.
+- **Cross-Module Communication**: Modules must communicate via events. NEVER import models directly from another module.
+- **Cross-Module Listeners**: When listening to an event from another module, wrap the listener registration in `class_exists(ForeignEvent::class)` inside your `ServiceProvider->boot()` so your module doesn't crash if the foreign module is disabled.
+- **Defensive Reads**: If you MUST query a foreign module's model directly for a dashboard widget, wrap the query in: `if (class_exists(ForeignModel::class) && auth()->user()->hasModuleSubscription('foreign-slug')) { try { ... } catch { ... } }`.
 
 
 
