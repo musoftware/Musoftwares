@@ -66,31 +66,31 @@
     {
         "id": "Sub2_2",
         "name": "Compute dual-currency transactions accurately",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Sub3_1",
         "name": "Orchestrate long-running async tasks via queues",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Sub3_2",
         "name": "Publish real-time WebSocket status updates",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Sub4_1",
         "name": "Observe internal events like Lead stage changes",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Sub4_2",
         "name": "Execute user-configured automation rules",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
@@ -108,13 +108,13 @@
     {
         "id": "Sub6_1",
         "name": "Actively monitor request velocities and enforce rate limits",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Sub6_2",
         "name": "Block malicious patterns to protect the ecosystem",
-        "status": "pending",
+        "status": "running",
         "dependencies": []
     }
 ]

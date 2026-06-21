@@ -14,6 +14,7 @@
         "laravel-notification-channels/fcm": "*",
         "laravel/breeze": "^2.4",
         "laravel/framework": "^12.0",
+        "laravel/reverb": "*",
         "laravel/sanctum": "^4.3",
         "laravel/scout": "^11.2",
         "laravel/socialite": "^5.27",

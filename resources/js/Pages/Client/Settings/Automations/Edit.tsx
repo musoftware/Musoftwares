@@ -67,11 +67,32 @@ export default function Edit({ auth, rule }) {
                             </div>
 
                             <div className="pt-4 border-t border-slate-100">
+                                <h4 className="text-sm font-medium text-slate-800 mb-4">Conditions (Optional)</h4>
+                                <div className="space-y-4 p-4 border border-slate-200 rounded-lg bg-slate-50">
+                                    <div className="space-y-2">
+                                        <Label>Condition Key (e.g., new_stage)</Label>
+                                        <Input value={Object.keys(data.conditions || {})[0] || ''} onChange={e => {
+                                            const key = e.target.value;
+                                            const val = Object.values(data.conditions || {})[0] || '';
+                                            setData('conditions', key ? { [key]: val } : {});
+                                        }} placeholder="new_stage" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Expected Value (e.g., WON)</Label>
+                                        <Input value={Object.values(data.conditions || {})[0] || ''} onChange={e => {
+                                            const key = Object.keys(data.conditions || {})[0] || 'new_stage';
+                                            setData('conditions', { [key]: e.target.value });
+                                        }} placeholder="WON" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="pt-4 border-t border-slate-100">
                                 <h4 className="text-sm font-medium text-slate-800 mb-4">Actions</h4>
                                 <div className="space-y-4 p-4 border border-slate-200 rounded-lg bg-slate-50">
                                     <div className="space-y-2">
                                         <Label>Action Type</Label>
-                                        <Select value={data.actions[0].type} onValueChange={v => setData('actions', [{...data.actions[0], type: v}])}>
+                                        <Select value={data.actions[0]?.type || 'send_email'} onValueChange={v => setData('actions', [{...(data.actions[0] || {}), type: v}])}>
                                             <SelectTrigger><SelectValue placeholder="Action" /></SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="send_email">Send Email</SelectItem>
@@ -80,6 +101,16 @@ export default function Edit({ auth, rule }) {
                                             </SelectContent>
                                         </Select>
                                     </div>
+                                    <div className="space-y-2">
+                                        <Label>Target {data.actions[0]?.type === 'send_email' ? '(Email Address, leave blank for Lead Email)' : data.actions[0]?.type === 'update_tag' ? '(Tag Name)' : '(Webhook URL)'}</Label>
+                                        <Input value={data.actions[0]?.target || ''} onChange={e => setData('actions', [{...(data.actions[0] || {}), target: e.target.value}])} placeholder={data.actions[0]?.type === 'webhook' ? 'https://...' : ''} />
+                                    </div>
+                                    {data.actions[0]?.type === 'send_email' && (
+                                    <div className="space-y-2">
+                                        <Label>Template / Message</Label>
+                                        <Input value={data.actions[0]?.template || ''} onChange={e => setData('actions', [{...(data.actions[0] || {}), template: e.target.value}])} placeholder="Welcome to our service!" />
+                                    </div>
+                                    )}
                                 </div>
                             </div>
 

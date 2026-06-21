@@ -58,27 +58,70 @@ class AppServiceProvider extends ServiceProvider
         if (class_exists(\Modules\CRM\Models\LeadNote::class) && class_exists(\Modules\CRM\Observers\LeadNoteObserver::class)) {
             \Modules\CRM\Models\LeadNote::observe(\Modules\CRM\Observers\LeadNoteObserver::class);
         }
+
+        \Illuminate\Support\Facades\Event::listen(
+            \Illuminate\Auth\Events\Lockout::class,
+            function (\Illuminate\Auth\Events\Lockout $event) {
+                $ip = $event->request->ip();
+                \App\Models\BlockedIp::firstOrCreate(
+                    ['ip_address' => $ip],
+                    ['reason' => 'Brute-force login attempt', 'blocked_until' => now()->addHours(24)]
+                );
+                \Illuminate\Support\Facades\Cache::forget("blocked_ip:{$ip}");
+            }
+        );
     }
 
-    /**
-     * Configure the rate limiters for the application.
-     */
     protected function configureRateLimiting(): void
     {
-        RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        $getLimit = function (string $module, int $defaultRequests, int $defaultDecay, Request $request) {
+            $tenantId = session('tenant_id');
+            $ip = $request->ip();
+
+            $cacheKey = "rate_limit:{$module}:{$tenantId}:{$ip}";
+            
+            $config = \Illuminate\Support\Facades\Cache::remember($cacheKey, 60, function () use ($module, $tenantId, $ip) {
+                if ($tenantId) {
+                    $limit = \App\Models\RateLimit::where('module', $module)
+                        ->where('tenant_id', $tenantId)
+                        ->where('is_active', true)
+                        ->first();
+                    if ($limit) return $limit;
+                }
+                
+                $limit = \App\Models\RateLimit::where('module', $module)
+                    ->where('ip_address', $ip)
+                    ->where('is_active', true)
+                    ->first();
+                if ($limit) return $limit;
+
+                return \App\Models\RateLimit::where('module', $module)
+                    ->whereNull('tenant_id')
+                    ->whereNull('ip_address')
+                    ->where('is_active', true)
+                    ->first();
+            });
+
+            $maxRequests = $config ? $config->max_requests : $defaultRequests;
+            $decayMinutes = $config ? $config->decay_minutes : $defaultDecay;
+
+            return Limit::perMinute($maxRequests, $decayMinutes);
+        };
+
+        RateLimiter::for('api', function (Request $request) use ($getLimit) {
+            return $getLimit('api', 60, 1, $request)->by($request->user()?->id ?: $request->ip());
         });
 
-        RateLimiter::for('web', function (Request $request) {
-            return Limit::perMinute(120)->by($request->user()?->id ?: $request->ip());
+        RateLimiter::for('web', function (Request $request) use ($getLimit) {
+            return $getLimit('web', 120, 1, $request)->by($request->user()?->id ?: $request->ip());
         });
 
-        RateLimiter::for('tenant', function (Request $request) {
-            return Limit::perMinute(1000)->by(session('tenant_id', $request->user()?->id ?: $request->ip()));
+        RateLimiter::for('tenant', function (Request $request) use ($getLimit) {
+            return $getLimit('tenant', 1000, 1, $request)->by(session('tenant_id', $request->user()?->id ?: $request->ip()));
         });
 
-        RateLimiter::for('webhooks', function (Request $request) {
-            return Limit::perMinute(300)->by($request->ip());
+        RateLimiter::for('webhooks', function (Request $request) use ($getLimit) {
+            return $getLimit('webhooks', 300, 1, $request)->by($request->ip());
         });
     }
 }

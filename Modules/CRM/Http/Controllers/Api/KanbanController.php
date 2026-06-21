@@ -87,8 +87,15 @@ class KanbanController extends Controller
         ];
 
         if (array_key_exists($request->stage_id, $stageMap)) {
-            $lead->pipeline_stage = $stageMap[$request->stage_id];
-            $lead->save();
+            $oldStage = $lead->pipeline_stage;
+            $newStage = $stageMap[$request->stage_id];
+            
+            if ($oldStage !== $newStage) {
+                $lead->pipeline_stage = $newStage;
+                $lead->save();
+                
+                event(new \App\Events\LeadStageChanged($lead, $oldStage ?? '', $newStage));
+            }
         }
 
         return response()->json(['status' => 'success']);

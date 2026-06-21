@@ -585,6 +585,16 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     Route::resource('free-downloads', \App\Http\Controllers\Admin\AdminFreeDownloadController::class)->except(['create', 'show', 'edit']);
 
+    // ── Incoming Webhooks (Admin Settings) ────────────────────────
+    Route::get('settings/incoming-webhooks', [\App\Http\Controllers\Admin\IncomingWebhooksController::class, 'index'])->name('settings.incoming-webhooks.index');
+    Route::get('settings/incoming-webhooks/{id}', [\App\Http\Controllers\Admin\IncomingWebhooksController::class, 'show'])->name('settings.incoming-webhooks.show');
+
+    // ── Security & Rate Limits (Admin Settings) ───────────────────
+    Route::get('settings/security', [\App\Http\Controllers\Admin\SecurityController::class, 'index'])->name('settings.security.index');
+    Route::delete('settings/security/unblock-ip/{id}', [\App\Http\Controllers\Admin\SecurityController::class, 'unblockIp'])->name('settings.security.unblock-ip');
+    Route::post('settings/security/rate-limits', [\App\Http\Controllers\Admin\SecurityController::class, 'storeRateLimit'])->name('settings.security.rate-limits.store');
+    Route::delete('settings/security/rate-limits/{id}', [\App\Http\Controllers\Admin\SecurityController::class, 'deleteRateLimit'])->name('settings.security.rate-limits.destroy');
+
 
     // ── Freelance (Admin Control) ───────────────────────────────────
     Route::prefix('freelance')->name('freelance.')->group(function () {

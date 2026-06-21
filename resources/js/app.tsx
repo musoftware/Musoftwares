@@ -9,6 +9,11 @@ import { Toaster as SonnerToaster } from 'sonner';
 import { GlobalErrorHandler } from '@/Components/GlobalErrorHandler';
 import { FreelanceModeProvider } from '@/Components/Freelance/FreelanceModeContext';
 import { MarketplaceModeProvider } from '@/Components/Marketplace/MarketplaceModeContext';
+import { configureEcho } from '@laravel/echo-react';
+
+configureEcho({
+    broadcaster: 'reverb',
+});
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

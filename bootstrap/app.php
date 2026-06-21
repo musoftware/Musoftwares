@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->append(\App\Http\Middleware\SecurityEnforcement::class);
         $middleware->append(\App\Http\Middleware\RemoveSecurityHeaders::class);
         $middleware->web(append: [
             'throttle:web',
@@ -72,6 +73,21 @@ return Application::configure(basePath: dirname(__DIR__))
                         : __('errors.database_error');
                 }
 
+                if ($exception instanceof \Illuminate\Http\Exceptions\ThrottleRequestsException) {
+                    $ip = $request->ip();
+                    $strikes = \Illuminate\Support\Facades\Cache::increment("throttle_strikes:{$ip}");
+                    if ($strikes === 1) {
+                        \Illuminate\Support\Facades\Cache::put("throttle_strikes:{$ip}", 1, 3600); // 1 hour
+                    }
+                    if ($strikes > 5) { // 5 rate limit hits in an hour -> block permanently
+                        \App\Models\BlockedIp::firstOrCreate(
+                            ['ip_address' => $ip],
+                            ['reason' => 'Persistent rate limiting (Spam)', 'blocked_until' => null]
+                        );
+                        \Illuminate\Support\Facades\Cache::forget("blocked_ip:{$ip}"); // clear cache
+                    }
+                }
+
                 return response()->json([
                     'status' => 'error',
                     'message' => $message ?: 'An error occurred.',
@@ -86,6 +102,21 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // Web requests - render custom Inertia error page for 404/403/503
             if (in_array($statusCode, [404, 403, 503, 429]) || ($statusCode === 500 && ! app()->environment(['local', 'testing']))) {
+                if ($statusCode === 429 || $exception instanceof \Illuminate\Http\Exceptions\ThrottleRequestsException) {
+                    $ip = $request->ip();
+                    $strikes = \Illuminate\Support\Facades\Cache::increment("throttle_strikes:{$ip}");
+                    if ($strikes === 1) {
+                        \Illuminate\Support\Facades\Cache::put("throttle_strikes:{$ip}", 1, 3600); // 1 hour
+                    }
+                    if ($strikes > 5) {
+                        \App\Models\BlockedIp::firstOrCreate(
+                            ['ip_address' => $ip],
+                            ['reason' => 'Persistent rate limiting (Spam)', 'blocked_until' => null]
+                        );
+                        \Illuminate\Support\Facades\Cache::forget("blocked_ip:{$ip}");
+                    }
+                }
+
                 if (class_exists(\Inertia\Inertia::class)) {
                     return \Inertia\Inertia::render('Error', ['status' => $statusCode])
                         ->toResponse($request)

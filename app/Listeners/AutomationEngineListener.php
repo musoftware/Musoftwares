@@ -27,12 +27,21 @@ class AutomationEngineListener
         // Fetch active rules matching this event trigger
         // We use a try-catch to avoid breaking the application if DB is down or tables don't exist yet
         try {
+            $eventObject = $data[0] ?? null;
+            $payload = [];
+            
+            if (is_object($eventObject) && method_exists($eventObject, 'getAutomationPayload')) {
+                $payload = $eventObject->getAutomationPayload();
+            } else {
+                $payload = (array) $data;
+            }
+
             $rules = \App\Models\AutomationRule::where('event_trigger', $eventName)
                 ->where('is_active', true)
                 ->get();
 
             foreach ($rules as $rule) {
-                \App\Jobs\EvaluateAutomationRuleJob::dispatch($rule, $data);
+                \App\Jobs\EvaluateAutomationRuleJob::dispatch($rule, $payload);
             }
         } catch (\Exception $e) {
             // Log or ignore if the table doesn't exist
