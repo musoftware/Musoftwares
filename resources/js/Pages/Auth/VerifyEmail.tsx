@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, MailCheck } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
 export default function VerifyEmail({ status }: { status?: string }) {
@@ -19,12 +19,18 @@ export default function VerifyEmail({ status }: { status?: string }) {
             <Head title={__('general.verify_email')} />
 
             <div className="space-y-6">
-                <div className="space-y-1.5">
+                <div className="flex justify-center">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20 shadow-sm">
+                        <MailCheck className="w-8 h-8 text-primary" />
+                    </div>
+                </div>
+                
+                <div className="space-y-1.5 text-center">
                     <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{__('general.check_your_email')}</h1>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">{__('general.we_sent_a_verification_link_to_your_inbox')}</p>
                 </div>
 
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-normal">{__('general.please_verify_your_email_address_to_unlock_full_workspace_access_if_you_didn_t_receive_the_email_we_will_gladly_send_you_another')}</p>
+                <p className="text-xs text-center text-zinc-500 dark:text-zinc-400 leading-relaxed font-normal">{__('general.please_verify_your_email_address_to_unlock_full_workspace_access_if_you_didn_t_receive_the_email_we_will_gladly_send_you_another')}</p>
 
                 {status === 'verification-link-sent' && (
                     <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 p-3 text-xs font-medium text-emerald-600 dark:text-emerald-400">{__('general.a_new_verification_link_has_been_sent_to_your_email_address')}</div>
