@@ -3,9 +3,9 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "prebuild": "C:\\tools\\php83\\php.exe artisan translations:export",
+        "prebuild": "php artisan translations:export",
         "build": "vite build",
-        "predev": "C:\\tools\\php83\\php.exe artisan translations:export",
+        "predev": "php artisan translations:export",
         "dev": "vite",
         "lint": "eslint resources/js --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --fix",
         "test:e2e": "playwright test",
