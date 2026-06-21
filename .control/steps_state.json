@@ -34,7 +34,7 @@
     {
         "id": "F5",
         "name": "Install nwidart/laravel-modules",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
@@ -46,7 +46,7 @@
     {
         "id": "F7",
         "name": "Setup Reverb for WebSockets",
-        "status": "done",
+        "status": "running",
         "dependencies": []
     },
     {
