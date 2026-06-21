@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnDelete();
             $table->string('session_id')->nullable()->index();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('affiliate_pos_cart_items', function (Blueprint $table) {
@@ -26,6 +27,7 @@ return new class extends Migration
             $table->double('price', 10, 2)->default(0);
             $table->double('commission', 10, 2)->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
