@@ -116,18 +116,34 @@ class WorkspaceController extends Controller
         $this->ensureAccess($request, ['Viewer', 'Manager'], 'crm-sales-staff');
 
         $tenantId = session('tenant_id') ?? $request->user()->tenant_id;
+        $user     = $request->user();
 
-        $overdueInvoices = \Modules\ERP\Models\Invoice::where('tenant_id', $tenantId)
-            ->overdue()
-            ->with(['client:id,name,email,phone', 'currency:id,symbol,currency'])
-            ->orderBy('due_date', 'asc')
-            ->get();
+        $overdueInvoices = collect();
+
+        // Pull overdue invoices from ERP only when ERP module is available
+        // and the user subscribes to ERP. CRM stays standalone otherwise.
+        if (
+            $tenantId &&
+            $user->hasModuleSubscription('erp') &&
+            class_exists(\Modules\ERP\Models\Invoice::class)
+        ) {
+            try {
+                $overdueInvoices = \Modules\ERP\Models\Invoice::where('tenant_id', $tenantId)
+                    ->overdue()
+                    ->with(['client:id,name,email,phone', 'currency:id,symbol,currency'])
+                    ->orderBy('due_date', 'asc')
+                    ->get();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::debug('[CRM] ERP module not available for collector workspace: ' . $e->getMessage());
+                $overdueInvoices = collect();
+            }
+        }
 
         $totalOverdueAmount = 0;
         $agingReport = [
-            '0_30' => 0,
-            '31_60' => 0,
-            '61_90' => 0,
+            '0_30'    => 0,
+            '31_60'   => 0,
+            '61_90'   => 0,
             '90_plus' => 0,
         ];
 
@@ -152,11 +168,11 @@ class WorkspaceController extends Controller
 
             if (!isset($clientBalances[$invoice->client_id])) {
                 $clientBalances[$invoice->client_id] = [
-                    'client' => $invoice->client ?: ['name' => 'Unknown Client', 'email' => '', 'phone' => ''],
-                    'total_overdue' => 0,
+                    'client'         => $invoice->client ?: ['name' => 'Unknown Client', 'email' => '', 'phone' => ''],
+                    'total_overdue'  => 0,
                     'invoices_count' => 0,
                     'oldest_due_date' => clone $invoice->due_date,
-                    'currency' => $invoice->currency, // Assume tenant base currency for simplicity or invoice currency
+                    'currency'       => $invoice->currency,
                 ];
             }
 
@@ -176,12 +192,12 @@ class WorkspaceController extends Controller
 
         return Inertia::render('CRM/Workspaces/CollectorDashboard', [
             'stats' => [
-                'total_overdue_amount' => $totalOverdueAmount,
+                'total_overdue_amount'   => $totalOverdueAmount,
                 'total_overdue_invoices' => count($overdueInvoices),
             ],
-            'agingReport' => $agingReport,
+            'agingReport'      => $agingReport,
             'highRiskAccounts' => $highRiskAccounts,
-            'overdueInvoices' => $overdueInvoices->take(20)->values(),
+            'overdueInvoices'  => $overdueInvoices->take(20)->values(),
         ]);
     }
 
@@ -304,14 +320,29 @@ class WorkspaceController extends Controller
         }
 
         $tenantId = session('tenant_id') ?? $request->user()->tenant_id;
+        $user     = $request->user();
 
-        $projects = \Modules\ERP\Models\Project::where('tenant_id', $tenantId)
-            ->whereNotIn('status', ['Completed', 'Cancelled'])
-            ->select('id', 'name', 'status', 'due_date', 'budget', 'currency_id')
-            ->with('currency:id,symbol')
-            ->orderBy('due_date', 'asc')
-            ->limit(5)
-            ->get();
+        // Pull ERP projects only when ERP module is available and user subscribes.
+        // CRM Manager workspace degrades gracefully if ERP is absent.
+        $projects = collect();
+        if (
+            $tenantId &&
+            $user->hasModuleSubscription('erp') &&
+            class_exists(\Modules\ERP\Models\Project::class)
+        ) {
+            try {
+                $projects = \Modules\ERP\Models\Project::where('tenant_id', $tenantId)
+                    ->whereNotIn('status', ['Completed', 'Cancelled'])
+                    ->select('id', 'name', 'status', 'due_date', 'budget', 'currency_id')
+                    ->with('currency:id,symbol')
+                    ->orderBy('due_date', 'asc')
+                    ->limit(5)
+                    ->get();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::debug('[CRM] ERP module not available for manager workspace: ' . $e->getMessage());
+                $projects = collect();
+            }
+        }
 
         $campaigns = \Modules\CRM\Models\Campaign::where('workspace_id', $workspaceId)
             ->whereIn('status', ['ACTIVE', 'scheduled', 'sending'])
@@ -376,9 +407,9 @@ class WorkspaceController extends Controller
         return Inertia::render('CRM/Workspaces/MarketingDashboard', [
             'stats' => [
                 'active_campaigns' => $activeCampaigns,
-                'leads_today' => $leadsGeneratedToday,
-                'cost_per_lead' => '$2.50',
-                'roi' => '125%'
+                'leads_today'      => $leadsGeneratedToday,
+                'cost_per_lead'    => null,
+                'roi'              => null,
             ],
             'topCampaigns' => $topCampaigns
         ]);

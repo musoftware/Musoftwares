@@ -130,9 +130,12 @@ class DashboardController extends Controller
         usort($activities, fn($a, $b) => $b['timestamp'] <=> $a['timestamp']);
         $recentActivities = array_slice($activities, 0, 5);
 
-        // 5. Upcoming Bookings (optional — module may not be active)
+        // 5. Upcoming Bookings (optional — requires Booking module subscription)
         $upcomingBookings = [];
-        if (class_exists(\Modules\Booking\Models\Booking::class)) {
+        if (
+            $user->hasModuleSubscription('booking') &&
+            class_exists(\Modules\Booking\Models\Booking::class)
+        ) {
             try {
                 $upcomingBookings = \Modules\Booking\Models\Booking::with('eventType')
                     ->whereHas('eventType', fn($q) => $q->where('user_id', $user->id))

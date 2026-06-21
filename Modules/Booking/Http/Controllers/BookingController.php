@@ -7,13 +7,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Modules\Booking\Models\Booking;
 use Modules\Booking\Models\BookingEventType;
 use Modules\Booking\Models\BookingProvider;
 use Modules\Booking\Models\BookingAvailabilityRule;
 use Modules\Booking\Models\BookingBlockedDate;
+use Modules\Booking\Events\BookingConfirmed;
 use App\Models\User;
-use App\Models\Transaction;
 use App\Helpers\KashierHelper;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -592,42 +593,39 @@ class BookingController extends Controller
     }
     
     /**
-     * Handle conversion to client/project.
+     * Handle post-booking operations after a booking is confirmed.
+     *
+     * Uses events for cross-module communication:
+     * - BookingConfirmed  → ERP module listens to sync guest as TenantClient
+     * - BookingStatusChanged → Booking module own listener for notifications
+     *
+     * This keeps Booking as a standalone SaaS with zero hard dependencies
+     * on ERP, CRM, or any other module.
      */
     private function handlePostBookingOperations(Booking $booking)
     {
-        // 1. Client Conversion
-        if (!$booking->client_user_id) {
+        // 1. Resolve or create a platform User account for the guest
+        if (! $booking->client_user_id) {
             $user = User::where('email', $booking->guest_email)->first();
             if ($user) {
                 $booking->client_user_id = $user->id;
                 $booking->save();
             } else {
                 $user = User::create([
-                    'name' => $booking->guest_name,
-                    'email' => $booking->guest_email,
-                    'password' => bcrypt(str_random(16)),
+                    'name'     => $booking->guest_name,
+                    'email'    => $booking->guest_email,
+                    'password' => bcrypt(Str::random(16)),
                 ]);
                 $booking->client_user_id = $user->id;
                 $booking->save();
             }
         }
 
-        // 2. Add as Tenant Client in ERP if Host has ERP
-        $host = $booking->eventType->user;
-        $tenant = \Modules\ERP\Models\Tenant::where('user_id', $host->id)->first();
-        if ($tenant) {
-            $erpClient = \Modules\ERP\Models\TenantClient::firstOrCreate(
-                ['tenant_id' => $tenant->id, 'email' => $booking->guest_email],
-                [
-                    'name' => $booking->guest_name,
-                    'phone' => $booking->guest_phone,
-                    'currency_id' => $booking->currency_id ?? null
-                ]
-            );
-        }
+        // 2. Fire BookingConfirmed — other modules (ERP, CRM) listen to this.
+        //    Booking has ZERO knowledge of what other modules do with this event.
+        event(new BookingConfirmed($booking));
 
-        // 3. Email notifications via Event
+        // 3. Email / WhatsApp notifications (own Booking event)
         event(new \Modules\Booking\Events\BookingStatusChanged($booking, 'confirmed'));
 
         // 4. Google Calendar Sync
@@ -637,7 +635,7 @@ class BookingController extends Controller
                 \App\Jobs\SyncBookingToGoogleCalendar::dispatch($booking, $host, 'create');
             }
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning('Google Calendar sync failed: ' . $e->getMessage());
+            Log::warning('Google Calendar sync failed: ' . $e->getMessage());
         }
     }
 }

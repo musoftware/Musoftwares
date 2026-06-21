@@ -37,7 +37,14 @@ A CRM is useless if it's just an address book. It must be an engine for action.
 > [!IMPORTANT]
 > **Polymorphic Relations.** Activities (Notes, Calls, Tasks) should be designed polymorphically so they can be attached to Leads, Deals, or existing Clients without duplicating database tables.
 
+> [!CAUTION]
+> **Cross-Module Boundaries.**
+> - **Write Operations**: Never import models from ERP, Booking, or other modules to create or update data. Always fire a CRM event (e.g., `LeadConverted`) and let the target module listen.
+> - **Read Operations**: If a CRM dashboard must display data from another module (e.g., ERP Invoices), you MUST use the Defensive Read Pattern: `if (class_exists(\Modules\ERP\Models\Invoice::class) && $user->hasModuleSubscription('erp')) { try { ... } catch { ... } }`.
+
 ## Summary Checklist
 - [ ] Are new interactions added to a unified Activity Stream?
 - [ ] Is the CRM UI providing actionable context rather than just displaying static text fields?
 - [ ] Are deal stage transitions handled by backend services that fire appropriate events (e.g., `DealWon`)?
+- [ ] Are all cross-module data reads guarded by `class_exists()` and `hasModuleSubscription()`?
+- [ ] Are cross-module write operations handled strictly via the Event Bus?

@@ -42,8 +42,15 @@ The ERP is the nervous system of the company. It is NOT a collection of database
 > [!IMPORTANT]
 > **Idempotency.** Actions like "Process Payment" or "Charge Subscription" must be idempotent. If a queue worker fails halfway through, retrying the job must not result in a double charge.
 
+> [!CAUTION]
+> **Cross-Module Boundaries.**
+> - **Write Operations**: ERP must NEVER import models from Booking, CRM, or other modules to create or update data. Always use the Event Bus (e.g., listen to `BookingConfirmed` instead of being called directly).
+> - **Read Operations**: If the ERP dashboard must display data from another module (e.g., upcoming bookings), you MUST use the Defensive Read Pattern: `if (class_exists(\Modules\Booking\Models\Booking::class) && $user->hasModuleSubscription('booking')) { try { ... } catch { ... } }`.
+
 ## Summary Checklist
 - [ ] Are financial transactions handled via ledger entries rather than raw balance updates?
 - [ ] Is the client's locked balance calculated dynamically as the sum of unpaid amounts on their pending invoices?
 - [ ] Does the UI reflect the entity's current lifecycle state (e.g., showing a "Void" button instead of "Delete" for a sent invoice)?
 - [ ] Are state transitions enforced by the backend service layer?
+- [ ] Are all cross-module data reads guarded by `class_exists()` and `hasModuleSubscription()`?
+- [ ] Are cross-module write operations handled strictly via the Event Bus?

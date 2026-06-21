@@ -353,18 +353,29 @@ class ERPDashboardController extends Controller
             'businessCurrency' => $businessCurrency,
         ];
 
-        // ── Upcoming Bookings ─────────────────────────────────────
+        // ── Upcoming Bookings (optional — requires Booking module subscription) ──
         $upcomingBookings = collect();
-        if ($tenantId) {
-            $upcomingBookings = \Modules\Booking\Models\Booking::with('eventType')
-                ->whereHas('eventType', function($q) use ($ownerUser) {
-                    $q->where('user_id', $ownerUser ? $ownerUser->id : null);
-                })
-                ->where('starts_at', '>=', now())
-                ->whereIn('status', ['confirmed', 'paid'])
-                ->orderBy('starts_at', 'asc')
-                ->take(5)
-                ->get();
+        if (
+            $tenantId &&
+            $ownerUser &&
+            $ownerUser->hasModuleSubscription('booking') &&
+            class_exists(\Modules\Booking\Models\Booking::class)
+        ) {
+            try {
+                $upcomingBookings = \Modules\Booking\Models\Booking::with('eventType')
+                    ->whereHas('eventType', function ($q) use ($ownerUser) {
+                        $q->where('user_id', $ownerUser->id);
+                    })
+                    ->where('starts_at', '>=', now())
+                    ->whereIn('status', ['confirmed', 'paid'])
+                    ->orderBy('starts_at', 'asc')
+                    ->take(5)
+                    ->get();
+            } catch (\Throwable $e) {
+                // Booking module disabled or unavailable — degrade gracefully.
+                \Illuminate\Support\Facades\Log::debug('[ERP] Booking module not available for dashboard widget: ' . $e->getMessage());
+                $upcomingBookings = collect();
+            }
         }
 
         // ── Transactions (Wallet Ledger) ──────────────────────────
