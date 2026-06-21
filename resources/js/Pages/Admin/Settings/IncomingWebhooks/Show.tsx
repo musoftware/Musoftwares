@@ -1,0 +1,132 @@
+import React from 'react';
+import { Head, Link } from '@inertiajs/react';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Badge } from '@/Components/ui/badge';
+import { ArrowLeft, CheckCircle2, Clock, XCircle, FileJson } from 'lucide-react';
+import { __ } from '@/lib/i18n';
+
+interface Webhook {
+    id: number;
+    source: string;
+    event_type: string | null;
+    payload: any;
+    headers: any;
+    status: string;
+    error_message: string | null;
+    created_at: string;
+    processed_at: string | null;
+}
+
+interface Props {
+    webhook: Webhook;
+}
+
+export default function Show({ webhook }: Props) {
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'processed':
+                return <Badge className="bg-emerald-100 text-emerald-800"><CheckCircle2 className="w-4 h-4 mr-1" /> Processed</Badge>;
+            case 'failed':
+                return <Badge className="bg-rose-100 text-rose-800"><XCircle className="w-4 h-4 mr-1" /> Failed</Badge>;
+            default:
+                return <Badge className="bg-amber-100 text-amber-800"><Clock className="w-4 h-4 mr-1" /> Pending</Badge>;
+        }
+    };
+
+    return (
+        <AdminSidebarLayout title={`Webhook #${webhook.id}`} header="Webhook Details">
+            <Head title={`Webhook #${webhook.id}`} />
+
+            <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <Link href={route('admin.settings.incoming-webhooks.index')} className="text-slate-500 hover:text-slate-900 transition-colors">
+                            <ArrowLeft className="w-5 h-5" />
+                        </Link>
+                        <h1 className="text-2xl font-bold text-slate-900">
+                            Webhook #{webhook.id}
+                        </h1>
+                        {getStatusBadge(webhook.status)}
+                    </div>
+                </div>
+
+                {webhook.error_message && (
+                    <div className="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-md">
+                        <div className="flex">
+                            <div className="flex-shrink-0">
+                                <XCircle className="h-5 w-5 text-rose-500" aria-hidden="true" />
+                            </div>
+                            <div className="ml-3">
+                                <h3 className="text-sm font-medium text-rose-800">Processing Failed</h3>
+                                <div className="mt-2 text-sm text-rose-700 font-mono bg-white/50 p-2 rounded">
+                                    {webhook.error_message}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg">Metadata</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-sm font-medium text-slate-500">Source</p>
+                                    <p className="font-semibold text-slate-900 mt-1 uppercase">{webhook.source}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-slate-500">Event Type</p>
+                                    <p className="font-semibold text-slate-900 mt-1">{webhook.event_type || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-slate-500">Received At</p>
+                                    <p className="font-semibold text-slate-900 mt-1">{new Date(webhook.created_at).toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-slate-500">Processed At</p>
+                                    <p className="font-semibold text-slate-900 mt-1">
+                                        {webhook.processed_at ? new Date(webhook.processed_at).toLocaleString() : 'Not processed yet'}
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg flex items-center gap-2">
+                                <FileJson className="w-5 h-5 text-slate-400" /> Headers
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="bg-slate-900 rounded-md p-4 overflow-x-auto">
+                                <pre className="text-emerald-400 text-xs font-mono">
+                                    {JSON.stringify(webhook.headers, null, 2)}
+                                </pre>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                            <FileJson className="w-5 h-5 text-slate-400" /> Payload
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="bg-slate-900 rounded-md p-4 overflow-x-auto">
+                            <pre className="text-emerald-400 text-xs font-mono leading-relaxed">
+                                {JSON.stringify(webhook.payload, null, 2)}
+                            </pre>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </AdminSidebarLayout>
+    );
+}

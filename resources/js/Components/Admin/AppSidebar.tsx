@@ -136,6 +136,7 @@ const items: MenuItem[] = [
         { title: "Serial Softwares", url: "/admin/serial-softwares" },
         { title: "Serial Devices", url: "/admin/serial-devices" },
         { title: "Settings", url: "/admin/settings" },
+        { title: "Security & Rate Limits", url: "/admin/settings/security" },
     ]
   },
 ];

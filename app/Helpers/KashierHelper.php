@@ -28,7 +28,7 @@ class KashierHelper
         $mode = config('services.kashier.mode', 'live');
         $successUrl = urlencode(route('financial.add-balance.success'));
         $failureUrl = urlencode(route('financial.add-balance.failure'));
-        $webhookUrl = urlencode(route('financial.add-balance.webhook'));
+        $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
 
         $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
 
@@ -82,7 +82,7 @@ class KashierHelper
         $mode = config('services.kashier.mode', 'live');
         $successUrl = urlencode(route('freelance.point-purchases.success'));
         $failureUrl = urlencode(route('freelance.point-purchases.failure'));
-        $webhookUrl = urlencode(route('freelance.point-purchases.webhook'));
+        $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
 
         $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
 
@@ -141,7 +141,7 @@ class KashierHelper
         $mode = config('services.kashier.mode', 'live');
         $successUrl = urlencode(route('subscriptions.kashier.success'));
         $failureUrl = urlencode(route('subscriptions.kashier.failure'));
-        $webhookUrl = urlencode(route('subscriptions.kashier.webhook'));
+        $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
 
         $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
 
@@ -200,7 +200,7 @@ class KashierHelper
         $successUrl = urlencode(route('booking.success', $bookingId));
         // Using the same checkout page for failure so user can retry
         $failureUrl = urlencode(route('booking.checkout', $bookingId));
-        $webhookUrl = urlencode(route('booking.webhook.kashier'));
+        $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
 
         $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
 
@@ -254,7 +254,7 @@ class KashierHelper
         $mode = config('services.kashier.mode', 'live');
         $successUrl = urlencode(route('guest.invoices.payment.success'));
         $failureUrl = urlencode(route('guest.invoices.payment.failure'));
-        $webhookUrl = urlencode(route('guest.invoices.payment.webhook'));
+        $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
 
         $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
 
@@ -308,7 +308,7 @@ class KashierHelper
         $mode = config('services.kashier.mode', 'live');
         $successUrl = urlencode(route('billing.invoices.payment.success'));
         $failureUrl = urlencode(route('billing.invoices.payment.failure'));
-        $webhookUrl = urlencode(route('billing.invoices.payment.webhook'));
+        $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
 
         $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
 
@@ -362,7 +362,7 @@ class KashierHelper
         $mode = config('services.kashier.mode', 'live');
         $successUrl = urlencode(route('guest.payment-links.success'));
         $failureUrl = urlencode(route('guest.payment-links.failure'));
-        $webhookUrl = urlencode(route('guest.payment-links.webhook'));
+        $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
 
         $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
 
@@ -403,32 +403,36 @@ class KashierHelper
         return 'https://payments.kashier.io/?' . http_build_query($params);
     }
 
-    public static function validatePayload(): bool
+    public static function validatePayload($rawPayload = null, $kashierSignature = null): bool
     {
         $paymentApiKey = config('services.kashier.secret_key');
-        if (request()->isMethod('POST')) {
-            $raw_payload = request()->getContent();
-            $json_data = json_decode($raw_payload, true);
-            if (!$json_data || !isset($json_data['data'])) {
+        
+        if ($rawPayload === null) {
+            if (!request()->isMethod('POST')) {
                 return false;
             }
-            $data_obj = $json_data['data'];
-            if (!isset($data_obj['signatureKeys']) || !is_array($data_obj['signatureKeys'])) {
-                return false;
-            }
-            sort($data_obj['signatureKeys']);
-
+            $rawPayload = request()->getContent();
             $kashierSignature = request()->header('x-kashier-signature');
-            $data = [];
-            foreach ($data_obj['signatureKeys'] as $key) {
-                if (isset($data_obj[$key])) {
-                    $data[$key] = $data_obj[$key];
-                }
-            }
-            $queryString = http_build_query($data, "", '&', PHP_QUERY_RFC3986);
-            $signature = hash_hmac('sha256', $queryString, $paymentApiKey, false);
-            return hash_equals($signature, (string) $kashierSignature);
         }
-        return false;
+
+        $json_data = is_array($rawPayload) ? $rawPayload : json_decode($rawPayload, true);
+        if (!$json_data || !isset($json_data['data'])) {
+            return false;
+        }
+        $data_obj = $json_data['data'];
+        if (!isset($data_obj['signatureKeys']) || !is_array($data_obj['signatureKeys'])) {
+            return false;
+        }
+        sort($data_obj['signatureKeys']);
+
+        $data = [];
+        foreach ($data_obj['signatureKeys'] as $key) {
+            if (isset($data_obj[$key])) {
+                $data[$key] = $data_obj[$key];
+            }
+        }
+        $queryString = http_build_query($data, "", '&', PHP_QUERY_RFC3986);
+        $signature = hash_hmac('sha256', $queryString, $paymentApiKey, false);
+        return hash_equals($signature, (string) $kashierSignature);
     }
 }

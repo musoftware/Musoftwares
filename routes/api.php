@@ -120,3 +120,9 @@ if (file_exists(base_path('Modules/Freelance/routes/api.php'))) {
     require base_path('Modules/Freelance/routes/api.php');
 }
 
+// â”€â”€ Incoming Webhooks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Handles all incoming webhooks from external providers
+Route::post('webhooks/incoming/{source}', [\App\Http\Controllers\WebhookController::class, 'handle'])
+    ->name('api.webhooks.incoming');
+
+

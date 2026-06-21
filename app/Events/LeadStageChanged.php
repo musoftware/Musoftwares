@@ -2,35 +2,41 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Modules\CRM\Models\Lead;
 
 class LeadStageChanged
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $lead;
+    public $oldStage;
+    public $newStage;
+
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct(Lead $lead, string $oldStage, string $newStage)
     {
-        //
+        $this->lead = $lead;
+        $this->oldStage = $oldStage;
+        $this->newStage = $newStage;
     }
 
     /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, Channel>
+     * Convert the event to a payload array for the automation engine.
      */
-    public function broadcastOn(): array
+    public function getAutomationPayload(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            'lead_id' => $this->lead->id,
+            'lead_email' => $this->lead->email,
+            'lead_name' => $this->lead->name,
+            'old_stage' => $this->oldStage,
+            'new_stage' => $this->newStage,
+            'workspace_id' => $this->lead->workspace_id,
         ];
     }
 }

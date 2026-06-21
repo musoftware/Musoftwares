@@ -590,6 +590,13 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                         <Button type="submit" variant="outline" className="w-full">{__('general.sync_exchange_rates_now')}</Button>
                     </form>
                 </SectionCard>
+                {/* Incoming Webhooks */}
+                <SectionCard title="Incoming Webhooks" icon={Globe}>
+                    <p className="text-sm font-medium text-gray-700 mb-4">View and monitor webhooks received from external platforms (e.g., Kashier, Stripe, WhatsApp).</p>
+                    <Button type="button" variant="outline" className="w-full" onClick={() => router.visit(route('admin.settings.incoming-webhooks.index'))}>
+                        View Webhooks Log
+                    </Button>
+                </SectionCard>
             </div>
 
             <ConfirmModal
