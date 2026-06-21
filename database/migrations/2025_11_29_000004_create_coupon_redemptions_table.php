@@ -32,6 +32,7 @@ return new class extends Migration
             
             // Timestamps
             $table->timestamps();
+            $table->softDeletes();
             
             // Indexes
             $table->index(['user_id', 'coupon_id']);

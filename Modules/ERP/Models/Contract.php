@@ -3,10 +3,13 @@
 namespace Modules\ERP\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Contract extends TenantModel
 {
+    use SoftDeletes;
+
     protected $table = 'erp_contracts';
 
     protected $fillable = [

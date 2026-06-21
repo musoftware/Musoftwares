@@ -36,6 +36,7 @@ return new class extends Migration
             $table->timestamp('released_at')->nullable();
             $table->timestamp('refunded_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -4,8 +4,12 @@ namespace Modules\CRM\Models;
 
 use App\Models\User;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Employee extends User
 {
+    use SoftDeletes;
+
     protected $table = 'users';
 
     public function leads()

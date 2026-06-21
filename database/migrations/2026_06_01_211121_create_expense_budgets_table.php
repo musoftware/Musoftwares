@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('period')->default('monthly'); // monthly, yearly
             $table->boolean('notify_on_exceed')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->boolean('is_instapay_enabled')->default(true);
             $table->boolean('is_vodafone_cash_enabled')->default(true);
             $table->timestamps();
+            $table->softDeletes();
 
             // Foreign keys if necessary
             // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

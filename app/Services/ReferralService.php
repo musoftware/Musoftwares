@@ -9,8 +9,9 @@ use App\Models\CurrenciesExchange;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
 
-class ReferralService
+class ReferralService extends BaseService
 {
+
     /**
      * Ensure the user has the referral system activated and a primary referral link exists.
      */

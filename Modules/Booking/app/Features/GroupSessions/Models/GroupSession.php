@@ -3,10 +3,13 @@
 namespace Modules\Booking\app\Features\GroupSessions\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 
 class GroupSession extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking_group_sessions';
 
     protected $fillable = [

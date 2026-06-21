@@ -16,6 +16,7 @@ class CreateLikesTable extends Migration
             $table->unsignedBigInteger(config('like.user_foreign_key', 'user_id'))->index()->comment('user_id');
             $table->morphs('likeable');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

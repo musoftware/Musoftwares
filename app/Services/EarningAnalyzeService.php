@@ -17,8 +17,9 @@ use Illuminate\Support\Facades\DB;
  * Centralizes all business logic for the admin earning analysis page.
  * Controller must NEVER contain these calculations directly.
  */
-class EarningAnalyzeService
+class EarningAnalyzeService extends BaseService
 {
+
     /**
      * Cached currency lookup: id => ['code' => ..., 'symbol' => ...]
      * Loaded once per request to avoid N+1 on groupBy queries.

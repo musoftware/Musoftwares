@@ -30,6 +30,7 @@ return new class extends Migration
 
             $table->enum('priority', ['low', 'medium', 'high'])->default('low');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->dateTime('closed_at')->nullable();
         });

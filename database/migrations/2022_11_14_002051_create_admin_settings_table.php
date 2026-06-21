@@ -20,6 +20,7 @@ return new class extends Migration
             $table->longText('setting_value')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

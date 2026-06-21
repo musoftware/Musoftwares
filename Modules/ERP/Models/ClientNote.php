@@ -13,8 +13,12 @@ use App\Models\User;
  * Categories: password | anydesk | notes | archived
  * Archive workflow: saves original_category before setting 'archived'.
  */
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class ClientNote extends TenantModel
 {
+    use SoftDeletes;
+
     protected $table = 'erp_client_notes';
 
     protected $fillable = [

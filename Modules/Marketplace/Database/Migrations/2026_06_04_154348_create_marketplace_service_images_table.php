@@ -15,6 +15,7 @@ return new class extends Migration
             $table->boolean('is_main')->default(false);
             $table->integer('sort_order')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

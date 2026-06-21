@@ -2,14 +2,17 @@
 
 namespace App\Services\Calculations\PayService;
 
+use App\Services\BaseService;
+
 use App\Models\CurrenciesExchange;
 use App\Models\Invoice;
 
 /**
  * Service to handle Pay Service (دفع خدمة) calculations
  */
-class PayServiceCalculator
+class PayServiceCalculator extends BaseService
 {
+
     private const MARGIN_USD = 0.20;
 
     public function __construct(

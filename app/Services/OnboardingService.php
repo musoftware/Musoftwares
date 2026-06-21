@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\QueryException;
 use GeoIp2\Database\Reader;
 
-class OnboardingService
+class OnboardingService extends BaseService
 {
+
     /**
      * Get the list of all countries, running the migration and seeder if necessary.
      *

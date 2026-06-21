@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('current_hash'); // التجزئة الحالية
             $table->boolean('burned')->default(false); // التجزئة الحالية
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

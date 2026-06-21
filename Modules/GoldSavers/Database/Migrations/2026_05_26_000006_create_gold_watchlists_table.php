@@ -18,6 +18,7 @@ return new class extends Migration
             $table->json('tracked_currencies')->nullable(); // ["EGP", "USD", "SAR"]
             $table->boolean('is_default')->default(false);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['tenant_id', 'user_id']);
         });

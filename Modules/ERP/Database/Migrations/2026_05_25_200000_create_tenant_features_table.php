@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('plan_id')->nullable(); // which plan granted this feature
             $table->dateTime('expires_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             // A tenant can only have one active entry per feature key
             $table->unique(['tenant_id', 'feature_key']);

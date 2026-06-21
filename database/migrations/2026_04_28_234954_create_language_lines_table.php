@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('key')->index();
             $table->json('text');
             $table->timestamps();
+            $table->softDeletes();
             
             $table->unique(['group', 'key']);
         });

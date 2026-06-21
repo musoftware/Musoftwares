@@ -16,8 +16,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *   - sent:     Money sent/deducted from client (negative amount)
  *   - used:     Internal wallet utilization for invoice payment (excluded from income)
  */
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class WalletTransaction extends TenantModel
 {
+    use SoftDeletes;
+
     protected $table = 'erp_client_transactions';
 
     protected $fillable = [

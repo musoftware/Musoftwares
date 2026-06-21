@@ -29,6 +29,7 @@ return new class extends Migration
             $table->integer('archived')->default('0');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

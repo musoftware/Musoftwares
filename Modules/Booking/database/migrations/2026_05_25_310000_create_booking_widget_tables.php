@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('button_text')->default('Book Now');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('booking_widget_domains', function (Blueprint $table) {
@@ -30,6 +31,7 @@ return new class extends Migration
             $table->unsignedBigInteger('widget_id')->index();
             $table->string('domain'); // e.g., myclinic.com
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('widget_id')->references('id')->on('booking_widgets')->onDelete('cascade');
         });
@@ -42,6 +44,7 @@ return new class extends Migration
             $table->string('visitor_ip')->nullable();
             $table->string('origin_domain')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('widget_id')->references('id')->on('booking_widgets')->onDelete('cascade');
         });

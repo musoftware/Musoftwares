@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('iso_code', 5)->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

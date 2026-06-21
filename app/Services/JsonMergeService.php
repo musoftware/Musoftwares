@@ -4,8 +4,9 @@ namespace App\Services;
 
 use Exception;
 
-class JsonMergeService
+class JsonMergeService extends BaseService
 {
+
     /**
      * Process JSON merge request
      */

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('user_agent')->nullable();
             $table->timestamp('opened_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -2,12 +2,15 @@
 
 namespace App\Services\AI;
 
+use App\Services\BaseService;
+
 use App\Models\AdminSettings;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class GeminiEstimatorService
+class GeminiEstimatorService extends BaseService
 {
+
     /**
      * Call Gemini API to get an estimated number of hours.
      */

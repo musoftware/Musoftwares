@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('status', ['incomplete', 'completed'])->default('incomplete');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

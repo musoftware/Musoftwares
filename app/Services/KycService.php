@@ -4,8 +4,9 @@ namespace App\Services;
 
 use App\Models\User;
 
-class KycService
+class KycService extends BaseService
 {
+
     public function approveKyc(User $user, int $adminId): void
     {
         $user->update([

@@ -37,6 +37,7 @@ return new class extends Migration
             $table->integer('auto_winner_visits')->nullable();
             
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

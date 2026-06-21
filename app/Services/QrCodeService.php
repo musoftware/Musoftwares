@@ -14,8 +14,9 @@ use Endroid\QrCode\Logo\LogoInterface;
 use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
 
-class QrCodeService
+class QrCodeService extends BaseService
 {
+
     /**
      * Generate QR code data based on type and content
      */

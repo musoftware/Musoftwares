@@ -18,6 +18,7 @@ return new class extends Migration
                 $table->json('features')->nullable();
                 $table->boolean('is_active')->default(true);
                 $table->timestamps();
+            $table->softDeletes();
 
                 $table->index('module');
                 $table->index('is_active');
@@ -34,6 +35,7 @@ return new class extends Migration
                 $table->timestamp('expires_at')->nullable();
                 $table->boolean('auto_renew')->default(true);
                 $table->timestamps();
+            $table->softDeletes();
 
                 $table->index(['user_id', 'status']);
                 $table->index('object');

@@ -3,10 +3,13 @@
 namespace Modules\Booking\app\Features\Widget\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 
 class BookingWidgetDomain extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking_widget_domains';
 
     protected $fillable = [

@@ -20,6 +20,7 @@ return new class extends Migration
                 $table->boolean('is_public')->default(true);
                 $table->timestamp('reviewed_at')->useCurrent();
                 $table->timestamps();
+            $table->softDeletes();
 
                 // One review per order per reviewer
                 $table->unique(['order_id', 'reviewer_id']);

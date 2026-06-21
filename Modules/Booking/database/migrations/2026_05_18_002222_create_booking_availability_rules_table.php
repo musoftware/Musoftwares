@@ -19,6 +19,7 @@ return new class extends Migration
             $table->time('end_time');
             $table->boolean('is_enabled')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

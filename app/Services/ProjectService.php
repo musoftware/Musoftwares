@@ -4,8 +4,9 @@ namespace App\Services;
 
 use App\Models\Project;
 
-class ProjectService
+class ProjectService extends BaseService
 {
+
     public function createProject(array $data): Project
     {
         $project = new Project();

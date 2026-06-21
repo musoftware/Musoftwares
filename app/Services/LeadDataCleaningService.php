@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-class LeadDataCleaningService
+class LeadDataCleaningService extends BaseService
 {
+
     public static function cleanName(?string $name): ?string
     {
         return $name !== null ? trim(strip_tags($name)) : null;

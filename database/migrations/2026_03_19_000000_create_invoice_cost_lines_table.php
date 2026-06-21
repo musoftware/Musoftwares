@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('cost_transaction_id')->nullable();
             $table->unsignedBigInteger('earned_transaction_id')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         if (Schema::hasTable('invoices')) {

@@ -33,6 +33,7 @@ class CreateEarningsTable extends Migration
             $table->date('convert_to_balance_on')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

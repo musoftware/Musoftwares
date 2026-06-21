@@ -8,8 +8,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Scout\Searchable;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Invoice extends TenantModel
 {
+    use SoftDeletes;
+
     protected $table = 'erp_invoices';
 
     use Searchable;

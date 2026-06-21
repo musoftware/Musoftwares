@@ -31,6 +31,7 @@ class CreateUserReferralRequestWithdrawsTable extends Migration
             $table->enum('status', ['pending', 'reviewing', 'approved', 'declined'])->default('pending');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

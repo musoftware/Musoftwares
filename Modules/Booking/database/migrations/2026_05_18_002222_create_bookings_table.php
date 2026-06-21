@@ -31,6 +31,7 @@ return new class extends Migration
             $table->text('internal_notes')->nullable();
             $table->unsignedBigInteger('project_id')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

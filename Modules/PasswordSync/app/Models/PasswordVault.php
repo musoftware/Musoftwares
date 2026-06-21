@@ -3,9 +3,12 @@
 namespace Modules\PasswordSync\app\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PasswordVault extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'user_id',
         'salt',

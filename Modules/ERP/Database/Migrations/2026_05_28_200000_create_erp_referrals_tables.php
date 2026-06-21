@@ -31,6 +31,7 @@ return new class extends Migration
             $table->decimal('commission_rate', 5, 2);
             $table->string('status')->default('pending'); // pending, paid, cancelled
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('referrer_id')->references('id')->on('erp_tenant_clients')->cascadeOnDelete();
             $table->foreign('referee_id')->references('id')->on('erp_tenant_clients')->cascadeOnDelete();

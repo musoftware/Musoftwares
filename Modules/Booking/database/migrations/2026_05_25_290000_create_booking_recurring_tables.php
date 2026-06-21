@@ -24,6 +24,7 @@ return new class extends Migration
                 $table->integer('duration_minutes')->default(30);
                 $table->enum('status', ['active', 'paused', 'completed', 'cancelled'])->default('active');
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
 
@@ -36,6 +37,7 @@ return new class extends Migration
                 $table->string('reason')->nullable(); // holiday, manually skipped, moved
                 $table->enum('status', ['skipped', 'rescheduled'])->default('skipped');
                 $table->timestamps();
+            $table->softDeletes();
 
                 $table->foreign('series_id')->references('id')->on('booking_recurring_series')->onDelete('cascade');
             });
@@ -49,6 +51,7 @@ return new class extends Migration
                 $table->string('action');
                 $table->text('description')->nullable();
                 $table->timestamps();
+            $table->softDeletes();
 
                 $table->foreign('series_id')->references('id')->on('booking_recurring_series')->onDelete('cascade');
             });

@@ -3,10 +3,13 @@
 namespace Modules\Booking\app\Features\GcalSync\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 
 class GoogleSyncLog extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking_google_sync_logs';
 
     protected $fillable = [

@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('status');
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('reservation_id')->references('id')->on('booking_reservations')->onDelete('cascade');
         });

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->index();
             $table->string('role')->default('staff'); // e.g. 'manager', 'staff'
             $table->timestamps();
+            $table->softDeletes();
             
             // Ensures a user is only assigned to a specific branch once
             $table->unique(['branch_id', 'user_id']);

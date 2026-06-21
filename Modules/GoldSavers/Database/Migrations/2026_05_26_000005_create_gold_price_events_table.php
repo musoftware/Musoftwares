@@ -28,6 +28,7 @@ return new class extends Migration
             $table->enum('severity', ['info', 'warning', 'critical'])->default('info');
             $table->timestamp('resolved_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['tenant_id', 'event_type', 'created_at']);
             $table->index(['tenant_id', 'severity', 'created_at']);

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('version')->default('1.0.0');
             $table->integer('estimated_time')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

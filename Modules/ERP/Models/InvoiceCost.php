@@ -5,8 +5,12 @@ namespace Modules\ERP\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class InvoiceCost extends TenantModel
 {
+    use SoftDeletes;
+
     protected $table = 'erp_invoice_costs';
 
     protected $fillable = [

@@ -11,8 +11,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * Categories: Internal | Client | Project
  */
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class TenantNote extends TenantModel
 {
+    use SoftDeletes;
+
     protected $table = 'erp_tenant_notes';
 
     protected $fillable = [

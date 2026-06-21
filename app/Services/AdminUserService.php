@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-class AdminUserService
+class AdminUserService extends BaseService
 {
+
     /**
      * Create a new platform user from admin panel.
      * Business rule: name must include a last name (space required).

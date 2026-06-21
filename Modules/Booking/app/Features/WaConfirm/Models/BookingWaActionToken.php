@@ -3,10 +3,13 @@
 namespace Modules\Booking\app\Features\WaConfirm\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BookingWaActionToken extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking_wa_action_tokens';
 
     protected $fillable = [

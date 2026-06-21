@@ -30,6 +30,7 @@ return new class extends Migration
 
                 $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
                 $table->timestamps();
+            $table->softDeletes();
             });
         } else {
             if (!Schema::hasColumn('erp_projects', 'currency_id')) {
@@ -79,6 +80,7 @@ return new class extends Migration
                 $table->foreignId('assigned_to')->nullable()->constrained('users')->nullOnDelete();
                 $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
                 $table->timestamps();
+            $table->softDeletes();
             });
         } else {
             if (!Schema::hasColumn('erp_support_tickets', 'project_id')) {

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('status', 20)->default('active'); // active|suspended|inactive
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['user_id', 'status']);
         });
@@ -41,6 +42,7 @@ return new class extends Migration
 
             $table->timestamp('joined_at')->useCurrent();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['reseller_id', 'user_id']);
             $table->index(['reseller_id', 'status']);
@@ -58,6 +60,7 @@ return new class extends Migration
             $table->string('user_agent', 512)->nullable();
             $table->timestamp('last_seen_at');
             $table->timestamps();
+            $table->softDeletes();
 
             // One row per (user, IP) — upserted on every request
             $table->unique(['reseller_user_id', 'ip_address']);
@@ -76,6 +79,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->string('reference')->nullable();  // subscription_id, etc.
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['reseller_id', 'type']);
         });

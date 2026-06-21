@@ -24,6 +24,7 @@ return new class extends Migration
             $table->text('audio_file');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

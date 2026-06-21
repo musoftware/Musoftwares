@@ -12,8 +12,9 @@ use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 use Exception;
 
-class WalletTransferService
+class WalletTransferService extends BaseService
 {
+
     protected ExchangeRateService $exchangeRateService;
 
     public function __construct(ExchangeRateService $exchangeRateService)
@@ -122,7 +123,7 @@ class WalletTransferService
         $convertedAmount = round($amount * $finalExchangeRate, 2);
 
         try {
-            return DB::transaction(function () use ($sender, $receiver, $amount, $fee, $convertedAmount, $senderCurrency, $receiverCurrency, $finalExchangeRate, $reason) {
+            return $this->executeInTransaction(function () use ($sender, $receiver, $amount, $fee, $convertedAmount, $senderCurrency, $receiverCurrency, $finalExchangeRate, $reason) {
                 
                 // Create pending transfer record first to bind reference IDs
                 $transfer = WalletTransfer::create([

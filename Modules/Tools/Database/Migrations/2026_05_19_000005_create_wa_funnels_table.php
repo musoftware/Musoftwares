@@ -18,6 +18,7 @@ return new class extends Migration
             $table->json('nodes'); // ReactFlow nodes
             $table->json('edges'); // ReactFlow edges
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('wa_funnel_states', function (Blueprint $table) {
@@ -29,6 +30,7 @@ return new class extends Migration
             $table->json('variables')->nullable(); // stored contextual variables (e.g., name, custom fields)
             $table->timestamp('next_execution_at')->nullable(); // For time delays
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index(['wa_funnel_id', 'status', 'next_execution_at']);
         });

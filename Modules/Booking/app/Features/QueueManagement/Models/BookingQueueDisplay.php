@@ -3,10 +3,13 @@
 namespace Modules\Booking\app\Features\QueueManagement\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BookingQueueDisplay extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking_queue_displays';
 
     protected $fillable = [

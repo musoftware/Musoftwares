@@ -37,6 +37,7 @@ return new class extends Migration
             $table->decimal('validation_threshold_pct', 5, 2)->default(15.00);
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['tenant_id', 'market_key', 'priority']);
         });

@@ -18,6 +18,7 @@ class CreateRolesTable extends Migration
             $table->string('name'); // edit posts
             $table->string('slug'); //edit-posts
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

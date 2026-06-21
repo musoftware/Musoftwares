@@ -2,8 +2,11 @@
 
 namespace App\Services\Calculations\PayService;
 
-class SourceFeeCalculator
+use App\Services\BaseService;
+
+class SourceFeeCalculator extends BaseService
 {
+
     /**
      * Applies the fee of the payment source (e.g., Wallet, PayPal) to the base cost.
      *

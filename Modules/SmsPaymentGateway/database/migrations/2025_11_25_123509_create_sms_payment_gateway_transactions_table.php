@@ -26,6 +26,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'processed', 'failed'])->default('pending');
             $table->json('metadata')->nullable();
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index('device_id');
             $table->index('user_id');

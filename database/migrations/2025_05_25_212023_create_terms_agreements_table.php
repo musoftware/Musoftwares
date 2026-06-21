@@ -34,6 +34,7 @@ return new class extends Migration
             $table->string('version')->default('v1.0');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

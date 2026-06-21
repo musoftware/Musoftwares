@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('status')->default('in-progress'); // in-progress, completed
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['user_id', 'course_slug', 'module_slug', 'lesson_slug'], 'w_c_p_user_lesson_unique');
         });

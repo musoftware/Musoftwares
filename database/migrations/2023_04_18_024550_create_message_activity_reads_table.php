@@ -28,6 +28,7 @@ return new class extends Migration
             $table->integer('heard')->default(0);
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

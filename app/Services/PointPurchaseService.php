@@ -9,8 +9,9 @@ use App\Models\Currency;
 use App\Models\CurrenciesExchange;
 use Illuminate\Support\Facades\DB;
 
-class PointPurchaseService
+class PointPurchaseService extends BaseService
 {
+
     // Defined tiers for volume pricing when purchasing custom points
     protected array $tiers = [
         ['min' => 1, 'max' => 999, 'price_per_point' => 1.00, 'discount_percent' => 0],
@@ -88,7 +89,7 @@ class PointPurchaseService
             throw new \Exception('INSUFFICIENT_FUNDS');
         }
 
-        DB::transaction(function () use ($user, $points, $costInEgp, $currencyId) {
+        $this->executeInTransaction(function () use ($user, $points, $costInEgp, $currencyId) {
             // Deduct using built-in system (negative value to deduct)
             $user->add_balance(-$costInEgp, 'purchased_points', 'used', $currencyId);
 
@@ -118,7 +119,7 @@ class PointPurchaseService
      */
     public function processWebhookPurchase(User $user, float $amountPaid, string $reason, int $points, $packageId = null): void
     {
-        DB::transaction(function () use ($user, $amountPaid, $reason, $points, $packageId) {
+        $this->executeInTransaction(function () use ($user, $amountPaid, $reason, $points, $packageId) {
             $user->add_balance($amountPaid, $reason, 'received');
             
             // Deduct balance for points

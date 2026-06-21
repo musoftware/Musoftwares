@@ -5,8 +5,9 @@ namespace App\Services;
 use App\Models\AdminSettings;
 use Illuminate\Support\Facades\DB;
 
-class SystemConfigurationService
+class SystemConfigurationService extends BaseService
 {
+
     public function updateSettings(array $settings): void
     {
         // Special case: if business currency changes, we reset calculated values

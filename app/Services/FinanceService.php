@@ -12,8 +12,9 @@ use Illuminate\Support\Facades\Cache;
  * Recovered from old project: App\Helpers\FinanceHelper
  * Modernized: Singleton-less, dependency-injected, service-oriented.
  */
-class FinanceService
+class FinanceService extends BaseService
 {
+
     protected ExchangeRateService $exchangeRateService;
 
     public function __construct(ExchangeRateService $exchangeRateService)

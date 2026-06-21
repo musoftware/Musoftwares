@@ -3,10 +3,13 @@
 namespace Modules\Booking\app\Features\WhiteLabel\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WhiteLabelSetting extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking_white_label_settings';
 
     protected $fillable = [

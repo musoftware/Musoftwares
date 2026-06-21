@@ -24,6 +24,7 @@ return new class extends Migration
             $table->timestamp('expires_at')->nullable();
             $table->timestamp('cancelled_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['user_id', 'tool_id']);
         });
@@ -40,6 +41,7 @@ return new class extends Migration
             $table->timestamp('expires_at')->nullable();
             $table->timestamp('last_validated_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['user_id', 'tool_id']);
         });

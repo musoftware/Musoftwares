@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('title');
             $table->longText('content_text');
             $table->timestamps();
+            $table->softDeletes();
             
             // Full text index for simple searching if Meilisearch is not available
             // $table->fullText(['title', 'content_text']);

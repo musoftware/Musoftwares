@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('body');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
 
             // Use soft deletes if needed later, but standard architecture often skips it for config tables
             // $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');

@@ -28,6 +28,7 @@ return new class extends Migration
             $table->foreign('currency_id')->references('id')->on('erp_currencies');
             
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

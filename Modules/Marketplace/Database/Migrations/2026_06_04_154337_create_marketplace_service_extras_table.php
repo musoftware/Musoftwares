@@ -15,6 +15,7 @@ return new class extends Migration
             $table->decimal('price', 20, 8);
             $table->integer('duration_days')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

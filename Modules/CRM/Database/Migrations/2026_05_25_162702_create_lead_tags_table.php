@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('color')->default('#3b82f6'); // Default to blue
             $table->timestamps();
+            $table->softDeletes();
             
             $table->unique(['user_id', 'name']);
         });

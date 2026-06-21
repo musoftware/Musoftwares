@@ -24,6 +24,7 @@ return new class extends Migration
             $table->timestamp('last_scanned_at')->nullable();
             $table->json('settings')->nullable(); // Size, color, logo, etc.
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['user_id', 'status']);
             $table->index('type');

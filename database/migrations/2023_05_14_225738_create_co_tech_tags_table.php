@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('tag_description')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

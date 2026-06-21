@@ -5,8 +5,12 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class RecurringEntry extends TenantModel
 {
+    use SoftDeletes;
+
     protected $table = 'erp_recurring_entries';
 
     protected $fillable = [

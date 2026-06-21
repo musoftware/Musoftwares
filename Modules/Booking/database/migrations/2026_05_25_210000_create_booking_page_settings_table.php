@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('logo_path')->nullable();
             $table->boolean('is_active')->default(false);
             $table->timestamps();
+            $table->softDeletes();
 
             // Typically: $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
         });

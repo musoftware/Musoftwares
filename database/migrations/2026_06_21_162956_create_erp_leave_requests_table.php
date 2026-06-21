@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->text('admin_response')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

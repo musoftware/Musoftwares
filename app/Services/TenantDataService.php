@@ -13,8 +13,9 @@ use Carbon\Carbon;
  * ERP, CRM, and other modules are accessed via class_exists() guards
  * to maintain module-level isolation — no hard imports from module namespaces.
  */
-class TenantDataService
+class TenantDataService extends BaseService
 {
+
     /**
      * Export all data belonging to a tenant as a structured array.
      */

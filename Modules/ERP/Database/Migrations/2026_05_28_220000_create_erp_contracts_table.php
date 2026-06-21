@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('currency_id')->nullable();
             $table->string('status')->default('Draft');
             $table->timestamps();
+            $table->softDeletes();
             
             $table->foreign('tenant_id')->references('id')->on('erp_tenants')->onDelete('cascade');
             $table->foreign('client_id')->references('id')->on('erp_tenant_clients')->onDelete('cascade');

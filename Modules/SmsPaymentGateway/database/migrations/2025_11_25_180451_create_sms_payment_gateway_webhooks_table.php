@@ -22,6 +22,7 @@ return new class extends Migration
             $table->integer('failure_count')->default(0);
             $table->timestamp('last_triggered_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index('user_id');
             $table->index('is_active');

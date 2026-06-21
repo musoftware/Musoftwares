@@ -13,8 +13,9 @@ use Illuminate\Support\Facades\DB;
  * Recovered from old project: App\Helpers\BalancesHelper
  * Modernized: Service-oriented, legacy-based (user-field-based).
  */
-class BalanceService
+class BalanceService extends BaseService
 {
+
     protected ExchangeRateService $exchangeRateService;
 
     public function __construct(ExchangeRateService $exchangeRateService)
@@ -155,7 +156,7 @@ class BalanceService
     {
         $payoutMethod = $user->payoutMethods()->where('id', $payoutMethodId)->firstOrFail();
 
-        DB::transaction(function () use ($user, $amount, $payoutMethod) {
+        $this->executeInTransaction(function () use ($user, $amount, $payoutMethod) {
             $user->add_balance(-1 * $amount, 'Withdrawal request via ' . ucwords(str_replace('_', ' ', $payoutMethod->type)), 'used');
 
             $withdrawal = new UserReferralRequestWithdraw();

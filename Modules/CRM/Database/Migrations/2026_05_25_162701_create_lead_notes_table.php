@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('note');
             $table->boolean('is_pinned')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -38,6 +38,7 @@ return new class extends Migration
 
             $table->timestamp('fetched_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['tenant_id', 'market_key', 'fetched_at']);
             $table->index(['tenant_id', 'market_key', 'interval']);

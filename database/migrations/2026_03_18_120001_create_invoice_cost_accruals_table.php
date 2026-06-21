@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreign('user_referral_request_withdraw_id', 'ica_withdraw_fk')
                 ->references('id')->on('user_referral_request_withdraws')->nullOnDelete();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['user_id', 'status']);
         });

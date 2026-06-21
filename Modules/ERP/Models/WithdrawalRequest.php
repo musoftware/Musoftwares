@@ -5,8 +5,12 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Scout\Searchable;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class WithdrawalRequest extends TenantModel
 {
+    use SoftDeletes;
+
     use Searchable;
     protected $table = 'erp_withdrawal_requests';
 

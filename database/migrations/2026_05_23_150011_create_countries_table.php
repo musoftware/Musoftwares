@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('code')->nullable(); // Optional ISO code
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

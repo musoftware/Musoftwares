@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('payment_frequency')->default('monthly'); // monthly, weekly, bi-weekly
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
             
             // A member can only have one active contract
             $table->unique(['tenant_id', 'member_id']);
@@ -40,6 +41,7 @@ return new class extends Migration
             $table->enum('status', ['draft', 'paid', 'cancelled'])->default('draft');
             $table->date('paid_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             // Prevent duplicate payslips for the same month/year per member
             $table->unique(['tenant_id', 'member_id', 'month', 'year']);
@@ -52,6 +54,7 @@ return new class extends Migration
             $table->decimal('amount', 15, 2);
             $table->string('description');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

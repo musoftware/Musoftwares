@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('used_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('used_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

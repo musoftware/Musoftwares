@@ -4,8 +4,12 @@ namespace Modules\ERP\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class ReferralEarning extends TenantModel
 {
+    use SoftDeletes;
+
     protected $table = 'erp_client_referral_earnings';
 
     protected $fillable = [

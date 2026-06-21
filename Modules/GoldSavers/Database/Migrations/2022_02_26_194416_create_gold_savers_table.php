@@ -30,6 +30,7 @@ class CreateGoldSaversTable extends Migration
             $table->dateTime('bought_date');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

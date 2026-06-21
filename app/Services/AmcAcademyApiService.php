@@ -5,8 +5,9 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class AmcAcademyApiService
+class AmcAcademyApiService extends BaseService
 {
+
     /**
      * The base URL for AmcAcademy API.
      */

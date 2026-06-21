@@ -5,8 +5,9 @@ namespace App\Services;
 use App\Models\UserCredential;
 use Illuminate\Support\Facades\Auth;
 
-class UserNoteService
+class UserNoteService extends BaseService
 {
+
     public function createNote(int $userId, array $data): UserCredential
     {
         return UserCredential::create([

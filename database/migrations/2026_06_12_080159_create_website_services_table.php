@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('description_ar')->nullable();
             $table->string('image_path')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

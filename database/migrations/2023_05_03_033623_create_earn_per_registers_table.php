@@ -36,6 +36,7 @@ return new class extends Migration
             $table->foreign('earning_id')->references('id')->on('earnings');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

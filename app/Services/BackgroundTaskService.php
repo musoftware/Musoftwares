@@ -5,8 +5,9 @@ namespace App\Services;
 use App\Models\BackgroundTask;
 use Illuminate\Support\Facades\Log;
 
-class BackgroundTaskService
+class BackgroundTaskService extends BaseService
 {
+
     /**
      * Dispatch a queued background task and record it in the database.
      *

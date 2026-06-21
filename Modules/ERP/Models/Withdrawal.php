@@ -5,8 +5,12 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\ERP\Models\TenantClient;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Withdrawal extends TenantModel
 {
+    use SoftDeletes;
+
     protected $table = 'erp_withdrawals';
 
     protected $fillable = [

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('total_received', 15, 2)->default(0.00);
             $table->decimal('total_spent', 15, 2)->default(0.00);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unique('user_id');

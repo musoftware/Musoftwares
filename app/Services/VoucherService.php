@@ -10,8 +10,9 @@ use App\Models\CurrenciesExchange;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class VoucherService
+class VoucherService extends BaseService
 {
+
     /**
      * Check and apply vouchers when user makes a transaction
      */

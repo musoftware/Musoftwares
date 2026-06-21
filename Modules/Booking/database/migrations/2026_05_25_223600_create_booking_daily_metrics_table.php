@@ -22,6 +22,7 @@ return new class extends Migration
                 
                 $table->unique(['tenant_id', 'date', 'currency_id']);
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
     }

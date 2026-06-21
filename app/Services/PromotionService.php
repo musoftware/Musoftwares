@@ -6,8 +6,9 @@ use App\Models\Coupon;
 use App\Models\Voucher;
 use Illuminate\Support\Str;
 
-class PromotionService
+class PromotionService extends BaseService
 {
+
     public function createCoupon(array $data): Coupon
     {
         $code = $data['code'] ?? null;

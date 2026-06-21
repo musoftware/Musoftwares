@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('booking_public_page_themes', function (Blueprint $table) {
@@ -30,6 +31,7 @@ return new class extends Migration
             $table->string('cover_image_url')->nullable();
             $table->string('font_family')->default('Inter');
             $table->timestamps();
+            $table->softDeletes();
             
             $table->foreign('page_id')->references('id')->on('booking_public_pages')->onDelete('cascade');
         });
@@ -50,6 +52,7 @@ return new class extends Migration
             $table->string('source_ip')->nullable();
             $table->string('status')->default('initiated'); // initiated, completed, failed
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

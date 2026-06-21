@@ -18,8 +18,9 @@ use App\Models\CurrenciesExchange;
 use App\Models\InvoiceItemTimer;
 use Carbon\Carbon;
 
-class DashboardService
+class DashboardService extends BaseService
 {
+
     public function getCoreMetrics(): array
     {
         return \Illuminate\Support\Facades\Cache::remember('admin_core_metrics', 300, function () {

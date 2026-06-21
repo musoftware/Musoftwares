@@ -26,6 +26,7 @@ return new class extends Migration
             $table->text('error_log')->nullable();
             
             $table->timestamps();
+            $table->softDeletes();
 
             // Foreign keys can be added, assuming bookings table exists
             // $table->foreign('booking_id')->references('id')->on('bookings')->onDelete('cascade');

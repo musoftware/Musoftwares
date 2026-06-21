@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('download_link');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

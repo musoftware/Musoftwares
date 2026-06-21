@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('custom_css')->nullable();
             $table->boolean('is_active')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // 2. booking_white_label_assets
@@ -32,6 +33,7 @@ return new class extends Migration
             $table->string('disk')->default('s3');
             $table->string('url')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // 3. booking_white_label_domains
@@ -43,6 +45,7 @@ return new class extends Migration
             $table->string('txt_record')->nullable();
             $table->string('ssl_status')->default('pending');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // 4. booking_white_label_themes
@@ -53,6 +56,7 @@ return new class extends Migration
             $table->boolean('is_default')->default(false);
             $table->json('settings_json')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // 5. booking_white_label_templates
@@ -63,6 +67,7 @@ return new class extends Migration
             $table->text('body');
             $table->string('subject')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

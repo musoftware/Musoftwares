@@ -2,11 +2,14 @@
 
 namespace App\Services\Tools;
 
+use App\Services\BaseService;
+
 use Modules\Tools\Models\ToolReseller;
 use Modules\Tools\Models\ToolResellerUser;
 
-class AdminResellerService
+class AdminResellerService extends BaseService
 {
+
     public function createReseller(array $data): void
     {
         if (ToolReseller::where('user_id', $data['user_id'])->exists()) {

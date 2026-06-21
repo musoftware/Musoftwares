@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('status')->default('pending'); // pending, sent, failed
             $table->text('error_message')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('reservation_id')->references('id')->on('booking_reservations')->onDelete('cascade');
         });

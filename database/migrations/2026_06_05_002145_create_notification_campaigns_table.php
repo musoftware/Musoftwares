@@ -21,6 +21,7 @@ return new class extends Migration
                 $table->unsignedInteger('clicks_count')->default(0);
                 $table->string('status')->default('sent');
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
     }

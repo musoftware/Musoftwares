@@ -2,12 +2,15 @@
 
 namespace App\Services\Integrations;
 
+use App\Services\BaseService;
+
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class GoogleCalendarService
+class GoogleCalendarService extends BaseService
 {
+
     /**
      * Create an event in the user's Google Calendar.
      * 

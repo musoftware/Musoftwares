@@ -27,6 +27,7 @@ class CreateUserReferralsTable extends Migration
             $table->integer('registered')->default(0);
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

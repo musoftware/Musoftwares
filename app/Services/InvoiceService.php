@@ -7,15 +7,16 @@ use App\Models\InvoiceItem;
 use App\Models\InvoiceCostLine;
 use Illuminate\Support\Facades\DB;
 
-class InvoiceService
+class InvoiceService extends BaseService
 {
+
     public function updateInvoice(Invoice $invoice, array $data): void
     {
         if ($invoice->status !== 'unpaid') {
             throw new \Exception('Cannot edit items on a paid/cancelled invoice.');
         }
 
-        DB::transaction(function () use ($invoice, $data) {
+        $this->executeInTransaction(function () use ($invoice, $data) {
             if (isset($data['discount'])) {
                 $invoice->update(['discount' => $data['discount']]);
             }

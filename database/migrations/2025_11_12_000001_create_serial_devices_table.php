@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('device_id');
             $table->string('status')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['serial_software_id', 'device_id']);
         });

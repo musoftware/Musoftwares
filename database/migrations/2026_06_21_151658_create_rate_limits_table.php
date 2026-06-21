@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('decay_minutes');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['module', 'tenant_id']);
             $table->index(['module', 'ip_address']);

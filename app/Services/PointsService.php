@@ -7,8 +7,9 @@ use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
-class PointsService
+class PointsService extends BaseService
 {
+
     /**
      * Get available points balance for the user.
      */
@@ -26,7 +27,7 @@ class PointsService
             throw new Exception("Insufficient points balance.");
         }
 
-        DB::transaction(function () use ($user, $amount, $reasonType, $description) {
+        $this->executeInTransaction(function () use ($user, $amount, $reasonType, $description) {
             $user->points_balance -= $amount;
             $user->save();
 
@@ -45,7 +46,7 @@ class PointsService
      */
     public function credit(User $user, float $amount, string $reasonType, string $description): void
     {
-        DB::transaction(function () use ($user, $amount, $reasonType, $description) {
+        $this->executeInTransaction(function () use ($user, $amount, $reasonType, $description) {
             $user->points_balance += $amount;
             $user->save();
 

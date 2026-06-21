@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('type'); // asset, liability, equity, revenue, expense
             $table->string('code')->unique()->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('journal_entries', function (Blueprint $table) {
@@ -22,6 +23,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->date('entry_date');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('journal_entry_lines', function (Blueprint $table) {
@@ -31,6 +33,7 @@ return new class extends Migration
             $table->decimal('debit', 15, 2)->default(0);
             $table->decimal('credit', 15, 2)->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('wallets', function (Blueprint $table) {
@@ -39,6 +42,7 @@ return new class extends Migration
             $table->decimal('balance', 15, 2)->default(0);
             $table->foreignId('currency_id')->constrained();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('wallet_transactions', function (Blueprint $table) {
@@ -52,6 +56,7 @@ return new class extends Migration
             $table->string('type'); // credit or debit
             $table->text('description')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('audit_logs', function (Blueprint $table) {
@@ -64,6 +69,7 @@ return new class extends Migration
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('impersonation_logs', function (Blueprint $table) {
@@ -74,6 +80,7 @@ return new class extends Migration
             $table->timestamp('started_at');
             $table->timestamp('ended_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

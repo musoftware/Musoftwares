@@ -49,6 +49,7 @@ return new class extends Migration
             $table->text('webhook_response')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['client_id', 'status']);
             $table->index('external_order_id');

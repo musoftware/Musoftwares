@@ -80,7 +80,7 @@
     {
         "id": "A4",
         "name": "Implement Soft Deletes",
-        "status": "done",
+        "status": "running",
         "dependencies": []
     },
     {

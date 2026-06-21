@@ -25,6 +25,7 @@ return new class extends Migration
             $table->date('current_date');
             $table->integer('transactions_count')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

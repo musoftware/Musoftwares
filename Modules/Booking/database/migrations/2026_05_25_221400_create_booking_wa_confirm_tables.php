@@ -19,6 +19,7 @@ return new class extends Migration
                 $table->boolean('is_active')->default(true);
                 
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
 
@@ -36,6 +37,7 @@ return new class extends Migration
                 $table->timestamp('responded_at')->nullable();
                 
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
 
@@ -53,6 +55,7 @@ return new class extends Migration
                 $table->timestamp('used_at')->nullable();
                 
                 $table->timestamps();
+            $table->softDeletes();
 
                 $table->foreign('confirmation_id')->references('id')->on('booking_wa_confirmations')->onDelete('cascade');
             });
@@ -68,6 +71,7 @@ return new class extends Migration
                 $table->json('payload')->nullable();
                 
                 $table->timestamps();
+            $table->softDeletes();
 
                 $table->foreign('confirmation_id')->references('id')->on('booking_wa_confirmations')->onDelete('cascade');
             });

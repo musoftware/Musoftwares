@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('sender_id')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('booking_sms_templates', function (Blueprint $table) {
@@ -28,6 +29,7 @@ return new class extends Migration
             $table->text('content'); // Contains {{customer_name}}, {{booking_time}}
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('booking_sms_logs', function (Blueprint $table) {
@@ -40,6 +42,7 @@ return new class extends Migration
             $table->enum('status', ['queued', 'sent', 'delivered', 'failed'])->default('queued');
             $table->text('error_message')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

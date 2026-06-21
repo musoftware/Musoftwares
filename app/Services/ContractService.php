@@ -4,8 +4,9 @@ namespace App\Services;
 
 use App\Models\Contract;
 
-class ContractService
-{    public function createContract(array $data): Contract
+class ContractService extends BaseService
+{
+    public function createContract(array $data): Contract
     {
         $data['content'] = [
             'lang' => $data['lang'] ?? 'ar'

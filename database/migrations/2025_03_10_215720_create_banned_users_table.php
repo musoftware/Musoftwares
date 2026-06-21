@@ -17,6 +17,7 @@ return new class extends Migration
             $table->timestamp('banned_until')->nullable();
             $table->string('reason');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

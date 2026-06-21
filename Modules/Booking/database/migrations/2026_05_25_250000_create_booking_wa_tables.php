@@ -19,6 +19,7 @@ return new class extends Migration
                 $table->text('content');
                 $table->boolean('is_active')->default(true);
                 $table->timestamps();
+            $table->softDeletes();
                 
                 // A tenant can only have one active template per type
                 $table->unique(['tenant_id', 'type']);
@@ -34,6 +35,7 @@ return new class extends Migration
                 $table->timestamp('scheduled_at')->index(); // When it should be sent
                 $table->enum('status', ['pending', 'sent', 'failed', 'cancelled'])->default('pending')->index();
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
 
@@ -48,6 +50,7 @@ return new class extends Migration
                 $table->enum('delivery_status', ['pending', 'sent', 'delivered', 'read', 'failed'])->default('pending');
                 $table->text('error_reason')->nullable();
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
     }

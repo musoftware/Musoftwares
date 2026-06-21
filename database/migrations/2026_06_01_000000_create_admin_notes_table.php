@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('risk_level')->default('none');
             $table->boolean('is_pinned')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

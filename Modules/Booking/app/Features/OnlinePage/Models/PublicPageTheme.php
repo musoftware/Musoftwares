@@ -3,9 +3,12 @@
 namespace Modules\Booking\app\Features\OnlinePage\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PublicPageTheme extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking_public_page_themes';
 
     protected $fillable = [

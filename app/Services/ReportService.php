@@ -4,8 +4,9 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 
-class ReportService
+class ReportService extends BaseService
 {
+
     public function getPnlReport(string $from, string $to): array
     {
         // ── Income Breakdown ─────────────────────────────────────

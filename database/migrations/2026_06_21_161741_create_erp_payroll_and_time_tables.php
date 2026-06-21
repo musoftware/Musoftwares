@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('erp_payroll_and_time_tables', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
