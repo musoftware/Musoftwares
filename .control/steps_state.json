@@ -80,13 +80,13 @@
     {
         "id": "A4",
         "name": "Implement Soft Deletes",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "A5",
         "name": "Setup Spatie Permissions",
-        "status": "done",
+        "status": "running",
         "dependencies": []
     },
     {
