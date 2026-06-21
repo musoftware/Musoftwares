@@ -1,0 +1,40 @@
+[
+    {
+        "id": "US_COL_01",
+        "name": "US-COL-01: Overdue Account Monitoring",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "US_COL_02",
+        "name": "US-COL-02: Client Outreach & Logging",
+        "status": "running",
+        "dependencies": [
+            "US_COL_01"
+        ]
+    },
+    {
+        "id": "US_COL_03",
+        "name": "US-COL-03: Payment Plan Structuring",
+        "status": "pending",
+        "dependencies": [
+            "US_COL_02"
+        ]
+    },
+    {
+        "id": "US_COL_04",
+        "name": "US-COL-04: Account Status Management",
+        "status": "pending",
+        "dependencies": [
+            "US_COL_03"
+        ]
+    },
+    {
+        "id": "US_COL_05",
+        "name": "US-COL-05: Automated Reminder Initiation",
+        "status": "pending",
+        "dependencies": [
+            "US_COL_04"
+        ]
+    }
+]

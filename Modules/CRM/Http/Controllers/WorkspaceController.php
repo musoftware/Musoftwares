@@ -117,24 +117,71 @@ class WorkspaceController extends Controller
 
         $tenantId = session('tenant_id') ?? $request->user()->tenant_id;
 
-        $totalAdded = DB::table('leads')
-            ->where('tenant_id', $tenantId)
-            ->whereDate('created_at', today())
-            ->count();
-
-        $recentImports = DB::table('leads')
-            ->where('tenant_id', $tenantId)
-            ->where('source', 'CSV Import')
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
+        $overdueInvoices = \Modules\ERP\Models\Invoice::where('tenant_id', $tenantId)
+            ->overdue()
+            ->with(['client:id,name,email,phone', 'currency:id,symbol,currency'])
+            ->orderBy('due_date', 'asc')
             ->get();
+
+        $totalOverdueAmount = 0;
+        $agingReport = [
+            '0_30' => 0,
+            '31_60' => 0,
+            '61_90' => 0,
+            '90_plus' => 0,
+        ];
+
+        $now = now()->startOfDay();
+        $clientBalances = [];
+
+        foreach ($overdueInvoices as $invoice) {
+            $dueAmount = max(0, $invoice->amount - $invoice->paid_amount);
+            $totalOverdueAmount += $dueAmount;
+            
+            $daysOverdue = $now->diffInDays($invoice->due_date, true);
+
+            if ($daysOverdue <= 30) {
+                $agingReport['0_30'] += $dueAmount;
+            } elseif ($daysOverdue <= 60) {
+                $agingReport['31_60'] += $dueAmount;
+            } elseif ($daysOverdue <= 90) {
+                $agingReport['61_90'] += $dueAmount;
+            } else {
+                $agingReport['90_plus'] += $dueAmount;
+            }
+
+            if (!isset($clientBalances[$invoice->client_id])) {
+                $clientBalances[$invoice->client_id] = [
+                    'client' => $invoice->client ?: ['name' => 'Unknown Client', 'email' => '', 'phone' => ''],
+                    'total_overdue' => 0,
+                    'invoices_count' => 0,
+                    'oldest_due_date' => clone $invoice->due_date,
+                    'currency' => $invoice->currency, // Assume tenant base currency for simplicity or invoice currency
+                ];
+            }
+
+            $clientBalances[$invoice->client_id]['total_overdue'] += $dueAmount;
+            $clientBalances[$invoice->client_id]['invoices_count']++;
+            if ($invoice->due_date->isBefore($clientBalances[$invoice->client_id]['oldest_due_date'])) {
+                $clientBalances[$invoice->client_id]['oldest_due_date'] = clone $invoice->due_date;
+            }
+        }
+
+        // Sort clients by highest overdue balance
+        usort($clientBalances, function ($a, $b) {
+            return $b['total_overdue'] <=> $a['total_overdue'];
+        });
+
+        $highRiskAccounts = array_slice($clientBalances, 0, 10);
 
         return Inertia::render('CRM/Workspaces/CollectorDashboard', [
             'stats' => [
-                'total_added' => $totalAdded,
-                'duplicates_prevented' => 0,
+                'total_overdue_amount' => $totalOverdueAmount,
+                'total_overdue_invoices' => count($overdueInvoices),
             ],
-            'recentImports' => $recentImports
+            'agingReport' => $agingReport,
+            'highRiskAccounts' => $highRiskAccounts,
+            'overdueInvoices' => $overdueInvoices->take(20)->values(),
         ]);
     }
 
@@ -219,7 +266,8 @@ class WorkspaceController extends Controller
                     'role' => $agent->role,
                     'calls_made' => $kpis->callsMade,
                     'conversion_rate' => $kpis->conversionRate,
-                    'leads_closed' => $kpis->leadsClosed
+                    'leads_closed' => $kpis->leadsClosed,
+                    'tasks_completed' => $kpis->tasksCompleted
                 ];
             }
 
@@ -230,18 +278,70 @@ class WorkspaceController extends Controller
                 }
                 return $b['conversion_rate'] <=> $a['conversion_rate'];
             });
+
+            // Calculate overall branch KPIs
+            $branchLeadsClosed = DB::table('leads')
+                ->where('workspace_id', $workspaceId)
+                ->where('pipeline_stage', 'WON')
+                ->whereBetween('updated_at', [$startDate, $endDate])
+                ->count();
+
+            $branchTotalAssigned = DB::table('leads')
+                ->where('workspace_id', $workspaceId)
+                ->whereBetween('reassigned_at', [$startDate, $endDate])
+                ->count();
+
+            $branchConversionRate = $branchTotalAssigned > 0 ? round(($branchLeadsClosed / $branchTotalAssigned) * 100, 2) : 0;
+
+            $branchTasksCompleted = DB::table('crm_activities')
+                ->where('workspace_id', $workspaceId)
+                ->where('event', 'task_completed')
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->count();
+        } else {
+            $branchConversionRate = 0;
+            $branchTasksCompleted = 0;
         }
+
+        $tenantId = session('tenant_id') ?? $request->user()->tenant_id;
+
+        $projects = \Modules\ERP\Models\Project::where('tenant_id', $tenantId)
+            ->whereNotIn('status', ['Completed', 'Cancelled'])
+            ->select('id', 'name', 'status', 'due_date', 'budget', 'currency_id')
+            ->with('currency:id,symbol')
+            ->orderBy('due_date', 'asc')
+            ->limit(5)
+            ->get();
+
+        $campaigns = \Modules\CRM\Models\Campaign::where('workspace_id', $workspaceId)
+            ->whereIn('status', ['ACTIVE', 'scheduled', 'sending'])
+            ->select('id', 'name', 'status', 'sent_count', 'total_recipients', 'scheduled_at')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get()
+            ->map(function ($campaign) {
+                return [
+                    'id' => $campaign->id,
+                    'name' => $campaign->name,
+                    'status' => $campaign->status,
+                    'progress' => $campaign->total_recipients > 0 ? round(($campaign->sent_count / $campaign->total_recipients) * 100) : 0,
+                    'scheduled_at' => $campaign->scheduled_at,
+                ];
+            });
 
         return Inertia::render('CRM/Workspaces/ManagerDashboard', [
             'branchKpis' => [
-                'conversion_rate' => '12.5%', 
-                'active_agents' => $activeAgents
+                'conversion_rate' => $branchConversionRate . '%', 
+                'active_agents' => $activeAgents,
+                'tasks_completed' => $branchTasksCompleted
             ],
             'slaAlerts' => [
                 'total' => $slaBreaches,
                 'leads' => $staleLeads
             ],
-            'leaderboard' => array_slice($leaderboard, 0, 10)
+            'leaderboard' => array_slice($leaderboard, 0, 10),
+            'projects' => $projects,
+            'campaigns' => $campaigns
         ]);
     }
 
@@ -249,8 +349,7 @@ class WorkspaceController extends Controller
     {
         $workspaceId = session('crm_workspace_id');
 
-        $activeCampaigns = DB::table('crm_campaigns')
-            ->where('workspace_id', $workspaceId)
+        $activeCampaigns = \Modules\CRM\Models\Campaign::where('workspace_id', $workspaceId)
             ->where('status', 'ACTIVE')
             ->count();
 
@@ -259,8 +358,7 @@ class WorkspaceController extends Controller
             ->whereDate('created_at', now()->toDateString())
             ->count();
 
-        $topCampaigns = DB::table('crm_campaigns')
-            ->where('workspace_id', $workspaceId)
+        $topCampaigns = \Modules\CRM\Models\Campaign::where('workspace_id', $workspaceId)
             ->whereIn('status', ['ACTIVE', 'sending'])
             ->select('id', 'name', 'status', 'sent_count', 'total_recipients')
             ->orderBy('created_at', 'desc')

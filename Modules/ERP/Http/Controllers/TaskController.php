@@ -86,6 +86,7 @@ class TaskController extends Controller
             'client',
             'project',
             'creator',
+            'comments' => fn($q) => $q->orderBy('created_at', 'asc')->with('commenter'),
             'items' => fn($q) => $q->whereNull('parent_id')
                 ->with(['children' => fn($q) => $q->orderBy('sort_index')->orderBy('id')])
                 ->orderBy('completed')
@@ -96,6 +97,7 @@ class TaskController extends Controller
         return Inertia::render('ERP/Tasks/Show', [
             'task'  => TaskResource::make($task)->resolve(),
             'todos' => TodoItemResource::collection($task->items)->resolve(),
+            'comments' => $task->comments,
             'completion' => $task->completionPercentage(),
             'currencies' => \App\Models\Currency::all(),
         ]);
@@ -290,6 +292,44 @@ class TaskController extends Controller
                 'message' => $e->getMessage(),
             ], 403);
         }
+    }
+
+    // ── Comments ──────────────────────────────────────────────────
+
+    public function storeComment(Request $request, ERPTask $task)
+    {
+        $this->authorize('update', $task);
+
+        $validated = $request->validate([
+            'comment' => 'required|string',
+        ]);
+
+        $user = Auth::guard('erp_team')->user() ?? Auth::user();
+
+        $task->comments()->create([
+            'commenter_id'   => $user->id,
+            'commenter_type' => get_class($user),
+            'comment'        => $validated['comment'],
+            'approved'       => true,
+        ]);
+
+        return back()->with('success', __('general.comment_added'));
+    }
+
+    public function destroyComment(ERPTask $task, \App\Models\Comment $comment)
+    {
+        $this->authorize('update', $task);
+
+        $user = Auth::guard('erp_team')->user() ?? Auth::user();
+        
+        // Ensure user can only delete their own comments or admins can delete any
+        if ($comment->commenter_id !== $user->id && !($user instanceof \App\Models\User)) {
+            abort(403);
+        }
+
+        $comment->delete();
+
+        return back()->with('success', __('general.comment_deleted'));
     }
 
 

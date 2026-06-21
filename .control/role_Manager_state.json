@@ -1,0 +1,38 @@
+[
+    {
+        "id": "ManagerRole",
+        "name": "Manager Role Implementation Steps",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "US_MGR_01",
+        "name": "US-MGR-01: Team Oversight & Performance Dashboard",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "US_MGR_02",
+        "name": "US-MGR-02: Task & Lead Assignment Controls",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "US_MGR_03",
+        "name": "US-MGR-03: Team Request Approval Workflows",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "US_MGR_04",
+        "name": "US-MGR-04: Project & Campaign Oversight",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "US_MGR_05",
+        "name": "US-MGR-05: Data Export & Department Reporting",
+        "status": "done",
+        "dependencies": []
+    }
+]

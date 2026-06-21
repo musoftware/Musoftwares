@@ -66,6 +66,11 @@ class ERPTask extends TenantModel
         return $this->belongsTo(TeamMember::class, 'assigned_team_member_id');
     }
 
+    public function comments()
+    {
+        return $this->morphMany(\App\Models\Comment::class, 'commentable');
+    }
+
     // ── Business Logic ───────────────────────────────────────────────
 
     /**

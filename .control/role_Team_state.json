@@ -20,25 +20,25 @@
     {
         "id": "Step3",
         "name": "Step 3: US-TM-03 Time Tracking & Payroll Visibility",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Step4",
         "name": "Step 4: US-TM-04 Internal Communication & Collaboration",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Step5",
         "name": "Step 5: US-TM-05 Restricted Access & Role Permissions",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "End",
         "name": "Team Member Role Complete",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     }
 ]

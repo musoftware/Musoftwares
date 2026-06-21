@@ -92,6 +92,10 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', 
         Route::delete('/customers/{customer}', [\Modules\CRM\Http\Controllers\CustomerController::class, 'destroy'])->name('customers.destroy');
         Route::post('/customers/{customer}/notes', [\Modules\CRM\Http\Controllers\CustomerController::class, 'addNote'])->name('customers.notes.store');
 
+        // ── Reports
+        Route::get('/reports', [\Modules\CRM\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+        Route::post('/reports/export', [\Modules\CRM\Http\Controllers\ReportController::class, 'export'])->name('reports.export');
+
         // ── Pipelines
         Route::resource('pipelines', \Modules\CRM\Http\Controllers\PipelineController::class);
 });

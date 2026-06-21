@@ -5912,4 +5912,9 @@ return [
     'sync_exchange_rates_now' => 'Sync Exchange Rates Now',
     'exchange_rates_synced_successfully' => 'Exchange rates synchronized successfully.',
     'failed_to_sync_exchange_rates' => 'Failed to sync exchange rates',
+    'member' => 'Member',
+    'action' => 'Action',
+    'approve' => 'Approve',
+    'reject' => 'Reject',
+    'optional_for_approval' => 'Optional for approval',
 ];

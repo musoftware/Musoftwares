@@ -2,7 +2,7 @@ import React from 'react';
 import { __ } from '@/lib/i18n';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
-import { Trophy, PhoneCall, Target, CheckCircle2 } from 'lucide-react';
+import { Trophy, PhoneCall, Target, CheckCircle2, CheckSquare } from 'lucide-react';
 import { Badge } from '@/Components/ui/badge';
 
 interface LeaderboardAgent {
@@ -12,6 +12,7 @@ interface LeaderboardAgent {
     calls_made: number;
     conversion_rate: number;
     leads_closed: number;
+    tasks_completed: number;
 }
 
 export default function LeaderboardTable({ leaderboard = [] }: { leaderboard: LeaderboardAgent[] }) {
@@ -39,6 +40,7 @@ export default function LeaderboardTable({ leaderboard = [] }: { leaderboard: Le
                         <TableHead className="w-12 text-center">#</TableHead>
                         <TableHead>{__('general.agent')}</TableHead>
                         <TableHead className="text-center">{__('general.calls')}</TableHead>
+                        <TableHead className="text-center">{__('general.tasks')}</TableHead>
                         <TableHead className="text-center">{__('general.closed')}</TableHead>
                         <TableHead className="text-right">{__('general.conversion')}</TableHead>
                     </TableRow>

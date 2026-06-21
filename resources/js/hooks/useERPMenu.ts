@@ -102,11 +102,41 @@ export function useERPMenu(
         { id: 'erp-smtp', label: 'Custom SMTP', icon: Settings, description: 'Send emails (invoices, receipts, etc) to clients from your own domain and custom email address.', features: ['Custom Sender Identity', 'White-labeled Emails', 'Increased Deliverability'] },
     ];
 
-    // Team members don't see team, settings, or backup
     const filtered = allItems.filter((item) => {
-        if (isTeamMember && (item.id === 'team' || item.id === 'settings' || item.id === 'backup')) {
-            return false;
+        if (isTeamMember) {
+            const role = auth.team_member.role;
+            const isAdmin = role === 'admin' || role === 'manager';
+            
+            if (!isAdmin) {
+                // Settings & Backup
+                if ((item.id === 'settings' || item.id === 'backup') && role !== 'account_manager') {
+                    return false;
+                }
+                // Team Members
+                if (item.id === 'team' && role !== 'account_manager' && role !== 'branch_manager') {
+                    return false;
+                }
+                // Financials
+                const isFinancial = ['invoices', 'transactions', 'expenses', 'referrals'].includes(item.id);
+                if (isFinancial) {
+                    if (!['account_manager', 'sales_manager', 'branch_manager'].includes(role)) {
+                        if (role === 'sales_agent' && item.id === 'invoices') {
+                            // allowed
+                        } else {
+                            return false;
+                        }
+                    }
+                }
+                // Inventory & POS
+                const isInventory = ['inventory', 'pos'].includes(item.id);
+                if (isInventory) {
+                    if (!['branch_manager', 'sales_manager', 'sales_agent', 'account_manager'].includes(role)) {
+                        return false;
+                    }
+                }
+            }
         }
+        
         if (item.id === 'referrals' && !activeAddons.includes('erp-referrals')) {
             return false;
         }

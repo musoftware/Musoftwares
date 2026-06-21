@@ -73,20 +73,69 @@ interface TodoItem {
     created_at: string;
 }
 
+interface CommentItem {
+    id: number;
+    comment: string;
+    created_at: string;
+    commenter: {
+        id: number;
+        first_name: string;
+        last_name: string;
+    } | null;
+}
+
 interface ShowProps {
     task: Task;
     todos: TodoItem[];
+    comments?: CommentItem[];
     completion: number;
     currencies?: Array<{ id: number; currency: string; symbol: string }>;
 }
 
-export default function Show({ task: initialTask, todos: initialTodos, completion: initialCompletion, currencies = [] }: ShowProps) {
+export default function Show({ task: initialTask, todos: initialTodos, comments: initialComments = [], completion: initialCompletion, currencies = [] }: ShowProps) {
     const [task, setTask] = useState<Task>(initialTask);
     const [todos, setTodos] = useState<TodoItem[]>(initialTodos);
     const [completion, setCompletion] = useState<number>(initialCompletion);
     
     // UI states
-    const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
+        const [comments, setComments] = useState<CommentItem[]>(initialComments);
+    const [newComment, setNewComment] = useState('');
+    const [submittingComment, setSubmittingComment] = useState(false);
+
+    const handleCommentSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newComment.trim()) return;
+        
+        setSubmittingComment(true);
+        try {
+            const response = await axios.post(`/erp/tasks/${task.id}/comments`, {
+                comment: newComment
+            });
+            if (response.data.success) {
+                setComments([...comments, response.data.comment]);
+                setNewComment('');
+            }
+        } catch (err: any) {
+            setErrorMessage(err.response?.data?.message || "Failed to post comment.");
+        } finally {
+            setSubmittingComment(false);
+        }
+    };
+
+    const handleDeleteComment = async (commentId: number) => {
+        if (!confirm("Are you sure you want to delete this comment?")) return;
+        
+        try {
+            const response = await axios.delete(`/erp/tasks/${task.id}/comments/${commentId}`);
+            if (response.data.success) {
+                setComments(comments.filter(c => c.id !== commentId));
+            }
+        } catch (err: any) {
+            setErrorMessage(err.response?.data?.message || "Failed to delete comment.");
+        }
+    };
+
+const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
     const [isAddTodoOpen, setIsAddTodoOpen] = useState(false);
     const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null);
     const [submittingTodo, setSubmittingTodo] = useState(false);
@@ -591,6 +640,68 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                         </CardContent>
                     </Card>
                 </div>
+
+                {/* Comments Section */}
+                <Card className="shadow-none border-border bg-card mt-8">
+                    <CardHeader className="p-5 pb-2">
+                        <CardTitle className="text-sm font-bold">Comments & Activity</CardTitle>
+                        <CardDescription className="text-[11px]">Discuss this task and leave updates</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-5 pt-0 space-y-4">
+                        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                            {comments.length === 0 ? (
+                                <div className="text-center text-muted-foreground text-xs italic py-4">No comments yet.</div>
+                            ) : (
+                                comments.map(comment => (
+                                    <div key={comment.id} className="flex gap-3 text-sm">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs flex-shrink-0">
+                                            {comment.commenter?.first_name?.charAt(0) || '?'}{comment.commenter?.last_name?.charAt(0) || ''}
+                                        </div>
+                                        <div className="flex-1 bg-muted/30 border border-border rounded-lg p-3 space-y-1 relative group">
+                                            <div className="flex justify-between items-start">
+                                                <span className="font-semibold text-xs">
+                                                    {comment.commenter?.first_name} {comment.commenter?.last_name}
+                                                </span>
+                                                <span className="text-[10px] text-muted-foreground">
+                                                    {new Date(comment.created_at).toLocaleString()}
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-foreground whitespace-pre-wrap">{comment.comment}</p>
+                                            <button 
+                                                onClick={() => handleDeleteComment(comment.id)}
+                                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-rose-500 hover:text-rose-700 transition-opacity"
+                                                title="Delete comment"
+                                            >
+                                                <Trash2 className="h-3 w-3" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                        <form onSubmit={handleCommentSubmit} className="flex gap-2 pt-2 border-t border-border mt-4">
+                            <Textarea 
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                                placeholder="Write a comment..."
+                                className="min-h-[40px] h-[40px] shadow-none text-xs resize-none flex-1"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleCommentSubmit(e);
+                                    }
+                                }}
+                            />
+                            <Button 
+                                type="submit" 
+                                disabled={submittingComment || !newComment.trim()} 
+                                className="h-[40px] shadow-none px-4"
+                            >
+                                {submittingComment ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send"}
+                            </Button>
+                        </form>
+                    </CardContent>
+                </Card>
             </div>
 
             {/* Edit Task Board Details Dialog Modal */}

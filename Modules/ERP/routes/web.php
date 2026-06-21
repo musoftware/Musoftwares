@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\ERP\Http\Controllers\InvoiceController;
 
-Route::middleware(['web', 'auth:web,erp_team', 'tenant.active'])
+Route::middleware(['web', 'auth:web,erp_team', 'tenant.active', 'erp.team.permissions'])
     ->prefix('erp')
     ->name('erp.')
     ->group(function () {
@@ -49,6 +49,8 @@ Route::middleware(['web', 'auth:web,erp_team', 'tenant.active'])
         Route::post('tasks/{task}/items/{item}/pause', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'pauseItem'])->name('tasks.items.pause');
         Route::post('tasks/{task}/items/{item}/resume', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'resumeItem'])->name('tasks.items.resume');
         Route::delete('tasks/{task}/items/{item}', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'destroyItem'])->name('tasks.items.destroy');
+        Route::post('tasks/{task}/comments', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'storeComment'])->name('tasks.comments.store');
+        Route::delete('tasks/{task}/comments/{comment}', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'destroyComment'])->name('tasks.comments.destroy');
 
         // ── Recurring Entries ──
         Route::resource('recurring', \Modules\ERP\Http\Controllers\RecurringController::class);
@@ -175,6 +177,18 @@ Route::middleware(['web', 'auth:web,erp_team', 'tenant.active'])
             Route::post('clock-in', [\Modules\ERP\Http\Controllers\Team\TeamPortalController::class, 'clockIn'])->name('clock-in');
             Route::post('clock-out', [\Modules\ERP\Http\Controllers\Team\TeamPortalController::class, 'clockOut'])->name('clock-out');
             Route::post('leave-request', [\Modules\ERP\Http\Controllers\Team\TeamPortalController::class, 'requestLeave'])->name('leave-request');
+        });
+
+        // ── Manager Portal ──
+        Route::prefix('manager')->name('manager.')->group(function () {
+            // Approvals
+            Route::get('approvals', [\Modules\ERP\Http\Controllers\Manager\ApprovalController::class, 'index'])->name('approvals.index');
+            Route::get('approvals/leave/{leaveRequest}', [\Modules\ERP\Http\Controllers\Manager\ApprovalController::class, 'showLeave'])->name('approvals.leave.show');
+            Route::post('approvals/leave/{leaveRequest}/approve', [\Modules\ERP\Http\Controllers\Manager\ApprovalController::class, 'approveLeave'])->name('approvals.leave.approve');
+            Route::post('approvals/leave/{leaveRequest}/reject', [\Modules\ERP\Http\Controllers\Manager\ApprovalController::class, 'rejectLeave'])->name('approvals.leave.reject');
+            
+            // Reports & Exports
+            Route::get('reports/export', [\Modules\ERP\Http\Controllers\Manager\ReportController::class, 'export'])->name('reports.export');
         });
     });
 
