@@ -68,13 +68,32 @@ class RenewPlatformSubscriptions extends Command
 
                 // Debit balance
                 try {
-                    DB::transaction(function () use ($user, $price, $plan, $subscription) {
-                        if ((float) $user->available_balance() < $price) {
-                            throw new Exception("Insufficient balance");
+                    $userBalance = (float) $user->available_balance();
+                    if ($userBalance < $price) {
+                        // Calculate prorations if partial balance exists
+                        if ($userBalance > 0 && $price > 0) {
+                            $billingCycle = $subscription->billing_cycle;
+                            $cycleDays = 365;
+                            if ($billingCycle === '3_months') $cycleDays = 90;
+                            elseif ($billingCycle === '6_months') $cycleDays = 180;
+                            elseif ($billingCycle === '1_month' || $billingCycle === 'monthly') $cycleDays = 30;
+                            
+                            $proratedDays = floor(($userBalance / $price) * $cycleDays);
+                            if ($proratedDays >= 1) {
+                                $proratedPrice = ($proratedDays / $cycleDays) * $price;
+                                DB::transaction(function () use ($user, $proratedPrice, $plan, $subscription, $proratedDays) {
+                                    $user->add_balance(-1 * $proratedPrice, 'Prorated Platform Subscription Renewal: ' . $plan->plan_name, 'used');
+                                    $this->renewSubscription($subscription, $plan, $user, $proratedPrice, $proratedDays);
+                                });
+                                $this->info("Subscription ID: {$subscription->id} prorated renewed for {$proratedDays} days via balance debit of {$proratedPrice} USD.");
+                                continue;
+                            }
                         }
-                        
+                        throw new Exception("Insufficient balance for even a 1-day proration.");
+                    }
+
+                    DB::transaction(function () use ($user, $price, $plan, $subscription) {
                         $user->add_balance(-1 * $price, 'Platform Subscription Renewal: ' . $plan->plan_name, 'used');
-                        
                         $this->renewSubscription($subscription, $plan, $user, $price);
                     });
 
@@ -125,7 +144,7 @@ class RenewPlatformSubscriptions extends Command
     /**
      * Helper to extend expires_at based on billing cycle.
      */
-    protected function renewSubscription(PlatformSubscription $subscription, $plan, User $user, float $price): void
+    protected function renewSubscription(PlatformSubscription $subscription, $plan, User $user, float $price, ?int $proratedDays = null): void
     {
         $newExpiresAt = $subscription->expires_at ? Carbon::parse($subscription->expires_at) : Carbon::now();
         
@@ -140,6 +159,10 @@ class RenewPlatformSubscriptions extends Command
             $daysToAdd = 365;
         } elseif ($subscription->billing_cycle === '3_years') {
             $daysToAdd = 365 * 3;
+        }
+
+        if ($proratedDays !== null) {
+            $daysToAdd = $proratedDays;
         }
 
         $newExpiresAt->addDays((int) $daysToAdd);

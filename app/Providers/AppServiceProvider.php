@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\LaravelModulesServiceProvider;
@@ -46,6 +49,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
+        $this->configureRateLimiting();
+
         if (class_exists(\Modules\CRM\Models\Lead::class) && class_exists(\Modules\CRM\Observers\LeadObserver::class)) {
             \Modules\CRM\Models\Lead::observe(\Modules\CRM\Observers\LeadObserver::class);
         }
@@ -53,5 +58,27 @@ class AppServiceProvider extends ServiceProvider
         if (class_exists(\Modules\CRM\Models\LeadNote::class) && class_exists(\Modules\CRM\Observers\LeadNoteObserver::class)) {
             \Modules\CRM\Models\LeadNote::observe(\Modules\CRM\Observers\LeadNoteObserver::class);
         }
+    }
+
+    /**
+     * Configure the rate limiters for the application.
+     */
+    protected function configureRateLimiting(): void
+    {
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
+        RateLimiter::for('web', function (Request $request) {
+            return Limit::perMinute(120)->by($request->user()?->id ?: $request->ip());
+        });
+
+        RateLimiter::for('tenant', function (Request $request) {
+            return Limit::perMinute(1000)->by(session('tenant_id', $request->user()?->id ?: $request->ip()));
+        });
+
+        RateLimiter::for('webhooks', function (Request $request) {
+            return Limit::perMinute(300)->by($request->ip());
+        });
     }
 }
