@@ -28,7 +28,7 @@ export default function Edit({ contract, currencies }: EditProps) {
 
                 <div className="mb-6 flex items-center justify-between">
                     <Link href={route('isaas.contracts.index')} className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
-                        <ArrowLeft className="mr-2 h-4 w-4" />{__('general.back_to_contracts')}</Link>
+                        <ArrowLeft className="me-2 h-4 w-4" />{__('general.back_to_contracts')}</Link>
                 </div>
 
                 <ContractForm contract={contract} currencies={currencies} />

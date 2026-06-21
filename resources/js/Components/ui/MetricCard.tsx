@@ -31,9 +31,9 @@ export function MetricCard({ label, value, icon: Icon, trend, className }: Metri
                 {trend && (
                     <div className="mt-1 flex items-center text-xs">
                         {trend.isPositive ? (
-                            <ArrowUp className="mr-1 h-3 w-3 text-emerald-500" />
+                            <ArrowUp className="me-1 h-3 w-3 text-emerald-500" />
                         ) : (
-                            <ArrowDown className="mr-1 h-3 w-3 text-rose-500" />
+                            <ArrowDown className="me-1 h-3 w-3 text-rose-500" />
                         )}
                         <span
                             className={cn(
@@ -43,7 +43,7 @@ export function MetricCard({ label, value, icon: Icon, trend, className }: Metri
                         >
                             {trend.value}%
                         </span>
-                        <span className="ml-1 text-slate-500">{trend.label}</span>
+                        <span className="ms-1 text-slate-500">{trend.label}</span>
                     </div>
                 )}
             </CardContent>

@@ -70,7 +70,7 @@ export default function CreateFile() {
                                     required 
                                     type="file"
                                     onChange={e => setForm({...form, file: e.target.files ? e.target.files[0] : null})} 
-                                    className="bg-white border-slate-200 text-slate-700 file:bg-slate-100 file:text-slate-700 file:border-0 file:rounded-md file:mr-4 file:px-4 file:py-2 hover:file:bg-slate-200 transition-colors"
+                                    className="bg-white border-slate-200 text-slate-700 file:bg-slate-100 file:text-slate-700 file:border-0 file:rounded-md file:me-4 file:px-4 file:py-2 hover:file:bg-slate-200 transition-colors"
                                 />
                                 {errors.file && <p className="text-xs text-red-500">{errors.file}</p>}
                             </div>

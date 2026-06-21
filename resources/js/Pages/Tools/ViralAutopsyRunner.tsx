@@ -200,14 +200,14 @@ export default function ViralAutopsyRunner({ tool }: any) {
 
                     <div className="flex gap-3">
                         <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                             <Input
                                 type="url"
                                 value={url}
                                 onChange={e => setUrl(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleAnalyze()}
                                 placeholder={__('general.https_www_tiktok_com_user_video')}
-                                className="pl-9 h-11 text-sm bg-slate-50 font-mono"
+                                className="ps-9 h-11 text-sm bg-slate-50 font-mono"
                             />
                         </div>
                         <Button
@@ -251,7 +251,7 @@ export default function ViralAutopsyRunner({ tool }: any) {
 
                         {/* Overall Viral Score hero */}
                         <div className="bg-gradient-to-tr from-slate-900 to-slate-800 border border-slate-700 rounded-2xl p-6 text-white relative overflow-hidden shadow-xl">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl -z-0" />
+                            <div className="absolute top-0 end-0 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl -z-0" />
                             <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
 
                                 {/* Big score */}

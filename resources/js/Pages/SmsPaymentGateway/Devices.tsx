@@ -76,11 +76,11 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                         </div>
                         <div className="flex gap-2">
                             <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
-                                <ArrowLeft className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2 rtl:rotate-180" />
+                                <ArrowLeft className="w-4 h-4 me-2 rtl:me-0 rtl:ms-2 rtl:rotate-180" />
                                 {__('general.back')}
                             </Button>
                             <Button onClick={handleAddDevice}>
-                                <Plus className="w-4 h-4 mr-2" />
+                                <Plus className="w-4 h-4 me-2" />
                                 {__('general.add_device')}
                             </Button>
                         </div>
@@ -121,7 +121,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                                     <Smartphone className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                                     <p className="text-slate-500 mb-4">{__('general.no_android_devices_connected')}</p>
                                     <Button onClick={handleAddDevice}>
-                                        <Plus className="w-4 h-4 mr-2" />
+                                        <Plus className="w-4 h-4 me-2" />
                                         {__('freelance.connect_new_device')}
                                     </Button>
                                 </div>
@@ -142,10 +142,10 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                                             </div>
                                             <div className="flex sm:flex-col gap-2 mt-4 sm:mt-0 items-end">
                                                 <Button size="sm" variant="outline" className="w-full" onClick={() => router.visit(route('sms-payment-gateway.device', device.id))}>
-                                                    <Eye className="w-4 h-4 mr-2" /> {__('general.inspect')}
+                                                    <Eye className="w-4 h-4 me-2" /> {__('general.inspect')}
                                                 </Button>
                                                 <Button size="sm" variant="destructive" className="w-full" onClick={() => handleDelete(device.id)}>
-                                                    <Trash2 className="w-4 h-4 mr-2" /> {__('general.remove')}
+                                                    <Trash2 className="w-4 h-4 me-2" /> {__('general.remove')}
                                                 </Button>
                                             </div>
                                         </div>

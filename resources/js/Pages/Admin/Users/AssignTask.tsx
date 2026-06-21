@@ -43,7 +43,7 @@ export default function AssignTask({ client }: Props) {
                     </div>
                     <div>
                         <Button variant="outline" onClick={() => window.history.back()}>
-                            <ArrowDownLeft className="h-4 w-4 mr-2" style={{ transform: 'rotate(45deg)' }} /> Back
+                            <ArrowDownLeft className="h-4 w-4 me-2" style={{ transform: 'rotate(45deg)' }} /> Back
                         </Button>
                     </div>
                 </header>
@@ -52,7 +52,7 @@ export default function AssignTask({ client }: Props) {
                     <form onSubmit={handleSubmit}>
                         <CardHeader>
                             <CardTitle className="flex items-center">
-                                <Briefcase className="h-5 w-5 mr-2 text-primary" />
+                                <Briefcase className="h-5 w-5 me-2 text-primary" />
                                 Task Details
                             </CardTitle>
                             <CardDescription>
@@ -85,7 +85,7 @@ export default function AssignTask({ client }: Props) {
 
                             <div className="pt-4 flex justify-end">
                                 <Button type="submit" disabled={processing} className="w-full md:w-auto">
-                                    <Save className="h-4 w-4 mr-2" />
+                                    <Save className="h-4 w-4 me-2" />
                                     {__('general.create_task')}
                                 </Button>
                             </div>

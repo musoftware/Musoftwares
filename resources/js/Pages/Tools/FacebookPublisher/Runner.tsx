@@ -65,7 +65,7 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
 
             <div className="flex h-[calc(100vh-4rem)]">
                 {/* Sidebar */}
-                <div className="w-64 border-r bg-muted/30 p-4 space-y-4">
+                <div className="w-64 border-e bg-muted/30 p-4 space-y-4">
                     <div className="flex items-center space-x-3 mb-6">
                         <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center">
                             <Upload className="h-5 w-5 text-primary" />
@@ -82,19 +82,19 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
                             className="w-full justify-start"
                             onClick={() => setActiveTab('queue')}
                         >
-                            <List className="mr-2 h-4 w-4" />{__('general.publishing_queue')}</Button>
+                            <List className="me-2 h-4 w-4" />{__('general.publishing_queue')}</Button>
                         <Button 
                             variant={activeTab === 'accounts' ? 'secondary' : 'ghost'} 
                             className="w-full justify-start"
                             onClick={() => setActiveTab('accounts')}
                         >
-                            <User className="mr-2 h-4 w-4" />{__('general.accounts_pages')}</Button>
+                            <User className="me-2 h-4 w-4" />{__('general.accounts_pages')}</Button>
                         <Button 
                             variant={activeTab === 'media' ? 'secondary' : 'ghost'} 
                             className="w-full justify-start"
                             onClick={() => setActiveTab('media')}
                         >
-                            <HardDrive className="mr-2 h-4 w-4" />{__('general.local_media_library')}</Button>
+                            <HardDrive className="me-2 h-4 w-4" />{__('general.local_media_library')}</Button>
                     </div>
 
                     <div className="mt-8 pt-8 border-t">
@@ -122,7 +122,7 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
                                         <p className="text-muted-foreground">{__('general.monitor_and_manage_background_automation_jobs')}</p>
                                     </div>
                                     <Button onClick={handleAddJob} disabled={!isConnected}>
-                                        <Plus className="mr-2 h-4 w-4" />{__('general.queue_new_post')}</Button>
+                                        <Plus className="me-2 h-4 w-4" />{__('general.queue_new_post')}</Button>
                                 </div>
 
                                 <Card>
@@ -130,7 +130,7 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
                                         <div className="border rounded-md">
                                             <table className="w-full text-sm">
                                                 <thead>
-                                                    <tr className="border-b bg-muted/50 text-left">
+                                                    <tr className="border-b bg-muted/50 text-start">
                                                         <th className="font-medium p-4">ID</th>
                                                         <th className="font-medium p-4">{__('general.page_id')}</th>
                                                         <th className="font-medium p-4">Type</th>
@@ -181,7 +181,7 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
                                         <p className="text-muted-foreground">{__('general.manage_connected_profiles_and_isolated_browser_sessions')}</p>
                                     </div>
                                     <Button onClick={handleAddAccount} disabled={!isConnected}>
-                                        <Plus className="mr-2 h-4 w-4" />{__('general.add_account')}</Button>
+                                        <Plus className="me-2 h-4 w-4" />{__('general.add_account')}</Button>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -53,7 +53,7 @@ export default function Index({ events }: { events: EventType[] }) {
                             href={route('booking.events.create')} 
                             className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors shadow-sm"
                         >
-                            <Plus className="w-4 h-4 mr-2" />{__('general.new_event_type')}</Link>
+                            <Plus className="w-4 h-4 me-2" />{__('general.new_event_type')}</Link>
                     </div>
                 </div>
 
@@ -94,7 +94,7 @@ export default function Index({ events }: { events: EventType[] }) {
                                 <CardContent>
                                     <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
                                         <div className="flex items-center">
-                                            <Clock className="w-4 h-4 mr-1.5" />
+                                            <Clock className="w-4 h-4 me-1.5" />
                                             {event.duration_minutes} min
                                         </div>
                                         {event.requires_payment && event.price && (
@@ -110,7 +110,7 @@ export default function Index({ events }: { events: EventType[] }) {
                                     </Badge>
                                     
                                     <button onClick={() => copyLink(event.slug)} className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 h-8 px-3 text-slate-500 hover:text-slate-900">
-                                        <Copy className="w-4 h-4 mr-2" />{__('general.copy_link_1')}</button>
+                                        <Copy className="w-4 h-4 me-2" />{__('general.copy_link_1')}</button>
                                 </CardFooter>
                             </Card>
                         ))}

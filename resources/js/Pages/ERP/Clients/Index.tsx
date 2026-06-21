@@ -83,7 +83,7 @@ export default function Index({ clients, filters, stats, tenant }: Props) {
                             {client.name.substring(0, 2)}
                         </AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col text-left group">
+                    <div className="flex flex-col text-start group">
                         <Link href={route('erp.clients.show', client.id)} className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
                             {client.name}
                         </Link>
@@ -133,7 +133,7 @@ export default function Index({ clients, filters, stats, tenant }: Props) {
         {
             key: 'actions',
             label: '',
-            className: 'w-[80px] text-right',
+            className: 'w-[80px] text-end',
             render: (client: any) => (
                 <button
                     onClick={() => setActionModalClient(client)}
@@ -177,7 +177,7 @@ export default function Index({ clients, filters, stats, tenant }: Props) {
                 </div>
                 <Link href={route('erp.clients.create')}>
                     <Button>
-                        <UserPlus className="w-4 h-4 mr-2" />
+                        <UserPlus className="w-4 h-4 me-2" />
                         {__('general.add_client')}
                     </Button>
                 </Link>

@@ -97,7 +97,7 @@ export default function Index({ files, storageProviders, hasFeature, hasProvider
                                 <TableHead className="text-slate-600 font-semibold">{__('general.size')}</TableHead>
                                 <TableHead className="text-slate-600 font-semibold">{__('general.uploaded_by')}</TableHead>
                                 <TableHead className="text-slate-600 font-semibold">{__('general.date')}</TableHead>
-                                <TableHead className="text-right text-slate-600 font-semibold">{__('general.actions')}</TableHead>
+                                <TableHead className="text-end text-slate-600 font-semibold">{__('general.actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -123,7 +123,7 @@ export default function Index({ files, storageProviders, hasFeature, hasProvider
                                         <TableCell className="text-slate-600">{formatBytes(file.size)}</TableCell>
                                         <TableCell className="text-slate-600">{file.uploaded_by}</TableCell>
                                         <TableCell className="text-slate-600">{file.created_at}</TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-end">
                                             <Dialog>
                                                 <DialogTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0">

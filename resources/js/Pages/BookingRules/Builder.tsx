@@ -18,7 +18,7 @@ export default function RuleBuilder({ rule }) {
                     <p className="text-muted-foreground mt-2">{__('general.visually_design_conditions_and_actions')}</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline"><Play className="mr-2 h-4 w-4" />{__('general.simulate_rule')}</Button>
+                    <Button variant="outline"><Play className="me-2 h-4 w-4" />{__('general.simulate_rule')}</Button>
                     <Button>{__('general.save_rule')}</Button>
                 </div>
             </div>
@@ -47,10 +47,10 @@ export default function RuleBuilder({ rule }) {
                     <CardHeader className="bg-blue-50/50">
                         <div className="flex items-center justify-between">
                             <CardTitle className="flex items-center text-blue-700">
-                                <Settings2 className="mr-2 h-5 w-5" /> IF (Conditions)
+                                <Settings2 className="me-2 h-5 w-5" /> IF (Conditions)
                             </CardTitle>
                             <Button size="sm" variant="outline" className="text-blue-600">
-                                <Plus className="h-4 w-4 mr-1" />{__('general.add_group')}</Button>
+                                <Plus className="h-4 w-4 me-1" />{__('general.add_group')}</Button>
                         </div>
                     </CardHeader>
                     <CardContent className="pt-6 space-y-4">
@@ -68,10 +68,10 @@ export default function RuleBuilder({ rule }) {
                     <CardHeader className="bg-emerald-50/50">
                         <div className="flex items-center justify-between">
                             <CardTitle className="flex items-center text-emerald-700">
-                                <GitMerge className="mr-2 h-5 w-5" /> THEN (Actions)
+                                <GitMerge className="me-2 h-5 w-5" /> THEN (Actions)
                             </CardTitle>
                             <Button size="sm" variant="outline" className="text-emerald-600">
-                                <Plus className="h-4 w-4 mr-1" />{__('general.add_action')}</Button>
+                                <Plus className="h-4 w-4 me-1" />{__('general.add_action')}</Button>
                         </div>
                     </CardHeader>
                     <CardContent className="pt-6 space-y-4">

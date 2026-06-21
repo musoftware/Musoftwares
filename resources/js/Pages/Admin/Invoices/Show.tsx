@@ -378,13 +378,13 @@ export default function Show({ invoice }: { invoice: any }) {
                             className="h-10 px-4 bg-white"
                             onClick={() => setRescheduleModal(true)}
                         >
-                            <Clock className="w-4 h-4 mr-2" /> {__('admin.reschedule_invoice')}
+                            <Clock className="w-4 h-4 me-2" /> {__('admin.reschedule_invoice')}
                         </Button>
                     )}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button className="bg-blue-600 hover:bg-blue-700 h-10 px-4">
-                                <Share2 className="w-4 h-4 mr-2" /> {__('admin.share')} <ChevronDown className="w-4 h-4 ml-2" />
+                                <Share2 className="w-4 h-4 me-2" /> {__('admin.share')} <ChevronDown className="w-4 h-4 ms-2" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -409,7 +409,7 @@ export default function Show({ invoice }: { invoice: any }) {
                 <Card className="shadow-sm border-gray-200">
                     <CardHeader className="pb-3 border-b border-gray-100 bg-gray-50/50">
                         <CardTitle className="text-base flex items-center text-gray-700">
-                            <User className="w-4 h-4 mr-2 text-gray-400" />{__('general.client_profile')}</CardTitle>
+                            <User className="w-4 h-4 me-2 text-gray-400" />{__('general.client_profile')}</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-3 mb-4">
@@ -444,7 +444,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             )}
                             {invoice.project && (
                                 <div className="inline-flex items-center rounded bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700 mt-2">
-                                    <Folder className="w-3 h-3 mr-1" /> {invoice.project.project_name}
+                                    <Folder className="w-3 h-3 me-1" /> {invoice.project.project_name}
                                 </div>
                             )}
                         </div>
@@ -455,7 +455,7 @@ export default function Show({ invoice }: { invoice: any }) {
                 <Card className="shadow-sm border-gray-200">
                     <CardHeader className="pb-3 border-b border-gray-100 bg-gray-50/50">
                         <CardTitle className="text-base flex items-center text-gray-700">
-                            <Receipt className="w-4 h-4 mr-2 text-gray-400" />{__('general.invoice_summary')}</CardTitle>
+                            <Receipt className="w-4 h-4 me-2 text-gray-400" />{__('general.invoice_summary')}</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-4">
                         <div className="bg-gray-50 rounded-lg p-4 mb-4">
@@ -465,7 +465,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             </div>
                             {invoice.status === 'partially_paid' && (
                                 <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-200">
-                                    <span className="text-xs font-bold text-red-600 flex items-center"><Clock className="w-3 h-3 mr-1" />{__('general.remaining_due')}</span>
+                                    <span className="text-xs font-bold text-red-600 flex items-center"><Clock className="w-3 h-3 me-1" />{__('general.remaining_due')}</span>
                                     <span className="font-bold text-red-600">{formatCurrency(currentTotal - invoice.paid_amount, invoice.currency)}</span>
                                 </div>
                             )}
@@ -511,18 +511,18 @@ export default function Show({ invoice }: { invoice: any }) {
                 <Card className="shadow-sm border-gray-200">
                     <CardHeader className="pb-3 border-b border-gray-100 bg-gray-50/50">
                         <CardTitle className="text-base flex items-center text-gray-700">
-                            <Clock className="w-4 h-4 mr-2 text-gray-400" />{__('general.time_tracking')}</CardTitle>
+                            <Clock className="w-4 h-4 me-2 text-gray-400" />{__('general.time_tracking')}</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-4 flex flex-col items-center justify-center h-full min-h-[140px]">
                         <div className="text-3xl font-black text-gray-900 mb-1 flex items-center">
-                            <Clock className="w-6 h-6 text-blue-500 opacity-20 mr-2" />
+                            <Clock className="w-6 h-6 text-blue-500 opacity-20 me-2" />
                             {invoice.total_timer_str || '00:00:00'}
                         </div>
                         <div className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">{__('general.total_billable_hours')}</div>
                         
                         {isUnpaid && (
                             <Button onClick={handleAddTimerItem} variant="link" className="mt-4 text-blue-600 font-bold hover:text-blue-800">
-                                <Plus className="w-3 h-3 mr-1" />{__('general.add_manual_entry')}
+                                <Plus className="w-3 h-3 me-1" />{__('general.add_manual_entry')}
                             </Button>
                         )}
                     </CardContent>
@@ -533,7 +533,7 @@ export default function Show({ invoice }: { invoice: any }) {
                     <Card className="shadow-sm border-gray-200">
                         <CardHeader className="pb-3 border-b border-gray-100 bg-gray-50/50">
                             <CardTitle className="text-base flex items-center text-gray-700">
-                                <Network className="w-4 h-4 mr-2 text-gray-400" /> Affiliate
+                                <Network className="w-4 h-4 me-2 text-gray-400" /> Affiliate
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="pt-4">
@@ -574,7 +574,7 @@ export default function Show({ invoice }: { invoice: any }) {
 
                             {invoice.affiliate_data.adds_to_total && (
                                 <div className="inline-flex items-center rounded bg-yellow-50 px-2 py-1 text-xs font-semibold text-yellow-800 border border-yellow-200">
-                                    <AlertCircle className="w-3 h-3 mr-1" />{__('general.added_to_invoice_total')}</div>
+                                    <AlertCircle className="w-3 h-3 me-1" />{__('general.added_to_invoice_total')}</div>
                             )}
                         </CardContent>
                     </Card>
@@ -585,20 +585,20 @@ export default function Show({ invoice }: { invoice: any }) {
             {isUnpaid && !isEditing && (
                 <div className="bg-white border rounded-lg p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                     <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wider mr-2">Quick Build:</span>
+                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wider me-2">Quick Build:</span>
                         <div className="flex gap-2 w-full sm:w-auto">
                             <Button onClick={handleAddQtyItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50">
-                                <Layers className="w-4 h-4 mr-2 text-blue-500" />{__('general.qty_item')}</Button>
+                                <Layers className="w-4 h-4 me-2 text-blue-500" />{__('general.qty_item')}</Button>
                             <Button onClick={handleAddSimpleItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50">
-                                <Plus className="w-4 h-4 mr-2 text-blue-500" />{__('general.simple_item')}</Button>
+                                <Plus className="w-4 h-4 me-2 text-blue-500" />{__('general.simple_item')}</Button>
                             <Button onClick={() => setShowPayServiceModal(true)} variant="outline" size="sm" className="hidden sm:flex border-dashed hover:border-green-300 hover:text-green-600 hover:bg-green-50">
-                                <CreditCard className="w-4 h-4 mr-2 text-green-500" />{__('general.pay_service')}</Button>
+                                <CreditCard className="w-4 h-4 me-2 text-green-500" />{__('general.pay_service')}</Button>
                             <Button onClick={handleAddTimerItem} variant="secondary" size="sm" className="hidden sm:flex bg-gray-100 text-gray-700 hover:bg-gray-200">
-                                <Clock className="w-4 h-4 mr-2" />{__('general.log_time')}</Button>
+                                <Clock className="w-4 h-4 me-2" />{__('general.log_time')}</Button>
                         </div>
                     </div>
                     <Button onClick={() => { if(confirm('Mark invoice as paid?')) router.post(route('admin.invoices.mark-paid', { invoice: String(invoice.id) })); }} variant="outline" size="sm" className="w-full md:w-auto border-dashed border-green-300 text-green-700 hover:bg-green-50">
-                        <CreditCard className="w-4 h-4 mr-2" />{__('general.mark_as_paid')}</Button>
+                        <CreditCard className="w-4 h-4 me-2" />{__('general.mark_as_paid')}</Button>
                 </div>
             )}
 
@@ -606,23 +606,23 @@ export default function Show({ invoice }: { invoice: any }) {
             <Card className="shadow-sm border-gray-200 mb-8 overflow-hidden">
                 <div className="bg-gray-50 border-b px-4 py-3 flex items-center justify-between">
                     <div className="flex items-center text-gray-700 font-semibold">
-                        <List className="w-5 h-5 text-gray-400 mr-2" />{__('general.invoice_items')}</div>
+                        <List className="w-5 h-5 text-gray-400 me-2" />{__('general.invoice_items')}</div>
                     {isUnpaid && !isEditing && (
                         <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
-                            <Edit2 className="w-4 h-4 mr-2" />{__('general.edit_rows')}</Button>
+                            <Edit2 className="w-4 h-4 me-2" />{__('general.edit_rows')}</Button>
                     )}
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
+                    <table className="w-full text-sm text-start">
                         <thead className="bg-gray-50/50 text-gray-500 border-b">
                             <tr>
                                 {isEditing && <th className="px-4 py-3 font-medium w-12 text-center">Merge</th>}
                                 <th className="px-4 py-3 font-medium w-12 text-center">#</th>
                                 <th className="px-4 py-3 font-medium w-24">Type</th>
                                 <th className="px-4 py-3 font-medium">Description</th>
-                                <th className="px-4 py-3 font-medium text-right w-32">Price</th>
+                                <th className="px-4 py-3 font-medium text-end w-32">Price</th>
                                 <th className="px-4 py-3 font-medium text-center w-24">Quantity</th>
-                                <th className="px-4 py-3 font-medium text-right w-32">Total</th>
+                                <th className="px-4 py-3 font-medium text-end w-32">Total</th>
                                 {isEditing && <th className="px-4 py-3 font-medium text-center w-16"></th>}
                             </tr>
                         </thead>
@@ -646,12 +646,12 @@ export default function Show({ invoice }: { invoice: any }) {
                                         {item.item_type === 'timer' ? (
                                             item.isNew ? (
                                                 <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 cursor-not-allowed opacity-70" title={__('general.save_invoice_first_to_edit_timer_details')}>
-                                                    <Clock className="w-3 h-3 mr-1" />
+                                                    <Clock className="w-3 h-3 me-1" />
                                                     <span className="capitalize">{item.item_type} (Save First)</span>
                                                 </span>
                                             ) : (
                                                 <Link href={route('admin.invoices.timer-details', item.id)} className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors cursor-pointer" title={__('general.click_to_edit_timer_details')}>
-                                                    <Clock className="w-3 h-3 mr-1" />
+                                                    <Clock className="w-3 h-3 me-1" />
                                                     <span className="capitalize">{item.item_type}</span>
                                                 </Link>
                                             )
@@ -676,15 +676,15 @@ export default function Show({ invoice }: { invoice: any }) {
                                             item.item_title
                                         )}
                                     </td>
-                                    <td className="px-4 py-3 text-right">
+                                    <td className="px-4 py-3 text-end">
                                         {(isEditing && item.item_type !== 'timer') ? (
                                             <div className="flex items-center justify-end">
-                                                <span className="text-gray-400 mr-1 text-xs">{item.currency}</span>
+                                                <span className="text-gray-400 me-1 text-xs">{item.currency}</span>
                                                 <Input 
                                                     type="number"
                                                     value={item.amount} 
                                                     onChange={(e) => handleItemChange(index, 'amount', e.target.value)}
-                                                    className="h-8 w-24 text-right shadow-none"
+                                                    className="h-8 w-24 text-end shadow-none"
                                                 />
                                             </div>
                                         ) : (
@@ -706,7 +706,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                             </span>
                                         )}
                                     </td>
-                                    <td className="px-4 py-3 text-right font-bold text-gray-900">
+                                    <td className="px-4 py-3 text-end font-bold text-gray-900">
                                         {formatCurrency(item.item_type === 'timer' ? (item.total_amount || 0) : (parseFloat(item.amount) || 0) * (Number(item.qty) || 1), item.currency)}
                                     </td>
                                     {isEditing && (
@@ -735,14 +735,14 @@ export default function Show({ invoice }: { invoice: any }) {
                                             <div className="flex gap-2">
                                                 {selectedItemsForMerge.length > 1 && (
                                                     <Button type="button" onClick={handleMergeSelected} variant="secondary" size="sm" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
-                                                        <Merge className="w-4 h-4 mr-1" /> Merge ({selectedItemsForMerge.length})
+                                                        <Merge className="w-4 h-4 me-1" /> Merge ({selectedItemsForMerge.length})
                                                     </Button>
                                                 )}
                                                 <Button type="button" onClick={handleCancel} variant="outline" size="sm" disabled={isSaving}>
-                                                    <X className="w-4 h-4 mr-1" /> Cancel
+                                                    <X className="w-4 h-4 me-1" /> Cancel
                                                 </Button>
                                                 <Button type="button" onClick={handleSave} size="sm" disabled={isSaving} className="bg-blue-600 hover:bg-blue-700">
-                                                    <Check className="w-4 h-4 mr-1" />{__('general.save_changes')}</Button>
+                                                    <Check className="w-4 h-4 me-1" />{__('general.save_changes')}</Button>
                                             </div>
                                         </div>
                                     </td>
@@ -767,7 +767,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             onClick={() => setShowPricingInsights(!showPricingInsights)}
                             className="text-blue-600 bg-blue-50 hover:bg-blue-100"
                         >
-                            <ChartLine className="w-4 h-4 mr-2" />
+                            <ChartLine className="w-4 h-4 me-2" />
                             {showPricingInsights ? 'Hide Pricing Insights' : 'Show Pricing Insights'}
                         </Button>
                     </div>
@@ -783,10 +783,10 @@ export default function Show({ invoice }: { invoice: any }) {
                                     <div className="flex-1 space-y-1 min-w-[150px]">
                                         <Label className="text-xs text-gray-500 uppercase">Amount</Label>
                                         <div className="flex items-center">
-                                            <span className="bg-gray-100 border border-r-0 border-gray-300 rounded-l-md px-3 py-2 text-sm text-gray-500 h-10">{invoice.currency}</span>
+                                            <span className="bg-gray-100 border border-e-0 border-gray-300 rounded-s-md px-3 py-2 text-sm text-gray-500 h-10">{invoice.currency}</span>
                                             <Input 
                                                 type="number"
-                                                className="rounded-l-none h-10 shadow-none focus-visible:ring-blue-500"
+                                                className="rounded-s-none h-10 shadow-none focus-visible:ring-blue-500"
                                                 value={discount}
                                                 onChange={(e) => {
                                                     setDiscount(Number(e.target.value));
@@ -801,7 +801,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                         <div className="flex items-center">
                                             <Input 
                                                 type="number"
-                                                className="rounded-r-none h-10 shadow-none focus-visible:ring-blue-500"
+                                                className="rounded-e-none h-10 shadow-none focus-visible:ring-blue-500"
                                                 value={discountPercentage}
                                                 onChange={(e) => {
                                                     const pct = parseFloat(e.target.value) || 0;
@@ -812,7 +812,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                 disabled={!isUnpaid}
                                                 placeholder="%"
                                             />
-                                            <span className="bg-gray-100 border border-l-0 border-gray-300 rounded-r-md px-3 py-2 text-sm text-gray-500 h-10">%</span>
+                                            <span className="bg-gray-100 border border-s-0 border-gray-300 rounded-e-md px-3 py-2 text-sm text-gray-500 h-10">%</span>
                                         </div>
                                     </div>
                                     {isUnpaid && (
@@ -867,7 +867,7 @@ export default function Show({ invoice }: { invoice: any }) {
                     <Card className="shadow-sm border-gray-200 mt-6">
                         <CardHeader className="pb-3 border-b border-gray-100 bg-gray-50/50 flex flex-row items-center justify-between">
                             <CardTitle className="text-base flex items-center text-gray-700">
-                                <Calculator className="w-4 h-4 mr-2 text-gray-400" />{__('general.internal_cost_lines')}</CardTitle>
+                                <Calculator className="w-4 h-4 me-2 text-gray-400" />{__('general.internal_cost_lines')}</CardTitle>
                             {isUnpaid && (
                                 <div className="flex gap-2">
                                     <Button 
@@ -906,7 +906,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                     <span className="font-bold text-gray-900">{formatCurrency(line.amount, invoice.currency)}</span>
                                                 </div>
                                                 {line.description && <div className="text-sm text-gray-700 mt-1">{line.description}</div>}
-                                                {line.credit_user_name && <div className="text-xs text-gray-500 mt-1 flex items-center"><User className="w-3 h-3 mr-1" /> {line.credit_user_name}</div>}
+                                                {line.credit_user_name && <div className="text-xs text-gray-500 mt-1 flex items-center"><User className="w-3 h-3 me-1" /> {line.credit_user_name}</div>}
                                             </div>
                                         ) : (
                                             <div className="flex flex-col gap-3">
@@ -1003,7 +1003,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                             }}
                                                             className="bg-emerald-500 hover:bg-emerald-600 text-white h-8 px-3 text-xs font-semibold"
                                                         >
-                                                            <Receipt className="w-3.5 h-3.5 mr-1.5" />{__('general.record_as_paid')}</Button>
+                                                            <Receipt className="w-3.5 h-3.5 me-1.5" />{__('general.record_as_paid')}</Button>
                                                         <span className="text-xs text-gray-500 font-medium">{__('general.creates_a_client_payment_for_this_amount')}</span>
                                                     </div>
                                                 )}
@@ -1019,7 +1019,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 {isUnpaid && (costLines.length > 0 || deletedCostLines.length > 0) && (
                                     <div className="mt-4">
                                         <Button type="button" onClick={handleSave} disabled={isSaving} className="w-full h-10 bg-black text-white hover:bg-gray-900 font-bold tracking-wider flex items-center justify-center">
-                                            <Calculator className="w-4 h-4 mr-2" />{__('general.save_cost_lines')}</Button>
+                                            <Calculator className="w-4 h-4 me-2" />{__('general.save_cost_lines')}</Button>
                                     </div>
                                 )}
                             </div>
@@ -1032,7 +1032,7 @@ export default function Show({ invoice }: { invoice: any }) {
             <div className="bg-white border rounded-lg p-4 mb-6 shadow-sm">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                     {/* Totals */}
-                    <div className="flex flex-wrap items-center gap-6 text-center md:text-left">
+                    <div className="flex flex-wrap items-center gap-6 text-center md:text-start">
                         <div className="flex flex-col">
                             <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.total_amount')}</span>
                             <span className="text-xl font-black text-gray-900">{formatCurrency(invoice.amount, invoice.currency)}</span>
@@ -1053,12 +1053,12 @@ export default function Show({ invoice }: { invoice: any }) {
                                     onClick={() => setActionModal({ isOpen: true, type: 'bill_balance', amount: '' })}
                                     className="bg-blue-600 hover:bg-blue-700 text-white"
                                 >
-                                    <Check className="w-4 h-4 mr-2" />{__('general.bill_from_balance')}</Button>
+                                    <Check className="w-4 h-4 me-2" />{__('general.bill_from_balance')}</Button>
                                 <Button 
                                     onClick={() => setActionModal({ isOpen: true, type: 'partial_pay', amount: String(invoice.amount) })}
                                     variant="outline"
                                 >
-                                    <CreditCard className="w-4 h-4 mr-2" />{__('general.partial_pay')}</Button>
+                                    <CreditCard className="w-4 h-4 me-2" />{__('general.partial_pay')}</Button>
                             </>
                         )}
                         {invoice.status === 'partially_paid' && (
@@ -1069,7 +1069,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 }}
                                 className="bg-blue-600 hover:bg-blue-700 text-white"
                             >
-                                <Plus className="w-4 h-4 mr-2" />{__('general.add_payment')}</Button>
+                                <Plus className="w-4 h-4 me-2" />{__('general.add_payment')}</Button>
                         )}
 
                         {invoice.status !== 'cancelled' && (
@@ -1118,20 +1118,20 @@ export default function Show({ invoice }: { invoice: any }) {
                     </div>
                     <div className="p-4 flex flex-col sm:flex-row justify-end gap-3 items-stretch sm:items-center">
                         {(invoice.status === 'paid' || invoice.status === 'partially_paid') && (
-                            <div className="sm:mr-auto text-sm text-gray-500">{__('general.cancelling_will_void_all_related_transactions')}</div>
+                            <div className="sm:me-auto text-sm text-gray-500">{__('general.cancelling_will_void_all_related_transactions')}</div>
                         )}
                         <Button 
                             variant="outline"
                             className="border-red-300 text-red-600 hover:bg-red-100 w-full sm:w-auto justify-center"
                             onClick={() => { if(confirm('Are you sure you want to cancel this invoice? This action is irreversible.')) router.post(route('admin.invoices.cancel', { invoice: String(invoice.id) })); }}
                         >
-                            <X className="w-4 h-4 mr-2" />{__('general.cancel_invoice')}</Button>
+                            <X className="w-4 h-4 me-2" />{__('general.cancel_invoice')}</Button>
                         <Button 
                             variant="outline"
                             className="border-red-300 text-red-600 hover:bg-red-100 w-full sm:w-auto justify-center"
                             onClick={() => { if(confirm('Are you sure you want to DELETE this invoice? This cannot be undone.')) router.post(route('admin.invoices.bulk-action'), { action: 'delete', invoices: [invoice.id] }); }}
                         >
-                            <Trash2 className="w-4 h-4 mr-2" />{__('general.delete_invoice')}</Button>
+                            <Trash2 className="w-4 h-4 me-2" />{__('general.delete_invoice')}</Button>
                     </div>
                 </div>
             )}
@@ -1141,7 +1141,7 @@ export default function Show({ invoice }: { invoice: any }) {
                 <DialogContent className="sm:max-w-[600px] bg-white">
                     <DialogHeader>
                         <DialogTitle className="flex items-center text-green-700">
-                            <CreditCard className="w-5 h-5 mr-2" />
+                            <CreditCard className="w-5 h-5 me-2" />
                             {__('general.pay_service')}
                         </DialogTitle>
                         <DialogDescription>
@@ -1220,7 +1220,7 @@ export default function Show({ invoice }: { invoice: any }) {
                         {/* Live Calculation Preview */}
                         <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
                             <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                                <Calculator className="w-4 h-4 mr-2" />
+                                <Calculator className="w-4 h-4 me-2" />
                                 {__('general.calculation_preview')}
                             </h4>
                             {isCalculatingPayService ? (

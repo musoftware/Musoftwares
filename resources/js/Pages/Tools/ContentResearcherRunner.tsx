@@ -219,7 +219,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
             />
 
             {/* Sidebar */}
-            <div className="w-80 bg-white border-r border-slate-200 shadow-[2px_0_10px_rgba(0,0,0,0.02)] flex flex-col z-10 overflow-y-auto">
+            <div className="w-80 bg-white border-e border-slate-200 shadow-[2px_0_10px_rgba(0,0,0,0.02)] flex flex-col z-10 overflow-y-auto">
                 <div className="px-6 py-8">
                     <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-inner mb-6 shadow-indigo-200">
                         <Search className="w-6 h-6 text-white" />
@@ -235,7 +235,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
 
                         <TabsContent value="new" className="space-y-6">
                             <div className="space-y-2">
-                                <Label className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">{__('general.target_keyword')}</Label>
+                                <Label className="text-xs font-bold uppercase tracking-wider text-slate-500 ms-1">{__('general.target_keyword')}</Label>
                                 <Input 
                                     placeholder="e.g. 'Best SEO tools 2026'" 
                                     value={keyword}
@@ -245,7 +245,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">{__('general.search_engine')}</Label>
+                                <Label className="text-xs font-bold uppercase tracking-wider text-slate-500 ms-1">{__('general.search_engine')}</Label>
                                 <select 
                                     value={engine}
                                     onChange={(e) => setEngine(e.target.value as any)}
@@ -264,7 +264,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                 >
                                     <Settings className="w-3.5 h-3.5" />
                                     Advanced Crawl Options
-                                    {showAdvanced ? <ChevronUp className="w-3.5 h-3.5 ml-auto" /> : <ChevronDown className="w-3.5 h-3.5 ml-auto" />}
+                                    {showAdvanced ? <ChevronUp className="w-3.5 h-3.5 ms-auto" /> : <ChevronDown className="w-3.5 h-3.5 ms-auto" />}
                                 </button>
                                 
                                 {showAdvanced && (
@@ -341,7 +341,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                         }`}
                                     >
                                         <div className="flex justify-between items-start mb-2">
-                                            <p className="text-xs font-bold text-slate-800 line-clamp-1 flex-1 pr-2">{c.name}</p>
+                                            <p className="text-xs font-bold text-slate-800 line-clamp-1 flex-1 pe-2">{c.name}</p>
                                             <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4">{c.engine}</Badge>
                                         </div>
                                         <div className="flex justify-between items-center">
@@ -439,13 +439,13 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                             )}
 
                             <div className="overflow-x-auto flex-1">
-                                <table className="w-full text-left border-collapse min-w-[1200px]">
+                                <table className="w-full text-start border-collapse min-w-[1200px]">
                                     <thead>
                                         <tr className="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-wider font-black text-slate-500 sticky top-0 z-10">
                                             <th className="px-4 py-3 whitespace-nowrap">Domain</th>
                                             <th className="px-4 py-3 whitespace-nowrap">{__('general.page_title')}</th>
                                             <th className="px-4 py-3 w-64">{__('general.h1_snippet')}</th>
-                                            <th className="px-4 py-3 whitespace-nowrap text-right">Metrics</th>
+                                            <th className="px-4 py-3 whitespace-nowrap text-end">Metrics</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">

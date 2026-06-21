@@ -64,8 +64,8 @@ export default function OrderShow({ order }: any) {
             <Card className="shadow-sm border-gray-200 bg-white">
                 <CardContent className="p-6">
                     <div className="flex justify-between items-center relative px-8">
-                        <div className="absolute top-5 left-16 right-16 h-0.5 bg-gray-100 z-0"></div>
-                        <div className="absolute top-5 left-16 right-16 h-0.5 bg-blue-600 z-0 transition-all duration-500" style={{ width: order.status === 'new' ? '0%' : order.status === 'preparing' ? '33%' : order.status === 'shipping' ? '66%' : '100%' }}></div>
+                        <div className="absolute top-5 start-16 end-16 h-0.5 bg-gray-100 z-0"></div>
+                        <div className="absolute top-5 start-16 end-16 h-0.5 bg-blue-600 z-0 transition-all duration-500" style={{ width: order.status === 'new' ? '0%' : order.status === 'preparing' ? '33%' : order.status === 'shipping' ? '66%' : '100%' }}></div>
                         
                         <div className="relative z-10"><TimelineStep title={__('general.new_order')} active={true} /></div>
                         <div className="relative z-10"><TimelineStep title="Preparing" active={['preparing', 'shipping', 'delivered'].includes(order.status)} /></div>
@@ -114,9 +114,9 @@ export default function OrderShow({ order }: any) {
                                 <TableRow className="bg-gray-50/80">
                                     <TableHead className="font-semibold text-gray-600">Product</TableHead>
                                     <TableHead className="font-semibold text-gray-600 text-center">Qty</TableHead>
-                                    <TableHead className="font-semibold text-gray-600 text-right">Price</TableHead>
-                                    <TableHead className="font-semibold text-gray-600 text-right">Commission</TableHead>
-                                    <TableHead className="font-semibold text-gray-600 text-right">Total</TableHead>
+                                    <TableHead className="font-semibold text-gray-600 text-end">Price</TableHead>
+                                    <TableHead className="font-semibold text-gray-600 text-end">Commission</TableHead>
+                                    <TableHead className="font-semibold text-gray-600 text-end">Total</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -132,24 +132,24 @@ export default function OrderShow({ order }: any) {
                                             )}
                                         </TableCell>
                                         <TableCell className="text-center font-medium">{item.quantity}</TableCell>
-                                        <TableCell className="text-right text-gray-600">{item.price}</TableCell>
-                                        <TableCell className="text-right text-green-600 font-medium">{item.commission}</TableCell>
-                                        <TableCell className="text-right font-semibold text-gray-900">
+                                        <TableCell className="text-end text-gray-600">{item.price}</TableCell>
+                                        <TableCell className="text-end text-green-600 font-medium">{item.commission}</TableCell>
+                                        <TableCell className="text-end font-semibold text-gray-900">
                                             {(item.price * item.quantity).toLocaleString()} EGP
                                         </TableCell>
                                     </TableRow>
                                 ))}
                                 <TableRow className="bg-gray-50/50">
-                                    <TableCell colSpan={4} className="text-right font-medium text-gray-500">Subtotal</TableCell>
-                                    <TableCell className="text-right font-bold text-gray-900">{order.subtotal.toLocaleString()} EGP</TableCell>
+                                    <TableCell colSpan={4} className="text-end font-medium text-gray-500">Subtotal</TableCell>
+                                    <TableCell className="text-end font-bold text-gray-900">{order.subtotal.toLocaleString()} EGP</TableCell>
                                 </TableRow>
                                 <TableRow className="bg-gray-50/50">
-                                    <TableCell colSpan={4} className="text-right font-medium text-gray-500">{__('general.shipping_fees')}</TableCell>
-                                    <TableCell className="text-right font-bold text-gray-900">{order.shipping_fees.toLocaleString()} EGP</TableCell>
+                                    <TableCell colSpan={4} className="text-end font-medium text-gray-500">{__('general.shipping_fees')}</TableCell>
+                                    <TableCell className="text-end font-bold text-gray-900">{order.shipping_fees.toLocaleString()} EGP</TableCell>
                                 </TableRow>
                                 <TableRow className="bg-blue-50/30">
-                                    <TableCell colSpan={4} className="text-right font-semibold text-blue-900">{__('general.grand_total')}</TableCell>
-                                    <TableCell className="text-right font-bold text-blue-700 text-lg">{order.total.toLocaleString()} EGP</TableCell>
+                                    <TableCell colSpan={4} className="text-end font-semibold text-blue-900">{__('general.grand_total')}</TableCell>
+                                    <TableCell className="text-end font-bold text-blue-700 text-lg">{order.total.toLocaleString()} EGP</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>

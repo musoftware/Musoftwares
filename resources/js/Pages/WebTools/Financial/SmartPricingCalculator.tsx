@@ -88,15 +88,15 @@ export default function SmartPricingCalculator() {
                                     <div className="space-y-2">
                                         <Label className="text-slate-600">Product Cost</Label>
                                         <div className="relative">
-                                            <span className="absolute left-3 top-2.5 text-slate-400">$</span>
-                                            <Input type="number" className="pl-7" value={productCost} onChange={e => setProductCost(Number(e.target.value))} />
+                                            <span className="absolute start-3 top-2.5 text-slate-400">$</span>
+                                            <Input type="number" className="ps-7" value={productCost} onChange={e => setProductCost(Number(e.target.value))} />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-slate-600">CPA (Cost/Acquisition)</Label>
                                         <div className="relative">
-                                            <span className="absolute left-3 top-2.5 text-slate-400">$</span>
-                                            <Input type="number" className="pl-7" value={cpa} onChange={e => setCpa(Number(e.target.value))} />
+                                            <span className="absolute start-3 top-2.5 text-slate-400">$</span>
+                                            <Input type="number" className="ps-7" value={cpa} onChange={e => setCpa(Number(e.target.value))} />
                                         </div>
                                     </div>
                                 </div>
@@ -119,36 +119,36 @@ export default function SmartPricingCalculator() {
                                     <div className="space-y-2">
                                         <Label className="text-slate-600">Monthly Expenses</Label>
                                         <div className="relative">
-                                            <span className="absolute left-3 top-2.5 text-slate-400">$</span>
-                                            <Input type="number" className="pl-7" value={monthlyExpenses} onChange={e => setMonthlyExpenses(Number(e.target.value))} />
+                                            <span className="absolute start-3 top-2.5 text-slate-400">$</span>
+                                            <Input type="number" className="ps-7" value={monthlyExpenses} onChange={e => setMonthlyExpenses(Number(e.target.value))} />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-slate-600">Confirmation Rate</Label>
                                         <div className="relative">
-                                            <Input type="number" className="pr-7" value={confirmationRate} onChange={e => setConfirmationRate(Number(e.target.value))} />
-                                            <span className="absolute right-3 top-2.5 text-slate-400">%</span>
+                                            <Input type="number" className="pe-7" value={confirmationRate} onChange={e => setConfirmationRate(Number(e.target.value))} />
+                                            <span className="absolute end-3 top-2.5 text-slate-400">%</span>
                                         </div>
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-slate-600">Delivery Rate</Label>
                                         <div className="relative">
-                                            <Input type="number" className="pr-7" value={deliveryRate} onChange={e => setDeliveryRate(Number(e.target.value))} />
-                                            <span className="absolute right-3 top-2.5 text-slate-400">%</span>
+                                            <Input type="number" className="pe-7" value={deliveryRate} onChange={e => setDeliveryRate(Number(e.target.value))} />
+                                            <span className="absolute end-3 top-2.5 text-slate-400">%</span>
                                         </div>
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-slate-600">Shipping Cost</Label>
                                         <div className="relative">
-                                            <span className="absolute left-3 top-2.5 text-slate-400">$</span>
-                                            <Input type="number" className="pl-7" value={shippingCost} onChange={e => setShippingCost(Number(e.target.value))} />
+                                            <span className="absolute start-3 top-2.5 text-slate-400">$</span>
+                                            <Input type="number" className="ps-7" value={shippingCost} onChange={e => setShippingCost(Number(e.target.value))} />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-slate-600">Return Cost</Label>
                                         <div className="relative">
-                                            <span className="absolute left-3 top-2.5 text-slate-400">$</span>
-                                            <Input type="number" className="pl-7" value={returnCost} onChange={e => setReturnCost(Number(e.target.value))} />
+                                            <span className="absolute start-3 top-2.5 text-slate-400">$</span>
+                                            <Input type="number" className="ps-7" value={returnCost} onChange={e => setReturnCost(Number(e.target.value))} />
                                         </div>
                                     </div>
                                 </div>
@@ -198,7 +198,7 @@ export default function SmartPricingCalculator() {
                                     {results.suggestions.map((s, i) => (
                                         <Card key={i} className={`border-2 ${i === 2 ? 'border-emerald-500 shadow-emerald-100' : 'border-slate-200'} shadow-sm relative overflow-hidden`}>
                                             {i === 2 && (
-                                                <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg uppercase tracking-wider">
+                                                <div className="absolute top-0 end-0 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg uppercase tracking-wider">
                                                     Recommended
                                                 </div>
                                             )}
@@ -208,7 +208,7 @@ export default function SmartPricingCalculator() {
                                                         <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Target Margin</p>
                                                         <p className="text-2xl font-black text-slate-900">{s.margin}%</p>
                                                     </div>
-                                                    <div className="text-right">
+                                                    <div className="text-end">
                                                         <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Sell Price</p>
                                                         <p className="text-2xl font-bold text-indigo-600">${formatMoney(s.price)}</p>
                                                     </div>
@@ -218,7 +218,7 @@ export default function SmartPricingCalculator() {
                                                         <p className="text-xs text-slate-500 mb-1">Profit / Unit</p>
                                                         <p className="font-bold text-emerald-600">${formatMoney(s.profitPerUnit)}</p>
                                                     </div>
-                                                    <div className="text-right">
+                                                    <div className="text-end">
                                                         <p className="text-xs text-slate-500 mb-1">Monthly Net Profit</p>
                                                         <p className="font-bold text-emerald-600">${formatMoney(s.monthlyProfit)}</p>
                                                     </div>

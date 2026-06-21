@@ -97,7 +97,7 @@ export default function CalendarIndex({ events }: Props) {
                             return (
                                 <div
                                     key={idx}
-                                    className={`min-h-[140px] border-r border-b border-slate-100 p-2 flex flex-col transition-colors ${
+                                    className={`min-h-[140px] border-e border-b border-slate-100 p-2 flex flex-col transition-colors ${
                                         !isCurrentMonth ? 'bg-slate-50/50 opacity-60' : ''
                                     } ${isCurrentDay ? 'bg-indigo-50/30' : 'hover:bg-slate-50/30'}`}
                                 >
@@ -113,7 +113,7 @@ export default function CalendarIndex({ events }: Props) {
                                         </span>
                                     </div>
 
-                                    <div className="flex-1 space-y-1.5 overflow-y-auto max-h-[160px] pr-1 styled-scrollbar">
+                                    <div className="flex-1 space-y-1.5 overflow-y-auto max-h-[160px] pe-1 styled-scrollbar">
                                         {dayEvents.map((evt) => (
                                             <a 
                                                 key={evt.id} 

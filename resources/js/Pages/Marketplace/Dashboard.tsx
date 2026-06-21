@@ -69,12 +69,12 @@ export default function MarketplaceDashboard({
                                 href="/marketplace/services"
                                 className="inline-flex items-center justify-center px-3.5 h-9 text-xs font-medium border border-slate-200 bg-white rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-colors text-slate-600 shadow-sm"
                             >
-                                <Search className="w-3.5 h-3.5 mr-1.5 text-slate-500" />{__('general.browse_services')}</Link>
+                                <Search className="w-3.5 h-3.5 me-1.5 text-slate-500" />{__('general.browse_services')}</Link>
                             <Link
                                 href="/marketplace/services/create"
                                 className="inline-flex items-center justify-center bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs h-9 px-3.5 rounded-lg transition-colors shadow-sm"
                             >
-                                <Plus className="w-3.5 h-3.5 mr-1.5" />{__('general.publish_service')}</Link>
+                                <Plus className="w-3.5 h-3.5 me-1.5" />{__('general.publish_service')}</Link>
                         </div>
                     }
                 />
@@ -192,7 +192,7 @@ export default function MarketplaceDashboard({
                                                 <span>({gig.reviews} reviews)</span>
                                             </div>
                                         </div>
-                                        <div className="text-right">
+                                        <div className="text-end">
                                             <span className="font-mono font-bold text-slate-900 block text-sm">
                                                 {formatMoney(gig.price, 'USD')}
                                             </span>

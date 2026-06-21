@@ -24,7 +24,7 @@ export default function VendorProductsIndex({ products }: any) {
                 </div>
                 <Link href={route('affiliate_pos.vendor.products.create')}>
                     <Button className="bg-blue-600 hover:bg-blue-700">
-                        <PackagePlus className="w-4 h-4 mr-2" />{__('general.add_product')}</Button>
+                        <PackagePlus className="w-4 h-4 me-2" />{__('general.add_product')}</Button>
                 </Link>
             </div>
 
@@ -47,7 +47,7 @@ export default function VendorProductsIndex({ products }: any) {
                                 <TableHead className="font-semibold text-gray-600">Price (EGP)</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Commission</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Status</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-right">Actions</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -69,10 +69,10 @@ export default function VendorProductsIndex({ products }: any) {
                                                 {product.status}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-end">
                                             <Link href={route('affiliate_pos.vendor.products.edit', { product: product.id })}>
                                                 <Button variant="ghost" size="sm">
-                                                    <Edit2 className="w-4 h-4 mr-2" /> Edit
+                                                    <Edit2 className="w-4 h-4 me-2" /> Edit
                                                 </Button>
                                             </Link>
                                         </TableCell>

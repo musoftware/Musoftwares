@@ -69,7 +69,7 @@ export function CrmCommandPalette({ open, setOpen, onOpenLead }) {
             <CommandList>
                 {loading && (
                     <div className="p-4 flex items-center justify-center text-sm text-slate-500">
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />{__('general.searching')}</div>
+                        <Loader2 className="me-2 h-4 w-4 animate-spin" />{__('general.searching')}</div>
                 )}
                 {!loading && query.length >= 2 && results.length === 0 && (
                     <CommandEmpty>{__('general.no_results_found')}</CommandEmpty>
@@ -79,10 +79,10 @@ export function CrmCommandPalette({ open, setOpen, onOpenLead }) {
                     <CommandGroup heading="Leads">
                         {results.filter(r => r.type === 'Lead').map((item) => (
                             <CommandItem key={item.id} onSelect={() => handleSelect(item)} className="cursor-pointer">
-                                <Users className="mr-2 h-4 w-4 text-indigo-500" />
+                                <Users className="me-2 h-4 w-4 text-indigo-500" />
                                 <div>
                                     <span className="font-medium">{item.title}</span>
-                                    <span className="ml-2 text-xs text-slate-500">{item.subtitle}</span>
+                                    <span className="ms-2 text-xs text-slate-500">{item.subtitle}</span>
                                 </div>
                             </CommandItem>
                         ))}

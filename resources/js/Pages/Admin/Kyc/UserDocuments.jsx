@@ -81,24 +81,24 @@ export default function AdminKycUserDocuments({ auth, user }) {
                                         <div className="w-10 h-10 rounded bg-white border border-slate-200 flex items-center justify-center flex-shrink-0">
                                             <FileText className="w-5 h-5 text-indigo-500" />
                                         </div>
-                                        <div className="truncate pr-4">
+                                        <div className="truncate pe-4">
                                             <h4 className="text-sm font-semibold uppercase tracking-wider">{doc.type.replace('_', ' ')}</h4>
                                             <p className="text-xs text-slate-500 truncate">{doc.filename}</p>
                                         </div>
                                     </div>
                                     <Button variant="secondary" size="sm" asChild>
                                         <a href={route('kyc.download', doc.id)} target="_blank" rel="noreferrer">
-                                            <Eye className="w-4 h-4 mr-1" /> View
+                                            <Eye className="w-4 h-4 me-1" /> View
                                         </a>
                                     </Button>
                                     
                                     {doc.status === 'rejected' && (
-                                        <div className="absolute top-0 right-0 px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-bl-lg">
+                                        <div className="absolute top-0 end-0 px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-bl-lg">
                                             REJECTED
                                         </div>
                                     )}
                                     {doc.status === 'approved' && (
-                                        <div className="absolute top-0 right-0 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-bl-lg">
+                                        <div className="absolute top-0 end-0 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-bl-lg">
                                             APPROVED
                                         </div>
                                     )}
@@ -115,10 +115,10 @@ export default function AdminKycUserDocuments({ auth, user }) {
                         {user.kyc_status === 'pending_review' && (
                             <div className="flex gap-2 sm:justify-end border-t mt-8 pt-6">
                                 <Button variant="destructive" onClick={() => setIsRejectDialogOpen(true)}>
-                                    <X className="w-4 h-4 mr-1" /> Reject
+                                    <X className="w-4 h-4 me-1" /> Reject
                                 </Button>
                                 <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleApprove}>
-                                    <Check className="w-4 h-4 mr-1" /> {__('general.approve_verification')}
+                                    <Check className="w-4 h-4 me-1" /> {__('general.approve_verification')}
                                 </Button>
                             </div>
                         )}

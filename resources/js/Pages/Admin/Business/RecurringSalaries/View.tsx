@@ -42,7 +42,7 @@ export default function View({ salary, transactions, upcomingSchedule, total_sta
                         <div>
                             <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Employee</span>
                             <div className="flex items-center mt-1">
-                                <div className="bg-slate-100 p-1.5 rounded-full mr-2 text-slate-650 border">
+                                <div className="bg-slate-100 p-1.5 rounded-full me-2 text-slate-650 border">
                                     <User className="w-4 h-4" />
                                 </div>
                                 <div>
@@ -143,10 +143,10 @@ export default function View({ salary, transactions, upcomingSchedule, total_sta
                                     <table className="min-w-full divide-y divide-gray-200">
                                         <thead className="bg-slate-50">
                                             <tr>
-                                                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.date_recorded')}</th>
-                                                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.transaction_id')}</th>
-                                                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Reason</th>
-                                                <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
+                                                <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.date_recorded')}</th>
+                                                <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.transaction_id')}</th>
+                                                <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">Reason</th>
+                                                <th className="px-4 py-2 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-200">
@@ -161,7 +161,7 @@ export default function View({ salary, transactions, upcomingSchedule, total_sta
                                                     <td className="px-4 py-3 text-sm text-gray-900">
                                                         {tx.reason}
                                                     </td>
-                                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-red-600 text-right">
+                                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-red-600 text-end">
                                                         -{formatCurrency(tx.amount, tx.currency)}
                                                     </td>
                                                 </tr>
@@ -178,9 +178,9 @@ export default function View({ salary, transactions, upcomingSchedule, total_sta
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-slate-50">
                                     <tr>
-                                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.projected_date')}</th>
-                                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.amount')}</th>
+                                        <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.projected_date')}</th>
+                                        <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th className="px-4 py-2 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.amount')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
@@ -196,7 +196,7 @@ export default function View({ salary, transactions, upcomingSchedule, total_sta
                                                     <span className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-medium">{__('general.pending_execution')}</span>
                                                 )}
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap text-right">
+                                            <td className="px-4 py-3 whitespace-nowrap text-end">
                                                 <span className={`text-sm font-bold ${run.recorded ? 'text-slate-900' : 'text-slate-400'}`}>
                                                     {run.amount_str}
                                                 </span>

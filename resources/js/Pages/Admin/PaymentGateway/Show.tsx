@@ -241,7 +241,7 @@ export default function Show({ client, payments, stats }: Props) {
             <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <Button variant="outline" size="sm" onClick={() => router.visit(route('admin.musoftware-clients.index'))}>
-                        <ArrowLeft className="h-4 w-4 mr-1" />
+                        <ArrowLeft className="h-4 w-4 me-1" />
                         Back
                     </Button>
                     <div>
@@ -251,10 +251,10 @@ export default function Show({ client, payments, stats }: Props) {
                 </div>
                 <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={() => setIsDocsOpen(true)}>
-                        <Code className="h-4 w-4 mr-1" />{__('general.integration_docs')}</Button>
+                        <Code className="h-4 w-4 me-1" />{__('general.integration_docs')}</Button>
                     <Button variant="outline" size="sm" onClick={() => setIsEditOpen(true)}>{__('general.edit_client')}</Button>
                     <Button variant="destructive" size="sm" onClick={() => setIsRegenOpen(true)}>
-                        <RefreshCw className="h-4 w-4 mr-1" />{__('general.regenerate_secrets')}</Button>
+                        <RefreshCw className="h-4 w-4 me-1" />{__('general.regenerate_secrets')}</Button>
                 </div>
             </div>
 
@@ -322,7 +322,7 @@ export default function Show({ client, payments, stats }: Props) {
                 <div className="border-b bg-gray-50 px-5 py-3">
                     <h2 className="text-sm font-semibold text-gray-700">{__('general.payment_history')}</h2>
                 </div>
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-start text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
                             <th className="p-4 font-medium text-gray-600">{__('general.order_id')}</th>
@@ -350,7 +350,7 @@ export default function Show({ client, payments, stats }: Props) {
                                 </td>
                                 <td className="p-4 font-medium text-green-700">
                                     {formatCurrency(p.commission_amount, p.currency)}
-                                    <span className="ml-1 text-xs text-gray-400">({p.commission_rate}%)</span>
+                                    <span className="ms-1 text-xs text-gray-400">({p.commission_rate}%)</span>
                                 </td>
                                 <td className="p-4 text-gray-700">
                                     {formatCurrency(p.net_amount, p.currency)}
@@ -460,7 +460,7 @@ export default function Show({ client, payments, stats }: Props) {
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsRegenOpen(false)}>Cancel</Button>
                         <Button variant="destructive" onClick={handleRegenerate}>
-                            <RefreshCw className="h-4 w-4 mr-1" />{__('general.yes_regenerate')}</Button>
+                            <RefreshCw className="h-4 w-4 me-1" />{__('general.yes_regenerate')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -469,7 +469,7 @@ export default function Show({ client, payments, stats }: Props) {
             <Dialog open={isDocsOpen} onOpenChange={setIsDocsOpen}>
                 <DialogContent className="max-w-3xl">
                     <DialogHeader><DialogTitle>Integration Guide — {client.name}</DialogTitle></DialogHeader>
-                    <div className="max-h-[70vh] space-y-4 overflow-y-auto py-2 pr-1">
+                    <div className="max-h-[70vh] space-y-4 overflow-y-auto py-2 pe-1">
                         <div className="rounded-lg border border-gray-200 p-4 text-sm space-y-2">
                             <p className="font-semibold text-gray-700">1. Endpoint</p>
                             <code className="block rounded bg-gray-100 px-3 py-2 text-xs">

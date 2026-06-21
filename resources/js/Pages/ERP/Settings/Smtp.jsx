@@ -157,7 +157,7 @@ export default function Smtp({ smtp }) {
 
                     <div className="flex justify-end gap-4">
                         <Button type="submit" disabled={processing} className="w-full sm:w-auto">
-                            <Save className="mr-2 h-4 w-4" />{__('general.save_settings')}</Button>
+                            <Save className="me-2 h-4 w-4" />{__('general.save_settings')}</Button>
                     </div>
                 </form>
             </div>

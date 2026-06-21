@@ -234,14 +234,14 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                         <OperationalCard>
                             {/* Desktop Table */}
                             <div className="hidden md:block overflow-x-auto">
-                                <table className="w-full text-left text-sm border-collapse">
+                                <table className="w-full text-start text-sm border-collapse">
                                     <thead>
                                         <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                             <th className="px-6 py-3.5">{t.full_name}</th>
                                             <th className="px-6 py-3.5">{t.email_address}</th>
                                             <th className="px-6 py-3.5">{t.access_role}</th>
                                             <th className="px-6 py-3.5">{t.account_status}</th>
-                                            <th className="px-6 py-3.5 text-right"></th>
+                                            <th className="px-6 py-3.5 text-end"></th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
@@ -288,7 +288,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                                                 {member.status === 'active' ? t.status_active : t.status_suspended}
                                                             </span>
                                                         </td>
-                                                        <td className="px-6 py-4 text-right">
+                                                        <td className="px-6 py-4 text-end">
                                                             <Dialog>
                                                                 <DialogTrigger asChild>
                                                                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -302,10 +302,10 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                                                     </DialogHeader>
                                                                     <div className="flex flex-col gap-2 py-2">
                                                                         <Button variant="outline" className="justify-start" onClick={() => handleEditClick(member)}>
-                                                                            <Edit2 className="h-4 w-4 mr-2" /> {t.update_member_details}
+                                                                            <Edit2 className="h-4 w-4 me-2" /> {t.update_member_details}
                                                                         </Button>
                                                                         <Button variant="destructive" className="justify-start" onClick={() => handleDeleteClick(member)}>
-                                                                            <Trash2 className="h-4 w-4 mr-2" /> {t.remove_member}
+                                                                            <Trash2 className="h-4 w-4 me-2" /> {t.remove_member}
                                                                         </Button>
                                                                     </div>
                                                                 </DialogContent>
@@ -366,10 +366,10 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                                         </DialogHeader>
                                                         <div className="flex flex-col gap-2 py-2">
                                                             <Button variant="outline" className="justify-start" onClick={() => handleEditClick(member)}>
-                                                                <Edit2 className="h-4 w-4 mr-2" /> {t.update_member_details}
+                                                                <Edit2 className="h-4 w-4 me-2" /> {t.update_member_details}
                                                             </Button>
                                                             <Button variant="destructive" className="justify-start" onClick={() => handleDeleteClick(member)}>
-                                                                <Trash2 className="h-4 w-4 mr-2" /> {t.remove_member}
+                                                                <Trash2 className="h-4 w-4 me-2" /> {t.remove_member}
                                                             </Button>
                                                         </div>
                                                     </DialogContent>

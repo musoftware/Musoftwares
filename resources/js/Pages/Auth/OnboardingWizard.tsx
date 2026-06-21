@@ -180,8 +180,8 @@ export default function OnboardingWizard({ user, countries }: Props) {
             {/* Main Centered Onboarding Wizard Container */}
             <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 lg:p-12 relative overflow-hidden">
                 {/* Background Ambient Glow */}
-                <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute top-1/4 -start-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-1/4 -end-20 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
 
                 {/* Progress Indicators */}
                 <div className="w-full max-w-xl mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 z-10">
@@ -260,7 +260,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="border-t px-8 py-4 flex justify-end bg-muted/30">
-                                    <Button onClick={nextStep} size="lg" className="h-11 px-6 rounded-xl font-medium shadow-sm">{__('general.continue_to_contact')}<ArrowRight className="w-4 h-4 ml-2" />
+                                    <Button onClick={nextStep} size="lg" className="h-11 px-6 rounded-xl font-medium shadow-sm">{__('general.continue_to_contact')}<ArrowRight className="w-4 h-4 ms-2" />
                                     </Button>
                                 </CardFooter>
                             </motion.div>
@@ -315,12 +315,12 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                                 <span>{__('general.telegram_username')}</span>
                                             </label>
                                             <div className="relative flex items-center">
-                                                <span className="absolute left-3 text-sm font-medium text-muted-foreground">@</span>
+                                                <span className="absolute start-3 text-sm font-medium text-muted-foreground">@</span>
                                                 <Input
                                                     placeholder="username"
                                                     value={formData.telegram_username}
                                                     onChange={(e) => setFormData(prev => ({ ...prev, telegram_username: e.target.value }))}
-                                                    className="h-10 text-sm font-medium pl-8"
+                                                    className="h-10 text-sm font-medium ps-8"
                                                 />
                                             </div>
                                         </div>
@@ -328,16 +328,16 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                 </CardContent>
                                 <CardFooter className="border-t px-8 py-4 flex items-center justify-between bg-muted/30">
                                     <Button onClick={prevStep} variant="outline" size="lg" className="h-11 px-5 rounded-xl font-medium">
-                                        <ArrowLeft className="w-4 h-4 mr-2" />
+                                        <ArrowLeft className="w-4 h-4 me-2" />
                                         {__('general.back')}
                                     </Button>
                                     <Button onClick={handleComplete} size="lg" className="h-11 px-8 rounded-xl font-medium shadow-md" disabled={saving}>
                                         {saving ? (
                                             <>
-                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />{__('general.configuring_workspace')}</>
+                                                <Loader2 className="w-4 h-4 me-2 animate-spin" />{__('general.configuring_workspace')}</>
                                         ) : (
                                             <>
-                                                <Sparkles className="w-4 h-4 mr-2 text-amber-400" />{__('general.complete_setup')}</>
+                                                <Sparkles className="w-4 h-4 me-2 text-amber-400" />{__('general.complete_setup')}</>
                                         )}
                                     </Button>
                                 </CardFooter>

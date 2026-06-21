@@ -195,18 +195,18 @@ export default function ReportsIndex({
 
                         <OperationalCard title={__('general.tenant_revenue_stats')}>
                             <div className="overflow-x-auto">
-                                <table className="w-full text-left text-sm">
+                                <table className="w-full text-start text-sm">
                                     <thead className="text-slate-500 border-b border-slate-200">
                                         <tr>
                                             <th className="pb-3 font-medium">{__('general.tenant_name')}</th>
-                                            <th className="pb-3 text-right font-medium">Revenue</th>
+                                            <th className="pb-3 text-end font-medium">Revenue</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
                                         {(pnl?.tenantStats || []).map((tenant: any, idx: number) => (
                                             <tr key={idx}>
                                                 <td className="py-3 font-medium text-slate-700">{tenant.tenant_name}</td>
-                                                <td className="py-3 text-right font-mono text-slate-900">
+                                                <td className="py-3 text-end font-mono text-slate-900">
                                                     {maskValue(formatCurrency(tenant.revenue, businessCurrency))}
                                                 </td>
                                             </tr>

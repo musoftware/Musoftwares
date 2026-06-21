@@ -42,7 +42,7 @@ export default function LeaderboardTable({ leaderboard = [] }: { leaderboard: Le
                         <TableHead className="text-center">{__('general.calls')}</TableHead>
                         <TableHead className="text-center">{__('general.tasks')}</TableHead>
                         <TableHead className="text-center">{__('general.closed')}</TableHead>
-                        <TableHead className="text-right">{__('general.conversion')}</TableHead>
+                        <TableHead className="text-end">{__('general.conversion')}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -77,7 +77,7 @@ export default function LeaderboardTable({ leaderboard = [] }: { leaderboard: Le
                                     <span className="font-medium">{agent.leads_closed}</span>
                                 </div>
                             </TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="text-end">
                                 <div className="flex items-center justify-end gap-1.5">
                                     <Target className="w-3.5 h-3.5 text-indigo-500" />
                                     <span className="font-bold text-slate-700">{agent.conversion_rate}%</span>

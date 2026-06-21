@@ -33,7 +33,7 @@ export function ReleaseNotes({ versions, defaultExpanded }: ReleaseNotesProps) {
                         className="border border-slate-200 rounded-xl overflow-hidden transition-all"
                     >
                         <button
-                            className="w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-slate-50/80 transition-colors"
+                            className="w-full flex items-center justify-between px-4 py-3.5 text-start hover:bg-slate-50/80 transition-colors"
                             onClick={() => setExpanded(isOpen ? null : v.version)}
                         >
                             <div className="flex items-center gap-2.5 min-w-0">

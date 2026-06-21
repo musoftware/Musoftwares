@@ -151,14 +151,14 @@ export default function Index({ projects, clients, currentTab }) {
             </div>
 
             <div className="overflow-hidden rounded-lg bg-white shadow">
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-start text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
                             <th className="p-4 font-medium text-gray-600">Name</th>
                             <th className="p-4 font-medium text-gray-600">Client</th>
                             <th className="p-4 font-medium text-gray-600">Budget</th>
                             <th className="p-4 font-medium text-gray-600">Status</th>
-                            <th className="p-4 font-medium text-gray-600 text-right">Actions</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -167,7 +167,7 @@ export default function Index({ projects, clients, currentTab }) {
                                 <td className="p-4 font-medium text-gray-900">
                                     <button 
                                         onClick={() => openProjectSheet(project)}
-                                        className="hover:text-blue-600 hover:underline text-left font-semibold cursor-pointer outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                                        className="hover:text-blue-600 hover:underline text-start font-semibold cursor-pointer outline-none focus:ring-2 focus:ring-blue-500 rounded"
                                     >
                                         {project.project_name}
                                     </button>
@@ -186,7 +186,7 @@ export default function Index({ projects, clients, currentTab }) {
                                                     <User className="h-5 w-5" />
                                                 </AvatarFallback>
                                             </Avatar>
-                                            <div className="flex flex-col text-left">
+                                            <div className="flex flex-col text-start">
                                                 <span className="font-semibold text-slate-900">
                                                     {project.client.name}
                                                 </span>
@@ -205,7 +205,7 @@ export default function Index({ projects, clients, currentTab }) {
                                         {project.archived === 0 ? project.status : 'Archived'}
                                     </span>
                                 </td>
-                                <td className="p-4 space-x-2 text-right">
+                                <td className="p-4 space-x-2 text-end">
                                     <Button variant="outline" size="sm" onClick={() => openEditModal(project)}>
                                         Edit
                                     </Button>

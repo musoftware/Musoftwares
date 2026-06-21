@@ -159,7 +159,7 @@ export default function ProposalsIndex({ proposals, stats, userCurrency }: any) 
                                     </div>
 
                                     <div className="flex items-center gap-4 shrink-0">
-                                        <div className="text-right">
+                                        <div className="text-end">
                                             <span className="text-base font-black text-slate-900 font-mono">
                                                 {proposal.bid_amount !== null && proposal.bid_amount !== undefined ? formatMoney(proposal.bid_amount, userCurrency) : `${proposal.proposed_budget_points} ${__('freelance.pts', undefined, 'pts')}`}
                                             </span>

@@ -298,7 +298,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
         {
             key: 'actions',
             label: '',
-            className: 'w-[70px] text-right',
+            className: 'w-[70px] text-end',
             render: (t: EmployeeTodo) => (
                 <DropdownMenu>
                     <DropdownMenuTrigger
@@ -310,13 +310,13 @@ export default function Index({ todos, filters, stats, users }: Props) {
                     <DropdownMenuContent align="end" className="w-40">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => openEdit(t)}>
-                            <Pencil className="mr-2 h-4 w-4" /> Edit
+                            <Pencil className="me-2 h-4 w-4" /> Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             className="text-red-600 focus:text-red-600"
                             onClick={() => setDeleteId(t.id)}
                         >
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                            <Trash2 className="me-2 h-4 w-4" /> Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -363,7 +363,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                 />
             </div>
 
-            <Button onClick={openCreate} className="flex items-center gap-1.5 ml-auto h-11 rounded-xl">
+            <Button onClick={openCreate} className="flex items-center gap-1.5 ms-auto h-11 rounded-xl">
                 <Plus className="h-4 w-4" />{__('general.new_todo')}</Button>
         </div>
     );

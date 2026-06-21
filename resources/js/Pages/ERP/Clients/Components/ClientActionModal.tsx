@@ -114,7 +114,7 @@ export function ClientActionModal({ client, isOpen, onClose, onDelete, auth }: C
                                     onClose();
                                     onDelete(client);
                                 }}
-                                className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] text-rose-600 hover:bg-rose-50 transition-colors group w-full text-left"
+                                className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] text-rose-600 hover:bg-rose-50 transition-colors group w-full text-start"
                             >
                                 <Trash2 className="h-4 w-4 shrink-0" />
                                 <span className="group-hover:translate-x-0.5 transition-transform">{__('general.delete_client')}</span>

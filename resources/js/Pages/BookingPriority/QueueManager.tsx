@@ -14,7 +14,7 @@ export default function QueueManager({ queueItems }) {
                     <p className="text-muted-foreground mt-2">{__('general.realtime_sorting_based_on_vip_weights_and_emergency_flags')}</p>
                 </div>
                 <Button variant="destructive">
-                    <AlertCircle className="mr-2 h-4 w-4" />{__('general.trigger_emergency')}</Button>
+                    <AlertCircle className="me-2 h-4 w-4" />{__('general.trigger_emergency')}</Button>
             </div>
 
             <div className="space-y-4">

@@ -67,7 +67,7 @@ export default function SupportDashboard({ stats, priorityMessages }: { stats: a
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex justify-between items-center mb-1">
                                                     <p className="font-semibold text-sm text-foreground truncate">{msg.customer}</p>
-                                                    <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">{msg.timeAgo}</span>
+                                                    <span className="text-xs text-muted-foreground whitespace-nowrap ms-2">{msg.timeAgo}</span>
                                                 </div>
                                                 <p className="text-sm text-slate-600 truncate">{msg.preview}</p>
                                             </div>

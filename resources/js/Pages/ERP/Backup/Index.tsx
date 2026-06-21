@@ -90,14 +90,14 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
                                         href={route('erp.backup.download')} 
                                         className="flex items-center justify-center w-full h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
                                     >
-                                        <Download className="mr-2 h-4 w-4" />{__('general.download_backup_file')}</a>
+                                        <Download className="me-2 h-4 w-4" />{__('general.download_backup_file')}</a>
                                 </div>
                             </CardContent>
                         </Card>
 
                         {/* Restore Backup */}
                         <Card className="shadow-none border-border border-destructive/20 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                            <div className="absolute top-0 end-0 p-4 opacity-10">
                                 <AlertTriangle className="h-24 w-24 text-destructive" />
                             </div>
                             <CardHeader>
@@ -113,7 +113,7 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
                                         type="file" 
                                         accept=".json,.zip"
                                         onChange={(e) => setRestoreFile(e.target.files?.[0] || null)}
-                                        className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+                                        className="block w-full text-sm text-slate-500 file:me-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
                                     />
                                     <Button 
                                         variant="destructive" 
@@ -121,7 +121,7 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
                                         onClick={handleRestoreSubmit}
                                         className="w-full"
                                     >
-                                        {isRestoring ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{__('general.restoring')}</> : __('general.restore_from_file')}
+                                        {isRestoring ? <><Loader2 className="me-2 h-4 w-4 animate-spin" />{__('general.restoring')}</> : __('general.restore_from_file')}
                                     </Button>
                                 </div>
                             </CardContent>

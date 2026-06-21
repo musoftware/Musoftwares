@@ -206,7 +206,7 @@ export default function PricingBuilder({
                 key={item.id}
                 onClick={() => toggleItem(item.id)}
                 className={cn(
-                    'relative flex items-start gap-4 rounded-2xl border transition-all duration-300 cursor-pointer group text-left',
+                    'relative flex items-start gap-4 rounded-2xl border transition-all duration-300 cursor-pointer group text-start',
                     isAddon ? 'p-4 bg-white/50 hover:bg-white' : 'p-5 bg-white hover:shadow-sm',
                     isSelected
                         ? (isAddon ? 'border-indigo-400 bg-indigo-50/50' : 'border-indigo-600 bg-indigo-50/50 shadow-md shadow-indigo-100/50')
@@ -231,7 +231,7 @@ export default function PricingBuilder({
                                 </h3>
                                 {ownedFeature && (
                                     <span className={cn(
-                                        "ml-2 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full",
+                                        "ms-2 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full",
                                         ownedFeature.status === 'active' 
                                             ? "bg-emerald-100 text-emerald-700" 
                                             : "bg-red-100 text-red-700"
@@ -255,14 +255,14 @@ export default function PricingBuilder({
                                 </p>
                             )}
                         </div>
-                        <div className="text-right shrink-0 ml-2">
+                        <div className="text-end shrink-0 ms-2">
                             {item.type === 'module' && (
-                                <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-0.5 text-right">{__('general.starts_from')}</div>
+                                <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-0.5 text-end">{__('general.starts_from')}</div>
                             )}
                             <span className="text-lg font-bold text-slate-900">
                                 {calculateItemPrice(item).toFixed(2)}
                             </span>
-                            <span className="text-xs text-slate-500 ml-1">{currency}</span>
+                            <span className="text-xs text-slate-500 ms-1">{currency}</span>
                         </div>
                     </div>
                 </div>
@@ -273,7 +273,7 @@ export default function PricingBuilder({
     return (
         <div className="flex flex-col lg:flex-row gap-8 items-start w-full">
             {/* ── Products List (Left) ── */}
-            <div className="flex-1 w-full space-y-10 text-left">
+            <div className="flex-1 w-full space-y-10 text-start">
                 <section>
                     <div className="mb-4">
                         <h2 className="text-xl font-semibold text-slate-900">{__('general.core_modules')}</h2>
@@ -289,7 +289,7 @@ export default function PricingBuilder({
                                     
                                     {/* Add-ons Section */}
                                     {moduleAddons.length > 0 && (isModuleSelected || (isNewSystem ? false : activeSubscription?.owned_features?.find(f => f.id === module.id)?.status === 'active')) && (
-                                        <div className="mt-4 pl-4 md:pl-8 border-l-[3px] border-indigo-100 ml-4 md:ml-6 pb-2 animate-in slide-in-from-top-4 fade-in duration-300">
+                                        <div className="mt-4 ps-4 md:ps-8 border-s-[3px] border-indigo-100 ms-4 md:ms-6 pb-2 animate-in slide-in-from-top-4 fade-in duration-300">
                                             <div className="flex items-center justify-between mb-3">
                                                 <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2 tracking-tight">
                                                     <Sparkles className="w-4 h-4 text-indigo-500" /> 
@@ -340,7 +340,7 @@ export default function PricingBuilder({
             </div>
 
             {/* ── Sticky Summary Cart (Right) ── */}
-            <div className="w-full lg:w-[380px] shrink-0 sticky top-24 text-left">
+            <div className="w-full lg:w-[380px] shrink-0 sticky top-24 text-start">
                 <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
                     <div className="p-6 bg-slate-50/50 border-b border-slate-100 flex flex-col gap-3">
                         <div>
@@ -388,7 +388,7 @@ export default function PricingBuilder({
                                     const isAddon = item.type === 'addon';
                                     
                                     return (
-                                        <div key={id} className={cn("flex justify-between text-sm", isAddon ? "pl-4 text-slate-500" : "text-slate-700 font-medium")}>
+                                        <div key={id} className={cn("flex justify-between text-sm", isAddon ? "ps-4 text-slate-500" : "text-slate-700 font-medium")}>
                                             <span className="flex items-center gap-1.5">
                                                 {isAddon && <span className="text-slate-300">↳</span>}
                                                 {item.name}
@@ -403,7 +403,7 @@ export default function PricingBuilder({
                                 {selectedItems.length > 5 && (
                                     <button
                                         onClick={() => setIsCartExpanded(!isCartExpanded)}
-                                        className="text-xs text-indigo-600 hover:text-indigo-700 font-medium w-full text-left py-1"
+                                        className="text-xs text-indigo-600 hover:text-indigo-700 font-medium w-full text-start py-1"
                                     >
                                         {isCartExpanded ? __('general.show_less') : `+${selectedItems.length - 5} ${__('general.more_items')}`}
                                     </button>
@@ -434,11 +434,11 @@ export default function PricingBuilder({
 
                                 <div className="flex justify-between items-end">
                                     <span className="text-base font-medium text-slate-900">{__('general.total_to_pay')}</span>
-                                    <div className={cn("text-right", isCalculating && "opacity-50 transition-opacity")}>
+                                    <div className={cn("text-end", isCalculating && "opacity-50 transition-opacity")}>
                                         <span className="text-3xl font-bold tracking-tight text-indigo-600">
                                             {Math.max(0, total - (!isNewSystem ? proratedRefund : 0)).toFixed(2)}
                                         </span>
-                                        <span className="text-sm text-slate-400 ml-1">{currency}</span>
+                                        <span className="text-sm text-slate-400 ms-1">{currency}</span>
                                     </div>
                                 </div>
                             </div>

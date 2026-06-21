@@ -42,7 +42,7 @@ export function LinkedInWorkspace(props: LinkedInWorkspaceProps) {
                                 </span>
                             </div>
                             {props.linkedInSession.validatedAt && (
-                                <div className="text-right">
+                                <div className="text-end">
                                     <span className="text-slate-400 block text-[10px]">Last validated:</span>
                                     <span className="font-mono text-slate-500 text-[10px] block mt-0.5">{new Date(props.linkedInSession.validatedAt).toLocaleDateString()}</span>
                                 </div>

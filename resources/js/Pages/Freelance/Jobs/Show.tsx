@@ -134,7 +134,7 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
                                                 onClick={handlePoke}
                                                 title={!canPoke ? __('freelance.poke_too_soon') : ''}
                                             >
-                                                <Bell className="w-3.5 h-3.5 mr-1.5" />
+                                                <Bell className="w-3.5 h-3.5 me-1.5" />
                                                 {__('freelance.poke_freelancers')}
                                             </Button>
                                         )}
@@ -146,7 +146,7 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
                                                     onClick={() => setIsDeleteDialogOpen(true)}
                                                     className="w-full sm:w-auto"
                                                 >
-                                                    <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                                                    <Trash2 className="w-3.5 h-3.5 me-1.5" />
                                                     {__('general.delete')}
                                                 </Button>
 
@@ -211,7 +211,7 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
                                                                 <span className="flex items-center gap-1 font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full"><AlertCircle className="h-3.5 w-3.5" /> {proposal.points_spent} {__('freelance.points')}</span>
                                                             </div>
                                                         </div>
-                                                        <div className="text-right">
+                                                        <div className="text-end">
                                                             <div className="text-xl font-bold text-indigo-700 font-mono">
                                                                 {proposal.bid_amount !== null && proposal.bid_amount !== undefined ? formatMoney(proposal.bid_amount, userCurrency) : `${proposal.proposed_budget_points} ${__('freelance.pts', undefined, 'pts')}`}
                                                             </div>
@@ -228,7 +228,7 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
                                                     {job.status === 'open' && proposal.status === 'pending' && (
                                                         <div className="flex flex-wrap gap-3 mt-6 pt-4 border-t border-slate-100">
                                                             <Button onClick={() => handleAccept(proposal.id)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
-                                                                <CheckCircle2 className="mr-2 h-4 w-4" /> {__('freelance.accept_create_contract')}
+                                                                <CheckCircle2 className="me-2 h-4 w-4" /> {__('freelance.accept_create_contract')}
                                                             </Button>
                                                             <Button onClick={() => handleReject(proposal.id)} variant="outline" className="text-slate-600 hover:text-red-600 hover:bg-red-50">
                                                                 {__('freelance.reject_proposal')}
@@ -427,7 +427,7 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
                                                     disabled={processing || userPoints < data.points_spent}
                                                     className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 font-bold px-8"
                                                 >
-                                                    <Send className="mr-2 h-4 w-4" /> {__('freelance.submit_proposal')}
+                                                    <Send className="me-2 h-4 w-4" /> {__('freelance.submit_proposal')}
                                                 </Button>
                                             </div>
                                         </form>

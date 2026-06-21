@@ -71,7 +71,7 @@ export default function Dashboard({ stats }) {
                                     href={card.href} 
                                     className="inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
                                 >
-                                    {__('general.go_to')} {card.title} <ArrowRight className="ml-1 h-4 w-4" />
+                                    {__('general.go_to')} {card.title} <ArrowRight className="ms-1 h-4 w-4" />
                                 </Link>
                             </div>
                         </CardContent>

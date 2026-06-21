@@ -75,11 +75,11 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
                                     type="text"
                                     name="search"
                                     value={search}
-                                    className="w-full pl-9 pr-4 py-2"
+                                    className="w-full ps-9 pe-4 py-2"
                                     placeholder={t('erp.search_products', 'Search products...')}
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                     <Search className="h-4 w-4 text-gray-400" />
                                 </div>
                             </form>
@@ -88,7 +88,7 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
                                 href={route('erp.inventory.products.create')}
                                 className="inline-flex w-full sm:w-auto items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
                             >
-                                <Plus className="mr-2 h-4 w-4" />
+                                <Plus className="me-2 h-4 w-4" />
                                 <span className="whitespace-nowrap">{t('erp.add_product', 'Add Product')}</span>
                             </Link>
                         </div>
@@ -107,13 +107,13 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
                                     <table className="min-w-full divide-y divide-gray-200">
                                         <thead className="bg-gray-50">
                                             <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 w-16"></th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.product_name', 'Name')}</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.category', 'Category')}</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.sku', 'SKU / Barcode')}</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.price', 'Price')}</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.stock', 'Stock')}</th>
-                                                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.actions', 'Actions')}</th>
+                                                <th className="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider text-gray-500 w-16"></th>
+                                                <th className="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.product_name', 'Name')}</th>
+                                                <th className="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.category', 'Category')}</th>
+                                                <th className="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.sku', 'SKU / Barcode')}</th>
+                                                <th className="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.price', 'Price')}</th>
+                                                <th className="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.stock', 'Stock')}</th>
+                                                <th className="px-6 py-3 text-end text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.actions', 'Actions')}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-200 bg-white">
@@ -147,14 +147,14 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
                                                         <div className="flex items-center space-x-2">
                                                             <span className="text-sm font-medium text-gray-900">{product.stock_quantity} <span className="text-xs text-gray-500 font-normal">{product.uom || 'piece'}</span></span>
                                                             {product.reorder_level !== null && product.stock_quantity <= product.reorder_level && (
-                                                                <Badge variant="destructive" className="ml-2 flex items-center">
-                                                                    <AlertCircle className="mr-1 h-3 w-3" />
+                                                                <Badge variant="destructive" className="ms-2 flex items-center">
+                                                                    <AlertCircle className="me-1 h-3 w-3" />
                                                                     {t('erp.low_stock', 'Low Stock')}
                                                                 </Badge>
                                                             )}
                                                         </div>
                                                     </td>
-                                                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                                                    <td className="whitespace-nowrap px-6 py-4 text-end text-sm font-medium">
                                                         <Dialog>
                                                             <DialogTrigger asChild>
                                                                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -168,15 +168,15 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
                                                                 </DialogHeader>
                                                                 <div className="flex flex-col gap-2 py-2">
                                                                     <Button variant="outline" className="justify-start" onClick={() => router.get(route('erp.inventory.products.adjust', product.id))}>
-                                                                        <ListPlus className="mr-2 h-4 w-4" />
+                                                                        <ListPlus className="me-2 h-4 w-4" />
                                                                         {t('erp.adjust_stock', 'Adjust')}
                                                                     </Button>
                                                                     <Button variant="outline" className="justify-start" onClick={() => router.get(route('erp.inventory.products.edit', product.id))}>
-                                                                        <Edit className="mr-2 h-4 w-4" />
+                                                                        <Edit className="me-2 h-4 w-4" />
                                                                         {t('erp.edit', 'Edit')}
                                                                     </Button>
                                                                     <Button variant="destructive" className="justify-start" onClick={() => handleDelete(product.id)}>
-                                                                        <Trash2 className="mr-2 h-4 w-4" />
+                                                                        <Trash2 className="me-2 h-4 w-4" />
                                                                         {t('erp.delete', 'Delete')}
                                                                     </Button>
                                                                 </div>
@@ -197,7 +197,7 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
                                                     <h4 className="text-sm font-medium text-gray-900">{product.name}</h4>
                                                     <p className="text-xs text-gray-500 mt-1">{t('erp.sku', 'SKU')}: {product.sku || '-'}</p>
                                                 </div>
-                                                <div className="text-right">
+                                                <div className="text-end">
                                                     <p className="text-sm font-bold text-gray-900">{formatCurrency(product.price, product.currency)}</p>
                                                     <div className="flex justify-between items-center text-sm">
                                                         <span className="text-gray-500">{t('erp.stock', 'Stock')}:</span>
@@ -209,7 +209,7 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
                                             {product.reorder_level !== null && product.stock_quantity <= product.reorder_level && (
                                                 <div className="flex items-center">
                                                     <Badge variant="destructive" className="flex items-center">
-                                                        <AlertCircle className="mr-1 h-3 w-3" />
+                                                        <AlertCircle className="me-1 h-3 w-3" />
                                                         {t('erp.low_stock', 'Low Stock')}
                                                     </Badge>
                                                 </div>
@@ -229,15 +229,15 @@ export default function Index({ products, hasInventoryFeature, filters }: { prod
                                                         </DialogHeader>
                                                         <div className="flex flex-col gap-2 py-2">
                                                             <Button variant="outline" className="justify-start" onClick={() => router.get(route('erp.inventory.products.adjust', product.id))}>
-                                                                <ListPlus className="mr-2 h-4 w-4" />
+                                                                <ListPlus className="me-2 h-4 w-4" />
                                                                 {t('erp.adjust_stock', 'Adjust')}
                                                             </Button>
                                                             <Button variant="outline" className="justify-start" onClick={() => router.get(route('erp.inventory.products.edit', product.id))}>
-                                                                <Edit className="mr-2 h-4 w-4" />
+                                                                <Edit className="me-2 h-4 w-4" />
                                                                 {t('erp.edit', 'Edit')}
                                                             </Button>
                                                             <Button variant="destructive" className="justify-start" onClick={() => handleDelete(product.id)}>
-                                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                                <Trash2 className="me-2 h-4 w-4" />
                                                                 {t('erp.delete', 'Delete')}
                                                             </Button>
                                                         </div>

@@ -350,7 +350,7 @@ export default function DeliverabilityWorkspace({
                         </Button>
                     </CardHeader>
                     <CardContent className="pt-6 flex-1 min-h-[220px] flex flex-col">
-                        <div className="overflow-y-auto max-h-[320px] pr-1 space-y-3 flex-1">
+                        <div className="overflow-y-auto max-h-[320px] pe-1 space-y-3 flex-1">
                             {sessions.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-3">
                                     <ShieldAlert className="w-10 h-10 text-slate-350 dark:text-slate-700 stroke-[1.5]" />
@@ -414,7 +414,7 @@ export default function DeliverabilityWorkspace({
                                                 </span>
                                             </div>
                                             
-                                            <div className="flex items-center gap-2 border-l pl-3 dark:border-slate-800">
+                                            <div className="flex items-center gap-2 border-s ps-3 dark:border-slate-800">
                                                 <span className="text-[10px] font-bold text-slate-500 hidden md:inline">
                                                     {session.warmupActive ? text.statusActive : text.statusInactive}
                                                 </span>
@@ -444,7 +444,7 @@ export default function DeliverabilityWorkspace({
                         {text.warmupToggled}: {intensity.toUpperCase()}
                     </Badge>
                 </CardHeader>
-                <CardContent className="pt-6 flex-1 overflow-y-auto pr-2 space-y-3.5">
+                <CardContent className="pt-6 flex-1 overflow-y-auto pe-2 space-y-3.5">
                     {logs.length === 0 ? (
                         <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400 dark:text-slate-650">
                             <Activity className="w-8 h-8 mb-2 stroke-[1.5]" />

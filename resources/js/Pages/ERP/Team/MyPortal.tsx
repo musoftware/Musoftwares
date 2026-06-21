@@ -173,13 +173,13 @@ export default function MyPortal({ todayLog, attendanceHistory, leaveRequests, p
                         <OperationalCard title={__('erp.recent_attendance')} icon={<History className="w-5 h-5 text-neutral-500" />}>
                             {attendanceHistory.length > 0 ? (
                                 <div className="overflow-x-auto rounded-xl border border-neutral-200">
-                                    <table className="w-full text-sm text-left">
+                                    <table className="w-full text-sm text-start">
                                         <thead className="bg-neutral-50 border-b border-neutral-200 text-neutral-500">
                                             <tr>
                                                 <th className="px-4 py-3 font-medium">{__('erp.date')}</th>
                                                 <th className="px-4 py-3 font-medium">{__('erp.clock_in')}</th>
                                                 <th className="px-4 py-3 font-medium">{__('erp.clock_out')}</th>
-                                                <th className="px-4 py-3 font-medium text-right">{__('erp.duration')}</th>
+                                                <th className="px-4 py-3 font-medium text-end">{__('erp.duration')}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-neutral-100">
@@ -188,7 +188,7 @@ export default function MyPortal({ todayLog, attendanceHistory, leaveRequests, p
                                                     <td className="px-4 py-3 font-medium">{log.date}</td>
                                                     <td className="px-4 py-3">{formatTime(log.clock_in_at)}</td>
                                                     <td className="px-4 py-3">{formatTime(log.clock_out_at)}</td>
-                                                    <td className="px-4 py-3 text-right text-neutral-500">{log.total_minutes} min</td>
+                                                    <td className="px-4 py-3 text-end text-neutral-500">{log.total_minutes} min</td>
                                                 </tr>
                                             ))}
                                         </tbody>

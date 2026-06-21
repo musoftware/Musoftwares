@@ -109,8 +109,8 @@ class SubscriptionAutoRenewalTest extends TestCase
         $item = collect($serviceItems)->firstWhere('id', 'erp');
         $expectedPrice = $item['monthly_price'] ?? 499.99;
 
-        // Give less than required
-        $this->user->user_balance = $expectedPrice - 10.00;
+        // Give less than required for even 1-day proration (price/30)
+        $this->user->user_balance = ($expectedPrice / 30) - 1.00;
         if ($this->user->user_balance < 0) {
             $this->user->user_balance = 0;
         }

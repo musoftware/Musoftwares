@@ -83,7 +83,7 @@ export default function Show({ widget }: { widget: any }) {
                                     <Button 
                                         size="sm" 
                                         variant="secondary" 
-                                        className="absolute top-3 right-3 gap-2 bg-white/10 hover:bg-white/20 text-white border-none"
+                                        className="absolute top-3 end-3 gap-2 bg-white/10 hover:bg-white/20 text-white border-none"
                                         onClick={handleCopy}
                                     >
                                         {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}

@@ -239,7 +239,7 @@ export default function Index({ leads, currentTab }) {
                 </div>
 
                 <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                    <table className="w-full text-left text-sm">
+                    <table className="w-full text-start text-sm">
                         <thead className="border-b border-slate-200 bg-slate-50/50">
                             <tr>
                                 <th className="px-6 py-4 font-semibold text-slate-600">{__('general.name')}</th>
@@ -247,7 +247,7 @@ export default function Index({ leads, currentTab }) {
                                 <th className="px-6 py-4 font-semibold text-slate-600">{__('general.company')}</th>
                                 <th className="px-6 py-4 font-semibold text-slate-600">{__('general.message_snippet')}</th>
                                 <th className="px-6 py-4 font-semibold text-slate-600 text-center">{__('general.status')}</th>
-                                <th className="px-6 py-4 font-semibold text-slate-600 text-right">{__('general.actions')}</th>
+                                <th className="px-6 py-4 font-semibold text-slate-600 text-end">{__('general.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -258,12 +258,12 @@ export default function Index({ leads, currentTab }) {
                                         <div className="flex flex-col space-y-1.5">
                                             {lead.email && (
                                                 <a href={`mailto:${lead.email}`} onClick={(e) => e.stopPropagation()} className="text-indigo-600 hover:text-indigo-700 flex items-center text-xs font-medium">
-                                                    <Mail className="h-3.5 w-3.5 mr-1.5 opacity-70" /> {lead.email}
+                                                    <Mail className="h-3.5 w-3.5 me-1.5 opacity-70" /> {lead.email}
                                                 </a>
                                             )}
                                             {lead.phone && (
                                                 <a href={`tel:${lead.phone}`} onClick={(e) => e.stopPropagation()} className="text-slate-600 hover:text-slate-900 flex items-center text-xs font-medium">
-                                                    <Phone className="h-3.5 w-3.5 mr-1.5 opacity-70" /> {lead.phone}
+                                                    <Phone className="h-3.5 w-3.5 me-1.5 opacity-70" /> {lead.phone}
                                                 </a>
                                             )}
                                         </div>
@@ -275,7 +275,7 @@ export default function Index({ leads, currentTab }) {
                                     <td className="px-6 py-4 text-center">
                                         {getStatusBadge(lead.status)}
                                     </td>
-                                    <td className="px-6 py-4 text-right">
+                                    <td className="px-6 py-4 text-end">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger render={<Button variant="ghost" className="h-8 w-8 p-0 text-slate-400 hover:text-slate-900" />} onClick={(e) => e.stopPropagation()}>
                                                 <span className="sr-only">{__('general.open_menu')}</span>
@@ -284,7 +284,7 @@ export default function Index({ leads, currentTab }) {
                                             <DropdownMenuContent align="end" className="w-48">
                                                 <DropdownMenuLabel>{__('general.actions')}</DropdownMenuLabel>
                                                 <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openLead(lead.id); }}>
-                                                    <Edit2 className="mr-2 h-4 w-4 text-slate-500" />
+                                                    <Edit2 className="me-2 h-4 w-4 text-slate-500" />
                                                     {__('general.view_edit')}
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
@@ -297,7 +297,7 @@ export default function Index({ leads, currentTab }) {
                                                 ))}
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDelete(lead.id); }} className="text-red-600 focus:text-red-600">
-                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    <Trash2 className="me-2 h-4 w-4" />
                                                     {__('general.delete_lead')}
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
@@ -324,7 +324,7 @@ export default function Index({ leads, currentTab }) {
                                 <Link
                                     key={i}
                                     href={link.url || '#'}
-                                    className={`px-4 py-2 text-sm font-medium border ${link.active ? 'z-10 bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'} ${i === 0 ? 'rounded-l-lg' : ''} ${i === leads.links.length - 1 ? 'rounded-r-lg' : ''}`}
+                                    className={`px-4 py-2 text-sm font-medium border ${link.active ? 'z-10 bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'} ${i === 0 ? 'rounded-s-lg' : ''} ${i === leads.links.length - 1 ? 'rounded-e-lg' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}

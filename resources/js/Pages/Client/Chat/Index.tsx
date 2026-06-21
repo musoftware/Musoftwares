@@ -22,7 +22,7 @@ export default function SmartRules({ rules }: { rules: Rule[] }) {
                     <p className="text-muted-foreground mt-2">{__('general.configure_rules_for_gap_reduction_and_load_balancing')}</p>
                 </div>
                 <Button>
-                    <Plus className="mr-2 h-4 w-4" />{__('general.add_rule')}</Button>
+                    <Plus className="me-2 h-4 w-4" />{__('general.add_rule')}</Button>
             </div>
 
             <Card>
@@ -36,7 +36,7 @@ export default function SmartRules({ rules }: { rules: Rule[] }) {
                                 <TableHead>{__('general.rule_name')}</TableHead>
                                 <TableHead>{__('general.target_metric')}</TableHead>
                                 <TableHead>Status</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead className="text-end">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -51,7 +51,7 @@ export default function SmartRules({ rules }: { rules: Rule[] }) {
                                             {rule.is_active ? 'Active' : 'Inactive'}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-end">
                                         <Button variant="ghost" size="sm">Edit</Button>
                                     </TableCell>
                                 </TableRow>

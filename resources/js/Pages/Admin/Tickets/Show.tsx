@@ -266,11 +266,11 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                     {!isClosed ? (
                         <Button size="sm" variant="outline" onClick={() => setCloseModalOpen(true)}
                             className="border-emerald-200 text-emerald-700 hover:bg-emerald-50">
-                            <CheckCircle className="mr-1.5 h-4 w-4" />{__('general.close_ticket')}</Button>
+                            <CheckCircle className="me-1.5 h-4 w-4" />{__('general.close_ticket')}</Button>
                     ) : (
                         <Button size="sm" variant="outline" onClick={handleReopen}
                             className="border-amber-200 text-amber-700 hover:bg-amber-50">
-                            <RotateCcw className="mr-1.5 h-4 w-4" /> Reopen
+                            <RotateCcw className="me-1.5 h-4 w-4" /> Reopen
                         </Button>
                     )}
                 </div>
@@ -420,7 +420,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                 {cannedResponses.length > 0 && !isInternal && (
                                     <div className="flex justify-end mb-1">
                                         <select 
-                                            className="text-xs border-slate-200 rounded-lg py-1 pl-2 pr-6 text-slate-600 bg-slate-50 focus:ring-indigo-200"
+                                            className="text-xs border-slate-200 rounded-lg py-1 ps-2 pe-6 text-slate-600 bg-slate-50 focus:ring-indigo-200"
                                             onChange={insertCannedResponse}
                                             defaultValue=""
                                         >

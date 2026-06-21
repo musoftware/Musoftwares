@@ -118,14 +118,14 @@ export default function PayoutUsd() {
                             <CardContent className="pt-6">
                                 <div className="space-y-4">
                                     <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
                                             <span className="text-slate-500 font-bold text-xl">$</span>
                                         </div>
                                         <Input 
                                             type="number" 
                                             value={usdAmount || ''} 
                                             onChange={e => setUsdAmount(Number(e.target.value))} 
-                                            className="pl-10 text-2xl h-14 font-bold"
+                                            className="ps-10 text-2xl h-14 font-bold"
                                             placeholder="0.00"
                                         />
                                     </div>
@@ -208,7 +208,7 @@ export default function PayoutUsd() {
                                                             )}
                                                         </div>
                                                     </div>
-                                                    <div className="text-right">
+                                                    <div className="text-end">
                                                         <p className="font-bold text-slate-900">{formatMoney(step.amount, 'EGP')}</p>
                                                         {step.fee > 0 && (
                                                             <p className="text-xs text-red-500 font-medium">+{formatMoney(step.fee, 'EGP')} fee</p>

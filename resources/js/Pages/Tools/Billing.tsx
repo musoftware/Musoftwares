@@ -64,10 +64,10 @@ export default function Billing({ subscriptions }: Props) {
                                 <p className="text-xs text-slate-500">{__('general.total_estimated_cost_per_month_for_active_tools')}</p>
                             </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-end">
                             <p className="text-2xl font-bold text-slate-900 dark:text-white">
                                 {formatMoney(totalMonthly, 'USD')}
-                                <span className="text-sm font-normal text-slate-500 ml-1">/mo</span>
+                                <span className="text-sm font-normal text-slate-500 ms-1">/mo</span>
                             </p>
                         </div>
                     </div>
@@ -96,7 +96,7 @@ export default function Billing({ subscriptions }: Props) {
                                                     <p className="font-semibold text-slate-900 dark:text-white">{sub.tool.title}</p>
                                                     <p className="text-sm text-slate-500">{sub.plan_name} · {sub.billing_cycle}</p>
                                                 </div>
-                                                <div className="text-right flex-shrink-0">
+                                                <div className="text-end flex-shrink-0">
                                                     <Badge className={`${statusColors[sub.status] ?? ''} hover:${statusColors[sub.status]}`}>{sub.status}</Badge>
                                                     <p className="text-lg font-bold text-slate-900 dark:text-white mt-1">{formatMoney(sub.amount_paid, sub.currency)}</p>
                                                 </div>

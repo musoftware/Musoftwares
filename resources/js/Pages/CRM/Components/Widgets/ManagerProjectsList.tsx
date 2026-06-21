@@ -57,7 +57,7 @@ export default function ManagerProjectsList({ projects = [] }: { projects: Proje
                     <Button variant="ghost" size="sm" asChild className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">
                         <Link href={`/erp/projects/${project.id}`}>
                             {__('general.view')}
-                            <ArrowRight className="w-4 h-4 ml-1" />
+                            <ArrowRight className="w-4 h-4 ms-1" />
                         </Link>
                     </Button>
                 </div>

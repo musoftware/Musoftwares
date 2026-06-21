@@ -46,7 +46,7 @@ export default function CreateDebtTransaction({ baseCurrency, clients = [] }: an
                 <div className="flex items-center justify-between">
                     <div>
                         <Link href={route('erp.debts.index')} className="inline-flex items-center text-sm text-slate-500 hover:text-slate-900 mb-2 transition-colors">
-                            <ArrowLeft className="w-4 h-4 mr-1" /> {__('general.back')}
+                            <ArrowLeft className="w-4 h-4 me-1" /> {__('general.back')}
                         </Link>
                         <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">{__('erp.record_new_debt_transaction')}</h2>
                     </div>
@@ -111,7 +111,7 @@ export default function CreateDebtTransaction({ baseCurrency, clients = [] }: an
                                             className="text-primary h-auto py-1"
                                         >
                                             {isNewClient ? __('erp.select_existing_client') : (
-                                                <><Plus className="w-3 h-3 mr-1" /> {__('erp.add_new_client')}</>
+                                                <><Plus className="w-3 h-3 me-1" /> {__('erp.add_new_client')}</>
                                             )}
                                         </Button>
                                     </div>

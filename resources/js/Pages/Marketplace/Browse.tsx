@@ -79,11 +79,11 @@ export default function Browse({ services, categories, filters }: any) {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder={__('general.what_service_are_you_looking_for_today')}
-                            className="w-full rounded-full py-4 pr-32 pl-6 text-lg text-gray-900 shadow-lg focus:ring-4 focus:ring-indigo-300 focus:outline-none"
+                            className="w-full rounded-full py-4 pe-32 ps-6 text-lg text-gray-900 shadow-lg focus:ring-4 focus:ring-indigo-300 focus:outline-none"
                         />
                         <button
                             type="submit"
-                            className="absolute top-2 right-2 bottom-2 rounded-full bg-indigo-600 px-6 font-semibold text-white transition hover:bg-indigo-700"
+                            className="absolute top-2 end-2 bottom-2 rounded-full bg-indigo-600 px-6 font-semibold text-white transition hover:bg-indigo-700"
                         >
                             Search
                         </button>
@@ -168,11 +168,11 @@ export default function Browse({ services, categories, filters }: any) {
                                                 </div>
                                             )}
                                             {service.is_featured && (
-                                                <div className="absolute top-3 left-3 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-amber-900 shadow">
+                                                <div className="absolute top-3 start-3 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-amber-900 shadow">
                                                     FEATURED
                                                 </div>
                                             )}
-                                            <button className="absolute top-3 right-3 rounded-full bg-white/80 p-2 text-gray-400 transition-colors hover:text-red-500">
+                                            <button className="absolute top-3 end-3 rounded-full bg-white/80 p-2 text-gray-400 transition-colors hover:text-red-500">
                                                 <svg
                                                     className="h-5 w-5"
                                                     fill="currentColor"
@@ -242,7 +242,7 @@ export default function Browse({ services, categories, filters }: any) {
                                                     ></path>
                                                 </svg>
                                             </div>
-                                            <div className="text-right">
+                                            <div className="text-end">
                                                 <span className="text-xs font-medium tracking-wider text-gray-500 uppercase">{__('general.starting_at')}</span>
                                                 <span className="block text-lg font-bold text-gray-900">
                                                     {startingPackage ? formatCurrency(startingPackage.price, startingPackage.currency) : '--'}

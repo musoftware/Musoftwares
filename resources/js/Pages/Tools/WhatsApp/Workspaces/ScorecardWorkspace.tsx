@@ -60,7 +60,7 @@ export default function ScorecardWorkspace({ t, campaignResult }: any) {
 
                 {/* Safe recommendation instruction panel */}
                 <div className="lg:col-span-2 bg-gradient-to-tr from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-6 text-white shadow-lg flex flex-col justify-between relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl -z-10" />
+                    <div className="absolute top-0 end-0 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl -z-10" />
 
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 text-teal-400">

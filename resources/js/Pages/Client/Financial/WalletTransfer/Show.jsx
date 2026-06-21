@@ -23,7 +23,7 @@ export default function Show({ transfer }) {
                 <div className="flex items-center justify-between print:hidden">
                     <Button variant="outline" size="sm" asChild className="shadow-none">
                         <Link href={route('financial.transfer.history')}>
-                            <ArrowLeft className="w-4 h-4 mr-2" /> History
+                            <ArrowLeft className="w-4 h-4 me-2" /> History
                         </Link>
                     </Button>
                     <div className="flex items-center gap-2">
@@ -42,7 +42,7 @@ export default function Show({ transfer }) {
                 <Card className="shadow-none border-primary/10 overflow-hidden relative print:border-none print:shadow-none">
                     
                     {/* Security Check Pattern */}
-                    <div className="absolute top-0 right-0 p-6 opacity-[0.03] text-primary select-none pointer-events-none print:hidden">
+                    <div className="absolute top-0 end-0 p-6 opacity-[0.03] text-primary select-none pointer-events-none print:hidden">
                         <ShieldCheck className="w-48 h-48" />
                     </div>
 

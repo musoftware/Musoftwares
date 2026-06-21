@@ -300,10 +300,10 @@ export default function Home() {
                             ].map((testimonial, idx) => (
                                 <div key={idx} className="gsap-fade-up bg-white p-10 rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-[#e5e5e5] hover:-translate-y-1 transition-transform duration-300">
                                     <div className="flex text-yellow-400 mb-6">
-                                        <Star className="w-4 h-4 fill-current mr-1" />
-                                        <Star className="w-4 h-4 fill-current mr-1" />
-                                        <Star className="w-4 h-4 fill-current mr-1" />
-                                        <Star className="w-4 h-4 fill-current mr-1" />
+                                        <Star className="w-4 h-4 fill-current me-1" />
+                                        <Star className="w-4 h-4 fill-current me-1" />
+                                        <Star className="w-4 h-4 fill-current me-1" />
+                                        <Star className="w-4 h-4 fill-current me-1" />
                                         <Star className="w-4 h-4 fill-current" />
                                     </div>
                                     <p className="text-[#444444] text-base leading-loose italic mb-8">
@@ -333,7 +333,7 @@ export default function Home() {
 
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 relative">
                         {/* Connecting Line */}
-                        <div className="hidden md:block absolute top-10 left-[10%] right-[10%] h-[2px] bg-[#f0f0f0] z-0"></div>
+                        <div className="hidden md:block absolute top-10 start-[10%] end-[10%] h-[2px] bg-[#f0f0f0] z-0"></div>
                         
                         {[
                             { step: "01", title: "Send Your Idea", desc: "Reach out via WhatsApp with a brief overview of what you want to build." },
@@ -360,7 +360,7 @@ export default function Home() {
                             <div className="absolute inset-0 bg-gradient-to-tr from-[#333333]/20 to-transparent z-10 pointer-events-none"></div>
                             <img src="/images/mahmoud-photo.jpg" alt="Eng. Mahmoud" className="w-full h-full object-cover relative z-0" />
                         </div>
-                        <div className="text-center md:text-left flex-1">
+                        <div className="text-center md:text-start flex-1">
                             <h2 className="gsap-fade-up text-4xl lg:text-5xl font-extrabold mb-4">About Eng. Mahmoud</h2>
                             <h3 className="gsap-fade-up text-[#888888] text-sm font-bold mb-8 uppercase tracking-[0.2em]">
                                 Software Architect & Developer

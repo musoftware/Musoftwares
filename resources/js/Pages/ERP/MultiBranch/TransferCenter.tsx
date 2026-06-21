@@ -45,9 +45,9 @@ export default function TransferCenter({ transfers = [], branches = [] }: Props)
 
     const getStatusBadge = (status: string) => {
         switch(status?.toLowerCase()) {
-            case 'pending': return <Badge variant="outline" className="text-amber-600 bg-amber-50 border-amber-200"><Clock className="w-3 h-3 mr-1"/> {__('erp.status_pending')}</Badge>;
-            case 'completed': return <Badge variant="outline" className="text-emerald-600 bg-emerald-50 border-emerald-200"><Check className="w-3 h-3 mr-1"/> {__('erp.status_completed')}</Badge>;
-            case 'rejected': return <Badge variant="outline" className="text-red-600 bg-red-50 border-red-200"><X className="w-3 h-3 mr-1"/> {__('erp.status_rejected')}</Badge>;
+            case 'pending': return <Badge variant="outline" className="text-amber-600 bg-amber-50 border-amber-200"><Clock className="w-3 h-3 me-1"/> {__('erp.status_pending')}</Badge>;
+            case 'completed': return <Badge variant="outline" className="text-emerald-600 bg-emerald-50 border-emerald-200"><Check className="w-3 h-3 me-1"/> {__('erp.status_completed')}</Badge>;
+            case 'rejected': return <Badge variant="outline" className="text-red-600 bg-red-50 border-red-200"><X className="w-3 h-3 me-1"/> {__('erp.status_rejected')}</Badge>;
             default: return <Badge variant="outline">{status}</Badge>;
         }
     };
@@ -69,7 +69,7 @@ export default function TransferCenter({ transfers = [], branches = [] }: Props)
                 </div>
 
                 <Button size="sm" onClick={() => setIsNewModalOpen(true)}>
-                    <ArrowRightLeft className="w-4 h-4 mr-2" />
+                    <ArrowRightLeft className="w-4 h-4 me-2" />
                     {__('erp.new_transfer')}
                 </Button>
             </div>
@@ -109,7 +109,7 @@ export default function TransferCenter({ transfers = [], branches = [] }: Props)
                     />
                 ) : (
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm border-collapse">
+                        <table className="w-full text-start text-sm border-collapse">
                             <thead>
                                 <tr className="bg-slate-50 border-b">
                                     <th className="px-6 py-3.5 font-medium text-slate-500">{__('erp.date')}</th>
@@ -117,7 +117,7 @@ export default function TransferCenter({ transfers = [], branches = [] }: Props)
                                     <th className="px-6 py-3.5 font-medium text-slate-500">{__('erp.to_branch')}</th>
                                     <th className="px-6 py-3.5 font-medium text-slate-500">{__('erp.type')}</th>
                                     <th className="px-6 py-3.5 font-medium text-slate-500 text-center">{__('erp.status')}</th>
-                                    <th className="px-6 py-3.5 font-medium text-slate-500 text-right">{__('erp.actions')}</th>
+                                    <th className="px-6 py-3.5 font-medium text-slate-500 text-end">{__('erp.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y">
@@ -132,7 +132,7 @@ export default function TransferCenter({ transfers = [], branches = [] }: Props)
                                         <td className="px-6 py-4 text-center">
                                             {getStatusBadge(transfer.status)}
                                         </td>
-                                        <td className="px-6 py-4 text-right">
+                                        <td className="px-6 py-4 text-end">
                                             <Button variant="ghost" size="sm" className="text-blue-600">
                                                 {__('erp.view_details')}
                                             </Button>

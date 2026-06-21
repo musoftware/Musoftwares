@@ -10,7 +10,7 @@ export default function Show({ ticket }: { ticket: any }) {
             header={`Ticket #${ticket.id}`}
             actions={
                 <Link href={route('admin.guest-tickets.index')}>
-                    <Button variant="outline"><ArrowLeft className="w-4 h-4 mr-2" /> Back</Button>
+                    <Button variant="outline"><ArrowLeft className="w-4 h-4 me-2" /> Back</Button>
                 </Link>
             }
         >

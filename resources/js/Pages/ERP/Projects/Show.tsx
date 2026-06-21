@@ -335,7 +335,7 @@ export default function ProjectShow({
                                             <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-primary' : 'text-slate-400'}`} />
                                             {tab.label}
                                             {tab.count !== null && (
-                                                <Badge variant="secondary" className="ml-1 px-1.5 py-0 rounded-full font-bold text-[9px] bg-slate-200 text-slate-700">
+                                                <Badge variant="secondary" className="ms-1 px-1.5 py-0 rounded-full font-bold text-[9px] bg-slate-200 text-slate-700">
                                                     {tab.count}
                                                 </Badge>
                                             )}
@@ -351,13 +351,13 @@ export default function ProjectShow({
                                         <EmptyState icon={FileText} title={__('general.no_invoices_linked')} description={__('general.create_invoices_for_this_project_to_track_billings')} className="border-0 rounded-none py-10" />
                                     ) : (
                                         <div className="overflow-x-auto">
-                                            <table className="w-full text-left text-sm border-collapse">
+                                            <table className="w-full text-start text-sm border-collapse">
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                                         <th className="px-6 py-3">{__('general.invoice_number')}</th>
                                                         <th className="px-6 py-3">Date</th>
-                                                        <th className="px-6 py-3 text-right">Amount</th>
-                                                        <th className="px-6 py-3 text-right">Value (Base)</th>
+                                                        <th className="px-6 py-3 text-end">Amount</th>
+                                                        <th className="px-6 py-3 text-end">Value (Base)</th>
                                                         <th className="px-6 py-3 text-center">Status</th>
                                                     </tr>
                                                 </thead>
@@ -372,10 +372,10 @@ export default function ProjectShow({
                                                             <td className="px-6 py-3.5">
                                                                 <DateDisplay date={inv.created_at} />
                                                             </td>
-                                                            <td className="px-6 py-3.5 text-right font-mono font-semibold">
+                                                            <td className="px-6 py-3.5 text-end font-mono font-semibold">
                                                                 <CurrencyDisplay amount={inv.amount} currency={inv.currency} />
                                                             </td>
-                                                            <td className="px-6 py-3.5 text-right font-mono text-slate-500">
+                                                            <td className="px-6 py-3.5 text-end font-mono text-slate-500">
                                                                 <CurrencyDisplay amount={inv.business_amount} currency={businessCurrency} />
                                                             </td>
                                                             <td className="px-6 py-3.5 text-center">
@@ -395,15 +395,15 @@ export default function ProjectShow({
                                         <EmptyState icon={Wallet} title={__("erp.no_transactions_recorded")} description={__("erp.record_manual_credit_or_debit")} className="border-0 rounded-none py-10" />
                                     ) : (
                                         <div className="overflow-x-auto">
-                                            <table className="w-full text-left text-sm border-collapse">
+                                            <table className="w-full text-start text-sm border-collapse">
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                                         <th className="px-6 py-3">{__("general.reference")}</th>
                                                         <th className="px-6 py-3">{__("general.date")}</th>
                                                         <th className="px-6 py-3">{__("general.type")}</th>
                                                         <th className="px-6 py-3">{__("general.description")}</th>
-                                                        <th className="px-6 py-3 text-right">{__("general.amount")}</th>
-                                                        <th className="px-6 py-3 text-right">{__("general.value_base")}</th>
+                                                        <th className="px-6 py-3 text-end">{__("general.amount")}</th>
+                                                        <th className="px-6 py-3 text-end">{__("general.value_base")}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-slate-100 text-[13px] text-slate-600">
@@ -425,10 +425,10 @@ export default function ProjectShow({
                                                             <td className="px-6 py-3.5 max-w-xs truncate" title={txn.note}>
                                                                 {txn.note}
                                                             </td>
-                                                            <td className="px-6 py-3.5 text-right font-mono font-semibold">
+                                                            <td className="px-6 py-3.5 text-end font-mono font-semibold">
                                                                 <CurrencyDisplay amount={txn.amount} currency={project.currency} />
                                                             </td>
-                                                            <td className="px-6 py-3.5 text-right font-mono text-slate-500">
+                                                            <td className="px-6 py-3.5 text-end font-mono text-slate-500">
                                                                 <CurrencyDisplay amount={txn.business_amount} currency={businessCurrency} />
                                                             </td>
                                                         </tr>
@@ -445,14 +445,14 @@ export default function ProjectShow({
                                         <EmptyState icon={TrendingDown} title={__('general.no_expenses_recorded')} description={__('general.add_costs_inside_invoices_to_log_project_expenses')} className="border-0 rounded-none py-10" />
                                     ) : (
                                         <div className="overflow-x-auto">
-                                            <table className="w-full text-left text-sm border-collapse">
+                                            <table className="w-full text-start text-sm border-collapse">
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                                         <th className="px-6 py-3">{__('general.cost_item')}</th>
                                                         <th className="px-6 py-3">Date</th>
                                                         <th className="px-6 py-3">Payer</th>
-                                                        <th className="px-6 py-3 text-right">Amount</th>
-                                                        <th className="px-6 py-3 text-right">Value (Base)</th>
+                                                        <th className="px-6 py-3 text-end">Amount</th>
+                                                        <th className="px-6 py-3 text-end">Value (Base)</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-slate-100 text-[13px] text-slate-600">
@@ -468,10 +468,10 @@ export default function ProjectShow({
                                                             <td className="px-6 py-3.5 text-xs">
                                                                 {exp.payer}
                                                             </td>
-                                                            <td className="px-6 py-3.5 text-right font-mono font-medium">
+                                                            <td className="px-6 py-3.5 text-end font-mono font-medium">
                                                                 <CurrencyDisplay amount={exp.amount} currency={exp.currency} />
                                                             </td>
-                                                            <td className="px-6 py-3.5 text-right font-mono text-slate-500">
+                                                            <td className="px-6 py-3.5 text-end font-mono text-slate-500">
                                                                 <CurrencyDisplay amount={exp.business_amount} currency={businessCurrency} />
                                                             </td>
                                                         </tr>
@@ -521,7 +521,7 @@ export default function ProjectShow({
                                         <EmptyState icon={MessageSquare} title={__('general.no_tickets_submitted')} description={__('general.no_support_tickets_opened_for_this_project')} className="border-0 rounded-none py-10" />
                                     ) : (
                                         <div className="overflow-x-auto">
-                                            <table className="w-full text-left text-sm border-collapse">
+                                            <table className="w-full text-start text-sm border-collapse">
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                                         <th className="px-6 py-3">Subject</th>

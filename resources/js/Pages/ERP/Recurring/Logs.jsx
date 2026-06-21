@@ -22,7 +22,7 @@ export default function Logs({ entry, logs }) {
                             href={route('erp.recurring.index')}
                             className="text-sm text-indigo-600 hover:text-indigo-900 flex items-center"
                         >
-                            <ArrowLeft className="w-4 h-4 mr-1" />{__('general.back_to_recurring_entries')}</Link>
+                            <ArrowLeft className="w-4 h-4 me-1" />{__('general.back_to_recurring_entries')}</Link>
                     </div>
 
                     <PageHeader
@@ -34,12 +34,12 @@ export default function Logs({ entry, logs }) {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.business_amount')}</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.exchange_rate')}</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Note</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.business_amount')}</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.exchange_rate')}</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Note</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -60,9 +60,9 @@ export default function Logs({ entry, logs }) {
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
                                                 {log.status === 'success' ? (
-                                                    <CheckCircle2 className="w-4 h-4 text-green-500 mr-1" />
+                                                    <CheckCircle2 className="w-4 h-4 text-green-500 me-1" />
                                                 ) : (
-                                                    <XCircle className="w-4 h-4 text-red-500 mr-1" />
+                                                    <XCircle className="w-4 h-4 text-red-500 me-1" />
                                                 )}
                                                 <span className={`text-xs font-semibold uppercase ${log.status === 'success' ? 'text-green-800' : 'text-red-800'}`}>
                                                     {log.status}

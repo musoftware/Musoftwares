@@ -27,11 +27,11 @@ export function BranchSwitcher({ branches, activeBranchId }: BranchSwitcherProps
     const getIcon = (type: string) => {
         switch (type) {
             case 'clinic':
-                return <Building2 className="w-4 h-4 mr-2" />;
+                return <Building2 className="w-4 h-4 me-2" />;
             case 'warehouse':
-                return <Warehouse className="w-4 h-4 mr-2" />;
+                return <Warehouse className="w-4 h-4 me-2" />;
             default:
-                return <Store className="w-4 h-4 mr-2" />;
+                return <Store className="w-4 h-4 me-2" />;
         }
     };
 
@@ -46,7 +46,7 @@ export function BranchSwitcher({ branches, activeBranchId }: BranchSwitcherProps
                         </>
                     ) : (
                         <>
-                            <Building2 className="w-4 h-4 mr-2 text-slate-500" />
+                            <Building2 className="w-4 h-4 me-2 text-slate-500" />
                             <span>All Branches (Global)</span>
                         </>
                     )}
@@ -54,9 +54,9 @@ export function BranchSwitcher({ branches, activeBranchId }: BranchSwitcherProps
             </Dropdown.Trigger>
 
             <Dropdown.Content align="left" width="48">
-                <button className="block w-full px-4 py-2 text-left text-sm leading-5 text-slate-700 hover:bg-slate-100 focus:outline-none" onClick={() => handleSwitch(null)}>
+                <button className="block w-full px-4 py-2 text-start text-sm leading-5 text-slate-700 hover:bg-slate-100 focus:outline-none" onClick={() => handleSwitch(null)}>
                     <div className="flex items-center">
-                        <Building2 className="w-4 h-4 mr-2" />
+                        <Building2 className="w-4 h-4 me-2" />
                         All Branches (Global)
                     </div>
                 </button>
@@ -64,7 +64,7 @@ export function BranchSwitcher({ branches, activeBranchId }: BranchSwitcherProps
                 <div className="border-t border-slate-100 my-1"></div>
 
                 {branches.map((branch) => (
-                    <button key={branch.id} className="block w-full px-4 py-2 text-left text-sm leading-5 text-slate-700 hover:bg-slate-100 focus:outline-none" onClick={() => handleSwitch(branch.id)}>
+                    <button key={branch.id} className="block w-full px-4 py-2 text-start text-sm leading-5 text-slate-700 hover:bg-slate-100 focus:outline-none" onClick={() => handleSwitch(branch.id)}>
                         <div className="flex items-center">
                             {getIcon(branch.type)}
                             <span className={activeBranchId === branch.id ? 'font-bold' : ''}>

@@ -162,7 +162,7 @@ export default function CreateService({ categories, seller }: Props) {
                                         </div>
                                     )}
                                     {selectedCategory && (
-                                        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur text-slate-800 text-[10px] font-bold px-2 py-1 rounded-md shadow-sm">
+                                        <div className="absolute top-3 start-3 bg-white/90 backdrop-blur text-slate-800 text-[10px] font-bold px-2 py-1 rounded-md shadow-sm">
                                             {selectedCategory.name}
                                         </div>
                                     )}
@@ -175,8 +175,8 @@ export default function CreateService({ categories, seller }: Props) {
                                             {seller?.avatar ? <img src={seller.avatar} alt={seller.name} className="w-full h-full object-cover" /> : <span className="text-[10px] font-bold text-indigo-600">{seller?.name?.charAt(0)}</span>}
                                         </div>
                                         <span className="text-xs font-medium text-slate-700 truncate">{seller?.name}</span>
-                                        <div className="ml-auto flex items-center text-amber-500 text-[11px] font-bold">
-                                            <Star className="w-3 h-3 fill-amber-500 mr-1" /> 5.0 (0)
+                                        <div className="ms-auto flex items-center text-amber-500 text-[11px] font-bold">
+                                            <Star className="w-3 h-3 fill-amber-500 me-1" /> 5.0 (0)
                                         </div>
                                     </div>
 

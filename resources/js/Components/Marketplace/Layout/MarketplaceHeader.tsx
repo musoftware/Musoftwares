@@ -51,11 +51,11 @@ export default function MarketplaceHeader() {
                             <Input
                                 type="search"
                                 placeholder={__('general.what_service_are_you_looking_for_today')}
-                                className="w-full rounded-r-none border-r-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                                className="w-full rounded-e-none border-e-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                            <Button type="submit" className="rounded-l-none bg-gray-900 hover:bg-gray-800 px-6">
+                            <Button type="submit" className="rounded-s-none bg-gray-900 hover:bg-gray-800 px-6">
                                 <Search className="h-4 w-4 text-white" />
                             </Button>
                         </form>
@@ -63,7 +63,7 @@ export default function MarketplaceHeader() {
                 </div>
 
                 {/* Right side: Navigation & Auth */}
-                <div className="flex items-center gap-2 sm:gap-4 ml-auto pl-4">
+                <div className="flex items-center gap-2 sm:gap-4 ms-auto ps-4">
                     <div className="hidden lg:flex items-center gap-4 text-sm font-medium text-gray-600">
                         <Link href="/marketplace/services" className="hover:text-indigo-600 transition-colors">
                             {__('general.explore')}

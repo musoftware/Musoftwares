@@ -208,19 +208,19 @@ export function WindowModal({
             {!isEffectivelyMaximized && (
                 <>
                     <div 
-                        className="absolute right-0 top-0 bottom-0 w-3 cursor-e-resize z-20 touch-none"
+                        className="absolute end-0 top-0 bottom-0 w-3 cursor-e-resize z-20 touch-none"
                         onPointerDown={(e) => handleResizePointerDown(e, 'e')}
                         onPointerMove={handleResizePointerMove}
                         onPointerUp={handleResizePointerUp}
                     />
                     <div 
-                        className="absolute left-0 right-0 bottom-0 h-3 cursor-s-resize z-20 touch-none"
+                        className="absolute start-0 end-0 bottom-0 h-3 cursor-s-resize z-20 touch-none"
                         onPointerDown={(e) => handleResizePointerDown(e, 's')}
                         onPointerMove={handleResizePointerMove}
                         onPointerUp={handleResizePointerUp}
                     />
                     <div 
-                        className="absolute right-0 bottom-0 w-5 h-5 cursor-se-resize z-30 touch-none"
+                        className="absolute end-0 bottom-0 w-5 h-5 cursor-se-resize z-30 touch-none"
                         onPointerDown={(e) => handleResizePointerDown(e, 'se')}
                         onPointerMove={handleResizePointerMove}
                         onPointerUp={handleResizePointerUp}

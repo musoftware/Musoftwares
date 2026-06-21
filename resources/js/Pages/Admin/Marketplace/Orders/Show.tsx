@@ -36,7 +36,7 @@ export default function Show({ order }) {
                                 <h2 className="text-xl font-bold font-sora text-slate-800">{__('general.order_information')}</h2>
                                 <p className="text-sm text-slate-500 mt-1">{order.package?.service?.title || 'Unknown Service'}</p>
                             </div>
-                            <div className="text-right">
+                            <div className="text-end">
                                 <span className="block text-2xl font-bold font-jetbrains text-slate-900">
                                     {formatCurrency(order.amount, order.currency)}
                                 </span>
@@ -95,14 +95,14 @@ export default function Show({ order }) {
                                     onClick={() => handleAction('release_to_seller')}
                                     disabled={processing}
                                 >
-                                    <CheckCircle className="mr-2 h-4 w-4" />{__('general.release_funds_to_seller')}</Button>
+                                    <CheckCircle className="me-2 h-4 w-4" />{__('general.release_funds_to_seller')}</Button>
 
                                 <Button 
                                     className="w-full justify-start bg-red-600 hover:bg-red-700 text-white" 
                                     onClick={() => handleAction('refund_buyer')}
                                     disabled={processing}
                                 >
-                                    <AlertTriangle className="mr-2 h-4 w-4" />
+                                    <AlertTriangle className="me-2 h-4 w-4" />
                                     Refund Buyer (Cancel Order)
                                 </Button>
                             </div>

@@ -569,12 +569,12 @@ export default function CampaignWorkspace({
                                     {/* Search + Tag Filter */}
                                     <div className="flex gap-2">
                                         <div className="relative flex-1">
-                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                                            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                                             <Input
                                                 value={dbSearch}
                                                 onChange={e => setDbSearch(e.target.value)}
                                                 placeholder={isRtl ? 'بحث...' : 'Search...'}
-                                                className="pl-9 h-9 rounded-lg text-xs text-start"
+                                                className="ps-9 h-9 rounded-lg text-xs text-start"
                                             />
                                         </div>
                                         {dbTags.length > 0 && (
@@ -802,7 +802,7 @@ export default function CampaignWorkspace({
                                                 </div>
                                                 {idx === 0 && (
                                                     <div 
-                                                        className="absolute right-[-5px] origin-top-left top-0 w-3 h-3 bg-[#d9fdd3] dark:bg-[#005c4b] rotate-45 transform" 
+                                                        className="absolute end-[-5px] origin-top-left top-0 w-3 h-3 bg-[#d9fdd3] dark:bg-[#005c4b] rotate-45 transform" 
                                                         style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }} 
                                                     />
                                                 )}
@@ -870,11 +870,11 @@ export default function CampaignWorkspace({
 
                             {/* Steps list flow */}
                             {dripSteps.length > 0 && (
-                                <div className="space-y-5 relative pl-4 border-l-2 border-dashed border-teal-500/20 ml-2">
+                                <div className="space-y-5 relative ps-4 border-s-2 border-dashed border-teal-500/20 ms-2">
                                     {dripSteps.map((step, index) => (
                                         <div key={index} className="relative space-y-3 bg-white dark:bg-slate-950 p-4 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm">
                                             {/* Dotted indicator dot */}
-                                            <div className="absolute -left-[23px] top-7 w-3.5 h-3.5 rounded-full bg-teal-500 border-2 border-white dark:border-slate-950 flex items-center justify-center shadow" />
+                                            <div className="absolute -start-[23px] top-7 w-3.5 h-3.5 rounded-full bg-teal-500 border-2 border-white dark:border-slate-950 flex items-center justify-center shadow" />
                                             
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">

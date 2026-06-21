@@ -22,7 +22,7 @@ export default function FloatingWhatsAppButton({ phoneNumber = "201015218548", d
     return (
         <button
             onClick={handleClick}
-            className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-[#25D366] hover:bg-[#1DA851] text-white py-3 px-5 rounded-full shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl group"
+            className="fixed bottom-6 end-6 z-50 flex items-center gap-3 bg-[#25D366] hover:bg-[#1DA851] text-white py-3 px-5 rounded-full shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl group"
             aria-label="Contact on WhatsApp"
         >
             <MessageCircle className="w-6 h-6 animate-pulse" />

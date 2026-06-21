@@ -131,7 +131,7 @@ export default function Index({ clients, filters, stats }) {
                             setSelectedClient(client);
                             setIsSheetOpen(true);
                         }}
-                        className="flex flex-col text-left group"
+                        className="flex flex-col text-start group"
                     >
                         <span className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
                             {client.name}
@@ -178,7 +178,7 @@ export default function Index({ clients, filters, stats }) {
         {
             key: 'actions',
             label: '',
-            className: 'w-[80px] text-right',
+            className: 'w-[80px] text-end',
             render: (client) => (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -192,11 +192,11 @@ export default function Index({ clients, filters, stats }) {
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/users/${client.id}`}>
-                                    <Eye className="mr-2 h-4 w-4" />{__('general.view_profile_1')}</Link>
+                                    <Eye className="me-2 h-4 w-4" />{__('general.view_profile_1')}</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/users/${client.id}/edit`}>
-                                    <Edit className="mr-2 h-4 w-4" />{__('general.edit_client')}</Link>
+                                    <Edit className="me-2 h-4 w-4" />{__('general.edit_client')}</Link>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         
@@ -204,11 +204,11 @@ export default function Index({ clients, filters, stats }) {
                         
                         <DropdownMenuGroup>
                             <DropdownMenuItem onClick={() => handleLoginAs(client.id)}>
-                                <LogIn className="mr-2 h-4 w-4" />{__('general.login_as')}</DropdownMenuItem>
+                                <LogIn className="me-2 h-4 w-4" />{__('general.login_as')}</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleResetPassword(client)}>
-                                <Key className="mr-2 h-4 w-4" />{__('general.reset_password')}</DropdownMenuItem>
+                                <Key className="me-2 h-4 w-4" />{__('general.reset_password')}</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => { setSelectedRoleUser(client); setSelectedRole(client.role || 'client'); setIsChangeRoleOpen(true); }}>
-                                <ShieldCheck className="mr-2 h-4 w-4" />{__('general.change_role')}</DropdownMenuItem>
+                                <ShieldCheck className="me-2 h-4 w-4" />{__('general.change_role')}</DropdownMenuItem>
                         </DropdownMenuGroup>
 
                         <DropdownMenuSeparator />
@@ -216,17 +216,17 @@ export default function Index({ clients, filters, stats }) {
                         <DropdownMenuGroup>
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/users/${client.id}/referrals`}>
-                                    <Users className="mr-2 h-4 w-4" /> Referrals
+                                    <Users className="me-2 h-4 w-4" /> Referrals
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/users/${client.id}/files`}>
-                                    <FolderOpen className="mr-2 h-4 w-4" /> Files
+                                    <FolderOpen className="me-2 h-4 w-4" /> Files
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/users/${client.id}/reports`}>
-                                    <FileText className="mr-2 h-4 w-4" /> Reports
+                                    <FileText className="me-2 h-4 w-4" /> Reports
                                 </Link>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
@@ -452,7 +452,7 @@ ${resetPasswordState.newPassword}`}
                                     <Button 
                                         variant="outline" 
                                         size="icon"
-                                        className="absolute top-2 right-2 h-8 w-8 shrink-0"
+                                        className="absolute top-2 end-2 h-8 w-8 shrink-0"
                                         onClick={() => {
                                             const txt = `Hello, ${resetPasswordState.client?.name} \nHere is your login details:\nEmail:\n${resetPasswordState.client?.email}\nPassword:\n${resetPasswordState.newPassword}`;
                                             navigator.clipboard.writeText(txt);

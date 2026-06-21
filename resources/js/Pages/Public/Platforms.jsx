@@ -74,9 +74,9 @@ export default function Platforms() {
                                 Give your team a central hub to manage data, view analytics, and control operations without juggling multiple tools.
                             </p>
                             <ul className="space-y-4 mb-10">
-                                <li className="flex items-center text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full mr-4"></div>Data visualizations & charts</li>
-                                <li className="flex items-center text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full mr-4"></div>Role-based permissions</li>
-                                <li className="flex items-center text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full mr-4"></div>Real-time data updates</li>
+                                <li className="flex items-center text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-4"></div>Data visualizations & charts</li>
+                                <li className="flex items-center text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-4"></div>Role-based permissions</li>
+                                <li className="flex items-center text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-4"></div>Real-time data updates</li>
                             </ul>
                             <button onClick={() => openWhatsApp("I'm interested in an Internal Dashboard.")} className="inline-flex items-center gap-2 text-xs font-bold text-[#111111] uppercase tracking-widest hover:text-[#666666] transition-colors">
                                 Discuss this platform <ArrowRight className="w-4 h-4" />
@@ -106,9 +106,9 @@ export default function Platforms() {
                                 Launch your own subscription-based software. We handle the complex multi-tenant architecture and billing engines.
                             </p>
                             <ul className="space-y-4 mb-10">
-                                <li className="flex items-center text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full mr-4"></div>Subscription & billing logic</li>
-                                <li className="flex items-center text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full mr-4"></div>Tenant data isolation</li>
-                                <li className="flex items-center text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full mr-4"></div>Custom user portals</li>
+                                <li className="flex items-center text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-4"></div>Subscription & billing logic</li>
+                                <li className="flex items-center text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-4"></div>Tenant data isolation</li>
+                                <li className="flex items-center text-[#111111] text-sm font-semibold"><div className="w-1.5 h-1.5 bg-[#111111] rounded-full me-4"></div>Custom user portals</li>
                             </ul>
                             <button onClick={() => openWhatsApp("I'm interested in building a SaaS Application.")} className="inline-flex items-center gap-2 text-xs font-bold text-[#111111] uppercase tracking-widest hover:text-[#666666] transition-colors">
                                 Discuss this platform <ArrowRight className="w-4 h-4" />

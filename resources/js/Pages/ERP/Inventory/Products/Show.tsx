@@ -27,9 +27,9 @@ export default function Show({ product, stockLogs }: { product: any, stockLogs: 
                         <div className="flex items-center">
                             <Link
                                 href={route('erp.inventory.index')}
-                                className="mr-4 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700"
+                                className="me-4 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700"
                             >
-                                <ArrowLeft className="mr-1 h-4 w-4" />
+                                <ArrowLeft className="me-1 h-4 w-4" />
                                 {t('erp.back_to_inventory', 'Back')}
                             </Link>
                             <h3 className="text-2xl font-semibold text-gray-900">
@@ -41,14 +41,14 @@ export default function Show({ product, stockLogs }: { product: any, stockLogs: 
                                 href={route('erp.inventory.products.adjust', product.id)}
                                 className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                             >
-                                <Plus className="mr-1 h-4 w-4" />
+                                <Plus className="me-1 h-4 w-4" />
                                 {t('erp.adjust_stock', 'Adjust Stock')}
                             </Link>
                             <Link
                                 href={route('erp.inventory.products.edit', product.id)}
                                 className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                             >
-                                <Edit className="mr-1 h-4 w-4" />
+                                <Edit className="me-1 h-4 w-4" />
                                 {t('erp.edit', 'Edit')}
                             </Link>
                         </div>
@@ -120,11 +120,11 @@ export default function Show({ product, stockLogs }: { product: any, stockLogs: 
                                                 <table className="min-w-full divide-y divide-gray-200">
                                                     <thead className="bg-gray-50">
                                                         <tr>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.date', 'Date')}</th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.user', 'User')}</th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.change', 'Change')}</th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.current_stock', 'Current Stock')}</th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.reason', 'Reason')}</th>
+                                                            <th className="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.date', 'Date')}</th>
+                                                            <th className="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.user', 'User')}</th>
+                                                            <th className="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.change', 'Change')}</th>
+                                                            <th className="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.current_stock', 'Current Stock')}</th>
+                                                            <th className="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.reason', 'Reason')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-gray-200 bg-white">

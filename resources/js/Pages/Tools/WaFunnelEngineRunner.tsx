@@ -43,7 +43,7 @@ function CanvasNode({ node, selected, onSelect, onDelete, style }: any) {
                 <p className="text-[10px] text-slate-400 leading-relaxed">{node.config?.preview || def.desc}</p>
             </div>
             <Button variant="ghost" size="icon" onClick={e => { e.stopPropagation(); onDelete(node.id); }}
-                className="absolute -top-2 -right-2 w-5 h-5 bg-rose-500 rounded-full text-white opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity hover:bg-rose-600">
+                className="absolute -top-2 -end-2 w-5 h-5 bg-rose-500 rounded-full text-white opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity hover:bg-rose-600">
                 <X className="w-3 h-3" />
             </Button>
         </div>
@@ -80,7 +80,7 @@ function FunnelCard({ funnel, onOpen, onDelete, onToggle }: any) {
             <div className="flex gap-2">
                 <Button variant="outline" onClick={e => { e.stopPropagation(); onToggle(funnel); }}
                     className={`flex-1 h-9 rounded-xl text-xs font-bold transition-all ${funnel.status === 'active' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/15 hover:text-yellow-400' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/15 hover:text-emerald-400'}`}>
-                    {funnel.status === 'active' ? <><Square className="w-3 h-3 inline mr-1" />Pause</> : <><Play className="w-3 h-3 inline mr-1" />Activate</>}
+                    {funnel.status === 'active' ? <><Square className="w-3 h-3 inline me-1" />Pause</> : <><Play className="w-3 h-3 inline me-1" />Activate</>}
                 </Button>
                 <Button variant="outline" size="icon" onClick={e => { e.stopPropagation(); onOpen(funnel); }}
                     className="h-9 w-10 bg-blue-500/10 border-blue-500/20 text-blue-400 rounded-xl hover:bg-blue-500/15 hover:text-blue-400 transition-all">
@@ -130,14 +130,14 @@ function FunnelBuilder({ funnel, onClose, onSave }: { funnel: any; onClose: () =
 
             <div className="flex flex-1 overflow-hidden">
                 {/* Node sidebar */}
-                <div className="w-52 bg-slate-900 border-r border-slate-800 p-3 space-y-1.5 overflow-y-auto shrink-0">
+                <div className="w-52 bg-slate-900 border-e border-slate-800 p-3 space-y-1.5 overflow-y-auto shrink-0">
                     <p className="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-2 px-1">{__('general.add_node')}</p>
                     {NODE_TYPES.map(t => {
                         const Icon = t.icon;
                         return (
                             <Button variant="outline" key={t.type} onClick={() => addNode(t.type)}
-                                className="w-full h-auto justify-start p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border-slate-700 hover:border-slate-600 transition-all text-left">
-                                <div className={`w-6 h-6 rounded-lg bg-gradient-to-br ${t.color} flex items-center justify-center shrink-0 mr-2`}>
+                                className="w-full h-auto justify-start p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border-slate-700 hover:border-slate-600 transition-all text-start">
+                                <div className={`w-6 h-6 rounded-lg bg-gradient-to-br ${t.color} flex items-center justify-center shrink-0 me-2`}>
                                     <Icon className="w-3 h-3 text-white" />
                                 </div>
                                 <span className="text-xs font-semibold text-slate-300">{t.label}</span>
@@ -171,7 +171,7 @@ function FunnelBuilder({ funnel, onClose, onSave }: { funnel: any; onClose: () =
 
                 {/* Properties panel */}
                 {selected && (
-                    <div className="w-64 bg-slate-900 border-l border-slate-800 p-4 shrink-0 overflow-y-auto">
+                    <div className="w-64 bg-slate-900 border-s border-slate-800 p-4 shrink-0 overflow-y-auto">
                         <p className="text-[9px] font-black uppercase tracking-widest text-slate-600 mb-3">{__('general.node_properties')}</p>
                         {(() => {
                             const node = nodes.find(n => n.id === selected);

@@ -78,7 +78,7 @@ export default function Reports({ client, dates = [], unpaid = 0 }) {
                                     <TableRow className="bg-gray-50">
                                         <TableHead>Date</TableHead>
                                         <TableHead>Time</TableHead>
-                                        <TableHead className="text-right">Cost</TableHead>
+                                        <TableHead className="text-end">Cost</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -96,7 +96,7 @@ export default function Reports({ client, dates = [], unpaid = 0 }) {
                                                     {dateObj.ds ? format(new Date(dateObj.ds), 'MM/dd/yyyy') : '--'}
                                                 </TableCell>
                                                 <TableCell>{secondsToTime(seconds)}</TableCell>
-                                                <TableCell className="text-right">{formatMoney(cost, currency)}</TableCell>
+                                                <TableCell className="text-end">{formatMoney(cost, currency)}</TableCell>
                                             </TableRow>
                                         );
                                     })}

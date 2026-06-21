@@ -34,9 +34,9 @@ export default function AdjustStock({ product }: { product: any }) {
                     <div className="mb-6 flex items-center">
                         <Link
                             href={route('erp.inventory.index')}
-                            className="mr-4 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700"
+                            className="me-4 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700"
                         >
-                            <ArrowLeft className="mr-1 h-4 w-4" />
+                            <ArrowLeft className="me-1 h-4 w-4" />
                             {t('erp.back_to_inventory', 'Back')}
                         </Link>
                         <h3 className="text-2xl font-semibold text-gray-900">

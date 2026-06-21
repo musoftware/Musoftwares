@@ -156,11 +156,11 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                     
                     <div className="flex items-center gap-2">
                         <Button variant="outline" onClick={() => setIsNewFolderOpen(true)} disabled={isLoading}>
-                            <Plus className="h-4 w-4 mr-2" />
+                            <Plus className="h-4 w-4 me-2" />
                             New Folder
                         </Button>
                         <Button onClick={handleUploadClick} disabled={isLoading}>
-                            <Upload className="h-4 w-4 mr-2" />
+                            <Upload className="h-4 w-4 me-2" />
                             Upload
                         </Button>
                         <input 
@@ -208,7 +208,7 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                                         className="group relative flex flex-col items-center p-4 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all text-center cursor-pointer"
                                         onDoubleClick={() => navigateTo(folder.path)}
                                     >
-                                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="absolute top-2 end-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.stopPropagation()}>
@@ -217,14 +217,14 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDownload(folder.path); }}>
-                                                        <Download className="h-4 w-4 mr-2" /> Download Zip
+                                                        <Download className="h-4 w-4 me-2" /> Download Zip
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setRenameItem({ ...folder, type: 'folder' }); }}>
-                                                        <Edit className="h-4 w-4 mr-2" /> Rename
+                                                        <Edit className="h-4 w-4 me-2" /> Rename
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem className="text-red-600" onClick={(e) => { e.stopPropagation(); setDeleteItem({ ...folder, type: 'folder' }); }}>
-                                                        <Trash2 className="h-4 w-4 mr-2" /> Delete
+                                                        <Trash2 className="h-4 w-4 me-2" /> Delete
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -243,7 +243,7 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                                         className="group relative flex flex-col items-center p-4 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all text-center cursor-pointer"
                                         onDoubleClick={() => isTextFile(file.ext) ? handleEdit(file.path) : handleDownload(file.path)}
                                     >
-                                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="absolute top-2 end-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -252,19 +252,19 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem onClick={() => handleDownload(file.path)}>
-                                                        <Download className="h-4 w-4 mr-2" /> Download
+                                                        <Download className="h-4 w-4 me-2" /> Download
                                                     </DropdownMenuItem>
                                                     {isTextFile(file.ext) && (
                                                         <DropdownMenuItem onClick={() => handleEdit(file.path)}>
-                                                            <FileText className="h-4 w-4 mr-2" /> Edit in Editor
+                                                            <FileText className="h-4 w-4 me-2" /> Edit in Editor
                                                         </DropdownMenuItem>
                                                     )}
                                                     <DropdownMenuItem onClick={() => setRenameItem({ ...file, type: 'file' })}>
-                                                        <Edit className="h-4 w-4 mr-2" /> Rename
+                                                        <Edit className="h-4 w-4 me-2" /> Rename
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem className="text-red-600" onClick={() => setDeleteItem({ ...file, type: 'file' })}>
-                                                        <Trash2 className="h-4 w-4 mr-2" /> Delete
+                                                        <Trash2 className="h-4 w-4 me-2" /> Delete
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>

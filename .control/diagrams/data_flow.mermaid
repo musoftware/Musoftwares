@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant User
+    participant ReactComponent as React Component (Frontend)
+    participant InertiaClient as Inertia.js Client
+    participant LaravelRoute as Laravel Routing / Middleware
+    participant Controller as Controller
+    participant Service as Business Service
+    participant Model as Eloquent Model / Database
+    
+    User->>ReactComponent: Interacts with UI
+    ReactComponent->>InertiaClient: Dispatch Action (e.g., router.post)
+    InertiaClient->>LaravelRoute: HTTP Request
+    LaravelRoute->>LaravelRoute: Auth & Authorization (Sanctum / Spatie)
+    LaravelRoute->>Controller: Route to method
+    Controller->>Service: Call Business Logic
+    Service->>Model: Read/Write Data
+    Model-->>Service: Return Result
+    Service-->>Controller: Return Processed Data
+    Controller-->>InertiaClient: Inertia::render() / redirect()
+    InertiaClient-->>ReactComponent: Update Props / UI State
+    ReactComponent-->>User: Visual Update

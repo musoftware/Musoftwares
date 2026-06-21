@@ -48,12 +48,12 @@ export default function ManagerCampaignsList({ campaigns = [] }: { campaigns: Ca
                         <Button variant="ghost" size="sm" asChild className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">
                             <Link href={`/crm/campaigns/${campaign.id}`}>
                                 {__('general.view')}
-                                <ArrowRight className="w-4 h-4 ml-1" />
+                                <ArrowRight className="w-4 h-4 ms-1" />
                             </Link>
                         </Button>
                     </div>
                     
-                    <div className="flex flex-col gap-1 mt-1 pl-11">
+                    <div className="flex flex-col gap-1 mt-1 ps-11">
                         <div className="flex justify-between text-xs text-slate-500">
                             <span>{__('general.progress')}</span>
                             <span>{campaign.sent_count} / {campaign.total_recipients}</span>

@@ -188,14 +188,14 @@ export default function FormatExtractorRunner({ tool }: any) {
 
                     <div className="space-y-3">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                             <Input
                                 type="url"
                                 value={url}
                                 onChange={e => setUrl(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleExtract()}
                                 placeholder={__('general.https_www_tiktok_com_user_video')}
-                                className="pl-9 h-11 text-sm bg-slate-50 font-mono"
+                                className="ps-9 h-11 text-sm bg-slate-50 font-mono"
                             />
                         </div>
                         <Input
@@ -246,7 +246,7 @@ export default function FormatExtractorRunner({ tool }: any) {
 
                         {/* Source hero */}
                         <div className="bg-gradient-to-tr from-slate-900 to-teal-950 border border-teal-800 rounded-2xl p-5 text-white shadow-xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-48 h-48 bg-teal-400/10 rounded-full blur-3xl" />
+                            <div className="absolute top-0 end-0 w-48 h-48 bg-teal-400/10 rounded-full blur-3xl" />
                             <div className="relative z-10">
                                 <div className="flex items-start justify-between gap-4 mb-3">
                                     <div>

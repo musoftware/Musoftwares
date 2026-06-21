@@ -102,9 +102,9 @@ export default function Index({ proposals }) {
                                     disabled={isCalculating}
                                 >
                                     {isCalculating ? (
-                                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{__('general.calculating')}</>
+                                        <><Loader2 className="me-2 h-4 w-4 animate-spin" />{__('general.calculating')}</>
                                     ) : (
-                                        <><Play className="mr-2 h-4 w-4" />{__('general.calculate_with_ai')}</>
+                                        <><Play className="me-2 h-4 w-4" />{__('general.calculate_with_ai')}</>
                                     )}
                                 </Button>
                             </CardContent>
@@ -130,7 +130,7 @@ export default function Index({ proposals }) {
                                             </div>
                                             {proposal.status === 'converted_to_contract' ? (
                                                 <div className="text-xs text-green-600 font-medium flex items-center mt-2">
-                                                    <CheckCircle2 className="w-3 h-3 mr-1" />{__('general.converted_to_contract')}</div>
+                                                    <CheckCircle2 className="w-3 h-3 me-1" />{__('general.converted_to_contract')}</div>
                                             ) : (
                                                 <div className="mt-2 flex space-x-2">
                                                     <Button size="sm" className="w-full text-xs bg-slate-900 hover:bg-slate-800 text-white" onClick={() => handleConvertToContract(proposal.id)}>{__('general.convert_to_contract')}</Button>
@@ -155,7 +155,7 @@ export default function Index({ proposals }) {
                                 </div>
                                 {aiResult && (
                                     <Button onClick={handleSaveProposal} disabled={isSaving} variant="default" className="bg-slate-900 hover:bg-slate-800 text-white">
-                                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                                        {isSaving ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : <Save className="me-2 h-4 w-4" />}
                                         Save Proposal
                                     </Button>
                                 )}

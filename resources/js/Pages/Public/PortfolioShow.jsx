@@ -69,7 +69,7 @@ export default function PortfolioShow({ slug }) {
                             href={route('portfolio')} 
                             className="gsap-fade-up inline-flex items-center text-xs font-bold uppercase tracking-widest text-[#888888] hover:text-[#111111] transition-colors mb-12"
                         >
-                            <ArrowLeft className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0 rtl:rotate-180" />
+                            <ArrowLeft className="w-4 h-4 me-2 rtl:ms-2 rtl:me-0 rtl:rotate-180" />
                             {__('general.back_to_portfolio') || 'Back to Portfolio'}
                         </Link>
 
@@ -101,7 +101,7 @@ export default function PortfolioShow({ slug }) {
                 <section className="py-24 lg:py-32 bg-white reveal-section">
                     <div className="max-w-4xl mx-auto px-6 lg:px-8">
                         <div 
-                            className="gsap-fade-up prose prose-lg max-w-none text-[#666666] prose-headings:text-[#111111] prose-headings:font-bold prose-headings:tracking-tight prose-a:text-[#111111] prose-a:font-semibold hover:prose-a:text-[#666666] prose-img:border prose-img:border-[#e5e5e5] prose-img:rounded-none rtl:prose-p:text-right rtl:prose-headings:text-right rtl:prose-ul:text-right rtl:prose-li:text-right rtl:prose-blockquote:text-right rtl:prose-blockquote:border-r-4 rtl:prose-blockquote:border-l-0 rtl:prose-blockquote:pr-4 rtl:prose-blockquote:pl-0"
+                            className="gsap-fade-up prose prose-lg max-w-none text-[#666666] prose-headings:text-[#111111] prose-headings:font-bold prose-headings:tracking-tight prose-a:text-[#111111] prose-a:font-semibold hover:prose-a:text-[#666666] prose-img:border prose-img:border-[#e5e5e5] prose-img:rounded-none rtl:prose-p:text-end rtl:prose-headings:text-end rtl:prose-ul:text-end rtl:prose-li:text-end rtl:prose-blockquote:text-end rtl:prose-blockquote:border-e-4 rtl:prose-blockquote:border-s-0 rtl:prose-blockquote:pe-4 rtl:prose-blockquote:ps-0"
                             dangerouslySetInnerHTML={{ __html: content }}
                         />
                     </div>

@@ -12,6 +12,7 @@ import { Textarea } from '@/Components/ui/textarea';
 import { Badge } from '@/Components/ui/badge';
 import { Switch } from '@/Components/ui/switch';
 import { runtimeSDK } from '@/lib/runtime-sdk';
+import { __ } from '@/lib/i18n';
 
 
 
@@ -375,25 +376,25 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                         <div className="flex items-center gap-2 px-2.5 py-1.5 bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-800/30 rounded-lg">
                             <AlertTriangle className="w-3 h-3 text-amber-600 shrink-0" />
                             <span className="text-[10px] text-amber-700 dark:text-amber-400 font-medium">
-                                {locale === 'ar' ? 'الأزرار التفاعلية قد تكون محدودة حسب نوع حساب واتساب (Business vs Personal)' : 'Interactive buttons may be limited depending on WhatsApp account type (Business vs Personal)'}
+                                {__('Interactive buttons may be limited depending on WhatsApp account type (Business vs Personal)')}
                             </span>
                         </div>
                         <Textarea
                             value={part.message || ''}
                             onChange={e => onChange({ ...part, message: e.target.value })}
-                            placeholder={locale === 'ar' ? 'نص الرسالة الرئيسي...' : 'Main message text...'}
+                            placeholder={__('Main message text...')}
                             rows={2}
                             className="resize-none text-sm text-start"
                         />
                         <Input
                             value={part.footer || ''}
                             onChange={e => onChange({ ...part, footer: e.target.value })}
-                            placeholder={locale === 'ar' ? 'نص التذييل (اختياري)' : 'Footer text (optional)'}
+                            placeholder={__('Footer text (optional)')}
                             className="text-xs h-8 text-start"
                         />
                         <div className="space-y-2">
                             <Label className="text-xs font-bold text-start block">
-                                {locale === 'ar' ? 'الأزرار (حد أقصى 3)' : 'Buttons (max 3)'}
+                                {__('Buttons (max 3)')}
                             </Label>
                             {(part.buttons || []).map((btn, bIdx) => (
                                 <div key={bIdx} className="flex items-center gap-2">
@@ -405,7 +406,7 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                             updated[bIdx] = { ...updated[bIdx], text: e.target.value };
                                             onChange({ ...part, buttons: updated });
                                         }}
-                                        placeholder={locale === 'ar' ? `نص الزر ${bIdx + 1}` : `Button ${bIdx + 1} text`}
+                                        placeholder={__(`Button ${bIdx + 1} text`)}
                                         className="text-xs h-8 text-start flex-1"
                                     />
                                     <button type="button" onClick={() => {
@@ -421,7 +422,7 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                     const updated = [...(part.buttons || []), { id: `btn_${Date.now()}`, text: '' }];
                                     onChange({ ...part, buttons: updated });
                                 }} className="w-full py-1.5 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-500 hover:text-cyan-600 hover:border-cyan-400/50 transition-colors font-bold">
-                                    + {locale === 'ar' ? 'إضافة زر' : 'Add Button'}
+                                    + {__('Add Button')}
                                 </button>
                             )}
                         </div>
@@ -432,13 +433,13 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                         <div className="flex items-center gap-2 px-2.5 py-1.5 bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-800/30 rounded-lg">
                             <AlertTriangle className="w-3 h-3 text-amber-600 shrink-0" />
                             <span className="text-[10px] text-amber-700 dark:text-amber-400 font-medium">
-                                {locale === 'ar' ? 'قوائم الرسائل قد تكون محدودة حسب نوع حساب واتساب' : 'List messages may be limited depending on WhatsApp account type'}
+                                {__('List messages may be limited depending on WhatsApp account type')}
                             </span>
                         </div>
                         <Textarea
                             value={part.message || ''}
                             onChange={e => onChange({ ...part, message: e.target.value })}
-                            placeholder={locale === 'ar' ? 'نص الرسالة الرئيسي...' : 'Main message text...'}
+                            placeholder={__('Main message text...')}
                             rows={2}
                             className="resize-none text-sm text-start"
                         />
@@ -446,19 +447,19 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                             <Input
                                 value={part.footer || ''}
                                 onChange={e => onChange({ ...part, footer: e.target.value })}
-                                placeholder={locale === 'ar' ? 'التذييل (اختياري)' : 'Footer (optional)'}
+                                placeholder={__('Footer (optional)')}
                                 className="text-xs h-8 text-start"
                             />
                             <Input
                                 value={part.buttonText || ''}
                                 onChange={e => onChange({ ...part, buttonText: e.target.value })}
-                                placeholder={locale === 'ar' ? 'نص زر القائمة (مثال: القائمة)' : 'Menu button text (e.g. Menu)'}
+                                placeholder={__('Menu button text (e.g. Menu)')}
                                 className="text-xs h-8 text-start"
                             />
                         </div>
                         <div className="space-y-3">
                             <Label className="text-xs font-bold text-start block">
-                                {locale === 'ar' ? 'أقسام القائمة' : 'List Sections'}
+                                {__('List Sections')}
                             </Label>
                             {(part.sections || []).map((sec, sIdx) => (
                                 <div key={sIdx} className="border border-slate-200 dark:border-slate-700 rounded-xl p-3 space-y-2">
@@ -470,7 +471,7 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                                 updated[sIdx] = { ...updated[sIdx], title: e.target.value };
                                                 onChange({ ...part, sections: updated });
                                             }}
-                                            placeholder={locale === 'ar' ? `عنوان القسم ${sIdx + 1}` : `Section ${sIdx + 1} title`}
+                                            placeholder={__(`Section ${sIdx + 1} title`)}
                                             className="text-xs h-7 text-start flex-1 font-bold"
                                         />
                                         <button type="button" onClick={() => {
@@ -492,7 +493,7 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                                     updatedSections[sIdx] = { ...updatedSections[sIdx], rows: updatedRows };
                                                     onChange({ ...part, sections: updatedSections });
                                                 }}
-                                                placeholder={locale === 'ar' ? 'عنوان العنصر' : 'Item title'}
+                                                placeholder={__('Item title')}
                                                 className="text-xs h-7 text-start flex-1"
                                             />
                                             <Input
@@ -504,7 +505,7 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                                     updatedSections[sIdx] = { ...updatedSections[sIdx], rows: updatedRows };
                                                     onChange({ ...part, sections: updatedSections });
                                                 }}
-                                                placeholder={locale === 'ar' ? 'الوصف' : 'Description'}
+                                                placeholder={__('Description')}
                                                 className="text-xs h-7 text-start flex-1"
                                             />
                                             <button type="button" onClick={() => {
@@ -523,7 +524,7 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                             updatedSections[sIdx] = { ...updatedSections[sIdx], rows: [...(updatedSections[sIdx].rows || []), newRow] };
                                             onChange({ ...part, sections: updatedSections });
                                         }} className="w-full py-1 border border-dashed border-slate-200 dark:border-slate-700 rounded-lg text-[10px] text-slate-500 hover:text-indigo-600 hover:border-indigo-400/50 transition-colors font-bold ms-4">
-                                            + {locale === 'ar' ? 'إضافة عنصر' : 'Add Row'}
+                                            + {__('Add Row')}
                                         </button>
                                     )}
                                 </div>
@@ -532,7 +533,7 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                 const newSection = { title: '', rows: [{ id: `row_${Date.now()}`, title: '', description: '' }] };
                                 onChange({ ...part, sections: [...(part.sections || []), newSection] });
                             }} className="w-full py-1.5 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-500 hover:text-indigo-600 hover:border-indigo-400/50 transition-colors font-bold">
-                                + {locale === 'ar' ? 'إضافة قسم' : 'Add Section'}
+                                + {__('Add Section')}
                             </button>
                         </div>
                     </div>
@@ -542,12 +543,12 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                         <Input
                             value={part.pollName || ''}
                             onChange={e => onChange({ ...part, pollName: e.target.value })}
-                            placeholder={locale === 'ar' ? 'سؤال التصويت...' : 'Poll question...'}
+                            placeholder={__('Poll question...')}
                             className="text-sm h-9 text-start font-bold"
                         />
                         <div className="space-y-2">
                             <Label className="text-xs font-bold text-start block">
-                                {locale === 'ar' ? 'خيارات التصويت (حد أقصى 12)' : 'Poll Options (max 12)'}
+                                {__('Poll Options (max 12)')}
                             </Label>
                             {(part.pollOptions || []).map((opt, oIdx) => (
                                 <div key={oIdx} className="flex items-center gap-2">
@@ -559,7 +560,7 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                             updated[oIdx] = e.target.value;
                                             onChange({ ...part, pollOptions: updated });
                                         }}
-                                        placeholder={locale === 'ar' ? `الخيار ${oIdx + 1}` : `Option ${oIdx + 1}`}
+                                        placeholder={__(`Option ${oIdx + 1}`)}
                                         className="text-xs h-8 text-start flex-1"
                                     />
                                     <button type="button" onClick={() => {
@@ -574,13 +575,13 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                 <button type="button" onClick={() => {
                                     onChange({ ...part, pollOptions: [...(part.pollOptions || []), ''] });
                                 }} className="w-full py-1.5 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-500 hover:text-pink-600 hover:border-pink-400/50 transition-colors font-bold">
-                                    + {locale === 'ar' ? 'إضافة خيار' : 'Add Option'}
+                                    + {__('Add Option')}
                                 </button>
                             )}
                         </div>
                         <div className="flex items-center gap-3">
                             <Label className="text-xs font-medium text-start shrink-0">
-                                {locale === 'ar' ? 'اختيارات مسموحة:' : 'Selectable:'}
+                                {__('Selectable:')}
                             </Label>
                             <Input
                                 type="number"
@@ -591,7 +592,7 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                 className="w-20 text-xs h-8 text-center"
                             />
                             <span className="text-[10px] text-muted-foreground">
-                                {locale === 'ar' ? '(1 = اختيار واحد فقط)' : '(1 = single choice)'}
+                                {__('(1 = single choice)')}
                             </span>
                         </div>
                     </div>
@@ -617,7 +618,7 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                     />
                                     <CloudUpload className="w-5 h-5 text-slate-400 animate-pulse" />
                                     <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
-                                        {locale === 'ar' ? 'رفع ملف محلي' : 'Upload Local'}
+                                        {__('Upload Local')}
                                     </span>
                                 </div>
                                 <div
@@ -626,7 +627,7 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                 >
                                     <FolderOpen className="w-5 h-5 text-teal-600 dark:text-teal-400" />
                                     <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
-                                        {locale === 'ar' ? 'مكتبة الوسائط' : 'Media Library'}
+                                        {__('Media Library')}
                                     </span>
                                 </div>
                             </div>
@@ -649,7 +650,7 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                         onClick={() => setSelectorOpen(true)} 
                                         className="text-[10px] text-teal-600 dark:text-teal-400 hover:underline font-bold"
                                     >
-                                        {locale === 'ar' ? 'المكتبة' : 'Library'}
+                                        {__('Library')}
                                     </button>
                                     <span className="text-slate-300">|</span>
                                     <button 
@@ -657,7 +658,7 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                         onClick={() => fileInputRef.current?.click()} 
                                         className="text-[10px] text-teal-600 dark:text-teal-400 hover:underline font-bold"
                                     >
-                                        {locale === 'ar' ? 'رفع جديد' : 'Upload'}
+                                        {__('Upload')}
                                     </button>
                                 </div>
                             </div>
@@ -690,10 +691,10 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                             <div className="flex items-center justify-between border border-slate-150 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/10 rounded-xl p-2.5 mt-2">
                                 <div className="flex flex-col text-start">
                                     <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                                        {locale === 'ar' ? 'إرسال كرسالة صوتية مسجلة (فويس)' : 'Send as recorded voice message (PTT)'}
+                                        {__('Send as recorded voice message (PTT)')}
                                     </span>
                                     <span className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
-                                        {locale === 'ar' ? 'ستظهر عند المستلم كأنها فويس مسجل الآن وليست كملف صوتي مرفق' : 'Appears to recipient as a real-time recorded voice note'}
+                                        {__('Appears to recipient as a real-time recorded voice note')}
                                     </span>
                                 </div>
                                 <Switch

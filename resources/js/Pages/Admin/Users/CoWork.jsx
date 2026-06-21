@@ -233,14 +233,14 @@ export default function CoWork({ freelancers = [], legacyCoWorkers = [] }) {
 
                     {/* Search */}
                     <div className="relative mb-2">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <input
                             id="cowork-search"
                             type="text"
                             placeholder={activeTab === 'freelancers' ? 'Search by name, email, skill…' : 'Search by name, email, tag…'}
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            className="h-9 pl-9 pr-3 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent w-64"
+                            className="h-9 ps-9 pe-3 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent w-64"
                         />
                     </div>
                 </div>

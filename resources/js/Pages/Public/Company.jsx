@@ -97,7 +97,7 @@ export default function Company() {
                         </div>
 
                         {/* Right Column: Values */}
-                        <div className="lg:col-span-7 border-t lg:border-t-0 lg:border-l border-[#e5e5e5] pt-12 lg:pt-0 lg:pl-16">
+                        <div className="lg:col-span-7 border-t lg:border-t-0 lg:border-s border-[#e5e5e5] pt-12 lg:pt-0 lg:ps-16">
                             <h2 className="gsap-fade-up text-xs font-bold text-[#888888] tracking-widest uppercase mb-12">Our Core Values</h2>
                             
                             <div className="space-y-12">
@@ -144,7 +144,7 @@ export default function Company() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <div className="gsap-fade-up relative p-8 bg-white border border-[#e5e5e5] rounded-2xl transition-colors hover:border-[#111111]">
-                                <span className="text-5xl font-bold text-[#f0f0f0] absolute top-6 right-6 font-mono select-none">1</span>
+                                <span className="text-5xl font-bold text-[#f0f0f0] absolute top-6 end-6 font-mono select-none">1</span>
                                 <h4 className="text-xl font-bold text-[#111111] mb-4 mt-8 relative z-10">Discovery</h4>
                                 <p className="text-[#666666] text-sm leading-relaxed relative z-10">
                                     We start with a deep dive into your business logic, identifying the bottlenecks and defining the technical requirements.
@@ -152,7 +152,7 @@ export default function Company() {
                             </div>
                             
                             <div className="gsap-fade-up relative p-8 bg-white border border-[#e5e5e5] rounded-2xl transition-colors hover:border-[#111111]">
-                                <span className="text-5xl font-bold text-[#f0f0f0] absolute top-6 right-6 font-mono select-none">2</span>
+                                <span className="text-5xl font-bold text-[#f0f0f0] absolute top-6 end-6 font-mono select-none">2</span>
                                 <h4 className="text-xl font-bold text-[#111111] mb-4 mt-8 relative z-10">Architecture</h4>
                                 <p className="text-[#666666] text-sm leading-relaxed relative z-10">
                                     We design the database schema, system flow, and user interface, ensuring everything is scalable from day one.
@@ -160,7 +160,7 @@ export default function Company() {
                             </div>
                             
                             <div className="gsap-fade-up relative p-8 bg-white border border-[#e5e5e5] rounded-2xl transition-colors hover:border-[#111111]">
-                                <span className="text-5xl font-bold text-[#f0f0f0] absolute top-6 right-6 font-mono select-none">3</span>
+                                <span className="text-5xl font-bold text-[#f0f0f0] absolute top-6 end-6 font-mono select-none">3</span>
                                 <h4 className="text-xl font-bold text-[#111111] mb-4 mt-8 relative z-10">Engineering</h4>
                                 <p className="text-[#666666] text-sm leading-relaxed relative z-10">
                                     We write clean, documented code using modern frameworks. You get regular updates and transparency throughout the build.
@@ -168,7 +168,7 @@ export default function Company() {
                             </div>
                             
                             <div className="gsap-fade-up relative p-8 bg-white border border-[#e5e5e5] rounded-2xl transition-colors hover:border-[#111111]">
-                                <span className="text-5xl font-bold text-[#f0f0f0] absolute top-6 right-6 font-mono select-none">4</span>
+                                <span className="text-5xl font-bold text-[#f0f0f0] absolute top-6 end-6 font-mono select-none">4</span>
                                 <h4 className="text-xl font-bold text-[#111111] mb-4 mt-8 relative z-10">Deployment</h4>
                                 <p className="text-[#666666] text-sm leading-relaxed relative z-10">
                                     We securely deploy your application to production servers, configure the domains, and hand over the keys.

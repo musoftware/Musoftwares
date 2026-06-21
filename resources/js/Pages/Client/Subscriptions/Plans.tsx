@@ -86,7 +86,7 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
             {/* ── Hero ── */}
             <div className="max-w-7xl mx-auto px-4 pt-10 pb-6">
                 <Link href={route('subscriptions.manage')} className="inline-flex items-center text-sm text-slate-500 hover:text-slate-800 mb-6 transition-colors">
-                    <ArrowLeft className="w-4 h-4 mr-1.5" />{__('general.back_to_my_subscriptions')}</Link>
+                    <ArrowLeft className="w-4 h-4 me-1.5" />{__('general.back_to_my_subscriptions')}</Link>
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
                         <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full mb-3">

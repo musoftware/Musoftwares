@@ -19,6 +19,7 @@ import {
     TooltipTrigger,
 } from '@/Components/ui/tooltip';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { __ } from '@/lib/i18n';
 
 // ── Tooltip Button helper ─────────────────────────────────────────────────────
 function TipButton({ tip, side = "left", children, ...props }: any) {
@@ -137,7 +138,7 @@ function SessionCard({
                             {s.state !== 'connected' && s.state !== 'connecting' && (
                                 <TipButton
                                     tip={t.accounts.reconnect}
-                                    side={locale === 'ar' ? 'right' : 'left'}
+                                    side={__('left')}
                                     variant="ghost" size="icon"
                                     onClick={() => onReconnect(s.accountId)}
                                     className="size-8 text-primary hover:bg-primary/10"
@@ -148,7 +149,7 @@ function SessionCard({
 
                             <TipButton
                                 tip={t.accounts.disconnect}
-                                side={locale === 'ar' ? 'right' : 'left'}
+                                side={__('left')}
                                 variant="ghost" size="icon"
                                 onClick={() => onDisconnect(s.accountId)}
                                 className="size-8 text-muted-foreground hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30"
@@ -170,7 +171,7 @@ function SessionCard({
                             ) : (
                                 <TipButton
                                     tip={t.accounts.deleteSession}
-                                    side={locale === 'ar' ? 'right' : 'left'}
+                                    side={__('left')}
                                     variant="ghost" size="icon"
                                     onClick={() => setDeleteConfirm(true)}
                                     className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
@@ -260,7 +261,7 @@ function SessionCard({
                             onClick={() => onOpenAiSettings(s)}
                         >
                             <Bot className="size-3 text-teal-600 dark:text-teal-400 shrink-0" />
-                            {locale === 'ar' ? 'المساعد' : 'Copilot'}
+                            {__('Copilot')}
                         </Button>
                     )}
                 </div>
@@ -310,9 +311,9 @@ export default function AccountsWorkspace({
                 instructions
             });
             setSelectedSessionForAi(null);
-            alert(locale === 'ar' ? 'تم حفظ إعدادات المساعد الذكي بنجاح!' : 'AI settings saved successfully!');
+            alert(__('AI settings saved successfully!'));
         } catch (err: any) {
-            alert((locale === 'ar' ? 'فشل الحفظ: ' : 'Save failed: ') + err.message);
+            alert((__('Save failed: ')) + err.message);
         }
         setSavingAiSettings(false);
     };
@@ -452,14 +453,14 @@ export default function AccountsWorkspace({
                         <CardHeader className="pb-4 border-b bg-gradient-to-r from-teal-600 to-teal-700">
                             <CardTitle className="text-white text-base flex items-center gap-2">
                                 <Bot className="w-5 h-5" />
-                                {locale === 'ar' ? `إعدادات مساعد الذكاء الاصطناعي - ${selectedSessionForAi.displayName || selectedSessionForAi.accountId}` : `AI Copilot Settings - ${selectedSessionForAi.displayName || selectedSessionForAi.accountId}`}
+                                {__(`AI Copilot Settings - ${selectedSessionForAi.displayName || selectedSessionForAi.accountId}`)}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6 space-y-5">
                             {loadingAiSettings ? (
                                 <div className="flex flex-col items-center justify-center py-10 gap-3">
                                     <Loader2 className="w-8 h-8 text-teal-600 animate-spin" />
-                                    <p className="text-xs text-muted-foreground">{locale === 'ar' ? 'جارٍ تحميل الإعدادات...' : 'Loading settings...'}</p>
+                                    <p className="text-xs text-muted-foreground">{__('Loading settings...')}</p>
                                 </div>
                             ) : (
                                 <>
@@ -467,10 +468,10 @@ export default function AccountsWorkspace({
                                     <div className="flex items-center justify-between p-3 rounded-xl bg-teal-50/50 dark:bg-teal-950/10 border border-teal-500/20">
                                         <div className="space-y-0.5 text-start">
                                             <Label htmlFor="ai-reply-toggle" className="font-bold text-sm text-teal-950 dark:text-teal-400">
-                                                {locale === 'ar' ? 'تفعيل الرد التلقائي المستقل (الطيار الآلي)' : 'Enable Autonomous Autopilot Auto-Reply'}
+                                                {__('Enable Autonomous Autopilot Auto-Reply')}
                                             </Label>
                                             <p className="text-xs text-muted-foreground leading-relaxed">
-                                                {locale === 'ar' ? 'سيقوم البوت بالرد تلقائياً على المحادثات الواردة بناءً على معلومات شركتك.' : 'AI will automatically handle and reply to incoming chats using your FAQ.'}
+                                                {__('AI will automatically handle and reply to incoming chats using your FAQ.')}
                                             </p>
                                         </div>
                                         <Switch
@@ -484,12 +485,12 @@ export default function AccountsWorkspace({
                                     <div className="space-y-2 text-start">
                                         <Label className="font-bold text-xs flex items-center gap-1.5">
                                             <span>📚</span>
-                                            {locale === 'ar' ? 'قاعدة معرفة الشركة والمنتجات (Knowledge Base)' : 'Business Knowledge Base (FAQs & Context)'}
+                                            {__('Business Knowledge Base (FAQs & Context)')}
                                         </Label>
                                         <textarea
                                             value={knowledgeBase}
                                             onChange={e => setKnowledgeBase(e.target.value)}
-                                            placeholder={locale === 'ar' ? 'اكتب هنا معلومات شركتك، منتجاتك، أسعارك، ساعات العمل، والأسئلة الشائعة...' : 'Enter your company services, product catalogs, prices, work hours, and FAQ answers here...'}
+                                            placeholder={__('Enter your company services, product catalogs, prices, work hours, and FAQ answers here...')}
                                             className="w-full h-32 text-xs p-3 rounded-xl border bg-muted/40 focus:bg-background focus:ring-1 focus:ring-teal-500 transition-all placeholder:text-muted-foreground/60 leading-relaxed resize-none text-start"
                                         />
                                     </div>
@@ -498,12 +499,12 @@ export default function AccountsWorkspace({
                                     <div className="space-y-2 text-start">
                                         <Label className="font-bold text-xs flex items-center gap-1.5">
                                             <span>✨</span>
-                                            {locale === 'ar' ? 'تعليمات ردود البوت وتوجيهاته (Behavior Guidelines)' : 'AI Guidelines & Behavioral Personality'}
+                                            {__('AI Guidelines & Behavioral Personality')}
                                         </Label>
                                         <textarea
                                             value={instructions}
                                             onChange={e => setInstructions(e.target.value)}
-                                            placeholder={locale === 'ar' ? 'مثال: تحدث بلهجة ودية وسهلة، اختصر إجاباتك تحت سطرين، لا تذكر أسعاراً واطلب رقم جوالهم للتفاصيل...' : 'Example: Be extremely polite, speak in a casual warm tone, keep replies under 2 sentences, ask for their phone number if details needed...'}
+                                            placeholder={__('Example: Be extremely polite, speak in a casual warm tone, keep replies under 2 sentences, ask for their phone number if details needed...')}
                                             className="w-full h-24 text-xs p-3 rounded-xl border bg-muted/40 focus:bg-background focus:ring-1 focus:ring-teal-500 transition-all placeholder:text-muted-foreground/60 leading-relaxed resize-none text-start"
                                         />
                                     </div>
@@ -520,7 +521,7 @@ export default function AccountsWorkspace({
                                             ) : (
                                                 <Check className="w-4 h-4" />
                                             )}
-                                            {locale === 'ar' ? 'حفظ التغييرات' : 'Save Settings'}
+                                            {__('Save Settings')}
                                         </Button>
                                         <Button
                                             variant="outline"
@@ -528,7 +529,7 @@ export default function AccountsWorkspace({
                                             disabled={savingAiSettings}
                                             className="rounded-xl h-10 font-bold text-sm px-4"
                                         >
-                                            {locale === 'ar' ? 'إلغاء' : 'Cancel'}
+                                            {__('Cancel')}
                                         </Button>
                                     </div>
                                 </>

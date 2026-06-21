@@ -183,7 +183,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                 <Card className="border-primary/20 bg-primary/5 shadow-none transition-all">
                     <CardContent className="p-4">
                         <h6 className="font-bold mb-3 text-primary flex items-center">
-                            <ArrowRightLeft className="mr-2 h-4 w-4" />{__('general.currency_exchange')}</h6>
+                            <ArrowRightLeft className="me-2 h-4 w-4" />{__('general.currency_exchange')}</h6>
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                             <div className="md:col-span-5 space-y-1">
                                 <Label className="text-xs text-muted-foreground uppercase tracking-wider font-bold">{__('general.from_currency')}</Label>
@@ -200,9 +200,9 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                 </Label>
                                 <Input type="number" className="bg-white" value={exchangeAmount} onChange={e => setExchangeAmount(e.target.value)} onKeyDown={e => e.key === 'Enter' && applyExchange()} placeholder="0.00" />
                             </div>
-                            <div className="md:col-span-2 text-right">
+                            <div className="md:col-span-2 text-end">
                                 <Button type="button" onClick={applyExchange} className="w-full">
-                                    Apply <Plus className="h-4 w-4 ml-1" />
+                                    Apply <Plus className="h-4 w-4 ms-1" />
                                 </Button>
                             </div>
                         </div>
@@ -254,12 +254,12 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                         value={amount} 
                                         onChange={e => handleAmountChange(e.target.value)} 
                                         placeholder="0.00" 
-                                        className="rounded-r-none font-bold text-lg h-12 bg-white"
+                                        className="rounded-e-none font-bold text-lg h-12 bg-white"
                                     />
                                     <Button 
                                         type="button" 
                                         variant="secondary" 
-                                        className="rounded-l-none h-12 px-3 border-l-0"
+                                        className="rounded-s-none h-12 px-3 border-s-0"
                                         onClick={() => setShowExchange(!showExchange)}
                                         title={__('general.currency_exchange')}
                                     >
@@ -296,13 +296,13 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                     </div>
                                 </div>
                                 {selectedFeeSource !== 'custom' && fee && parseFloat(fee) > 0 && (
-                                    <div className="mt-2 text-right">
+                                    <div className="mt-2 text-end">
                                         <button 
                                             type="button" 
                                             onClick={subtractFeeFromAmount}
                                             className="text-xs text-destructive hover:underline font-medium flex items-center justify-end w-full"
                                         >
-                                            <MinusCircle className="h-3 w-3 mr-1" />{__('general.subtract_fee_from_amount')}</button>
+                                            <MinusCircle className="h-3 w-3 me-1" />{__('general.subtract_fee_from_amount')}</button>
                                     </div>
                                 )}
                             </div>
@@ -329,7 +329,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                     <Label className="font-semibold">{__('general.split_across_projects')}</Label>
                                 </div>
                                 <Button type="button" variant="ghost" size="sm" onClick={() => setProjectSplits([...projectSplits, { projectId: '', percentage: '100' }])}>
-                                    <Plus className="h-3 w-3 mr-1" />{__('general.add_split')}</Button>
+                                    <Plus className="h-3 w-3 me-1" />{__('general.add_split')}</Button>
                             </div>
                             {projectSplits.length > 0 && (
                                 <div className="space-y-2 pt-2 border-t">
@@ -359,14 +359,14 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                                         setProjectSplits(newS);
                                                     }}
                                                 />
-                                                <Percent className="h-3 w-3 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                                <Percent className="h-3 w-3 absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                                             </div>
                                             <Button type="button" variant="ghost" size="icon" className="text-destructive h-10 w-10 shrink-0" onClick={() => setProjectSplits(projectSplits.filter((_, i) => i !== idx))}>
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>
                                     ))}
-                                    <div className="text-right">
+                                    <div className="text-end">
                                         <Button type="button" variant="link" size="sm" className="text-xs text-muted-foreground" onClick={() => {
                                             const p = (100 / projectSplits.length).toFixed(1);
                                             setProjectSplits(projectSplits.map(s => ({ ...s, percentage: p })));
@@ -387,7 +387,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                     ) : null}
 
                     <Button type="button" className="w-full" onClick={addItem} disabled={!amount || parseFloat(amount) <= 0}>
-                        <Plus className="h-4 w-4 mr-2" />{__('general.add_to_list')}</Button>
+                        <Plus className="h-4 w-4 me-2" />{__('general.add_to_list')}</Button>
                 </CardContent>
             </Card>
 
@@ -396,15 +396,15 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                 <Card className="border shadow-sm bg-muted/10">
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
+                            <table className="w-full text-sm text-start">
                                 <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
                                     <tr>
                                         <th className="px-4 py-3 font-semibold">Reason</th>
                                         {projectSplits.length > 0 && <th className="px-4 py-3 font-semibold">Project</th>}
-                                        <th className="px-4 py-3 font-semibold text-right">Gross</th>
-                                        <th className="px-4 py-3 font-semibold text-right">Fee</th>
-                                        <th className="px-4 py-3 font-semibold text-right">Net</th>
-                                        <th className="px-4 py-3 font-semibold text-right w-16"></th>
+                                        <th className="px-4 py-3 font-semibold text-end">Gross</th>
+                                        <th className="px-4 py-3 font-semibold text-end">Fee</th>
+                                        <th className="px-4 py-3 font-semibold text-end">Net</th>
+                                        <th className="px-4 py-3 font-semibold text-end w-16"></th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y bg-background">
@@ -416,16 +416,16 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                                     {activeProjects.find(p => p.id.toString() === item.project?.toString())?.project_name || '-'}
                                                 </td>
                                             )}
-                                            <td className="px-4 py-3 text-right font-semibold">
+                                            <td className="px-4 py-3 text-end font-semibold">
                                                 <CurrencyDisplay amount={item.amount} currency={user.currency_obj || businessCurrency} />
                                             </td>
-                                            <td className="px-4 py-3 text-right text-destructive">
+                                            <td className="px-4 py-3 text-end text-destructive">
                                                 {item.fee > 0 ? <CurrencyDisplay amount={item.fee} currency={user.currency_obj || businessCurrency} /> : '-'}
                                             </td>
-                                            <td className="px-4 py-3 text-right text-success font-bold">
+                                            <td className="px-4 py-3 text-end text-success font-bold">
                                                 <CurrencyDisplay amount={item.amount - item.fee} currency={user.currency_obj || businessCurrency} />
                                             </td>
-                                            <td className="px-4 py-3 text-right">
+                                            <td className="px-4 py-3 text-end">
                                                 <Button type="button" variant="ghost" size="icon" className="text-destructive h-8 w-8 hover:bg-destructive/10" onClick={() => removeItem(idx)}>
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>

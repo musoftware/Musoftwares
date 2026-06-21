@@ -233,7 +233,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
 
     const renderSortIcon = (field: string) => {
         if (filters.sort_by !== field) return null;
-        return filters.sort_dir === 'asc' ? <ChevronUp className="w-3.5 h-3.5 ml-1 inline" /> : <ChevronDown className="w-3.5 h-3.5 ml-1 inline" />;
+        return filters.sort_dir === 'asc' ? <ChevronUp className="w-3.5 h-3.5 ms-1 inline" /> : <ChevronDown className="w-3.5 h-3.5 ms-1 inline" />;
     };
 
     const handleCreate = (e: React.FormEvent) => {
@@ -315,9 +315,9 @@ export default function Index({ entries, categories, users, currentTab, stats, a
 
     const getStatusBadge = (status: string) => {
         switch (status) {
-            case 'completed': return <span className="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><CheckCircle2 className="w-3 h-3 mr-1"/> Completed</span>;
-            case 'pending': return <span className="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><Clock className="w-3 h-3 mr-1"/> Pending</span>;
-            case 'overdue': return <span className="bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><AlertCircle className="w-3 h-3 mr-1"/> Overdue</span>;
+            case 'completed': return <span className="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><CheckCircle2 className="w-3 h-3 me-1"/> Completed</span>;
+            case 'pending': return <span className="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><Clock className="w-3 h-3 me-1"/> Pending</span>;
+            case 'overdue': return <span className="bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><AlertCircle className="w-3 h-3 me-1"/> Overdue</span>;
             default: return null;
         }
     };
@@ -329,7 +329,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
             {/* Top Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div className="bg-white p-6 rounded-xl border shadow-sm flex items-center">
-                    <div className="bg-slate-100 p-4 rounded-full mr-4 text-slate-800 border">
+                    <div className="bg-slate-100 p-4 rounded-full me-4 text-slate-800 border">
                         <TrendingUp className="w-6 h-6" />
                     </div>
                     <div>
@@ -338,7 +338,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-xl border shadow-sm flex items-center">
-                    <div className="bg-slate-100 p-4 rounded-full mr-4 text-slate-800 border">
+                    <div className="bg-slate-100 p-4 rounded-full me-4 text-slate-800 border">
                         <TrendingDown className="w-6 h-6" />
                     </div>
                     <div>
@@ -347,7 +347,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-xl border shadow-sm flex items-center">
-                    <div className="bg-slate-100 p-4 rounded-full mr-4 text-slate-800 border">
+                    <div className="bg-slate-100 p-4 rounded-full me-4 text-slate-800 border">
                         <Users className="w-6 h-6" />
                     </div>
                     <div>
@@ -356,7 +356,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-xl border shadow-sm flex items-center">
-                    <div className="bg-indigo-50 p-4 rounded-full mr-4 text-indigo-700 border border-indigo-100">
+                    <div className="bg-indigo-50 p-4 rounded-full me-4 text-indigo-700 border border-indigo-100">
                         <DollarSign className="w-6 h-6" />
                     </div>
                     <div>
@@ -477,7 +477,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 </div>
 
                                 {/* Legend */}
-                                <div className="mt-2 space-y-1 max-h-[100px] overflow-y-auto pr-1">
+                                <div className="mt-2 space-y-1 max-h-[100px] overflow-y-auto pe-1">
                                     {categoryAllocationData.slice(0, 4).map((entry: any, index: number) => {
                                         const total = categoryAllocationData.reduce((sum: number, item: any) => sum + item.value, 0);
                                         const percentage = total > 0 ? ((entry.value / total) * 100).toFixed(1) : 0;
@@ -565,10 +565,10 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                     {currentTab !== 'calendar' ? (
                         <div className="flex flex-wrap gap-2 items-center flex-1 min-w-[300px]">
                             <div className="relative flex-1 max-w-[240px]">
-                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+                                <Search className="absolute start-2.5 top-2.5 h-4 w-4 text-gray-400" />
                                 <Input
                                     placeholder={__('general.search_by_reason')}
-                                    className="pl-8 h-9 text-sm"
+                                    className="ps-8 h-9 text-sm"
                                     value={searchTerm}
                                     onChange={e => setSearchTerm(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && applyFilters()}
@@ -608,26 +608,26 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                             
                             {(filters.search || filters.category || filters.status || filters.user_id || searchTerm || selectedCategoryFilter || selectedStatusFilter || selectedUserFilter) && (
                                 <Button onClick={clearFilters} variant="ghost" size="sm" className="h-9 text-gray-500 hover:text-black">
-                                    <X className="w-4 h-4 mr-1" /> Clear
+                                    <X className="w-4 h-4 me-1" /> Clear
                                 </Button>
                             )}
                         </div>
                     ) : (
                         <div className="flex items-center gap-2 flex-1">
                             <span className="text-xs font-semibold text-gray-500 flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded px-2.5 py-1">
-                                <CalendarDays className="w-4 h-4 text-black mr-1" />{__('general.click_any_day_on_the_calendar_to_log_a_transaction')}</span>
+                                <CalendarDays className="w-4 h-4 text-black me-1" />{__('general.click_any_day_on_the_calendar_to_log_a_transaction')}</span>
                         </div>
                     )}
 
                     <a href={route('admin.finance.report.export', { type: currentTab === 'income' || currentTab === 'expenses' ? 'ledger' : 'pnl' })} target="_blank" rel="noreferrer">
-                        <Button variant="outline" className="h-9 mr-2 text-slate-700">
-                            <Download className="w-4 h-4 mr-2" /> Export CSV
+                        <Button variant="outline" className="h-9 me-2 text-slate-700">
+                            <Download className="w-4 h-4 me-2" /> Export CSV
                         </Button>
                     </a>
                     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                         <DialogTrigger asChild>
                             <Button className="bg-black hover:bg-slate-800 text-white h-9">
-                                <Plus className="w-4 h-4 mr-2" /> Add {currentTab === 'salaries' ? 'Salary' : currentTab === 'expenses' ? 'Expense' : currentTab === 'calendar' ? 'Record' : 'Income'}
+                                <Plus className="w-4 h-4 me-2" /> Add {currentTab === 'salaries' ? 'Salary' : currentTab === 'expenses' ? 'Expense' : currentTab === 'calendar' ? 'Record' : 'Income'}
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px]">
@@ -776,12 +776,12 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Project Name</th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Client</th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Revenue</th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Costs</th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Margin</th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Profit</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Project Name</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Client</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Revenue</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Costs</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Margin</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Profit</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -808,11 +808,11 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Category</th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Budget Amount</th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Spent</th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Remaining</th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Status</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Category</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Budget Amount</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Spent</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Remaining</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Status</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -845,25 +845,25 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th onClick={() => handleSort('reason')} className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">
+                                <th onClick={() => handleSort('reason')} className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">
                                     Description {renderSortIcon('reason')}
                                 </th>
-                                <th onClick={() => handleSort('amount')} className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">
+                                <th onClick={() => handleSort('amount')} className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">
                                     Amount {renderSortIcon('amount')}
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
+                                <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
                                     Category
                                 </th>
-                                <th onClick={() => handleSort('created_at')} className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">
+                                <th onClick={() => handleSort('created_at')} className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">
                                     Date {renderSortIcon('created_at')}
                                 </th>
-                                <th onClick={() => handleSort('due_date')} className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">
+                                <th onClick={() => handleSort('due_date')} className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">
                                     Due Date {renderSortIcon('due_date')}
                                 </th>
-                                <th onClick={() => handleSort('status')} className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">
+                                <th onClick={() => handleSort('status')} className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">
                                     Status {renderSortIcon('status')}
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Actions</th>
+                                <th className="px-6 py-3 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -907,16 +907,16 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     <td className="px-6 py-4 whitespace-nowrap cursor-pointer" onClick={() => openDetails(entry)}>
                                         {getStatusBadge(entry.status)}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <Button variant="ghost" size="sm" title={__('general.view_details')} className="text-slate-500 hover:text-black hover:bg-slate-50 mr-1" onClick={() => openDetails(entry)}>
+                                    <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
+                                        <Button variant="ghost" size="sm" title={__('general.view_details')} className="text-slate-500 hover:text-black hover:bg-slate-50 me-1" onClick={() => openDetails(entry)}>
                                             <Eye className="w-4 h-4" />
                                         </Button>
                                         {entry.status === 'pending' && (
-                                            <Button variant="outline" size="sm" className="mr-2 border-green-200 text-green-700 hover:bg-green-50" onClick={() => handleMarkPaid(entry.id)}>
-                                                <CheckCircle2 className="w-4 h-4 mr-1" /> Paid
+                                            <Button variant="outline" size="sm" className="me-2 border-green-200 text-green-700 hover:bg-green-50" onClick={() => handleMarkPaid(entry.id)}>
+                                                <CheckCircle2 className="w-4 h-4 me-1" /> Paid
                                             </Button>
                                         )}
-                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black hover:bg-slate-50 mr-1" onClick={() => openEdit(entry)}>
+                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black hover:bg-slate-50 me-1" onClick={() => openEdit(entry)}>
                                             <Edit className="w-4 h-4" />
                                         </Button>
                                         <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900 hover:bg-red-50" onClick={() => handleDelete(entry.id)}>
@@ -1050,7 +1050,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                                         <button
                                                             key={`${event.type}-${event.id}`}
                                                             onClick={() => openEdit(event)}
-                                                            className={`w-full text-left text-[10px] p-1 rounded border flex flex-col hover:opacity-80 transition-opacity truncate ${bgClass}`}
+                                                            className={`w-full text-start text-[10px] p-1 rounded border flex flex-col hover:opacity-80 transition-opacity truncate ${bgClass}`}
                                                             title={`${event.title}: ${formatCurrency(event.amount, event.currency || stats.business_currency_code)}`}
                                                         >
                                                             <span className="font-semibold truncate">{event.title}</span>
@@ -1191,10 +1191,10 @@ export default function Index({ entries, categories, users, currentTab, stats, a
 
             {/* Entry Detail Sheet */}
             <Sheet open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-                <SheetContent className="sm:max-w-[480px] overflow-y-auto bg-white border-l">
+                <SheetContent className="sm:max-w-[480px] overflow-y-auto bg-white border-s">
                     {selectedDetailEntry && (
                         <div className="space-y-6 pt-4">
-                            <SheetHeader className="text-left border-b pb-4">
+                            <SheetHeader className="text-start border-b pb-4">
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">{__('general.transaction_details')}</span>
                                     {getStatusBadge(selectedDetailEntry.status)}
@@ -1232,7 +1232,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     <div className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                                         {selectedDetailEntry.type === 'received' ? (
                                             <span className="text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200 inline-flex items-center text-xs font-bold">
-                                                <TrendingUp className="w-3 h-3 mr-1" />{__('general.deposit_income')}</span>
+                                                <TrendingUp className="w-3 h-3 me-1" />{__('general.deposit_income')}</span>
                                         ) : selectedDetailEntry.type === 'refunded' ? (
                                             <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200 inline-flex items-center text-xs font-bold">
                                                 Refund
@@ -1243,7 +1243,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             </span>
                                         ) : (
                                             <span className="text-slate-700 bg-slate-50 px-2 py-0.5 rounded border border-slate-200 inline-flex items-center text-xs font-bold">
-                                                <TrendingDown className="w-3 h-3 mr-1" /> Expense
+                                                <TrendingDown className="w-3 h-3 me-1" /> Expense
                                             </span>
                                         )}
                                     </div>
@@ -1291,7 +1291,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             href={route('admin.users.show', selectedDetailEntry.user.id)}
                                             className="text-xs text-slate-500 hover:text-black flex items-center hover:underline font-semibold"
                                         >
-                                            Profile <ExternalLink className="w-3 h-3 ml-1" />
+                                            Profile <ExternalLink className="w-3 h-3 ms-1" />
                                         </Link>
                                     </div>
                                     <div>
@@ -1355,7 +1355,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             handleMarkPaid(selectedDetailEntry.id, true);
                                         }}
                                     >
-                                        <CheckCircle2 className="w-4 h-4 mr-2" />{__('general.mark_as_paid_completed')}</Button>
+                                        <CheckCircle2 className="w-4 h-4 me-2" />{__('general.mark_as_paid_completed')}</Button>
                                 )}
                                 <div className="flex gap-2">
                                     <Button
@@ -1365,7 +1365,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             openEdit(selectedDetailEntry);
                                         }}
                                     >
-                                        <Edit className="w-4 h-4 mr-2" />{__('general.edit_record')}</Button>
+                                        <Edit className="w-4 h-4 me-2" />{__('general.edit_record')}</Button>
                                     <Button
                                         variant="outline"
                                         className="flex-1 font-semibold border-red-200 text-red-600 hover:bg-red-50 hover:text-red-900"
@@ -1375,7 +1375,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             handleDelete(selectedDetailEntry.id);
                                         }}
                                     >
-                                        <Trash2 className="w-4 h-4 mr-2" /> Delete
+                                        <Trash2 className="w-4 h-4 me-2" /> Delete
                                     </Button>
                                 </div>
                             </div>

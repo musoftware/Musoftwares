@@ -118,14 +118,14 @@ export default function ConversationList({ onSelectConversation, selectedId }) {
                             );
                             onSelectConversation(conv.id);
                         }}
-                        className={`flex cursor-pointer items-center gap-3 border-b p-4 transition-colors hover:bg-gray-50 ${selectedId === conv.id ? 'border-l-4 border-l-indigo-500 bg-indigo-50' : 'border-l-4 border-l-transparent'}`}
+                        className={`flex cursor-pointer items-center gap-3 border-b p-4 transition-colors hover:bg-gray-50 ${selectedId === conv.id ? 'border-s-4 border-s-indigo-500 bg-indigo-50' : 'border-s-4 border-s-transparent'}`}
                     >
                         <div className="relative">
                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 font-bold text-indigo-700">
                                 {conv.user.name.charAt(0)}
                             </div>
                             {conv.user.isOnline && (
-                                <div className="absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 border-white bg-green-500"></div>
+                                <div className="absolute end-0 bottom-0 h-3 w-3 rounded-full border-2 border-white bg-green-500"></div>
                             )}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -134,7 +134,7 @@ export default function ConversationList({ onSelectConversation, selectedId }) {
                                     {conv.user.name}
                                 </h4>
                                 {conv.lastMessage && (
-                                    <span className="ml-2 text-[10px] whitespace-nowrap text-gray-500">
+                                    <span className="ms-2 text-[10px] whitespace-nowrap text-gray-500">
                                         {new Date(
                                             conv.lastMessage.created_at,
                                         ).toLocaleTimeString([], {

@@ -46,9 +46,9 @@ export default function Create({ currencies, categories, hasMultiCurrency, baseC
                     <div className="mb-6 flex items-center">
                         <Link
                             href={route('erp.inventory.index')}
-                            className="mr-4 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700"
+                            className="me-4 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700"
                         >
-                            <ArrowLeft className="mr-1 h-4 w-4" />
+                            <ArrowLeft className="me-1 h-4 w-4" />
                             {t('erp.back_to_inventory', 'Back')}
                         </Link>
                         <h3 className="text-2xl font-semibold text-gray-900">
@@ -190,7 +190,7 @@ export default function Create({ currencies, categories, hasMultiCurrency, baseC
                                         type="file"
                                         id="image"
                                         onChange={(e) => setData('image', e.target.files ? e.target.files[0] : null)}
-                                        className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                                        className="mt-1 block w-full text-sm text-gray-500 file:me-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                                         accept="image/*"
                                     />
                                     <InputError message={errors.image} className="mt-2" />

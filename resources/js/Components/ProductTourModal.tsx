@@ -141,7 +141,7 @@ export default function ProductTourModal({ user, isOpen, onClose, currentStep, o
                     {/* Skip */}
                     <button
                         onClick={handleSkip}
-                        className="absolute top-5 right-5 text-xs font-medium text-slate-400 hover:text-slate-700 transition-colors z-10"
+                        className="absolute top-5 end-5 text-xs font-medium text-slate-400 hover:text-slate-700 transition-colors z-10"
                     >
                         Skip
                     </button>

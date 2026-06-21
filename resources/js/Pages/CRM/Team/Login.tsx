@@ -26,8 +26,8 @@ export default function Login() {
             <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 flex items-center justify-center p-4">
                 {/* Ambient glow effects */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
-                    <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-500/8 rounded-full blur-3xl" />
+                    <div className="absolute top-1/4 start-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
+                    <div className="absolute bottom-1/4 end-1/4 w-96 h-96 bg-violet-500/8 rounded-full blur-3xl" />
                 </div>
 
                 <div className="relative w-full max-w-md">
@@ -53,14 +53,14 @@ export default function Login() {
                                     {__('crm.email_address')}
                                 </label>
                                 <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                                    <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                                     <Input
                                         type="email"
                                         required
                                         placeholder={__('general.name_company_com')}
                                         value={form.data.email}
                                         onChange={e => form.setData('email', e.target.value)}
-                                        className="pl-10 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-500 focus:border-indigo-500/50 focus:ring-indigo-500/20 h-11"
+                                        className="ps-10 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-500 focus:border-indigo-500/50 focus:ring-indigo-500/20 h-11"
                                     />
                                 </div>
                                 {form.errors.email && (
@@ -74,19 +74,19 @@ export default function Login() {
                                     {__('crm.temporary_password')}
                                 </label>
                                 <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                                    <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                                     <Input
                                         type={showPassword ? 'text' : 'password'}
                                         required
                                         placeholder="••••••••"
                                         value={form.data.password}
                                         onChange={e => form.setData('password', e.target.value)}
-                                        className="pl-10 pr-10 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-500 focus:border-indigo-500/50 focus:ring-indigo-500/20 h-11"
+                                        className="ps-10 pe-10 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-500 focus:border-indigo-500/50 focus:ring-indigo-500/20 h-11"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition"
+                                        className="absolute end-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition"
                                     >
                                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                     </button>

@@ -65,7 +65,7 @@ export default function Webhooks({ webhook }: WebhooksProps) {
                             <p className="text-slate-500 mt-1">{__('general.receive_real_time_payment_notifications_on_your_server')}</p>
                         </div>
                         <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
-                            <ArrowLeft className="w-4 h-4 mr-2" />{__('general.back_to_dashboard')}</Button>
+                            <ArrowLeft className="w-4 h-4 me-2" />{__('general.back_to_dashboard')}</Button>
                     </div>
 
                     <Card>
@@ -103,12 +103,12 @@ export default function Webhooks({ webhook }: WebhooksProps) {
                             <CardFooter className="flex justify-between border-t p-4 bg-slate-50">
                                 {webhook ? (
                                     <Button type="button" variant="destructive" onClick={handleDelete} className="bg-rose-600 hover:bg-rose-700 text-white">
-                                        <Trash2 className="w-4 h-4 mr-2" />{__('general.remove_webhook')}</Button>
+                                        <Trash2 className="w-4 h-4 me-2" />{__('general.remove_webhook')}</Button>
                                 ) : (
                                     <div />
                                 )}
                                 <Button type="submit" disabled={processing} className="bg-indigo-600 hover:bg-indigo-700 text-white">
-                                    {processing ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <ShieldCheck className="w-4 h-4 mr-2" />}
+                                    {processing ? <RefreshCw className="w-4 h-4 me-2 animate-spin" /> : <ShieldCheck className="w-4 h-4 me-2" />}
                                     {webhook ? 'Update Settings' : 'Register Webhook'}
                                 </Button>
                             </CardFooter>
@@ -160,9 +160,9 @@ export default function Webhooks({ webhook }: WebhooksProps) {
                                         variant="outline"
                                     >
                                         {testing ? (
-                                            <RefreshCw className="w-4 h-4 mr-2 animate-spin text-indigo-600" />
+                                            <RefreshCw className="w-4 h-4 me-2 animate-spin text-indigo-600" />
                                         ) : (
-                                            <Play className="w-4 h-4 mr-2 text-indigo-600" />
+                                            <Play className="w-4 h-4 me-2 text-indigo-600" />
                                         )}
                                         {testing ? 'Dispatching...' : 'Send Ping Event'}
                                     </Button>

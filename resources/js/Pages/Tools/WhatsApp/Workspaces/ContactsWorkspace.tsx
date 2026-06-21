@@ -378,7 +378,7 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected,
                                 <span
                                     role="button"
                                     onClick={(e) => handleDeleteFolder(folder.id, e)}
-                                    className={`ml-1 rounded-full p-0.5 transition-opacity cursor-pointer ${
+                                    className={`ms-1 rounded-full p-0.5 transition-opacity cursor-pointer ${
                                         activeFolder === folder.id 
                                             ? 'opacity-60 hover:opacity-100 text-white' 
                                             : 'opacity-0 group-hover:opacity-60 hover:!opacity-100 text-destructive'
@@ -399,7 +399,7 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected,
                     <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
                         {isRtl ? `عرض مجلد: ${activeFolderName}` : `Viewing folder: ${activeFolderName}`}
                     </span>
-                    <button onClick={() => { setActiveFolder(null); setPage(1); }} className="ml-auto">
+                    <button onClick={() => { setActiveFolder(null); setPage(1); }} className="ms-auto">
                         <X className="w-3.5 h-3.5 text-emerald-600 hover:text-emerald-800" />
                     </button>
                 </div>
@@ -423,7 +423,7 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected,
                                     : `Checking active accounts to protect your session from spam filters during campaigns.`}
                             </p>
                         </div>
-                        <div className="flex items-center gap-4 text-xs font-bold ml-auto md:ml-0 shrink-0">
+                        <div className="flex items-center gap-4 text-xs font-bold ms-auto md:ms-0 shrink-0">
                             <span className="text-emerald-650">✅ {validationProgress.valid} {isRtl ? 'صحيح' : 'valid'}</span>
                             <span className="text-rose-650">❌ {validationProgress.invalid} {isRtl ? 'غير متوفر' : 'invalid'}</span>
                             <span className="text-muted-foreground">{validationProgress.current} / {validationProgress.total}</span>
@@ -447,12 +447,12 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected,
             {/* Search & Tags */}
             <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                         value={search}
                         onChange={e => handleSearch(e.target.value)}
                         placeholder={isRtl ? 'بحث بالاسم أو الرقم أو الشركة...' : 'Search by name, phone, or company...'}
-                        className="pl-10 rounded-xl text-start"
+                        className="ps-10 rounded-xl text-start"
                     />
                 </div>
                 {tags.length > 0 && (
@@ -473,7 +473,7 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected,
                                 className="cursor-pointer hover:bg-muted rounded-lg text-xs"
                                 onClick={() => { setActiveTag(tag.name); setPage(1); }}
                             >
-                                <Tag className="w-3 h-3 mr-1" />{tag.name} ({tag.count})
+                                <Tag className="w-3 h-3 me-1" />{tag.name} ({tag.count})
                             </Badge>
                         ))}
                     </div>

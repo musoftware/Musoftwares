@@ -46,7 +46,7 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
 
                     {!hasAnalytics && (
                         <Card className="bg-indigo-50 border-indigo-100 shadow-sm overflow-hidden relative">
-                            <div className="absolute right-0 top-0 w-64 h-64 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 translate-x-1/2 -translate-y-1/2"></div>
+                            <div className="absolute end-0 top-0 w-64 h-64 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 translate-x-1/2 -translate-y-1/2"></div>
                             <CardContent className="p-8 md:p-12 text-center relative z-10 flex flex-col items-center justify-center min-h-[400px]">
                                 <div className="bg-white p-4 rounded-full shadow-lg border border-indigo-100 text-indigo-600 mb-6">
                                     <Lock className="w-10 h-10" />

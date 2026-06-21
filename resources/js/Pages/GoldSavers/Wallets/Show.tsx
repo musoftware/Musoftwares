@@ -229,7 +229,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                     </div>
                                     <div className="flex justify-between items-center pt-2">
                                         <Button type="button" variant="destructive" onClick={handleDeleteWallet}>
-                                            <Trash className="w-4 h-4 mr-2" />
+                                            <Trash className="w-4 h-4 me-2" />
                                             {__('erp.delete_wallet')}
                                         </Button>
                                         <div className="flex gap-2">
@@ -432,7 +432,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                         <CardContent>
                             {wallet.transactions.length > 0 ? (
                                 <div className="overflow-x-auto">
-                                    <table className="w-full text-sm text-left">
+                                    <table className="w-full text-sm text-start">
                                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
                                             <tr>
                                                 <th className="px-4 py-3">{__('general.date')}</th>
@@ -480,7 +480,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                                                 <span>{formatNumber(txCurrentValue)} {wallet.currency}</span>
                                                                 {tx.type === 'buy' && (
                                                                     <span className={`text-xs ${txProfitLoss >= 0 ? 'text-green-600' : 'text-red-600'} flex items-center`}>
-                                                                        {txProfitLoss >= 0 ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
+                                                                        {txProfitLoss >= 0 ? <TrendingUp className="w-3 h-3 me-1" /> : <TrendingDown className="w-3 h-3 me-1" />}
                                                                         {txProfitLoss >= 0 ? '+' : ''}{formatNumber(txProfitLoss)}
                                                                     </span>
                                                                 )}
@@ -490,7 +490,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-3 text-muted-foreground">{tx.notes}</td>
-                                                    <td className="px-4 py-3 text-right">
+                                                    <td className="px-4 py-3 text-end">
                                                         <Dialog>
                                                             <DialogTrigger asChild>
                                                                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -506,11 +506,11 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                                                     <Button variant="outline" className="justify-start" onClick={() => {
                                                                         setEditingTx(tx);
                                                                     }}>
-                                                                        <Edit className="w-4 h-4 mr-2" />
+                                                                        <Edit className="w-4 h-4 me-2" />
                                                                         {__('general.edit')}
                                                                     </Button>
                                                                     <Button variant="destructive" className="justify-start" onClick={() => handleDeleteTransaction(tx.id)}>
-                                                                        <Trash className="w-4 h-4 mr-2" />
+                                                                        <Trash className="w-4 h-4 me-2" />
                                                                         {__('general.delete')}
                                                                     </Button>
                                                                 </div>

@@ -261,7 +261,7 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
                                         <CardTitle className="text-sm">{__('general.available_channels')}</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="h-96 overflow-y-auto space-y-2 pr-2">
+                                        <div className="h-96 overflow-y-auto space-y-2 pe-2">
                                             {channels.length === 0 ? (
                                                 <div className="text-center p-8 text-slate-500">{__('general.no_channels_fetched_click_refresh')}</div>
                                             ) : (
@@ -318,13 +318,13 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
                 </main>
 
                 {/* Real-time Side Stream panel */}
-                <aside className="w-72 border-l border-slate-200 bg-white flex flex-col hidden lg:flex shrink-0">
+                <aside className="w-72 border-s border-slate-200 bg-white flex flex-col hidden lg:flex shrink-0">
                     <div className="p-5 flex-1 flex flex-col min-h-0">
                         <div className="flex items-center gap-2 mb-4">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping" />
                             <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">{__('general.live_activity_feed')}</h3>
                         </div>
-                        <div className="flex-1 overflow-y-auto space-y-3 pr-1 font-sans scrollbar-thin">
+                        <div className="flex-1 overflow-y-auto space-y-3 pe-1 font-sans scrollbar-thin">
                             {realtimeLogs.map(log => (
                                 <div key={log.id} className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                                     <p className="text-slate-800 text-xs leading-relaxed font-medium">{log.message}</p>

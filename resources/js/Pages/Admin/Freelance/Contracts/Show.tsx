@@ -57,7 +57,7 @@ export default function Show({ contract }: any) {
     return (
         <AdminSidebarLayout title={`${__('freelance.contract_details', undefined, 'Contract Details')}`} header={
             <div className="flex items-center space-x-2">
-                <Link href={route('admin.freelance.contracts.index')} className="text-gray-500 hover:text-gray-900 mr-2">
+                <Link href={route('admin.freelance.contracts.index')} className="text-gray-500 hover:text-gray-900 me-2">
                     <ArrowLeft className="h-5 w-5" />
                 </Link>
                 <span>{__('freelance.contract_details', undefined, 'Contract Details')}</span>
@@ -124,7 +124,7 @@ export default function Show({ contract }: any) {
                     {contract.status === 'disputed' && (
                         <div className="bg-red-50 border border-red-200 shadow-sm rounded-lg p-6">
                             <h3 className="text-lg font-bold text-red-900 mb-4 flex items-center">
-                                <AlertTriangle className="h-5 w-5 mr-2" />
+                                <AlertTriangle className="h-5 w-5 me-2" />
                                 {__('freelance.dispute_resolution', undefined, 'Dispute Resolution')}
                             </h3>
                             <p className="text-red-700 text-sm mb-4">
@@ -137,7 +137,7 @@ export default function Show({ contract }: any) {
                                     variant="outline"
                                     onClick={() => resolveDispute('refund_client')}
                                 >
-                                    <ArrowLeft className="h-4 w-4 mr-2 text-blue-600" />
+                                    <ArrowLeft className="h-4 w-4 me-2 text-blue-600" />
                                     {__('freelance.refund_100_client', undefined, 'Refund 100% to Client')}
                                 </Button>
                                 
@@ -146,7 +146,7 @@ export default function Show({ contract }: any) {
                                     variant="outline"
                                     onClick={() => resolveDispute('split')}
                                 >
-                                    <ArrowRightLeft className="h-4 w-4 mr-2 text-purple-600" />
+                                    <ArrowRightLeft className="h-4 w-4 me-2 text-purple-600" />
                                     {__('freelance.split_50_50', undefined, 'Split 50/50 Between Both')}
                                 </Button>
                                 
@@ -155,7 +155,7 @@ export default function Show({ contract }: any) {
                                     variant="outline"
                                     onClick={() => resolveDispute('pay_freelancer')}
                                 >
-                                    <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                                    <CheckCircle className="h-4 w-4 me-2 text-green-600" />
                                     {__('freelance.pay_100_freelancer', undefined, 'Pay 100% to Freelancer')}
                                 </Button>
                             </div>
@@ -208,7 +208,7 @@ export default function Show({ contract }: any) {
 
                     <div className="bg-white shadow rounded-lg p-6">
                         <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                            <ShieldAlert className="h-5 w-5 mr-2 text-red-500" /> 
+                            <ShieldAlert className="h-5 w-5 me-2 text-red-500" /> 
                             {__('freelance.admin_actions')}
                         </h3>
                         
@@ -219,7 +219,7 @@ export default function Show({ contract }: any) {
                                     variant="outline"
                                     onClick={() => updateStatus('cancelled')}
                                 >
-                                    <XCircle className="h-4 w-4 mr-2" />
+                                    <XCircle className="h-4 w-4 me-2" />
                                     {__('freelance.force_cancel_contract', undefined, 'Force Cancel Contract')}
                                 </Button>
                             )}
@@ -230,7 +230,7 @@ export default function Show({ contract }: any) {
                                     variant="outline"
                                     onClick={() => updateStatus('completed')}
                                 >
-                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                    <CheckCircle className="h-4 w-4 me-2" />
                                     {__('freelance.force_complete_contract', undefined, 'Force Complete Contract')}
                                 </Button>
                             )}
@@ -250,7 +250,7 @@ export default function Show({ contract }: any) {
                                 variant="destructive"
                                 onClick={handleDelete}
                             >
-                                <Trash2 className="h-4 w-4 mr-2" />
+                                <Trash2 className="h-4 w-4 me-2" />
                                 {__('freelance.delete_permanent', undefined, 'Delete Permanently')}
                             </Button>
                         </div>

@@ -29,7 +29,7 @@ const AUDIENCES = [
     { value: 'pt-br', label: 'Brazil (pt)' },
     { value: 'it-it', label: 'Italy (it)' },
     { value: 'nl-nl', label: 'Netherlands (nl)' },
-    { value: 'pl-pl', label: 'Poland (pl)' },
+    { value: 'ps-pl', label: 'Poland (pl)' },
     { value: 'ru-ru', label: 'Russia (ru)' },
     { value: 'tr-tr', label: 'Turkey (tr)' },
     { value: 'ar-eg', label: 'Egypt (ar)' },
@@ -501,7 +501,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                     <TabsList className="grid w-full max-w-lg grid-cols-3 mb-6 bg-slate-100 p-1 rounded-xl">
                         <TabsTrigger value="discover" className="gap-2 text-sm font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg">
                             <Zap className="w-4 h-4" /> Discover
-                            {discoverStatus === 'running' && <span className="ml-1 w-2 h-2 rounded-full bg-violet-500 animate-pulse" />}
+                            {discoverStatus === 'running' && <span className="ms-1 w-2 h-2 rounded-full bg-violet-500 animate-pulse" />}
                         </TabsTrigger>
                         <TabsTrigger value="wordpress" className="gap-2 text-sm font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg">
                             <Send className="w-4 h-4" /> WordPress
@@ -509,7 +509,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                         <TabsTrigger value="campaigns" className="gap-2 text-sm font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg">
                             <History className="w-4 h-4" /> Campaigns
                             {campaigns.length > 0 && (
-                                <span className="ml-1 text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0 rounded-full font-bold">
+                                <span className="ms-1 text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0 rounded-full font-bold">
                                     {campaigns.length}
                                 </span>
                             )}
@@ -532,14 +532,14 @@ export default function ArticleMakerRunner({ tool }: any) {
                                 <div className="md:col-span-1">
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.niche_seed_keyword')}</label>
                                     <div className="relative">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
                                             type="text"
                                             value={niche}
                                             onChange={e => setNiche(e.target.value)}
                                             onKeyDown={e => e.key === 'Enter' && handleStartDiscover()}
                                             placeholder={__('general.weight_loss_crypto_seo')}
-                                            className="pl-9 h-11 text-sm bg-slate-50"
+                                            className="ps-9 h-11 text-sm bg-slate-50"
                                         />
                                     </div>
                                 </div>
@@ -548,17 +548,17 @@ export default function ArticleMakerRunner({ tool }: any) {
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Source</label>
                                     <div className="relative">
-                                        <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Globe className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <select
                                             value={source}
                                             onChange={e => setSource(e.target.value)}
-                                            className="w-full pl-9 pr-8 h-11 text-sm border border-slate-200 focus:border-violet-400 rounded-md outline-none transition-all bg-slate-50 appearance-none"
+                                            className="w-full ps-9 pe-8 h-11 text-sm border border-slate-200 focus:border-violet-400 rounded-md outline-none transition-all bg-slate-50 appearance-none"
                                         >
                                             {SOURCES.map(s => (
                                                 <option key={s.value} value={s.value}>{s.icon} {s.label}</option>
                                             ))}
                                         </select>
-                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                                        <ChevronDown className="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                                     </div>
                                 </div>
 
@@ -566,17 +566,17 @@ export default function ArticleMakerRunner({ tool }: any) {
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.region_language')}</label>
                                     <div className="relative">
-                                        <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Globe className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <select
                                             value={audience}
                                             onChange={e => setAudience(e.target.value)}
-                                            className="w-full pl-9 pr-8 h-11 text-sm border border-slate-200 focus:border-violet-400 rounded-md outline-none transition-all bg-slate-50 appearance-none"
+                                            className="w-full ps-9 pe-8 h-11 text-sm border border-slate-200 focus:border-violet-400 rounded-md outline-none transition-all bg-slate-50 appearance-none"
                                         >
                                             {AUDIENCES.map(a => (
                                                 <option key={a.value} value={a.value}>{a.label}</option>
                                             ))}
                                         </select>
-                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                                        <ChevronDown className="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                                     </div>
                                 </div>
 
@@ -584,13 +584,13 @@ export default function ArticleMakerRunner({ tool }: any) {
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.max_keywords')}</label>
                                     <div className="relative">
-                                        <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Hash className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
                                             type="number"
                                             min={10} max={2000} step={10}
                                             value={limit}
                                             onChange={e => setLimit(parseInt(e.target.value, 10))}
-                                            className="pl-9 h-11 text-sm bg-slate-50"
+                                            className="ps-9 h-11 text-sm bg-slate-50"
                                         />
                                     </div>
                                 </div>
@@ -722,13 +722,13 @@ export default function ArticleMakerRunner({ tool }: any) {
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.wordpress_url')}</label>
                                     <div className="relative">
-                                        <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Link2 className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
                                             type="text"
                                             value={wpUrl}
                                             onChange={e => setWpUrl(e.target.value)}
                                             placeholder={__('general.https_your_site_com')}
-                                            className="pl-9 h-11 text-sm bg-slate-50"
+                                            className="ps-9 h-11 text-sm bg-slate-50"
                                         />
                                     </div>
                                 </div>
@@ -737,13 +737,13 @@ export default function ArticleMakerRunner({ tool }: any) {
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Username</label>
                                     <div className="relative">
-                                        <Type className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Type className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
                                             type="text"
                                             value={wpUser}
                                             onChange={e => setWpUser(e.target.value)}
                                             placeholder="admin"
-                                            className="pl-9 h-11 text-sm bg-slate-50"
+                                            className="ps-9 h-11 text-sm bg-slate-50"
                                         />
                                     </div>
                                 </div>
@@ -752,13 +752,13 @@ export default function ArticleMakerRunner({ tool }: any) {
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Password</label>
                                     <div className="relative">
-                                        <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Key className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
                                             type="password"
                                             value={wpPass}
                                             onChange={e => setWpPass(e.target.value)}
                                             placeholder="••••••••"
-                                            className="pl-9 h-11 text-sm bg-slate-50"
+                                            className="ps-9 h-11 text-sm bg-slate-50"
                                         />
                                     </div>
                                 </div>
@@ -781,13 +781,13 @@ export default function ArticleMakerRunner({ tool }: any) {
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Delay Between Posts (seconds)</label>
                                     <div className="relative">
-                                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Clock className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
                                             type="number"
                                             min={1} max={120} step={1}
                                             value={postDelay}
                                             onChange={e => setPostDelay(parseInt(e.target.value, 10))}
-                                            className="pl-9 h-11 text-sm bg-slate-50"
+                                            className="ps-9 h-11 text-sm bg-slate-50"
                                         />
                                     </div>
                                     <p className="text-[10px] text-slate-400 mt-1">{__('general.higher_delay_safer_from_rate_limits')}</p>
@@ -874,7 +874,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                     {/* ══════════════════════════════════════════════════════════ */}
                     <TabsContent value="campaigns" className="space-y-4">
                         {selectedCampaign ? (
-                            <div className="space-y-4 animate-in fade-in slide-in-from-right-3 duration-300">
+                            <div className="space-y-4 animate-in fade-in slide-in-from-end-3 duration-300">
                                 <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                                     <button
                                         onClick={() => { setSelectedCampaign(null); setCampaignKeywords([]); }}
@@ -966,7 +966,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                                             <button
                                                 key={c.id}
                                                 onClick={() => openCampaign(c)}
-                                                className={`w-full flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors text-left ${i < campaigns.length - 1 ? 'border-b border-slate-100' : ''}`}
+                                                className={`w-full flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors text-start ${i < campaigns.length - 1 ? 'border-b border-slate-100' : ''}`}
                                             >
                                                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-100 to-indigo-100 flex items-center justify-center shrink-0">
                                                     <Search className="w-4 h-4 text-violet-600" />

@@ -28,7 +28,7 @@ export function DateDisplay({
         >
             <span>{primaryText}</span>
             {relativeText && (
-                <span className="text-text-muted ml-1.5">({relativeText})</span>
+                <span className="text-text-muted ms-1.5">({relativeText})</span>
             )}
         </div>
     );

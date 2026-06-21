@@ -41,7 +41,7 @@ export default function Index({ proposals, auth }: Props) {
                     </div>
                     <Link href={route('isaas.proposals.create')}>
                         <Button>
-                            <Plus className="mr-2 h-4 w-4" />{__('general.new_estimate')}</Button>
+                            <Plus className="me-2 h-4 w-4" />{__('general.new_estimate')}</Button>
                     </Link>
                 </div>
 
@@ -64,7 +64,7 @@ export default function Index({ proposals, auth }: Props) {
                             <Card key={proposal.id} className="hover:shadow-md transition-shadow">
                                 <CardHeader className="pb-3">
                                     <div className="flex justify-between items-start">
-                                        <CardTitle className="text-lg truncate pr-4" title={proposal.project_name}>
+                                        <CardTitle className="text-lg truncate pe-4" title={proposal.project_name}>
                                             {proposal.project_name}
                                         </CardTitle>
                                         <Badge variant={proposal.status === 'converted' ? 'default' : proposal.status === 'sent' ? 'secondary' : 'outline'}>

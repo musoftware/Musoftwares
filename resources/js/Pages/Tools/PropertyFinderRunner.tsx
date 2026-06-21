@@ -55,7 +55,7 @@ function LeadCard({ lead, idx }: { lead: any; idx: number }) {
                                 {lead.title || '—'}
                             </p>
                             <p className="text-xs text-slate-400 mt-0.5 truncate" title={lead.address || ''}>
-                                <MapPinned className="w-3 h-3 inline mr-1" />{lead.address || '—'}
+                                <MapPinned className="w-3 h-3 inline me-1" />{lead.address || '—'}
                             </p>
                         </div>
                         {lead.price && (
@@ -110,7 +110,7 @@ function LeadCard({ lead, idx }: { lead: any; idx: number }) {
                             <span className="text-[10px] text-slate-400">{lead.furnishings}</span>
                         )}
                         {lead.url && (
-                            <a href={lead.url} target="_blank" rel="noreferrer" className="text-[10px] text-blue-500 hover:underline flex items-center gap-0.5 ml-auto">
+                            <a href={lead.url} target="_blank" rel="noreferrer" className="text-[10px] text-blue-500 hover:underline flex items-center gap-0.5 ms-auto">
                                 <ExternalLink className="w-3 h-3" /> View
                             </a>
                         )}
@@ -492,7 +492,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                         >
                             <Zap className="w-4 h-4" /> Extract
                             {status === 'running' && (
-                                <span className="ml-1 w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                                <span className="ms-1 w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
                             )}
                         </TabsTrigger>
                         <TabsTrigger
@@ -501,7 +501,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                         >
                             <History className="w-4 h-4" /> Campaigns
                             {campaigns.length > 0 && (
-                                <span className="ml-1 text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0 rounded-full font-bold">
+                                <span className="ms-1 text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0 rounded-full font-bold">
                                     {campaigns.length}
                                 </span>
                             )}
@@ -524,14 +524,14 @@ export default function PropertyFinderRunner({ tool }: any) {
                                 <div className="md:col-span-1">
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.keyword_category')}</label>
                                     <div className="relative">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
                                             type="text"
                                             value={keyword}
                                             onChange={e => setKeyword(e.target.value)}
                                             onKeyDown={e => e.key === 'Enter' && handleStart()}
                                             placeholder={__('general.apartment_villa_office')}
-                                            className="pl-9 h-11 text-sm bg-slate-50"
+                                            className="ps-9 h-11 text-sm bg-slate-50"
                                         />
                                     </div>
                                 </div>
@@ -540,17 +540,17 @@ export default function PropertyFinderRunner({ tool }: any) {
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.country_site')}</label>
                                     <div className="relative">
-                                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <MapPin className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <select
                                             value={country}
                                             onChange={e => setCountry(e.target.value)}
-                                            className="w-full pl-9 pr-8 h-11 text-sm border border-slate-200 focus:border-indigo-400 rounded-md outline-none transition-all bg-slate-50 appearance-none"
+                                            className="w-full ps-9 pe-8 h-11 text-sm border border-slate-200 focus:border-indigo-400 rounded-md outline-none transition-all bg-slate-50 appearance-none"
                                         >
                                             {COUNTRIES.map(c => (
                                                 <option key={c.code} value={c.code}>{c.name} — {c.domain}</option>
                                             ))}
                                         </select>
-                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                                        <ChevronDown className="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                                     </div>
                                 </div>
 
@@ -558,13 +558,13 @@ export default function PropertyFinderRunner({ tool }: any) {
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.max_properties')}</label>
                                     <div className="relative">
-                                        <Home className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Home className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
                                             type="number"
                                             min={10} max={500} step={10}
                                             value={limit}
                                             onChange={e => setLimit(parseInt(e.target.value, 10))}
-                                            className="pl-9 h-11 text-sm bg-slate-50"
+                                            className="ps-9 h-11 text-sm bg-slate-50"
                                         />
                                     </div>
                                 </div>
@@ -659,7 +659,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                     <TabsContent value="campaigns" className="space-y-4">
                         {/* Campaign Detail View */}
                         {selectedCampaign ? (
-                            <div className="space-y-4 animate-in fade-in slide-in-from-right-3 duration-300">
+                            <div className="space-y-4 animate-in fade-in slide-in-from-end-3 duration-300">
                                 {/* Back + Title */}
                                 <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                                     <button
@@ -755,7 +755,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                                             <button
                                                 key={c.id}
                                                 onClick={() => openCampaign(c)}
-                                                className={`w-full flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors text-left ${i < campaigns.length - 1 ? 'border-b border-slate-100' : ''}`}
+                                                className={`w-full flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors text-start ${i < campaigns.length - 1 ? 'border-b border-slate-100' : ''}`}
                                             >
                                                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-100 to-blue-100 flex items-center justify-center shrink-0">
                                                     <Search className="w-4.5 h-4.5 text-indigo-600" />

@@ -82,7 +82,7 @@ export default function AffiliateModeratorsCreate() {
                         Cancel
                     </Button>
                     <Button type="submit" className="bg-blue-600 hover:bg-blue-700 shadow-md" disabled={processing}>
-                        <UserPlus className="w-4 h-4 mr-2" />{__('general.create_account')}</Button>
+                        <UserPlus className="w-4 h-4 me-2" />{__('general.create_account')}</Button>
                 </div>
             </form>
         </div>

@@ -98,9 +98,9 @@ export default function PricingStep({ data, setData, errors }: any) {
                                             min="1" max="365"
                                             value={pkg.delivery_days}
                                             onChange={e => setPackageField(idx, 'delivery_days', Number(e.target.value))}
-                                            className="h-10 text-sm font-medium pr-12"
+                                            className="h-10 text-sm font-medium pe-12"
                                         />
-                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Days</span>
+                                        <span className="absolute end-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Days</span>
                                     </div>
                                 </div>
                                 <div className="space-y-1.5">
@@ -123,7 +123,7 @@ export default function PricingStep({ data, setData, errors }: any) {
                                     <select
                                         value={pkg.currency_id}
                                         onChange={e => setPackageField(idx, 'currency_id', Number(e.target.value))}
-                                        className="h-12 pl-4 pr-2 bg-slate-50 text-sm font-bold text-slate-600 border-none outline-none appearance-none cursor-pointer"
+                                        className="h-12 ps-4 pe-2 bg-slate-50 text-sm font-bold text-slate-600 border-none outline-none appearance-none cursor-pointer"
                                     >
                                         {CURRENCIES.map(c => <option key={c.id} value={c.id}>{c.currency}</option>)}
                                     </select>

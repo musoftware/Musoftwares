@@ -28,7 +28,7 @@ export default function OptimizationDashboard({ metrics }: { metrics: Metrics })
                     <p className="text-muted-foreground mt-2">{__('general.ai_driven_gap_reduction_and_dynamic_load_balancing')}</p>
                 </div>
                 <Button>
-                    <Zap className="mr-2 h-4 w-4" />{__('general.run_manual_optimization')}</Button>
+                    <Zap className="me-2 h-4 w-4" />{__('general.run_manual_optimization')}</Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

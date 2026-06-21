@@ -79,41 +79,41 @@ export default function Index({ orders, tab }: any) {
                                         <tr>
                                             <th
                                                 scope="col"
-                                                className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase"
+                                                className="px-6 py-4 text-start text-xs font-semibold tracking-wider text-gray-500 uppercase"
                                             >
                                                 Service
                                             </th>
                                             <th
                                                 scope="col"
-                                                className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase"
+                                                className="px-6 py-4 text-start text-xs font-semibold tracking-wider text-gray-500 uppercase"
                                             >
                                                 Package
                                             </th>
                                             <th
                                                 scope="col"
-                                                className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase"
+                                                className="px-6 py-4 text-start text-xs font-semibold tracking-wider text-gray-500 uppercase"
                                             >{__('general.other_party')}</th>
                                             <th
                                                 scope="col"
-                                                className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase"
+                                                className="px-6 py-4 text-start text-xs font-semibold tracking-wider text-gray-500 uppercase"
                                             >
                                                 Amount
                                             </th>
                                             <th
                                                 scope="col"
-                                                className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase"
+                                                className="px-6 py-4 text-start text-xs font-semibold tracking-wider text-gray-500 uppercase"
                                             >
                                                 Status
                                             </th>
                                             <th
                                                 scope="col"
-                                                className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-500 uppercase"
+                                                className="px-6 py-4 text-start text-xs font-semibold tracking-wider text-gray-500 uppercase"
                                             >
                                                 Deadline
                                             </th>
                                             <th
                                                 scope="col"
-                                                className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-gray-500 uppercase"
+                                                className="px-6 py-4 text-end text-xs font-semibold tracking-wider text-gray-500 uppercase"
                                             >
                                                 Action
                                             </th>
@@ -143,7 +143,7 @@ export default function Index({ orders, tab }: any) {
                                                 >
                                                     <td className="px-6 py-4">
                                                         <div className="flex items-center">
-                                                            <div className="mr-3 h-10 w-16 flex-shrink-0 overflow-hidden rounded bg-gray-200">
+                                                            <div className="me-3 h-10 w-16 flex-shrink-0 overflow-hidden rounded bg-gray-200">
                                                                 {order.package
                                                                     ?.service
                                                                     ?.cover_image ? (
@@ -181,7 +181,7 @@ export default function Index({ orders, tab }: any) {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center">
-                                                            <div className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
+                                                            <div className="me-2 flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
                                                                 {otherParty?.name?.charAt(
                                                                     0,
                                                                 ) || '?'}
@@ -214,7 +214,7 @@ export default function Index({ orders, tab }: any) {
                                                             </div>
                                                         )}
                                                     </td>
-                                                    <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
+                                                    <td className="px-6 py-4 text-end text-sm font-medium whitespace-nowrap">
                                                         <Link
                                                             href={route(
                                                                 'marketplace.orders.show',
@@ -225,7 +225,7 @@ export default function Index({ orders, tab }: any) {
                                                             View Order{' '}
                                                             <span
                                                                 aria-hidden="true"
-                                                                className="ml-1"
+                                                                className="ms-1"
                                                             >
                                                                 &rarr;
                                                             </span>

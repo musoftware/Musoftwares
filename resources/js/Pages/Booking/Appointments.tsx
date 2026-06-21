@@ -139,12 +139,12 @@ export default function Appointments({ bookings, providers, filters }: any) {
                         </select>
 
                         <div className="relative w-full sm:w-64">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                             <Input 
                                 placeholder={__('general.search_guest_name_or_email')} 
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
-                                className="pl-9 bg-white"
+                                className="ps-9 bg-white"
                             />
                         </div>
 
@@ -153,13 +153,13 @@ export default function Appointments({ bookings, providers, filters }: any) {
                                 onClick={() => setViewMode('list')}
                                 className={`px-3 py-1.5 rounded-sm text-sm font-medium flex items-center transition-colors ${viewMode === 'list' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
                             >
-                                <LayoutList className="w-4 h-4 mr-1.5" /> List
+                                <LayoutList className="w-4 h-4 me-1.5" /> List
                             </button>
                             <button
                                 onClick={() => setViewMode('calendar')}
                                 className={`px-3 py-1.5 rounded-sm text-sm font-medium flex items-center transition-colors ${viewMode === 'calendar' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
                             >
-                                <CalendarDays className="w-4 h-4 mr-1.5" /> Calendar
+                                <CalendarDays className="w-4 h-4 me-1.5" /> Calendar
                             </button>
                         </div>
                     </div>
@@ -190,7 +190,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
                             <Card key={booking.id} className="overflow-hidden border-slate-200/60 shadow-sm transition-shadow hover:shadow-md">
                                 <div className="flex flex-col md:flex-row">
                                     {/* Left Status Bar */}
-                                    <div className="w-full md:w-48 bg-slate-50 p-6 flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-100">
+                                    <div className="w-full md:w-48 bg-slate-50 p-6 flex flex-col justify-center border-b md:border-b-0 md:border-e border-slate-100">
                                         <div className="text-sm text-slate-500 font-medium mb-1">
                                             {format(new Date(booking.starts_at), 'MMM d, yyyy')}
                                         </div>
@@ -210,15 +210,15 @@ export default function Appointments({ bookings, providers, filters }: any) {
                                                 <h3 className="text-lg font-medium text-slate-900 mb-1">{booking.eventType.title}</h3>
                                                 
                                                 <div className="flex items-center text-slate-600 mb-4">
-                                                    <UserCircle2 className="h-4 w-4 mr-2 text-slate-400" />
-                                                    <span className="font-medium mr-2">{booking.guest_name}</span>
+                                                    <UserCircle2 className="h-4 w-4 me-2 text-slate-400" />
+                                                    <span className="font-medium me-2">{booking.guest_name}</span>
                                                     <span className="text-sm text-slate-500">({booking.guest_email})</span>
                                                 </div>
                                                 
                                                 {booking.provider && (
                                                     <div className="flex items-center text-sm text-slate-500 mb-2">
-                                                        <Users className="h-4 w-4 mr-2 text-slate-400" />
-                                                        Provider: <span className="font-medium ml-1 text-slate-700">{booking.provider.name}</span>
+                                                        <Users className="h-4 w-4 me-2 text-slate-400" />
+                                                        Provider: <span className="font-medium ms-1 text-slate-700">{booking.provider.name}</span>
                                                     </div>
                                                 )}
                                                 
@@ -239,11 +239,11 @@ export default function Appointments({ bookings, providers, filters }: any) {
                                             
                                             <div className="flex flex-col items-end gap-2 text-sm text-slate-500">
                                                 <div className="flex items-center">
-                                                    <Clock className="h-4 w-4 mr-1.5" /> {booking.eventType.duration_minutes}m
+                                                    <Clock className="h-4 w-4 me-1.5" /> {booking.eventType.duration_minutes}m
                                                 </div>
                                                 {booking.price && (
                                                     <div className="flex items-center">
-                                                        <CreditCard className="h-4 w-4 mr-1.5" /> {booking.price} {booking.currency}
+                                                        <CreditCard className="h-4 w-4 me-1.5" /> {booking.price} {booking.currency}
                                                     </div>
                                                 )}
                                             </div>
@@ -251,7 +251,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
                                     </div>
                                     
                                     {/* Right Actions */}
-                                    <div className="p-4 md:p-6 bg-white border-t md:border-t-0 md:border-l border-slate-100 flex md:flex-col items-center justify-end gap-2 md:w-16">
+                                    <div className="p-4 md:p-6 bg-white border-t md:border-t-0 md:border-s border-slate-100 flex md:flex-col items-center justify-end gap-2 md:w-16">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 hover:text-slate-900 h-8 w-8">
                                                 <MoreVertical className="h-4 w-4 text-slate-500" />
@@ -263,29 +263,29 @@ export default function Appointments({ bookings, providers, filters }: any) {
                                                 {/* Status Actions */}
                                                 {booking.status === 'pending' && (
                                                     <DropdownMenuItem onClick={() => handleUpdateStatus(booking.id, 'confirmed')}>
-                                                        <CheckCircle className="h-4 w-4 mr-2 text-slate-500" />{__('general.confirm_booking')}</DropdownMenuItem>
+                                                        <CheckCircle className="h-4 w-4 me-2 text-slate-500" />{__('general.confirm_booking')}</DropdownMenuItem>
                                                 )}
                                                 {(booking.status === 'confirmed' || booking.status === 'pending') && (
                                                     <DropdownMenuItem onClick={() => handleUpdateStatus(booking.id, 'cancelled')}>
-                                                        <XCircle className="h-4 w-4 mr-2 text-slate-500" />{__('general.cancel_booking')}</DropdownMenuItem>
+                                                        <XCircle className="h-4 w-4 me-2 text-slate-500" />{__('general.cancel_booking')}</DropdownMenuItem>
                                                 )}
                                                 {booking.status === 'confirmed' && (
                                                     <DropdownMenuItem onClick={() => handleUpdateStatus(booking.id, 'completed')}>
-                                                        <CheckCircle className="h-4 w-4 mr-2 text-slate-500" />{__('general.mark_completed')}</DropdownMenuItem>
+                                                        <CheckCircle className="h-4 w-4 me-2 text-slate-500" />{__('general.mark_completed')}</DropdownMenuItem>
                                                 )}
 
                                                 <DropdownMenuSeparator />
                                                 
                                                 <DropdownMenuItem onClick={() => openNotesModal(booking)}>
-                                                    <FileText className="h-4 w-4 mr-2 text-slate-500" />{__('general.internal_notes_1')}</DropdownMenuItem>
+                                                    <FileText className="h-4 w-4 me-2 text-slate-500" />{__('general.internal_notes_1')}</DropdownMenuItem>
 
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuLabel className="text-xs text-slate-500">{__('general.pipeline_workflow')}</DropdownMenuLabel>
                                                 
                                                 <DropdownMenuItem onClick={() => handleCreateProject(booking.id)}>
-                                                    <Briefcase className="h-4 w-4 mr-2 text-slate-500" />{__('general.convert_to_project')}</DropdownMenuItem>
+                                                    <Briefcase className="h-4 w-4 me-2 text-slate-500" />{__('general.convert_to_project')}</DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => handleCreateInvoice(booking.id)}>
-                                                    <CreditCard className="h-4 w-4 mr-2 text-slate-500" />{__('general.generate_invoice')}</DropdownMenuItem>
+                                                    <CreditCard className="h-4 w-4 me-2 text-slate-500" />{__('general.generate_invoice')}</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>

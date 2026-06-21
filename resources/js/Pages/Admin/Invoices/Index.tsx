@@ -268,7 +268,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                         {(filters as any).client_id && (
                             <Link href={`/admin/invoices?client_id=${(filters as any).client_id}${(filters as any).project_id ? `&project_id=${(filters as any).project_id}` : ''}`}>
                                 <Button size="sm">
-                                    <Plus className="mr-2 h-4 w-4" />{__('general.add_invoice')}</Button>
+                                    <Plus className="me-2 h-4 w-4" />{__('general.add_invoice')}</Button>
                             </Link>
                         )}
 
@@ -292,7 +292,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                             />
                         </div>
 
-                        <div className="w-full md:ml-auto md:w-64">
+                        <div className="w-full md:ms-auto md:w-64">
                             <Label className="mb-2 hidden text-xs uppercase text-muted-foreground md:block">&nbsp;</Label>
                             <Input
                                 type="text"
@@ -331,10 +331,10 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                     <TableHead className="uppercase text-xs">Project</TableHead>
                                     <TableHead className="uppercase text-xs">Date</TableHead>
                                     <TableHead className="uppercase text-xs">{__('general.schedule_date')}</TableHead>
-                                    <TableHead className="text-right uppercase text-xs">Total</TableHead>
+                                    <TableHead className="text-end uppercase text-xs">Total</TableHead>
                                     <TableHead className="text-center uppercase text-xs">{__('general.job_status')}</TableHead>
                                     <TableHead className="text-center uppercase text-xs">{__('general.invoice_status')}</TableHead>
-                                    <TableHead className="text-right uppercase text-xs">Actions</TableHead>
+                                    <TableHead className="text-end uppercase text-xs">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -365,7 +365,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                     <button
                                                         type="button"
                                                         onClick={() => setSelectedClient(invoice.user)}
-                                                        className="flex flex-col text-left group"
+                                                        className="flex flex-col text-start group"
                                                     >
                                                         <span className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-1">
                                                             {invoice.user.name}
@@ -389,7 +389,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                         <TableCell className="text-muted-foreground text-sm" data-label={__('general.schedule_date')}>
                                             {invoice.scheduled_start_date ? new Date(invoice.scheduled_start_date).toLocaleDateString() : '-'}
                                         </TableCell>
-                                        <TableCell className="text-right" data-label="Total">
+                                        <TableCell className="text-end" data-label="Total">
                                             <div className="flex flex-col items-end gap-1">
                                                 <span className="font-semibold text-emerald-600">
                                                     {formatCurrency(invoice.amount, invoice.currency)}
@@ -423,7 +423,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                 {getStatusBadge(invoice.status)}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-right" data-label="Actions">
+                                        <TableCell className="text-end" data-label="Actions">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -435,17 +435,17 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                     <DropdownMenuLabel>{__('general.invoice_actions')}</DropdownMenuLabel>
                                                     <DropdownMenuItem asChild>
                                                         <Link href={route('admin.invoices.show', invoice.id)} className="flex w-full items-center">
-                                                            <FileText className="mr-2 h-4 w-4 text-blue-500" />{__('general.view_details')}</Link>
+                                                            <FileText className="me-2 h-4 w-4 text-blue-500" />{__('general.view_details')}</Link>
                                                     </DropdownMenuItem>
                                                     
                                                     <DropdownMenuItem asChild>
                                                         <Link href={`/admin/invoices/create?client_id=${invoice.user_id || invoice.user?.id}${(invoice.project_id || invoice.project?.id) ? `&project_id=${invoice.project_id || invoice.project?.id}` : ''}`} className="flex w-full items-center">
-                                                            <Plus className="mr-2 h-4 w-4 text-emerald-500" />{__('general.new_invoice')}</Link>
+                                                            <Plus className="me-2 h-4 w-4 text-emerald-500" />{__('general.new_invoice')}</Link>
                                                     </DropdownMenuItem>
                                                     
                                                     <DropdownMenuItem asChild>
                                                         <Link href={`/admin/invoices?client_id=${invoice.user_id || invoice.user?.id}`} className="flex w-full items-center">
-                                                            <List className="mr-2 h-4 w-4 text-slate-500" />{__('general.all_invoices')}</Link>
+                                                            <List className="me-2 h-4 w-4 text-slate-500" />{__('general.all_invoices')}</Link>
                                                     </DropdownMenuItem>
                                                 
                                                     <DropdownMenuSeparator />
@@ -453,11 +453,11 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                     <DropdownMenuLabel>{__('general.client_reports')}</DropdownMenuLabel>
                                                     <DropdownMenuItem asChild>
                                                         <a href={`/admin/users/${invoice.user_id || invoice.user?.id}/balance-sheet`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
-                                                            <Receipt className="mr-2 h-4 w-4 text-sky-500" />{__('general.due_balance_sheet')}</a>
+                                                            <Receipt className="me-2 h-4 w-4 text-sky-500" />{__('general.due_balance_sheet')}</a>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
                                                         <a href={`/admin/users/${invoice.user_id || invoice.user?.id}/reports`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
-                                                            <Clock className="mr-2 h-4 w-4 text-amber-500" />{__('general.timer_balance_sheet')}</a>
+                                                            <Clock className="me-2 h-4 w-4 text-amber-500" />{__('general.timer_balance_sheet')}</a>
                                                     </DropdownMenuItem>
                                                 
                                                     <DropdownMenuSeparator />
@@ -465,22 +465,22 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                     <DropdownMenuLabel>{__('general.profile_tasks')}</DropdownMenuLabel>
                                                     <DropdownMenuItem asChild>
                                                         <a href={`/admin/users/${invoice.user_id || invoice.user?.id}`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
-                                                            <User className="mr-2 h-4 w-4 text-blue-500" />{__('general.user_profile')}</a>
+                                                            <User className="me-2 h-4 w-4 text-blue-500" />{__('general.user_profile')}</a>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
                                                         <Link href={`/admin/users/${invoice.user_id || invoice.user?.id}/tasks/add`} className="flex w-full items-center">
-                                                            <ClipboardList className="mr-2 h-4 w-4 text-emerald-500" />{__('general.add_tasks')}</Link>
+                                                            <ClipboardList className="me-2 h-4 w-4 text-emerald-500" />{__('general.add_tasks')}</Link>
                                                     </DropdownMenuItem>
                                                 
                                                     <DropdownMenuSeparator />
                                                 
                                                     {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
                                                         <DropdownMenuItem onClick={() => handleMarkPaid(invoice.id)}>
-                                                            <CheckCircle className="mr-2 h-4 w-4 text-emerald-600" />{__('general.mark_as_paid')}</DropdownMenuItem>
+                                                            <CheckCircle className="me-2 h-4 w-4 text-emerald-600" />{__('general.mark_as_paid')}</DropdownMenuItem>
                                                     )}
                                                     {invoice.status !== 'cancelled' && (
                                                         <DropdownMenuItem onClick={() => handleCancel(invoice.id)} className="text-red-600 focus:text-red-600">
-                                                            <XCircle className="mr-2 h-4 w-4" />{__('general.cancel_invoice')}</DropdownMenuItem>
+                                                            <XCircle className="me-2 h-4 w-4" />{__('general.cancel_invoice')}</DropdownMenuItem>
                                                     )}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -490,13 +490,13 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                 
                                 {((filters as any).client_id || (filters as any).search === 'unpaid_partial' || (filters as any).search === 'archived') && (invoices.data as any).length > 0 && (
                                     <TableRow className="bg-muted/30 font-semibold border-t">
-                                        <TableCell colSpan={6} className="text-right hidden sm:table-cell pr-4" data-label="Total">
+                                        <TableCell colSpan={6} className="text-end hidden sm:table-cell pe-4" data-label="Total">
                                             Total
                                         </TableCell>
-                                        <TableCell className="text-right sm:hidden" data-label="Total">
+                                        <TableCell className="text-end sm:hidden" data-label="Total">
                                             Total
                                         </TableCell>
-                                        <TableCell className="text-right" data-label={__('general.total_amount')}>
+                                        <TableCell className="text-end" data-label={__('general.total_amount')}>
                                             {formatCurrency(
                                                 invoices.data.reduce((sum, inv) => sum + (Number(inv.business_amount) || Number(inv.amount) || 0), 0),
                                                 invoices.data[0]?.business_currency || invoices.data[0]?.currency
@@ -553,7 +553,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                             </Button>
                         </div>
 
-                        <div className="w-full md:ml-auto md:w-auto">
+                        <div className="w-full md:ms-auto md:w-auto">
                             {Array.isArray(paginationLinks) && paginationLinks.length > 3 && (
                                 <div className="flex justify-center md:justify-end">
                                     <div className="inline-flex -space-x-px rounded-md shadow-sm">
@@ -565,7 +565,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                     link.active 
                                                         ? 'z-10 bg-primary border-primary text-primary-foreground font-medium' 
                                                         : 'bg-background border-input text-muted-foreground hover:bg-muted'
-                                                } ${i === 0 ? 'rounded-l-md' : ''} ${i === paginationLinks.length - 1 ? 'rounded-r-md' : ''}`}
+                                                } ${i === 0 ? 'rounded-s-md' : ''} ${i === paginationLinks.length - 1 ? 'rounded-e-md' : ''}`}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                             />
                                         ))}

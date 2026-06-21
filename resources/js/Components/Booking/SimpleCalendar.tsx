@@ -78,12 +78,12 @@ export function SimpleCalendar({ bookings, onDateClick, onBookingClick }: any) {
                                         }}
                                         className="text-xs truncate bg-indigo-50 text-indigo-700 rounded px-1.5 py-1 hover:bg-indigo-100 cursor-pointer flex items-center"
                                     >
-                                        <Clock className="w-3 h-3 mr-1 shrink-0" />
+                                        <Clock className="w-3 h-3 me-1 shrink-0" />
                                         {format(new Date(booking.starts_at), 'HH:mm')} - {booking.guest_name}
                                     </div>
                                 ))}
                                 {dayBookings.length > 3 && (
-                                    <div className="text-[10px] text-slate-500 font-medium pl-1">
+                                    <div className="text-[10px] text-slate-500 font-medium ps-1">
                                         + {dayBookings.length - 3} more...
                                     </div>
                                 )}

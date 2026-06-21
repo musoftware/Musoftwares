@@ -46,8 +46,8 @@ export default function Tutorial({ tool }: Props) {
 
                 {/* Header card with glassmorphism feel */}
                 <div className="relative overflow-hidden rounded-3xl bg-slate-900 text-white p-8 md:p-10 shadow-xl">
-                    <div className="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl" />
-                    <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl" />
+                    <div className="absolute -end-10 -top-10 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl" />
+                    <div className="absolute -start-10 -bottom-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl" />
                     
                     <div className="relative z-10 space-y-4">
                         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/50 text-xs font-semibold text-indigo-300">
@@ -71,12 +71,12 @@ export default function Tutorial({ tool }: Props) {
                         <p className="text-xs text-slate-400 mt-1">{__('general.follow_these_simple_steps_to_activate_and_run_your_tool')}</p>
                     </div>
 
-                    <div className="relative border-l border-slate-100 pl-6 md:pl-8 ml-4 space-y-10">
+                    <div className="relative border-s border-slate-100 ps-6 md:ps-8 ms-4 space-y-10">
                         {isBrowser ? (
                             <>
                                 {/* Step 1: Download Extension */}
                                 <div className="relative">
-                                    <div className="absolute -left-[45px] md:-left-[53px] top-0 w-8 h-8 rounded-full bg-indigo-50 border-4 border-white flex items-center justify-center text-xs font-bold text-indigo-600 shadow-sm">
+                                    <div className="absolute -start-[45px] md:-start-[53px] top-0 w-8 h-8 rounded-full bg-indigo-50 border-4 border-white flex items-center justify-center text-xs font-bold text-indigo-600 shadow-sm">
                                         1
                                     </div>
                                     <div className="space-y-2">
@@ -93,7 +93,7 @@ export default function Tutorial({ tool }: Props) {
 
                                 {/* Step 2: Enable Developer Mode */}
                                 <div className="relative">
-                                    <div className="absolute -left-[45px] md:-left-[53px] top-0 w-8 h-8 rounded-full bg-indigo-50 border-4 border-white flex items-center justify-center text-xs font-bold text-indigo-600 shadow-sm">
+                                    <div className="absolute -start-[45px] md:-start-[53px] top-0 w-8 h-8 rounded-full bg-indigo-50 border-4 border-white flex items-center justify-center text-xs font-bold text-indigo-600 shadow-sm">
                                         2
                                     </div>
                                     <div className="space-y-2">
@@ -109,7 +109,7 @@ export default function Tutorial({ tool }: Props) {
 
                                 {/* Step 3: Pin the Extension */}
                                 <div className="relative">
-                                    <div className="absolute -left-[45px] md:-left-[53px] top-0 w-8 h-8 rounded-full bg-indigo-50 border-4 border-white flex items-center justify-center text-xs font-bold text-indigo-600 shadow-sm">
+                                    <div className="absolute -start-[45px] md:-start-[53px] top-0 w-8 h-8 rounded-full bg-indigo-50 border-4 border-white flex items-center justify-center text-xs font-bold text-indigo-600 shadow-sm">
                                         3
                                     </div>
                                     <div className="space-y-2">
@@ -120,7 +120,7 @@ export default function Tutorial({ tool }: Props) {
 
                                 {/* Step 4: Open Target Platform */}
                                 <div className="relative">
-                                    <div className="absolute -left-[45px] md:-left-[53px] top-0 w-8 h-8 rounded-full bg-indigo-50 border-4 border-white flex items-center justify-center text-xs font-bold text-indigo-600 shadow-sm">
+                                    <div className="absolute -start-[45px] md:-start-[53px] top-0 w-8 h-8 rounded-full bg-indigo-50 border-4 border-white flex items-center justify-center text-xs font-bold text-indigo-600 shadow-sm">
                                         4
                                     </div>
                                     <div className="space-y-2">
@@ -133,7 +133,7 @@ export default function Tutorial({ tool }: Props) {
                             <>
                                 {/* Step 1: Make sure runtime is running */}
                                 <div className="relative">
-                                    <div className="absolute -left-[45px] md:-left-[53px] top-0 w-8 h-8 rounded-full bg-indigo-50 border-4 border-white flex items-center justify-center text-xs font-bold text-indigo-600 shadow-sm">
+                                    <div className="absolute -start-[45px] md:-start-[53px] top-0 w-8 h-8 rounded-full bg-indigo-50 border-4 border-white flex items-center justify-center text-xs font-bold text-indigo-600 shadow-sm">
                                         1
                                     </div>
                                     <div className="space-y-2">
@@ -150,7 +150,7 @@ export default function Tutorial({ tool }: Props) {
 
                                 {/* Step 2: Run and Authorize */}
                                 <div className="relative">
-                                    <div className="absolute -left-[45px] md:-left-[53px] top-0 w-8 h-8 rounded-full bg-indigo-50 border-4 border-white flex items-center justify-center text-xs font-bold text-indigo-600 shadow-sm">
+                                    <div className="absolute -start-[45px] md:-start-[53px] top-0 w-8 h-8 rounded-full bg-indigo-50 border-4 border-white flex items-center justify-center text-xs font-bold text-indigo-600 shadow-sm">
                                         2
                                     </div>
                                     <div className="space-y-2">
@@ -163,7 +163,7 @@ export default function Tutorial({ tool }: Props) {
 
                         {/* Final Step: Run */}
                         <div className="relative">
-                            <div className="absolute -left-[45px] md:-left-[53px] top-0 w-8 h-8 rounded-full bg-emerald-50 border-4 border-white flex items-center justify-center text-xs font-bold text-emerald-600 shadow-sm">
+                            <div className="absolute -start-[45px] md:-start-[53px] top-0 w-8 h-8 rounded-full bg-emerald-50 border-4 border-white flex items-center justify-center text-xs font-bold text-emerald-600 shadow-sm">
                                 ✓
                             </div>
                             <div className="space-y-2">

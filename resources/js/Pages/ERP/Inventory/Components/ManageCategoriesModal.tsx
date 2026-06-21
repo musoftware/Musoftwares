@@ -81,7 +81,7 @@ export function ManageCategoriesModal() {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline" className="w-full sm:w-auto shadow-sm border-slate-200 text-slate-700 hover:bg-slate-50">
-                    <Tags className="mr-2 h-4 w-4" />
+                    <Tags className="me-2 h-4 w-4" />
                     <span className="whitespace-nowrap">{t('erp.manage_categories', 'Categories')}</span>
                 </Button>
             </DialogTrigger>
@@ -101,7 +101,7 @@ export function ManageCategoriesModal() {
                             required
                         />
                         <Button type="submit" disabled={isSubmitting || !newCategoryName.trim()}>
-                            {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
+                            {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4 me-2" />}
                             {t('erp.add', 'Add')}
                         </Button>
                     </form>

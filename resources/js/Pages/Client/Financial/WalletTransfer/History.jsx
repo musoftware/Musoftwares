@@ -41,14 +41,14 @@ export default function History({ transfers }) {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="pl-6">Type</TableHead>
+                                    <TableHead className="ps-6">Type</TableHead>
                                     <TableHead>{__('general.recipient_sender')}</TableHead>
                                     <TableHead>{__('general.reason_memo')}</TableHead>
                                     <TableHead>Amount</TableHead>
                                     <TableHead>{__('general.fees_paid')}</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead>{__('general.processed_date')}</TableHead>
-                                    <TableHead className="pr-6 text-right">Actions</TableHead>
+                                    <TableHead className="pe-6 text-end">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -74,7 +74,7 @@ export default function History({ transfers }) {
                                         <TableRow key={tx.id}>
                                             
                                             {/* Type indicator */}
-                                            <TableCell className="pl-6">
+                                            <TableCell className="ps-6">
                                                 <Badge
                                                     variant={tx.type === 'sent' ? 'secondary' : 'outline'}
                                                     className={`font-normal tracking-wide bg-opacity-10 ${
@@ -85,11 +85,11 @@ export default function History({ transfers }) {
                                                 >
                                                     {tx.type === 'sent' ? (
                                                         <>
-                                                            <ArrowUpRight className="w-3 h-3 mr-1" /> Sent
+                                                            <ArrowUpRight className="w-3 h-3 me-1" /> Sent
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <ArrowDownLeft className="w-3 h-3 mr-1" /> Received
+                                                            <ArrowDownLeft className="w-3 h-3 me-1" /> Received
                                                         </>
                                                     )}
                                                 </Badge>
@@ -159,10 +159,10 @@ export default function History({ transfers }) {
                                             </TableCell>
 
                                             {/* Actions */}
-                                            <TableCell className="pr-6 text-right">
+                                            <TableCell className="pe-6 text-end">
                                                 <Button variant="ghost" size="sm" asChild className="shadow-none hover:bg-muted">
                                                     <Link href={route('financial.transfer.show', tx.id)}>
-                                                        <FileText className="w-4 h-4 mr-1" /> Receipt
+                                                        <FileText className="w-4 h-4 me-1" /> Receipt
                                                     </Link>
                                                 </Button>
                                             </TableCell>

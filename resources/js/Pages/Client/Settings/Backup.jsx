@@ -69,7 +69,7 @@ export default function Backup({ auth, flash }) {
                         <p className="text-sm text-slate-600 mb-4">{__('general.keep_this_file_safe_it_contains_sensitive_business_data_and_can_be_used_to_restore_your_account_if_needed')}</p>
                         <a href={route('settings.backup.export')} target="_blank" rel="noopener noreferrer">
                             <Button className="bg-indigo-600 hover:bg-indigo-700">
-                                <Download className="w-4 h-4 mr-2" />{__('general.download_json_backup')}</Button>
+                                <Download className="w-4 h-4 me-2" />{__('general.download_json_backup')}</Button>
                         </a>
                     </CardContent>
                 </Card>

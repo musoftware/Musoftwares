@@ -95,13 +95,13 @@ export default function Edit({ event }: Props) {
                             <div className="space-y-2">
                                 <Label>URL Slug (Read-only)</Label>
                                 <div className="flex items-center">
-                                    <span className="text-muted-foreground bg-slate-50 border border-r-0 border-input rounded-l-md px-3 h-10 flex items-center text-sm">
+                                    <span className="text-muted-foreground bg-slate-50 border border-e-0 border-input rounded-s-md px-3 h-10 flex items-center text-sm">
                                         /book/
                                     </span>
                                     <Input 
                                         value={event.slug}
                                         disabled
-                                        className="rounded-l-none bg-slate-50 text-slate-500 cursor-not-allowed"
+                                        className="rounded-s-none bg-slate-50 text-slate-500 cursor-not-allowed"
                                     />
                                 </div>
                             </div>

@@ -52,7 +52,7 @@ export default function AboutUs() {
                 <Accordion className="w-full">
                     {faqs.map((faq, index) => (
                         <AccordionItem key={index} value={`item-${index}`}>
-                            <AccordionTrigger className="text-left text-lg font-semibold text-slate-800 hover:text-emerald-600">
+                            <AccordionTrigger className="text-start text-lg font-semibold text-slate-800 hover:text-emerald-600">
                                 {faq.question}
                             </AccordionTrigger>
                             <AccordionContent className="text-slate-600 text-base leading-relaxed">

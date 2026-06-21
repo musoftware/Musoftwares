@@ -21,16 +21,16 @@ export default function Index({ orders }) {
     return (
         <AdminSidebarLayout title={__('general.marketplace_orders')} header="Marketplace Orders">
             <div className="overflow-hidden rounded-lg bg-white shadow">
-                <table className="w-full text-left">
+                <table className="w-full text-start">
                     <thead className="border-b bg-gray-50">
                         <tr>
                             <th className="p-4 font-medium text-gray-600">ID</th>
                             <th className="p-4 font-medium text-gray-600">Service</th>
                             <th className="p-4 font-medium text-gray-600">Buyer</th>
                             <th className="p-4 font-medium text-gray-600">Seller</th>
-                            <th className="p-4 font-medium text-gray-600 text-right">Amount</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">Amount</th>
                             <th className="p-4 font-medium text-gray-600 text-center">Status</th>
-                            <th className="p-4 font-medium text-gray-600 text-right">Actions</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -42,13 +42,13 @@ export default function Index({ orders }) {
                                 </td>
                                 <td className="p-4 text-gray-600">{order.buyer?.name || 'Unknown'}</td>
                                 <td className="p-4 text-gray-600">{order.seller?.name || 'Unknown'}</td>
-                                <td className="p-4 text-right font-jetbrains font-medium text-gray-900">
+                                <td className="p-4 text-end font-jetbrains font-medium text-gray-900">
                                     {formatCurrency(order.amount, order.currency)}
                                 </td>
                                 <td className="p-4 text-center">
                                     {getStatusBadge(order.status)}
                                 </td>
-                                <td className="p-4 text-right">
+                                <td className="p-4 text-end">
                                     <Link
                                         href={`/admin/marketplace/orders/${order.id}`}
                                         className="text-indigo-600 hover:text-indigo-900 hover:underline font-medium text-sm"

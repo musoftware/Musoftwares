@@ -53,20 +53,20 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
                                         <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                                            <th className="px-6 py-3 text-start text-xs font-medium tracking-wider text-gray-500 uppercase">
                                                 Date
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                                            <th className="px-6 py-3 text-start text-xs font-medium tracking-wider text-gray-500 uppercase">
                                                 Client
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                                            <th className="px-6 py-3 text-start text-xs font-medium tracking-wider text-gray-500 uppercase">
                                                 Amount
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">{__('general.bank_info')}</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                                            <th className="px-6 py-3 text-start text-xs font-medium tracking-wider text-gray-500 uppercase">{__('general.bank_info')}</th>
+                                            <th className="px-6 py-3 text-start text-xs font-medium tracking-wider text-gray-500 uppercase">
                                                 Status
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                                            <th className="px-6 py-3 text-start text-xs font-medium tracking-wider text-gray-500 uppercase">
                                                 Actions
                                             </th>
                                         </tr>
@@ -118,7 +118,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                                                         withdrawal.id,
                                                                     )
                                                                 }
-                                                                className="mr-3 text-indigo-600 hover:text-indigo-900"
+                                                                className="me-3 text-indigo-600 hover:text-indigo-900"
                                                             >
                                                                 Approve
                                                             </button>
@@ -186,7 +186,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                         >
                             &#8203;
                         </span>
-                        <div className="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle">
+                        <div className="inline-block transform overflow-hidden rounded-lg bg-white text-start align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle">
                             {actionModal.type === 'reject' ? (
                                 <form onSubmit={handleReject}>
                                     <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -214,7 +214,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                         <button
                                             type="submit"
                                             disabled={processing}
-                                            className="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 sm:ml-3 sm:w-auto sm:text-sm"
+                                            className="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 sm:ms-3 sm:w-auto sm:text-sm"
                                         >
                                             Reject
                                         </button>
@@ -227,7 +227,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                                     id: null,
                                                 })
                                             }
-                                            className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                            className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 sm:mt-0 sm:ms-3 sm:w-auto sm:text-sm"
                                         >
                                             Cancel
                                         </button>
@@ -284,7 +284,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                         <button
                                             type="submit"
                                             disabled={processing}
-                                            className="inline-flex w-full justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-green-700 sm:ml-3 sm:w-auto sm:text-sm"
+                                            className="inline-flex w-full justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-green-700 sm:ms-3 sm:w-auto sm:text-sm"
                                         >{__('general.mark_paid')}</button>
                                         <button
                                             type="button"
@@ -295,7 +295,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                                     id: null,
                                                 })
                                             }
-                                            className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                            className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 sm:mt-0 sm:ms-3 sm:w-auto sm:text-sm"
                                         >
                                             Cancel
                                         </button>

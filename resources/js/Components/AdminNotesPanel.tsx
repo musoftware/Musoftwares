@@ -130,7 +130,7 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <h3 className="text-lg font-medium mb-4">{__('general.internal_admin_notes')}</h3>
 
-            <div className="mb-6 space-y-4 max-h-96 overflow-y-auto pr-2">
+            <div className="mb-6 space-y-4 max-h-96 overflow-y-auto pe-2">
                 {sortedNotes.map(note => (
                     <div key={note.id} className={`p-4 rounded-[8px] border border-slate-200 bg-white`}>
                         <div className="flex justify-between items-start mb-2">
@@ -145,17 +145,17 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
                                     {note.category}
                                 </span>
 
-                                <div className="relative group ml-2">
+                                <div className="relative group ms-2">
                                     <button className="text-gray-400 hover:text-gray-600 px-1">...</button>
-                                    <div className="absolute right-0 hidden group-hover:block bg-white border rounded shadow-lg z-10 w-28">
-                                        <button onClick={() => handleTogglePin(note.id)} className="block w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                    <div className="absolute end-0 hidden group-hover:block bg-white border rounded shadow-lg z-10 w-28">
+                                        <button onClick={() => handleTogglePin(note.id)} className="block w-full text-start px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2">
                                             <Pin size={12} /> {note.is_pinned ? 'Unpin' : 'Pin'}
                                         </button>
-                                        <button onClick={() => handleArchive(note.id, note.category)} className="block w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                                        <button onClick={() => handleArchive(note.id, note.category)} className="block w-full text-start px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2">
                                             {note.category === 'archived' ? <Upload size={12} /> : <Archive size={12} />} 
                                             {note.category === 'archived' ? 'Unarchive' : 'Archive'}
                                         </button>
-                                        <button onClick={() => handleDelete(note.id)} className="block w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                        <button onClick={() => handleDelete(note.id)} className="block w-full text-start px-4 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2">
                                             <Trash2 size={12} /> Delete
                                         </button>
                                     </div>

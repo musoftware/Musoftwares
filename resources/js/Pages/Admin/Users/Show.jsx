@@ -173,21 +173,21 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                 <DropdownMenuLabel className="text-slate-500 uppercase tracking-wider text-xs mb-2">{__('general.profile_and_security') || 'Profile & Security'}</DropdownMenuLabel>
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem onClick={handleLoginAsUser} disabled={isLoginAsLoading}>
-                                        <Briefcase className="mr-2 h-4 w-4" />
+                                        <Briefcase className="me-2 h-4 w-4" />
                                         <span>{isLoginAsLoading ? __('general.logging_in') : __('general.login_as')}</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/users/${client.id}/edit`} className="w-full cursor-pointer flex items-center">
-                                            <Edit className="mr-2 h-4 w-4" />
+                                            <Edit className="me-2 h-4 w-4" />
                                             <span>{__('general.edit_profile')}</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => { setIsResetPassOpen(true); setNewPassword(''); }}>
-                                        <Key className="mr-2 h-4 w-4" />
+                                        <Key className="me-2 h-4 w-4" />
                                         <span>{__('general.reset_password')}</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => { setSelectedRole(client.role || 'client'); setIsChangeRoleOpen(true); }}>
-                                        <ShieldCheck className="mr-2 h-4 w-4" />
+                                        <ShieldCheck className="me-2 h-4 w-4" />
                                         <span>{__('general.change_role')}</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
@@ -195,7 +195,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                 <div className="pt-4 mt-4 border-t border-slate-100"></div>
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-700" onClick={() => setIsDeleteUserOpen(true)}>
-                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        <Trash2 className="me-2 h-4 w-4" />
                                         <span>{__('general.delete_user')}</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
@@ -207,36 +207,36 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/users/${client.id}/tasks/add`} className="w-full cursor-pointer flex items-center">
-                                            <Briefcase className="mr-2 h-4 w-4" />
+                                            <Briefcase className="me-2 h-4 w-4" />
                                             <span>{__('general.assign_task')}</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/users/${client.id}/files`} className="w-full cursor-pointer flex items-center">
-                                            <FileText className="mr-2 h-4 w-4" />
+                                            <FileText className="me-2 h-4 w-4" />
                                             <span>Files</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/users/${client.id}/notes`} className="w-full cursor-pointer flex items-center">
-                                            <ShieldCheck className="mr-2 h-4 w-4" />
+                                            <ShieldCheck className="me-2 h-4 w-4" />
                                             <span>{__('general.secure_notes')}</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/users/${client.id}/reports`} className="w-full cursor-pointer flex items-center">
-                                            <FileText className="mr-2 h-4 w-4" />
+                                            <FileText className="me-2 h-4 w-4" />
                                             <span>Reports</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/users/${client.id}/referrals`} className="w-full cursor-pointer flex items-center">
-                                            <MessageCircle className="mr-2 h-4 w-4" />
+                                            <MessageCircle className="me-2 h-4 w-4" />
                                             <span>{__('general.manage_referrals')}</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => setIsActivateMembershipOpen(true)}>
-                                        <Briefcase className="mr-2 h-4 w-4" />
+                                        <Briefcase className="me-2 h-4 w-4" />
                                         <span>{__('general.activate_membership')}</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
@@ -248,18 +248,18 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/invoices/create?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
-                                            <FileText className="mr-2 h-4 w-4" />
+                                            <FileText className="me-2 h-4 w-4" />
                                             <span>{__('general.new_invoice')}</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/invoices?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
-                                            <FileText className="mr-2 h-4 w-4" />
+                                            <FileText className="me-2 h-4 w-4" />
                                             <span>Invoices</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => setIsFinanceModalOpen(true)}>
-                                        <Wallet className="mr-2 h-4 w-4" />
+                                        <Wallet className="me-2 h-4 w-4" />
                                         <span>{__('general.all_transactions')}</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
@@ -268,43 +268,43 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/transactions/create?type=receive&user=${client.id}`} className="w-full cursor-pointer flex items-center">
-                                            <Wallet className="mr-2 h-4 w-4" />
+                                            <Wallet className="me-2 h-4 w-4" />
                                             <span>{__('general.receive_money')}</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/transactions/create?type=send-money&user=${client.id}`} className="w-full cursor-pointer flex items-center">
-                                            <Wallet className="mr-2 h-4 w-4" />
+                                            <Wallet className="me-2 h-4 w-4" />
                                             <span>{__('general.send_money')}</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/transactions/create?type=earn&user=${client.id}`} className="w-full cursor-pointer flex items-center">
-                                            <Wallet className="mr-2 h-4 w-4" />
+                                            <Wallet className="me-2 h-4 w-4" />
                                             <span>{__('general.earned_money')}</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/transactions/create?type=charge&user=${client.id}`} className="w-full cursor-pointer flex items-center">
-                                            <Wallet className="mr-2 h-4 w-4" />
+                                            <Wallet className="me-2 h-4 w-4" />
                                             <span>{__('general.charge_account')}</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/transactions/create?type=refund&user=${client.id}`} className="w-full cursor-pointer flex items-center">
-                                            <Wallet className="mr-2 h-4 w-4" />
+                                            <Wallet className="me-2 h-4 w-4" />
                                             <span>{__('general.refund_money')}</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/transactions/transfer?user=${client.id}`} className="w-full cursor-pointer flex items-center">
-                                            <Wallet className="mr-2 h-4 w-4" />
+                                            <Wallet className="me-2 h-4 w-4" />
                                             <span>{__('general.swap_projects_budget')}</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <a href={`/admin/users/${client.id}/balance-sheet`} target="_blank" rel="noopener noreferrer" className="w-full cursor-pointer flex items-center">
-                                            <FileText className="mr-2 h-4 w-4" />
+                                            <FileText className="me-2 h-4 w-4" />
                                             <span>{__('general.due_balance_sheet')}</span>
                                         </a>
                                     </DropdownMenuItem>
@@ -313,7 +313,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                         disabled={isRecalcLoading}
                                         className="text-amber-700 focus:bg-amber-50 focus:text-amber-800"
                                     >
-                                        <RefreshCcw className={`mr-2 h-4 w-4 ${isRecalcLoading ? 'animate-spin' : ''}`} />
+                                        <RefreshCcw className={`me-2 h-4 w-4 ${isRecalcLoading ? 'animate-spin' : ''}`} />
                                         <span>{isRecalcLoading ? 'Recalculating...' : 'Recalc Balance'}</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
@@ -448,7 +448,7 @@ ${client.email}
 Password:
 ${newPassword}`}
                                 </pre>
-                                <Button variant="ghost" size="sm" className="absolute top-2 right-2" onClick={() => copyToClipboard(`Hello, ${client.name} \nHere is your login details:\nEmail:\n${client.email}\nPassword:\n${newPassword}`)}><Copy size={14}/></Button>
+                                <Button variant="ghost" size="sm" className="absolute top-2 end-2" onClick={() => copyToClipboard(`Hello, ${client.name} \nHere is your login details:\nEmail:\n${client.email}\nPassword:\n${newPassword}`)}><Copy size={14}/></Button>
                             </div>
                         </div>
                     ) : (
@@ -512,13 +512,13 @@ ${newPassword}`}
                     <div className="py-4 flex flex-col gap-4">
                         <Link href={`/admin/transactions?user=${client.id}`} className="w-full">
                             <Button className="w-full justify-start h-12" variant="outline" onClick={() => setIsFinanceModalOpen(false)}>
-                                <TrendingUp className="mr-2 h-5 w-5 text-green-600" />
+                                <TrendingUp className="me-2 h-5 w-5 text-green-600" />
                                 Income Transactions
                             </Button>
                         </Link>
                         <Link href={`/admin/finance?client_id=${client.id}`} className="w-full">
                             <Button className="w-full justify-start h-12" variant="outline" onClick={() => setIsFinanceModalOpen(false)}>
-                                <TrendingDown className="mr-2 h-5 w-5 text-red-600" />
+                                <TrendingDown className="me-2 h-5 w-5 text-red-600" />
                                 Cost Transactions
                             </Button>
                         </Link>
@@ -527,7 +527,7 @@ ${newPassword}`}
             </Dialog>
 
             {/* NEW HERO SECTION */}
-            <div className="bg-white p-8 rounded-[12px] shadow-sm border border-slate-200 mb-6 flex flex-col md:flex-row items-center md:items-start gap-6 text-center md:text-left">
+            <div className="bg-white p-8 rounded-[12px] shadow-sm border border-slate-200 mb-6 flex flex-col md:flex-row items-center md:items-start gap-6 text-center md:text-start">
                 <div className="w-24 h-24 rounded-full bg-slate-900 text-white flex items-center justify-center text-3xl font-bold font-sora shadow-md shrink-0">
                     {client.initials || "U"}
                 </div>
@@ -798,13 +798,13 @@ ${newPassword}`}
                         </div>
                         {subscriptions && subscriptions.length > 0 ? (
                             <div className="overflow-x-auto">
-                                <table className="w-full text-left text-sm">
+                                <table className="w-full text-start text-sm">
                                     <thead className="bg-slate-50 border-b border-slate-200">
                                         <tr>
                                             <th className="p-3 font-bold text-slate-600">Module</th>
                                             <th className="p-3 font-bold text-slate-600">Status</th>
                                             <th className="p-3 font-bold text-slate-600">{__('general.expires_at')}</th>
-                                            <th className="p-3 text-right font-bold text-slate-600">Actions</th>
+                                            <th className="p-3 text-end font-bold text-slate-600">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -825,7 +825,7 @@ ${newPassword}`}
                                                 <td className="p-3 text-slate-500">
                                                     {sub.expires_at ? new Date(sub.expires_at).toLocaleDateString() : 'Lifetime'}
                                                 </td>
-                                                <td className="p-3 text-right space-x-2">
+                                                <td className="p-3 text-end space-x-2">
                                                     <Button variant="ghost" size="sm" onClick={() => openEditMembership(sub)}>
                                                         Edit
                                                     </Button>

@@ -185,7 +185,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                 <DialogTrigger render={
                                     <Button className="bg-indigo-600 hover:bg-indigo-700 text-white" />
                                 }>
-                                    <Plus className="w-4 h-4 mr-2" />
+                                    <Plus className="w-4 h-4 me-2" />
                                     {__('general.create_key')}
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-md">
@@ -234,9 +234,9 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
                                             >
                                                 {createForm.processing ? (
-                                                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                                    <RefreshCw className="w-4 h-4 me-2 animate-spin" />
                                                 ) : (
-                                                    <Key className="w-4 h-4 mr-2" />
+                                                    <Key className="w-4 h-4 me-2" />
                                                 )}
                                                 {__('general.generate_keys')}
                                             </Button>
@@ -246,7 +246,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                             </Dialog>
 
                             <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
-                                <ArrowLeft className="w-4 h-4 mr-2" />
+                                <ArrowLeft className="w-4 h-4 me-2" />
                                 {__('general.back')}
                             </Button>
                         </div>
@@ -448,7 +448,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                                                 setRollConfirmOpen(true);
                                                                             }}
                                                                         >
-                                                                            <RefreshCw className="w-4 h-4 mr-2" />
+                                                                            <RefreshCw className="w-4 h-4 me-2" />
                                                                             {__('general.roll_secret_key')}
                                                                         </Button>
                                                                         <Button
@@ -459,7 +459,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                                                 setDeleteConfirmOpen(true);
                                                                             }}
                                                                         >
-                                                                            <Trash2 className="w-4 h-4 mr-2" />
+                                                                            <Trash2 className="w-4 h-4 me-2" />
                                                                             {__('general.delete_key')}
                                                                         </Button>
                                                                     </div>
@@ -520,7 +520,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                                         setRollConfirmOpen(true);
                                                                     }}
                                                                 >
-                                                                    <RefreshCw className="w-4 h-4 mr-2" />
+                                                                    <RefreshCw className="w-4 h-4 me-2" />
                                                                     {__('general.roll_secret_key')}
                                                                 </Button>
                                                                 <Button
@@ -531,7 +531,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                                         setDeleteConfirmOpen(true);
                                                                     }}
                                                                 >
-                                                                    <Trash2 className="w-4 h-4 mr-2" />
+                                                                    <Trash2 className="w-4 h-4 me-2" />
                                                                     {__('general.delete_key')}
                                                                 </Button>
                                                             </div>
@@ -543,7 +543,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                 <div className="space-y-1">
                                                     <span className="text-xs text-slate-500 uppercase tracking-wide">{__('general.publishable_key')}</span>
                                                     <div className="flex items-center gap-1.5">
-                                                        <code className="text-xs bg-slate-100 px-2 py-1.5 rounded font-mono text-slate-700 flex-1 truncate" dir="ltr">
+                                                        <code className="text-xs bg-slate-100 px-2 py-1.5 rounded font-mono text-slate-700 flex-1 truncate" >
                                                             {key.publishable_key}
                                                         </code>
                                                         <button
@@ -562,7 +562,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                 {/* Secret Key (masked) */}
                                                 <div className="space-y-1">
                                                     <span className="text-xs text-slate-500 uppercase tracking-wide">{__('general.secret_key')}</span>
-                                                    <code className="block text-xs bg-slate-100 px-2 py-1.5 rounded font-mono text-slate-500" dir="ltr">
+                                                    <code className="block text-xs bg-slate-100 px-2 py-1.5 rounded font-mono text-slate-500" >
                                                         sk_{'••••'}{key.secret_key_last_four}
                                                     </code>
                                                 </div>
@@ -614,9 +614,9 @@ export default function ApiKeys({ apiKeys }: Props) {
                             className="bg-amber-600 hover:bg-amber-700 text-white"
                         >
                             {rolling ? (
-                                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                <RefreshCw className="w-4 h-4 me-2 animate-spin" />
                             ) : (
-                                <RefreshCw className="w-4 h-4 mr-2" />
+                                <RefreshCw className="w-4 h-4 me-2" />
                             )}
                             {__('general.roll_key')}
                         </Button>
@@ -639,7 +639,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                     {actionKey && (
                         <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-sm">
                             <p className="font-medium text-red-800">{actionKey.name}</p>
-                            <code className="text-xs text-red-600 font-mono mt-1 block" dir="ltr">
+                            <code className="text-xs text-red-600 font-mono mt-1 block" >
                                 {actionKey.publishable_key}
                             </code>
                         </div>
@@ -658,9 +658,9 @@ export default function ApiKeys({ apiKeys }: Props) {
                             disabled={deleting}
                         >
                             {deleting ? (
-                                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                <RefreshCw className="w-4 h-4 me-2 animate-spin" />
                             ) : (
-                                <Trash2 className="w-4 h-4 mr-2" />
+                                <Trash2 className="w-4 h-4 me-2" />
                             )}
                             {__('general.delete')}
                         </Button>

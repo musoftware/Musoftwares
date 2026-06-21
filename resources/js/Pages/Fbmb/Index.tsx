@@ -308,8 +308,8 @@ export default function ISaasIndex() {
 
                     {/* -- Hero Header -- */}
                     <div className="relative mb-6">
-                        <div className="absolute -top-4 -left-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl" />
-                        <div className="absolute -top-2 right-8 w-16 h-16 bg-purple-500/10 rounded-full blur-xl" />
+                        <div className="absolute -top-4 -start-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl" />
+                        <div className="absolute -top-2 end-8 w-16 h-16 bg-purple-500/10 rounded-full blur-xl" />
                         <div className="relative flex items-center gap-3">
                             <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25">
                                 <Database className="w-5 h-5 text-white" />
@@ -340,7 +340,7 @@ export default function ISaasIndex() {
                                 <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
                                     <AlertCircle className="w-3 h-3" />{__('general.get_points_to_start_lookups')}</p>
                             )}
-                            <div className={cn("absolute -right-2 -bottom-2 w-16 h-16 rounded-full opacity-10", hasBalance ? "bg-emerald-500" : "bg-amber-500")} />
+                            <div className={cn("absolute -end-2 -bottom-2 w-16 h-16 rounded-full opacity-10", hasBalance ? "bg-emerald-500" : "bg-amber-500")} />
                         </div>
 
                         <div className="relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-4">
@@ -359,7 +359,7 @@ export default function ISaasIndex() {
                                 ))}
                             </div>
                             <p className="text-[10px] text-slate-500 mt-2">{__('general.only_charged_for_successful_matches')}</p>
-                            <div className="absolute -right-2 -bottom-2 w-24 h-24 rounded-full bg-indigo-500 opacity-5" />
+                            <div className="absolute -end-2 -bottom-2 w-24 h-24 rounded-full bg-indigo-500 opacity-5" />
                         </div>
                     </div>
 
@@ -527,7 +527,7 @@ export default function ISaasIndex() {
                                                                 <p>
                                                                     <span className="font-medium text-slate-700">Max cost:</span>{' '}
                                                                     <span className="font-mono">{estimatedCost.toLocaleString()}</span> points
-                                                                    <span className="text-slate-400 ml-1">(only matched IDs are charged)</span>
+                                                                    <span className="text-slate-400 ms-1">(only matched IDs are charged)</span>
                                                                 </p>
                                                                 {estimatedCost > pointsBalance && (
                                                                     <p className="text-amber-600 flex items-center gap-1 font-medium">
@@ -549,7 +549,7 @@ export default function ISaasIndex() {
                                                                 : ""
                                                         )}
                                                     >
-                                                        <Sparkles className="w-4 h-4 mr-2" />{__('general.start_lookup')}</Button>
+                                                        <Sparkles className="w-4 h-4 me-2" />{__('general.start_lookup')}</Button>
                                                     {!hasBalance && (
                                                         <p className="text-xs text-amber-600 flex items-center gap-1">
                                                             <AlertCircle className="w-3 h-3 shrink-0" />{__('general.get_points_to_use_this_feature')}</p>
@@ -603,7 +603,7 @@ export default function ISaasIndex() {
                                                         onClick={() => setActiveTab('history')} 
                                                         className="flex-1 h-11 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold shadow-sm hover:shadow animate-in fade-in slide-in-from-bottom-2 duration-350"
                                                     >
-                                                        <History className="w-4 h-4 mr-2" />
+                                                        <History className="w-4 h-4 me-2" />
                                                         {__('general.view_history')}
                                                     </Button>
                                                     <Button 
@@ -611,7 +611,7 @@ export default function ISaasIndex() {
                                                         variant="outline" 
                                                         className="flex-1 h-11 rounded-xl"
                                                     >
-                                                        <ArrowRight className="w-4 h-4 mr-2" />
+                                                        <ArrowRight className="w-4 h-4 me-2" />
                                                         {__('general.new_lookup')}
                                                     </Button>
                                                 </div>
@@ -672,12 +672,12 @@ export default function ISaasIndex() {
                                                             onClick={() => triggerDownload(result.download_token)}
                                                             className="flex-1 h-11 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-px transition-all font-semibold"
                                                         >
-                                                            <Download className="w-4 h-4 mr-2" />
+                                                            <Download className="w-4 h-4 me-2" />
                                                             Download Results ({result.found_count} records)
                                                         </Button>
                                                     )}
                                                     <Button onClick={startNewLookup} variant="outline" className="h-11 rounded-xl">
-                                                        <ArrowRight className="w-4 h-4 mr-2" />{__('general.new_lookup')}</Button>
+                                                        <ArrowRight className="w-4 h-4 me-2" />{__('general.new_lookup')}</Button>
                                                 </div>
 
                                                 {(result.found_count || 0) === 0 && (
@@ -710,7 +710,7 @@ export default function ISaasIndex() {
                                         onClick={() => setActiveTab('lookup')}
                                         className="mt-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl h-10 px-5 text-sm font-semibold"
                                     >
-                                        <Sparkles className="w-4 h-4 mr-2" />{__('general.start_your_first_lookup')}</Button>
+                                        <Sparkles className="w-4 h-4 me-2" />{__('general.start_your_first_lookup')}</Button>
                                 </div>
                             ) : (
                                 <div className="space-y-3">
@@ -822,7 +822,7 @@ export default function ISaasIndex() {
                                                                 onClick={() => triggerDownload(record.download_token)}
                                                                 className="h-9 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-semibold shadow-sm hover:shadow-md hover:-translate-y-px transition-all"
                                                             >
-                                                                <Download className="w-3.5 h-3.5 mr-1.5" />
+                                                                <Download className="w-3.5 h-3.5 me-1.5" />
                                                                 {__('general.download')}
                                                             </Button>
                                                         ) : (

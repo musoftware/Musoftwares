@@ -86,7 +86,7 @@ export default function GoldIndicator() {
                             </div>
                             <div className="mt-4 flex items-center text-sm">
                                 <span className="text-emerald-600 font-medium">+1.2%</span>
-                                <span className="text-slate-500 ml-2">vs yesterday</span>
+                                <span className="text-slate-500 ms-2">vs yesterday</span>
                             </div>
                         </CardContent>
                     </Card>
@@ -104,7 +104,7 @@ export default function GoldIndicator() {
                             </div>
                             <div className="mt-4 flex items-center text-sm">
                                 <span className="text-red-600 font-medium">-0.4%</span>
-                                <span className="text-slate-500 ml-2">vs yesterday</span>
+                                <span className="text-slate-500 ms-2">vs yesterday</span>
                             </div>
                         </CardContent>
                     </Card>
@@ -122,7 +122,7 @@ export default function GoldIndicator() {
                             </div>
                             <div className="mt-4 flex items-center text-sm">
                                 <span className="text-emerald-600 font-medium">+0.1%</span>
-                                <span className="text-slate-500 ml-2">vs yesterday</span>
+                                <span className="text-slate-500 ms-2">vs yesterday</span>
                             </div>
                         </CardContent>
                     </Card>
@@ -140,7 +140,7 @@ export default function GoldIndicator() {
                             </div>
                             <div className="mt-4 flex items-center text-sm">
                                 <span className="text-amber-600 font-medium">High Premium</span>
-                                <span className="text-slate-500 ml-2">Wait for dip</span>
+                                <span className="text-slate-500 ms-2">Wait for dip</span>
                             </div>
                         </CardContent>
                     </Card>

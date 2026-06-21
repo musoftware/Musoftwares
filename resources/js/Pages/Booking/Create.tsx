@@ -86,14 +86,14 @@ export default function Create() {
                             <div className="space-y-2">
                                 <Label htmlFor="slug">{__('general.url_slug')}</Label>
                                 <div className="flex items-center">
-                                    <span className="text-muted-foreground bg-slate-50 border border-r-0 border-input rounded-l-md px-3 h-10 flex items-center text-sm">
+                                    <span className="text-muted-foreground bg-slate-50 border border-e-0 border-input rounded-s-md px-3 h-10 flex items-center text-sm">
                                         /book/
                                     </span>
                                     <Input 
                                         id="slug" 
                                         value={data.slug}
                                         onChange={e => setData('slug', e.target.value)}
-                                        className="rounded-l-none"
+                                        className="rounded-s-none"
                                         required
                                     />
                                 </div>

@@ -26,11 +26,11 @@ export default function Show({ webhook }: Props) {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'processed':
-                return <Badge className="bg-emerald-100 text-emerald-800"><CheckCircle2 className="w-4 h-4 mr-1" /> Processed</Badge>;
+                return <Badge className="bg-emerald-100 text-emerald-800"><CheckCircle2 className="w-4 h-4 me-1" /> Processed</Badge>;
             case 'failed':
-                return <Badge className="bg-rose-100 text-rose-800"><XCircle className="w-4 h-4 mr-1" /> Failed</Badge>;
+                return <Badge className="bg-rose-100 text-rose-800"><XCircle className="w-4 h-4 me-1" /> Failed</Badge>;
             default:
-                return <Badge className="bg-amber-100 text-amber-800"><Clock className="w-4 h-4 mr-1" /> Pending</Badge>;
+                return <Badge className="bg-amber-100 text-amber-800"><Clock className="w-4 h-4 me-1" /> Pending</Badge>;
         }
     };
 
@@ -52,12 +52,12 @@ export default function Show({ webhook }: Props) {
                 </div>
 
                 {webhook.error_message && (
-                    <div className="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-md">
+                    <div className="bg-rose-50 border-s-4 border-rose-500 p-4 rounded-e-md">
                         <div className="flex">
                             <div className="flex-shrink-0">
                                 <XCircle className="h-5 w-5 text-rose-500" aria-hidden="true" />
                             </div>
-                            <div className="ml-3">
+                            <div className="ms-3">
                                 <h3 className="text-sm font-medium text-rose-800">Processing Failed</h3>
                                 <div className="mt-2 text-sm text-rose-700 font-mono bg-white/50 p-2 rounded">
                                     {webhook.error_message}

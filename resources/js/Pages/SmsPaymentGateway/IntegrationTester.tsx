@@ -68,7 +68,7 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
                             <p className="text-slate-500 mt-1">{__('general.simulate_api_calls_to_verify_your_application_s_handling_of_text_payment_gateway_payloads')}</p>
                         </div>
                         <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
-                            <ArrowLeft className="w-4 h-4 mr-2" />{__('general.back_to_dashboard')}</Button>
+                            <ArrowLeft className="w-4 h-4 me-2" />{__('general.back_to_dashboard')}</Button>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -125,7 +125,7 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
                                 </CardContent>
                                 <div className="p-4 border-t bg-slate-50 flex justify-end">
                                     <Button type="submit" disabled={testing || !endpoint || !phone} className="bg-indigo-600 hover:bg-indigo-700">
-                                        {testing ? <span className="animate-pulse">{__('general.running_simulation')}</span> : <span className="flex items-center"><Play className="w-4 h-4 mr-2" />{__('general.dispatch_mock_payload')}</span>}
+                                        {testing ? <span className="animate-pulse">{__('general.running_simulation')}</span> : <span className="flex items-center"><Play className="w-4 h-4 me-2" />{__('general.dispatch_mock_payload')}</span>}
                                     </Button>
                                 </div>
                             </form>

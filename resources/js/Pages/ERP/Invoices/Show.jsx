@@ -122,7 +122,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                         {formatDuration(timerValue)}
                                     </div>
                                 </div>
-                                <p className="text-sm text-muted-foreground mt-4 text-center md:text-left">
+                                <p className="text-sm text-muted-foreground mt-4 text-center md:text-start">
                                     {__('general.this_session_previous_sessions')} <span className="font-bold">{(timerValue/60 + parseFloat(activeTimerItem.quantity)).toFixed(0)}  {__('general.mins')}</span> {__('total.')}
                                 </p>
                             </div>
@@ -133,8 +133,8 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                 <TableRow className="bg-muted/50">
                                     <TableHead className="font-bold">{__('general.description')}</TableHead>
                                     <TableHead className="text-center font-bold">{__('general.qty')}</TableHead>
-                                    <TableHead className="text-right font-bold">{__('general.rate')}</TableHead>
-                                    <TableHead className="text-right font-bold">{__('general.total')}</TableHead>
+                                    <TableHead className="text-end font-bold">{__('general.rate')}</TableHead>
+                                    <TableHead className="text-end font-bold">{__('general.total')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -148,10 +148,10 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                         <TableCell className="text-center">
                                             {item.quantity} {item.uom && <span className="text-xs text-muted-foreground uppercase">{item.uom}</span>}
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-end">
                                             <CurrencyDisplay amount={item.unit_price} currency={invoice.currency} />
                                         </TableCell>
-                                        <TableCell className="text-right font-bold">
+                                        <TableCell className="text-end font-bold">
                                             <CurrencyDisplay amount={item.total} currency={invoice.currency} />
                                         </TableCell>
                                     </TableRow>
@@ -187,7 +187,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                         </div>
 
                         {invoice.notes && (
-                            <div className="mt-16 p-6 bg-muted/30 rounded-xl border-l-4 border-primary">
+                            <div className="mt-16 p-6 bg-muted/30 rounded-xl border-s-4 border-primary">
                                 <h4 className="text-xs font-bold uppercase text-muted-foreground mb-2">{__('general.message_from_business')}</h4>
                                 <p className="italic text-foreground">{invoice.notes}</p>
                             </div>
@@ -196,12 +196,12 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                         <div className="mt-16 flex justify-center gap-4 no-print">
                             <Button size="lg" className="px-12 shadow-none" asChild>
                                 <a href={route('erp.invoices.download', invoice.id) + '?paper=a4'} target="_blank" rel="noreferrer">
-                                    <Download className="mr-2 h-5 w-5" /> {__('general.download_a4_pdf')}
+                                    <Download className="me-2 h-5 w-5" /> {__('general.download_a4_pdf')}
                                 </a>
                             </Button>
                             <Button size="lg" variant="outline" className="px-12 shadow-none" asChild>
                                 <a href={route('erp.invoices.download', invoice.id) + '?paper=thermal'} target="_blank" rel="noreferrer">
-                                    <Download className="mr-2 h-5 w-5" /> {__('general.download_thermal_pdf')}
+                                    <Download className="me-2 h-5 w-5" /> {__('general.download_thermal_pdf')}
                                 </a>
                             </Button>
                         </div>
@@ -230,12 +230,12 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                     <div className="flex flex-wrap items-center gap-2">
                         {invoice.status === 'draft' && (
                             <Button variant="outline" size="sm" onClick={() => router.post(route('erp.invoices.send', invoice.id))} className="shadow-sm border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors">
-                                <CheckCircle className="mr-2 h-4 w-4" /> {__('erp.issue_invoice')}
+                                <CheckCircle className="me-2 h-4 w-4" /> {__('erp.issue_invoice')}
                             </Button>
                         )}
                         {(invoice.status === 'sent' || invoice.status === 'partial') && (
                             <Button variant="outline" size="sm" onClick={() => router.post(route('erp.invoices.mark-paid', invoice.id))} className="shadow-sm border-emerald-200 text-emerald-700 hover:bg-emerald-50 transition-colors">
-                                <CheckCircle className="mr-2 h-4 w-4" /> {__('general.mark_as_paid')}
+                                <CheckCircle className="me-2 h-4 w-4" /> {__('general.mark_as_paid')}
                             </Button>
                         )}
                         <DropdownMenu>
@@ -245,22 +245,22 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                             <DropdownMenuContent align="end" className="w-48">
                                 {(invoice.status === 'draft' || invoice.status === 'sent' || invoice.status === 'partial') && (
                                     <DropdownMenuItem asChild className="cursor-pointer">
-                                        <Link href={route('erp.invoices.edit', invoice.id)}><Edit className="mr-2 h-4 w-4 text-slate-400" /> {__('general.edit_draft')}</Link>
+                                        <Link href={route('erp.invoices.edit', invoice.id)}><Edit className="me-2 h-4 w-4 text-slate-400" /> {__('general.edit_draft')}</Link>
                                     </DropdownMenuItem>
                                 )}
                                 {(invoice.status === 'sent' || invoice.status === 'partial') && (
                                     <>
                                         <DropdownMenuItem onClick={() => router.post(route('erp.invoices.pay-wallet', invoice.id))} className="cursor-pointer">
-                                            <Wallet className="mr-2 h-4 w-4 text-slate-400" /> {__('erp.pay_with_wallet')}
+                                            <Wallet className="me-2 h-4 w-4 text-slate-400" /> {__('erp.pay_with_wallet')}
                                         </DropdownMenuItem>
                                         {has_smtp_addon ? (
                                             has_smtp_settings ? (
                                                 <DropdownMenuItem onClick={() => router.post(route('erp.invoices.send-email', invoice.id))} className="cursor-pointer">
-                                                    <Send className="mr-2 h-4 w-4 text-slate-400" /> {__('general.send_email')}
+                                                    <Send className="me-2 h-4 w-4 text-slate-400" /> {__('general.send_email')}
                                                 </DropdownMenuItem>
                                             ) : (
                                                 <DropdownMenuItem asChild className="cursor-pointer text-orange-600">
-                                                    <Link href={route('erp.settings.smtp.edit')}><Send className="mr-2 h-4 w-4 text-orange-400" /> {__('general.configure_smtp_to_send')}</Link>
+                                                    <Link href={route('erp.settings.smtp.edit')}><Send className="me-2 h-4 w-4 text-orange-400" /> {__('general.configure_smtp_to_send')}</Link>
                                                 </DropdownMenuItem>
                                             )
                                         ) : null}
@@ -268,19 +268,19 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                 )}
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={() => router.post(route('erp.invoices.duplicate', invoice.id))} className="cursor-pointer">
-                                    <Copy className="mr-2 h-4 w-4 text-slate-400" /> {__('general.duplicate')}
+                                    <Copy className="me-2 h-4 w-4 text-slate-400" /> {__('general.duplicate')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild className="cursor-pointer">
-                                    <a href={route('erp.invoices.download', invoice.id) + '?paper=a4'} target="_blank" rel="noreferrer"><Download className="mr-2 h-4 w-4 text-slate-400" /> {__('general.download_a4_pdf')}</a>
+                                    <a href={route('erp.invoices.download', invoice.id) + '?paper=a4'} target="_blank" rel="noreferrer"><Download className="me-2 h-4 w-4 text-slate-400" /> {__('general.download_a4_pdf')}</a>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild className="cursor-pointer">
-                                    <a href={route('erp.invoices.download', invoice.id) + '?paper=thermal'} target="_blank" rel="noreferrer"><Download className="mr-2 h-4 w-4 text-slate-400" /> {__('general.download_thermal_pdf')}</a>
+                                    <a href={route('erp.invoices.download', invoice.id) + '?paper=thermal'} target="_blank" rel="noreferrer"><Download className="me-2 h-4 w-4 text-slate-400" /> {__('general.download_thermal_pdf')}</a>
                                 </DropdownMenuItem>
                                 {(invoice.status === 'sent' || invoice.status === 'partial' || invoice.status === 'paid') && (
                                     <>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem onClick={() => router.post(route('erp.invoices.cancel', invoice.id))} className="cursor-pointer text-rose-600 hover:text-rose-700 focus:text-rose-700">
-                                            <CheckCircle className="mr-2 h-4 w-4 text-rose-500" /> {__('erp.cancel_invoice')}
+                                            <CheckCircle className="me-2 h-4 w-4 text-rose-500" /> {__('erp.cancel_invoice')}
                                         </DropdownMenuItem>
                                     </>
                                 )}
@@ -305,7 +305,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                     <h2 className="text-lg font-semibold text-slate-900">{workspaceName || auth.user?.workspace_name || auth.user?.name || 'Business Workspace'}</h2>
                                     <p className="text-sm text-slate-500">{auth.user?.email}</p>
                                 </div>
-                                <div className="text-right">
+                                <div className="text-end">
                                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{__('general.billed_to')}</p>
                                     <h3 className="text-base font-semibold text-slate-900">{invoice.client?.name}</h3>
                                     <p className="text-sm text-slate-500">{invoice.client?.email}</p>
@@ -327,7 +327,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{__('general.due_date')}</p>
                                 <p className="font-medium text-sm text-slate-900"><DateDisplay date={invoice.due_date} /></p>
                                 </div>
-                                <div className="text-right">
+                                <div className="text-end">
                                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{__('general.amount_due')}</p>
                                     <p className="text-lg font-bold text-indigo-600">
                                         <CurrencyDisplay amount={invoice.amount} currency={invoice.currency} />
@@ -356,8 +356,8 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                         <TableRow className="border-b border-slate-100 hover:bg-transparent">
                                             <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wider h-10">{__('general.description')}</TableHead>
                                             <TableHead className="text-center text-xs font-semibold text-slate-500 uppercase tracking-wider h-10 w-[80px]">{__('general.qty')}</TableHead>
-                                            <TableHead className="text-right text-xs font-semibold text-slate-500 uppercase tracking-wider h-10 w-[120px]">{__('general.rate')}</TableHead>
-                                            <TableHead className="text-right text-xs font-semibold text-slate-500 uppercase tracking-wider h-10 w-[120px]">{__('general.total')}</TableHead>
+                                            <TableHead className="text-end text-xs font-semibold text-slate-500 uppercase tracking-wider h-10 w-[120px]">{__('general.rate')}</TableHead>
+                                            <TableHead className="text-end text-xs font-semibold text-slate-500 uppercase tracking-wider h-10 w-[120px]">{__('general.total')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -370,10 +370,10 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                                 <TableCell className="text-center font-medium text-slate-700 py-4">
                                                     {item.quantity} {item.uom && <span className="text-xs text-slate-400 uppercase">{item.uom}</span>}
                                                 </TableCell>
-                                                <TableCell className="text-right font-medium text-slate-700 py-4">
+                                                <TableCell className="text-end font-medium text-slate-700 py-4">
                                                     <CurrencyDisplay amount={item.unit_price} currency={invoice.currency} />
                                                 </TableCell>
-                                                <TableCell className="text-right font-semibold text-slate-900 py-4">
+                                                <TableCell className="text-end font-semibold text-slate-900 py-4">
                                                     <CurrencyDisplay amount={item.total} currency={invoice.currency} />
                                                 </TableCell>
                                             </TableRow>
@@ -390,7 +390,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                     </div>
                                     <div className="pt-3 border-t border-slate-100 flex justify-between items-center">
                                         <span className="text-base font-semibold text-slate-900">{__('general.total')}</span>
-                                        <div className="text-right">
+                                        <div className="text-end">
                                             <div className="text-2xl font-bold text-indigo-600 tracking-tight">
                                                 <CurrencyDisplay amount={invoice.amount} currency={invoice.currency} />
                                             </div>
@@ -414,7 +414,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                             {invoice.costs.map((cost) => (
                                                 <TableRow key={cost.id} className="border-b border-slate-50 hover:bg-slate-50/50">
                                                     <TableCell className="font-medium text-slate-900 py-4">{cost.title}</TableCell>
-                                                    <TableCell className="text-right font-medium text-slate-900 py-4">
+                                                    <TableCell className="text-end font-medium text-slate-900 py-4">
                                                         <CurrencyDisplay amount={cost.amount} currency={cost.currency || invoice.currency} />
                                                     </TableCell>
                                                     <TableCell className="w-[100px] py-4">
@@ -422,7 +422,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                                             {cost.payment_status}
                                                         </Badge>
                                                     </TableCell>
-                                                    <TableCell className="text-right py-4">
+                                                    <TableCell className="text-end py-4">
                                                         {cost.payment_status === 'unpaid' && <Button size="sm" variant="ghost" className="text-rose-600 hover:bg-rose-50 hover:text-rose-700" onClick={() => router.post(route('erp.invoices.costs.mark-paid', { invoice: invoice.id, cost: cost.id }))}>{__('general.pay_now')}</Button>}
                                                     </TableCell>
                                                 </TableRow>
@@ -474,10 +474,10 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                 </div>
                                 <div className="flex gap-2">
                                     <Button variant="outline" size="sm" className="flex-1 shadow-sm border-slate-200 text-slate-700 hover:bg-slate-50" onClick={() => handleWalletAction('receive')}>
-                                        <ArrowDownLeft className="mr-1.5 h-3.5 w-3.5 text-emerald-600" />{__('general.credit')}
+                                        <ArrowDownLeft className="me-1.5 h-3.5 w-3.5 text-emerald-600" />{__('general.credit')}
                                     </Button>
                                     <Button variant="outline" size="sm" className="flex-1 shadow-sm border-slate-200 text-slate-700 hover:bg-slate-50" onClick={() => handleWalletAction('send')}>
-                                        <ArrowUpRight className="mr-1.5 h-3.5 w-3.5 text-rose-600" />{__('general.debit')}
+                                        <ArrowUpRight className="me-1.5 h-3.5 w-3.5 text-rose-600" />{__('general.debit')}
                                     </Button>
                                 </div>
                             </div>

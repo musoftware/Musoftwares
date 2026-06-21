@@ -97,12 +97,12 @@ export default function ResellersIndex({ resellers, meta }: any) {
 
                 {/* Search */}
                 <div className="relative max-w-sm">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                     <Input
                         placeholder={__('general.search_resellers')}
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="pl-9"
+                        className="ps-9"
                     />
                 </div>
 
@@ -115,12 +115,12 @@ export default function ResellersIndex({ resellers, meta }: any) {
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b border-border/60">
-                                        <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Reseller</th>
-                                        <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Balance</th>
-                                        <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.sub_users')}</th>
-                                        <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.sharing_flags')}</th>
-                                        <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Status</th>
-                                        <th className="text-right px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
+                                        <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Reseller</th>
+                                        <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Balance</th>
+                                        <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.sub_users')}</th>
+                                        <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.sharing_flags')}</th>
+                                        <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Status</th>
+                                        <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border/40">
@@ -135,7 +135,7 @@ export default function ResellersIndex({ resellers, meta }: any) {
                                                     {formatCurrency(r.balance, r.currency)}
                                                 </span>
                                                 {r.balance <= 0 && (
-                                                    <span className="ml-2 text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded">EMPTY</span>
+                                                    <span className="ms-2 text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded">EMPTY</span>
                                                 )}
                                             </td>
                                             <td className="px-4 py-3.5">
@@ -159,7 +159,7 @@ export default function ResellersIndex({ resellers, meta }: any) {
                                             <td className="px-4 py-3.5">
                                                 <StatusBadge status={statusMap[r.status] || 'neutral'} label={r.status} size="sm" />
                                             </td>
-                                            <td className="px-4 py-3.5 text-right">
+                                            <td className="px-4 py-3.5 text-end">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <Link
                                                         href={`/admin/resellers/${r.id}`}

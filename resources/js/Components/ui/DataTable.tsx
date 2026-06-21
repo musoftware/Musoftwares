@@ -152,7 +152,7 @@ export function DataTable({
 
             {/* Table Area */}
             <div className="relative flex-1 overflow-x-auto">
-                <table className="w-full border-collapse text-left font-sans text-[13px]">
+                <table className="w-full border-collapse text-start font-sans text-[13px]">
                     <thead className="sticky top-0 z-10 border-b border-slate-200 bg-slate-50">
                         <tr>
                             {normalized.map((col, idx) => (
@@ -230,7 +230,7 @@ export function DataTable({
                     <div className="flex items-center gap-2">
                         <span className="text-slate-400 text-xs">Show</span>
                         <select
-                            className="h-7 rounded-md border border-slate-200 bg-white pl-2 pr-6 text-[12px] focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            className="h-7 rounded-md border border-slate-200 bg-white ps-2 pe-6 text-[12px] focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             value={pagination.per_page}
                             onChange={(e) =>
                                 onPerPageChange?.(Number(e.target.value))

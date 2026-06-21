@@ -198,7 +198,7 @@ export default function Index({ skills, filters }: any) {
             </div>
 
             <div className="overflow-hidden rounded-lg bg-white shadow">
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-start text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
                             <th className="p-4 font-medium text-gray-600">ID</th>
@@ -206,7 +206,7 @@ export default function Index({ skills, filters }: any) {
                             <th className="p-4 font-medium text-gray-600">{__('freelance.description')}</th>
                             <th className="p-4 font-medium text-gray-600">{__('freelance.status')}</th>
                             <th className="p-4 font-medium text-gray-600">{__('freelance.created_by', undefined, 'Created By')}</th>
-                            <th className="p-4 font-medium text-gray-600 text-right">{__('freelance.actions')}</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">{__('freelance.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -227,7 +227,7 @@ export default function Index({ skills, filters }: any) {
                                 <td className="p-4 text-gray-500">
                                     {skill.creator ? skill.creator.name : __('freelance.system', undefined, 'System')}
                                 </td>
-                                <td className="p-4 text-right">
+                                <td className="p-4 text-end">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -241,30 +241,30 @@ export default function Index({ skills, filters }: any) {
                                             {skill.status === 'pending' && (
                                                 <>
                                                     <DropdownMenuItem onClick={() => handleApprove(skill.id)} className="cursor-pointer">
-                                                        <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
+                                                        <CheckCircle className="me-2 h-4 w-4 text-green-600" />
                                                         <span>{__('freelance.approve_skill', undefined, 'Approve')}</span>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem onClick={() => handleReject(skill.id)} className="cursor-pointer text-yellow-600">
-                                                        <XCircle className="mr-2 h-4 w-4" />
+                                                        <XCircle className="me-2 h-4 w-4" />
                                                         <span>{__('freelance.decline_skill', undefined, 'Decline')}</span>
                                                     </DropdownMenuItem>
                                                 </>
                                             )}
                                             <DropdownMenuItem onClick={() => openEditModal(skill)} className="cursor-pointer">
-                                                <Edit className="mr-2 h-4 w-4 text-blue-600" />
+                                                <Edit className="me-2 h-4 w-4 text-blue-600" />
                                                 <span>{__('freelance.edit')}</span>
                                             </DropdownMenuItem>
                                             
                                             {skill.creator && (
                                                 <DropdownMenuItem onClick={() => handleBlockUser(skill.creator.id, skill.creator.name)} className="cursor-pointer text-orange-600">
-                                                    <Ban className="mr-2 h-4 w-4" />
+                                                    <Ban className="me-2 h-4 w-4" />
                                                     <span>{__('freelance.block_user_skills', undefined, 'Block User')}</span>
                                                 </DropdownMenuItem>
                                             )}
 
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem onClick={() => handleDelete(skill.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
-                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                <Trash2 className="me-2 h-4 w-4" />
                                                 <span>{__('freelance.delete')}</span>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>

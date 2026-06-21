@@ -106,10 +106,10 @@ export default function TikTokBoosterRunner({ tool }: any) {
                                 onClick={() => setType(m)}
                                 className={`h-8 px-4 text-xs font-bold transition-all ${type === m ? 'bg-slate-900 text-white shadow-sm hover:bg-slate-800' : 'text-slate-500 hover:text-slate-900 hover:bg-white'}`}
                             >
-                                {m === 'views' && <Video className="w-3.5 h-3.5 mr-2" />}
-                                {m === 'shares' && <Share2 className="w-3.5 h-3.5 mr-2" />}
-                                {m === 'favorites' && <Star className="w-3.5 h-3.5 mr-2" />}
-                                {m === 'hearts' && <Heart className="w-3.5 h-3.5 mr-2" />}
+                                {m === 'views' && <Video className="w-3.5 h-3.5 me-2" />}
+                                {m === 'shares' && <Share2 className="w-3.5 h-3.5 me-2" />}
+                                {m === 'favorites' && <Star className="w-3.5 h-3.5 me-2" />}
+                                {m === 'hearts' && <Heart className="w-3.5 h-3.5 me-2" />}
                                 {m.charAt(0).toUpperCase() + m.slice(1)}
                             </Button>
                         ))}
@@ -139,14 +139,14 @@ export default function TikTokBoosterRunner({ tool }: any) {
                     <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                         <h2 className="text-lg font-bold">{__('general.active_past_campaigns')}</h2>
                         <Button variant="ghost" size="sm" onClick={fetchCampaigns}>
-                            <RefreshCw className="w-4 h-4 mr-2" /> Refresh
+                            <RefreshCw className="w-4 h-4 me-2" /> Refresh
                         </Button>
                     </div>
                     
                     {campaigns.length === 0 ? (
                         <div className="p-12 text-center text-slate-500">{__('general.no_campaigns_yet_1')}</div>
                     ) : (
-                        <table className="w-full text-sm text-left">
+                        <table className="w-full text-sm text-start">
                             <thead className="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase">
                                 <tr>
                                     <th className="px-6 py-4 tracking-wider">URL</th>
@@ -154,7 +154,7 @@ export default function TikTokBoosterRunner({ tool }: any) {
                                     <th className="px-6 py-4 tracking-wider">Status</th>
                                     <th className="px-6 py-4 tracking-wider">Counter</th>
                                     <th className="px-6 py-4 tracking-wider">Cooldown</th>
-                                    <th className="px-6 py-4 tracking-wider text-right">Actions</th>
+                                    <th className="px-6 py-4 tracking-wider text-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -177,7 +177,7 @@ export default function TikTokBoosterRunner({ tool }: any) {
                                         <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500">
                                             {camp.cooldown > 0 ? `${camp.cooldown}s` : '-'}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                                        <td className="px-6 py-4 whitespace-nowrap text-end">
                                             <Button variant="ghost" size="sm" onClick={() => handleDeleteCampaign(camp.id)} className="text-rose-500 hover:text-rose-700 hover:bg-rose-50">
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>

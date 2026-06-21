@@ -131,7 +131,7 @@ export default function Calculator({ input, result, amount_to_pay, calculation_t
                                 <div>
                                     <h3 className="font-semibold text-blue-900 mb-1">Choose Your Payment Method</h3>
                                     <p className="text-sm text-blue-800 mb-2">Select how you want to pay and receive money. This tool handles 2 different scenarios:</p>
-                                    <ul className="text-sm text-blue-800 list-disc pl-5 space-y-1">
+                                    <ul className="text-sm text-blue-800 list-disc ps-5 space-y-1">
                                         <li><strong>Visa/Master:</strong> Pay with credit card to receive funds</li>
                                         <li><strong>Mobile Wallet:</strong> Pay from mobile wallet to receive funds</li>
                                     </ul>
@@ -172,12 +172,12 @@ export default function Calculator({ input, result, amount_to_pay, calculation_t
                         <div className="space-y-2 pt-4">
                             <Label className="text-base font-semibold">Initial Amount (EGP)</Label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                     <span className="text-slate-500 sm:text-sm">EGP</span>
                                 </div>
                                 <Input
                                     type="number"
-                                    className="pl-12 h-14 text-lg"
+                                    className="ps-12 h-14 text-lg"
                                     placeholder="Enter balance to process (e.g. 1000)"
                                     value={amount}
                                     onChange={e => setAmount(e.target.value)}
@@ -191,14 +191,14 @@ export default function Calculator({ input, result, amount_to_pay, calculation_t
                         {amountToPay !== null && amountToPay > 0 && (
                             <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border rounded-xl overflow-hidden shadow-sm">
-                                    <div className="bg-white p-6 border-b md:border-b-0 md:border-r border-slate-100">
+                                    <div className="bg-white p-6 border-b md:border-b-0 md:border-e border-slate-100">
                                         <p className="text-sm font-medium text-slate-500 mb-1">You Receive</p>
                                         <div className="flex items-baseline gap-1">
                                             <span className="text-3xl font-bold text-emerald-600">{formatNumber(receiveAmount)}</span>
                                             <span className="text-sm font-medium text-emerald-600/70">EGP</span>
                                         </div>
                                     </div>
-                                    <div className="bg-white p-6 border-b md:border-b-0 md:border-r border-slate-100">
+                                    <div className="bg-white p-6 border-b md:border-b-0 md:border-e border-slate-100">
                                         <p className="text-sm font-medium text-slate-500 mb-1">Amount to Pay</p>
                                         <div className="flex items-baseline gap-1">
                                             <span className="text-3xl font-bold text-indigo-600">{formatNumber(amountToPay)}</span>
@@ -294,7 +294,7 @@ export default function Calculator({ input, result, amount_to_pay, calculation_t
                                         {isLoggedIn ? (
                                             <>
                                                 <Button className="w-full h-12 text-base font-semibold" disabled={!signedPayUrl} onClick={() => window.location.href = signedPayUrl}>
-                                                    <CreditCard className="w-5 h-5 mr-2" /> Secure Checkout
+                                                    <CreditCard className="w-5 h-5 me-2" /> Secure Checkout
                                                 </Button>
                                                 <Button variant="outline" className="w-full" onClick={() => router.get(route('dashboard'))}>
                                                     Back to Dashboard

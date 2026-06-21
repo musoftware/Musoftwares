@@ -65,7 +65,7 @@ export default function ShowTransaction({ transaction }: Props) {
                     icon={Activity}
                     actions={
                         <Button variant="outline" size="sm" onClick={() => router.get(route('erp.dashboard', { section: 'transactions' }))}>
-                            <ArrowLeft className="w-4 h-4 mr-2" />{__('general.back_to_ledger')}</Button>
+                            <ArrowLeft className="w-4 h-4 me-2" />{__('general.back_to_ledger')}</Button>
                     }
                 />
 
@@ -79,7 +79,7 @@ export default function ShowTransaction({ transaction }: Props) {
                                         <CardDescription className="mt-1">{transaction.note}</CardDescription>
                                     </div>
                                     <Badge variant={isCredit ? 'default' : 'secondary'} className={isCredit ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}>
-                                        {isCredit ? <ArrowDownLeft className="w-4 h-4 mr-1" /> : <ArrowUpRight className="w-4 h-4 mr-1" />}
+                                        {isCredit ? <ArrowDownLeft className="w-4 h-4 me-1" /> : <ArrowUpRight className="w-4 h-4 me-1" />}
                                         {transaction.direction}
                                     </Badge>
                                 </div>
@@ -88,12 +88,12 @@ export default function ShowTransaction({ transaction }: Props) {
                                 <div className="grid grid-cols-2 gap-8 py-4">
                                     <div>
                                         <span className="text-sm font-medium text-slate-500 flex items-center mb-1">
-                                            <Hash className="w-4 h-4 mr-2" />{__('general.reference_id')}</span>
+                                            <Hash className="w-4 h-4 me-2" />{__('general.reference_id')}</span>
                                         <span className="text-lg font-mono font-semibold text-slate-900">{transaction.reference_id}</span>
                                     </div>
                                     <div>
                                         <span className="text-sm font-medium text-slate-500 flex items-center mb-1">
-                                            <DollarSign className="w-4 h-4 mr-2" />{__('general.business_amount')}</span>
+                                            <DollarSign className="w-4 h-4 me-2" />{__('general.business_amount')}</span>
                                         <span className={`text-2xl font-bold tracking-tight ${isCredit ? 'text-emerald-600' : 'text-rose-600'}`}>
                                             {isCredit ? '+' : '-'}
                                             <CurrencyDisplay amount={transaction.business_amount} currency={transaction.business_currency} />
@@ -102,7 +102,7 @@ export default function ShowTransaction({ transaction }: Props) {
                                     
                                     <div>
                                         <span className="text-sm font-medium text-slate-500 flex items-center mb-1">
-                                            <User className="w-4 h-4 mr-2" />
+                                            <User className="w-4 h-4 me-2" />
                                             Client
                                         </span>
                                         {transaction.client_id ? (
@@ -116,7 +116,7 @@ export default function ShowTransaction({ transaction }: Props) {
 
                                     <div>
                                         <span className="text-sm font-medium text-slate-500 flex items-center mb-1">
-                                            <Calendar className="w-4 h-4 mr-2" />{__('general.date_time_1')}</span>
+                                            <Calendar className="w-4 h-4 me-2" />{__('general.date_time_1')}</span>
                                         <span className="text-base font-medium text-slate-900">{transaction.date}</span>
                                     </div>
                                 </div>

@@ -71,7 +71,7 @@ export default function WebToolsLayout({ children, title, activeNav = '' }: WebT
                                         Financial
                                         <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
                                     </button>
-                                    <div className="absolute top-full left-0 w-64 bg-white border border-slate-200 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2 flex flex-col gap-1 z-50">
+                                    <div className="absolute top-full start-0 w-64 bg-white border border-slate-200 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2 flex flex-col gap-1 z-50">
                                         {financialTools.map((tool, idx) => {
                                             const Icon = tool.icon;
                                             return (
@@ -89,7 +89,7 @@ export default function WebToolsLayout({ children, title, activeNav = '' }: WebT
                                         Utilities
                                         <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
                                     </button>
-                                    <div className="absolute top-full left-0 w-64 bg-white border border-slate-200 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2 flex flex-col gap-1 z-50">
+                                    <div className="absolute top-full start-0 w-64 bg-white border border-slate-200 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2 flex flex-col gap-1 z-50">
                                         {utilityTools.map((tool, idx) => {
                                             const Icon = tool.icon;
                                             return (

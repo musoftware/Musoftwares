@@ -1,0 +1,52 @@
+graph TD
+    Client[Browser / Client SPA]
+    
+    subgraph Frontend[Frontend: React + Inertia.js]
+        ReactUI[React 18.2 UI Components<br>Tailwind CSS v4 + Shadcn]
+        State[Zustand / React Context]
+        InertiaClient[Inertia.js Client]
+        ReactUI --> State
+        ReactUI --> InertiaClient
+    end
+
+    subgraph Backend[Backend: Laravel Modular Monolith]
+        InertiaServer[Inertia.js Server Adapter]
+        
+        subgraph CoreApp[Core Application - app/]
+            Controllers[Thin Controllers]
+            Services[Business Services<br>app/Services/]
+            Models[Core Models]
+        end
+        
+        subgraph Modules[nwidart/laravel-modules]
+            ERP[ERP Module]
+            CRM[CRM Module]
+            Billing[Billing Module]
+            Booking[Booking Module]
+            Marketplace[Marketplace Module]
+            Fbmb[Fbmb Module]
+            Freelance[Freelance Module]
+        end
+        
+        InertiaServer --> Controllers
+        Controllers --> Services
+        Controllers --> Modules
+        Services --> Models
+        Modules --> Models
+    end
+    
+    subgraph Infrastructure
+        DB[(Database<br>MySQL/PostgreSQL/SQLite)]
+        Redis[(Redis Cache/Queues)]
+        Scout[Meilisearch]
+        Reverb[Laravel Reverb WebSocket]
+    end
+
+    Client -->|HTTP / Inertia Requests| Frontend
+    InertiaClient -->|JSON/Inertia Protocol| InertiaServer
+    Client <-->|WebSockets| Reverb
+    
+    Models --> DB
+    Services --> Redis
+    Models --> Scout
+    Reverb --> Backend

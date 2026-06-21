@@ -41,7 +41,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                     href="/admin/users/co-work"
                     className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
                 >
-                    <ArrowLeft className="w-4 h-4 mr-1" />{__('general.back_to_co_work')}</Link>
+                    <ArrowLeft className="w-4 h-4 me-1" />{__('general.back_to_co_work')}</Link>
             </div>
 
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden max-w-4xl">
@@ -79,15 +79,15 @@ export default function LegacyCoWorkerShow({ worker }) {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem asChild>
                                     <Link href={`/admin/users/legacy-coworker/${worker.id}/edit`} className="cursor-pointer flex items-center">
-                                        <Edit className="w-4 h-4 mr-2 text-slate-500" />{__('general.edit_co_worker')}</Link>
+                                        <Edit className="w-4 h-4 me-2 text-slate-500" />{__('general.edit_co_worker')}</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => setIsCreateUserDialogOpen(true)} className="cursor-pointer">
-                                    <UserPlus className="w-4 h-4 mr-2 text-slate-500" />{__('general.create_user_account')}</DropdownMenuItem>
+                                    <UserPlus className="w-4 h-4 me-2 text-slate-500" />{__('general.create_user_account')}</DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => setIsResetPasswordDialogOpen(true)} className="cursor-pointer">
-                                    <KeyRound className="w-4 h-4 mr-2 text-slate-500" />{__('general.reset_password')}</DropdownMenuItem>
+                                    <KeyRound className="w-4 h-4 me-2 text-slate-500" />{__('general.reset_password')}</DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)} className="cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50">
-                                    <Trash2 className="w-4 h-4 mr-2" />{__('general.delete_co_worker')}</DropdownMenuItem>
+                                    <Trash2 className="w-4 h-4 me-2" />{__('general.delete_co_worker')}</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

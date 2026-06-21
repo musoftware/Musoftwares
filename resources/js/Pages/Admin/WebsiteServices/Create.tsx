@@ -42,7 +42,7 @@ export default function Create() {
                         </div>
                         <div className="space-y-2">
                             <Label>Title (Arabic)</Label>
-                            <Input value={data.title_ar} onChange={e => setData('title_ar', e.target.value)} required dir="rtl" />
+                            <Input value={data.title_ar} onChange={e => setData('title_ar', e.target.value)} required  />
                             {errors.title_ar && <p className="text-sm text-red-600">{errors.title_ar}</p>}
                         </div>
                     </div>
@@ -54,7 +54,7 @@ export default function Create() {
                         </div>
                         <div className="space-y-2">
                             <Label>Subtitle (Arabic)</Label>
-                            <Input value={data.subtitle_ar} onChange={e => setData('subtitle_ar', e.target.value)} dir="rtl" />
+                            <Input value={data.subtitle_ar} onChange={e => setData('subtitle_ar', e.target.value)}  />
                             {errors.subtitle_ar && <p className="text-sm text-red-600">{errors.subtitle_ar}</p>}
                         </div>
                     </div>
@@ -66,7 +66,7 @@ export default function Create() {
                         </div>
                         <div className="space-y-2">
                             <Label>Description (Arabic)</Label>
-                            <Textarea value={data.description_ar} onChange={e => setData('description_ar', e.target.value)} rows={4} dir="rtl" />
+                            <Textarea value={data.description_ar} onChange={e => setData('description_ar', e.target.value)} rows={4}  />
                             {errors.description_ar && <p className="text-sm text-red-600">{errors.description_ar}</p>}
                         </div>
                     </div>
@@ -94,7 +94,7 @@ export default function Create() {
                             </div>
                             <div className="space-y-2">
                                 <Label>SEO Title (Arabic)</Label>
-                                <Input value={data.seo_title_ar} onChange={e => setData('seo_title_ar', e.target.value)} dir="rtl" maxLength={60} />
+                                <Input value={data.seo_title_ar} onChange={e => setData('seo_title_ar', e.target.value)}  maxLength={60} />
                             </div>
                         </div>
 
@@ -105,7 +105,7 @@ export default function Create() {
                             </div>
                             <div className="space-y-2">
                                 <Label>SEO Description (Arabic)</Label>
-                                <Textarea value={data.seo_description_ar} onChange={e => setData('seo_description_ar', e.target.value)} rows={3} dir="rtl" maxLength={160} />
+                                <Textarea value={data.seo_description_ar} onChange={e => setData('seo_description_ar', e.target.value)} rows={3}  maxLength={160} />
                             </div>
                         </div>
 
@@ -116,7 +116,7 @@ export default function Create() {
                             </div>
                             <div className="space-y-2">
                                 <Label>SEO Keywords (Arabic) - Comma separated</Label>
-                                <Input value={data.seo_keywords_ar} onChange={e => setData('seo_keywords_ar', e.target.value)} dir="rtl" />
+                                <Input value={data.seo_keywords_ar} onChange={e => setData('seo_keywords_ar', e.target.value)}  />
                             </div>
                         </div>
                     </div>

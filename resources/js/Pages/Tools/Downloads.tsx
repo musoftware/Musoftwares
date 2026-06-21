@@ -131,7 +131,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                             <CardFooter className="flex items-center gap-2 pt-0">
                                 <a href={route('runtime.download')} target="_blank" rel="noreferrer">
                                     <Button size="sm" variant="outline" className="text-xs h-8 bg-white dark:bg-slate-900">
-                                        <Download className="h-3 w-3 mr-1.5" />{__('general.download_app')}</Button>
+                                        <Download className="h-3 w-3 me-1.5" />{__('general.download_app')}</Button>
                                 </a>
                                 <a href={`http://${host}:18400/setup`} target="_blank" className="text-xs text-indigo-600 hover:underline" rel="noreferrer">
                                     Check Status →
@@ -143,7 +143,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                         <Card className="flex flex-col border-emerald-100 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-none">
                             <CardHeader className="pb-2">
                                 <CardTitle className="flex items-center gap-3 text-sm">
-                                    <Globe className="h-5 w-5 text-emerald-500" />{__('general.browser_extension')}<Badge className="ml-2 text-[10px] uppercase tracking-wider bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800 shadow-none">
+                                    <Globe className="h-5 w-5 text-emerald-500" />{__('general.browser_extension')}<Badge className="ms-2 text-[10px] uppercase tracking-wider bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800 shadow-none">
                                         New
                                     </Badge>
                                 </CardTitle>
@@ -154,7 +154,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                             <CardFooter className="pt-0">
                                 <a href={route('tools.download.agent', 'extension')}>
                                     <Button size="sm" className="text-xs h-8 bg-emerald-600 hover:bg-emerald-500 text-white border-0">
-                                        <Download className="h-3 w-3 mr-1.5" />{__('general.download_extension')}</Button>
+                                        <Download className="h-3 w-3 me-1.5" />{__('general.download_extension')}</Button>
                                 </a>
                             </CardFooter>
                         </Card>
@@ -183,7 +183,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                                             <code className="text-xs text-slate-400 font-mono">v{d.version}</code>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3 shrink-0 ml-4">
+                                    <div className="flex items-center gap-3 shrink-0 ms-4">
                                         <span className="text-xs text-slate-400">{d.downloaded_at}</span>
                                         <Link href={route('tools.show', d.tool.slug)}>
                                             <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-indigo-600">

@@ -51,7 +51,7 @@ export function PricingPanel({ plans, toolSlug, isAuthed }: PricingPanelProps) {
                         >
                             {c}
                             {c === 'yearly' && (
-                                <span className={`ml-1 ${cycle === 'yearly' ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                <span className={`ms-1 ${cycle === 'yearly' ? 'text-emerald-600' : 'text-slate-400'}`}>
                                     −20%
                                 </span>
                             )}
@@ -87,7 +87,7 @@ export function PricingPanel({ plans, toolSlug, isAuthed }: PricingPanelProps) {
                             }`}
                         >
                             {isPopular && (
-                                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500" />
+                                <div className="absolute top-0 start-0 end-0 h-0.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500" />
                             )}
 
                             <div className="p-4 space-y-3">
@@ -115,7 +115,7 @@ export function PricingPanel({ plans, toolSlug, isAuthed }: PricingPanelProps) {
                                         /mo
                                     </span>
                                     {cycle === 'yearly' && computedSavings > 0 && (
-                                        <span className={`text-xs mb-1 ml-1 font-medium ${isPopular ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                                        <span className={`text-xs mb-1 ms-1 font-medium ${isPopular ? 'text-emerald-400' : 'text-emerald-600'}`}>
                                             Save {computedSavings}%
                                         </span>
                                     )}
@@ -144,7 +144,7 @@ export function PricingPanel({ plans, toolSlug, isAuthed }: PricingPanelProps) {
                                         `Get ${plan.name}`
                                     ) : (
                                         <>
-                                            <LogIn className="h-3.5 w-3.5 mr-1.5" />{__('general.sign_in_to_subscribe')}</>
+                                            <LogIn className="h-3.5 w-3.5 me-1.5" />{__('general.sign_in_to_subscribe')}</>
                                     )}
                                 </Button>
                             </div>

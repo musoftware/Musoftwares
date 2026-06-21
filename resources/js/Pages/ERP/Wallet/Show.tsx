@@ -44,7 +44,7 @@ export default function Show({ wallet, transactions, client }: WalletShowProps) 
                 {/* Header */}
                 <div className="space-y-2">
                     <Link href={route('erp.clients.show', activeClient.id)} className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                        <ArrowLeft className="mr-2 h-4 w-4" /> {__('erp.back_to_client')}
+                        <ArrowLeft className="me-2 h-4 w-4" /> {__('erp.back_to_client')}
                     </Link>
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
@@ -113,11 +113,11 @@ export default function Show({ wallet, transactions, client }: WalletShowProps) 
                             <Table>
                                 <TableHeader>
                                     <TableRow className="hover:bg-transparent border-slate-100">
-                                        <TableHead className="pl-6 text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('general.type')}</TableHead>
+                                        <TableHead className="ps-6 text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('general.type')}</TableHead>
                                         <TableHead className="text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('general.amount')}</TableHead>
                                         <TableHead className="text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('erp.project')}</TableHead>
                                         <TableHead className="text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('general.note')}</TableHead>
-                                        <TableHead className="pr-6 text-right text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('general.date')}</TableHead>
+                                        <TableHead className="pe-6 text-end text-xs font-semibold uppercase text-slate-500 tracking-wider">{__('general.date')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -128,7 +128,7 @@ export default function Show({ wallet, transactions, client }: WalletShowProps) 
                                         
                                         return (
                                             <TableRow key={tx.id} className="hover:bg-slate-50/50 border-slate-50">
-                                                <TableCell className="pl-6 py-4">
+                                                <TableCell className="ps-6 py-4">
                                                     <Badge variant="secondary" className={`font-medium tracking-wide text-[10px] ${typeConfig.bgColor} ${typeConfig.color} hover:${typeConfig.bgColor} gap-1`}>
                                                         <TypeIcon className="w-3 h-3" />
                                                         {__(typeConfig.label)}
@@ -152,7 +152,7 @@ export default function Show({ wallet, transactions, client }: WalletShowProps) 
                                                 <TableCell className="max-w-[250px] truncate text-sm text-slate-700 py-4" title={tx.note}>
                                                     {tx.note || '—'}
                                                 </TableCell>
-                                                <TableCell className="pr-6 text-right text-slate-400 text-xs py-4">
+                                                <TableCell className="pe-6 text-end text-slate-400 text-xs py-4">
                                                     <DateDisplay date={tx.created_at} />
                                                 </TableCell>
                                             </TableRow>

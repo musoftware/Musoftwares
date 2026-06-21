@@ -54,7 +54,7 @@ export default function ContractView({ contract }: Props) {
                             <h2 className="text-xl font-bold text-gray-900">{contract.project_name}</h2>
                             <p className="text-gray-600 mt-1">Prepared for: <span className="font-semibold text-gray-900">{contract.client_name}</span></p>
                         </div>
-                        <div className="text-left md:text-right">
+                        <div className="text-start md:text-end">
                             <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold">{__('general.total_amount')}</p>
                             <p className="text-3xl font-bold text-gray-900 mt-1">{formatMoney(contract.total_amount, contract.currency)}</p>
                         </div>
@@ -70,7 +70,7 @@ export default function ContractView({ contract }: Props) {
                         {isSigned ? (
                             <div className="rounded-lg bg-green-50 p-6 border border-green-200">
                                 <div className="flex items-center">
-                                    <CheckCircle className="h-8 w-8 text-green-500 mr-4" />
+                                    <CheckCircle className="h-8 w-8 text-green-500 me-4" />
                                     <div>
                                         <h3 className="text-lg font-medium text-green-800">{__('general.contract_signed')}</h3>
                                         <p className="mt-1 text-sm text-green-700">{__('general.signed_by')}<span className="font-semibold">{contract.client_signature}</span> on {new Date(contract.signed_at!).toLocaleString()}
@@ -82,7 +82,7 @@ export default function ContractView({ contract }: Props) {
                             <Card className="border-0 shadow-none bg-transparent">
                                 <CardHeader className="px-0 pt-0">
                                     <CardTitle className="text-xl flex items-center">
-                                        <CheckSquare className="mr-2 h-5 w-5 text-gray-700" />{__('general.digital_signature')}</CardTitle>
+                                        <CheckSquare className="me-2 h-5 w-5 text-gray-700" />{__('general.digital_signature')}</CardTitle>
                                     <CardDescription className="text-base text-gray-600">{__('general.by_typing_your_full_name_below_and_clicking_sign_contract_you_agree_to_be_legally_bound_by_the_terms_above')}</CardDescription>
                                 </CardHeader>
                                 <form onSubmit={submit}>

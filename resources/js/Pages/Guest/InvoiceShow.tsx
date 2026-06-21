@@ -39,7 +39,7 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
                         <Card>
                             <CardHeader>
                                 <CardTitle className="text-xl flex items-center">
-                                    <FileText className="w-5 h-5 mr-2 text-blue-600" />
+                                    <FileText className="w-5 h-5 me-2 text-blue-600" />
                                     {__('general.invoice_items')}
                                 </CardTitle>
                             </CardHeader>
@@ -73,7 +73,7 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
                         <Card>
                             <CardHeader>
                                 <CardTitle className="text-lg flex items-center">
-                                    <User className="w-5 h-5 mr-2 text-gray-400" />
+                                    <User className="w-5 h-5 me-2 text-gray-400" />
                                     {__('general.client_details')}
                                 </CardTitle>
                             </CardHeader>
@@ -97,7 +97,7 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
                         <Card className="sticky top-6">
                             <CardHeader className="bg-blue-600 text-white rounded-t-xl">
                                 <CardTitle className="flex items-center text-lg">
-                                    <CreditCard className="w-5 h-5 mr-2" />
+                                    <CreditCard className="w-5 h-5 me-2" />
                                     {__('general.payment')}
                                 </CardTitle>
                             </CardHeader>

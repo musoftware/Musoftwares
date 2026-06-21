@@ -88,7 +88,7 @@ export default function Install({ androidAppUrl, macrodroidUrl, macrodroidToken 
                                     </div>
                                     <Button asChild size="lg" className="mt-2">
                                         <a href={androidAppUrl} target="_blank" rel="noopener noreferrer">
-                                            <Download className="w-4 h-4 mr-2" />
+                                            <Download className="w-4 h-4 me-2" />
                                             {__('admin.download')}
                                         </a>
                                     </Button>
@@ -142,7 +142,7 @@ export default function Install({ androidAppUrl, macrodroidUrl, macrodroidToken 
                                                 </p>
                                                 <Button variant="link" className="p-0 h-auto text-sm" asChild>
                                                     <a href="https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid" target="_blank" rel="noopener noreferrer">
-                                                        {__('admin.open_in_playstore')} <ExternalLink className="w-3 h-3 ml-1" />
+                                                        {__('admin.open_in_playstore')} <ExternalLink className="w-3 h-3 ms-1" />
                                                     </a>
                                                 </Button>
                                             </div>

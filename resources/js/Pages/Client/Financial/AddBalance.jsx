@@ -65,7 +65,7 @@ export default function AddBalance({ wallet }) {
                         href={safeRoute('dashboard', undefined, '/dashboard')}
                         className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                     >
-                        <ArrowLeft className="mr-2 h-4 w-4" />{__('general.back_to_dashboard')}</Link>
+                        <ArrowLeft className="me-2 h-4 w-4" />{__('general.back_to_dashboard')}</Link>
                     <h1 className="text-2xl font-semibold tracking-tight">{__('general.add_balance')}</h1>
                     <p className="text-sm text-muted-foreground">{__('general.top_up_your_wallet_to_pay_for_subscriptions_and_platform_services')}</p>
                 </div>
@@ -129,7 +129,7 @@ export default function AddBalance({ wallet }) {
                             <div className="space-y-1.5 max-w-xs">
                                 <Label htmlFor="custom-amount" className="text-sm font-medium">{__('general.custom_amount')}</Label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm pointer-events-none">
+                                    <span className="absolute start-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm pointer-events-none">
                                         {walletCurrency}
                                     </span>
                                     <Input
@@ -140,7 +140,7 @@ export default function AddBalance({ wallet }) {
                                         placeholder="0.00"
                                         value={customAmount}
                                         onChange={handleCustomChange}
-                                        className={`pl-12 shadow-none ${
+                                        className={`ps-12 shadow-none ${
                                             customAmount && !selectedPreset
                                                 ? 'border-primary ring-1 ring-primary'
                                                 : 'border-slate-200'
@@ -179,7 +179,7 @@ export default function AddBalance({ wallet }) {
                                     <p className="text-sm font-semibold text-slate-900">{__('general.kashier_card_amp_wallet')}</p>
                                     <p className="text-xs text-slate-500">{__('general.visa_mastercard_and_digital_wallets_accepted')}</p>
                                 </div>
-                                <div className="ml-auto w-2 h-2 rounded-full bg-emerald-500" />
+                                <div className="ms-auto w-2 h-2 rounded-full bg-emerald-500" />
                             </div>
                         </CardContent>
                     </Card>

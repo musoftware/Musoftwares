@@ -80,7 +80,7 @@ export default function OrdersIndex({ orders, filters }: any) {
                                 <SelectItem value="cancelled">Cancelled</SelectItem>
                             </SelectContent>
                         </Select>
-                        <Button variant="outline" onClick={handleSearch} className="ml-auto">{__('general.apply_filters')}</Button>
+                        <Button variant="outline" onClick={handleSearch} className="ms-auto">{__('general.apply_filters')}</Button>
                     </div>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -90,10 +90,10 @@ export default function OrdersIndex({ orders, filters }: any) {
                                 <TableHead className="font-semibold text-gray-600">{__('general.order_id')}</TableHead>
                                 <TableHead className="font-semibold text-gray-600">{__('general.customer_details')}</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Location</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-right">Total (EGP)</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">Total (EGP)</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Status</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Date</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-right">Actions</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -118,7 +118,7 @@ export default function OrdersIndex({ orders, filters }: any) {
                                                 {order.customer_address}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-end">
                                             <div className="font-semibold text-gray-900">{order.total.toLocaleString()}</div>
                                             <div className="text-xs text-green-600 mt-0.5">Comm: {order.commission.toLocaleString()}</div>
                                         </TableCell>
@@ -133,7 +133,7 @@ export default function OrdersIndex({ orders, filters }: any) {
                                                 {new Date(order.created_at).toLocaleTimeString('en-GB')}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-end">
                                             <div className="flex justify-end gap-2">
                                                 <Select onValueChange={(val) => handleStatusUpdate(order.id, String(val))}>
                                                     <SelectTrigger className="w-[130px] h-8 text-xs">

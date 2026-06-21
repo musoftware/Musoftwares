@@ -29,14 +29,14 @@ export default function Create() {
             <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
                 <div className="mb-6">
                     <Link href={route('isaas.proposals.index')} className="text-sm font-medium text-gray-500 hover:text-gray-900 flex items-center">
-                        <ArrowLeft className="mr-1 h-4 w-4" />{__('general.back_to_proposals')}</Link>
+                        <ArrowLeft className="me-1 h-4 w-4" />{__('general.back_to_proposals')}</Link>
                 </div>
 
                 <Card className="border-0 shadow-lg bg-white overflow-hidden">
                     <div className="h-2 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
                     <CardHeader className="pb-4">
                         <CardTitle className="text-2xl flex items-center">
-                            <Sparkles className="mr-2 h-6 w-6 text-purple-500" />{__('general.generate_ai_estimate')}</CardTitle>
+                            <Sparkles className="me-2 h-6 w-6 text-purple-500" />{__('general.generate_ai_estimate')}</CardTitle>
                         <CardDescription className="text-base">{__('general.describe_your_client_s_project_requirements_in_plain_text_and_our_ai_will_generate_a_professional_cost_breakdown_and_timeline')}</CardDescription>
                     </CardHeader>
                     
@@ -109,7 +109,7 @@ export default function Create() {
                             <Button type="submit" disabled={processing} size="lg" className="w-full sm:w-auto bg-black text-white hover:bg-gray-800">
                                 {processing ? (
                                     <>
-                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />{__('general.generating_estimate')}</>
+                                        <Loader2 className="me-2 h-5 w-5 animate-spin" />{__('general.generating_estimate')}</>
                                 ) : (
                                     <>{__('general.generate_ai_proposal')}</>
                                 )}

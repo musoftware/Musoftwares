@@ -57,13 +57,13 @@ export default function BackgroundTaskStatus() {
     if (!user || tasks.length === 0 || !isOpen) return null;
 
     return (
-        <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full">
+        <div className="fixed bottom-4 end-4 z-50 flex flex-col gap-2 max-w-sm w-full">
             {tasks.map(task => (
                 <div key={task.id} className="bg-background border shadow-lg rounded-xl p-4 flex flex-col gap-3 relative animate-in slide-in-from-bottom-5">
                     <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="absolute top-2 right-2 h-6 w-6 text-muted-foreground hover:text-foreground"
+                        className="absolute top-2 end-2 h-6 w-6 text-muted-foreground hover:text-foreground"
                         onClick={() => dismissTask(task.id)}
                     >
                         <X className="h-4 w-4" />

@@ -66,7 +66,7 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
                     </div>
                     <div className="mt-4 sm:mt-0">
                         <Button onClick={() => setIsAdding(!isAdding)} className="bg-slate-900 text-white hover:bg-slate-800">
-                            <Plus className="w-4 h-4 mr-2" />{__('general.add_exception')}</Button>
+                            <Plus className="w-4 h-4 me-2" />{__('general.add_exception')}</Button>
                     </div>
                 </div>
 

@@ -138,13 +138,13 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                         <h3 className="font-semibold text-slate-800 text-sm">{__('general.workspace_registry')}</h3>
                         <form onSubmit={handleSearch} className="flex items-center gap-2 max-w-sm w-full">
                             <div className="relative w-full">
-                                <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                                <Search className="absolute start-3 top-3 h-4 w-4 text-slate-400" />
                                 <Input 
                                     type="text" 
                                     placeholder={__('general.search_by_name_owner_or_email')} 
                                     value={search}
                                     onChange={e => setSearch(e.target.value)}
-                                    className="pl-9 h-10 shadow-none border-slate-200 focus-visible:ring-indigo-500"
+                                    className="ps-9 h-10 shadow-none border-slate-200 focus-visible:ring-indigo-500"
                                 />
                             </div>
                             <Button type="submit" size="sm" className="h-10 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-none border-0">
@@ -154,7 +154,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                     </div>
 
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm border-collapse">
+                        <table className="w-full text-start text-sm border-collapse">
                             <thead>
                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                     <th className="px-6 py-3.5">{__('general.workspace_name')}</th>
@@ -162,9 +162,9 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                     <th className="px-6 py-3.5 text-center">Clients</th>
                                     <th className="px-6 py-3.5 text-center">Invoices</th>
                                     <th className="px-6 py-3.5 text-center">{__('general.team_size')}</th>
-                                    <th className="px-6 py-3.5 text-right">Revenue</th>
+                                    <th className="px-6 py-3.5 text-end">Revenue</th>
                                     <th className="px-6 py-3.5">{__('general.created_at')}</th>
-                                    <th className="px-6 py-3.5 text-right">Actions</th>
+                                    <th className="px-6 py-3.5 text-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -209,13 +209,13 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                                     {tenant.team_count} staff
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-right font-bold text-slate-900 font-mono">
+                                            <td className="px-6 py-4 text-end font-bold text-slate-900 font-mono">
                                                 {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(tenant.revenue)}
                                             </td>
                                             <td className="px-6 py-4 text-slate-500 font-mono text-xs">
                                                 {tenant.created_at}
                                             </td>
-                                            <td className="px-6 py-4 text-right">
+                                            <td className="px-6 py-4 text-end">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <Link 
                                                         href={route('admin.erp.show', tenant.id)}

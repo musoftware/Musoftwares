@@ -107,13 +107,13 @@ export default function EditProfile({ profile, userSkills, availableSkills, revi
                             <div>
                                 <Label htmlFor="hourly_rate">{__('freelance.hourly_rate')}</Label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                                    <span className="absolute start-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
                                     <Input 
                                         id="hourly_rate"
                                         type="number"
                                         min="0"
                                         step="0.01"
-                                        className="pl-7"
+                                        className="ps-7"
                                         value={data.hourly_rate}
                                         onChange={e => setData('hourly_rate', e.target.value)}
                                     />
@@ -139,7 +139,7 @@ export default function EditProfile({ profile, userSkills, availableSkills, revi
                                     {skill.name}
                                     <button 
                                         onClick={() => removeSkill(skill.pivot.id)}
-                                        className="ml-2 hover:text-red-500 focus:outline-none"
+                                        className="ms-2 hover:text-red-500 focus:outline-none"
                                         title={__('general.remove')}
                                     >
                                         <X className="w-3 h-3" />
@@ -155,7 +155,7 @@ export default function EditProfile({ profile, userSkills, availableSkills, revi
                             <PopoverTrigger asChild>
                                 <Button variant="outline" role="combobox" aria-expanded={openSkillSearch} className="w-full sm:w-[300px] justify-between">
                                     <div className="flex items-center text-slate-500">
-                                        <Plus className="w-4 h-4 mr-2" />
+                                        <Plus className="w-4 h-4 me-2" />
                                         {__('freelance.add_skill')}
                                     </div>
                                 </Button>

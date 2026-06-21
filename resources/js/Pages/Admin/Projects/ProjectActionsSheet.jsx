@@ -34,7 +34,7 @@ export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-xl p-0 overflow-hidden bg-slate-50 border-slate-200 shadow-2xl rounded-xl">
-                <DialogHeader className="bg-slate-950 p-6 text-left space-y-0 border-b border-slate-800">
+                <DialogHeader className="bg-slate-950 p-6 text-start space-y-0 border-b border-slate-800">
                     <div className="flex items-center gap-4">
                         <Avatar className="h-12 w-12 bg-white/10 text-white">
                             <AvatarFallback className="bg-transparent text-lg font-bold">

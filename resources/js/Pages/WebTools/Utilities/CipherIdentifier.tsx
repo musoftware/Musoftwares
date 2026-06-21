@@ -245,12 +245,12 @@ export default function CipherIdentifier() {
                                             <p className="text-slate-600 mb-3">{match.description}</p>
                                             {match.preview && (
                                                 <div className="bg-slate-900 rounded-md p-3 relative group">
-                                                    <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <div className="absolute end-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <Button variant="secondary" size="icon" className="h-7 w-7" onClick={() => copyToClipboard(match.preview as string)}>
                                                             <Copy className="h-3.5 w-3.5" />
                                                         </Button>
                                                     </div>
-                                                    <pre className="text-xs text-slate-300 whitespace-pre-wrap font-mono break-all pr-8">
+                                                    <pre className="text-xs text-slate-300 whitespace-pre-wrap font-mono break-all pe-8">
                                                         {match.preview}
                                                     </pre>
                                                 </div>

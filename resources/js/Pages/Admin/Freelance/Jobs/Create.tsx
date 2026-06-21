@@ -30,7 +30,7 @@ export default function Create() {
     return (
         <AdminSidebarLayout title={__('freelance.create_job')} header={
             <div className="flex items-center space-x-2">
-                <Link href={route('admin.freelance.jobs.index')} className="text-gray-500 hover:text-gray-900 mr-2">
+                <Link href={route('admin.freelance.jobs.index')} className="text-gray-500 hover:text-gray-900 me-2">
                     <ArrowLeft className="h-5 w-5" />
                 </Link>
                 <span>{__('freelance.create_job')}</span>
@@ -154,7 +154,7 @@ export default function Create() {
                                 </Button>
                             </Link>
                             <Button type="submit" disabled={processing} className="shadow-sm">
-                                <Save className="mr-2 h-4 w-4" />
+                                <Save className="me-2 h-4 w-4" />
                                 {__('freelance.create_job')}
                             </Button>
                         </CardFooter>

@@ -488,7 +488,7 @@ export default function ExcelMergerRunner() {
         <div className="flex flex-col h-screen bg-slate-50 font-sans antialiased relative">
             {/* Top Bar */}
             <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm z-20 shrink-0">
-                <div className="flex items-center gap-2 overflow-x-auto pr-4">
+                <div className="flex items-center gap-2 overflow-x-auto pe-4">
                     <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" accept=".xlsx,.xls,.csv" />
                     
                     <select value={csvEncoding} onChange={(e) => setCsvEncoding(e.target.value)} className="h-8 text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 rounded-md px-2 outline-none">
@@ -525,14 +525,14 @@ export default function ExcelMergerRunner() {
                     </Button>
                 </div>
 
-                <div className="flex items-center gap-4 shrink-0 pl-4 border-l border-slate-200">
+                <div className="flex items-center gap-4 shrink-0 ps-4 border-s border-slate-200">
                     <div className="w-48 h-2.5 bg-slate-100 rounded-full overflow-hidden shrink-0">
                         <div 
                             className="h-full bg-indigo-500 transition-all duration-300" 
                             style={{ width: `${progressPercent}%` }} 
                         />
                     </div>
-                    <span className="text-xs font-bold text-slate-500 shrink-0 min-w-[100px] text-right">
+                    <span className="text-xs font-bold text-slate-500 shrink-0 min-w-[100px] text-end">
                         Count = {filteredData.length}
                     </span>
                 </div>
@@ -540,7 +540,7 @@ export default function ExcelMergerRunner() {
 
             <div className="flex-1 flex overflow-hidden">
                 {/* Left Panel */}
-                <div className="w-80 bg-slate-50 border-r border-slate-200 flex flex-col z-10 shrink-0">
+                <div className="w-80 bg-slate-50 border-e border-slate-200 flex flex-col z-10 shrink-0">
                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
                         {headers.length === 0 ? (
                             <div className="text-center p-8 text-slate-400 font-medium text-sm">
@@ -629,7 +629,7 @@ export default function ExcelMergerRunner() {
                                                                     newKw.splice(idx, 1);
                                                                     updateFilter(h, { keywords: newKw });
                                                                 }}
-                                                                className="text-slate-400 hover:text-rose-500 ml-2"
+                                                                className="text-slate-400 hover:text-rose-500 ms-2"
                                                             >
                                                                 <Minus className="w-3 h-3" />
                                                             </button>
@@ -656,7 +656,7 @@ export default function ExcelMergerRunner() {
                                             <span className="truncate font-medium text-emerald-800">
                                                 [{t.column}] {t.type} {t.text1} {t.text2 ? `-> ${t.text2}` : ''}
                                             </span>
-                                            <button onClick={() => removeTransformation(t.id)} className="text-rose-400 hover:text-rose-600 ml-2 shrink-0">
+                                            <button onClick={() => removeTransformation(t.id)} className="text-rose-400 hover:text-rose-600 ms-2 shrink-0">
                                                 <Minus className="w-3 h-3" />
                                             </button>
                                         </div>
@@ -729,12 +729,12 @@ export default function ExcelMergerRunner() {
                                 <p className="text-sm">Click "Upload" to select an Excel or CSV file.</p>
                             </div>
                         ) : (
-                            <table className="w-full text-left border-collapse text-xs whitespace-nowrap">
+                            <table className="w-full text-start border-collapse text-xs whitespace-nowrap">
                                 <thead>
                                     <tr>
-                                        <th className="sticky top-0 left-0 z-20 bg-slate-100 border-b border-r border-slate-200 px-3 py-2 font-bold text-slate-500 w-12 text-center shadow-[0_1px_0_#e2e8f0]">#</th>
+                                        <th className="sticky top-0 start-0 z-20 bg-slate-100 border-b border-e border-slate-200 px-3 py-2 font-bold text-slate-500 w-12 text-center shadow-[0_1px_0_#e2e8f0]">#</th>
                                         {headers.map((h, i) => (
-                                            <th key={i} className="sticky top-0 z-10 bg-slate-100 border-b border-r border-slate-200 px-3 py-2 font-bold text-slate-700 shadow-[0_1px_0_#e2e8f0]">
+                                            <th key={i} className="sticky top-0 z-10 bg-slate-100 border-b border-e border-slate-200 px-3 py-2 font-bold text-slate-700 shadow-[0_1px_0_#e2e8f0]">
                                                 {h}
                                             </th>
                                         ))}
@@ -745,11 +745,11 @@ export default function ExcelMergerRunner() {
                                         const globalIdx = (page - 1) * rowsPerPage + rIdx + 1;
                                         return (
                                             <tr key={rIdx} className="hover:bg-slate-50 transition-colors">
-                                                <td className="sticky left-0 z-10 bg-white border-b border-r border-slate-200 px-3 py-1.5 text-center text-slate-400 font-medium group-hover:bg-slate-50">
+                                                <td className="sticky start-0 z-10 bg-white border-b border-e border-slate-200 px-3 py-1.5 text-center text-slate-400 font-medium group-hover:bg-slate-50">
                                                     {globalIdx}
                                                 </td>
                                                 {headers.map((_, cIdx) => (
-                                                    <td key={cIdx} className="border-b border-r border-slate-100 px-3 py-1.5 text-slate-600 max-w-xs truncate" title={String(row[cIdx] || '')}>
+                                                    <td key={cIdx} className="border-b border-e border-slate-100 px-3 py-1.5 text-slate-600 max-w-xs truncate" title={String(row[cIdx] || '')}>
                                                         {row[cIdx] !== undefined ? String(row[cIdx]) : ''}
                                                     </td>
                                                 ))}
@@ -771,7 +771,7 @@ export default function ExcelMergerRunner() {
                     {/* Pagination Bar */}
                     {headers.length > 0 && (
                         <div className="bg-white border-t border-slate-200 p-2 flex items-center justify-between shrink-0 shadow-[0_-4px_10px_rgba(0,0,0,0.02)] z-10">
-                            <span className="text-xs font-bold text-slate-500 ml-2">
+                            <span className="text-xs font-bold text-slate-500 ms-2">
                                 Showing {(page - 1) * rowsPerPage + 1} to {Math.min(page * rowsPerPage, filteredData.length)} of {filteredData.length} entries
                             </span>
                             <div className="flex items-center gap-1">
@@ -891,7 +891,7 @@ export default function ExcelMergerRunner() {
 
             {/* Status Toast Overlay */}
             {progressMsg && status !== 'idle' && (
-                <div className="fixed bottom-6 right-6 bg-slate-800 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-4 z-50">
+                <div className="fixed bottom-6 end-6 bg-slate-800 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-4 z-50">
                     {status === 'running' && <RefreshCw className="w-4 h-4 animate-spin text-indigo-400" />}
                     {status === 'done' && <CheckCircle className="w-4 h-4 text-emerald-400" />}
                     {status === 'error' && <XCircle className="w-4 h-4 text-rose-400" />}

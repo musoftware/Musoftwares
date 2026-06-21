@@ -46,7 +46,7 @@ export function OperationalActionItem({
     return (
         <button 
             onClick={onClick} 
-            className="group flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white p-3 text-left shadow-sm transition-all hover:border-slate-300 hover:shadow-md"
+            className="group flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white p-3 text-start shadow-sm transition-all hover:border-slate-300 hover:shadow-md"
         >
             <div className="flex items-center gap-3">
                 <div className="rounded-lg bg-slate-50 p-2 transition-colors group-hover:bg-slate-100">

@@ -128,7 +128,7 @@ function MetricCard({ label, value, sub, icon: Icon, tooltip, accent = false, da
                     {Icon && (
                         <div className={`rounded-lg p-2 flex-shrink-0 relative bg-slate-50 ${href ? 'group-hover:bg-slate-100 transition-colors' : ''}`}>
                             <Icon className={`h-4 w-4 text-slate-500 ${href ? 'group-hover:opacity-0 transition-opacity' : ''}`} />
-                            {href && <ArrowUpRight className="h-4 w-4 text-slate-900 absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                            {href && <ArrowUpRight className="h-4 w-4 text-slate-900 absolute top-2 start-2 opacity-0 group-hover:opacity-100 transition-opacity" />}
                         </div>
                     )}
                 </div>
@@ -485,8 +485,8 @@ export default function EarningAnalyze({
                                 <TableHeader>
                                     <TableRow className="bg-slate-50">
                                         <TableHead className="text-xs">Currency</TableHead>
-                                        <TableHead className="text-right text-xs">Total</TableHead>
-                                        <TableHead className="text-right text-xs">Count</TableHead>
+                                        <TableHead className="text-end text-xs">Total</TableHead>
+                                        <TableHead className="text-end text-xs">Count</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -497,10 +497,10 @@ export default function EarningAnalyze({
                                                     {row.currency_code}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="text-right font-medium text-sm tabular-nums">
+                                            <TableCell className="text-end font-medium text-sm tabular-nums">
                                                 {formatMoney(row.total, row.currency_code)}
                                             </TableCell>
-                                            <TableCell className="text-right text-slate-500 text-sm">
+                                            <TableCell className="text-end text-slate-500 text-sm">
                                                 {row.count}
                                             </TableCell>
                                         </TableRow>
@@ -537,14 +537,14 @@ export default function EarningAnalyze({
                                         </span>
                                     </TableHead>
                                     <TableHead
-                                        className="text-right cursor-pointer select-none hover:text-slate-900 text-xs"
+                                        className="text-end cursor-pointer select-none hover:text-slate-900 text-xs"
                                         onClick={() => toggleSort('total_earned')}
                                     >
                                         <span className="flex items-center justify-end gap-1">
                                             Earned <SortIcon k="total_earned" />
                                         </span>
                                     </TableHead>
-                                    <TableHead className="w-12 text-right text-xs"></TableHead>
+                                    <TableHead className="w-12 text-end text-xs"></TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -571,10 +571,10 @@ export default function EarningAnalyze({
                                                 {earner.referral_count}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="text-right font-semibold text-green-700 text-sm tabular-nums">
+                                        <TableCell className="text-end font-semibold text-green-700 text-sm tabular-nums">
                                             {fmt(earner.total_earned)}
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-end">
                                             {earner.user_id && (
                                                 <Link
                                                     href={`/admin/users/${earner.user_id}`}
@@ -627,7 +627,7 @@ export default function EarningAnalyze({
                                     <TableHead className="w-10 text-xs">ID</TableHead>
                                     <TableHead className="text-xs">Earner</TableHead>
                                     <TableHead className="text-xs">{__('general.referred_user')}</TableHead>
-                                    <TableHead className="text-right text-xs">Amount</TableHead>
+                                    <TableHead className="text-end text-xs">Amount</TableHead>
                                     <TableHead className="text-xs">Status</TableHead>
                                     <TableHead className="text-xs">{__('general.clear_date')}</TableHead>
                                     <TableHead className="text-xs">Created</TableHead>
@@ -656,10 +656,10 @@ export default function EarningAnalyze({
                                                 <span className="text-xs text-slate-400 italic">{__('general.no_referral')}</span>
                                             )}
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-end">
                                             <div className={`font-semibold text-sm tabular-nums ${e.amount >= 0 ? 'text-green-700' : 'text-red-600'}`}>
                                                 {formatMoney(e.amount, e.currency_code)}
-                                                <span className="text-xs font-normal ml-1 text-slate-400">{e.currency_code}</span>
+                                                <span className="text-xs font-normal ms-1 text-slate-400">{e.currency_code}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell>

@@ -102,12 +102,12 @@ export function DesktopIcon({
             </div>
 
             {!isOwned && (
-                <div className="absolute -top-1 right-0 bg-slate-800/90 rounded-full p-[3px] border border-slate-600 shadow-sm backdrop-blur-sm">
+                <div className="absolute -top-1 end-0 bg-slate-800/90 rounded-full p-[3px] border border-slate-600 shadow-sm backdrop-blur-sm">
                     <Lock className="w-3 h-3 text-slate-300" strokeWidth={2.5} />
                 </div>
             )}
             {isOwned && (
-                <div className="absolute top-0 right-1 bg-emerald-500 rounded-full w-3 h-3 border-2 border-slate-900 shadow-sm"></div>
+                <div className="absolute top-0 end-1 bg-emerald-500 rounded-full w-3 h-3 border-2 border-slate-900 shadow-sm"></div>
             )}
             
             {isEditing ? (

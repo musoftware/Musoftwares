@@ -25,7 +25,7 @@ export default function CartSidebar({ cart, updateQuantity, removeFromCart, onCh
     const subtotal = cart.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
 
     return (
-        <div className="w-full h-full flex flex-col bg-white border-l">
+        <div className="w-full h-full flex flex-col bg-white border-s">
             <div className="p-4 border-b">
                 <h2 className="text-lg font-semibold">{__('general.current_order')}</h2>
             </div>
@@ -40,7 +40,7 @@ export default function CartSidebar({ cart, updateQuantity, removeFromCart, onCh
                         <div key={item.product_id} className="flex flex-col gap-2 p-3 bg-gray-50 rounded-lg border">
                             <div className="flex justify-between items-start">
                                 <span className="font-medium text-sm line-clamp-2">{item.name}</span>
-                                <span className="font-bold whitespace-nowrap ml-2">
+                                <span className="font-bold whitespace-nowrap ms-2">
                                     {formatCurrency(item.unit_price * item.quantity, currency)}
                                 </span>
                             </div>

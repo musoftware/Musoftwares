@@ -39,7 +39,7 @@ export default function MyJobs({ jobs, userCurrency }) {
                         href="/freelance/jobs/create" 
                         className={cn(buttonVariants({ variant: 'default' }), "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm")}
                     >
-                        <Plus className="h-4 w-4 mr-2" /> {__('freelance.post_new_job')}
+                        <Plus className="h-4 w-4 me-2" /> {__('freelance.post_new_job')}
                     </Link>
                 }
             />

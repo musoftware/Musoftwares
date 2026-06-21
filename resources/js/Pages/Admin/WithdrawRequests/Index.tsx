@@ -131,7 +131,7 @@ export default function Index({ requests, filters }: Props) {
         {
             key: 'actions',
             label: '',
-            className: 'w-[60px] text-right',
+            className: 'w-[60px] text-end',
             render: (row: WithdrawRequest) => (
                 <DropdownMenu>
                     <DropdownMenuTrigger className="inline-flex h-8 w-8 items-center justify-center rounded-md p-0 text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus:outline-none">
@@ -142,7 +142,7 @@ export default function Index({ requests, filters }: Props) {
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem asChild>
                             <Link href={`/admin/withdraw-requests/${row.id}`}>
-                                <Eye className="mr-2 h-4 w-4" /> View
+                                <Eye className="me-2 h-4 w-4" /> View
                             </Link>
                         </DropdownMenuItem>
                     </DropdownMenuContent>

@@ -268,7 +268,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                 onClick={handleAiGenerate}
                                 disabled={isGenerating}
                             >
-                                <Wand2 className="w-4 h-4 mr-2" />
+                                <Wand2 className="w-4 h-4 me-2" />
                                 {isGenerating ? 'Generating...' : 'AI Auto-Fill'}
                             </Button>
                         </CardHeader>
@@ -292,8 +292,8 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                 <div>
                                     <Label htmlFor="total_amount">{__('general.total_amount')}</Label>
                                     <div className="flex">
-                                        <Input type="number" step="0.01" id="total_amount" value={data.total_amount} onChange={e => setData('total_amount', parseFloat(e.target.value))} className="rounded-r-none" />
-                                        <Button type="button" variant="outline" className="rounded-l-none" onClick={() => recalculateTotal()}>
+                                        <Input type="number" step="0.01" id="total_amount" value={data.total_amount} onChange={e => setData('total_amount', parseFloat(e.target.value))} className="rounded-e-none" />
+                                        <Button type="button" variant="outline" className="rounded-s-none" onClick={() => recalculateTotal()}>
                                             <Calculator className="w-4 h-4" />
                                         </Button>
                                     </div>
@@ -344,7 +344,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                     ))}
                                 </div>
                                 <Button type="button" variant="outline" size="sm" className="mt-3" onClick={addItem}>
-                                    <Plus className="w-4 h-4 mr-2" />{__('general.add_item')}</Button>
+                                    <Plus className="w-4 h-4 me-2" />{__('general.add_item')}</Button>
                             </div>
 
                             <div className="pt-4 border-t">
@@ -360,7 +360,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                     ))}
                                 </div>
                                 <Button type="button" variant="outline" size="sm" className="mt-3" onClick={addFeature}>
-                                    <Plus className="w-4 h-4 mr-2" />{__('general.add_feature')}</Button>
+                                    <Plus className="w-4 h-4 me-2" />{__('general.add_feature')}</Button>
                             </div>
 
                             <div className="pt-4 border-t">
@@ -383,7 +383,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                 <div className="flex justify-between items-center mb-2">
                                     <Label htmlFor="description">{__('general.contract_description_content')}</Label>
                                     <Button type="button" variant="secondary" size="sm" onClick={handleAiReview} disabled={isReviewing}>
-                                        <Wand2 className="w-4 h-4 mr-2" />
+                                        <Wand2 className="w-4 h-4 me-2" />
                                         {isReviewing ? 'Reviewing...' : 'AI Review & Fix'}
                                     </Button>
                                 </div>
@@ -450,9 +450,9 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                         </div>
                                         
                                         <div className="relative">
-                                            <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+                                            <Search className="w-4 h-4 absolute start-3 top-3 text-gray-400" />
                                             <Input 
-                                                className="pl-9" 
+                                                className="ps-9" 
                                                 placeholder={__('general.search_system_users')} 
                                                 value={clientSearch}
                                                 onChange={e => setClientSearch(e.target.value)}
@@ -463,7 +463,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                                         <button
                                                             key={user.id}
                                                             type="button"
-                                                            className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm border-b last:border-0"
+                                                            className="w-full text-start px-4 py-2 hover:bg-gray-100 text-sm border-b last:border-0"
                                                             onClick={() => selectClient(user)}
                                                         >
                                                             <div className="font-medium">{user.name}</div>

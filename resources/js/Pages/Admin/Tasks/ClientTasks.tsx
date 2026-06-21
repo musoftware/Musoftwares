@@ -245,13 +245,13 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                         <Card className="rounded-xl border border-slate-200 bg-white shadow-sm max-w-md">
                             <CardContent className="p-4">
                                 <div className="relative">
-                                    <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <Search className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                     <Input
                                         type="text"
                                         placeholder={__('general.search_client_by_name_or_email')}
                                         value={search}
                                         onChange={handleSearchChange}
-                                        className="pl-9 h-10 border-slate-200 focus-visible:ring-indigo-500"
+                                        className="ps-9 h-10 border-slate-200 focus-visible:ring-indigo-500"
                                         autoComplete="off"
                                     />
                                 </div>
@@ -305,7 +305,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                             <Button 
                                                 onClick={() => handleSelectClient(client.id)}
                                                 className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs h-9 rounded-lg"
-                                            >{__('general.view_focus_board')}<ChevronRight className="h-3.5 w-3.5 ml-1" />
+                                            >{__('general.view_focus_board')}<ChevronRight className="h-3.5 w-3.5 ms-1" />
                                             </Button>
                                         </CardContent>
                                     </Card>
@@ -420,7 +420,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                         className="flex-grow rounded-lg shadow-sm bg-white"
                                     />
                                     <Button type="submit" disabled={!newTodoTitle.trim()} className="bg-slate-800 hover:bg-slate-900 text-white rounded-lg px-4 shadow-sm flex-shrink-0">
-                                        <PlusCircle className="h-4 w-4 mr-2" />{__('general.add_to_queue')}</Button>
+                                        <PlusCircle className="h-4 w-4 me-2" />{__('general.add_to_queue')}</Button>
                                 </form>
 
                                 {todos.length === 0 ? (
@@ -472,7 +472,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                                                     REFUNDED
                                                                 </Badge>
                                                             )}
-                                                            <div className="ml-auto md:hidden">
+                                                            <div className="ms-auto md:hidden">
                                                                 <span className="font-bold text-slate-900">
                                                                     {formatCurrency(todo.cost_in_client_currency, todo.client_currency)}
                                                                 </span>

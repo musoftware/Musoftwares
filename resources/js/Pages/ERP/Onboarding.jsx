@@ -245,7 +245,7 @@ export default function Onboarding({ currencies = [] }) {
                                     <h3 className="text-3xl font-bold tracking-tight text-primary">Ready to launch! 🎉</h3>
                                     <p className="text-muted-foreground">{__('general.review_your_configuration_summary_before_entering_your_workspace')}</p>
                                 </div>
-                                <div className="bg-muted p-5 rounded-xl text-left inline-block w-full max-w-sm mx-auto border border-border">
+                                <div className="bg-muted p-5 rounded-xl text-start inline-block w-full max-w-sm mx-auto border border-border">
                                     <h4 className="font-semibold text-foreground mb-3 text-sm">Summary</h4>
                                     <ul className="space-y-2 text-sm text-muted-foreground font-medium">
                                         <li className="flex items-center gap-2">

@@ -60,7 +60,7 @@ export function SlideOver({ isOpen, onClose, title, icon: Icon, children }: {
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-                        className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-border bg-white shadow-2xl"
+                        className="fixed inset-y-0 end-0 z-50 flex w-full max-w-md flex-col border-s border-border bg-white shadow-2xl"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between border-b border-border px-5 py-4">
@@ -167,9 +167,9 @@ export function InvoiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                 {/* Status Timeline */}
                 <div className="space-y-4">
                     <h4 className="font-semibold text-text-primary">{__('general.invoice_timeline')}</h4>
-                    <div className="relative border-l border-border pl-4 space-y-4 ml-2">
+                    <div className="relative border-s border-border ps-4 space-y-4 ms-2">
                         <div className="relative">
-                            <div className="absolute -left-[21px] mt-0.5 bg-emerald-500 text-white rounded-full p-0.5 border-4 border-white">
+                            <div className="absolute -start-[21px] mt-0.5 bg-emerald-500 text-white rounded-full p-0.5 border-4 border-white">
                                 <CheckCircle2 className="h-3 w-3" />
                             </div>
                             <span className="text-text-muted text-[11px] block">{formatDate(data.issuedDate)}</span>
@@ -177,7 +177,7 @@ export function InvoiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                         </div>
                         {data.status === 'paid' ? (
                             <div className="relative">
-                                <div className="absolute -left-[21px] mt-0.5 bg-emerald-500 text-white rounded-full p-0.5 border-4 border-white">
+                                <div className="absolute -start-[21px] mt-0.5 bg-emerald-500 text-white rounded-full p-0.5 border-4 border-white">
                                     <CheckCircle2 className="h-3 w-3" />
                                 </div>
                                 <span className="text-text-muted text-[11px] block">{formatDate(data.dueDate)}</span>
@@ -185,7 +185,7 @@ export function InvoiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                             </div>
                         ) : (
                             <div className="relative">
-                                <div className="absolute -left-[21px] mt-0.5 bg-gray-300 text-white rounded-full p-0.5 border-4 border-white">
+                                <div className="absolute -start-[21px] mt-0.5 bg-gray-300 text-white rounded-full p-0.5 border-4 border-white">
                                     <Clock className="h-3 w-3" />
                                 </div>
                                 <span className="text-text-muted text-[11px] block">{__('general.awaiting_client_payment')}</span>
@@ -213,7 +213,7 @@ export function WalletQuickView({ isOpen, onClose, data }: QuickViewProps) {
             <div className="space-y-6">
                 {/* Total balance card */}
                 <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 p-6 text-white shadow-xl relative overflow-hidden">
-                    <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 opacity-10">
+                    <div className="absolute end-0 top-0 translate-x-4 -translate-y-4 opacity-10">
                         <Wallet className="h-36 w-36" />
                     </div>
                     <div className="text-[11px] font-semibold uppercase tracking-wider text-indigo-200">{__('general.unified_wallet_balance')}</div>
@@ -530,7 +530,7 @@ export function ServiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                             </div>
                             <span className="font-mono font-bold text-text-primary self-center">$450.00</span>
                         </div>
-                        <div className="flex justify-between p-3 border-l-2 border-indigo-500 bg-indigo-50/5">
+                        <div className="flex justify-between p-3 border-s-2 border-indigo-500 bg-indigo-50/5">
                             <div>
                                 <span className="font-bold text-indigo-950 flex items-center gap-1">{__('general.standard_full_core')}<Badge className="bg-indigo-100 text-indigo-700 text-[8px] font-bold py-0">POPULAR</Badge>
                                 </span>

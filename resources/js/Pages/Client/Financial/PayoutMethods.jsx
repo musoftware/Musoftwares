@@ -83,7 +83,7 @@ export default function PayoutMethods({ payoutMethods }) {
                         <p className="text-sm text-muted-foreground mt-1">{__('general.manage_destination_accounts_for_withdrawing_earned_funds')}</p>
                     </div>
                     <Button onClick={() => { setEditingMethod(null); reset(); setIsCreating(true); }} className="shadow-none">
-                        <Plus className="w-4 h-4 mr-2" />{__('general.add_new_method')}</Button>
+                        <Plus className="w-4 h-4 me-2" />{__('general.add_new_method')}</Button>
                 </div>
 
                 {(!payoutMethods || payoutMethods.length === 0) ? (
@@ -95,7 +95,7 @@ export default function PayoutMethods({ payoutMethods }) {
                             <h3 className="text-lg font-semibold text-foreground">{__('general.no_payout_methods_configured')}</h3>
                             <p className="text-sm text-muted-foreground max-w-md mx-auto mt-2 mb-6 leading-relaxed">{__('general.add_a_bank_account_paypal_vodafone_cash_or_instapay_to_enable_fast_secure_withdrawals_from_your_earned_balance')}</p>
                             <Button onClick={() => { setEditingMethod(null); reset(); setIsCreating(true); }} className="shadow-none">
-                                <Plus className="w-4 h-4 mr-2" />{__('general.setup_payout_method')}</Button>
+                                <Plus className="w-4 h-4 me-2" />{__('general.setup_payout_method')}</Button>
                         </CardContent>
                     </Card>
                 ) : (
@@ -106,7 +106,7 @@ export default function PayoutMethods({ payoutMethods }) {
                             }`}>
                                 <CardContent className="p-6">
                                     {pm.is_default && (
-                                        <Badge variant="secondary" className="absolute top-4 right-4 bg-primary/10 text-primary border-primary/20 gap-1 font-semibold">
+                                        <Badge variant="secondary" className="absolute top-4 end-4 bg-primary/10 text-primary border-primary/20 gap-1 font-semibold">
                                             <CheckCircle2 className="w-3.5 h-3.5" /> Default
                                         </Badge>
                                     )}

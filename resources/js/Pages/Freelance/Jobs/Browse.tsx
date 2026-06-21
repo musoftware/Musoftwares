@@ -122,12 +122,12 @@ function BrowseJobsContent({ jobs: initialJobs, userCurrency }: any) {
                 onSubmit={handleSearch} 
                 className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white border border-slate-200 rounded-xl shadow-sm hover:border-slate-300 transition-all duration-200 p-1.5 gap-2 sm:gap-0 focus-within:ring-4 focus-within:ring-indigo-500/10 focus-within:border-indigo-500 w-full mb-6"
             >
-                <div className="relative flex-1 flex items-center min-w-0 pl-3">
+                <div className="relative flex-1 flex items-center min-w-0 ps-3">
                     <Search className="h-5 w-5 text-slate-400 shrink-0" />
                     <input 
                         type="text"
                         placeholder={__('erp.search_for_jobs_skills_or')} 
-                        className="w-full bg-transparent border-0 ring-0 focus:ring-0 focus:outline-none pl-3 text-sm text-slate-900 placeholder:text-slate-400 h-11"
+                        className="w-full bg-transparent border-0 ring-0 focus:ring-0 focus:outline-none ps-3 text-sm text-slate-900 placeholder:text-slate-400 h-11"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />

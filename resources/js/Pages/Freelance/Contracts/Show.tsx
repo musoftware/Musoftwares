@@ -71,14 +71,14 @@ function ShowContractContent({ auth, contract, userCurrency }: any) {
                     </div>
 
                     <div className="flex items-center gap-6">
-                        <div className="text-right">
+                        <div className="text-end">
                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-0.5">{__('freelance.contract_value')}</p>
                             <p className="text-xl font-bold text-slate-900 font-mono">
                                 {contract.amount !== null && contract.amount !== undefined ? formatMoney(contract.amount, userCurrency) : `${contract.contract_points} ${__('freelance.pts', undefined, 'pts')}`}
                             </p>
                         </div>
                         <div className="h-10 w-px bg-slate-200 hidden sm:block"></div>
-                        <div className="text-right hidden sm:block">
+                        <div className="text-end hidden sm:block">
                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-0.5">{__('general.deadline')}</p>
                             <p className={`text-lg font-bold ${daysRemaining <= 2 ? 'text-red-600' : 'text-slate-900'}`}>
                                 {daysRemaining} {__('general.days_left')}
@@ -94,7 +94,7 @@ function ShowContractContent({ auth, contract, userCurrency }: any) {
                         {/* Parties */}
                         <Card className="shadow-sm border-slate-200/60 overflow-hidden">
                             <CardContent className="p-0 flex items-stretch">
-                                <div className="flex-1 p-6 text-center space-y-2 border-r border-slate-100 bg-slate-50/30">
+                                <div className="flex-1 p-6 text-center space-y-2 border-e border-slate-100 bg-slate-50/30">
                                     <div className="h-12 w-12 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xl flex items-center justify-center mx-auto">
                                         {contract.client.avatar}
                                     </div>
@@ -159,7 +159,7 @@ function ShowContractContent({ auth, contract, userCurrency }: any) {
                                             className="flex-1 h-11 rounded-full px-5 bg-slate-50 border-slate-200 focus-visible:ring-indigo-500"
                                         />
                                         <Button type="submit" className="shrink-0 h-11 px-6 rounded-full bg-indigo-600 hover:bg-indigo-700 font-bold">
-                                            <Send className="h-4 w-4 mr-2" /> {__('general.send')}
+                                            <Send className="h-4 w-4 me-2" /> {__('general.send')}
                                         </Button>
                                     </form>
                                 </div>
@@ -190,7 +190,7 @@ function ShowContractContent({ auth, contract, userCurrency }: any) {
                                                     onClick={handleMarkCompleted}
                                                     className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12"
                                                 >
-                                                    <CheckCircle2 className="mr-2 h-5 w-5" /> {__('general.approve_and_complete')}
+                                                    <CheckCircle2 className="me-2 h-5 w-5" /> {__('general.approve_and_complete')}
                                                 </Button>
                                             </div>
                                         </div>
@@ -220,7 +220,7 @@ function ShowContractContent({ auth, contract, userCurrency }: any) {
                                                     type="submit"
                                                     className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-12 mt-2"
                                                 >
-                                                    <CheckCircle2 className="mr-2 h-5 w-5" /> {__('general.submit_delivery')}
+                                                    <CheckCircle2 className="me-2 h-5 w-5" /> {__('general.submit_delivery')}
                                                 </Button>
                                             </form>
                                         ) : (

@@ -12,7 +12,7 @@ export default function Index({ services }: { services: any[] }) {
             header="Website Services"
             actions={
                 <Link href={route('admin.website-services.create')}>
-                    <Button><Plus className="w-4 h-4 mr-2" /> Add Service</Button>
+                    <Button><Plus className="w-4 h-4 me-2" /> Add Service</Button>
                 </Link>
             }
         >
@@ -24,7 +24,7 @@ export default function Index({ services }: { services: any[] }) {
                             <TableHead>Icon/Image</TableHead>
                             <TableHead>Title</TableHead>
                             <TableHead>Subtitle</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead className="text-end">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -44,7 +44,7 @@ export default function Index({ services }: { services: any[] }) {
                                     </TableCell>
                                     <TableCell className="font-medium">{service.title_en}</TableCell>
                                     <TableCell>{service.subtitle_en}</TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-end">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -55,12 +55,12 @@ export default function Index({ services }: { services: any[] }) {
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem asChild>
                                                     <Link href={route('admin.website-services.edit', service.id)} className="flex items-center">
-                                                        <Edit className="w-4 h-4 mr-2" /> Edit
+                                                        <Edit className="w-4 h-4 me-2" /> Edit
                                                     </Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem asChild className="text-red-600 focus:bg-red-50 focus:text-red-700">
                                                     <Link href={route('admin.website-services.destroy', service.id)} method="delete" as="button" className="w-full flex items-center">
-                                                        <Trash className="w-4 h-4 mr-2" /> Delete
+                                                        <Trash className="w-4 h-4 me-2" /> Delete
                                                     </Link>
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>

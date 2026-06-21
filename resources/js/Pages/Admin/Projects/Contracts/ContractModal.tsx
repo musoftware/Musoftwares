@@ -198,7 +198,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                     </button>
                     {contract && (
                         <button 
-                            className={`px-4 py-2 font-medium text-sm ${activeTab === 'ai' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'text-slate-500'} ml-auto flex items-center gap-1`}
+                            className={`px-4 py-2 font-medium text-sm ${activeTab === 'ai' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'text-slate-500'} ms-auto flex items-center gap-1`}
                             onClick={() => setActiveTab('ai')}
                         >
                             <Sparkles className="w-3 h-3" /> AI Assistant
@@ -223,7 +223,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                             disabled={isGenerating} 
                             className="self-end bg-indigo-600 hover:bg-indigo-700 text-white"
                         >
-                            {isGenerating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Generating...</> : 'Generate Contract'}
+                            {isGenerating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" /> Generating...</> : 'Generate Contract'}
                         </Button>
                     </div>
                 )}
@@ -303,7 +303,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                 <div className="flex justify-between items-center mb-2">
                                     <Label className="text-base font-semibold">Key Features / Scope of Work</Label>
                                     <Button type="button" variant="outline" size="sm" onClick={addFeature}>
-                                        <Plus className="w-4 h-4 mr-1" /> Add Feature
+                                        <Plus className="w-4 h-4 me-1" /> Add Feature
                                     </Button>
                                 </div>
                                 <div className="space-y-2">
@@ -345,7 +345,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                 <div className="flex justify-between items-center mb-2">
                                     <Label className="text-base font-semibold">Pricing Items (Quotation)</Label>
                                     <Button type="button" variant="outline" size="sm" onClick={addPricing}>
-                                        <Plus className="w-4 h-4 mr-1" /> Add Item
+                                        <Plus className="w-4 h-4 me-1" /> Add Item
                                     </Button>
                                 </div>
                                 <div className="space-y-3">
@@ -400,7 +400,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                         You can generate invoices dynamically from the contract milestones.
                                     </div>
                                     <Button type="button" variant="outline" onClick={handleGenerateInvoice}>
-                                        <Send className="w-4 h-4 mr-2" /> Generate Invoice
+                                        <Send className="w-4 h-4 me-2" /> Generate Invoice
                                     </Button>
                                 </div>
                             )}
@@ -427,7 +427,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                 disabled={isGenerating} 
                                 className="self-end bg-indigo-600 hover:bg-indigo-700 text-white"
                             >
-                                {isGenerating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</> : 'Refine Contract'}
+                                {isGenerating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" /> Processing...</> : 'Refine Contract'}
                             </Button>
                         </div>
                     )}
@@ -437,7 +437,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                 <DialogFooter className="mt-6 border-t pt-4">
                     <Button variant="outline" onClick={onClose} type="button">Cancel</Button>
                     <Button type="submit" form="contract-form" disabled={isLoading || isGenerating}>
-                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin me-2" /> : null}
                         {contract ? 'Update Contract (Creates new version)' : 'Create Contract'}
                     </Button>
                 </DialogFooter>

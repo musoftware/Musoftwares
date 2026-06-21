@@ -223,7 +223,7 @@ export default function FacebookExtractorRunner({ tool }: any) {
 
                         <div className="space-y-3">
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <Input
                                     type="url"
                                     value={url}
@@ -233,7 +233,7 @@ export default function FacebookExtractorRunner({ tool }: any) {
                                         (type === 'followers' || type === 'following') ? "https://www.facebook.com/profile.php?id=... OR username" :
                                         "https://www.facebook.com/post/..."
                                     }
-                                    className="pl-9 h-11 text-sm bg-slate-50 font-mono"
+                                    className="ps-9 h-11 text-sm bg-slate-50 font-mono"
                                     disabled={status === 'running'}
                                 />
                             </div>
@@ -262,14 +262,14 @@ export default function FacebookExtractorRunner({ tool }: any) {
                                     disabled={!url.trim()}
                                     className="flex-1 h-12 bg-[#1877F2] hover:bg-[#166FE5] text-white rounded-xl font-bold shadow-md"
                                 >
-                                    <Play className="w-4 h-4 mr-2 fill-current" />{__('general.start_extraction')}</Button>
+                                    <Play className="w-4 h-4 me-2 fill-current" />{__('general.start_extraction')}</Button>
                             ) : (
                                 <Button
                                     onClick={handleStop}
                                     variant="destructive"
                                     className="flex-1 h-12 rounded-xl font-bold shadow-md"
                                 >
-                                    <Square className="w-4 h-4 mr-2 fill-current" />{__('general.stop_extraction')}</Button>
+                                    <Square className="w-4 h-4 me-2 fill-current" />{__('general.stop_extraction')}</Button>
                             )}
                         </div>
                     </div>

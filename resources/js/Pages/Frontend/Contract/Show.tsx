@@ -90,7 +90,7 @@ export default function Show({ contract, invoices, project }) {
                                             {formatMoney(contract.total_amount, contract.currency)}
                                         </p>
                                     </div>
-                                    <div className="text-right">
+                                    <div className="text-end">
                                         <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">Duration</p>
                                         <p className="text-xl font-semibold text-slate-900 mt-1">
                                             {contract.content?.duration || 'TBD'}
@@ -102,13 +102,13 @@ export default function Show({ contract, invoices, project }) {
                                     <div className="mb-6">
                                         <h4 className="font-semibold text-slate-900 mb-4">Investment Breakdown</h4>
                                         <div className="overflow-x-auto">
-                                            <table className="w-full text-left border-collapse">
+                                            <table className="w-full text-start border-collapse">
                                                 <thead>
                                                     <tr className="border-b border-slate-200 text-sm text-slate-500">
                                                         <th className="pb-3 font-medium">Item</th>
-                                                        <th className="pb-3 font-medium text-right">Hours/Qty</th>
-                                                        <th className="pb-3 font-medium text-right">Rate</th>
-                                                        <th className="pb-3 font-medium text-right">Total</th>
+                                                        <th className="pb-3 font-medium text-end">Hours/Qty</th>
+                                                        <th className="pb-3 font-medium text-end">Rate</th>
+                                                        <th className="pb-3 font-medium text-end">Total</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="text-sm">
@@ -118,9 +118,9 @@ export default function Show({ contract, invoices, project }) {
                                                                 <p className="font-medium text-slate-900">{item.item}</p>
                                                                 {item.description && <p className="text-slate-500 text-xs mt-0.5">{item.description}</p>}
                                                             </td>
-                                                            <td className="py-3 text-right text-slate-600">{item.hours || '-'}</td>
-                                                            <td className="py-3 text-right text-slate-600">{formatMoney(item.hourly_rate || 0, contract.currency)}</td>
-                                                            <td className="py-3 text-right font-medium text-slate-900">{formatMoney(item.total || 0, contract.currency)}</td>
+                                                            <td className="py-3 text-end text-slate-600">{item.hours || '-'}</td>
+                                                            <td className="py-3 text-end text-slate-600">{formatMoney(item.hourly_rate || 0, contract.currency)}</td>
+                                                            <td className="py-3 text-end font-medium text-slate-900">{formatMoney(item.total || 0, contract.currency)}</td>
                                                         </tr>
                                                     ))}
                                                 </tbody>

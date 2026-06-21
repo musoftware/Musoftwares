@@ -19,7 +19,7 @@ export default function SmartCalendar({ slots, date }: { slots: Slot[], date: st
                     <p className="text-muted-foreground mt-2">Visualizing gaps and smart recommendations for {date}.</p>
                 </div>
                 <Button variant="outline">
-                    <CalendarIcon className="mr-2 h-4 w-4" />{__('general.change_date')}</Button>
+                    <CalendarIcon className="me-2 h-4 w-4" />{__('general.change_date')}</Button>
             </div>
 
             <Card>
@@ -37,7 +37,7 @@ export default function SmartCalendar({ slots, date }: { slots: Slot[], date: st
                                 <span className="text-lg font-bold">{slot.time}</span>
                                 {slot.is_smart_optimized && (
                                     <Badge className="bg-emerald-500 hover:bg-emerald-600">
-                                        <Zap className="w-3 h-3 mr-1" />{__('general.smart_slot')}</Badge>
+                                        <Zap className="w-3 h-3 me-1" />{__('general.smart_slot')}</Badge>
                                 )}
                             </div>
                         ))}

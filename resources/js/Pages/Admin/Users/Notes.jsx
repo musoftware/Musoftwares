@@ -276,19 +276,19 @@ export default function Notes({ user, notes, stats }) {
                                 <div className="prose prose-sm max-w-none text-slate-600 bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-between items-center">
                                     {isPasswordSet ? (
                                         note.decryptedContent.startsWith('🔒') 
-                                            ? <span className="text-red-500 font-medium"><Key size={14} className="inline mr-1"/> {note.decryptedContent}</span>
+                                            ? <span className="text-red-500 font-medium"><Key size={14} className="inline me-1"/> {note.decryptedContent}</span>
                                             : <span className="text-slate-500 line-clamp-1 flex-1 font-mono text-xs overflow-hidden text-ellipsis whitespace-nowrap">
                                                  {note.decryptedContent}
                                               </span>
                                     ) : (
                                         <div className="flex items-center text-slate-400 font-medium text-sm">
-                                            <Key size={16} className="mr-2" />{__('general.encrypted_content_hidden')}
+                                            <Key size={16} className="me-2" />{__('general.encrypted_content_hidden')}
                                         </div>
                                     )}
                                     
                                     {isPasswordSet && !note.decryptedContent.startsWith('🔒') && (
-                                        <Button variant="outline" size="sm" className="ml-4 shrink-0 shadow-sm border-slate-200" onClick={() => handleViewNote(note)}>
-                                            <FileText size={14} className="mr-2 text-slate-400" />
+                                        <Button variant="outline" size="sm" className="ms-4 shrink-0 shadow-sm border-slate-200" onClick={() => handleViewNote(note)}>
+                                            <FileText size={14} className="me-2 text-slate-400" />
                                             View Note
                                         </Button>
                                     )}
@@ -376,7 +376,7 @@ export default function Notes({ user, notes, stats }) {
                                 disabled={loading || !isPasswordSet || !content.trim() || !title.trim()} 
                                 className="w-full py-6 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg shadow-sm text-base transition-all"
                             >
-                                {loading ? <RefreshCw className="animate-spin mr-2" size={18} /> : <Key className="mr-2" size={18} />}
+                                {loading ? <RefreshCw className="animate-spin me-2" size={18} /> : <Key className="me-2" size={18} />}
                                 {loading ? 'Encrypting...' : 'Encrypt & Save Note'}
                             </Button>
                         </form>
@@ -402,14 +402,14 @@ export default function Notes({ user, notes, stats }) {
                     </div>
                     
                     <div className="p-6 relative bg-white">
-                        <div className="absolute top-8 right-8 z-10">
+                        <div className="absolute top-8 end-8 z-10">
                             <Button 
                                 variant="outline" 
                                 size="sm" 
                                 className={`h-8 px-3 shadow-sm transition-all ${copied ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-50 hover:text-green-700' : 'bg-white hover:bg-slate-50 text-slate-600'}`}
                                 onClick={handleCopy}
                             >
-                                {copied ? <><Check size={14} className="mr-1.5" /> Copied</> : <><Copy size={14} className="mr-1.5" /> Copy Text</>}
+                                {copied ? <><Check size={14} className="me-1.5" /> Copied</> : <><Copy size={14} className="me-1.5" /> Copy Text</>}
                             </Button>
                         </div>
                         <Textarea 

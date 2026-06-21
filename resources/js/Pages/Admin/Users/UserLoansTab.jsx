@@ -81,13 +81,13 @@ export default function UserLoansTab({ client, loans }) {
                     <Wallet size={18} className="text-slate-400" /> {__('admin.loans') || 'السلف'}
                 </h2>
                 <Button size="sm" onClick={() => setIsAddLoanOpen(true)}>
-                    <Plus size={16} className="mr-2" /> {__('admin.add_loan') || 'إضافة سلفة'}
+                    <Plus size={16} className="me-2" /> {__('admin.add_loan') || 'إضافة سلفة'}
                 </Button>
             </div>
 
             {loans && loans.length > 0 ? (
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
+                    <table className="w-full text-sm text-start">
                         <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs">
                             <tr>
                                 <th className="px-4 py-3">{__('admin.date')}</th>
@@ -95,7 +95,7 @@ export default function UserLoansTab({ client, loans }) {
                                 <th className="px-4 py-3">{__('admin.paid_amount')}</th>
                                 <th className="px-4 py-3">{__('admin.remaining')}</th>
                                 <th className="px-4 py-3">{__('admin.status')}</th>
-                                <th className="px-4 py-3 text-right"></th>
+                                <th className="px-4 py-3 text-end"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -114,7 +114,7 @@ export default function UserLoansTab({ client, loans }) {
                                                 <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-bold uppercase">{__('admin.active') || 'نشط'}</span>
                                             )}
                                         </td>
-                                        <td className="px-4 py-3 text-right">
+                                        <td className="px-4 py-3 text-end">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -124,11 +124,11 @@ export default function UserLoansTab({ client, loans }) {
                                                 <DropdownMenuContent align="end">
                                                     {loan.status !== 'paid' && (
                                                         <DropdownMenuItem onClick={() => openRepayModal(loan)}>
-                                                            <Wallet className="mr-2 h-4 w-4" /> {__('admin.add_repayment') || 'إضافة سداد'}
+                                                            <Wallet className="me-2 h-4 w-4" /> {__('admin.add_repayment') || 'إضافة سداد'}
                                                         </DropdownMenuItem>
                                                     )}
                                                     <DropdownMenuItem className="text-red-600" onClick={() => deleteLoan(loan.id)}>
-                                                        <Trash2 className="mr-2 h-4 w-4" /> {__('general.delete')}
+                                                        <Trash2 className="me-2 h-4 w-4" /> {__('general.delete')}
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>

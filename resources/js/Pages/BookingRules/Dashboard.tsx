@@ -17,7 +17,7 @@ export default function RulesDashboard({ rules, stats }) {
                 </div>
                 <Link href="/booking-rules/builder">
                     <Button>
-                        <Plus className="mr-2 h-4 w-4" />{__('general.create_new_rule')}</Button>
+                        <Plus className="me-2 h-4 w-4" />{__('general.create_new_rule')}</Button>
                 </Link>
             </div>
 
@@ -64,7 +64,7 @@ export default function RulesDashboard({ rules, stats }) {
                                 <TableHead>Name</TableHead>
                                 <TableHead>Trigger</TableHead>
                                 <TableHead>Status</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead className="text-end">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -78,7 +78,7 @@ export default function RulesDashboard({ rules, stats }) {
                                             {rule.is_active ? 'Active' : 'Inactive'}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-end">
                                         <Link href={`/booking-rules/${rule.id}/edit`}>
                                             <Button variant="ghost" size="sm">Edit</Button>
                                         </Link>

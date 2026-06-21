@@ -210,7 +210,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
         {
             key: 'actions',
             label: '',
-            className: 'w-[60px] text-right',
+            className: 'w-[60px] text-end',
             render: (row: BusyTime) => (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -223,16 +223,16 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => handleToggleActive(row)}>
                             {row.is_active ? (
-                                <><ToggleLeft className="mr-2 h-4 w-4" /> Deactivate</>
+                                <><ToggleLeft className="me-2 h-4 w-4" /> Deactivate</>
                             ) : (
-                                <><ToggleRight className="mr-2 h-4 w-4" /> Activate</>
+                                <><ToggleRight className="me-2 h-4 w-4" /> Activate</>
                             )}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={() => handleDelete(row)}
                             className="text-red-600 focus:text-red-700"
                         >
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                            <Trash2 className="me-2 h-4 w-4" /> Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

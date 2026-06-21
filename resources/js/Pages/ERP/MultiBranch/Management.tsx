@@ -30,18 +30,18 @@ export default function BranchManagement({ branches }: Props) {
                 </div>
 
                 <Button size="sm">
-                    <Plus className="w-4 h-4 mr-2" />{__('general.add_branch')}</Button>
+                    <Plus className="w-4 h-4 me-2" />{__('general.add_branch')}</Button>
             </div>
 
             <div className="bg-white border rounded-xl overflow-hidden shadow-sm">
-                <table className="w-full text-sm text-left">
+                <table className="w-full text-sm text-start">
                     <thead className="bg-slate-50 border-b">
                         <tr>
                             <th className="px-6 py-3 font-medium text-slate-500">{__('general.branch_name')}</th>
                             <th className="px-6 py-3 font-medium text-slate-500">Type</th>
                             <th className="px-6 py-3 font-medium text-slate-500">Timezone</th>
                             <th className="px-6 py-3 font-medium text-slate-500">Status</th>
-                            <th className="px-6 py-3 font-medium text-slate-500 text-right">Actions</th>
+                            <th className="px-6 py-3 font-medium text-slate-500 text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -60,7 +60,7 @@ export default function BranchManagement({ branches }: Props) {
                                             {branch.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-right">
+                                    <td className="px-6 py-4 text-end">
                                         <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">{__('general.edit_settings')}</button>
                                     </td>
                                 </tr>

@@ -107,7 +107,7 @@ export default function Income({ transactions, filters, filteredUser }) {
         {
             key: 'amount',
             label: __('general.amount'),
-            className: 'text-right',
+            className: 'text-end',
             render: (tx) => (
                 <span className="font-medium font-mono text-slate-800">
                     {formatCurrency(tx.amount || 0, tx.currency)}
@@ -117,7 +117,7 @@ export default function Income({ transactions, filters, filteredUser }) {
         {
             key: 'business_amount',
             label: __('general.business_amount'),
-            className: 'text-right',
+            className: 'text-end',
             render: (tx) => (
                 <span className="font-medium font-mono text-green-600">
                     {formatCurrency(tx.business_amount || 0, tx.business_currency)}
@@ -142,7 +142,7 @@ export default function Income({ transactions, filters, filteredUser }) {
         {
             key: 'actions',
             label: '',
-            className: 'w-[50px] text-right',
+            className: 'w-[50px] text-end',
             render: (tx) => <TransactionActions tx={tx} type="income" />
         }
     ];

@@ -77,7 +77,7 @@ export default function CheckoutSessions({ sessions }: Props) {
                                         <tr key={session.id} className="hover:bg-slate-50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600">
                                                 {session.session_id}
-                                                {session.is_test && <Badge variant="outline" className="ml-2 bg-amber-50 text-amber-600 border-amber-200">Test</Badge>}
+                                                {session.is_test && <Badge variant="outline" className="ms-2 bg-amber-50 text-amber-600 border-amber-200">Test</Badge>}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">
                                                 {formatMoney(session.amount, session.currency?.currency)}
@@ -87,13 +87,13 @@ export default function CheckoutSessions({ sessions }: Props) {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {session.status === 'complete' && (
-                                                    <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200"><CheckCircle2 className="w-3 h-3 mr-1"/> {__('general.paid')}</Badge>
+                                                    <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200"><CheckCircle2 className="w-3 h-3 me-1"/> {__('general.paid')}</Badge>
                                                 )}
                                                 {session.status === 'open' && (
-                                                    <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"><Clock className="w-3 h-3 mr-1"/> {__('general.open')}</Badge>
+                                                    <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"><Clock className="w-3 h-3 me-1"/> {__('general.open')}</Badge>
                                                 )}
                                                 {session.status === 'expired' && (
-                                                    <Badge className="bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200"><XCircle className="w-3 h-3 mr-1"/> {__('general.expired')}</Badge>
+                                                    <Badge className="bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200"><XCircle className="w-3 h-3 me-1"/> {__('general.expired')}</Badge>
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">

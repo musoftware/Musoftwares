@@ -74,7 +74,7 @@ export default function PayGuest({ payGuestCurrencies = [] }: PayGuestProps) {
                                                 <Wallet className="w-4 h-4 text-slate-500" /> Amount to Pay
                                             </Label>
                                             <div className="flex relative">
-                                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                                <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
                                                     <span className="text-slate-500 font-bold">$</span>
                                                 </div>
                                                 <Input 
@@ -84,14 +84,14 @@ export default function PayGuest({ payGuestCurrencies = [] }: PayGuestProps) {
                                                     required
                                                     value={data.amount}
                                                     onChange={e => setData('amount', e.target.value)}
-                                                    className={`pl-10 h-14 text-xl font-bold rounded-r-none focus-visible:z-10 ${errors.amount ? 'border-red-500' : ''}`}
+                                                    className={`ps-10 h-14 text-xl font-bold rounded-e-none focus-visible:z-10 ${errors.amount ? 'border-red-500' : ''}`}
                                                     placeholder="e.g. 1000"
                                                 />
                                                 <Select 
                                                     value={data.currency_id} 
                                                     onValueChange={val => setData('currency_id', val || '')}
                                                 >
-                                                    <SelectTrigger className={`w-[120px] h-14 rounded-l-none border-l-0 bg-slate-50 font-bold ${errors.currency_id ? 'border-red-500' : ''}`}>
+                                                    <SelectTrigger className={`w-[120px] h-14 rounded-s-none border-s-0 bg-slate-50 font-bold ${errors.currency_id ? 'border-red-500' : ''}`}>
                                                         <SelectValue placeholder="Currency" />
                                                     </SelectTrigger>
                                                     <SelectContent>
@@ -109,7 +109,7 @@ export default function PayGuest({ payGuestCurrencies = [] }: PayGuestProps) {
                                             <div className="space-y-2">
                                                 <Label className="text-slate-700 font-bold">Full Name</Label>
                                                 <div className="relative">
-                                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                                         <User className="w-5 h-5 text-slate-400" />
                                                     </div>
                                                     <Input 
@@ -117,7 +117,7 @@ export default function PayGuest({ payGuestCurrencies = [] }: PayGuestProps) {
                                                         required 
                                                         value={data.name}
                                                         onChange={e => setData('name', e.target.value)}
-                                                        className={`pl-10 h-12 bg-slate-50 ${errors.name ? 'border-red-500' : ''}`}
+                                                        className={`ps-10 h-12 bg-slate-50 ${errors.name ? 'border-red-500' : ''}`}
                                                         placeholder="Your full name"
                                                     />
                                                 </div>
@@ -127,7 +127,7 @@ export default function PayGuest({ payGuestCurrencies = [] }: PayGuestProps) {
                                             <div className="space-y-2">
                                                 <Label className="text-slate-700 font-bold">Email Address</Label>
                                                 <div className="relative">
-                                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                                         <Mail className="w-5 h-5 text-slate-400" />
                                                     </div>
                                                     <Input 
@@ -135,7 +135,7 @@ export default function PayGuest({ payGuestCurrencies = [] }: PayGuestProps) {
                                                         required 
                                                         value={data.email}
                                                         onChange={e => setData('email', e.target.value)}
-                                                        className={`pl-10 h-12 bg-slate-50 ${errors.email ? 'border-red-500' : ''}`}
+                                                        className={`ps-10 h-12 bg-slate-50 ${errors.email ? 'border-red-500' : ''}`}
                                                         placeholder="name@example.com"
                                                     />
                                                 </div>
@@ -145,7 +145,7 @@ export default function PayGuest({ payGuestCurrencies = [] }: PayGuestProps) {
                                             <div className="space-y-2">
                                                 <Label className="text-slate-700 font-bold">WhatsApp Number</Label>
                                                 <div className="relative">
-                                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                                         <Phone className="w-5 h-5 text-slate-400" />
                                                     </div>
                                                     <Input 
@@ -153,7 +153,7 @@ export default function PayGuest({ payGuestCurrencies = [] }: PayGuestProps) {
                                                         required 
                                                         value={data.mobile}
                                                         onChange={e => setData('mobile', e.target.value)}
-                                                        className={`pl-10 h-12 bg-slate-50 ${errors.mobile ? 'border-red-500' : ''}`}
+                                                        className={`ps-10 h-12 bg-slate-50 ${errors.mobile ? 'border-red-500' : ''}`}
                                                         placeholder="+1234567890"
                                                     />
                                                 </div>
@@ -163,7 +163,7 @@ export default function PayGuest({ payGuestCurrencies = [] }: PayGuestProps) {
                                         </div>
 
                                         <Button type="submit" size="lg" className="w-full h-14 text-lg mt-6" disabled={processing}>
-                                            {processing ? 'Processing...' : 'Continue to Payment'} <ArrowRight className="w-5 h-5 ml-2" />
+                                            {processing ? 'Processing...' : 'Continue to Payment'} <ArrowRight className="w-5 h-5 ms-2" />
                                         </Button>
                                     </form>
                                 )}
@@ -175,19 +175,19 @@ export default function PayGuest({ payGuestCurrencies = [] }: PayGuestProps) {
                         <Card className="border-none shadow-sm bg-slate-50">
                             <CardContent className="p-6">
                                 <h3 className="font-bold text-slate-900 mb-4">How it works</h3>
-                                <ol className="space-y-4 text-sm text-slate-600 relative border-l border-slate-200 ml-3 pl-4">
+                                <ol className="space-y-4 text-sm text-slate-600 relative border-s border-slate-200 ms-3 ps-4">
                                     <li className="relative">
-                                        <div className="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-indigo-500 border-2 border-white"></div>
+                                        <div className="absolute -start-[21px] top-1 w-3 h-3 rounded-full bg-indigo-500 border-2 border-white"></div>
                                         <strong className="text-slate-900 block mb-1">1. Fill Details</strong>
                                         Enter your amount and contact info.
                                     </li>
                                     <li className="relative">
-                                        <div className="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-indigo-500 border-2 border-white"></div>
+                                        <div className="absolute -start-[21px] top-1 w-3 h-3 rounded-full bg-indigo-500 border-2 border-white"></div>
                                         <strong className="text-slate-900 block mb-1">2. Get Credentials</strong>
                                         Receive an instant WhatsApp message with your secure password.
                                     </li>
                                     <li className="relative">
-                                        <div className="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-indigo-500 border-2 border-white"></div>
+                                        <div className="absolute -start-[21px] top-1 w-3 h-3 rounded-full bg-indigo-500 border-2 border-white"></div>
                                         <strong className="text-slate-900 block mb-1">3. Pay Securely</strong>
                                         You'll be redirected to log in and complete your payment via Instapay or Card.
                                     </li>

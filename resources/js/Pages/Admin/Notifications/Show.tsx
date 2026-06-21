@@ -35,7 +35,7 @@ export default function Show({ campaign }: { campaign: any }) {
                             <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
                                 {campaign.title}
                                 {campaign.audience_type === 'personal' && (
-                                    <Badge variant="outline" className="ml-2 bg-indigo-50 text-indigo-700 border-indigo-200">
+                                    <Badge variant="outline" className="ms-2 bg-indigo-50 text-indigo-700 border-indigo-200">
                                         Personal
                                     </Badge>
                                 )}
@@ -122,19 +122,19 @@ export default function Show({ campaign }: { campaign: any }) {
                                         No views tracked yet.
                                     </div>
                                 ) : (
-                                    <div className="max-h-64 overflow-y-auto pr-2 border rounded-md">
+                                    <div className="max-h-64 overflow-y-auto pe-2 border rounded-md">
                                         <Table>
                                             <TableHeader className="bg-slate-50 sticky top-0">
                                                 <TableRow>
                                                     <TableHead>User</TableHead>
-                                                    <TableHead className="text-right">Time</TableHead>
+                                                    <TableHead className="text-end">Time</TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
                                                 {views.map((view: any) => (
                                                     <TableRow key={view.id}>
                                                         <TableCell className="font-medium">{view.user?.name || 'Unknown'}</TableCell>
-                                                        <TableCell className="text-right text-xs text-slate-500">{formatDate(view.created_at)}</TableCell>
+                                                        <TableCell className="text-end text-xs text-slate-500">{formatDate(view.created_at)}</TableCell>
                                                     </TableRow>
                                                 ))}
                                             </TableBody>
@@ -157,19 +157,19 @@ export default function Show({ campaign }: { campaign: any }) {
                                         No clicks tracked yet.
                                     </div>
                                 ) : (
-                                    <div className="max-h-64 overflow-y-auto pr-2 border rounded-md">
+                                    <div className="max-h-64 overflow-y-auto pe-2 border rounded-md">
                                         <Table>
                                             <TableHeader className="bg-slate-50 sticky top-0">
                                                 <TableRow>
                                                     <TableHead>User</TableHead>
-                                                    <TableHead className="text-right">Time</TableHead>
+                                                    <TableHead className="text-end">Time</TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
                                                 {clicks.map((click: any) => (
                                                     <TableRow key={click.id}>
                                                         <TableCell className="font-medium">{click.user?.name || 'Unknown'}</TableCell>
-                                                        <TableCell className="text-right text-xs text-slate-500">{formatDate(click.created_at)}</TableCell>
+                                                        <TableCell className="text-end text-xs text-slate-500">{formatDate(click.created_at)}</TableCell>
                                                     </TableRow>
                                                 ))}
                                             </TableBody>

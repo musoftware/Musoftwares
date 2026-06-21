@@ -26,7 +26,7 @@ export default function Edit({ job }: any) {
     return (
         <AdminSidebarLayout title={`${__('freelance.edit_job')}: ${job.title}`} header={
             <div className="flex items-center space-x-2">
-                <Link href={route('admin.freelance.jobs.show', job.id)} className="text-gray-500 hover:text-gray-900 mr-2">
+                <Link href={route('admin.freelance.jobs.show', job.id)} className="text-gray-500 hover:text-gray-900 me-2">
                     <ArrowLeft className="h-5 w-5" />
                 </Link>
                 <span>{__('freelance.edit_job')}</span>
@@ -124,7 +124,7 @@ export default function Edit({ job }: any) {
                                 </Button>
                             </Link>
                             <Button type="submit" disabled={processing} className="shadow-sm">
-                                <Save className="mr-2 h-4 w-4" />
+                                <Save className="me-2 h-4 w-4" />
                                 {__('freelance.save_changes')}
                             </Button>
                         </CardFooter>

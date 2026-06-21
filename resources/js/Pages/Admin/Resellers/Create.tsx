@@ -71,10 +71,10 @@ export default function ResellersCreate() {
                         <div className="space-y-1.5">
                             <Label htmlFor="user_search">{__('general.platform_user')}<span className="text-red-500">*</span></Label>
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                                <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                                 <Input
                                     id="user_search"
-                                    className="pl-9"
+                                    className="ps-9"
                                     placeholder={__('general.search_by_name_or_email_1')}
                                     value={userSearch}
                                     onChange={e => searchUsers(e.target.value)}
@@ -87,7 +87,7 @@ export default function ResellersCreate() {
                                             key={u.id}
                                             type="button"
                                             onClick={() => selectUser(u)}
-                                            className="w-full text-left px-4 py-2.5 hover:bg-surface-raised transition-colors flex items-center gap-3"
+                                            className="w-full text-start px-4 py-2.5 hover:bg-surface-raised transition-colors flex items-center gap-3"
                                         >
                                             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
                                                 {u.name[0]?.toUpperCase()}

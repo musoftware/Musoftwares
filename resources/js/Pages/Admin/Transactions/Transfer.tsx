@@ -306,7 +306,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                     </div>
                     <div>
                         <Button variant="outline" onClick={() => window.history.back()}>
-                            <ArrowDownLeft className="h-4 w-4 mr-2" style={{ transform: 'rotate(45deg)' }} /> Back
+                            <ArrowDownLeft className="h-4 w-4 me-2" style={{ transform: 'rotate(45deg)' }} /> Back
                         </Button>
                     </div>
                 </header>
@@ -436,7 +436,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                                     Add Transfer
                                 </Button>
                                 <Button variant="outline" className="w-full text-yellow-600 border-yellow-200 bg-yellow-50 hover:bg-yellow-100" onClick={handleGeniusFix}>
-                                    <Lightbulb className="h-4 w-4 mr-2" />
+                                    <Lightbulb className="h-4 w-4 me-2" />
                                     Genius Fix
                                 </Button>
                             </div>
@@ -450,7 +450,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                                 <CardTitle>Prepared Transfers</CardTitle>
                                 {data.data.length > 0 && (
                                     <Button onClick={handleSubmit} disabled={processing} variant="default" className="bg-green-600 hover:bg-green-700">
-                                        <Save className="h-4 w-4 mr-2" />
+                                        <Save className="h-4 w-4 me-2" />
                                         Save All Transfers
                                     </Button>
                                 )}
@@ -465,7 +465,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
-                                    <table className="w-full text-sm text-left">
+                                    <table className="w-full text-sm text-start">
                                         <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
                                             <tr>
                                                 <th className="px-4 py-3 rounded-tl-lg">Source</th>

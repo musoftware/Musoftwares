@@ -42,7 +42,7 @@ export default function Approvals({ leaveRequests, withdrawals }: any) {
                                             <TableHead>{__('general.type')}</TableHead>
                                             <TableHead>{__('general.duration')}</TableHead>
                                             <TableHead>{__('general.reason')}</TableHead>
-                                            <TableHead className="text-right">{__('general.action')}</TableHead>
+                                            <TableHead className="text-end">{__('general.action')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -58,7 +58,7 @@ export default function Approvals({ leaveRequests, withdrawals }: any) {
                                                 <TableCell className="max-w-xs truncate" title={request.reason}>
                                                     {request.reason || __('erp.no_reason_provided')}
                                                 </TableCell>
-                                                <TableCell className="text-right space-x-2">
+                                                <TableCell className="text-end space-x-2">
                                                     <Link href={route('erp.manager.approvals.leave.show', request.id)}>
                                                         <Button 
                                                             variant="default" 
@@ -66,7 +66,7 @@ export default function Approvals({ leaveRequests, withdrawals }: any) {
                                                             className="shadow-sm"
                                                         >
                                                             {__('general.review')}
-                                                            <ArrowRight className="w-4 h-4 ml-1" />
+                                                            <ArrowRight className="w-4 h-4 ms-1" />
                                                         </Button>
                                                     </Link>
                                                 </TableCell>
@@ -96,7 +96,7 @@ export default function Approvals({ leaveRequests, withdrawals }: any) {
                                             <TableHead>{__('erp.client_member')}</TableHead>
                                             <TableHead>{__('general.amount')}</TableHead>
                                             <TableHead>{__('general.date')}</TableHead>
-                                            <TableHead className="text-right">{__('general.action')}</TableHead>
+                                            <TableHead className="text-end">{__('general.action')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -105,7 +105,7 @@ export default function Approvals({ leaveRequests, withdrawals }: any) {
                                                 <TableCell className="font-medium">{withdrawal.client?.name || __('general.unknown')}</TableCell>
                                                 <TableCell>{withdrawal.amount} {withdrawal.amount_currency}</TableCell>
                                                 <TableCell>{format(new Date(withdrawal.created_at), 'MMM d, yyyy')}</TableCell>
-                                                <TableCell className="text-right">
+                                                <TableCell className="text-end">
                                                     <span className="text-xs text-muted-foreground italic">{__('erp.handled_by_finance')}</span>
                                                 </TableCell>
                                             </TableRow>

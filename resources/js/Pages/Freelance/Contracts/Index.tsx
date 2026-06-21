@@ -186,7 +186,7 @@ export default function ContractsIndex({ contracts, stats, userCurrency }: any) 
                                         </div>
 
                                         <div className="flex items-center gap-4 shrink-0">
-                                            <div className="text-right">
+                                            <div className="text-end">
                                                 <span className="text-base font-black text-slate-900 font-mono">
                                                     {contract.amount !== null && contract.amount !== undefined ? formatMoney(contract.amount, userCurrency) : `${contract.contract_points} ${__('freelance.pts', undefined, 'pts')}`}
                                                 </span>

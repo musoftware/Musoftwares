@@ -43,7 +43,7 @@ export function FoldersWorkspace({
                             variant="ghost"
                             key={folder.path}
                             onClick={() => handleOpenFolder(folder.name)}
-                            className="p-4 h-auto justify-start text-left transition-all hover:border-amber-500/30 active:scale-95 border"
+                            className="p-4 h-auto justify-start text-start transition-all hover:border-amber-500/30 active:scale-95 border"
                             style={{ background: '#13161f', borderColor: 'rgba(255,255,255,0.06)' }}
                         >
                             <div className="flex items-start gap-3 w-full">

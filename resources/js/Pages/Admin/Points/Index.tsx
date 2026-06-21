@@ -93,7 +93,7 @@ function AdjustDialog({ user, onClose }: { user: UserRow; onClose: () => void })
                         <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">{__('general.current_balance')}</p>
                         <p className="text-2xl font-bold text-slate-900">
                             {user.coins_balance.toLocaleString()}
-                            <span className="ml-1 text-sm font-normal text-slate-400">pts</span>
+                            <span className="ms-1 text-sm font-normal text-slate-400">pts</span>
                         </p>
                     </div>
 
@@ -102,7 +102,7 @@ function AdjustDialog({ user, onClose }: { user: UserRow; onClose: () => void })
                         <Label htmlFor="adj-amount">
                             Amount
                             {amount !== 0 && (
-                                <span className={`ml-2 text-xs font-semibold ${isAdd ? 'text-green-600' : 'text-red-600'}`}>
+                                <span className={`ms-2 text-xs font-semibold ${isAdd ? 'text-green-600' : 'text-red-600'}`}>
                                     {isAdd ? '+ Adding' : '− Deducting'} {Math.abs(amount).toLocaleString()} pts
                                 </span>
                             )}
@@ -194,14 +194,14 @@ function HistoryDialog({ user, onClose }: { user: UserRow; onClose: () => void }
                         <div className="flex flex-col items-center justify-center py-12 text-slate-400 text-sm gap-2">
                             <History className="h-8 w-8 opacity-30" />{__('general.no_points_history_found')}</div>
                     ) : (
-                        <table className="w-full text-left text-[13px]">
+                        <table className="w-full text-start text-[13px]">
                             <thead className="sticky top-0 bg-slate-50 border-b border-slate-200">
                                 <tr>
                                     <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{__('general.action_label')}</th>
                                     <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 text-center">
                                         Points
                                     </th>
-                                    <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 text-right">
+                                    <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 text-end">
                                         Date
                                     </th>
                                 </tr>
@@ -233,7 +233,7 @@ function HistoryDialog({ user, onClose }: { user: UserRow; onClose: () => void }
                                                 {entry.coins_reward.toLocaleString()}
                                             </span>
                                         </td>
-                                        <td className="px-3 py-2.5 text-right text-slate-400 text-xs whitespace-nowrap">
+                                        <td className="px-3 py-2.5 text-end text-slate-400 text-xs whitespace-nowrap">
                                             {new Date(entry.created_at).toLocaleString()}
                                         </td>
                                     </tr>
@@ -290,19 +290,19 @@ export default function Index({ users, search }: Props) {
                 {/* Search */}
                 <form onSubmit={handleSearch} className="flex items-center gap-2">
                     <div className="relative max-w-sm w-full">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                         <Input
                             type="text"
                             placeholder={__('general.search_by_name_or_email')}
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
-                            className="pl-9 pr-8"
+                            className="ps-9 pe-8"
                         />
                         {searchInput && (
                             <button
                                 type="button"
                                 onClick={clearSearch}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                className="absolute end-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                             >
                                 <X className="h-3.5 w-3.5" />
                             </button>
@@ -315,14 +315,14 @@ export default function Index({ users, search }: Props) {
 
                 {/* Table */}
                 <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                    <table className="w-full text-left text-[13px]">
+                    <table className="w-full text-start text-[13px]">
                         <thead className="border-b border-slate-200 bg-slate-50">
                             <tr>
                                 <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                                     User
                                 </th>
                                 <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{__('general.points_balance')}</th>
-                                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 text-right">
+                                <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 text-end">
                                     Actions
                                 </th>
                             </tr>
@@ -364,14 +364,14 @@ export default function Index({ users, search }: Props) {
                                         </td>
 
                                         {/* Actions */}
-                                        <td className="px-4 py-3 text-right">
+                                        <td className="px-4 py-3 text-end">
                                             <div className="flex items-center justify-end gap-2">
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
                                                     onClick={() => setAdjustTarget(user)}
                                                 >
-                                                    <Coins className="mr-1.5 h-3.5 w-3.5" />
+                                                    <Coins className="me-1.5 h-3.5 w-3.5" />
                                                     Adjust
                                                 </Button>
                                                 <Button
@@ -379,7 +379,7 @@ export default function Index({ users, search }: Props) {
                                                     variant="ghost"
                                                     onClick={() => setHistoryTarget(user)}
                                                 >
-                                                    <History className="mr-1.5 h-3.5 w-3.5" />
+                                                    <History className="me-1.5 h-3.5 w-3.5" />
                                                     History
                                                 </Button>
                                             </div>

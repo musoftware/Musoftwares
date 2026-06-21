@@ -138,7 +138,7 @@ export function ActiveProcessesWorkspace({
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => handleStopProcess(proc.id)}
-                                        className="gap-1.5 h-9 text-[11px] font-bold transition-all ml-auto"
+                                        className="gap-1.5 h-9 text-[11px] font-bold transition-all ms-auto"
                                         style={{ background: 'rgba(244,63,94,0.15)', color: '#f43f5e', border: '1px solid rgba(244,63,94,0.25)' }}
                                     >
                                         <StopCircle className="w-3 h-3" /> {__('general.stop')}

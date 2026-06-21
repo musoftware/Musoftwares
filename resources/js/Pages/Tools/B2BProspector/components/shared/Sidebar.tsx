@@ -12,13 +12,13 @@ interface SidebarProps {
 
 export function B2BProspectorSidebar({ realtimeLogs, linkedInSession, inboxes, runningCampaignIds }: SidebarProps) {
     return (
-        <aside className="w-72 border-r border-slate-200 bg-white flex flex-col justify-between hidden lg:flex shrink-0">
+        <aside className="w-72 border-e border-slate-200 bg-white flex flex-col justify-between hidden lg:flex shrink-0">
             <div className="p-5 flex-1 flex flex-col min-h-0">
                 <div className="flex items-center gap-2 mb-4">
                     <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-ping" />
                     <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">{__('general.live_activity_feed')}</h3>
                 </div>
-                <div className="flex-1 overflow-y-auto space-y-3 pr-1 font-sans scrollbar-thin">
+                <div className="flex-1 overflow-y-auto space-y-3 pe-1 font-sans scrollbar-thin">
                     {realtimeLogs.length === 0 ? (
                         <div className="text-center py-20 text-slate-400 text-xs flex flex-col items-center gap-2">
                             <HelpCircle className="w-6 h-6 text-slate-300" />

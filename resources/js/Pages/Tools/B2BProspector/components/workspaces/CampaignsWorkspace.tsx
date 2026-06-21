@@ -60,7 +60,7 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
                         return (
                             <Card key={camp.id} className="p-6 hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden group">
                                 {isRunning && (
-                                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-400 to-indigo-500 animate-pulse" />
+                                    <div className="absolute top-0 start-0 end-0 h-1 bg-gradient-to-r from-teal-400 to-indigo-500 animate-pulse" />
                                 )}
                                 
                                 <div>
@@ -107,7 +107,7 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
                                         variant="ghost" size="sm"
                                         onClick={() => props.onViewLeads(camp.id)}
                                         className="text-xs text-slate-500 hover:text-slate-900"
-                                    >{__('general.view_leads')}<ChevronRight className="w-3.5 h-3.5 ml-1" />
+                                    >{__('general.view_leads')}<ChevronRight className="w-3.5 h-3.5 ms-1" />
                                     </Button>
                                     
                                     {isRunning ? (
@@ -116,14 +116,14 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
                                             onClick={() => props.handleStopCampaign(camp.id)}
                                             className="h-8 bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-100 text-[11px]"
                                         >
-                                            <Square className="w-3 h-3 fill-rose-700 mr-1" />{__('general.pause_search')}</Button>
+                                            <Square className="w-3 h-3 fill-rose-700 me-1" />{__('general.pause_search')}</Button>
                                     ) : (
                                         <Button 
                                             variant="outline" size="sm"
                                             onClick={() => props.handleStartCampaign(camp.id)}
                                             className="h-8 bg-teal-50 hover:bg-teal-100 text-teal-700 border-teal-100 text-[11px]"
                                         >
-                                            <Play className="w-3 h-3 fill-teal-700 mr-1" />{__('general.launch_scraper')}</Button>
+                                            <Play className="w-3 h-3 fill-teal-700 me-1" />{__('general.launch_scraper')}</Button>
                                     )}
                                 </div>
                             </Card>

@@ -48,7 +48,7 @@ export default function Index({
                                                             href={route('notifications.mark-read', { id: notification.id })} 
                                                             method="post" 
                                                             as="button" 
-                                                            className="flex-1 text-left outline-none"
+                                                            className="flex-1 text-start outline-none"
                                                         >
                                                             <p className="text-sm font-medium text-gray-900 leading-tight">
                                                                 {notification.data?.title || notification.data?.message || __('general.new_notification')}

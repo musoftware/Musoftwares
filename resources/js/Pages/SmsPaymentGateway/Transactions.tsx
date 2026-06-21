@@ -67,7 +67,7 @@ export default function Transactions({ transactions, filters }: TransactionsProp
                         </div>
                         <div className="flex gap-2">
                             <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
-                                <ArrowLeft className="w-4 h-4 mr-2" />
+                                <ArrowLeft className="w-4 h-4 me-2" />
                                 {__('general.back')}
                             </Button>
                         </div>
@@ -119,7 +119,7 @@ export default function Transactions({ transactions, filters }: TransactionsProp
                                                     <TableCell>
                                                         {tx.device ? (
                                                             <div className="flex items-center text-sm text-slate-600">
-                                                                <Smartphone className="w-3 h-3 mr-1" />
+                                                                <Smartphone className="w-3 h-3 me-1" />
                                                                 {tx.device.device_name}
                                                             </div>
                                                         ) : (

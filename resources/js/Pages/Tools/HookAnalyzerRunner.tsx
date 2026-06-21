@@ -72,7 +72,7 @@ function AnalysisCard({ a, idx }: { a: any; idx: number }) {
             <Button
                 variant="ghost"
                 onClick={() => setOpen(v => !v)}
-                className="w-full h-auto flex items-center gap-4 p-5 hover:bg-slate-50 transition-colors text-left rounded-none"
+                className="w-full h-auto flex items-center gap-4 p-5 hover:bg-slate-50 transition-colors text-start rounded-none"
             >
                 <GradeBadge grade={a.grade} emoji={a.grade_emoji} />
                 <div className="flex-1 min-w-0 space-y-1.5">
@@ -271,14 +271,14 @@ export default function HookAnalyzerRunner({ tool }: any) {
                     {/* Single URL input */}
                     {mode === 'single' && (
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                             <Input
                                 type="url"
                                 value={singleUrl}
                                 onChange={e => setSingleUrl(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleAnalyze()}
                                 placeholder={__('general.https_www_tiktok_com_user_video')}
-                                className="pl-9 h-11 text-sm bg-slate-50 font-mono"
+                                className="ps-9 h-11 text-sm bg-slate-50 font-mono"
                             />
                         </div>
                     )}
@@ -289,13 +289,13 @@ export default function HookAnalyzerRunner({ tool }: any) {
                             {batchUrls.map((u, i) => (
                                 <div key={i} className="flex gap-2">
                                     <div className="relative flex-1">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400">{i + 1}</span>
+                                        <span className="absolute start-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400">{i + 1}</span>
                                         <Input
                                             type="url"
                                             value={u}
                                             onChange={e => updateUrl(i, e.target.value)}
                                             placeholder={__('general.https_www_tiktok_com_user_video')}
-                                            className="pl-8 h-11 text-sm bg-slate-50 font-mono"
+                                            className="ps-8 h-11 text-sm bg-slate-50 font-mono"
                                         />
                                     </div>
                                     {batchUrls.length > 1 && (
@@ -357,7 +357,7 @@ export default function HookAnalyzerRunner({ tool }: any) {
                                     <p className="text-xs font-bold text-violet-300 uppercase tracking-wider">{__('general.average_hook_score')}</p>
                                     <p className="text-4xl font-black mt-1">{avg}<span className="text-lg font-bold text-violet-400">/100</span></p>
                                 </div>
-                                <div className="text-right">
+                                <div className="text-end">
                                     <p className="text-xs font-bold text-violet-300 uppercase tracking-wider">{__('general.videos_analyzed')}</p>
                                     <p className="text-4xl font-black mt-1">{analyses.length}</p>
                                 </div>

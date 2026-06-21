@@ -92,7 +92,7 @@ export default function Index({ vouchers }) {
     };
 
     const renderFormFields = () => (
-        <div className="space-y-4 max-h-[65vh] overflow-y-auto p-1 pr-2">
+        <div className="space-y-4 max-h-[65vh] overflow-y-auto p-1 pe-2">
             {/* Name */}
             <div>
                 <Label htmlFor="name">{__('general.voucher_name')}</Label>
@@ -295,7 +295,7 @@ export default function Index({ vouchers }) {
                 </div>
 
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                    <DialogTrigger render={<Button><Plus className="mr-2 h-4 w-4" />{__('general.create_voucher')}</Button>} />
+                    <DialogTrigger render={<Button><Plus className="me-2 h-4 w-4" />{__('general.create_voucher')}</Button>} />
                     <DialogContent className="max-w-lg">
                         <DialogHeader>
                             <DialogTitle>{__('general.create_new_voucher')}</DialogTitle>
@@ -315,7 +315,7 @@ export default function Index({ vouchers }) {
 
             {/* Table */}
             <div className="overflow-hidden rounded-lg bg-white shadow">
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-start text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
                             <th className="p-4 font-medium text-gray-600">Name</th>
@@ -324,7 +324,7 @@ export default function Index({ vouchers }) {
                             <th className="p-4 font-medium text-gray-600">Uses</th>
                             <th className="p-4 font-medium text-gray-600">Expires</th>
                             <th className="p-4 font-medium text-gray-600">Status</th>
-                            <th className="p-4 font-medium text-gray-600 text-right">Actions</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -344,7 +344,7 @@ export default function Index({ vouchers }) {
                                 <td className="p-4 text-sm text-gray-700">
                                     <span className="font-medium">{parseFloat(v.spend_amount).toFixed(2)}</span>
                                     {v.spend_currency && v.spend_currency.currency && (
-                                        <span className="text-gray-400 ml-1">{v.spend_currency.currency}</span>
+                                        <span className="text-gray-400 ms-1">{v.spend_currency.currency}</span>
                                     )}
                                     <span className="mx-2 text-gray-400">→</span>
                                     <span className="font-medium">
@@ -353,7 +353,7 @@ export default function Index({ vouchers }) {
                                             : parseFloat(v.reward_amount).toFixed(2)}
                                     </span>
                                     {v.reward_currency && v.type !== 'percentage' && v.reward_currency.currency && (
-                                        <span className="text-gray-400 ml-1">{v.reward_currency.currency}</span>
+                                        <span className="text-gray-400 ms-1">{v.reward_currency.currency}</span>
                                     )}
                                 </td>
                                 <td className="p-4 text-sm text-gray-700">
@@ -376,12 +376,12 @@ export default function Index({ vouchers }) {
                                         </span>
                                     )}
                                 </td>
-                                <td className="p-4 space-x-2 text-right">
+                                <td className="p-4 space-x-2 text-end">
                                     <Button variant="outline" size="sm" onClick={() => openEditModal(v)}>
-                                        <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
+                                        <Pencil className="h-3.5 w-3.5 me-1" /> Edit
                                     </Button>
                                     <Button variant="destructive" size="sm" onClick={() => handleDelete(v.id)}>
-                                        <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
+                                        <Trash2 className="h-3.5 w-3.5 me-1" /> Delete
                                     </Button>
                                 </td>
                             </tr>

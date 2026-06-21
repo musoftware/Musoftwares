@@ -141,7 +141,7 @@ export default function Index({ salaries, currencies, users }) {
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
                         <Button className="bg-black hover:bg-slate-800 text-white h-9">
-                            <Plus className="w-4 h-4 mr-2" />{__('general.add_recurring_salary')}</Button>
+                            <Plus className="w-4 h-4 me-2" />{__('general.add_recurring_salary')}</Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[450px] max-h-[85vh] overflow-y-auto">
                         <form onSubmit={handleCreate}>
@@ -282,9 +282,9 @@ export default function Index({ salaries, currencies, users }) {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.employee_user')}</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.title_schedule')}</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.start_date')}</th>
+                            <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.employee_user')}</th>
+                            <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.title_schedule')}</th>
+                            <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.start_date')}</th>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
                                 Amount
                             </th>
@@ -294,7 +294,7 @@ export default function Index({ salaries, currencies, users }) {
                             <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
                                 Note
                             </th>
-                            <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Actions</th>
+                            <th className="px-6 py-3 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -302,7 +302,7 @@ export default function Index({ salaries, currencies, users }) {
                             <tr key={salary.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center">
-                                        <div className="bg-slate-100 border p-2 rounded-full mr-3 text-slate-650">
+                                        <div className="bg-slate-100 border p-2 rounded-full me-3 text-slate-650">
                                             <User className="w-4 h-4" />
                                         </div>
                                         <div>
@@ -337,14 +337,14 @@ export default function Index({ salaries, currencies, users }) {
                                         {salary.reason || 'No notes'}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
                                     <Link href={route('admin.recurring_salaries.view', salary.id)}>
-                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black mr-1" title={__('general.view_details')}>
+                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black me-1" title={__('general.view_details')}>
                                             <Eye className="w-4 h-4" />
                                         </Button>
                                     </Link>
                                     <Link href={route('admin.recurring_salaries.edit', salary.id)}>
-                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black mr-1" title="Edit">
+                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black me-1" title="Edit">
                                             <Edit className="w-4 h-4" />
                                         </Button>
                                     </Link>

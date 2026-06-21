@@ -8,7 +8,7 @@ export default function Guest({ children }: PropsWithChildren) {
     return (
         <div className="min-h-screen flex w-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans selection:bg-zinc-900 selection:text-white dark:selection:bg-white dark:selection:text-zinc-900">
             {/* Desktop Left Column: Calm Minimal Supportive View */}
-            <div className="hidden lg:flex lg:w-[42%] xl:w-[45%] bg-zinc-100/50 dark:bg-zinc-900/30 text-zinc-800 dark:text-zinc-200 flex-col justify-between p-12 lg:p-16 border-r border-zinc-200/80 dark:border-zinc-800/80">
+            <div className="hidden lg:flex lg:w-[42%] xl:w-[45%] bg-zinc-100/50 dark:bg-zinc-900/30 text-zinc-800 dark:text-zinc-200 flex-col justify-between p-12 lg:p-16 border-e border-zinc-200/80 dark:border-zinc-800/80">
                 {/* Top Branding Header */}
                 <div className="flex items-center space-x-3">
                     <Link href="/" className="flex items-center space-x-2.5 group">
@@ -42,7 +42,7 @@ export default function Guest({ children }: PropsWithChildren) {
             {/* Right Side / Mobile Centered Container */}
             <div className="flex-1 flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-16 relative bg-white dark:bg-zinc-950">
                 {/* Mobile / Tablet Minimal Top Bar */}
-                <div className="absolute top-6 left-6 lg:hidden flex items-center space-x-2.5">
+                <div className="absolute top-6 start-6 lg:hidden flex items-center space-x-2.5">
                     <Link href="/" className="flex items-center space-x-2 group">
                         <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
                             <ApplicationLogo className="w-4 h-4 fill-current" />

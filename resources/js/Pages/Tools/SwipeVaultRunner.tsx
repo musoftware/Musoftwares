@@ -396,7 +396,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => { setSelectedCollectionId(null); setActiveView('swipes'); }}
-                                className="group bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 hover:bg-white/[0.06] hover:border-white/10 transition-all text-left"
+                                className="group bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 hover:bg-white/[0.06] hover:border-white/10 transition-all text-start"
                             >
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center border border-white/10">
@@ -410,7 +410,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                             </button>
                             <button
                                 onClick={() => handleOpenCollection('__uncategorized__')}
-                                className="group bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 hover:bg-white/[0.06] hover:border-white/10 transition-all text-left"
+                                className="group bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 hover:bg-white/[0.06] hover:border-white/10 transition-all text-start"
                             >
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center border border-white/10">
@@ -458,7 +458,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                                                 </div>
                                             )}
                                             {/* Color bar */}
-                                            <div className="absolute bottom-0 left-0 right-0 h-1" style={{ backgroundColor: c.color }} />
+                                            <div className="absolute bottom-0 start-0 end-0 h-1" style={{ backgroundColor: c.color }} />
                                         </div>
 
                                         <div className="p-4 flex items-center justify-between">
@@ -467,7 +467,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                                                     <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: c.color }} />
                                                     <h3 className="text-sm font-bold text-white truncate">{c.name}</h3>
                                                 </div>
-                                                <p className="text-xs text-slate-500 mt-1 ml-5">{c.swipeCount} swipes</p>
+                                                <p className="text-xs text-slate-500 mt-1 ms-5">{c.swipeCount} swipes</p>
                                             </div>
                                             <Button
                                                 variant="ghost"
@@ -496,7 +496,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                                         >
                                             <Hash className="w-3 h-3" />
                                             {t.name}
-                                            <span className="text-slate-600 ml-0.5">{t.count}</span>
+                                            <span className="text-slate-600 ms-0.5">{t.count}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -519,13 +519,13 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                         <div className="flex items-center justify-between flex-wrap gap-3">
                             <div className="flex items-center gap-2 flex-1 min-w-0 max-w-md">
                                 <div className="relative flex-1">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                                     <Input
                                         type="text"
                                         placeholder={__('general.search_swipes')}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="pl-9 h-9 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 text-sm focus:border-amber-500/50 focus:ring-amber-500/20"
+                                        className="ps-9 h-9 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 text-sm focus:border-amber-500/50 focus:ring-amber-500/20"
                                     />
                                 </div>
                                 {activeTag && (
@@ -755,7 +755,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => { setAddBase64(null); setAddFilename(''); }}
-                                        className="absolute top-2 right-2 h-7 w-7 bg-black/60 hover:bg-black/80 text-white"
+                                        className="absolute top-2 end-2 h-7 w-7 bg-black/60 hover:bg-black/80 text-white"
                                     >
                                         <X className="w-3.5 h-3.5" />
                                     </Button>
@@ -858,7 +858,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                     <div className="space-y-1.5 pt-2 max-h-[40vh] overflow-y-auto">
                         <button
                             onClick={() => selectedSwipe && handleMoveSwipe(selectedSwipe.id, null as any)}
-                            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.06] transition-all text-left"
+                            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.06] transition-all text-start"
                         >
                             <div className="w-3 h-3 rounded-full bg-slate-500" />
                             <span className="text-sm text-slate-300">Uncategorized</span>
@@ -867,11 +867,11 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                             <button
                                 key={c.id}
                                 onClick={() => selectedSwipe && handleMoveSwipe(selectedSwipe.id, c.id)}
-                                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.06] transition-all text-left"
+                                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.06] transition-all text-start"
                             >
                                 <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: c.color }} />
                                 <span className="text-sm text-slate-300 truncate">{c.name}</span>
-                                <span className="text-xs text-slate-600 ml-auto">{c.swipeCount}</span>
+                                <span className="text-xs text-slate-600 ms-auto">{c.swipeCount}</span>
                             </button>
                         ))}
                     </div>
@@ -919,7 +919,7 @@ function SwipeCard({ swipe, onOpen, onEdit, onDelete, onMove, collectionColor }:
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
                 {/* Action menu */}
-                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                <div className="absolute top-2 end-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                     <Dialog>
                         <DialogTrigger asChild>
                             <Button
@@ -950,7 +950,7 @@ function SwipeCard({ swipe, onOpen, onEdit, onDelete, onMove, collectionColor }:
                 </div>
 
                 {/* Color indicator */}
-                <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ backgroundColor: collectionColor }} />
+                <div className="absolute bottom-0 start-0 end-0 h-0.5" style={{ backgroundColor: collectionColor }} />
             </div>
 
             {/* Title */}

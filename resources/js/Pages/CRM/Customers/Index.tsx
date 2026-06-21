@@ -13,14 +13,14 @@ export default function CustomersIndex({ customers }: { customers: any }) {
                 </div>
 
                 <div className="bg-white rounded shadow overflow-hidden">
-                    <table className="w-full text-sm text-left">
+                    <table className="w-full text-sm text-start">
                         <thead className="bg-gray-50 border-b">
                             <tr>
                                 <th className="px-6 py-3">{__('crm.name')}</th>
                                 <th className="px-6 py-3">{__('crm.email')}</th>
                                 <th className="px-6 py-3">{__('crm.company')}</th>
                                 <th className="px-6 py-3">{__('crm.total_value')}</th>
-                                <th className="px-6 py-3 text-right">{__('crm.actions')}</th>
+                                <th className="px-6 py-3 text-end">{__('crm.actions')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -30,7 +30,7 @@ export default function CustomersIndex({ customers }: { customers: any }) {
                                     <td className="px-6 py-4">{customer.email}</td>
                                     <td className="px-6 py-4">{customer.company}</td>
                                     <td className="px-6 py-4">{customer.total_value}</td>
-                                    <td className="px-6 py-4 text-right">
+                                    <td className="px-6 py-4 text-end">
                                         <Link href={route('crm.customers.show', customer.id)} className="text-blue-600 hover:underline">
                                             {__('crm.view')}
                                         </Link>

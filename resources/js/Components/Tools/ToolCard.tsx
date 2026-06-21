@@ -81,7 +81,7 @@ export function ToolCard({ tool, isSubscribed = false }: ToolCardProps) {
             </div>
 
             {/* End / Footer */}
-            <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 sm:gap-2 sm:pl-4 sm:border-l border-slate-100 min-w-[140px]">
+            <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 sm:gap-2 sm:ps-4 sm:border-s border-slate-100 min-w-[140px]">
                 <PlatformBadges platforms={safePlatforms} size="sm" />
                 <span className={`text-sm font-semibold ${tool.is_free ? 'text-emerald-600' : 'text-slate-800'}`}>
                     {tool.is_free ? 'Free' : `From $${tool.starting_price}/mo`}

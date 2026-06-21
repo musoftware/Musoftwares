@@ -103,7 +103,7 @@ export default function CollectorDashboard({ stats, agingReport, highRiskAccount
                                         <TableRow>
                                             <TableHead>{__('general.client')}</TableHead>
                                             <TableHead>{__('general.invoices')}</TableHead>
-                                            <TableHead className="text-right">{__('general.total_overdue')}</TableHead>
+                                            <TableHead className="text-end">{__('general.total_overdue')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -116,7 +116,7 @@ export default function CollectorDashboard({ stats, agingReport, highRiskAccount
                                                 <TableCell>
                                                     <Badge variant="outline">{account.invoices_count}</Badge>
                                                 </TableCell>
-                                                <TableCell className="text-right font-bold text-red-600">
+                                                <TableCell className="text-end font-bold text-red-600">
                                                     {formatCurrency(account.total_overdue, account.currency || baseCurrency)}
                                                 </TableCell>
                                             </TableRow>
@@ -146,7 +146,7 @@ export default function CollectorDashboard({ stats, agingReport, highRiskAccount
                                         <TableRow>
                                             <TableHead>{__('general.invoice')}</TableHead>
                                             <TableHead>{__('general.due_date')}</TableHead>
-                                            <TableHead className="text-right">{__('general.amount')}</TableHead>
+                                            <TableHead className="text-end">{__('general.amount')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -161,7 +161,7 @@ export default function CollectorDashboard({ stats, agingReport, highRiskAccount
                                                         {formatDateHuman(invoice.due_date)}
                                                     </span>
                                                 </TableCell>
-                                                <TableCell className="text-right font-bold">
+                                                <TableCell className="text-end font-bold">
                                                     {formatCurrency(Math.max(0, invoice.amount - invoice.paid_amount), invoice.currency || baseCurrency)}
                                                 </TableCell>
                                             </TableRow>

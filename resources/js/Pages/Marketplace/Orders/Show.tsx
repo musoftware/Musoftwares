@@ -106,7 +106,7 @@ export default function Show({ order, conversation }: any) {
                             </div>
                             <div className="flex justify-between px-1 text-xs font-medium text-gray-500">
                                 <div
-                                    className={`text-left ${currentStepIndex >= 0 ? 'font-bold text-indigo-600' : ''}`}
+                                    className={`text-start ${currentStepIndex >= 0 ? 'font-bold text-indigo-600' : ''}`}
                                 >
                                     Placed
                                 </div>
@@ -119,7 +119,7 @@ export default function Show({ order, conversation }: any) {
                                     Delivered
                                 </div>
                                 <div
-                                    className={`text-right ${currentStepIndex >= 3 ? 'font-bold text-indigo-600' : ''}`}
+                                    className={`text-end ${currentStepIndex >= 3 ? 'font-bold text-indigo-600' : ''}`}
                                 >
                                     Completed
                                 </div>
@@ -158,7 +158,7 @@ export default function Show({ order, conversation }: any) {
                             {/* Delivery Section (Shown if delivered) */}
                             {order.status === 'delivered' && (
                                 <div className="relative overflow-hidden rounded-xl border border-indigo-200 bg-white p-6 shadow-sm">
-                                    <div className="absolute top-0 left-0 h-full w-1 bg-indigo-500"></div>
+                                    <div className="absolute top-0 start-0 h-full w-1 bg-indigo-500"></div>
                                     <h4 className="mb-4 flex items-center gap-2 text-lg font-bold text-gray-900">
                                         <svg
                                             className="h-5 w-5 text-indigo-500"
@@ -274,7 +274,7 @@ export default function Show({ order, conversation }: any) {
                                                         <div
                                                             className={`flex max-w-[75%] flex-col ${isMe ? 'items-end' : 'items-start'}`}
                                                         >
-                                                            <span className="mb-1 ml-1 text-xs text-gray-500">
+                                                            <span className="mb-1 ms-1 text-xs text-gray-500">
                                                                 {isMe
                                                                     ? 'You'
                                                                     : msg.sender
@@ -384,7 +384,7 @@ export default function Show({ order, conversation }: any) {
                                             className="flex items-center justify-center rounded-full bg-indigo-600 p-2.5 text-white transition hover:bg-indigo-700"
                                         >
                                             <svg
-                                                className="ml-1 h-5 w-5"
+                                                className="ms-1 h-5 w-5"
                                                 fill="none"
                                                 stroke="currentColor"
                                                 viewBox="0 0 24 24"
@@ -429,7 +429,7 @@ export default function Show({ order, conversation }: any) {
                                         <div className="mb-6 space-y-3">
                                             <div className="flex items-start text-sm text-gray-600">
                                                 <svg
-                                                    className="mr-2 h-5 w-5 shrink-0 text-green-500"
+                                                    className="me-2 h-5 w-5 shrink-0 text-green-500"
                                                     fill="none"
                                                     stroke="currentColor"
                                                     viewBox="0 0 24 24"
@@ -443,7 +443,7 @@ export default function Show({ order, conversation }: any) {
                                                 </svg>{__('general.source_files_included')}</div>
                                             <div className="flex items-start text-sm text-gray-600">
                                                 <svg
-                                                    className="mr-2 h-5 w-5 shrink-0 text-green-500"
+                                                    className="me-2 h-5 w-5 shrink-0 text-green-500"
                                                     fill="none"
                                                     stroke="currentColor"
                                                     viewBox="0 0 24 24"
@@ -459,7 +459,7 @@ export default function Show({ order, conversation }: any) {
                                             </div>
                                             <div className="flex items-start text-sm text-gray-600">
                                                 <svg
-                                                    className="mr-2 h-5 w-5 shrink-0 text-green-500"
+                                                    className="me-2 h-5 w-5 shrink-0 text-green-500"
                                                     fill="none"
                                                     stroke="currentColor"
                                                     viewBox="0 0 24 24"

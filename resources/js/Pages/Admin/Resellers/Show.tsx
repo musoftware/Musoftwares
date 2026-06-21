@@ -114,7 +114,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                             <p className="text-xs text-red-600 mt-1 font-medium">⚠️ Service suspended — balance is empty. Top up to restore access.</p>
                         )}
                     </div>
-                    <div className="text-right">
+                    <div className="text-end">
                         <p className="text-xs text-text-muted">{__('general.active_sub_users_1')}</p>
                         <p className="text-2xl font-bold text-text-primary">{reseller.active_users}</p>
                         <p className="text-xs text-text-muted mt-0.5">of {reseller.total_users} total</p>
@@ -131,7 +131,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                         >
                             {t.label}
                             {t.badge != null && t.badge > 0 && (
-                                <span className={`ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full ${t.id === 'flagged' ? 'bg-red-100 text-red-600' : 'bg-primary/10 text-primary'}`}>
+                                <span className={`ms-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full ${t.id === 'flagged' ? 'bg-red-100 text-red-600' : 'bg-primary/10 text-primary'}`}>
                                     {t.badge}
                                 </span>
                             )}
@@ -204,11 +204,11 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-border/60">
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">User</th>
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Status</th>
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.anti_sharing')}</th>
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Joined</th>
-                                            <th className="text-right px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">User</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Status</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.anti_sharing')}</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Joined</th>
+                                            <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/40">
@@ -233,7 +233,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-3.5 text-xs text-text-muted">{u.joined_at}</td>
-                                                <td className="px-4 py-3.5 text-right">
+                                                <td className="px-4 py-3.5 text-end">
                                                     <div className="flex items-center justify-end gap-2">
                                                         {u.status === 'active' ? (
                                                             <button onClick={() => suspendUser(u.user_id)} className="text-xs text-orange-600 hover:underline font-medium flex items-center gap-1">
@@ -267,10 +267,10 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-border/60">
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">User</th>
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.flagged_ips')}</th>
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Detected</th>
-                                            <th className="text-right px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">User</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.flagged_ips')}</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Detected</th>
+                                            <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/40">
@@ -290,7 +290,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-3.5 text-xs text-text-muted">{u.sharing_flagged_at}</td>
-                                                <td className="px-4 py-3.5 text-right">
+                                                <td className="px-4 py-3.5 text-end">
                                                     <div className="flex items-center justify-end gap-2">
                                                         <button
                                                             onClick={() => clearFlag(u.user_id)}
@@ -324,12 +324,12 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-border/60">
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Type</th>
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Description</th>
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.sub_user')}</th>
-                                            <th className="text-right px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Amount</th>
-                                            <th className="text-right px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.balance_after')}</th>
-                                            <th className="text-right px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Date</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Type</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Description</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.sub_user')}</th>
+                                            <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Amount</th>
+                                            <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.balance_after')}</th>
+                                            <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Date</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/40">
@@ -346,15 +346,15 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                                     </td>
                                                     <td className="px-4 py-3 text-xs text-text-muted max-w-[200px] truncate">{t.description || '—'}</td>
                                                     <td className="px-4 py-3 text-xs text-text-muted">{t.user?.name || '—'}</td>
-                                                    <td className="px-4 py-3 text-right font-mono text-xs">
+                                                    <td className="px-4 py-3 text-end font-mono text-xs">
                                                         <span className={t.amount >= 0 ? 'text-emerald-600' : 'text-red-600'}>
                                                             {t.amount >= 0 ? '+' : ''}{formatCurrency(t.amount, t.currency)}
                                                         </span>
                                                     </td>
-                                                    <td className="px-4 py-3 text-right font-mono text-xs text-text-muted">
+                                                    <td className="px-4 py-3 text-end font-mono text-xs text-text-muted">
                                                         {formatCurrency(t.balance_after, t.currency)}
                                                     </td>
-                                                    <td className="px-4 py-3 text-right text-xs text-text-muted">{t.created_at}</td>
+                                                    <td className="px-4 py-3 text-end text-xs text-text-muted">{t.created_at}</td>
                                                 </tr>
                                             );
                                         })}

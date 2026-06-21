@@ -170,7 +170,7 @@ export default function MultipleCountdownTimer() {
                         return (
                             <Card key={timer.id} className={`shadow-sm transition-colors border-2 ${isFinished ? 'border-red-400 bg-red-50' : timer.isRunning ? 'border-indigo-400 bg-indigo-50/30' : 'border-slate-200'}`}>
                                 <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-center justify-between space-y-0">
-                                    <CardTitle className="text-base font-semibold truncate pr-4 text-slate-800" title={timer.label}>
+                                    <CardTitle className="text-base font-semibold truncate pe-4 text-slate-800" title={timer.label}>
                                         {timer.label}
                                     </CardTitle>
                                     <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-red-500 shrink-0" onClick={() => removeTimer(timer.id)}>
@@ -215,7 +215,7 @@ export default function MultipleCountdownTimer() {
                                     <div className="flex justify-center gap-2 mb-4">
                                         {!timer.isRunning ? (
                                             <Button size="icon" variant="default" className="h-10 w-10 bg-emerald-600 hover:bg-emerald-700" onClick={() => startTimer(timer.id)}>
-                                                <Play className="h-5 w-5 ml-1" />
+                                                <Play className="h-5 w-5 ms-1" />
                                             </Button>
                                         ) : (
                                             <Button size="icon" variant="destructive" className="h-10 w-10 text-white" onClick={() => pauseTimer(timer.id)}>
@@ -249,7 +249,7 @@ export default function MultipleCountdownTimer() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-sm text-slate-600">
-                            <ul className="list-disc pl-5 space-y-2">
+                            <ul className="list-disc ps-5 space-y-2">
                                 <li><strong>Add a Timer:</strong> Enter a label (optional) and click "Add Timer".</li>
                                 <li><strong>Set Time:</strong> Enter hours, minutes, and seconds for each timer.</li>
                                 <li><strong>Controls:</strong> Start, pause, or reset each timer individually.</li>
