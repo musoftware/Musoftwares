@@ -22,6 +22,24 @@ export default function ResetPassword({
     });
 
     const [showPassword, setShowPassword] = useState(false);
+    const [passwordStrength, setPasswordStrength] = useState({ score: 0, label: '' });
+
+    const checkPasswordStrength = (pass: string) => {
+        let score = 0;
+        if (pass.length > 7) score += 1;
+        if (/[a-z]/.test(pass) && /[A-Z]/.test(pass)) score += 1;
+        if (/\d/.test(pass)) score += 1;
+        if (/[^a-zA-Z\d]/.test(pass)) score += 1;
+
+        let label = '';
+        if (score === 0) label = '';
+        else if (score === 1) label = __('general.weak') || 'Weak';
+        else if (score === 2) label = __('general.fair') || 'Fair';
+        else if (score === 3) label = __('general.good') || 'Good';
+        else if (score === 4) label = __('general.strong') || 'Strong';
+
+        setPasswordStrength({ score, label });
+    };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -68,7 +86,10 @@ export default function ResetPassword({
                                 value={data.password}
                                 autoComplete="new-password"
                                 autoFocus
-                                onChange={(e) => setData('password', e.target.value)}
+                                onChange={(e) => {
+                                    setData('password', e.target.value);
+                                    checkPasswordStrength(e.target.value);
+                                }}
                                 required
                                 className="h-10 px-3 py-2 pe-10 text-sm rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 transition-all font-normal"
                             />
@@ -81,6 +102,31 @@ export default function ResetPassword({
                                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                         </div>
+                        {data.password.length > 0 && (
+                            <div className="mt-2">
+                                <div className="flex items-center space-x-1">
+                                    {[1, 2, 3, 4].map((i) => (
+                                        <div 
+                                            key={i} 
+                                            className={`h-1 w-full rounded-full transition-all duration-300 ${
+                                                passwordStrength.score >= i 
+                                                    ? (passwordStrength.score <= 2 ? 'bg-orange-500' : passwordStrength.score === 3 ? 'bg-amber-500' : 'bg-emerald-500') 
+                                                    : 'bg-zinc-200 dark:bg-zinc-800'
+                                            }`} 
+                                        />
+                                    ))}
+                                </div>
+                                {passwordStrength.label && (
+                                    <p className={`text-[10px] font-medium mt-1.5 uppercase tracking-wider ${
+                                        passwordStrength.score <= 2 ? 'text-orange-600 dark:text-orange-400' : 
+                                        passwordStrength.score === 3 ? 'text-amber-600 dark:text-amber-400' : 
+                                        'text-emerald-600 dark:text-emerald-400'
+                                    }`}>
+                                        {passwordStrength.label}
+                                    </p>
+                                )}
+                            </div>
+                        )}
                         {errors.password && (
                             <p className="text-xs text-red-500 font-medium mt-1">{errors.password}</p>
                         )}
@@ -98,6 +144,12 @@ export default function ResetPassword({
                             required
                             className="h-10 px-3 py-2 text-sm rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 transition-all font-normal"
                         />
+                        {data.password_confirmation.length > 0 && data.password !== data.password_confirmation && (
+                            <p className="text-xs text-red-500 font-medium mt-1">{__('general.passwords_do_not_match') || 'Passwords do not match'}</p>
+                        )}
+                        {data.password_confirmation.length > 0 && data.password === data.password_confirmation && (
+                            <p className="text-xs text-emerald-500 font-medium mt-1">{__('general.passwords_match') || 'Passwords match'}</p>
+                        )}
                         {errors.password_confirmation && (
                             <p className="text-xs text-red-500 font-medium mt-1">{errors.password_confirmation}</p>
                         )}

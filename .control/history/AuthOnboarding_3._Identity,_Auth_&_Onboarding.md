@@ -1,10 +1,10 @@
-# Step: Setup Spatie Permissions (ID: A5)
+# Step: 3. Identity, Auth & Onboarding (ID: AuthOnboarding)
 **Status:** done
-**Timestamp:** 2026-06-22 00:59:09
+**Timestamp:** 2026-06-22 01:09:37
 
 ## Prompt Sent
 ```text
-agy execute A5
+agy execute AuthOnboarding
 ```
 
 ## Execution Output
