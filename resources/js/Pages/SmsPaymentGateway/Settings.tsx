@@ -93,8 +93,8 @@ export default function Settings({ settings, devices }: Props) {
                                 <Input
                                     id="wallet_phone_number"
                                     type="text"
-                                    dir="ltr"
-                                    className="text-left font-mono max-w-md"
+                                    
+                                    className="text-start font-mono max-w-md"
                                     value={data.wallet_phone_number}
                                     onChange={(e) => setData('wallet_phone_number', e.target.value)}
                                     placeholder={__('general.example_01012345678')}
@@ -166,8 +166,8 @@ export default function Settings({ settings, devices }: Props) {
                                             <Input
                                                 id="instapay_phone_number"
                                                 type="text"
-                                                dir="ltr"
-                                                className="text-left font-mono mt-2"
+                                                
+                                                className="text-start font-mono mt-2"
                                                 value={data.instapay_phone_number}
                                                 onChange={(e) => setData('instapay_phone_number', e.target.value)}
                                                 placeholder={__('general.example_userinstapay')}
@@ -194,8 +194,8 @@ export default function Settings({ settings, devices }: Props) {
                                                 <Input
                                                     id="instapay_allowed_sender"
                                                     type="text"
-                                                    dir="ltr"
-                                                    className="text-left font-mono mt-2"
+                                                    
+                                                    className="text-start font-mono mt-2"
                                                     value={data.instapay_allowed_sender}
                                                     onChange={(e) => setData('instapay_allowed_sender', e.target.value)}
                                                     placeholder={__('general.example_instapay')}
@@ -231,8 +231,8 @@ export default function Settings({ settings, devices }: Props) {
                                             <Input
                                                 id="vodafone_cash_phone_number"
                                                 type="text"
-                                                dir="ltr"
-                                                className="text-left font-mono mt-2"
+                                                
+                                                className="text-start font-mono mt-2"
                                                 value={data.vodafone_cash_phone_number}
                                                 onChange={(e) => setData('vodafone_cash_phone_number', e.target.value)}
                                                 placeholder={__('general.example_01012345678')}
@@ -259,8 +259,8 @@ export default function Settings({ settings, devices }: Props) {
                                                 <Input
                                                     id="vodafone_cash_allowed_sender"
                                                     type="text"
-                                                    dir="ltr"
-                                                    className="text-left font-mono mt-2"
+                                                    
+                                                    className="text-start font-mono mt-2"
                                                     value={data.vodafone_cash_allowed_sender}
                                                     onChange={(e) => setData('vodafone_cash_allowed_sender', e.target.value)}
                                                     placeholder={__('general.example_vodafone_cash')}
@@ -281,7 +281,7 @@ export default function Settings({ settings, devices }: Props) {
                                     <textarea
                                         id="whitelist_senders"
                                         className="w-full max-w-md min-h-[100px] flex rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                        dir="ltr"
+                                        
                                         value={data.whitelist_senders}
                                         onChange={(e) => setData('whitelist_senders', e.target.value)}
                                         placeholder={__('general.e_money_vf_cash_cib')}
@@ -303,8 +303,8 @@ export default function Settings({ settings, devices }: Props) {
                                         <Label>{__('sms_gateway.vodafone_cash_logo')}</Label>
                                         <Input
                                             type="url"
-                                            dir="ltr"
-                                            className="text-left font-mono"
+                                            
+                                            className="text-start font-mono"
                                             value={data.custom_logos?.vodafone || ''}
                                             onChange={(e) => setData('custom_logos', { ...data.custom_logos, vodafone: e.target.value })}
                                             placeholder="https://example.com/logo.png"
@@ -315,8 +315,8 @@ export default function Settings({ settings, devices }: Props) {
                                         <Label>{__('sms_gateway.orange_cash_logo')}</Label>
                                         <Input
                                             type="url"
-                                            dir="ltr"
-                                            className="text-left font-mono"
+                                            
+                                            className="text-start font-mono"
                                             value={data.custom_logos?.orange || ''}
                                             onChange={(e) => setData('custom_logos', { ...data.custom_logos, orange: e.target.value })}
                                             placeholder="https://example.com/logo.png"
@@ -327,8 +327,8 @@ export default function Settings({ settings, devices }: Props) {
                                         <Label>{__('sms_gateway.etisalat_cash_logo')}</Label>
                                         <Input
                                             type="url"
-                                            dir="ltr"
-                                            className="text-left font-mono"
+                                            
+                                            className="text-start font-mono"
                                             value={data.custom_logos?.etisalat || ''}
                                             onChange={(e) => setData('custom_logos', { ...data.custom_logos, etisalat: e.target.value })}
                                             placeholder="https://example.com/logo.png"
@@ -339,8 +339,8 @@ export default function Settings({ settings, devices }: Props) {
                                         <Label>{__('sms_gateway.we_pay_logo')}</Label>
                                         <Input
                                             type="url"
-                                            dir="ltr"
-                                            className="text-left font-mono"
+                                            
+                                            className="text-start font-mono"
                                             value={data.custom_logos?.we || ''}
                                             onChange={(e) => setData('custom_logos', { ...data.custom_logos, we: e.target.value })}
                                             placeholder="https://example.com/logo.png"
@@ -351,8 +351,8 @@ export default function Settings({ settings, devices }: Props) {
                                         <Label>{__('general.instapay_logo')}</Label>
                                         <Input
                                             type="url"
-                                            dir="ltr"
-                                            className="text-left font-mono"
+                                            
+                                            className="text-start font-mono"
                                             value={data.custom_logos?.instapay || ''}
                                             onChange={(e) => setData('custom_logos', { ...data.custom_logos, instapay: e.target.value })}
                                             placeholder="https://example.com/logo.png"

@@ -334,7 +334,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`h-8 px-3 text-sm font-medium transition-colors ${activeTab === tab.id ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
                             >
-                                <tab.icon className="w-3.5 h-3.5 mr-2" />
+                                <tab.icon className="w-3.5 h-3.5 me-2" />
                                 {tab.label}
                             </Button>
                         ))}
@@ -397,7 +397,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                     <p className="text-sm text-slate-500">{__('general.no_campaigns_yet_1')}</p>
                                 </div>
                             ) : (
-                                <table className="w-full text-sm text-left">
+                                <table className="w-full text-sm text-start">
                                     <thead className="text-xs text-slate-500 bg-slate-50 border-b border-slate-100 uppercase">
                                         <tr>
                                             <th className="px-6 py-3 font-medium">{__('general.campaign_name')}</th>
@@ -512,7 +512,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                             </div>
                         ) : (
                             <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                                <table className="w-full text-sm text-left">
+                                <table className="w-full text-sm text-start">
                                     <thead className="text-xs text-slate-500 bg-slate-50 border-b border-slate-100 uppercase">
                                         <tr>
                                             <th className="px-6 py-3 font-medium">{__('general.campaign_name')}</th>
@@ -521,7 +521,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                             <th className="px-6 py-3 font-medium">Opens</th>
                                             <th className="px-6 py-3 font-medium">Clicks</th>
                                             <th className="px-6 py-3 font-medium">Unsubs</th>
-                                            <th className="px-6 py-3 font-medium text-right">Actions</th>
+                                            <th className="px-6 py-3 font-medium text-end">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
@@ -545,7 +545,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                                 <td className="px-6 py-4">
                                                     <span className="font-semibold text-rose-600">{c.unsubscribe_count || 0}</span>
                                                 </td>
-                                                <td className="px-6 py-4 text-right">
+                                                <td className="px-6 py-4 text-end">
                                                     <div className="flex items-center justify-end gap-1">
                                                         {c.status === 'running' && (
                                                             <Button variant="ghost" size="icon" onClick={() => handleAction('pauseCampaign', c.id)} className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50">
@@ -635,7 +635,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {lists.map(l => (
                                     <div key={l.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-sm transition-all group relative">
-                                        <h3 className="font-semibold text-slate-900 pr-8">{l.name}</h3>
+                                        <h3 className="font-semibold text-slate-900 pe-8">{l.name}</h3>
                                         <p className="text-2xl font-bold text-slate-800 mt-3">{l.contact_count}</p>
                                         <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mt-1 mb-4">Subscribers</p>
                                         <Button variant="outline" size="sm" onClick={() => handleViewContacts(l.id)} className="w-full text-xs">{__('general.view_contacts')}</Button>
@@ -643,7 +643,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                             variant="ghost" 
                                             size="icon" 
                                             onClick={() => handleDelete('deleteList', l.id)}
-                                            className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 h-8 w-8 text-slate-400 hover:text-rose-600 transition-opacity"
+                                            className="absolute top-4 end-4 opacity-0 group-hover:opacity-100 h-8 w-8 text-slate-400 hover:text-rose-600 transition-opacity"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </Button>
@@ -656,19 +656,19 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                         <Dialog open={isContactViewerOpen} onOpenChange={setIsContactViewerOpen}>
                             <DialogContent className="sm:max-w-3xl max-h-[80vh] flex flex-col">
                                 <DialogHeader>
-                                    <div className="flex items-center justify-between pr-8">
+                                    <div className="flex items-center justify-between pe-8">
                                         <DialogTitle>{__('general.contact_list')}</DialogTitle>
                                         <Button variant="outline" size="sm" onClick={handleExportCSV}>{__('general.export_csv')}</Button>
                                     </div>
                                 </DialogHeader>
-                                <div className="flex-1 overflow-y-auto mt-4 pr-2">
-                                    <table className="w-full text-sm text-left">
+                                <div className="flex-1 overflow-y-auto mt-4 pe-2">
+                                    <table className="w-full text-sm text-start">
                                         <thead className="text-xs text-slate-500 bg-slate-50 border-b border-slate-100 uppercase sticky top-0">
                                             <tr>
                                                 <th className="px-4 py-2 font-medium">Name</th>
                                                 <th className="px-4 py-2 font-medium">Email</th>
                                                 <th className="px-4 py-2 font-medium">Status</th>
-                                                <th className="px-4 py-2 font-medium text-right">Actions</th>
+                                                <th className="px-4 py-2 font-medium text-end">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
@@ -686,7 +686,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                                             <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Active</span>
                                                         )}
                                                     </td>
-                                                    <td className="px-4 py-3 text-right">
+                                                    <td className="px-4 py-3 text-end">
                                                         <Button variant="ghost" size="icon" onClick={() => handleDeleteContact(c.id)} className="h-7 w-7 text-slate-400 hover:text-rose-600">
                                                             <Trash2 className="w-3.5 h-3.5" />
                                                         </Button>
@@ -762,7 +762,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {templates.map(t => (
                                     <div key={t.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-sm transition-all group relative">
-                                        <h3 className="font-semibold text-slate-900 pr-8">{t.name}</h3>
+                                        <h3 className="font-semibold text-slate-900 pe-8">{t.name}</h3>
                                         <p className="text-sm text-slate-500 mt-1 truncate mb-4">{t.subject}</p>
                                         <div className="flex gap-2">
                                             <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => { setPreviewHtml(t.html_content); setIsPreviewOpen(true); }}>Preview</Button>
@@ -772,7 +772,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                             variant="ghost" 
                                             size="icon" 
                                             onClick={() => handleDelete('deleteTemplate', t.id)}
-                                            className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 h-8 w-8 text-slate-400 hover:text-rose-600 transition-opacity"
+                                            className="absolute top-4 end-4 opacity-0 group-hover:opacity-100 h-8 w-8 text-slate-400 hover:text-rose-600 transition-opacity"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </Button>
@@ -887,7 +887,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                             </div>
                                             <Button variant="outline" size="sm" className="text-xs" onClick={() => handleEditAccount(a)}>{__('general.edit_account')}</Button>
                                         </div>
-                                        <Button variant="ghost" size="icon" onClick={() => handleDelete('deleteSmtpAccount', a.id)} className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 h-8 w-8 text-slate-400 hover:text-rose-600 transition-opacity">
+                                        <Button variant="ghost" size="icon" onClick={() => handleDelete('deleteSmtpAccount', a.id)} className="absolute top-4 end-4 opacity-0 group-hover:opacity-100 h-8 w-8 text-slate-400 hover:text-rose-600 transition-opacity">
                                             <Trash2 className="w-4 h-4" />
                                         </Button>
                                     </div>
@@ -944,8 +944,8 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                         <DialogHeader>
                             <DialogTitle>{__('general.campaign_activity_logs')}</DialogTitle>
                         </DialogHeader>
-                        <div className="flex-1 overflow-y-auto mt-4 pr-2">
-                            <table className="w-full text-sm text-left">
+                        <div className="flex-1 overflow-y-auto mt-4 pe-2">
+                            <table className="w-full text-sm text-start">
                                 <thead className="text-xs text-slate-500 bg-slate-50 border-b border-slate-100 uppercase sticky top-0">
                                     <tr>
                                         <th className="px-4 py-2 font-medium">Time</th>

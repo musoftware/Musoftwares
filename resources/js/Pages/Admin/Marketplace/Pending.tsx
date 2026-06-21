@@ -62,16 +62,16 @@ export default function Pending({ auth, services, filters }: any) {
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="flex-1 max-w-md w-full">
                             <div className="relative flex items-center">
-                                <Search className="absolute left-3 h-4 w-4 text-slate-400" />
+                                <Search className="absolute start-3 h-4 w-4 text-slate-400" />
                                 <Input
                                     placeholder={__('general.search_by_title_or_seller')}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && applySearch()}
-                                    className="pl-9 bg-white"
+                                    className="ps-9 bg-white"
                                 />
                                 {search && (
-                                    <Button variant="ghost" size="icon" onClick={clearSearch} className="absolute right-1 h-7 w-7 text-slate-400 hover:text-black">
+                                    <Button variant="ghost" size="icon" onClick={clearSearch} className="absolute end-1 h-7 w-7 text-slate-400 hover:text-black">
                                         <X className="h-4 w-4" />
                                     </Button>
                                 )}
@@ -92,7 +92,7 @@ export default function Pending({ auth, services, filters }: any) {
                                     className="flex flex-col md:flex-row overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md"
                                 >
                                     {/* Left: Image/Preview */}
-                                    <div className="relative flex-shrink-0 bg-slate-100 md:w-64 border-b md:border-b-0 md:border-r border-slate-200">
+                                    <div className="relative flex-shrink-0 bg-slate-100 md:w-64 border-b md:border-b-0 md:border-e border-slate-200">
                                         {service.gallery && service.gallery.length > 0 ? (
                                             <img
                                                 src={`/storage/${service.gallery[0]}`}
@@ -104,7 +104,7 @@ export default function Pending({ auth, services, filters }: any) {
                                                 <FileWarning className="h-12 w-12" />
                                             </div>
                                         )}
-                                        <div className="absolute top-3 left-3 rounded bg-white/90 px-2 py-1 text-xs font-bold text-slate-700 shadow-sm border border-slate-200">
+                                        <div className="absolute top-3 start-3 rounded bg-white/90 px-2 py-1 text-xs font-bold text-slate-700 shadow-sm border border-slate-200">
                                             ID: {service.id}
                                         </div>
                                     </div>
@@ -147,7 +147,7 @@ export default function Pending({ auth, services, filters }: any) {
                                     </div>
 
                                     {/* Right: Actions */}
-                                    <div className="flex flex-col justify-center gap-3 bg-slate-50 p-6 md:w-56 border-t md:border-t-0 md:border-l border-slate-100">
+                                    <div className="flex flex-col justify-center gap-3 bg-slate-50 p-6 md:w-56 border-t md:border-t-0 md:border-s border-slate-100">
                                         <Button
                                             onClick={() => handleApprove(service.id)}
                                             className="w-full bg-green-600 hover:bg-green-700 text-white font-bold gap-2 shadow-sm"

@@ -211,7 +211,7 @@ export default function HoursCalendar({ years, auth }: any) {
                     <div className="overflow-x-auto pb-4">
                         <div className="min-w-[800px]">
                             <div 
-                                className="grid text-xs text-slate-500 mb-2 pl-[40px]" 
+                                className="grid text-xs text-slate-500 mb-2 ps-[40px]" 
                                 style={{ gridTemplateColumns: `repeat(${weeksCount}, minmax(12px, 1fr))` }}
                             >
                                 {monthLabels.map((month, idx) => (
@@ -222,7 +222,7 @@ export default function HoursCalendar({ years, auth }: any) {
                             </div>
 
                             <div className="flex">
-                                <div className="flex flex-col justify-between text-xs text-slate-400 pr-2 pb-[2px] pt-[2px]" style={{ height: '110px' }}>
+                                <div className="flex flex-col justify-between text-xs text-slate-400 pe-2 pb-[2px] pt-[2px]" style={{ height: '110px' }}>
                                     <div className="invisible">Sun</div>
                                     <div>Mon</div>
                                     <div className="invisible">Tue</div>
@@ -270,7 +270,7 @@ export default function HoursCalendar({ years, auth }: any) {
                         >
                             <div className="font-semibold">{tooltip.date}</div>
                             <div className="text-slate-300">{tooltip.hours}</div>
-                            <div className="absolute w-2 h-2 bg-slate-900 rotate-45 -bottom-1 left-1/2 transform -translate-x-1/2"></div>
+                            <div className="absolute w-2 h-2 bg-slate-900 rotate-45 -bottom-1 start-1/2 transform -translate-x-1/2"></div>
                         </div>
                     )}
                 </OperationalCard>

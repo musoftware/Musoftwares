@@ -100,7 +100,7 @@ export default function Index({ income, expense, stats }) {
                                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
                                 `}
                             >
-                                <TrendingUp className="w-4 h-4 mr-2" />
+                                <TrendingUp className="w-4 h-4 me-2" />
                                 Income
                             </button>
                             <button
@@ -112,7 +112,7 @@ export default function Index({ income, expense, stats }) {
                                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
                                 `}
                             >
-                                <TrendingDown className="w-4 h-4 mr-2" />
+                                <TrendingDown className="w-4 h-4 me-2" />
                                 Expenses
                             </button>
                         </nav>
@@ -128,7 +128,7 @@ export default function Index({ income, expense, stats }) {
                                             {activeTab === 'income' ? <TrendingUp /> : <TrendingDown />}
                                         </div>
                                     </div>
-                                    <div className="ml-5 w-0 flex-1">
+                                    <div className="ms-5 w-0 flex-1">
                                         <dl>
                                             <dt className="text-sm font-medium text-gray-500 truncate">
                                                 Total monthly recurring {activeTab}
@@ -152,7 +152,7 @@ export default function Index({ income, expense, stats }) {
                                             <Clock />
                                         </div>
                                     </div>
-                                    <div className="ml-5 w-0 flex-1">
+                                    <div className="ms-5 w-0 flex-1">
                                         <dl>
                                             <dt className="text-sm font-medium text-gray-500 truncate">{__('general.next_7_days_scheduled')}</dt>
                                             <dd className="flex items-baseline">
@@ -172,11 +172,11 @@ export default function Index({ income, expense, stats }) {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Frequency</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.next_run')}</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Frequency</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.next_run')}</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th scope="col" className="relative px-6 py-3">
                                         <span className="sr-only">Actions</span>
                                     </th>
@@ -214,7 +214,7 @@ export default function Index({ income, expense, stats }) {
                                                     <StatusBadge status={entry.status === 'active' ? 'Active' : 'Paused'} />
                                                 </button>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger className="text-gray-400 hover:text-gray-600">
                                                         <MoreHorizontal className="w-5 h-5" />
@@ -222,26 +222,26 @@ export default function Index({ income, expense, stats }) {
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuItem asChild>
                                                             <Link href={route('erp.recurring.edit', entry.id)} className="flex items-center w-full">
-                                                                <Edit2 className="w-4 h-4 mr-2" /> Edit
+                                                                <Edit2 className="w-4 h-4 me-2" /> Edit
                                                             </Link>
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => handlePauseResume(entry)} className="flex items-center w-full cursor-pointer">
                                                             {entry.status === 'active' ? (
-                                                                <><Pause className="w-4 h-4 mr-2" /> Pause</>
+                                                                <><Pause className="w-4 h-4 me-2" /> Pause</>
                                                             ) : (
-                                                                <><Play className="w-4 h-4 mr-2" /> Resume</>
+                                                                <><Play className="w-4 h-4 me-2" /> Resume</>
                                                             )}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem asChild>
                                                             <Link href={route('erp.recurring.logs', entry.id)} className="flex items-center w-full">
-                                                                <History className="w-4 h-4 mr-2" /> Logs
+                                                                <History className="w-4 h-4 me-2" /> Logs
                                                             </Link>
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             className="flex items-center w-full text-red-600 focus:text-red-600 cursor-pointer"
                                                             onClick={() => handleDelete(entry.id)}
                                                         >
-                                                            <Trash2 className="w-4 h-4 mr-2" /> Delete
+                                                            <Trash2 className="w-4 h-4 me-2" /> Delete
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>

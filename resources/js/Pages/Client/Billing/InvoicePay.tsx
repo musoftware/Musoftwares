@@ -116,7 +116,7 @@ export default function InvoicePay({
                             className: 'text-slate-500 hover:text-slate-900 inline-flex items-center'
                         })}
                     >
-                        <ArrowLeft className="mr-1.5 h-4 w-4" /> {__('erp.back_to_invoices')}
+                        <ArrowLeft className="me-1.5 h-4 w-4" /> {__('erp.back_to_invoices')}
                     </Link>
                     <ChevronRight className="h-4 w-4 text-slate-300" />
                     <span className="text-sm font-semibold text-slate-900 font-mono">{__('erp.invoice_2')} #{invoice.invoice_number}</span>
@@ -134,7 +134,7 @@ export default function InvoicePay({
                                     </div>
                                     <h1 className="text-2xl font-bold font-mono tracking-tight">{invoice.invoice_number}</h1>
                                 </div>
-                                <div className="text-right sm:text-right space-y-2 flex flex-col items-end">
+                                <div className="text-end sm:text-end space-y-2 flex flex-col items-end">
                                     <div className="space-y-1.5">
                                         <span className="text-xs text-slate-400 block uppercase tracking-wider font-semibold">{__('general.status')}</span>
                                         <StatusBadge status={invoice.status} />
@@ -149,14 +149,14 @@ export default function InvoicePay({
                                         target="_blank"
                                         rel="noreferrer"
                                     >
-                                        <FileText className="w-3.5 h-3.5 mr-1.5" /> {__('general.download_pdf')}
+                                        <FileText className="w-3.5 h-3.5 me-1.5" /> {__('general.download_pdf')}
                                     </a>
                                 </div>
                             </div>
 
                             {/* Dates Summary */}
                             <div className="grid grid-cols-2 border-b border-slate-100 bg-slate-50/50">
-                                <div className="p-4 sm:p-6 border-r border-slate-100 space-y-1">
+                                <div className="p-4 sm:p-6 border-e border-slate-100 space-y-1">
                                     <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">{__('general.issued_date')}</span>
                                     <DateDisplay date={invoice.issued_at} className="text-sm font-medium text-slate-800" />
                                 </div>
@@ -172,22 +172,22 @@ export default function InvoicePay({
                                 <div className="overflow-x-auto">
                                     <table className="min-w-full divide-y divide-slate-100">
                                         <thead>
-                                            <tr className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                                                <th className="pb-3 pr-4">{__('general.description')}</th>
+                                            <tr className="text-start text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                                <th className="pb-3 pe-4">{__('general.description')}</th>
                                                 <th className="pb-3 px-4 text-center">{__('general.qty')}</th>
-                                                <th className="pb-3 px-4 text-right">{__('general.unit_price')}</th>
-                                                <th className="pb-3 pl-4 text-right">{__('general.total')}</th>
+                                                <th className="pb-3 px-4 text-end">{__('general.unit_price')}</th>
+                                                <th className="pb-3 ps-4 text-end">{__('general.total')}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100 text-[13px] text-slate-700">
                                             {invoice.items.map((item, idx) => (
                                                 <tr key={idx} className="hover:bg-slate-50/40">
-                                                    <td className="py-4 pr-4 font-medium text-slate-900 max-w-[250px] truncate">{item.title}</td>
+                                                    <td className="py-4 pe-4 font-medium text-slate-900 max-w-[250px] truncate">{item.title}</td>
                                                     <td className="py-4 px-4 text-center font-mono">{item.quantity}</td>
-                                                    <td className="py-4 px-4 text-right font-mono">
+                                                    <td className="py-4 px-4 text-end font-mono">
                                                         <CurrencyDisplay amount={item.unit_price} currency={invoice.currency} />
                                                     </td>
-                                                    <td className="py-4 pl-4 text-right font-semibold font-mono text-slate-900">
+                                                    <td className="py-4 ps-4 text-end font-semibold font-mono text-slate-900">
                                                         <CurrencyDisplay amount={item.total} currency={invoice.currency} />
                                                     </td>
                                                 </tr>

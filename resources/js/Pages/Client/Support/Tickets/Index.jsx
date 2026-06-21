@@ -85,9 +85,9 @@ export default function TicketsIndex({ tickets, isAdmin }) {
             key: 'action',
             label: '',
             render: (row) => (
-                <div className="text-right">
+                <div className="text-end">
                     <Button variant="ghost" size="sm" onClick={() => setSelectedTicket(row)} className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 shadow-none h-8 px-3 text-xs">
-                        <Eye className="w-3.5 h-3.5 mr-1.5" />
+                        <Eye className="w-3.5 h-3.5 me-1.5" />
                         {isAdmin ? 'View / Respond' : 'View Ticket'}
                     </Button>
                 </div>
@@ -127,7 +127,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                     actions={
                         !isAdmin && (
                             <Button onClick={() => setIsCreating(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
-                                <Plus className="w-4 h-4 mr-2" />{__('general.open_ticket')}</Button>
+                                <Plus className="w-4 h-4 me-2" />{__('general.open_ticket')}</Button>
                         )
                     }
                 />

@@ -19,7 +19,7 @@ export default function AffiliateModeratorsIndex({ moderators }: any) {
                 </div>
                 <Link href={route('affiliate_pos.affiliate.moderators.create')}>
                     <Button className="bg-blue-600 hover:bg-blue-700">
-                        <UserPlus className="w-4 h-4 mr-2" />{__('general.add_moderator')}</Button>
+                        <UserPlus className="w-4 h-4 me-2" />{__('general.add_moderator')}</Button>
                 </Link>
             </div>
 
@@ -31,7 +31,7 @@ export default function AffiliateModeratorsIndex({ moderators }: any) {
                                 <TableHead className="font-semibold text-gray-600">Name</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Email</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Joined</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-right">Actions</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -47,7 +47,7 @@ export default function AffiliateModeratorsIndex({ moderators }: any) {
                                         <TableCell className="text-sm text-gray-500">
                                             {new Date(mod.created_at).toLocaleDateString()}
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-end">
                                             <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50">
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>

@@ -114,7 +114,7 @@ export default function Dashboard({ wallets, latestPrice, portfolio, hasLivePric
                             <CardContent>
                                 <div className={`text-2xl font-bold ${portfolio.total_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                     {portfolio.total_profit >= 0 ? '+' : ''}{formatNumber(portfolio.total_profit)} 
-                                    <span className="text-sm font-normal ml-1">({portfolio.profit_percentage}%)</span>
+                                    <span className="text-sm font-normal ms-1">({portfolio.profit_percentage}%)</span>
                                 </div>
                             </CardContent>
                         </Card>
@@ -153,7 +153,7 @@ export default function Dashboard({ wallets, latestPrice, portfolio, hasLivePric
                                                     <p className="text-sm text-muted-foreground">{__(wallet.goal_type)}</p>
                                                 </div>
                                             </div>
-                                            <div className="text-right flex items-center gap-4">
+                                            <div className="text-end flex items-center gap-4">
                                                 <div>
                                                     <div className="font-bold">{wallet.balance_grams} {__('general.g')}</div>
                                                     <div className="text-sm text-muted-foreground">{formatNumber(wallet.balance_amount)} {wallet.currency}</div>
@@ -246,7 +246,7 @@ export default function Dashboard({ wallets, latestPrice, portfolio, hasLivePric
                                             )}
                                         </div>
                                         <div className="p-6 rounded-xl bg-indigo-50 border border-indigo-100 shadow-sm relative overflow-hidden">
-                                            <div className="absolute top-0 right-0 w-3 h-3 bg-indigo-500 rounded-bl-xl opacity-20"></div>
+                                            <div className="absolute top-0 end-0 w-3 h-3 bg-indigo-500 rounded-bl-xl opacity-20"></div>
                                             <div className="text-indigo-600 text-sm font-medium mb-2">21k {__('gold_saver.purity')}</div>
                                             <div className="font-bold text-3xl text-indigo-700">{latestPrice?.price_gram_21k ?? '3,550'}</div>
                                             <div className="text-xs text-indigo-400 mt-2">{latestPrice?.currency} / {__('general.g')}</div>

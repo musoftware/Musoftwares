@@ -377,16 +377,16 @@ function InboxTab({ call, onEvent, profileId, profiles, onProfilesChange }: any)
                     <table className="w-full">
                         <thead>
                             <tr className="border-b border-white/5">
-                                <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30 w-10">
+                                <th className="text-start px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30 w-10">
                                     <input type="checkbox" className="rounded bg-white/5 border-white/20"
                                         checked={selectedUsers.size === users.length && users.length > 0}
                                         onChange={e => setSelectedUsers(e.target.checked ? new Set(users.map(u => u.id)) : new Set())}
                                     />
                                 </th>
-                                <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30">Name</th>
-                                <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30 hidden md:table-cell">Message</th>
-                                <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30 hidden lg:table-cell">{__('general.user_id')}</th>
-                                <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30">Status</th>
+                                <th className="text-start px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30">Name</th>
+                                <th className="text-start px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30 hidden md:table-cell">Message</th>
+                                <th className="text-start px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30 hidden lg:table-cell">{__('general.user_id')}</th>
+                                <th className="text-start px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -573,11 +573,11 @@ function CampaignsTab({ call, onEvent, profileId }: any) {
                                         <DialogContent className="bg-[#1a1a2e] border-white/10 text-white sm:max-w-xs">
                                             <DialogHeader><DialogTitle className="text-sm">Actions</DialogTitle></DialogHeader>
                                             <div className="flex flex-col gap-2 py-2">
-                                                {c.status === 'draft' && <Button variant="outline" className="justify-start border-white/10 text-white/70" onClick={() => handleAction(c.id, 'startCampaign')}><Play className="w-4 h-4 mr-2" /> Start</Button>}
-                                                {c.status === 'running' && <Button variant="outline" className="justify-start border-white/10 text-white/70" onClick={() => handleAction(c.id, 'pauseCampaign')}><Pause className="w-4 h-4 mr-2" /> Pause</Button>}
-                                                {c.status === 'paused' && <Button variant="outline" className="justify-start border-white/10 text-white/70" onClick={() => handleAction(c.id, 'resumeCampaign')}><Play className="w-4 h-4 mr-2" /> Resume</Button>}
-                                                {['running', 'paused'].includes(c.status) && <Button variant="destructive" className="justify-start" onClick={() => handleAction(c.id, 'cancelCampaign')}><Square className="w-4 h-4 mr-2" /> Stop</Button>}
-                                                <Button variant="destructive" className="justify-start" onClick={() => handleAction(c.id, 'deleteCampaign')}><Trash2 className="w-4 h-4 mr-2" /> Delete</Button>
+                                                {c.status === 'draft' && <Button variant="outline" className="justify-start border-white/10 text-white/70" onClick={() => handleAction(c.id, 'startCampaign')}><Play className="w-4 h-4 me-2" /> Start</Button>}
+                                                {c.status === 'running' && <Button variant="outline" className="justify-start border-white/10 text-white/70" onClick={() => handleAction(c.id, 'pauseCampaign')}><Pause className="w-4 h-4 me-2" /> Pause</Button>}
+                                                {c.status === 'paused' && <Button variant="outline" className="justify-start border-white/10 text-white/70" onClick={() => handleAction(c.id, 'resumeCampaign')}><Play className="w-4 h-4 me-2" /> Resume</Button>}
+                                                {['running', 'paused'].includes(c.status) && <Button variant="destructive" className="justify-start" onClick={() => handleAction(c.id, 'cancelCampaign')}><Square className="w-4 h-4 me-2" /> Stop</Button>}
+                                                <Button variant="destructive" className="justify-start" onClick={() => handleAction(c.id, 'deleteCampaign')}><Trash2 className="w-4 h-4 me-2" /> Delete</Button>
                                             </div>
                                         </DialogContent>
                                     </Dialog>
@@ -607,7 +607,7 @@ function CampaignsTab({ call, onEvent, profileId }: any) {
             <Dialog open={showCreate} onOpenChange={setShowCreate}>
                 <DialogContent className="bg-[#1a1a2e] border-white/10 text-white max-w-lg">
                     <DialogHeader><DialogTitle className="text-sm font-bold">{__('general.create_campaign')}</DialogTitle></DialogHeader>
-                    <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                    <div className="space-y-4 max-h-[60vh] overflow-y-auto pe-2">
                         <div><Label className="text-[10px] font-bold uppercase text-white/50">{__('general.campaign_name')}</Label><Input value={name} onChange={e => setName(e.target.value)} placeholder={__('general.my_campaign')} className="bg-white/5 border-white/10 text-white mt-1" /></div>
 
                         <div><Label className="text-[10px] font-bold uppercase text-white/50">{__('general.sender_mode')}</Label>
@@ -747,9 +747,9 @@ function WatchTab({ call, onEvent, profileId }: any) {
                     <table className="w-full">
                         <thead>
                             <tr className="border-b border-white/5">
-                                <th className="text-left px-4 py-2 text-[10px] font-bold uppercase text-white/30">Name</th>
-                                <th className="text-left px-4 py-2 text-[10px] font-bold uppercase text-white/30">{__('general.fb_user_id')}</th>
-                                <th className="text-left px-4 py-2 text-[10px] font-bold uppercase text-white/30">{__('general.found_at')}</th>
+                                <th className="text-start px-4 py-2 text-[10px] font-bold uppercase text-white/30">Name</th>
+                                <th className="text-start px-4 py-2 text-[10px] font-bold uppercase text-white/30">{__('general.fb_user_id')}</th>
+                                <th className="text-start px-4 py-2 text-[10px] font-bold uppercase text-white/30">{__('general.found_at')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -812,11 +812,11 @@ function LogsTab({ call, profileId }: any) {
                     <table className="w-full">
                         <thead>
                             <tr className="border-b border-white/5">
-                                <th className="text-left px-4 py-3 text-[10px] font-bold uppercase text-white/30">User</th>
-                                <th className="text-left px-4 py-3 text-[10px] font-bold uppercase text-white/30 hidden md:table-cell">{__('general.fb_id')}</th>
-                                <th className="text-left px-4 py-3 text-[10px] font-bold uppercase text-white/30">Status</th>
-                                <th className="text-left px-4 py-3 text-[10px] font-bold uppercase text-white/30 hidden md:table-cell">Error</th>
-                                <th className="text-left px-4 py-3 text-[10px] font-bold uppercase text-white/30">Time</th>
+                                <th className="text-start px-4 py-3 text-[10px] font-bold uppercase text-white/30">User</th>
+                                <th className="text-start px-4 py-3 text-[10px] font-bold uppercase text-white/30 hidden md:table-cell">{__('general.fb_id')}</th>
+                                <th className="text-start px-4 py-3 text-[10px] font-bold uppercase text-white/30">Status</th>
+                                <th className="text-start px-4 py-3 text-[10px] font-bold uppercase text-white/30 hidden md:table-cell">Error</th>
+                                <th className="text-start px-4 py-3 text-[10px] font-bold uppercase text-white/30">Time</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -826,7 +826,7 @@ function LogsTab({ call, profileId }: any) {
                                     <td className="px-4 py-2.5 text-xs font-mono text-white/30 hidden md:table-cell">{l.user_fb_id}</td>
                                     <td className="px-4 py-2.5">
                                         <Badge variant="outline" className={`text-[9px] font-bold uppercase ${l.status === 'sent' ? 'border-emerald-500/30 text-emerald-400' : 'border-red-500/30 text-red-400'}`}>
-                                            {l.status === 'sent' ? <CheckCircle2 className="w-2.5 h-2.5 mr-1" /> : <XCircle className="w-2.5 h-2.5 mr-1" />}
+                                            {l.status === 'sent' ? <CheckCircle2 className="w-2.5 h-2.5 me-1" /> : <XCircle className="w-2.5 h-2.5 me-1" />}
                                             {l.status}
                                         </Badge>
                                     </td>
@@ -913,11 +913,11 @@ function SettingsTab({ call, profiles, onProfilesChange }: any) {
                                             <DialogHeader><DialogTitle className="text-sm">{__('general.profile_actions')}</DialogTitle></DialogHeader>
                                             <div className="flex flex-col gap-2 py-2">
                                                 <Button variant="outline" className="justify-start border-white/10 text-white/70" onClick={async () => { try { await call('launchBrowser', { profileId: p.id }); } catch { /* empty */ } }}>
-                                                    <Globe className="w-4 h-4 mr-2" />{__('general.launch_browser')}</Button>
+                                                    <Globe className="w-4 h-4 me-2" />{__('general.launch_browser')}</Button>
                                                 <Button variant="outline" className="justify-start border-white/10 text-white/70" onClick={async () => { try { await call('closeBrowser', { profileId: p.id }); } catch { /* empty */ } }}>
-                                                    <X className="w-4 h-4 mr-2" />{__('general.close_browser')}</Button>
+                                                    <X className="w-4 h-4 me-2" />{__('general.close_browser')}</Button>
                                                 <Button variant="destructive" className="justify-start" onClick={() => handleDeleteProfile(p.id)}>
-                                                    <Trash2 className="w-4 h-4 mr-2" />{__('general.delete_profile')}</Button>
+                                                    <Trash2 className="w-4 h-4 me-2" />{__('general.delete_profile')}</Button>
                                             </div>
                                         </DialogContent>
                                     </Dialog>

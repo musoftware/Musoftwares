@@ -124,7 +124,7 @@ export default function ObfuscatorRunner({ tool }: any) {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans">
             <div className="h-14 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center px-6 sticky top-0 z-10">
-                <Shield className="w-5 h-5 text-indigo-500 mr-2" />
+                <Shield className="w-5 h-5 text-indigo-500 me-2" />
                 <span className="font-bold text-sm">{__('general.js_code_protector')}</span>
             </div>
 
@@ -195,7 +195,7 @@ export default function ObfuscatorRunner({ tool }: any) {
                             </div>
                         ) : (
                             <Button onClick={handleStart} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-11" disabled={!scanResult || scanResult.count === 0}>
-                                <Play className="w-4 h-4 mr-2" />{__('general.start_obfuscation')}</Button>
+                                <Play className="w-4 h-4 me-2" />{__('general.start_obfuscation')}</Button>
                         )}
                         
                         {errorMsg && <p className="mt-4 text-sm text-red-500 font-medium">{errorMsg}</p>}

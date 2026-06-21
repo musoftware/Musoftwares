@@ -8,8 +8,8 @@ import { __ } from '@/lib/i18n';
 
 function TreeNode({ client }: { client: any }) {
     return (
-        <div className="mt-3 ml-6 border-l-2 border-slate-100 pl-4 relative">
-            <div className="absolute w-4 h-0.5 bg-slate-100 left-0 top-3"></div>
+        <div className="mt-3 ms-6 border-s-2 border-slate-100 ps-4 relative">
+            <div className="absolute w-4 h-0.5 bg-slate-100 start-0 top-3"></div>
             <div className="flex items-center space-x-2">
                 <div className="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center shrink-0 border border-slate-200">
                     <Users className="w-3 h-3 text-slate-500" />
@@ -18,7 +18,7 @@ function TreeNode({ client }: { client: any }) {
                 <span className="text-xs text-slate-400">({client.email})</span>
             </div>
             {client.referrals && client.referrals.length > 0 && (
-                <div className="ml-2 mt-2">
+                <div className="ms-2 mt-2">
                     {client.referrals.map((child: any) => (
                         <TreeNode key={child.id} client={child} />
                     ))}
@@ -66,13 +66,13 @@ export default function Tree({ client }: { client: any }) {
                             </div>
                             
                             {client.referrals && client.referrals.length > 0 ? (
-                                <div className="ml-4 mt-4">
+                                <div className="ms-4 mt-4">
                                     {client.referrals.map((child: any) => (
                                         <TreeNode key={child.id} client={child} />
                                     ))}
                                 </div>
                             ) : (
-                                <p className="mt-6 text-slate-500 italic text-sm ml-11">
+                                <p className="mt-6 text-slate-500 italic text-sm ms-11">
                                     {__("general.no_referrals_yet")}
                                 </p>
                             )}

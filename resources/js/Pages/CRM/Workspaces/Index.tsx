@@ -105,7 +105,7 @@ export default function WorkspaceIndex({ availableCenters }: { availableCenters:
 
                             <div className="flex items-center text-sm font-semibold text-indigo-600 group-hover:text-indigo-700 transition-colors">
                                 {__('general.enter_workspace')}
-                                <ArrowRight size={16} className="ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                                <ArrowRight size={16} className="ms-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                             </div>
                         </Link>
                     ))}

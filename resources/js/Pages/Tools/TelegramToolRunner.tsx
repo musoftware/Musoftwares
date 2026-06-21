@@ -452,7 +452,7 @@ export default function TelegramToolRunner({ tool }: any) {
             {/* ── Header ── */}
             <div className="relative overflow-hidden border-b border-slate-200/60">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-cyan-500/5 to-indigo-500/5" />
-                <div className="absolute top-[-50%] right-[-10%] w-[40%] h-[200%] rounded-full bg-blue-400/5 blur-3xl" />
+                <div className="absolute top-[-50%] end-[-10%] w-[40%] h-[200%] rounded-full bg-blue-400/5 blur-3xl" />
                 <div className="relative max-w-7xl mx-auto px-5 py-6 md:py-8">
                     <div className="flex items-center gap-4 mb-4">
                         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
@@ -462,7 +462,7 @@ export default function TelegramToolRunner({ tool }: any) {
                             <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">{__('general.telegram_tool')}</h1>
                             <p className="text-xs text-slate-500 font-medium">{__('general.extract_members_send_messages_manage_sessions')}</p>
                         </div>
-                        <div className="ml-auto flex items-center gap-2">
+                        <div className="ms-auto flex items-center gap-2">
                             <Badge variant={connected ? 'default' : 'destructive'} className="gap-1.5 font-bold text-[10px]">
                                 <span className={`w-1.5 h-1.5 rounded-full ${connected ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
                                 {connected ? 'Connected' : 'Offline'}
@@ -556,7 +556,7 @@ export default function TelegramToolRunner({ tool }: any) {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-[40vh] overflow-y-auto p-0.5">
                                         {groups.map(g => (
                                             <button key={g.id} onClick={() => toggleGroup(g.id)}
-                                                className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${selectedGroups.has(g.id)
+                                                className={`flex items-center gap-3 p-3 rounded-xl border text-start transition-all ${selectedGroups.has(g.id)
                                                     ? 'bg-blue-50 border-blue-300 ring-1 ring-blue-200'
                                                     : 'bg-white border-slate-200 hover:border-blue-200'}`}>
                                                 <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${selectedGroups.has(g.id) ? 'bg-blue-500 border-blue-500' : 'border-slate-300'}`}>
@@ -769,9 +769,9 @@ export default function TelegramToolRunner({ tool }: any) {
                             ) : (
                                 <div className="flex gap-2">
                                     <div className="relative flex-1 max-w-xs">
-                                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Phone className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input value={newPhone} onChange={e => setNewPhone(e.target.value)}
-                                            placeholder="+201001234567" className="pl-9 font-mono text-xs" />
+                                            placeholder="+201001234567" className="ps-9 font-mono text-xs" />
                                     </div>
                                     <Button onClick={handleAddSession} disabled={addingSession || !newPhone.trim()}
                                         className="gap-1 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white">
@@ -861,7 +861,7 @@ export default function TelegramToolRunner({ tool }: any) {
                                         </div>
                                     ) : campaigns.map(c => (
                                         <button key={c.id} onClick={() => handleViewCampaign(c)}
-                                            className="w-full flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:bg-slate-50/50 transition-colors text-left">
+                                            className="w-full flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:bg-slate-50/50 transition-colors text-start">
                                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${c.type === 'extract' ? 'bg-blue-50 text-blue-500' : 'bg-violet-50 text-violet-500'}`}>
                                                 {c.type === 'extract' ? <Users className="w-5 h-5" /> : <MessageCircle className="w-5 h-5" />}
                                             </div>

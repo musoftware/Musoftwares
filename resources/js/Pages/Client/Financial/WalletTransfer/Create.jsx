@@ -180,11 +180,11 @@ export default function Create({ user, wallet }) {
                                     <div className="space-y-2">
                                         <Label htmlFor="receiver_search">{__('general.search_recipient')}</Label>
                                         <div className="relative">
-                                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                            <Search className="absolute start-3 top-2.5 h-4 w-4 text-muted-foreground" />
                                             <Input
                                                 id="receiver_search"
                                                 type="text"
-                                                className="pl-9 shadow-none"
+                                                className="ps-9 shadow-none"
                                                 placeholder={__('general.enter_recipient_s_name_or_email')}
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -201,7 +201,7 @@ export default function Create({ user, wallet }) {
                                                 <button
                                                     key={userMatch.id}
                                                     type="button"
-                                                    className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-muted/30 transition-colors"
+                                                    className="w-full px-4 py-3 flex items-center justify-between text-start hover:bg-muted/30 transition-colors"
                                                     onClick={() => selectRecipient(userMatch)}
                                                 >
                                                     <div className="flex flex-col">
@@ -257,12 +257,12 @@ export default function Create({ user, wallet }) {
                                                     id="amount"
                                                     type="number"
                                                     step="0.01"
-                                                    className="shadow-none pr-12"
+                                                    className="shadow-none pe-12"
                                                     placeholder="0.00"
                                                     value={data.amount}
                                                     onChange={(e) => setData('amount', e.target.value)}
                                                 />
-                                                <div className="absolute right-3 top-2 text-sm font-semibold text-muted-foreground">
+                                                <div className="absolute end-3 top-2 text-sm font-semibold text-muted-foreground">
                                                     {wallet.currency}
                                                 </div>
                                             </div>
@@ -350,14 +350,14 @@ export default function Create({ user, wallet }) {
                                     {/* Action Buttons */}
                                     <div className="flex items-center justify-between pt-4">
                                         <Button type="button" variant="outline" className="shadow-none" onClick={() => setStep(1)}>
-                                            <ArrowLeft className="w-4 h-4 mr-2" /> Back
+                                            <ArrowLeft className="w-4 h-4 me-2" /> Back
                                         </Button>
                                         <Button
                                             type="button"
                                             className="shadow-none"
                                             disabled={!previewData || !!previewError}
                                             onClick={() => setStep(3)}
-                                        >{__('general.next_step')}<ArrowRight className="w-4 h-4 ml-2" />
+                                        >{__('general.next_step')}<ArrowRight className="w-4 h-4 ms-2" />
                                         </Button>
                                     </div>
                                 </div>
@@ -426,7 +426,7 @@ export default function Create({ user, wallet }) {
                                     {/* Action Buttons */}
                                     <div className="flex items-center justify-between pt-4">
                                         <Button type="button" variant="outline" className="shadow-none" onClick={() => setStep(2)}>
-                                            <ArrowLeft className="w-4 h-4 mr-2" /> Back
+                                            <ArrowLeft className="w-4 h-4 me-2" /> Back
                                         </Button>
                                         <Button
                                             type="submit"
@@ -434,7 +434,7 @@ export default function Create({ user, wallet }) {
                                             disabled={processing || !data.confirm_transfer}
                                         >
                                             {processing ? 'Processing Transfer...' : (
-                                                <>{__('general.execute_transfer')}<Send className="w-4 h-4 ml-2" />
+                                                <>{__('general.execute_transfer')}<Send className="w-4 h-4 ms-2" />
                                                 </>
                                             )}
                                         </Button>

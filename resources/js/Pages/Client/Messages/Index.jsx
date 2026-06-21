@@ -105,7 +105,7 @@ export default function MessagesIndex({ conversations, users }) {
                     </div>
 
                     <PrimaryButton onClick={() => setIsNewModalOpen(true)} className="self-start md:self-auto shadow-md">
-                        <Plus className="w-4 h-4 mr-2" />{__('general.new_direct_chat')}</PrimaryButton>
+                        <Plus className="w-4 h-4 me-2" />{__('general.new_direct_chat')}</PrimaryButton>
                 </div>
 
                 {/* Main Chat Layout */}
@@ -114,13 +114,13 @@ export default function MessagesIndex({ conversations, users }) {
                     <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200 flex flex-col overflow-hidden shadow-sm h-full">
                         <div className="p-4 border-b border-slate-100">
                             <div className="relative">
-                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <Search className="absolute start-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input
                                     type="text"
                                     placeholder={__('general.search_conversations')}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-indigo-500 focus:ring-indigo-500 transition-all"
+                                    className="w-full ps-10 pe-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-indigo-500 focus:ring-indigo-500 transition-all"
                                 />
                             </div>
                         </div>
@@ -138,7 +138,7 @@ export default function MessagesIndex({ conversations, users }) {
                                         <button
                                             key={conv.id}
                                             onClick={() => setSelectedConvId(conv.id)}
-                                            className={`w-full p-3.5 rounded-xl flex items-start gap-3 transition-all text-left ${
+                                            className={`w-full p-3.5 rounded-xl flex items-start gap-3 transition-all text-start ${
                                                 isSelected ? 'bg-indigo-50/80 border-indigo-100 shadow-sm' : 'hover:bg-slate-50/80'
                                             }`}
                                         >

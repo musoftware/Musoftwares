@@ -42,7 +42,7 @@ export default function Show({ job }: any) {
     return (
         <AdminSidebarLayout title={`${__('freelance.job_title')}: ${job.title}`} header={
             <div className="flex items-center space-x-2">
-                <Link href={route('admin.freelance.jobs.index')} className="text-gray-500 hover:text-gray-900 mr-2">
+                <Link href={route('admin.freelance.jobs.index')} className="text-gray-500 hover:text-gray-900 me-2">
                     <ArrowLeft className="h-5 w-5" />
                 </Link>
                 <span>{__('freelance.job_details')}</span>
@@ -105,7 +105,7 @@ export default function Show({ job }: any) {
                                             <div className="font-medium text-gray-900">{proposal.freelancer?.name}</div>
                                             <div className="text-xs text-gray-500">{proposal.freelancer?.email}</div>
                                         </div>
-                                        <div className="text-right flex items-center space-x-4">
+                                        <div className="text-end flex items-center space-x-4">
                                             <div>
                                                 <div className="font-semibold text-green-600">{formatCurrency(proposal.bid_amount, proposal.currency || job.currency)}</div>
                                                 <Badge variant="outline" className="capitalize text-xs">{proposal.status}</Badge>
@@ -131,7 +131,7 @@ export default function Show({ job }: any) {
                     {/* Job Contracts Monitoring */}
                     <div className="bg-white shadow rounded-lg p-6 mt-6">
                         <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                            <FileText className="h-5 w-5 mr-2 text-slate-500" />
+                            <FileText className="h-5 w-5 me-2 text-slate-500" />
                             {__('freelance.job_contracts', undefined, 'Job Contracts')}
                         </h3>
                         {job.contracts && job.contracts.length > 0 ? (
@@ -144,7 +144,7 @@ export default function Show({ job }: any) {
                                                 {__('freelance.freelancer')}: <span className="font-semibold text-slate-700">{contract.freelancer?.name}</span>
                                             </div>
                                         </div>
-                                        <div className="text-right flex items-center space-x-4">
+                                        <div className="text-end flex items-center space-x-4">
                                             <div>
                                                 <div className="font-semibold text-green-600">{formatCurrency(contract.amount, contract.currency || job.currency)}</div>
                                                 <Badge variant="outline" className="capitalize text-xs">{__('freelance.' + contract.status) || contract.status}</Badge>
@@ -187,7 +187,7 @@ export default function Show({ job }: any) {
 
                     <div className="bg-white shadow rounded-lg p-6">
                         <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                            <ShieldAlert className="h-5 w-5 mr-2 text-red-500" /> 
+                            <ShieldAlert className="h-5 w-5 me-2 text-red-500" /> 
                             {__('freelance.admin_actions')}
                         </h3>
                         
@@ -196,7 +196,7 @@ export default function Show({ job }: any) {
                                 href={route('admin.freelance.jobs.edit', job.id)} 
                                 className={buttonVariants({ variant: 'outline', className: 'w-full justify-start' })}
                             >
-                                <Edit className="h-4 w-4 mr-2 text-blue-500" />
+                                <Edit className="h-4 w-4 me-2 text-blue-500" />
                                 {__('freelance.edit')}
                             </Link>
 
@@ -226,7 +226,7 @@ export default function Show({ job }: any) {
                                     variant="secondary"
                                     onClick={() => setRefundConfirm(true)}
                                 >
-                                    <RefreshCw className="h-4 w-4 mr-2" />
+                                    <RefreshCw className="h-4 w-4 me-2" />
                                     {__('freelance.force_refund')}
                                 </Button>
                             )}
@@ -236,7 +236,7 @@ export default function Show({ job }: any) {
                                 variant="destructive"
                                 onClick={() => setDeleteConfirm(true)}
                             >
-                                <Trash2 className="h-4 w-4 mr-2" />
+                                <Trash2 className="h-4 w-4 me-2" />
                                 {__('freelance.delete_job_permanent')}
                             </Button>
                         </div>

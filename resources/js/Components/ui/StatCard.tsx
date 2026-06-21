@@ -47,8 +47,8 @@ export function StatCard({
                 </div>
                 {change && (
                     <div className={cn('flex items-center text-xs font-medium', badgeClasses[changeType])}>
-                        {changeType === 'up' && <ArrowUp className="h-3 w-3 mr-0.5" />}
-                        {changeType === 'down' && <ArrowDown className="h-3 w-3 mr-0.5" />}
+                        {changeType === 'up' && <ArrowUp className="h-3 w-3 me-0.5" />}
+                        {changeType === 'down' && <ArrowDown className="h-3 w-3 me-0.5" />}
                         {change}
                     </div>
                 )}

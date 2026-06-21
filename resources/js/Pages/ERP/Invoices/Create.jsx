@@ -316,9 +316,9 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                             {/* Table Header */}
                             <div className="flex items-center px-6 py-3 border-b border-slate-100 bg-slate-50/50 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
                                 <div className="flex-1">{__('general.item_description')}</div>
-                                <div className="w-24 text-right">Qty</div>
-                                <div className="w-32 text-right">Price</div>
-                                <div className="w-32 text-right">Total</div>
+                                <div className="w-24 text-end">Qty</div>
+                                <div className="w-32 text-end">Price</div>
+                                <div className="w-32 text-end">Total</div>
                                 <div className="w-10" />
                             </div>
 
@@ -380,7 +380,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                         </div>
                                         <div className="w-24 pt-0.5 relative">
                                             <Input
-                                                className="h-8 text-right shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2 pr-8"
+                                                className="h-8 text-end shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2 pe-8"
                                                 type="number"
                                                 min="0.01"
                                                 step="0.01"
@@ -389,14 +389,14 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                                 onChange={e => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
                                             />
                                             {item.uom && (
-                                                <span className="absolute right-2 top-2 text-[10px] text-slate-400 font-medium select-none pointer-events-none uppercase">
+                                                <span className="absolute end-2 top-2 text-[10px] text-slate-400 font-medium select-none pointer-events-none uppercase">
                                                     {item.uom}
                                                 </span>
                                             )}
                                         </div>
                                         <div className="w-32 pt-0.5">
                                             <Input
-                                                className="h-8 text-right shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2"
+                                                className="h-8 text-end shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2"
                                                 type="number"
                                                 min="0"
                                                 step="0.01"
@@ -405,7 +405,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                                 onChange={e => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
                                             />
                                         </div>
-                                        <div className="w-32 text-right pt-2 font-medium text-slate-700 px-2 text-[13px]">
+                                        <div className="w-32 text-end pt-2 font-medium text-slate-700 px-2 text-[13px]">
                                             <CurrencyDisplay amount={item.unit_price * item.quantity} currency={data.amount_currency} />
                                         </div>
                                         <div className="w-10 pt-1.5 opacity-0 group-hover:opacity-100 transition-opacity flex justify-end">
@@ -429,7 +429,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                     onClick={() => addItem('simple')}
                                     className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 font-medium"
                                 >
-                                    <Plus className="mr-1.5 h-4 w-4" />{__('general.add_line_item')}</Button>
+                                    <Plus className="me-1.5 h-4 w-4" />{__('general.add_line_item')}</Button>
                             </div>
                         </div>
                     </section>
@@ -476,7 +476,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                                     onChange={e => updateCost(index, 'title', e.target.value)}
                                                 />
                                                 <Input
-                                                    className="h-8 w-28 bg-white text-right"
+                                                    className="h-8 w-28 bg-white text-end"
                                                     type="number"
                                                     placeholder="0.00"
                                                     value={cost.amount}
@@ -498,13 +498,13 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                             className="w-full h-8 text-xs bg-white shadow-sm"
                                             onClick={addCost}
                                         >
-                                            <Plus className="mr-1.5 h-3 w-3" />{__('general.add_cost')}</Button>
+                                            <Plus className="me-1.5 h-3 w-3" />{__('general.add_cost')}</Button>
                                     </div>
                                 )}
                             </div>
                         </div>
 
-                        <div className="md:col-span-6 md:pl-12">
+                        <div className="md:col-span-6 md:ps-12">
                             <div className="bg-slate-50 rounded-xl p-6 border border-slate-100 space-y-4">
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="text-slate-500 font-medium">Subtotal</span>
@@ -515,7 +515,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                     <div className="w-24">
                                         <Input
                                             type="number"
-                                            className="h-8 text-right bg-white shadow-sm border-slate-200"
+                                            className="h-8 text-end bg-white shadow-sm border-slate-200"
                                             value={data.discount_amount || ''}
                                             placeholder="0.00"
                                             onChange={e => setData('discount_amount', parseFloat(e.target.value) || 0)}
@@ -527,7 +527,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                     <div className="w-24">
                                         <Input
                                             type="number"
-                                            className="h-8 text-right bg-white shadow-sm border-slate-200"
+                                            className="h-8 text-end bg-white shadow-sm border-slate-200"
                                             value={data.tax_rate || ''}
                                             placeholder="0%"
                                             onChange={e => setData('tax_rate', parseFloat(e.target.value) || 0)}
@@ -536,7 +536,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                 </div>
                                 <div className="pt-4 mt-2 border-t border-slate-200 flex justify-between items-end">
                                     <span className="font-semibold text-slate-900">{__('general.total_due')}</span>
-                                    <div className="text-right">
+                                    <div className="text-end">
                                         <div className="text-3xl font-bold tracking-tight text-indigo-600">
                                             <CurrencyDisplay amount={total} currency={data.amount_currency} />
                                         </div>

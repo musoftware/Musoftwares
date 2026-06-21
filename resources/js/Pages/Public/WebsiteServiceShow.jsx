@@ -113,7 +113,7 @@ export default function WebsiteServiceShow({ service }) {
                             href={route('home')} 
                             className="gsap-fade-up inline-flex items-center text-xs font-bold uppercase tracking-widest text-[#888888] hover:text-[#111111] transition-colors mb-12"
                         >
-                            <ArrowLeft className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0 rtl:rotate-180" />
+                            <ArrowLeft className="w-4 h-4 me-2 rtl:ms-2 rtl:me-0 rtl:rotate-180" />
                             {__('general.back_to_home') || 'Back to Home'}
                         </Link>
 
@@ -144,8 +144,8 @@ export default function WebsiteServiceShow({ service }) {
                                             alt={title} 
                                             className="w-full h-auto object-cover border border-[#e5e5e5] max-h-[600px] grayscale hover:grayscale-0 transition-all duration-700" 
                                         />
-                                        <div className="absolute top-8 right-8 bg-white text-[#111111] text-[10px] font-bold px-3 py-1 uppercase tracking-widest border border-[#e5e5e5]">
-                                            {locale === 'ar' ? 'العربية' : 'English'}
+                                        <div className="absolute top-8 end-8 bg-white text-[#111111] text-[10px] font-bold px-3 py-1 uppercase tracking-widest border border-[#e5e5e5]">
+                                            {__('English')}
                                         </div>
                                     </>
                                 ) : (
@@ -160,7 +160,7 @@ export default function WebsiteServiceShow({ service }) {
                 <section className="py-24 lg:py-32 bg-white reveal-section">
                     <div className="max-w-[80rem] mx-auto px-6 lg:px-8">
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
-                            <div className="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-[#e5e5e5] pb-8 lg:pb-0 lg:pr-12">
+                            <div className="lg:col-span-4 border-b lg:border-b-0 lg:border-e border-[#e5e5e5] pb-8 lg:pb-0 lg:pe-12">
                                 <h2 className="gsap-fade-up text-xs font-bold text-[#888888] tracking-widest uppercase mb-4">
                                     {__('general.service_description') || 'Service Description'}
                                 </h2>
@@ -170,7 +170,7 @@ export default function WebsiteServiceShow({ service }) {
                             </div>
                             <div className="lg:col-span-8">
                                 <div 
-                                    className="gsap-fade-up prose prose-lg max-w-none text-[#666666] prose-headings:text-[#111111] prose-headings:font-bold prose-headings:tracking-tight prose-a:text-[#111111] prose-a:font-semibold hover:prose-a:text-[#666666] prose-img:border prose-img:border-[#e5e5e5] prose-img:rounded-none rtl:prose-p:text-right rtl:prose-headings:text-right rtl:prose-ul:text-right rtl:prose-li:text-right rtl:prose-blockquote:text-right rtl:prose-blockquote:border-r-4 rtl:prose-blockquote:border-l-0 rtl:prose-blockquote:pr-4 rtl:prose-blockquote:pl-0 whitespace-pre-wrap"
+                                    className="gsap-fade-up prose prose-lg max-w-none text-[#666666] prose-headings:text-[#111111] prose-headings:font-bold prose-headings:tracking-tight prose-a:text-[#111111] prose-a:font-semibold hover:prose-a:text-[#666666] prose-img:border prose-img:border-[#e5e5e5] prose-img:rounded-none rtl:prose-p:text-end rtl:prose-headings:text-end rtl:prose-ul:text-end rtl:prose-li:text-end rtl:prose-blockquote:text-end rtl:prose-blockquote:border-e-4 rtl:prose-blockquote:border-s-0 rtl:prose-blockquote:pe-4 rtl:prose-blockquote:ps-0 whitespace-pre-wrap"
                                     dangerouslySetInnerHTML={{ __html: description }}
                                 />
                             </div>

@@ -243,7 +243,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                     </Button>
                                     <Button 
                                         type="button" 
-                                        variant={locale === 'ar' ? 'default' : 'outline'} 
+                                        variant={__('outline')} 
                                         size="sm" 
                                         onClick={() => setLocale('ar')}
                                     >
@@ -259,7 +259,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                         id="title"
                                         value={data.title_translations[locale] || ''}
                                         onChange={(e) => handleTranslationChange('title', e.target.value)}
-                                        dir={locale === 'ar' ? 'rtl' : 'ltr'}
+                                        dir={__('ltr')}
                                     />
                                 </div>
 
@@ -269,7 +269,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                         id="tagline"
                                         value={data.tagline_translations[locale] || ''}
                                         onChange={(e) => handleTranslationChange('tagline', e.target.value)}
-                                        dir={locale === 'ar' ? 'rtl' : 'ltr'}
+                                        dir={__('ltr')}
                                     />
                                 </div>
 
@@ -294,7 +294,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                         value={data.description_translations[locale] || ''}
                                         onChange={(e) => handleTranslationChange('description', e.target.value)}
                                         rows={6}
-                                        dir={locale === 'ar' ? 'rtl' : 'ltr'}
+                                        dir={__('ltr')}
                                     />
                                 </div>
 
@@ -305,7 +305,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                         value={data.auto_reply_translations[locale] || ''}
                                         onChange={(e) => handleTranslationChange('auto_reply', e.target.value)}
                                         rows={3}
-                                        dir={locale === 'ar' ? 'rtl' : 'ltr'}
+                                        dir={__('ltr')}
                                     />
                                 </div>
                             </div>
@@ -329,13 +329,13 @@ export default function Edit({ auth, service, categories }: Props) {
                                             <button 
                                                 type="button" 
                                                 onClick={() => removePackage(index)}
-                                                className="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition-colors bg-white p-1.5 rounded-md border border-slate-200 shadow-sm"
+                                                className="absolute top-3 end-3 text-slate-400 hover:text-red-500 transition-colors bg-white p-1.5 rounded-md border border-slate-200 shadow-sm"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
                                         )}
                                         
-                                        <h3 className="font-semibold text-slate-700 mb-4 pr-10 text-sm uppercase tracking-wider">Package {index + 1}</h3>
+                                        <h3 className="font-semibold text-slate-700 mb-4 pe-10 text-sm uppercase tracking-wider">Package {index + 1}</h3>
                                         
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-2">
@@ -441,11 +441,11 @@ export default function Edit({ auth, service, categories }: Props) {
                                         <button 
                                             type="button" 
                                             onClick={() => removeFaq(index)}
-                                            className="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition-colors bg-white p-1.5 rounded-md border border-slate-200 shadow-sm"
+                                            className="absolute top-3 end-3 text-slate-400 hover:text-red-500 transition-colors bg-white p-1.5 rounded-md border border-slate-200 shadow-sm"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
-                                        <div className="space-y-4 pr-10">
+                                        <div className="space-y-4 pe-10">
                                             <div className="space-y-2">
                                                 <Label>{__('general.question')}</Label>
                                                 <Input 
@@ -477,7 +477,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                 {data.kept_gallery.map((path, index) => (
                                     <div key={`kept-${index}`} className="relative aspect-video bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
                                         <img src={`/storage/${path}`} alt="Gallery" className="w-full h-full object-cover" />
-                                        <button type="button" onClick={() => removeKeptImage(path)} className="absolute top-1 right-1 bg-white p-1 rounded shadow text-red-500">
+                                        <button type="button" onClick={() => removeKeptImage(path)} className="absolute top-1 end-1 bg-white p-1 rounded shadow text-red-500">
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
@@ -485,7 +485,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                 {data.gallery.map((file, index) => (
                                     <div key={`new-${index}`} className="relative aspect-video bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
                                         <img src={URL.createObjectURL(file)} alt="New Gallery" className="w-full h-full object-cover opacity-70" />
-                                        <button type="button" onClick={() => removeNewImage(index)} className="absolute top-1 right-1 bg-white p-1 rounded shadow text-red-500">
+                                        <button type="button" onClick={() => removeNewImage(index)} className="absolute top-1 end-1 bg-white p-1 rounded shadow text-red-500">
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
@@ -546,11 +546,11 @@ export default function Edit({ auth, service, categories }: Props) {
                                     <div className="space-y-2">
                                         <Label>{__('general.service_link')}</Label>
                                         <div className="flex">
-                                            <span className="flex items-center justify-center px-3 border border-r-0 border-slate-200 bg-slate-50 text-slate-500 rounded-l-md">
+                                            <span className="flex items-center justify-center px-3 border border-e-0 border-slate-200 bg-slate-50 text-slate-500 rounded-s-md">
                                                 <Globe className="w-4 h-4" />
                                             </span>
                                             <Input 
-                                                className="rounded-l-none" 
+                                                className="rounded-s-none" 
                                                 value={data.service_link} 
                                                 onChange={(e) => setData('service_link', e.target.value)} 
                                                 placeholder="https://..."
@@ -576,9 +576,9 @@ export default function Edit({ auth, service, categories }: Props) {
                                                     value={data.referral_commission_percentage} 
                                                     onChange={(e) => setData('referral_commission_percentage', e.target.value)} 
                                                     placeholder="%"
-                                                    className="pr-8"
+                                                    className="pe-8"
                                                 />
-                                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">%</span>
+                                                <span className="absolute end-3 top-1/2 -translate-y-1/2 text-slate-500">%</span>
                                             </div>
                                         </div>
                                     </div>

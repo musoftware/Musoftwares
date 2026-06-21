@@ -34,13 +34,13 @@ export default function Earnings({ earnings }: { earnings: any }) {
                     <CardContent className="p-0">
                         {earnings && earnings.data && (earnings.data as any).length > 0 ? (
                             <div className="overflow-x-auto">
-                                <table className="w-full text-left text-sm border-collapse">
+                                <table className="w-full text-start text-sm border-collapse">
                                     <thead>
                                         <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                             <th className="px-6 py-3">{__("general.date")}</th>
                                             <th className="px-6 py-3">{__("erp.client_earner")}</th>
                                             <th className="px-6 py-3">{__("erp.referred_client")}</th>
-                                            <th className="px-6 py-3 text-right">{__("general.amount")}</th>
+                                            <th className="px-6 py-3 text-end">{__("general.amount")}</th>
                                             <th className="px-6 py-3 text-center">{__("general.status")}</th>
                                         </tr>
                                     </thead>
@@ -61,7 +61,7 @@ export default function Earnings({ earnings }: { earnings: any }) {
                                                 <td className="px-6 py-4">
                                                     {earning.referred_client?.name}
                                                 </td>
-                                                <td className="px-6 py-4 text-right font-mono font-medium text-emerald-600">
+                                                <td className="px-6 py-4 text-end font-mono font-medium text-emerald-600">
                                                     <CurrencyDisplay amount={earning.amount} currency={earning.currency} />
                                                 </td>
                                                 <td className="px-6 py-4 text-center">

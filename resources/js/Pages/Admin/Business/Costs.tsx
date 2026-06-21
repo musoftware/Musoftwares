@@ -113,7 +113,7 @@ export default function Costs() {
                             {formatCurrency(stats.total_monthly_costs, stats.business_currency_code)}
                         </div>
                         <p className="text-xs text-slate-500 mt-2 font-medium">
-                            <span className="text-rose-600 font-semibold bg-rose-50 px-1.5 py-0.5 rounded mr-1">This Month</span>
+                            <span className="text-rose-600 font-semibold bg-rose-50 px-1.5 py-0.5 rounded me-1">This Month</span>
                             Total Costs
                         </p>
                     </CardContent>
@@ -177,11 +177,11 @@ export default function Costs() {
                     <div className="flex flex-col sm:flex-row items-center w-full sm:w-auto gap-3">
                         <form onSubmit={handleSearch} className="flex items-center w-full sm:w-auto gap-2">
                             <div className="relative w-full sm:w-64">
-                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+                                <Search className="absolute start-2.5 top-2.5 h-4 w-4 text-slate-400" />
                                 <Input
                                     type="text"
                                     placeholder="Search reason..."
-                                    className="pl-9 h-9 border-slate-200 focus-visible:ring-rose-500 rounded-lg w-full text-sm"
+                                    className="ps-9 h-9 border-slate-200 focus-visible:ring-rose-500 rounded-lg w-full text-sm"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -200,7 +200,7 @@ export default function Costs() {
                                 <TableHead className="w-[120px] font-semibold">Date</TableHead>
                                 <TableHead className="font-semibold">Reason</TableHead>
                                 <TableHead className="font-semibold">Project/Client</TableHead>
-                                <TableHead className="text-right font-semibold">Amount</TableHead>
+                                <TableHead className="text-end font-semibold">Amount</TableHead>
                                 <TableHead className="w-[80px]"></TableHead>
                             </TableRow>
                         </TableHeader>
@@ -227,7 +227,7 @@ export default function Costs() {
                                             <span className="text-slate-400 text-xs">--</span>
                                         )}
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-end">
                                         <div className="font-semibold font-mono tabular-nums text-rose-600">
                                             -{formatCurrency(Math.abs(entry.amount), entry.currency)}
                                         </div>

@@ -150,7 +150,7 @@ export default function Subscribe({ tool, plan, walletBalance, walletCurrency = 
                                         type="button"
                                         key={opt.method}
                                         onClick={() => setData('payment_method', opt.method)}
-                                        className={`flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all ${
+                                        className={`flex items-center gap-3 p-4 rounded-xl border-2 text-start transition-all ${
                                             isSelected
                                                 ? 'border-slate-900 bg-slate-50'
                                                 : 'border-slate-200 bg-white hover:border-slate-300'

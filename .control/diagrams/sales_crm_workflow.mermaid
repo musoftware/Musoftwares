@@ -1,0 +1,14 @@
+flowchart TD
+    Start([CRM Entry])
+    
+    Start --> Source{Source}
+    
+    Source -->|Marketing| Campaign[Marketing Campaigns]
+    Source -->|Sales| Lead[Lead Management]
+    Source -->|Support| Ticket[Ticketing]
+    
+    Campaign --> Lead
+    Lead --> Comm[Client Communications]
+    Ticket --> Comm
+    
+    Comm --> End([Resolution / Conversion])

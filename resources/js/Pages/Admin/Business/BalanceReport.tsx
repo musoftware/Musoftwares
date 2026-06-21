@@ -229,22 +229,22 @@ export default function BalanceReport() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Month</TableHead>
-                                <TableHead className="text-right">Income</TableHead>
-                                <TableHead className="text-right">Costs</TableHead>
-                                <TableHead className="text-right">Profit</TableHead>
+                                <TableHead className="text-end">Income</TableHead>
+                                <TableHead className="text-end">Costs</TableHead>
+                                <TableHead className="text-end">Profit</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {stats.monthly_trends.map((monthData: any, idx: number) => (
                                 <TableRow key={idx}>
                                     <TableCell className="font-medium text-slate-700">{monthData.name}</TableCell>
-                                    <TableCell className="text-right text-emerald-600 font-medium">
+                                    <TableCell className="text-end text-emerald-600 font-medium">
                                         {formatCurrency(monthData.income, stats.business_currency_code)}
                                     </TableCell>
-                                    <TableCell className="text-right text-rose-600 font-medium">
+                                    <TableCell className="text-end text-rose-600 font-medium">
                                         {formatCurrency(monthData.costs, stats.business_currency_code)}
                                     </TableCell>
-                                    <TableCell className={`text-right font-semibold ${monthData.profit >= 0 ? 'text-purple-600' : 'text-rose-600'}`}>
+                                    <TableCell className={`text-end font-semibold ${monthData.profit >= 0 ? 'text-purple-600' : 'text-rose-600'}`}>
                                         {formatCurrency(monthData.profit, stats.business_currency_code)}
                                     </TableCell>
                                 </TableRow>

@@ -174,7 +174,7 @@ export default function LaragonManagerRunner({ tool }: any) {
                                     className="flex-1 text-xs h-8 bg-slate-900 text-white hover:bg-slate-800"
                                     onClick={() => openInVSCode(p.path)}
                                 >
-                                    <Code className="w-3.5 h-3.5 mr-1.5" /> VSCode
+                                    <Code className="w-3.5 h-3.5 me-1.5" /> VSCode
                                 </Button>
                                 <Button
                                     variant="outline"
@@ -182,7 +182,7 @@ export default function LaragonManagerRunner({ tool }: any) {
                                     className="flex-1 text-xs h-8"
                                     onClick={() => window.open(p.localUrl, '_blank')}
                                 >
-                                    <Globe2 className="w-3.5 h-3.5 mr-1.5 text-blue-500" />{__('general.open_web')}</Button>
+                                    <Globe2 className="w-3.5 h-3.5 me-1.5 text-blue-500" />{__('general.open_web')}</Button>
                             </div>
                         </div>
                     ))}

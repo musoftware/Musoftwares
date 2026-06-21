@@ -599,7 +599,7 @@ export default function InstagramRunner({ tool }: any) {
                         >
                             <Zap className="w-4 h-4" /> Extract
                             {status === 'running' && (
-                                <span className="ml-1 w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+                                <span className="ms-1 w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
                             )}
                         </TabsTrigger>
                         <TabsTrigger
@@ -608,7 +608,7 @@ export default function InstagramRunner({ tool }: any) {
                         >
                             <History className="w-4 h-4" /> Campaigns
                             {campaigns.length > 0 && (
-                                <span className="ml-1 text-[10px] bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-1.5 py-0 rounded-full font-bold">
+                                <span className="ms-1 text-[10px] bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-1.5 py-0 rounded-full font-bold">
                                     {campaigns.length}
                                 </span>
                             )}
@@ -666,7 +666,7 @@ export default function InstagramRunner({ tool }: any) {
                                                 disabled={addingAccount}
                                                 className="h-6 text-[10px] px-2 font-bold text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-500/10"
                                             >
-                                                {addingAccount ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Plus className="w-3 h-3 mr-1" />} Add Account
+                                                {addingAccount ? <Loader2 className="w-3 h-3 animate-spin me-1" /> : <Plus className="w-3 h-3 me-1" />} Add Account
                                             </Button>
                                         )}
                                     </div>
@@ -679,7 +679,7 @@ export default function InstagramRunner({ tool }: any) {
                                             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">{__('general.no_accounts_added')}</h4>
                                             <p className="text-xs text-slate-500 mb-4 max-w-xs mx-auto">{__('general.add_an_instagram_account_to_start_extracting_data')}</p>
                                             <Button onClick={handleAddAccount} disabled={addingAccount} className="h-9 px-4 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 text-xs font-bold">
-                                                {addingAccount ? <Loader2 className="w-3 h-3 animate-spin mr-1.5" /> : <Plus className="w-3 h-3 mr-1.5" />} Add Account
+                                                {addingAccount ? <Loader2 className="w-3 h-3 animate-spin me-1.5" /> : <Plus className="w-3 h-3 me-1.5" />} Add Account
                                             </Button>
                                         </div>
                                     ) : (
@@ -697,7 +697,7 @@ export default function InstagramRunner({ tool }: any) {
                                                         }`}
                                                     >
                                                         {isSelected && (
-                                                            <div className="absolute -top-2 -right-2 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white shadow-sm border-2 border-white dark:border-slate-900 z-10">
+                                                            <div className="absolute -top-2 -end-2 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white shadow-sm border-2 border-white dark:border-slate-900 z-10">
                                                                 <Check className="w-3 h-3" strokeWidth={3} />
                                                             </div>
                                                         )}
@@ -719,7 +719,7 @@ export default function InstagramRunner({ tool }: any) {
                                                                 e.stopPropagation();
                                                                 handleDeleteAccount(acc.id, e);
                                                             }}
-                                                            className="opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-red-50 dark:hover:bg-red-900/30 p-1.5 rounded-md text-slate-400 hover:text-red-500 transition-all absolute right-2 shadow-sm border border-slate-100 dark:border-slate-800"
+                                                            className="opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-red-50 dark:hover:bg-red-900/30 p-1.5 rounded-md text-slate-400 hover:text-red-500 transition-all absolute end-2 shadow-sm border border-slate-100 dark:border-slate-800"
                                                         >
                                                             <Trash2 className="w-3.5 h-3.5" />
                                                         </button>
@@ -735,14 +735,14 @@ export default function InstagramRunner({ tool }: any) {
                                 <div className="md:col-span-2">
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Target</label>
                                     <div className="relative">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
                                             type="text"
                                             value={target}
                                             onChange={e => setTarget(e.target.value)}
                                             onKeyDown={e => e.key === 'Enter' && handleStart()}
                                             placeholder={currentType.placeholder}
-                                            className="pl-9 h-11 text-sm bg-slate-50 dark:bg-slate-900"
+                                            className="ps-9 h-11 text-sm bg-slate-50 dark:bg-slate-900"
                                         />
                                     </div>
                                 </div>
@@ -751,13 +751,13 @@ export default function InstagramRunner({ tool }: any) {
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.max_users')}</label>
                                     <div className="relative">
-                                        <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Users className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
                                             type="number"
                                             min={10} max={5000} step={10}
                                             value={limit}
                                             onChange={e => setLimit(parseInt(e.target.value, 10))}
-                                            className="pl-9 h-11 text-sm bg-slate-50 dark:bg-slate-900"
+                                            className="ps-9 h-11 text-sm bg-slate-50 dark:bg-slate-900"
                                         />
                                     </div>
                                 </div>
@@ -886,7 +886,7 @@ export default function InstagramRunner({ tool }: any) {
                     {/* ════════════════════════════════════════════════════ */}
                     <TabsContent value="campaigns" className="space-y-4">
                         {selectedCampaign ? (
-                            <div className="space-y-4 animate-in fade-in slide-in-from-right-3 duration-300">
+                            <div className="space-y-4 animate-in fade-in slide-in-from-end-3 duration-300">
                                 <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
                                     <button
                                         onClick={() => { setSelectedCampaign(null); setCampaignUsers([]); }}
@@ -987,7 +987,7 @@ export default function InstagramRunner({ tool }: any) {
                                                 <button
                                                     key={c.id}
                                                     onClick={() => openCampaign(c)}
-                                                    className={`w-full flex items-center gap-4 px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors text-left ${i < campaigns.length - 1 ? 'border-b border-slate-100 dark:border-slate-800' : ''}`}
+                                                    className={`w-full flex items-center gap-4 px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors text-start ${i < campaigns.length - 1 ? 'border-b border-slate-100 dark:border-slate-800' : ''}`}
                                                 >
                                                     <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${typeConfig.color} flex items-center justify-center shrink-0 shadow-sm`}>
                                                         <TypeIcon className="w-4.5 h-4.5 text-white" />

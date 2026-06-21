@@ -111,7 +111,7 @@ export default function Dashboard({ stats, upcoming_bookings }: DashboardProps) 
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="text-right">
+                                            <div className="text-end">
                                                 <p className="text-sm font-medium text-slate-900">{booking.event_type?.title}</p>
                                                 <p className="text-xs text-slate-500 mt-0.5">with {booking.provider?.name}</p>
                                             </div>

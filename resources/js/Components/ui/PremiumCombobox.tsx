@@ -141,9 +141,9 @@ export function PremiumCombobox({
             </div>
 
             {isOpen && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-background border rounded-xl shadow-xl z-50 p-2 max-h-60 overflow-y-auto">
+                <div className="absolute top-full start-0 end-0 mt-2 bg-background border rounded-xl shadow-xl z-50 p-2 max-h-60 overflow-y-auto">
                     <div className="relative mb-2">
-                        <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
+                        <Search className="absolute start-3 top-2.5 w-4 h-4 text-muted-foreground" />
                         <input
                             type="text"
                             placeholder={searchPlaceholder}
@@ -155,7 +155,7 @@ export function PremiumCombobox({
                                 }
                             }}
                             onClick={(e) => e.stopPropagation()}
-                            className="w-full bg-muted rounded-lg pl-9 pr-3 py-1.5 text-xs border-none outline-none focus:ring-2 focus:ring-primary/20 text-foreground"
+                            className="w-full bg-muted rounded-lg ps-9 pe-3 py-1.5 text-xs border-none outline-none focus:ring-2 focus:ring-primary/20 text-foreground"
                         />
                     </div>
                     

@@ -68,7 +68,7 @@ export default function DebtsIndex({ clients, filters, totalOwedToMe, totalIOwe,
 
                 {/* Search */}
                 <div className="relative max-w-sm">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+                    <Search className="absolute start-2.5 top-2.5 h-4 w-4 text-slate-400" />
                     <Input 
                         placeholder={__('erp.search_clients')}
                         defaultValue={filters?.q || ''}
@@ -78,7 +78,7 @@ export default function DebtsIndex({ clients, filters, totalOwedToMe, totalIOwe,
                                 router.get(route('erp.debts.index'), { q: val }, { preserveState: true, replace: true });
                             }, 300);
                         }}
-                        className="pl-9"
+                        className="ps-9"
                     />
                 </div>
 
@@ -105,7 +105,7 @@ export default function DebtsIndex({ clients, filters, totalOwedToMe, totalIOwe,
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="text-right">
+                                        <div className="text-end">
                                             {client.debt_balance > 0 ? (
                                                 <div className="text-green-600 font-medium flex items-center justify-end gap-1">
                                                     <ArrowDownRight className="w-4 h-4" />

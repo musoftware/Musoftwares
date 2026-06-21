@@ -84,7 +84,7 @@ export function SkeletonTable({ rows = 5, cols = 4, className }) {
                 className,
             )}
         >
-            <table className="w-full border-collapse text-left">
+            <table className="w-full border-collapse text-start">
                 <thead>
                     <tr className="bg-surface-raised border-border border-b">
                         {Array.from({ length: cols }).map((_, i) => (

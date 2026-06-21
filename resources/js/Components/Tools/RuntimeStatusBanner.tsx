@@ -129,7 +129,7 @@ export function RuntimeStatusBanner({ toolSlug }: Props) {
                     <span className="text-blue-300">
                         <span className="font-medium">Installing:</span> {installing}…
                     </span>
-                    <div className="flex-1 h-1 bg-blue-900/40 rounded-full overflow-hidden ml-2">
+                    <div className="flex-1 h-1 bg-blue-900/40 rounded-full overflow-hidden ms-2">
                         <div className="h-full bg-blue-400 rounded-full animate-[pulse_1.5s_ease-in-out_infinite]" style={{ width: '65%' }} />
                     </div>
                 </div>
@@ -144,7 +144,7 @@ export function RuntimeStatusBanner({ toolSlug }: Props) {
                     <a
                         href={route('runtime.download')}
                         target="_blank"
-                        className="ml-auto text-violet-400 hover:text-violet-200 underline" rel="noreferrer"
+                        className="ms-auto text-violet-400 hover:text-violet-200 underline" rel="noreferrer"
                     >
                         Update
                     </a>

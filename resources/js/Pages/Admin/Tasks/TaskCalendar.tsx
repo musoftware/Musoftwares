@@ -214,7 +214,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                 <div
                                     key={idx}
                                     onDoubleClick={() => handleDayDoubleClick(day)}
-                                    className={`min-h-[140px] border-r border-b border-slate-100 p-2 flex flex-col transition-colors cursor-pointer ${
+                                    className={`min-h-[140px] border-e border-b border-slate-100 p-2 flex flex-col transition-colors cursor-pointer ${
                                         !isCurrentMonth ? 'bg-slate-50/50 opacity-60' : ''
                                     } ${isCurrentDay ? 'bg-indigo-50/30' : 'hover:bg-slate-50/30'}`}
                                 >
@@ -230,7 +230,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                         </span>
                                     </div>
 
-                                    <div className="flex-1 space-y-1.5 overflow-y-auto max-h-[160px] pr-1 styled-scrollbar">
+                                    <div className="flex-1 space-y-1.5 overflow-y-auto max-h-[160px] pe-1 styled-scrollbar">
                                         {/* Busy Times */}
                                         {dayEvents.busy_times.map((bt) => (
                                             <div key={bt.id} className="text-[10px] px-1.5 py-1 rounded bg-rose-50 text-rose-700 border border-rose-100 flex flex-col gap-0.5 shadow-sm">
@@ -239,7 +239,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                                     <span className="truncate">{bt.title}</span>
                                                 </div>
                                                 {!bt.is_full_day && (
-                                                    <div className="flex items-center gap-1 opacity-80 pl-4">
+                                                    <div className="flex items-center gap-1 opacity-80 ps-4">
                                                         <Clock className="h-2.5 w-2.5" />
                                                         {bt.start_time} - {bt.end_time}
                                                     </div>
@@ -255,7 +255,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                                     <span className={`truncate ${task.completed ? 'line-through opacity-70' : ''}`}>{task.title}</span>
                                                 </div>
                                                 {task.client && (
-                                                    <div className="flex items-center gap-1 opacity-80 pl-4">
+                                                    <div className="flex items-center gap-1 opacity-80 ps-4">
                                                         <User className="h-2.5 w-2.5 shrink-0 text-indigo-600" />
                                                         <span className="truncate">{task.client}</span>
                                                     </div>
@@ -276,7 +276,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                                         {todo.title}
                                                     </span>
                                                 </div>
-                                                <div className="flex flex-col gap-0.5 pl-4 opacity-80">
+                                                <div className="flex flex-col gap-0.5 ps-4 opacity-80">
                                                     <div className="flex items-center gap-1">
                                                         <Clock className="h-2.5 w-2.5 shrink-0 text-emerald-600" />
                                                         <span>{todo.start_time}</span>
@@ -381,7 +381,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                     onClick={() => setData('checklist_items', [...data.checklist_items, { title: '' }])}
                                     className="h-7 px-2 text-xs"
                                 >
-                                    <Plus className="h-3 w-3 mr-1" /> Add Item
+                                    <Plus className="h-3 w-3 me-1" /> Add Item
                                 </Button>
                             </div>
                             

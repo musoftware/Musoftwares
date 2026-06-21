@@ -125,7 +125,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
     };
 
     const renderFormFields = () => (
-        <div className="space-y-4 max-h-[65vh] overflow-y-auto p-1 pr-2">
+        <div className="space-y-4 max-h-[65vh] overflow-y-auto p-1 pe-2">
             {/* Code & Name */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -320,7 +320,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 </div>
 
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                    <DialogTrigger render={<Button><Plus className="mr-2 h-4 w-4" />{__('general.create_coupon')}</Button>} />
+                    <DialogTrigger render={<Button><Plus className="me-2 h-4 w-4" />{__('general.create_coupon')}</Button>} />
                     <DialogContent className="max-w-lg">
                         <DialogHeader>
                             <DialogTitle>{__('general.create_new_coupon')}</DialogTitle>
@@ -340,7 +340,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
 
             {/* Table */}
             <div className="overflow-hidden rounded-lg bg-white shadow">
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-start text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
                             <th className="p-4 font-medium text-gray-600">Code</th>
@@ -350,7 +350,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                             <th className="p-4 font-medium text-gray-600">Uses</th>
                             <th className="p-4 font-medium text-gray-600">Expires</th>
                             <th className="p-4 font-medium text-gray-600">Status</th>
-                            <th className="p-4 font-medium text-gray-600 text-right">Actions</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -381,7 +381,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                                             <>
                                                 <span className="font-medium">{parseFloat(String(c.discount_amount ?? 0)).toFixed(2)}</span>
                                                 {c.currency_relation && (
-                                                    <span className="text-gray-400 ml-1">{c.currency_relation.currency}</span>
+                                                    <span className="text-gray-400 ms-1">{c.currency_relation.currency}</span>
                                                 )}
                                             </>
                                         )
@@ -416,19 +416,19 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                                         </span>
                                     )}
                                 </td>
-                                <td className="p-4 space-x-2 text-right">
+                                <td className="p-4 space-x-2 text-end">
                                     <Button
                                         variant="outline"
                                         size="sm"
                                         onClick={() => router.visit(route('admin.coupons.show', c.id))}
                                     >
-                                        <Eye className="h-3.5 w-3.5 mr-1" /> View
+                                        <Eye className="h-3.5 w-3.5 me-1" /> View
                                     </Button>
                                     <Button variant="outline" size="sm" onClick={() => openEditModal(c)}>
-                                        <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
+                                        <Pencil className="h-3.5 w-3.5 me-1" /> Edit
                                     </Button>
                                     <Button variant="destructive" size="sm" onClick={() => handleDelete(c.id)}>
-                                        <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
+                                        <Trash2 className="h-3.5 w-3.5 me-1" /> Delete
                                     </Button>
                                 </td>
                             </tr>

@@ -50,7 +50,7 @@ export default function Wallets({ wallets }: WalletProps) {
                             <p className="text-slate-500 mt-1">{__('general.register_the_phone_numbers_or_aliases_where_you_receive_money')}</p>
                         </div>
                         <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
-                            <ArrowLeft className="w-4 h-4 mr-2" />{__('general.back_to_dashboard')}</Button>
+                            <ArrowLeft className="w-4 h-4 me-2" />{__('general.back_to_dashboard')}</Button>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -92,7 +92,7 @@ export default function Wallets({ wallets }: WalletProps) {
                                     </CardContent>
                                     <div className="p-4 border-t bg-slate-50">
                                         <Button type="submit" disabled={processing} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
-                                            <Plus className="w-4 h-4 mr-2" />{__('general.add_record')}</Button>
+                                            <Plus className="w-4 h-4 me-2" />{__('general.add_record')}</Button>
                                     </div>
                                 </form>
                             </Card>

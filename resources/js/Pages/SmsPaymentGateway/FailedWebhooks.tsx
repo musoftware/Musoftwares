@@ -62,7 +62,7 @@ export default function FailedWebhooks({ failedWebhooks }: FailedWebhooksProps) 
                         </div>
                         <div className="flex gap-2">
                             <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.webhooks'))}>
-                                <ArrowLeft className="w-4 h-4 mr-2" />
+                                <ArrowLeft className="w-4 h-4 me-2" />
                                 {__('general.back')}
                             </Button>
                         </div>
@@ -115,7 +115,7 @@ export default function FailedWebhooks({ failedWebhooks }: FailedWebhooksProps) 
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align="end" className="w-[160px]">
                                                                 <DropdownMenuItem onClick={() => handleViewDetails(item)}>
-                                                                    <Eye className="mr-2 h-4 w-4" />
+                                                                    <Eye className="me-2 h-4 w-4" />
                                                                     <span>View Details</span>
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuContent>

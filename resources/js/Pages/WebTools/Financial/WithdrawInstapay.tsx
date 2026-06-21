@@ -105,7 +105,7 @@ export default function WithdrawInstapay({
                                                     <Wallet className="w-4 h-4 text-slate-500" /> Amount to Pay
                                                 </Label>
                                                 <div className="flex relative">
-                                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                                    <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
                                                         <span className="text-slate-500 font-bold">$</span>
                                                     </div>
                                                     <Input 
@@ -115,14 +115,14 @@ export default function WithdrawInstapay({
                                                         required
                                                         value={signupForm.data.amount}
                                                         onChange={e => signupForm.setData('amount', e.target.value)}
-                                                        className={`pl-10 h-14 text-xl font-bold rounded-r-none focus-visible:z-10 ${signupForm.errors.amount ? 'border-red-500' : ''}`}
+                                                        className={`ps-10 h-14 text-xl font-bold rounded-e-none focus-visible:z-10 ${signupForm.errors.amount ? 'border-red-500' : ''}`}
                                                         placeholder="e.g. 1000"
                                                     />
                                                     <Select 
                                                         value={signupForm.data.currency_id} 
                                                         onValueChange={val => signupForm.setData('currency_id', val || '')}
                                                     >
-                                                        <SelectTrigger className={`w-[120px] h-14 rounded-l-none border-l-0 bg-slate-50 font-bold ${signupForm.errors.currency_id ? 'border-red-500' : ''}`}>
+                                                        <SelectTrigger className={`w-[120px] h-14 rounded-s-none border-s-0 bg-slate-50 font-bold ${signupForm.errors.currency_id ? 'border-red-500' : ''}`}>
                                                             <SelectValue placeholder="Currency" />
                                                         </SelectTrigger>
                                                         <SelectContent>
@@ -140,7 +140,7 @@ export default function WithdrawInstapay({
                                                 <div className="space-y-2">
                                                     <Label className="text-slate-700 font-bold">Full Name</Label>
                                                     <div className="relative">
-                                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                                             <User className="w-5 h-5 text-slate-400" />
                                                         </div>
                                                         <Input 
@@ -148,7 +148,7 @@ export default function WithdrawInstapay({
                                                             required 
                                                             value={signupForm.data.name}
                                                             onChange={e => signupForm.setData('name', e.target.value)}
-                                                            className={`pl-10 h-12 bg-slate-50 ${signupForm.errors.name ? 'border-red-500' : ''}`}
+                                                            className={`ps-10 h-12 bg-slate-50 ${signupForm.errors.name ? 'border-red-500' : ''}`}
                                                             placeholder="Your full name"
                                                         />
                                                     </div>
@@ -158,7 +158,7 @@ export default function WithdrawInstapay({
                                                 <div className="space-y-2">
                                                     <Label className="text-slate-700 font-bold">Email Address</Label>
                                                     <div className="relative">
-                                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                                             <Mail className="w-5 h-5 text-slate-400" />
                                                         </div>
                                                         <Input 
@@ -166,7 +166,7 @@ export default function WithdrawInstapay({
                                                             required 
                                                             value={signupForm.data.email}
                                                             onChange={e => signupForm.setData('email', e.target.value)}
-                                                            className={`pl-10 h-12 bg-slate-50 ${signupForm.errors.email ? 'border-red-500' : ''}`}
+                                                            className={`ps-10 h-12 bg-slate-50 ${signupForm.errors.email ? 'border-red-500' : ''}`}
                                                             placeholder="name@example.com"
                                                         />
                                                     </div>
@@ -176,7 +176,7 @@ export default function WithdrawInstapay({
                                                 <div className="space-y-2">
                                                     <Label className="text-slate-700 font-bold">WhatsApp Number</Label>
                                                     <div className="relative">
-                                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                                             <Phone className="w-5 h-5 text-slate-400" />
                                                         </div>
                                                         <Input 
@@ -184,7 +184,7 @@ export default function WithdrawInstapay({
                                                             required 
                                                             value={signupForm.data.mobile}
                                                             onChange={e => signupForm.setData('mobile', e.target.value)}
-                                                            className={`pl-10 h-12 bg-slate-50 ${signupForm.errors.mobile ? 'border-red-500' : ''}`}
+                                                            className={`ps-10 h-12 bg-slate-50 ${signupForm.errors.mobile ? 'border-red-500' : ''}`}
                                                             placeholder="+1234567890"
                                                         />
                                                     </div>
@@ -194,7 +194,7 @@ export default function WithdrawInstapay({
                                             </div>
 
                                             <Button type="submit" size="lg" className="w-full h-14 text-lg mt-6" disabled={signupForm.processing}>
-                                                {signupForm.processing ? 'Processing...' : 'Continue to Payment'} <ArrowRight className="w-5 h-5 ml-2" />
+                                                {signupForm.processing ? 'Processing...' : 'Continue to Payment'} <ArrowRight className="w-5 h-5 ms-2" />
                                             </Button>
                                         </form>
                                     )}
@@ -205,19 +205,19 @@ export default function WithdrawInstapay({
                             <Card className="border-none shadow-sm bg-slate-50">
                                 <CardContent className="p-6">
                                     <h3 className="font-bold text-slate-900 mb-4">How it works</h3>
-                                    <ol className="space-y-4 text-sm text-slate-600 relative border-l border-slate-200 ml-3 pl-4">
+                                    <ol className="space-y-4 text-sm text-slate-600 relative border-s border-slate-200 ms-3 ps-4">
                                         <li className="relative">
-                                            <div className="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-purple-500 border-2 border-white"></div>
+                                            <div className="absolute -start-[21px] top-1 w-3 h-3 rounded-full bg-purple-500 border-2 border-white"></div>
                                             <strong className="text-slate-900 block mb-1">1. Fill Details</strong>
                                             Enter your amount and contact info.
                                         </li>
                                         <li className="relative">
-                                            <div className="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-purple-500 border-2 border-white"></div>
+                                            <div className="absolute -start-[21px] top-1 w-3 h-3 rounded-full bg-purple-500 border-2 border-white"></div>
                                             <strong className="text-slate-900 block mb-1">2. Get Credentials</strong>
                                             Receive an instant WhatsApp message with your password.
                                         </li>
                                         <li className="relative">
-                                            <div className="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-purple-500 border-2 border-white"></div>
+                                            <div className="absolute -start-[21px] top-1 w-3 h-3 rounded-full bg-purple-500 border-2 border-white"></div>
                                             <strong className="text-slate-900 block mb-1">3. Pay Securely</strong>
                                             You'll be redirected to log in and complete your payment via Instapay.
                                         </li>
@@ -256,7 +256,7 @@ export default function WithdrawInstapay({
                                     <div className="space-y-2">
                                         <Label className="text-slate-700 font-bold">Transfer Amount (EGP)</Label>
                                         <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                                 <span className="text-slate-500 font-bold">EGP</span>
                                             </div>
                                             <Input 
@@ -266,7 +266,7 @@ export default function WithdrawInstapay({
                                                 required
                                                 value={calcForm.data.balance_egp}
                                                 onChange={e => calcForm.setData('balance_egp', e.target.value)}
-                                                className="pl-14 h-12 text-lg font-bold"
+                                                className="ps-14 h-12 text-lg font-bold"
                                                 placeholder="0.00"
                                             />
                                         </div>
@@ -298,13 +298,13 @@ export default function WithdrawInstapay({
                                     </CardContent>
                                 </Card>
 
-                                <Card className="border-slate-200 shadow-sm border-l-4 border-l-blue-500">
+                                <Card className="border-slate-200 shadow-sm border-s-4 border-s-blue-500">
                                     <CardContent className="p-6 flex items-center justify-between">
                                         <div>
                                             <h4 className="font-bold text-slate-900">Total Fees Deducted</h4>
                                             <p className="text-sm text-slate-500">Includes processing, gateway, and service fees</p>
                                         </div>
-                                        <div className="text-right">
+                                        <div className="text-end">
                                             <p className="text-2xl font-bold text-slate-900">{formatMoney((input || 0) - result)} <span className="text-sm text-slate-500">EGP</span></p>
                                         </div>
                                     </CardContent>

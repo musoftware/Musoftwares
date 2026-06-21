@@ -29,7 +29,7 @@ export function SectionCard({
                         {title && <h3 className="text-lg font-semibold text-slate-900">{title}</h3>}
                         {description && <p className="text-sm text-slate-500">{description}</p>}
                     </div>
-                    {action && <div className="shrink-0 ml-4">{action}</div>}
+                    {action && <div className="shrink-0 ms-4">{action}</div>}
                 </div>
             )}
             <div className={cn('p-6', noPadding && 'p-0')}>

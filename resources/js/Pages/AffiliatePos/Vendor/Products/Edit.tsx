@@ -81,7 +81,7 @@ export default function VendorProductsEdit({ product }: any) {
                         Cancel
                     </Button>
                     <Button type="submit" className="bg-blue-600 hover:bg-blue-700 shadow-md" disabled={processing}>
-                        <Save className="w-4 h-4 mr-2" />{__('general.update_product')}</Button>
+                        <Save className="w-4 h-4 me-2" />{__('general.update_product')}</Button>
                 </div>
             </form>
         </div>

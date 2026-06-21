@@ -73,13 +73,13 @@ export default function Categories({ categories }: any) {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead>
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
                                         Name
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
                                         Slug
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase">
                                         Actions
                                     </th>
                                 </tr>
@@ -93,7 +93,7 @@ export default function Categories({ categories }: any) {
                                         <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                                             {cat.slug}
                                         </td>
-                                        <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
+                                        <td className="px-6 py-4 text-end text-sm font-medium whitespace-nowrap">
                                             <button
                                                 onClick={() =>
                                                     handleDelete(cat.id)

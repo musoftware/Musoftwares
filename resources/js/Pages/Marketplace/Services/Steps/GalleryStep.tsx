@@ -49,7 +49,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
                                 </button>
                             </div>
                             {idx === 0 && (
-                                <div className="absolute top-2 left-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">
+                                <div className="absolute top-2 start-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">
                                     PRIMARY
                                 </div>
                             )}

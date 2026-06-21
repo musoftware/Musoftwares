@@ -53,7 +53,7 @@ function CreatorCard({ creator, idx }: { creator: any; idx: number }) {
                     <span className="flex items-center gap-1 text-[10px] text-slate-400"><Eye className="w-3 h-3" />{creator.avg_views?.toLocaleString() ?? '—'}</span>
                 </div>
             </div>
-            <div className="shrink-0 text-right">
+            <div className="shrink-0 text-end">
                 <p className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1">Engagement</p>
                 <p className="text-sm font-black text-emerald-400">{creator.engagement_rate ?? '—'}%</p>
             </div>
@@ -161,9 +161,9 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                     <span className="font-bold text-sm">{__('general.tiktok_analytics')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Tab active={tab === 'discover'} onClick={() => setTab('discover')}><Search className="w-3 h-3 inline mr-1" />Discover</Tab>
-                    <Tab active={tab === 'monitor'} onClick={() => setTab('monitor')}><Eye className="w-3 h-3 inline mr-1" />Monitor</Tab>
-                    <Tab active={tab === 'vault'} onClick={() => setTab('vault')}><Bookmark className="w-3 h-3 inline mr-1" />{__('general.ugc_vault')}</Tab>
+                    <Tab active={tab === 'discover'} onClick={() => setTab('discover')}><Search className="w-3 h-3 inline me-1" />Discover</Tab>
+                    <Tab active={tab === 'monitor'} onClick={() => setTab('monitor')}><Eye className="w-3 h-3 inline me-1" />Monitor</Tab>
+                    <Tab active={tab === 'vault'} onClick={() => setTab('vault')}><Bookmark className="w-3 h-3 inline me-1" />{__('general.ugc_vault')}</Tab>
                 </div>
                 <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-pink-500/10 border-pink-500/30 text-pink-400' : status === 'done' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-slate-800 border-slate-700 text-slate-500'}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-pink-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-600'}`} />
@@ -184,10 +184,10 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                                 <div className="md:col-span-1">
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.search_keyword')}</label>
                                     <div className="relative">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
                                         <Input type="text" value={keyword} onChange={e => setKeyword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleDiscover()}
                                             placeholder={__('general.muscle_building_meal_prep')}
-                                            className="pl-9 h-11 text-sm bg-slate-800 border-slate-700 focus-visible:ring-pink-500 text-white placeholder:text-slate-600" />
+                                            className="ps-9 h-11 text-sm bg-slate-800 border-slate-700 focus-visible:ring-pink-500 text-white placeholder:text-slate-600" />
                                     </div>
                                 </div>
                                 <div>

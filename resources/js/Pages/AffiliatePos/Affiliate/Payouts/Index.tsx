@@ -18,7 +18,7 @@ export default function AffiliatePayoutsIndex({ payouts }: any) {
                     <p className="text-sm text-gray-500 mt-1">{__('general.track_your_requested_withdrawals_and_current_status')}</p>
                 </div>
                 <Button className="bg-blue-600 hover:bg-blue-700">
-                    <Wallet className="w-4 h-4 mr-2" />{__('general.request_payout')}</Button>
+                    <Wallet className="w-4 h-4 me-2" />{__('general.request_payout')}</Button>
             </div>
 
             <Card className="shadow-sm border-gray-200">
@@ -55,9 +55,9 @@ export default function AffiliatePayoutsIndex({ payouts }: any) {
                                         </TableCell>
                                         <TableCell className="font-semibold">{payout.amount}</TableCell>
                                         <TableCell>
-                                            {payout.status === 'pending' && <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-none"><Clock className="w-3 h-3 mr-1" /> Pending</Badge>}
-                                            {payout.status === 'approved' && <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-none"><CheckCircle2 className="w-3 h-3 mr-1" /> Approved</Badge>}
-                                            {payout.status === 'declined' && <Badge className="bg-red-100 text-red-800 hover:bg-red-100 border-none"><XCircle className="w-3 h-3 mr-1" /> Declined</Badge>}
+                                            {payout.status === 'pending' && <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-none"><Clock className="w-3 h-3 me-1" /> Pending</Badge>}
+                                            {payout.status === 'approved' && <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-none"><CheckCircle2 className="w-3 h-3 me-1" /> Approved</Badge>}
+                                            {payout.status === 'declined' && <Badge className="bg-red-100 text-red-800 hover:bg-red-100 border-none"><XCircle className="w-3 h-3 me-1" /> Declined</Badge>}
                                         </TableCell>
                                         <TableCell className="text-sm text-gray-500">
                                             {new Date(payout.created_at).toLocaleDateString()}

@@ -35,7 +35,7 @@ export default function SnapDownloaderRunnerPage() {
                 <div className="text-center space-y-6 w-full max-w-sm p-8 rounded-3xl border border-white/5" style={{ background: 'rgba(255,255,255,0.03)' }}>
                     <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto relative" style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
                         <Smartphone className="w-8 h-8 text-white" />
-                        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center">
+                        <span className="absolute -top-1 -end-1 w-4 h-4 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                         </span>
                     </div>

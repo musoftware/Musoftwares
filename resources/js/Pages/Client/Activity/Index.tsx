@@ -60,7 +60,7 @@ export default function ActivityIndex({ activities, filters }: Props) {
                                 </div>
                                 <h1 className="text-2xl font-bold text-slate-900">{__('general.activity_log')}</h1>
                             </div>
-                            <p className="text-sm text-slate-500 ml-10">
+                            <p className="text-sm text-slate-500 ms-10">
                                 {activities.total} events across the platform
                             </p>
                         </div>

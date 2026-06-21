@@ -37,7 +37,7 @@ export function Sidebar({
     });
 
     return (
-        <aside className="hidden md:flex w-56 flex-col border-r shrink-0 sticky top-0 h-screen" style={{ borderColor: 'rgba(255,255,255,0.06)', background: '#13161f' }}>
+        <aside className="hidden md:flex w-56 flex-col border-e shrink-0 sticky top-0 h-screen" style={{ borderColor: 'rgba(255,255,255,0.06)', background: '#13161f' }}>
             {/* Logo */}
             <div className="p-5 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
                 <div className="flex items-center gap-3">
@@ -67,7 +67,7 @@ export function Sidebar({
                             }}
                         >
                             <span style={{ color: active ? '#f59e0b' : 'rgba(255,255,255,0.3)' }}>{item.icon}</span>
-                            <span className="flex-1 text-left">{item.label}</span>
+                            <span className="flex-1 text-start">{item.label}</span>
                             {item.badge !== undefined && item.badge > 0 && (
                                 <Badge variant="secondary" className="px-1.5 min-w-[20px] justify-center text-[9px] font-black" style={{ background: '#f59e0b', color: '#000' }}>
                                     {item.badge}

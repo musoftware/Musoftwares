@@ -106,7 +106,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                         </div>
                         <div className="flex flex-wrap gap-2">
                             <Button variant="outline" onClick={() => window.history.back()}>
-                                <ArrowDownLeft className="h-4 w-4 mr-2" style={{ transform: 'rotate(45deg)' }} /> Back
+                                <ArrowDownLeft className="h-4 w-4 me-2" style={{ transform: 'rotate(45deg)' }} /> Back
                             </Button>
                         </div>
                     </div>
@@ -218,16 +218,16 @@ export default function Create({ user, selectedProject, type, currencies, busine
                     <div className="flex items-center gap-4">
                         <Button variant="secondary" asChild className="rounded-full">
                             <a href={route('admin.users.notes.index', user.id)} target="_blank" rel="noopener noreferrer">
-                                <StickyNote className="h-4 w-4 mr-2" />{__('general.user_notes')}</a>
+                                <StickyNote className="h-4 w-4 me-2" />{__('general.user_notes')}</a>
                         </Button>
                         <Button variant="secondary" asChild className="rounded-full">
                             <a href={route('admin.finance.index', { user_id: user.id })} target="_blank" rel="noopener noreferrer">
-                                <Coins className="h-4 w-4 mr-2" /> Transactions
+                                <Coins className="h-4 w-4 me-2" /> Transactions
                             </a>
                         </Button>
                         <Button variant="secondary" asChild className="rounded-full">
                             <a href={route('admin.invoices.index', { client_id: user.id })} target="_blank" rel="noopener noreferrer">
-                                <Receipt className="h-4 w-4 mr-2" /> Invoices
+                                <Receipt className="h-4 w-4 me-2" /> Invoices
                             </a>
                         </Button>
                     </div>

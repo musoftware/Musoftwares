@@ -93,9 +93,9 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                 {/* Filters */}
                 <div className="flex flex-wrap gap-3">
                     <div className="relative flex-1 min-w-48">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                         <Input
-                            className="pl-9 bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500"
+                            className="ps-9 bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500"
                             placeholder={__('general.search_device_id_user')}
                             value={search}
                             onChange={e => setSearch(e.target.value)}
@@ -120,12 +120,12 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b border-zinc-800">
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">{__('general.device_id')}</th>
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">{__('general.assigned_user')}</th>
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Notes</th>
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Assigned</th>
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Status</th>
-                                        <th className="text-right px-4 py-3 text-zinc-400 font-medium">Actions</th>
+                                        <th className="text-start px-4 py-3 text-zinc-400 font-medium">{__('general.device_id')}</th>
+                                        <th className="text-start px-4 py-3 text-zinc-400 font-medium">{__('general.assigned_user')}</th>
+                                        <th className="text-start px-4 py-3 text-zinc-400 font-medium">Notes</th>
+                                        <th className="text-start px-4 py-3 text-zinc-400 font-medium">Assigned</th>
+                                        <th className="text-start px-4 py-3 text-zinc-400 font-medium">Status</th>
+                                        <th className="text-end px-4 py-3 text-zinc-400 font-medium">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -155,7 +155,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                                     </SelectContent>
                                                 </Select>
                                             </td>
-                                            <td className="px-4 py-3 text-right">
+                                            <td className="px-4 py-3 text-end">
                                                 <Button size="sm" variant="ghost"
                                                     className="text-red-400 hover:text-red-300 hover:bg-red-500/10 w-8 h-8 p-0"
                                                     onClick={() => destroy(a)}>

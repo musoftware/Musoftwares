@@ -51,10 +51,10 @@ export default function VendorOrdersIndex({ orders, filters }: any) {
                                 <TableHead className="font-semibold text-gray-600">{__('general.order_id')}</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Customer</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Location</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-right">Items</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">Items</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Status</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Date</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-right">Action</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">Action</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -70,17 +70,17 @@ export default function VendorOrdersIndex({ orders, filters }: any) {
                                             <div className="font-medium text-gray-900">{order.customer_name}</div>
                                         </TableCell>
                                         <TableCell className="text-sm text-gray-600">{order.customer_governorate}</TableCell>
-                                        <TableCell className="text-right font-medium">{order.items?.length || 0} items</TableCell>
+                                        <TableCell className="text-end font-medium">{order.items?.length || 0} items</TableCell>
                                         <TableCell>
                                             <Badge variant="outline" className="capitalize">{order.status}</Badge>
                                         </TableCell>
                                         <TableCell className="text-sm text-gray-500">
                                             {new Date(order.created_at).toLocaleDateString()}
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-end">
                                             <Link href={route('affiliate_pos.vendor.orders.show', order.id)}>
                                                 <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800 hover:bg-blue-50">
-                                                    <Eye className="w-4 h-4 mr-1" /> View
+                                                    <Eye className="w-4 h-4 me-1" /> View
                                                 </Button>
                                             </Link>
                                         </TableCell>

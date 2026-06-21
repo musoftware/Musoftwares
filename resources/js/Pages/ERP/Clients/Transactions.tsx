@@ -70,7 +70,7 @@ export default function ClientTransactions({
                                             <p className="text-[10px] text-slate-400 mt-0.5"><DateDisplay date={tx.created_at} format="datetime" /></p>
                                         </div>
                                     </div>
-                                    <div className="text-right">
+                                    <div className="text-end">
                                         <p className={`text-base font-bold ${
                                             ['received', 'earned', 'refunded_to_wallet'].includes(tx.type) ? 'text-green-600' : 'text-slate-900'
                                         }`}>

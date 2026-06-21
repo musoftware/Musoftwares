@@ -45,7 +45,7 @@ export default function AffiliateOrdersIndex({ orders, filters }: any) {
                             <TableRow className="bg-gray-50/80">
                                 <TableHead className="font-semibold text-gray-600">{__('general.order_id')}</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Customer</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-right">Commission (EGP)</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">Commission (EGP)</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Status</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Date</TableHead>
                             </TableRow>
@@ -63,7 +63,7 @@ export default function AffiliateOrdersIndex({ orders, filters }: any) {
                                             <div className="font-medium text-gray-900">{order.customer_name}</div>
                                             <div className="text-xs text-gray-500">{order.customer_governorate}</div>
                                         </TableCell>
-                                        <TableCell className="text-right text-green-600 font-semibold text-lg">
+                                        <TableCell className="text-end text-green-600 font-semibold text-lg">
                                             {order.commission.toLocaleString()}
                                         </TableCell>
                                         <TableCell>

@@ -239,13 +239,13 @@ export default function DataFilterRunner({ tool }: any) {
             {/* Main Multi-Workspace Layout */}
             <div className="flex-1 flex overflow-hidden">
                 {/* Real-time Side Stream panel (Operational UX) */}
-                <aside className="w-72 border-r border-slate-200 bg-white flex flex-col justify-between hidden lg:flex shrink-0">
+                <aside className="w-72 border-e border-slate-200 bg-white flex flex-col justify-between hidden lg:flex shrink-0">
                     <div className="p-5 flex-1 flex flex-col min-h-0">
                         <div className="flex items-center gap-2 mb-4">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping" />
                             <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">{__('general.live_engine_feed')}</h3>
                         </div>
-                        <div className="flex-1 overflow-y-auto space-y-3 pr-1 font-sans scrollbar-thin">
+                        <div className="flex-1 overflow-y-auto space-y-3 pe-1 font-sans scrollbar-thin">
                             {realtimeLogs.length === 0 ? (
                                 <div className="text-center py-20 text-slate-400 text-xs flex flex-col items-center gap-2">
                                     <Layers className="w-6 h-6 text-slate-300" />
@@ -451,7 +451,7 @@ export default function DataFilterRunner({ tool }: any) {
                             {(status === 'running' || status === 'completed') && (
                                 <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-2">
                                     <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative overflow-hidden">
-                                        {status === 'running' && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-cyan-400 animate-pulse" />}
+                                        {status === 'running' && <div className="absolute top-0 start-0 w-full h-1 bg-gradient-to-r from-blue-400 to-cyan-400 animate-pulse" />}
                                         <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{__('general.rows_read_from_input')}</p>
                                         <p className="text-3xl font-black text-slate-800">{totalRows.toLocaleString()}</p>
                                     </div>
@@ -495,7 +495,7 @@ export default function DataFilterRunner({ tool }: any) {
                                 </div>
                             ) : (
                                 <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                                    <table className="w-full text-sm text-left">
+                                    <table className="w-full text-sm text-start">
                                         <thead className="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase">
                                             <tr>
                                                 <th className="px-6 py-4 tracking-wider">Date</th>

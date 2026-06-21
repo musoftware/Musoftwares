@@ -170,13 +170,13 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
 
                             {/* Search */}
                             <div className="relative flex-1 max-w-xs">
-                                <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                                <Search className="absolute start-3 top-2.5 h-4 w-4 text-slate-400" />
                                 <Input
                                     type="text"
                                     placeholder={__('general.search_todo_title_or_client_name')}
                                     value={search}
                                     onChange={e => setSearch(e.target.value)}
-                                    className="pl-9 h-9 shadow-none border-slate-200 text-xs focus-visible:ring-indigo-500"
+                                    className="ps-9 h-9 shadow-none border-slate-200 text-xs focus-visible:ring-indigo-500"
                                 />
                             </div>
 
@@ -228,13 +228,13 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                     </div>
                                     <Link
                                         href={route('admin.users.show', clientGroup.client.id)}
-                                        className="ml-auto text-xs text-indigo-600 hover:underline flex items-center gap-0.5"
+                                        className="ms-auto text-xs text-indigo-600 hover:underline flex items-center gap-0.5"
                                     >{__('general.view_client_profile')}<ChevronRight className="h-3.5 w-3.5" />
                                     </Link>
                                 </div>
 
                                 {/* Tasks within Client */}
-                                <div className="space-y-5 pl-11">
+                                <div className="space-y-5 ps-11">
                                     {clientGroup.tasks.map((task) => (
                                         <Card key={task.id} className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
                                             {/* Task header */}

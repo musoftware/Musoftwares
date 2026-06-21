@@ -41,7 +41,7 @@ export function OutreachWorkspace(props: OutreachWorkspaceProps) {
                                 <button
                                     key={camp.id}
                                     onClick={() => props.setSelectedSequenceCampaignId(camp.id)}
-                                    className={`w-full text-left p-3 rounded-xl border text-xs font-semibold flex items-center justify-between transition-all ${
+                                    className={`w-full text-start p-3 rounded-xl border text-xs font-semibold flex items-center justify-between transition-all ${
                                         props.selectedSequenceCampaignId === camp.id 
                                             ? 'border-slate-900 bg-slate-950 text-white shadow-sm' 
                                             : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50 text-slate-700'

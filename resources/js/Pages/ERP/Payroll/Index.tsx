@@ -164,7 +164,7 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-semibold text-slate-900">{__('general.payroll_system')}</h1>
                 <Button onClick={() => setIsGenerateModalOpen(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="w-4 h-4 me-2" />
                     {__('general.run_payroll')}
                 </Button>
             </div>
@@ -189,7 +189,7 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                                         <TableHead>{__('general.base')}</TableHead>
                                         <TableHead>{__('payment.net_pay')}</TableHead>
                                         <TableHead>{__('general.status')}</TableHead>
-                                        <TableHead className="text-right">{__('general.actions')}</TableHead>
+                                        <TableHead className="text-end">{__('general.actions')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -209,15 +209,15 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                                                 <TableCell>
                                                     <StatusBadge status={payslip.status} />
                                                 </TableCell>
-                                                <TableCell className="text-right">
+                                                <TableCell className="text-end">
                                                     {payslip.status === 'draft' && (
                                                         <div className="flex items-center justify-end gap-2">
                                                             <Button size="sm" variant="outline" onClick={() => openItemsModal(payslip)} disabled={isProcessing}>
-                                                                <Edit className="w-4 h-4 mr-1" />
+                                                                <Edit className="w-4 h-4 me-1" />
                                                                 {__('general.edit')}
                                                             </Button>
                                                             <Button size="sm" variant="default" onClick={() => openPayModal(payslip)} disabled={isProcessing}>
-                                                                <CheckCircle className="w-4 h-4 mr-1" />
+                                                                <CheckCircle className="w-4 h-4 me-1" />
                                                                 {__('general.mark_paid')}
                                                             </Button>
                                                         </div>
@@ -244,7 +244,7 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                                         <TableHead>{__('general.employee')}</TableHead>
                                         <TableHead>{__('general.role')}</TableHead>
                                         <TableHead>{__('general.base_salary')}</TableHead>
-                                        <TableHead className="text-right">{__('general.actions')}</TableHead>
+                                        <TableHead className="text-end">{__('general.actions')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -262,9 +262,9 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                                                     <span className="text-slate-400 italic">{__('general.not_set')}</span>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-right">
+                                            <TableCell className="text-end">
                                                 <Button size="sm" variant="ghost" onClick={() => openContractModal(member)}>
-                                                    <Settings2 className="w-4 h-4 mr-2" />
+                                                    <Settings2 className="w-4 h-4 me-2" />
                                                     {__('freelance.manage_contract')}
                                                 </Button>
                                             </TableCell>
@@ -391,7 +391,7 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                                                     onChange={(e) => updatePayslipItem(index, 'amount', e.target.value)}
                                                 />
                                             </TableCell>
-                                            <TableCell className="text-right">
+                                            <TableCell className="text-end">
                                                 <Button size="sm" variant="destructive" onClick={() => removePayslipItem(index)}>{__('general.remove')}</Button>
                                             </TableCell>
                                         </TableRow>
@@ -400,8 +400,8 @@ export default function Index({ members, payslips, filters, auth, paymentMethods
                             </Table>
                         )}
                         <div className="flex justify-end gap-2">
-                            <Button size="sm" variant="outline" onClick={() => addPayslipItem('bonus')}><Plus className="w-4 h-4 mr-1"/> {__('general.add_bonus')}</Button>
-                            <Button size="sm" variant="outline" onClick={() => addPayslipItem('deduction')}><Plus className="w-4 h-4 mr-1"/> {__('general.add_deduction')}</Button>
+                            <Button size="sm" variant="outline" onClick={() => addPayslipItem('bonus')}><Plus className="w-4 h-4 me-1"/> {__('general.add_bonus')}</Button>
+                            <Button size="sm" variant="outline" onClick={() => addPayslipItem('deduction')}><Plus className="w-4 h-4 me-1"/> {__('general.add_deduction')}</Button>
                         </div>
                     </div>
 

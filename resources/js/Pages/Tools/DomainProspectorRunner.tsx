@@ -131,7 +131,7 @@ export default function DomainProspectorRunner({ tool }: any) {
 
             <div className="flex flex-1 overflow-hidden">
                 {/* Sidebar Configuration */}
-                <div className="w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-y-auto">
+                <div className="w-80 bg-white border-e border-slate-200 flex flex-col shrink-0 overflow-y-auto">
                     <div className="p-5 space-y-6">
                         <div>
                             <h2 className="text-lg font-bold tracking-tight text-slate-900">{__('general.campaign_setup')}</h2>
@@ -209,7 +209,7 @@ export default function DomainProspectorRunner({ tool }: any) {
                         ) : (
                             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full animate-in fade-in duration-500">
                                 <div className="overflow-x-auto flex-1">
-                                    <table className="w-full text-left border-collapse min-w-[800px]">
+                                    <table className="w-full text-start border-collapse min-w-[800px]">
                                         <thead>
                                             <tr className="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-wider font-black text-slate-500 sticky top-0 z-10">
                                                 <th className="px-4 py-3 whitespace-nowrap">Domain</th>

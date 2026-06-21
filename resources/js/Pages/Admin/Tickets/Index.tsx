@@ -74,7 +74,7 @@ function StatCard({
     return (
         <button
             onClick={onClick}
-            className={`group flex flex-col gap-2 rounded-2xl border p-4 text-left transition-all ${
+            className={`group flex flex-col gap-2 rounded-2xl border p-4 text-start transition-all ${
                 active
                     ? 'border-indigo-300 bg-indigo-50 shadow-md'
                     : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
@@ -198,7 +198,7 @@ export default function Index({ tickets, filters, stats }: Props) {
         {
             key: 'actions',
             label: '',
-            className: 'w-[50px] text-right',
+            className: 'w-[50px] text-end',
             render: (t: Ticket) => (
                 <DropdownMenu>
                     <DropdownMenuTrigger render={<Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100" />}>
@@ -210,14 +210,14 @@ export default function Index({ tickets, filters, stats }: Props) {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <Link href={`/admin/tickets/${t.id}`} className="flex items-center">
-                                <Eye className="mr-2 h-4 w-4" />{__('general.view_ticket')}</Link>
+                                <Eye className="me-2 h-4 w-4" />{__('general.view_ticket')}</Link>
                         </DropdownMenuItem>
                         {t.ticket_status !== 'closed' ? (
                             <DropdownMenuItem onClick={() => handleClose(t.id)} className="text-emerald-700 focus:text-emerald-800">
-                                <CheckCircle className="mr-2 h-4 w-4" />{__('general.close_ticket')}</DropdownMenuItem>
+                                <CheckCircle className="me-2 h-4 w-4" />{__('general.close_ticket')}</DropdownMenuItem>
                         ) : (
                             <DropdownMenuItem onClick={() => handleReopen(t.id)} className="text-amber-700 focus:text-amber-800">
-                                <RotateCcw className="mr-2 h-4 w-4" /> Reopen
+                                <RotateCcw className="me-2 h-4 w-4" /> Reopen
                             </DropdownMenuItem>
                         )}
                     </DropdownMenuContent>

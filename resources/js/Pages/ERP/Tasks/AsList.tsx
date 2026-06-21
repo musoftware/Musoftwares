@@ -164,7 +164,7 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
                     <div className="flex items-center gap-1.5 text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-md text-xs animate-shake">
                         <AlertCircle className="h-4 w-4" />
                         <span>{errorMessage}</span>
-                        <button onClick={() => setErrorMessage(null)} className="ml-auto text-rose-400 hover:text-rose-600">
+                        <button onClick={() => setErrorMessage(null)} className="ms-auto text-rose-400 hover:text-rose-600">
                             <X className="h-3 w-3" />
                         </button>
                     </div>
@@ -236,20 +236,20 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
                                                         <div className="flex flex-wrap items-center gap-1.5">
                                                             <Button asChild size="sm" variant="default" className="h-7 text-[10px] px-2.5 bg-blue-600 hover:bg-blue-700">
                                                                 <Link href={route('erp.tasks.index')}>
-                                                                    <Plus className="h-3 w-3 mr-1" />{__('general.new_task')}</Link>
+                                                                    <Plus className="h-3 w-3 me-1" />{__('general.new_task')}</Link>
                                                             </Button>
                                                             <Button asChild size="sm" variant="default" className="h-7 text-[10px] px-2.5 bg-purple-600 hover:bg-purple-700">
                                                                 <Link href={route('erp.tasks.show', task.id)}>
-                                                                    <Share2 className="h-3 w-3 mr-1" /> Share
+                                                                    <Share2 className="h-3 w-3 me-1" /> Share
                                                                 </Link>
                                                             </Button>
                                                             <Button asChild size="sm" variant="default" className="h-7 text-[10px] px-2.5 bg-green-600 hover:bg-green-700">
                                                                 <Link href={route('erp.tasks.show', task.id)}>
-                                                                    <FilePlus2 className="h-3 w-3 mr-1" />{__('general.add_todo')}</Link>
+                                                                    <FilePlus2 className="h-3 w-3 me-1" />{__('general.add_todo')}</Link>
                                                             </Button>
                                                             <Button asChild size="sm" variant="default" className="h-7 text-[10px] px-2.5 bg-slate-500 hover:bg-slate-600">
                                                                 <Link href={route('erp.tasks.show', task.id)}>
-                                                                    <Archive className="h-3 w-3 mr-1" /> Archive
+                                                                    <Archive className="h-3 w-3 me-1" /> Archive
                                                                 </Link>
                                                             </Button>
                                                         </div>

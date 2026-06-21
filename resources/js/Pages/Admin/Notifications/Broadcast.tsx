@@ -114,7 +114,7 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                             </div>
 
                             {data.audience_type === 'personal' && (
-                                <div className="space-y-4 border-l-2 border-indigo-200 pl-4 py-2">
+                                <div className="space-y-4 border-s-2 border-indigo-200 ps-4 py-2">
                                     <Label>{__('admin.target_users')}</Label>
                                     <div className="flex gap-2">
                                         <Button 
@@ -230,7 +230,7 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
 
                         <CardFooter className="flex justify-end bg-gray-50 rounded-b-xl">
                             <Button type="submit" disabled={processing} className="w-full sm:w-auto">
-                                <Send className="w-4 h-4 mr-2" />
+                                <Send className="w-4 h-4 me-2" />
                                 {__('general.send')}
                             </Button>
                         </CardFooter>
@@ -259,7 +259,7 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                                             <TableHead>{__('admin.type')}</TableHead>
                                             <TableHead className="text-center">{__('freelance.views')}</TableHead>
                                             <TableHead>{__('general.status')}</TableHead>
-                                            <TableHead className="text-right">{__('general.actions')}</TableHead>
+                                            <TableHead className="text-end">{__('general.actions')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -286,7 +286,7 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                                                         {__(campaign.status)}
                                                     </Badge>
                                                 </TableCell>
-                                                <TableCell className="text-right">
+                                                <TableCell className="text-end">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
                                                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -297,7 +297,7 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem asChild>
                                                                 <Link href={route('admin.notifications.broadcast.show', campaign.id)} className="flex items-center cursor-pointer">
-                                                                    <Eye className="w-4 h-4 mr-2" />
+                                                                    <Eye className="w-4 h-4 me-2" />
                                                                     {__('general.view')}
                                                                 </Link>
                                                             </DropdownMenuItem>

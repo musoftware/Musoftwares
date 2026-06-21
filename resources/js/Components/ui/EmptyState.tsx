@@ -52,7 +52,7 @@ export function EmptyState({
                             onClick={onClick}
                             className="bg-slate-900 hover:bg-slate-800 border border-slate-900 inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors"
                         >
-                            {ActionIcon && <ActionIcon className="mr-2 h-4 w-4" />}
+                            {ActionIcon && <ActionIcon className="me-2 h-4 w-4" />}
                             {actionLabel}
                         </button>
                     ) : (
@@ -60,7 +60,7 @@ export function EmptyState({
                             href={action}
                             className="bg-slate-900 hover:bg-slate-800 border border-slate-900 inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors"
                         >
-                            {ActionIcon && <ActionIcon className="mr-2 h-4 w-4" />}
+                            {ActionIcon && <ActionIcon className="me-2 h-4 w-4" />}
                             {actionLabel}
                         </Link>
                     )}

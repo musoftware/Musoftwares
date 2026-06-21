@@ -54,19 +54,19 @@ function getStatusBadge(status: string) {
     switch (status) {
         case 'active':
             return (
-                <Badge className="bg-green-50 text-green-700 border border-green-200 font-medium capitalize"><CheckCircle2 className="h-3 w-3 mr-1" />{__('admin.active')}</Badge>
+                <Badge className="bg-green-50 text-green-700 border border-green-200 font-medium capitalize"><CheckCircle2 className="h-3 w-3 me-1" />{__('admin.active')}</Badge>
             );
         case 'draft':
             return (
-                <Badge className="bg-amber-50 text-amber-700 border border-amber-200 font-medium capitalize"><Clock className="h-3 w-3 mr-1" />{__('admin.pending')}</Badge>
+                <Badge className="bg-amber-50 text-amber-700 border border-amber-200 font-medium capitalize"><Clock className="h-3 w-3 me-1" />{__('admin.pending')}</Badge>
             );
         case 'suspended':
             return (
-                <Badge className="bg-red-50 text-red-700 border border-red-200 font-medium capitalize"><Ban className="h-3 w-3 mr-1" />{__('admin.suspended')}</Badge>
+                <Badge className="bg-red-50 text-red-700 border border-red-200 font-medium capitalize"><Ban className="h-3 w-3 me-1" />{__('admin.suspended')}</Badge>
             );
         case 'rejected':
             return (
-                <Badge className="bg-slate-100 text-slate-600 border border-slate-200 font-medium capitalize"><XCircle className="h-3 w-3 mr-1" />{__('admin.rejected')}</Badge>
+                <Badge className="bg-slate-100 text-slate-600 border border-slate-200 font-medium capitalize"><XCircle className="h-3 w-3 me-1" />{__('admin.rejected')}</Badge>
             );
         default:
             return (
@@ -295,19 +295,19 @@ export default function All({ auth, services, categories, filters, stats }: any)
                     <div className="flex flex-col sm:flex-row gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                         {/* Search */}
                         <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                             <Input
                                 id="services-search"
                                 placeholder={__('admin.search_title_seller')}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && applyFilters({ search })}
-                                className="pl-9 bg-slate-50 border-slate-200 focus:bg-white"
+                                className="ps-9 bg-slate-50 border-slate-200 focus:bg-white"
                             />
                             {search && (
                                 <button
                                     onClick={() => { setSearch(''); applyFilters({ search: '' }); }}
-                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                                    className="absolute end-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
                                 >
                                     <X className="h-3.5 w-3.5" />
                                 </button>
@@ -407,7 +407,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                             <SortIcon col="created_at" />
                                         </div>
                                     </TableHead>
-                                    <TableHead className="text-right w-[60px]">{__('admin.actions')}</TableHead>
+                                    <TableHead className="text-end w-[60px]">{__('admin.actions')}</TableHead>
                                 </TableRow>
                             </TableHeader>
 
@@ -433,7 +433,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                             <span className="text-xs text-slate-400 font-mono">#{service.id}</span>
                                                             {service.is_featured && (
                                                                 <Badge className="text-[10px] px-1 py-0 h-4 bg-amber-50 text-amber-600 border border-amber-200 font-medium">
-                                                                    <Star className="h-2.5 w-2.5 mr-0.5 fill-current" />{__('admin.featured')}</Badge>
+                                                                    <Star className="h-2.5 w-2.5 me-0.5 fill-current" />{__('admin.featured')}</Badge>
                                                             )}
                                                         </div>
                                                     </div>
@@ -501,7 +501,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                             </TableCell>
 
                                             {/* Actions dropdown */}
-                                            <TableCell className="text-right">
+                                            <TableCell className="text-end">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
                                                         <Button

@@ -64,7 +64,7 @@ export default function ERPLayout({
 
             {/* Mobile Menu Drawer Content */}
             <div 
-                className={`fixed top-0 bottom-0 left-0 z-50 w-72 bg-white shadow-xl lg:hidden transform transition-transform duration-300 ease-in-out flex flex-col ${
+                className={`fixed top-0 bottom-0 start-0 z-50 w-72 bg-white shadow-xl lg:hidden transform transition-transform duration-300 ease-in-out flex flex-col ${
                     isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
@@ -214,7 +214,7 @@ export default function ERPLayout({
                         {/* Hamburger Menu Toggle Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(true)}
-                            className="lg:hidden -ml-2 p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none"
+                            className="lg:hidden -ms-2 p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none"
                             aria-label={__('general.open_navigation_menu')}
                         >
                             <Menu className="w-5 h-5" />

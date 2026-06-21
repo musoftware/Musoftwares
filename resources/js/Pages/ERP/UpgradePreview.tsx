@@ -41,7 +41,7 @@ export default function UpgradePreview() {
                 
                 {/* Visual upgrade hero card */}
                 <Card className="border-primary/20 bg-muted/10 shadow-none overflow-hidden relative">
-                    <div className="absolute top-0 right-0 translate-x-12 -translate-y-12 opacity-5 pointer-events-none">
+                    <div className="absolute top-0 end-0 translate-x-12 -translate-y-12 opacity-5 pointer-events-none">
                         <Calculator className="h-64 w-64 text-primary" />
                     </div>
 
@@ -71,7 +71,7 @@ export default function UpgradePreview() {
                     {/* Capability 1: Advanced Estimations */}
                     <Card className="shadow-none border-border group overflow-hidden">
                         <CardHeader className="pb-3 relative">
-                            <div className="absolute top-6 right-6 text-muted-foreground opacity-30 group-hover:opacity-60 transition-opacity">
+                            <div className="absolute top-6 end-6 text-muted-foreground opacity-30 group-hover:opacity-60 transition-opacity">
                                 <Lock className="h-5 w-5" />
                             </div>
                             <CardTitle className="text-base flex items-center gap-2">
@@ -89,7 +89,7 @@ export default function UpgradePreview() {
                                     <div className="flex justify-between"><span>{__('general.core_refactoring')}</span><span>{formatMoney(1200, 'USD')}</span></div>
                                     <div className="flex justify-between"><span>{__('general.database_migration')}</span><span>{formatMoney(650, 'USD')}</span></div>
                                 </div>
-                                <div className="text-right font-bold pt-2 border-t border-border text-foreground">Total: {formatMoney(1850, 'USD')}</div>
+                                <div className="text-end font-bold pt-2 border-t border-border text-foreground">Total: {formatMoney(1850, 'USD')}</div>
                             </div>
                         </CardContent>
                     </Card>
@@ -97,7 +97,7 @@ export default function UpgradePreview() {
                     {/* Capability 2: Ledger Expenses & Cash Flow Reports */}
                     <Card className="shadow-none border-border group overflow-hidden">
                         <CardHeader className="pb-3 relative">
-                            <div className="absolute top-6 right-6 text-muted-foreground opacity-30 group-hover:opacity-60 transition-opacity">
+                            <div className="absolute top-6 end-6 text-muted-foreground opacity-30 group-hover:opacity-60 transition-opacity">
                                 <Lock className="h-5 w-5" />
                             </div>
                             <CardTitle className="text-base flex items-center gap-2">
@@ -109,7 +109,7 @@ export default function UpgradePreview() {
                             <div className="rounded-lg border border-border bg-muted/30 p-4 select-none filter blur-[1.5px] opacity-70 pointer-events-none font-mono text-[10px] space-y-3">
                                 <div className="flex justify-between items-center">
                                     <span className="font-semibold text-foreground">{__('general.profit_loss_ledger')}</span>
-                                    <span className="text-emerald-600 font-bold flex items-center"><TrendingUp className="h-3 w-3 mr-1" /> +14.5%</span>
+                                    <span className="text-emerald-600 font-bold flex items-center"><TrendingUp className="h-3 w-3 me-1" /> +14.5%</span>
                                 </div>
                                 <div className="flex justify-between text-muted-foreground">
                                     <span>Net Sales: {formatMoney(12450, 'USD')}</span>
@@ -134,34 +134,34 @@ export default function UpgradePreview() {
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-muted/10">
-                                        <TableHead className="pl-6 w-[40%]">Feature</TableHead>
+                                        <TableHead className="ps-6 w-[40%]">Feature</TableHead>
                                         <TableHead className="text-center w-[30%]">{__('general.standard_client_account')}</TableHead>
                                         <TableHead className="text-center w-[30%] bg-primary/5 text-primary font-semibold">{__('general.premium_erp_workspace')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell className="pl-6 font-medium">{__('general.receive_invoices_pay')}</TableCell>
+                                        <TableCell className="ps-6 font-medium">{__('general.receive_invoices_pay')}</TableCell>
                                         <TableCell className="text-center"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
                                         <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell className="pl-6 font-medium">{__('general.estimates_creation_signatures')}</TableCell>
+                                        <TableCell className="ps-6 font-medium">{__('general.estimates_creation_signatures')}</TableCell>
                                         <TableCell className="text-center text-muted-foreground"><Lock className="h-4 w-4 mx-auto opacity-50" /></TableCell>
                                         <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell className="pl-6 font-medium">{__('general.client_expense_ledger_tracking')}</TableCell>
+                                        <TableCell className="ps-6 font-medium">{__('general.client_expense_ledger_tracking')}</TableCell>
                                         <TableCell className="text-center text-muted-foreground"><Lock className="h-4 w-4 mx-auto opacity-50" /></TableCell>
                                         <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell className="pl-6 font-medium">{__('general.annual_profit_loss_reports')}</TableCell>
+                                        <TableCell className="ps-6 font-medium">{__('general.annual_profit_loss_reports')}</TableCell>
                                         <TableCell className="text-center text-muted-foreground"><Lock className="h-4 w-4 mx-auto opacity-50" /></TableCell>
                                         <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
                                     </TableRow>
                                     <TableRow>
-                                        <TableCell className="pl-6 font-medium">{__('general.recurring_auto_invoicing_automation')}</TableCell>
+                                        <TableCell className="ps-6 font-medium">{__('general.recurring_auto_invoicing_automation')}</TableCell>
                                         <TableCell className="text-center text-muted-foreground"><Lock className="h-4 w-4 mx-auto opacity-50" /></TableCell>
                                         <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
                                     </TableRow>
@@ -183,7 +183,7 @@ export default function UpgradePreview() {
                             disabled={isUpgrading}
                             className="shadow-none whitespace-nowrap"
                         >
-                            {isUpgrading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{__('general.checking')}</> : "Upgrade Now"}
+                            {isUpgrading ? <><Loader2 className="me-2 h-4 w-4 animate-spin" />{__('general.checking')}</> : "Upgrade Now"}
                         </Button>
                     </CardContent>
                 </Card>

@@ -25,7 +25,7 @@ export default function Contact({ canLogin, canRegister }) {
             <section className="py-24 bg-slate-50 border-t border-slate-100">
                 <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                        <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-start text-left">
+                        <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-start text-start">
                             <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mb-6">
                                 <Mail className="h-6 w-6 text-slate-900" />
                             </div>
@@ -34,7 +34,7 @@ export default function Contact({ canLogin, canRegister }) {
                             <a href="mailto:admin@musoftwares.com" className="text-slate-900 font-semibold hover:underline">admin@musoftwares.com</a>
                         </div>
 
-                        <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-start text-left">
+                        <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-start text-start">
                             <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mb-6">
                                 <Phone className="h-6 w-6 text-slate-900" />
                             </div>
@@ -46,7 +46,7 @@ export default function Contact({ canLogin, canRegister }) {
                             </div>
                         </div>
 
-                        <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-start text-left">
+                        <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-start text-start">
                             <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mb-6">
                                 <MapPin className="h-6 w-6 text-slate-900" />
                             </div>

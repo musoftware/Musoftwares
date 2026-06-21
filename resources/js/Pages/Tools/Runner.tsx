@@ -108,8 +108,8 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4 md:p-8 font-sans relative overflow-hidden">
             {/* Background elements */}
-            <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
-            <div className="absolute bottom-[-20%] right-[-20%] w-[60%] h-[60%] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
+            <div className="absolute top-[-20%] start-[-20%] w-[60%] h-[60%] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-[-20%] end-[-20%] w-[60%] h-[60%] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
 
             <Card className="w-full max-w-lg shadow-xl relative z-10 border-muted">
                 <CardHeader className="text-center space-y-3 pb-6 border-b border-border/50">
@@ -183,14 +183,14 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
                                     </p>
                                     
                                     <div className="bg-muted/50 rounded-xl p-3.5 border font-mono text-[10px] relative group overflow-hidden flex items-center">
-                                        <div className="overflow-x-auto whitespace-pre pr-8 select-all flex-1">
+                                        <div className="overflow-x-auto whitespace-pre pe-8 select-all flex-1">
                                             {fwCommand}
                                         </div>
                                         <Button 
                                             variant="ghost"
                                             size="icon"
                                             onClick={handleCopy}
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 bg-background/80 hover:bg-background shadow-sm"
+                                            className="absolute end-2 top-1/2 -translate-y-1/2 h-7 w-7 bg-background/80 hover:bg-background shadow-sm"
                                             title={__('general.copy_powershell_command')}
                                         >
                                             {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
@@ -211,14 +211,14 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
                                     <form onSubmit={handleLink} className="space-y-3">
                                         <div className="flex gap-2">
                                             <div className="relative flex-1">
-                                                <Wifi className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                                <Wifi className="absolute start-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                                 <Input 
                                                     type="text" 
                                                     placeholder={__('general.e_g_192_168_1_15')} 
                                                     value={ipInput}
                                                     onChange={e => setIpInput(e.target.value)}
                                                     disabled={testing || success}
-                                                    className="pl-10 font-mono"
+                                                    className="ps-10 font-mono"
                                                 />
                                             </div>
                                             
@@ -298,7 +298,7 @@ function FloatingBadge({ host, onDisconnect }: { host: string; onDisconnect: () 
     return (
         <>
             {/* Floating Indicator */}
-            <div className="fixed top-3 right-3 z-[9999] animate-in fade-in duration-300">
+            <div className="fixed top-3 end-3 z-[9999] animate-in fade-in duration-300">
                 <Button
                     variant="outline"
                     onClick={() => setIsOpen(true)}
@@ -309,7 +309,7 @@ function FloatingBadge({ host, onDisconnect }: { host: string; onDisconnect: () 
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
                     <span className="text-[10px] tracking-wide text-muted-foreground">Linked PC: <span className="font-mono text-emerald-600 dark:text-emerald-400">{host}</span></span>
-                    <Settings className="w-3.5 h-3.5 text-muted-foreground ml-0.5" />
+                    <Settings className="w-3.5 h-3.5 text-muted-foreground ms-0.5" />
                 </Button>
             </div>
 
@@ -321,7 +321,7 @@ function FloatingBadge({ host, onDisconnect }: { host: string; onDisconnect: () 
                             variant="ghost" 
                             size="icon"
                             onClick={() => setIsOpen(false)}
-                            className="absolute top-2 right-2 h-8 w-8"
+                            className="absolute top-2 end-2 h-8 w-8"
                         >
                             <X className="w-4 h-4" />
                         </Button>
@@ -339,14 +339,14 @@ function FloatingBadge({ host, onDisconnect }: { host: string; onDisconnect: () 
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-bold uppercase tracking-wider">{__('general.pc_local_ip_address')}</Label>
                                     <div className="relative">
-                                        <Wifi className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                        <Wifi className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                         <Input 
                                             type="text" 
                                             placeholder={__('general.e_g_192_168_1_15')} 
                                             value={ipInput}
                                             onChange={e => setIpInput(e.target.value)}
                                             disabled={testing || success}
-                                            className="pl-9 font-mono"
+                                            className="ps-9 font-mono"
                                         />
                                     </div>
                                 </div>

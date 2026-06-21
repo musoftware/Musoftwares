@@ -475,7 +475,7 @@ export default function OpensooqRunner({ tool }: any) {
                         >
                             <Zap className="w-4 h-4" /> Extract
                             {status === 'running' && (
-                                <span className="ml-1 w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+                                <span className="ms-1 w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
                             )}
                         </TabsTrigger>
                         <TabsTrigger
@@ -484,7 +484,7 @@ export default function OpensooqRunner({ tool }: any) {
                         >
                             <History className="w-4 h-4" /> Campaigns
                             {campaigns.length > 0 && (
-                                <span className="ml-1 text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0 rounded-full font-bold">
+                                <span className="ms-1 text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0 rounded-full font-bold">
                                     {campaigns.length}
                                 </span>
                             )}
@@ -507,14 +507,14 @@ export default function OpensooqRunner({ tool }: any) {
                                 <div className="md:col-span-1">
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.keyword_category')}</label>
                                     <div className="relative">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
                                             type="text"
                                             value={keyword}
                                             onChange={e => setKeyword(e.target.value)}
                                             onKeyDown={e => e.key === 'Enter' && handleStart()}
                                             placeholder={__('general.real_estate_cars_jobs')}
-                                            className="pl-9 h-11 text-sm bg-slate-50"
+                                            className="ps-9 h-11 text-sm bg-slate-50"
                                         />
                                     </div>
                                 </div>
@@ -523,17 +523,17 @@ export default function OpensooqRunner({ tool }: any) {
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Country</label>
                                     <div className="relative">
-                                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <MapPin className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <select
                                             value={country}
                                             onChange={e => setCountry(e.target.value)}
-                                            className="w-full pl-9 pr-8 h-11 text-sm border border-slate-200 focus:border-orange-400 rounded-md outline-none transition-all bg-slate-50 appearance-none"
+                                            className="w-full ps-9 pe-8 h-11 text-sm border border-slate-200 focus:border-orange-400 rounded-md outline-none transition-all bg-slate-50 appearance-none"
                                         >
                                             {COUNTRIES.map(c => (
                                                 <option key={c.code} value={c.code}>{c.name}</option>
                                             ))}
                                         </select>
-                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                                        <ChevronDown className="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                                     </div>
                                 </div>
 
@@ -541,13 +541,13 @@ export default function OpensooqRunner({ tool }: any) {
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.max_leads')}</label>
                                     <div className="relative">
-                                        <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <Users className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
                                             type="number"
                                             min={10} max={1000} step={10}
                                             value={limit}
                                             onChange={e => setLimit(parseInt(e.target.value, 10))}
-                                            className="pl-9 h-11 text-sm bg-slate-50"
+                                            className="ps-9 h-11 text-sm bg-slate-50"
                                         />
                                     </div>
                                 </div>
@@ -642,7 +642,7 @@ export default function OpensooqRunner({ tool }: any) {
                     <TabsContent value="campaigns" className="space-y-4">
                         {/* Campaign Detail View */}
                         {selectedCampaign ? (
-                            <div className="space-y-4 animate-in fade-in slide-in-from-right-3 duration-300">
+                            <div className="space-y-4 animate-in fade-in slide-in-from-end-3 duration-300">
                                 {/* Back + Title */}
                                 <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                                     <button
@@ -738,7 +738,7 @@ export default function OpensooqRunner({ tool }: any) {
                                             <button
                                                 key={c.id}
                                                 onClick={() => openCampaign(c)}
-                                                className={`w-full flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors text-left ${i < campaigns.length - 1 ? 'border-b border-slate-100' : ''}`}
+                                                className={`w-full flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors text-start ${i < campaigns.length - 1 ? 'border-b border-slate-100' : ''}`}
                                             >
                                                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-100 to-rose-100 flex items-center justify-center shrink-0">
                                                     <Search className="w-4.5 h-4.5 text-orange-600" />

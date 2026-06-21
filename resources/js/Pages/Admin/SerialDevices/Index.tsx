@@ -89,10 +89,10 @@ const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'o
 };
 
 function SortIcon({ column, currentSort, direction }: { column: string; currentSort: string; direction: string }) {
-    if (currentSort !== column) return <ArrowUpDown className="w-3 h-3 ml-1 text-muted-foreground/50" />;
+    if (currentSort !== column) return <ArrowUpDown className="w-3 h-3 ms-1 text-muted-foreground/50" />;
     return direction === 'asc'
-        ? <ChevronUp className="w-3 h-3 ml-1" />
-        : <ChevronDown className="w-3 h-3 ml-1" />;
+        ? <ChevronUp className="w-3 h-3 ms-1" />
+        : <ChevronDown className="w-3 h-3 ms-1" />;
 }
 
 function truncateId(id: string, max = 20) {
@@ -267,7 +267,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     </div>
                     <a href={exportUrl} className="inline-flex">
                         <Button variant="outline" size="sm">
-                            <Download className="w-4 h-4 mr-1.5" />
+                            <Download className="w-4 h-4 me-1.5" />
                             {__('general.export_csv')}
                         </Button>
                     </a>
@@ -295,9 +295,9 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                 <div className="flex flex-wrap gap-3">
                     {/* Device/Machine search */}
                     <div className="relative flex-1 min-w-48">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
-                            className="pl-9"
+                            className="ps-9"
                             placeholder={__('general.device_id_or_machine_name')}
                             value={search}
                             onChange={e => setSearch(e.target.value)}
@@ -306,9 +306,9 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     </div>
                     {/* User search */}
                     <div className="relative min-w-40">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
-                            className="pl-9"
+                            className="ps-9"
                             placeholder={__('general.username')}
                             value={user}
                             onChange={e => setUser(e.target.value)}
@@ -476,7 +476,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                         <SortTh column="serial_software_id">{__('general.software')}</SortTh>
                                         <SortTh column="last_check_date">{__('general.last_check')}</SortTh>
                                         <SortTh column="status">{__('general.status')}</SortTh>
-                                        <TableHead className="text-right w-12">{__('general.actions')}</TableHead>
+                                        <TableHead className="text-end w-12">{__('general.actions')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -531,7 +531,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                     {__(device.status.charAt(0).toUpperCase() + device.status.slice(1))}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell onClick={e => e.stopPropagation()} className="text-right">
+                                            <TableCell onClick={e => e.stopPropagation()} className="text-end">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger render={<Button variant="ghost" className="h-8 w-8 p-0" />}>
                                                         <span className="sr-only">{__('general.open_menu')}</span>
@@ -539,7 +539,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" side="bottom">
                                                         <DropdownMenuItem onClick={() => setDetail(device)}>
-                                                            <Monitor className="w-4 h-4 mr-2" />
+                                                            <Monitor className="w-4 h-4 me-2" />
                                                             {__('general.view_details')}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuSeparator />
@@ -563,7 +563,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                             variant="destructive"
                                                             onClick={() => setDeleteConfirmId(device.id)}
                                                         >
-                                                            <Trash2 className="w-4 h-4 mr-2" />
+                                                            <Trash2 className="w-4 h-4 me-2" />
                                                             {__('general.delete')}
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
@@ -644,7 +644,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                             style={{ width: `${(sw.devices_count / maxDeviceCount) * 100}%` }}
                                         />
                                     </div>
-                                    <span className="text-xs text-muted-foreground font-mono w-10 text-right">{sw.devices_count}</span>
+                                    <span className="text-xs text-muted-foreground font-mono w-10 text-end">{sw.devices_count}</span>
                                 </div>
                             ))}
                         </div>
@@ -757,7 +757,7 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
     return (
         <div className="flex justify-between gap-4">
             <span className="text-muted-foreground shrink-0">{label}</span>
-            <span className="text-right font-medium">{value}</span>
+            <span className="text-end font-medium">{value}</span>
         </div>
     );
 }

@@ -66,7 +66,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                                         {availableDevices.map(d => (
                                             <SelectItem key={d.device_id} value={d.device_id}>
                                                 <span className="font-mono text-xs text-violet-300">{d.device_id}</span>
-                                                <span className="text-zinc-400 ml-2">· {d.machine_name}</span>
+                                                <span className="text-zinc-400 ms-2">· {d.machine_name}</span>
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -96,7 +96,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                                         {users.map(u => (
                                             <SelectItem key={u.id} value={String(u.id)}>
                                                 <span className="text-white">{u.name}</span>
-                                                <span className="text-zinc-500 ml-2 text-xs">{u.email}</span>
+                                                <span className="text-zinc-500 ms-2 text-xs">{u.email}</span>
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

@@ -52,11 +52,11 @@ export default function PosIndex({ initialProducts, categories }: any) {
                     </div>
                     <div className="flex-1 max-w-xl mx-8">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <Input 
                                 type="text"
                                 placeholder={__('general.search_by_name_sku_or_scan_barcode')}
-                                className="w-full pl-10 pr-4 py-6 rounded-xl border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
+                                className="w-full ps-10 pe-4 py-6 rounded-xl border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -106,7 +106,7 @@ export default function PosIndex({ initialProducts, categories }: any) {
             </div>
 
             {/* Cart Sidebar */}
-            <div className="w-[400px] bg-white border-l shadow-xl flex flex-col z-10">
+            <div className="w-[400px] bg-white border-s shadow-xl flex flex-col z-10">
                 <div className="p-6 border-b bg-gray-50/50">
                     <h2 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
                         <ShoppingCart className="w-5 h-5" />{__('general.current_order')}</h2>

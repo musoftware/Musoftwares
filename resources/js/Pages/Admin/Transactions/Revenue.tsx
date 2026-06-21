@@ -40,7 +40,7 @@ export default function Revenue({ income, cost, filters, businessCurrency, filte
         {
             key: 'business_amount',
             label: __('general.income'),
-            className: 'text-right',
+            className: 'text-end',
             render: (tx) => (
                 <span className="font-medium font-mono text-green-600">
                     {formatCurrency(tx.business_amount || 0, tx.business_currency)}
@@ -63,7 +63,7 @@ export default function Revenue({ income, cost, filters, businessCurrency, filte
         {
             key: 'business_amount',
             label: __('erp.cost'),
-            className: 'text-right',
+            className: 'text-end',
             render: (tx) => (
                 <span className="font-medium font-mono text-red-600">
                     {formatCurrency(tx.business_amount || 0, tx.business_currency)}

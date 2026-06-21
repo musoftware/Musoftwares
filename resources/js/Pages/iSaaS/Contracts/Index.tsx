@@ -85,16 +85,16 @@ export default function Index({ contracts, currentTab }) {
                 </div>
 
                 <div className="overflow-hidden rounded-lg bg-white shadow border border-slate-200">
-                    <table className="w-full text-left text-sm">
+                    <table className="w-full text-start text-sm">
                         <thead className="border-b bg-gray-50/55">
                             <tr>
                                 <th className="p-4 font-semibold text-slate-600">Reference</th>
                                 <th className="p-4 font-semibold text-slate-600">{__('general.client_user')}</th>
                                 <th className="p-4 font-semibold text-slate-600">Project</th>
-                                <th className="p-4 font-semibold text-slate-600 text-right">Amount</th>
+                                <th className="p-4 font-semibold text-slate-600 text-end">Amount</th>
                                 <th className="p-4 font-semibold text-slate-600 text-center">Status</th>
                                 <th className="p-4 font-semibold text-slate-600 text-center">{__('general.valid_until')}</th>
-                                <th className="p-4 font-semibold text-slate-600 text-right">Actions</th>
+                                <th className="p-4 font-semibold text-slate-600 text-end">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -107,7 +107,7 @@ export default function Index({ contracts, currentTab }) {
                                     <td className="p-4 text-gray-700">
                                         <div className="font-medium">{contract.project_name || 'N/A'}</div>
                                     </td>
-                                    <td className="p-4 text-right font-medium text-gray-900">
+                                    <td className="p-4 text-end font-medium text-gray-900">
                                         {contract.total_amount ? `${parseFloat(contract.total_amount).toFixed(2)} ${contract.currency}` : '-'}
                                     </td>
                                     <td className="p-4 text-center">
@@ -116,7 +116,7 @@ export default function Index({ contracts, currentTab }) {
                                     <td className="p-4 text-center text-gray-500">
                                         {contract.valid_until ? new Date(contract.valid_until).toLocaleDateString() : '-'}
                                     </td>
-                                    <td className="p-4 text-right">
+                                    <td className="p-4 text-end">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -127,23 +127,23 @@ export default function Index({ contracts, currentTab }) {
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                 <DropdownMenuItem onClick={() => router.get(route('isaas.contracts.edit', contract.id))}>
-                                                    <FileText className="mr-2 h-4 w-4" />{__('general.view_edit')}</DropdownMenuItem>
+                                                    <FileText className="me-2 h-4 w-4" />{__('general.view_edit')}</DropdownMenuItem>
                                                 <DropdownMenuSeparator />
                                                 {contract.status === 'draft' && (
                                                     <DropdownMenuItem onClick={() => handleStatusUpdate(contract.id, 'sent')}>
-                                                        <Send className="mr-2 h-4 w-4 text-blue-600" />{__('general.mark_as_sent')}</DropdownMenuItem>
+                                                        <Send className="me-2 h-4 w-4 text-blue-600" />{__('general.mark_as_sent')}</DropdownMenuItem>
                                                 )}
                                                 {contract.status === 'sent' && (
                                                     <DropdownMenuItem onClick={() => handleStatusUpdate(contract.id, 'signed')}>
-                                                        <CheckCircle className="mr-2 h-4 w-4 text-green-600" />{__('general.mark_as_signed')}</DropdownMenuItem>
+                                                        <CheckCircle className="me-2 h-4 w-4 text-green-600" />{__('general.mark_as_signed')}</DropdownMenuItem>
                                                 )}
                                                 {contract.status !== 'cancelled' && (
                                                     <DropdownMenuItem onClick={() => handleStatusUpdate(contract.id, 'cancelled')} className="text-yellow-600">
-                                                        <XCircle className="mr-2 h-4 w-4" />{__('general.cancel_contract')}</DropdownMenuItem>
+                                                        <XCircle className="me-2 h-4 w-4" />{__('general.cancel_contract')}</DropdownMenuItem>
                                                 )}
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuItem onClick={() => handleDelete(contract.id)} className="text-red-600">
-                                                    <Trash2 className="mr-2 h-4 w-4" />{__('general.delete_contract')}</DropdownMenuItem>
+                                                    <Trash2 className="me-2 h-4 w-4" />{__('general.delete_contract')}</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </td>
@@ -166,7 +166,7 @@ export default function Index({ contracts, currentTab }) {
                                 <Link
                                     key={i}
                                     href={link.url || '#'}
-                                    className={`px-4 py-2 text-sm font-medium border ${link.active ? 'z-10 bg-slate-100 border-slate-500 text-slate-800' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'} ${i === 0 ? 'rounded-l-md' : ''} ${i === contracts.links.length - 1 ? 'rounded-r-md' : ''}`}
+                                    className={`px-4 py-2 text-sm font-medium border ${link.active ? 'z-10 bg-slate-100 border-slate-500 text-slate-800' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'} ${i === 0 ? 'rounded-s-md' : ''} ${i === contracts.links.length - 1 ? 'rounded-e-md' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}

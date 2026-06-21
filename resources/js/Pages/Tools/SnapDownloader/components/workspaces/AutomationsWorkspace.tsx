@@ -194,7 +194,7 @@ export function AutomationsWorkspace({
                                 <div className="flex items-center justify-between p-3 rounded-lg border" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
                                     <span className="text-xs font-bold text-white">{__('general.delay_between_profiles')}</span>
                                     <select 
-                                        className="h-7 rounded text-xs bg-transparent border outline-none text-white text-right"
+                                        className="h-7 rounded text-xs bg-transparent border outline-none text-white text-end"
                                         style={{ borderColor: 'rgba(255,255,255,0.1)' }}
                                         value={autoForm.pacing}
                                         onChange={e => setAutoForm(p => ({ ...p, pacing: e.target.value }))}
@@ -258,11 +258,11 @@ export function AutomationsWorkspace({
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between p-3 rounded-lg border" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
                                     <span className="text-xs font-bold text-white">{__('general.min_duration_sec')}</span>
-                                    <Input type="number" value={autoForm.minDuration} onChange={e => setAutoForm(p => ({ ...p, minDuration: parseInt(e.target.value) || 0 }))} className="w-16 h-7 text-xs text-right bg-transparent border-white/10 text-white" />
+                                    <Input type="number" value={autoForm.minDuration} onChange={e => setAutoForm(p => ({ ...p, minDuration: parseInt(e.target.value) || 0 }))} className="w-16 h-7 text-xs text-end bg-transparent border-white/10 text-white" />
                                 </div>
                                 <div className="flex items-center justify-between p-3 rounded-lg border" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
                                     <span className="text-xs font-bold text-white">{__('general.max_duration_sec')}</span>
-                                    <Input type="number" value={autoForm.maxDuration} onChange={e => setAutoForm(p => ({ ...p, maxDuration: parseInt(e.target.value) || 0 }))} className="w-16 h-7 text-xs text-right bg-transparent border-white/10 text-white" />
+                                    <Input type="number" value={autoForm.maxDuration} onChange={e => setAutoForm(p => ({ ...p, maxDuration: parseInt(e.target.value) || 0 }))} className="w-16 h-7 text-xs text-end bg-transparent border-white/10 text-white" />
                                 </div>
                                 <div className="flex items-center justify-between p-3 rounded-lg border" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}>
                                     <span className="text-xs font-bold text-white">{__('general.global_deduplication')}</span>
@@ -362,7 +362,7 @@ export function AutomationsWorkspace({
                                                 onCheckedChange={v => handleToggleAutomation(auto.id, v)} 
                                             />
                                             <Dialog>
-                                                <DialogTrigger className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/10 ml-2 rounded-md inline-flex items-center justify-center transition-colors">
+                                                <DialogTrigger className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/10 ms-2 rounded-md inline-flex items-center justify-center transition-colors">
                                                     <span className="sr-only">{__('general.open_menu')}</span>
                                                     <MoreHorizontal className="h-4 w-4" />
                                                 </DialogTrigger>

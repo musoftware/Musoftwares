@@ -118,7 +118,7 @@ export default function FreelanceLayout({ children, clean = false }) {
                         {/* RIGHT: Mode, Points, Notifications, Profile */}
                         <div className="flex items-center gap-3">
                             {/* Mode Toggle */}
-                            <div className="mr-1 sm:mr-2">
+                            <div className="me-1 sm:me-2">
                                 <FreelanceModeToggle />
                             </div>
 
@@ -138,7 +138,7 @@ export default function FreelanceLayout({ children, clean = false }) {
                                     <DropdownMenuTrigger className="w-10 h-10 rounded-full inline-flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors duration-150 relative outline-none shrink-0">
                                         <Bell className="w-5 h-5" />
                                         {notifications?.unread_count > 0 && (
-                                            <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white" />
+                                            <span className="absolute top-2 end-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white" />
                                         )}
                                     </DropdownMenuTrigger>
                                 </div>
@@ -189,20 +189,20 @@ export default function FreelanceLayout({ children, clean = false }) {
                                                 className="cursor-pointer rounded-lg text-sm mb-1"
                                                 render={<Link href="/dashboard" className="flex items-center w-full font-medium" />}
                                             >
-                                                <ArrowLeft className="mr-2 h-4 w-4 text-slate-400" /> {__('general.exit_to_main_hub')}
+                                                <ArrowLeft className="me-2 h-4 w-4 text-slate-400" /> {__('general.exit_to_main_hub')}
                                             </DropdownMenuItem>
                                         )}
                                         <DropdownMenuItem 
                                             className="cursor-pointer rounded-lg text-sm"
                                             render={<Link href="/freelance/profile" className="flex items-center w-full" />}
                                         >
-                                            <User className="mr-2 h-4 w-4 text-slate-400" /> {__('general.my_profile')}
+                                            <User className="me-2 h-4 w-4 text-slate-400" /> {__('general.my_profile')}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem 
                                             className="cursor-pointer rounded-lg text-sm"
                                             render={<Link href="/financial/transactions" className="flex items-center w-full" />}
                                         >
-                                            <History className="mr-2 h-4 w-4 text-slate-400" /> {__('general.balance_history')}
+                                            <History className="me-2 h-4 w-4 text-slate-400" /> {__('general.balance_history')}
                                         </DropdownMenuItem>
                                     </DropdownMenuGroup>
                                     <div className="my-1 border-t border-slate-50" />
@@ -210,7 +210,7 @@ export default function FreelanceLayout({ children, clean = false }) {
                                         className="cursor-pointer rounded-lg text-sm text-rose-600 focus:bg-rose-50 focus:text-rose-700"
                                         render={<Link href="/logout" method="post" as="button" className="flex items-center w-full font-medium" />}
                                     >
-                                        <LogOut className="mr-2 h-4 w-4" /> {__('general.log_out')}
+                                        <LogOut className="me-2 h-4 w-4" /> {__('general.log_out')}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

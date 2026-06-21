@@ -63,17 +63,17 @@ export default function AdminKycIndex({ auth, users }) {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="pl-6 py-4">Client</TableHead>
+                                    <TableHead className="ps-6 py-4">Client</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead>Documents</TableHead>
                                     <TableHead>Submitted</TableHead>
-                                    <TableHead className="text-right pr-6">Action</TableHead>
+                                    <TableHead className="text-end pe-6">Action</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {users.data.map((user) => (
                                     <TableRow key={user.id} className="hover:bg-slate-50/50">
-                                        <TableCell className="pl-6 py-4">
+                                        <TableCell className="ps-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 <Avatar className="h-9 w-9">
                                                     <AvatarFallback className="bg-indigo-100 text-indigo-700 font-bold font-jetbrains">
@@ -109,7 +109,7 @@ export default function AdminKycIndex({ auth, users }) {
                                         <TableCell className="text-sm text-slate-500">
                                             {new Date(user.submitted_at).toLocaleDateString()}
                                         </TableCell>
-                                        <TableCell className="text-right pr-6">
+                                        <TableCell className="text-end pe-6">
                                             <Button variant="outline" size="sm" className="h-8" onClick={() => setSelectedUser(user)}>
                                                 Review
                                             </Button>
@@ -152,7 +152,7 @@ export default function AdminKycIndex({ auth, users }) {
                                         </div>
                                         <Button variant="secondary" size="sm" asChild>
                                             <a href={route('kyc.download', doc.id)} target="_blank" rel="noreferrer">
-                                                <Eye className="w-4 h-4 mr-1" /> View
+                                                <Eye className="w-4 h-4 me-1" /> View
                                             </a>
                                         </Button>
                                     </div>
@@ -166,10 +166,10 @@ export default function AdminKycIndex({ auth, users }) {
                                 <Button variant="outline" onClick={() => setSelectedUser(null)}>Cancel</Button>
                                 <div className="flex gap-2">
                                     <Button variant="destructive" onClick={() => setIsRejectDialogOpen(true)}>
-                                        <X className="w-4 h-4 mr-1" /> Reject
+                                        <X className="w-4 h-4 me-1" /> Reject
                                     </Button>
                                     <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleApprove(selectedUser.id)}>
-                                        <Check className="w-4 h-4 mr-1" />{__('general.approve_verification')}</Button>
+                                        <Check className="w-4 h-4 me-1" />{__('general.approve_verification')}</Button>
                                 </div>
                             </DialogFooter>
                         </DialogContent>

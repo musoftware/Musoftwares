@@ -550,7 +550,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                 }
                 break;
             case 'move_to_desktop':
-                // Handled specifically inside FolderModal right-click, but keeping placeholder
+                // Handled specifically inside FolderModal end-click, but keeping placeholder
                 break;
         }
     };
@@ -1169,7 +1169,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                 {/* Start Menu Popup */}
                 {isStartMenuOpen && (
                     <div 
-                        className="absolute bottom-14 left-2 w-80 bg-[#1c1c1c]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-4 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-200"
+                        className="absolute bottom-14 start-2 w-80 bg-[#1c1c1c]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-4 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-200"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center gap-3 pb-4 border-b border-white/10">
@@ -1207,7 +1207,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                             <div className="h-px bg-white/10 my-1 mx-2"></div>
                             <button 
                                 onClick={togglePrayerTimes}
-                                className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/10 text-slate-200 transition-colors text-left"
+                                className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/10 text-slate-200 transition-colors text-start"
                             >
                                 <span className="text-lg">🕌</span>
                                 <span className="text-sm font-medium">{showPrayerTimes ? 'Hide Prayer Times' : 'Show Prayer Times'}</span>
@@ -1222,7 +1222,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                         return nextZ;
                                     });
                                 }}
-                                className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/10 text-slate-200 transition-colors text-left mt-1"
+                                className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/10 text-slate-200 transition-colors text-start mt-1"
                             >
                                 <span className="text-lg">⚙️</span>
                                 <span className="text-sm font-medium">{__('general.desktop_settings')}</span>
@@ -1242,7 +1242,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                         </div>
                     </button>
                     
-                    <div className="flex items-center h-full ml-2 space-x-1 border-r border-white/10 pr-2 mr-2">
+                    <div className="flex items-center h-full ms-2 space-x-1 border-e border-white/10 pe-2 me-2">
                         <button 
                             onClick={handleCreateFolder}
                             className="h-10 px-3 flex items-center justify-center text-slate-300 hover:bg-white/10 rounded transition-colors text-xs font-medium gap-2"
@@ -1287,7 +1287,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                     {showPrayerTimes && nextPrayer && (
                         <div 
                             onContextMenu={handleHidePrayerTimes}
-                            className="hidden md:flex items-center gap-3 px-4 border-r border-white/10 mr-2 h-full cursor-pointer hover:bg-white/5 transition-colors"
+                            className="hidden md:flex items-center gap-3 px-4 border-e border-white/10 me-2 h-full cursor-pointer hover:bg-white/5 transition-colors"
                             title={__('general.right_click_to_hide')}
                         >
                             <span className="text-lg">🕌</span>
@@ -1415,7 +1415,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                                 </li>
                                             ))}
                                             {selectedTool.pricing_plans[0].features.length > 4 && (
-                                                <li className="text-xs text-slate-400 pl-6">
+                                                <li className="text-xs text-slate-400 ps-6">
                                                     + {selectedTool.pricing_plans[0].features.length - 4} more features
                                                 </li>
                                             )}

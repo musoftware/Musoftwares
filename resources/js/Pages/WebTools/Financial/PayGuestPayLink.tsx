@@ -26,7 +26,7 @@ export default function PayGuestPayLink({ payLink, userId, whatsappSent }: PayGu
                         </h1>
 
                         {whatsappSent ? (
-                            <div className="bg-slate-50 border border-slate-100 rounded-xl p-6 mb-8 flex items-start gap-4 text-left max-w-xl mx-auto">
+                            <div className="bg-slate-50 border border-slate-100 rounded-xl p-6 mb-8 flex items-start gap-4 text-start max-w-xl mx-auto">
                                 <Smartphone className="w-6 h-6 text-slate-500 flex-shrink-0 mt-1" />
                                 <div>
                                     <h3 className="font-bold text-slate-900">Check your WhatsApp</h3>
@@ -36,7 +36,7 @@ export default function PayGuestPayLink({ payLink, userId, whatsappSent }: PayGu
                                 </div>
                             </div>
                         ) : (
-                            <div className="bg-amber-50 border border-amber-100 rounded-xl p-6 mb-8 flex items-start gap-4 text-left max-w-xl mx-auto">
+                            <div className="bg-amber-50 border border-amber-100 rounded-xl p-6 mb-8 flex items-start gap-4 text-start max-w-xl mx-auto">
                                 <AlertCircle className="w-6 h-6 text-amber-500 flex-shrink-0 mt-1" />
                                 <div>
                                     <h3 className="font-bold text-amber-900">Important Notice</h3>
@@ -50,7 +50,7 @@ export default function PayGuestPayLink({ payLink, userId, whatsappSent }: PayGu
                         <div className="space-y-4 max-w-md mx-auto">
                             <Button asChild size="lg" className="w-full h-14 text-lg">
                                 <a href={payLink}>
-                                    <Lock className="w-5 h-5 mr-2" /> Log in & Pay <ArrowRight className="w-5 h-5 ml-2" />
+                                    <Lock className="w-5 h-5 me-2" /> Log in & Pay <ArrowRight className="w-5 h-5 ms-2" />
                                 </a>
                             </Button>
                             <p className="text-sm text-slate-500">

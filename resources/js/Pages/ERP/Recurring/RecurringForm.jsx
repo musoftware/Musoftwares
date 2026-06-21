@@ -121,14 +121,14 @@ export default function RecurringForm({ entry = null, business_currency = 'USD' 
                                 onClick={() => setData('type', 'income')}
                                 className={`flex-1 py-2 px-4 border rounded-md flex items-center justify-center ${data.type === 'income' ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}`}
                             >
-                                <TrendingUp className="w-4 h-4 mr-2" /> Income
+                                <TrendingUp className="w-4 h-4 me-2" /> Income
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setData('type', 'expense')}
                                 className={`flex-1 py-2 px-4 border rounded-md flex items-center justify-center ${data.type === 'expense' ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}`}
                             >
-                                <TrendingDown className="w-4 h-4 mr-2" /> Expense
+                                <TrendingDown className="w-4 h-4 me-2" /> Expense
                             </button>
                         </div>
                         <InputError message={errors.type} className="mt-2" />
@@ -299,7 +299,7 @@ export default function RecurringForm({ entry = null, business_currency = 'USD' 
                                 <label className="flex items-center text-xs text-gray-500 cursor-pointer">
                                     <input
                                         type="checkbox"
-                                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 mr-1"
+                                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 me-1"
                                         checked={data.no_end_date}
                                         onChange={(e) => setData('no_end_date', e.target.checked)}
                                     />{__('general.no_end_date')}</label>
@@ -320,13 +320,13 @@ export default function RecurringForm({ entry = null, business_currency = 'USD' 
 
             <div className="bg-gray-50 p-6 border-2 border-dashed border-gray-300 rounded-lg">
                 <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                    <CalendarIcon className="w-5 h-5 mr-2 text-indigo-500" />{__('general.section_4_preview')}</h3>
+                    <CalendarIcon className="w-5 h-5 me-2 text-indigo-500" />{__('general.section_4_preview')}</h3>
                 <div className="space-y-2">
                     <p className="text-sm font-medium text-gray-700">Next 3 occurrences:</p>
                     <ul className="space-y-1">
                         {occurrences.map((date, idx) => (
                             <li key={idx} className="text-sm text-gray-600 flex items-center">
-                                <span className="text-indigo-400 mr-2">→</span>
+                                <span className="text-indigo-400 me-2">→</span>
                                 {format(date, 'MMMM d, yyyy')}
                             </li>
                         ))}

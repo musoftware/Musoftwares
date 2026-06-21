@@ -23,15 +23,15 @@ export default function Documentation() {
                             <p className="text-slate-500 mt-1">{__('general.smsgatewaydocssubtitle')}</p>
                         </div>
                         <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
-                            <ArrowLeft className="w-4 h-4 mr-2" />
+                            <ArrowLeft className="w-4 h-4 me-2" />
                             {__('general.smsgatewaybacktodashboard')}
                         </Button>
                     </div>
 
                     <Tabs defaultValue="simple" className="w-full">
                         <TabsList className="mb-4">
-                            <TabsTrigger value="simple"><Code className="w-4 h-4 mr-2"/> Simple</TabsTrigger>
-                            <TabsTrigger value="advanced"><Terminal className="w-4 h-4 mr-2"/> Advanced</TabsTrigger>
+                            <TabsTrigger value="simple"><Code className="w-4 h-4 me-2"/> Simple</TabsTrigger>
+                            <TabsTrigger value="advanced"><Terminal className="w-4 h-4 me-2"/> Advanced</TabsTrigger>
                         </TabsList>
 
                         {/* SIMPLE */}
@@ -104,7 +104,7 @@ export default function Documentation() {
                                                     </div>
                                                     <Button variant="secondary" size="sm" asChild>
                                                         <a href={`/sdks/smspay-php.zip?ts=${Date.now()}`} download>
-                                                            <Download className="w-4 h-4 mr-2" />{__('general.download_php_sdk')}</a>
+                                                            <Download className="w-4 h-4 me-2" />{__('general.download_php_sdk')}</a>
                                                     </Button>
                                                 </div>
                                                 <div className="bg-slate-900 rounded-lg p-4 flex flex-col justify-between items-start gap-4">
@@ -114,7 +114,7 @@ export default function Documentation() {
                                                     </div>
                                                     <Button variant="secondary" size="sm" asChild>
                                                         <a href={`/sdks/smspay-node.zip?ts=${Date.now()}`} download>
-                                                            <Download className="w-4 h-4 mr-2" />{__('general.download_node_js_sdk')}</a>
+                                                            <Download className="w-4 h-4 me-2" />{__('general.download_node_js_sdk')}</a>
                                                     </Button>
                                                 </div>
                                             </div>
@@ -269,7 +269,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
                                                 </div>
                                                 <Button variant="secondary" size="sm" asChild>
                                                     <a href={`/downloads/musoftware-sms-gateway.zip?ts=${Date.now()}`} download>
-                                                        <Download className="w-4 h-4 mr-2" />{__('sms_gateway.download_wp_plugin')}</a>
+                                                        <Download className="w-4 h-4 me-2" />{__('sms_gateway.download_wp_plugin')}</a>
                                                 </Button>
                                             </div>
                                         </div>
@@ -297,7 +297,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
                                 <p>
                                     <strong>{__('general.never_rely_on_the_frontend')}<code>onSuccess</code>{__('general.callback_to_fulfill_orders')}</strong><br/>{__('general.client_side_code_can_be_easily_manipulated_or_bypassed_by_users_hijacking_the')}<code>onSuccess</code>{__('general.event_is_strictly_for_ui_purposes_such_as_redirecting_the_user_to_a_thank_you_page_to_securely_verify_that_a_payment_was_successful_you_must_use')}<strong>Webhooks</strong>{__('general.or_server_side_api_verification_exactly_as_implemented_by_major_gateways_like_stripe')}</p>
                             </div>
-                            <div dir="rtl" className="text-right font-sans">
+                            <div  className="text-end font-sans">
                                 <h4 className="font-bold mb-1 text-amber-900 dark:text-amber-400">عربي</h4>
                                 <p>
                                     <strong>لا تعتمد أبداً على دالة <code>onSuccess</code> في واجهة المستخدم لتأكيد الطلبات.</strong><br/>

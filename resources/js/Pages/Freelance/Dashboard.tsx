@@ -148,14 +148,14 @@ export default function FreelanceDashboard({
                                 href="/freelance/jobs/create" 
                                 className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 transition-colors shadow-sm"
                             >
-                                <Plus className="w-4 h-4 mr-2 stroke-[1.5]" /> {__('freelance.post_a_job')}
+                                <Plus className="w-4 h-4 me-2 stroke-[1.5]" /> {__('freelance.post_a_job')}
                             </Link>
                         ) : (
                             <Link 
                                 href="/freelance/jobs/browse" 
                                 className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 transition-colors shadow-sm"
                             >
-                                <Search className="w-4 h-4 mr-2 stroke-[1.5]" /> {__('freelance.browse_jobs')}
+                                <Search className="w-4 h-4 me-2 stroke-[1.5]" /> {__('freelance.browse_jobs')}
                             </Link>
                         )
                     }
@@ -342,7 +342,7 @@ export default function FreelanceDashboard({
                                             {upcomingBookings.map((booking: any) => (
                                                 <div key={booking.id} className="py-4 flex items-center justify-between gap-4 hover:bg-slate-50/50 px-2 rounded-lg transition-colors -mx-2">
                                                     <div className="min-w-0 flex items-center">
-                                                        <div className="mr-4 bg-slate-100 rounded-lg p-2 text-center min-w-[50px]">
+                                                        <div className="me-4 bg-slate-100 rounded-lg p-2 text-center min-w-[50px]">
                                                             <span className="block text-xs font-bold text-slate-500 uppercase">{formatDate(booking.starts_at, 'MMM')}</span>
                                                             <span className="block text-lg font-bold text-slate-900">{formatDate(booking.starts_at, 'd')}</span>
                                                         </div>

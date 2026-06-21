@@ -385,7 +385,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                         <div className="flex items-center gap-1.5 text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-md text-xs animate-shake">
                             <AlertCircle className="h-4 w-4" />
                             <span>{errorMessage}</span>
-                            <button onClick={() => setErrorMessage(null)} className="ml-2 text-rose-400 hover:text-rose-600">
+                            <button onClick={() => setErrorMessage(null)} className="ms-2 text-rose-400 hover:text-rose-600">
                                 <X className="h-3 w-3" />
                             </button>
                         </div>
@@ -394,7 +394,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
 
                 {/* Board overview hero card */}
                 <Card className="shadow-none border-border relative overflow-hidden bg-card">
-                    <div className="absolute top-0 right-0 p-6 flex gap-2">
+                    <div className="absolute top-0 end-0 p-6 flex gap-2">
                         <Button 
                             onClick={() => setIsEditBoardOpen(true)}
                             variant="outline" 
@@ -648,7 +648,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                         <CardDescription className="text-[11px]">Discuss this task and leave updates</CardDescription>
                     </CardHeader>
                     <CardContent className="p-5 pt-0 space-y-4">
-                        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                        <div className="space-y-4 max-h-[400px] overflow-y-auto pe-2">
                             {comments.length === 0 ? (
                                 <div className="text-center text-muted-foreground text-xs italic py-4">No comments yet.</div>
                             ) : (
@@ -669,7 +669,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                                             <p className="text-xs text-foreground whitespace-pre-wrap">{comment.comment}</p>
                                             <button 
                                                 onClick={() => handleDeleteComment(comment.id)}
-                                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-rose-500 hover:text-rose-700 transition-opacity"
+                                                className="absolute top-2 end-2 opacity-0 group-hover:opacity-100 text-rose-500 hover:text-rose-700 transition-opacity"
                                                 title="Delete comment"
                                             >
                                                 <Trash2 className="h-3 w-3" />
@@ -794,7 +794,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                                 className="shadow-none text-xs text-rose-500 hover:text-rose-600 hover:bg-rose-50 px-2"
                                 disabled={boardForm.processing}
                             >
-                                <Trash2 className="h-3.5 w-3.5 mr-1.5" />{__('general.delete_board')}</Button>
+                                <Trash2 className="h-3.5 w-3.5 me-1.5" />{__('general.delete_board')}</Button>
                             <div className="flex items-center gap-2">
                                 <Button 
                                     type="button" 

@@ -124,7 +124,7 @@ export default function ExclusiveService({ serviceSlug }: { serviceSlug: string 
                                                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                                                 required
                                                 placeholder="example@domain.com"
-                                                dir="ltr"
+                                                
                                             />
                                             <InputError message={errors.email} />
                                         </div>
@@ -139,7 +139,7 @@ export default function ExclusiveService({ serviceSlug }: { serviceSlug: string 
                                                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                                                 required
                                                 placeholder="+201xxxxxxxxx"
-                                                dir="ltr"
+                                                
                                             />
                                             <InputError message={errors.phone} />
                                         </div>

@@ -110,7 +110,7 @@ export function InboxesWorkspace(props: InboxesWorkspaceProps) {
                                                     disabled={isTesting}
                                                     className="h-7 text-[10px]"
                                                 >
-                                                    {isTesting && <RefreshCw className="w-3 h-3 animate-spin mr-1" />}
+                                                    {isTesting && <RefreshCw className="w-3 h-3 animate-spin me-1" />}
                                                     Test SMTP
                                                 </Button>
                                                 

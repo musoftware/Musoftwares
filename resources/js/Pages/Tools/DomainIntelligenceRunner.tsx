@@ -151,7 +151,7 @@ export default function DomainIntelligenceRunner({ tool }: any) {
 
             <div className="flex flex-1 overflow-hidden">
                 {/* Sidebar Configuration */}
-                <div className="w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-y-auto">
+                <div className="w-80 bg-white border-e border-slate-200 flex flex-col shrink-0 overflow-y-auto">
                     <div className="p-5 space-y-6">
                         <div>
                             <h2 className="text-lg font-bold tracking-tight text-slate-900">{__('general.target_setup')}</h2>
@@ -162,12 +162,12 @@ export default function DomainIntelligenceRunner({ tool }: any) {
                             <div className="space-y-1.5">
                                 <Label className="text-xs font-bold text-slate-700">{__('general.domain_names')}</Label>
                                 <div className="relative">
-                                    <Globe className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                                    <Globe className="absolute start-3 top-3 w-4 h-4 text-slate-400" />
                                     <textarea
                                         value={domainsText}
                                         onChange={e => setDomainsText(e.target.value)}
                                         placeholder={__('general.musoftwares_com_10_example_com')}
-                                        className="w-full flex min-h-[120px] rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 disabled:cursor-not-allowed disabled:opacity-50 resize-y pl-9"
+                                        className="w-full flex min-h-[120px] rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 disabled:cursor-not-allowed disabled:opacity-50 resize-y ps-9"
                                         disabled={status === 'running'}
                                     />
                                 </div>
@@ -200,7 +200,7 @@ export default function DomainIntelligenceRunner({ tool }: any) {
                             {logs.length > 0 && (
                                 <div className="mt-6 pt-6 border-t border-slate-100">
                                     <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">{__('general.live_activity')}</Label>
-                                    <div className="space-y-1.5 max-h-48 overflow-y-auto pr-2">
+                                    <div className="space-y-1.5 max-h-48 overflow-y-auto pe-2">
                                         {logs.map((l, i) => (
                                             <div key={i} className="text-[10px] text-slate-600 truncate bg-slate-50 px-2 py-1.5 rounded border border-slate-100">
                                                 {l}
@@ -318,7 +318,7 @@ export default function DomainIntelligenceRunner({ tool }: any) {
                                                         <div className="space-y-1">
                                                             {res.dns?.mx?.length > 0 ? res.dns.mx.map((mx: any, i: number) => (
                                                                 <div key={i} className="text-xs font-mono bg-slate-100 text-slate-800 px-2 py-1 rounded truncate">
-                                                                    <span className="text-slate-400 mr-2">Priority {mx.priority}</span>
+                                                                    <span className="text-slate-400 me-2">Priority {mx.priority}</span>
                                                                     {mx.exchange}
                                                                 </div>
                                                             )) : <span className="text-xs text-slate-500">None</span>}

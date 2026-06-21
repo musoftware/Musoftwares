@@ -88,13 +88,13 @@ export default function TagsIndex({ tags }: { tags: any[] }) {
                         <CardTitle className="font-semibold text-slate-800">{__('general.all_tags')}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0 overflow-y-auto">
-                        <table className="w-full text-sm text-left">
+                        <table className="w-full text-sm text-start">
                             <thead className="text-xs text-slate-500 uppercase bg-slate-50/80 border-b">
                                 <tr>
                                     <th className="px-6 py-4 font-medium">{__('general.tag_name')}</th>
                                     <th className="px-6 py-4 font-medium">{__('general.color')}</th>
                                     <th className="px-6 py-4 font-medium">{__('general.created_at')}</th>
-                                    <th className="px-6 py-4 font-medium text-right">{__('general.actions')}</th>
+                                    <th className="px-6 py-4 font-medium text-end">{__('general.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -116,7 +116,7 @@ export default function TagsIndex({ tags }: { tags: any[] }) {
                                             <td className="px-6 py-4 text-slate-500">
                                                 {new Date(tag.created_at).toLocaleDateString()}
                                             </td>
-                                            <td className="px-6 py-4 text-right">
+                                            <td className="px-6 py-4 text-end">
                                                 <Button 
                                                     variant="ghost" 
                                                     size="sm" 

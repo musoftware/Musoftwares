@@ -76,11 +76,11 @@ export default function Show({ campaign }) {
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900 flex items-center">
                         {campaign.name}
-                        {campaign.status === 'draft' && <span className="ml-3 inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">Draft</span>}
-                        {campaign.status === 'scheduled' && <span className="ml-3 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Scheduled</span>}
-                        {campaign.status === 'sending' && <span className="ml-3 inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">{__('general.sending')}</span>}
-                        {campaign.status === 'paused' && <span className="ml-3 inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800">Paused</span>}
-                        {campaign.status === 'completed' && <span className="ml-3 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Completed</span>}
+                        {campaign.status === 'draft' && <span className="ms-3 inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">Draft</span>}
+                        {campaign.status === 'scheduled' && <span className="ms-3 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Scheduled</span>}
+                        {campaign.status === 'sending' && <span className="ms-3 inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">{__('general.sending')}</span>}
+                        {campaign.status === 'paused' && <span className="ms-3 inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800">Paused</span>}
+                        {campaign.status === 'completed' && <span className="ms-3 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Completed</span>}
                     </h2>
                     <p className="text-gray-500 mt-1">Target: {campaign.target_audience.replace('_', ' ')} • Type: <span className="capitalize">{campaign.type}</span></p>
                 </div>
@@ -95,7 +95,7 @@ export default function Show({ campaign }) {
                             <Dialog open={isAiOpen} onOpenChange={setIsAiOpen}>
                                 <DialogTrigger asChild>
                                     <Button variant="secondary" className="bg-indigo-100 text-indigo-700 hover:bg-indigo-200">
-                                        <Sparkles className="w-4 h-4 mr-2" />{__('general.ai_copywriter')}</Button>
+                                        <Sparkles className="w-4 h-4 me-2" />{__('general.ai_copywriter')}</Button>
                                 </DialogTrigger>
                                 <DialogContent>
                                     <DialogHeader>
@@ -124,7 +124,7 @@ export default function Show({ campaign }) {
                                             </select>
                                         </div>
                                         <Button className="w-full" onClick={handleGenerateAI} disabled={isGenerating}>
-                                            {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                                            {isGenerating ? <Loader2 className="w-4 h-4 me-2 animate-spin" /> : <Sparkles className="w-4 h-4 me-2" />}
                                             Generate Copy
                                         </Button>
                                     </div>
@@ -132,29 +132,29 @@ export default function Show({ campaign }) {
                             </Dialog>
 
                             <Button onClick={handleSaveContent} disabled={isSaving} className="bg-gray-900">
-                                {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />} Save Content
+                                {isSaving ? <Loader2 className="w-4 h-4 me-2 animate-spin" /> : <Save className="w-4 h-4 me-2" />} Save Content
                             </Button>
                             
                             <Button onClick={handleSchedule} className="bg-blue-600 hover:bg-blue-700">
-                                <Clock className="w-4 h-4 mr-2" />{__('general.schedule_send')}</Button>
+                                <Clock className="w-4 h-4 me-2" />{__('general.schedule_send')}</Button>
                         </>
                     )}
 
                     {campaign.status === 'scheduled' || campaign.status === 'sending' ? (
                         <Button onClick={handlePause} variant="outline" className="border-orange-200 text-orange-600 hover:bg-orange-50">
-                            <PauseCircle className="w-4 h-4 mr-2" />{__('general.pause_campaign')}</Button>
+                            <PauseCircle className="w-4 h-4 me-2" />{__('general.pause_campaign')}</Button>
                     ) : null}
 
                     {campaign.status === 'paused' && (
                         <Button onClick={handleResume} className="bg-green-600 hover:bg-green-700">
-                            <PlayCircle className="w-4 h-4 mr-2" />{__('general.resume_campaign')}</Button>
+                            <PlayCircle className="w-4 h-4 me-2" />{__('general.resume_campaign')}</Button>
                     )}
                 </div>
             </div>
 
             {!isEditable && (
-                <div className="mb-6 bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-md flex">
-                    <AlertCircle className="w-5 h-5 text-blue-400 mr-3 mt-0.5" />
+                <div className="mb-6 bg-blue-50 border-s-4 border-blue-400 p-4 rounded-e-md flex">
+                    <AlertCircle className="w-5 h-5 text-blue-400 me-3 mt-0.5" />
                     <div>
                         <h3 className="text-sm font-medium text-blue-800">{__('general.campaign_is_locked')}</h3>
                         <p className="text-sm text-blue-700 mt-1">{__('general.this_campaign_has_already_been_scheduled_or_sent_you_cannot_edit_the_content')}</p>

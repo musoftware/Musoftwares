@@ -268,10 +268,10 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                         <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.04em', marginBottom: 0 }} className="text-gray-900">
                             {__('general.start_timer')}
                         </h1>
-                        <div className="flex flex-wrap gap-2 items-center ml-auto">
+                        <div className="flex flex-wrap gap-2 items-center ms-auto">
                             <Link href={route('admin.invoices.show', item.invoice_id)}>
                                 <Button variant="ghost" className="hover:bg-gray-100 text-gray-600">
-                                    <ArrowLeft className="w-4 h-4 mr-2" /> {__('general.back')}
+                                    <ArrowLeft className="w-4 h-4 me-2" /> {__('general.back')}
                                 </Button>
                             </Link>
                         </div>
@@ -360,13 +360,13 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                         value={rate} 
                                         onChange={e => setRate(parseFloat(e.target.value) || 0)}
                                         disabled={item.invoice_status !== 'unpaid'}
-                                        className="font-mono font-bold tracking-widest rounded-r-none border-r-0 focus-visible:ring-0 bg-gray-50"
+                                        className="font-mono font-bold tracking-widest rounded-e-none border-e-0 focus-visible:ring-0 bg-gray-50"
                                     />
-                                    <Button type="button" variant="outline" className="rounded-none border-l-0 px-3 hover:bg-gray-100" onClick={() => setRateVisible(!rateVisible)}>
+                                    <Button type="button" variant="outline" className="rounded-none border-s-0 px-3 hover:bg-gray-100" onClick={() => setRateVisible(!rateVisible)}>
                                         {rateVisible ? <EyeOff className="w-4 h-4 text-gray-500" /> : <Eye className="w-4 h-4 text-gray-500" />}
                                     </Button>
                                     <Link href={rateUrl} target="_blank">
-                                        <Button type="button" variant="outline" className="rounded-l-none px-3 hover:bg-gray-100 border-l-0">
+                                        <Button type="button" variant="outline" className="rounded-s-none px-3 hover:bg-gray-100 border-s-0">
                                             <Edit className="w-4 h-4 text-blue-600" />
                                         </Button>
                                     </Link>
@@ -397,7 +397,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                         <Input type="number" min="0" max="59" placeholder="0" value={manualMinutes} onChange={e => setManualMinutes(e.target.value)} disabled={item.invoice_status !== 'unpaid'} />
                                     </div>
                                     <Button type="button" variant="secondary" onClick={handleAddManual} disabled={item.invoice_status !== 'unpaid'}>
-                                        <Plus className="w-4 h-4 mr-2" /> Add Duration
+                                        <Plus className="w-4 h-4 me-2" /> Add Duration
                                     </Button>
                                 </div>
                             </div>
@@ -408,10 +408,10 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                             <table className="w-full text-sm">
                                 <thead className="bg-gray-50 border-b border-gray-200">
                                     <tr>
-                                        <th className="px-4 py-2 text-left font-semibold text-gray-600 w-1/4">Start</th>
-                                        <th className="px-4 py-2 text-left font-semibold text-gray-600 w-1/4">End</th>
-                                        <th className="px-4 py-2 text-left font-semibold text-gray-600 w-1/4">Duration</th>
-                                        <th className="px-4 py-2 text-left font-semibold text-gray-600">{invoice_currency?.currency || 'Amount'}</th>
+                                        <th className="px-4 py-2 text-start font-semibold text-gray-600 w-1/4">Start</th>
+                                        <th className="px-4 py-2 text-start font-semibold text-gray-600 w-1/4">End</th>
+                                        <th className="px-4 py-2 text-start font-semibold text-gray-600 w-1/4">Duration</th>
+                                        <th className="px-4 py-2 text-start font-semibold text-gray-600">{invoice_currency?.currency || 'Amount'}</th>
                                         <th className="px-4 py-2 w-12"></th>
                                     </tr>
                                 </thead>
@@ -422,7 +422,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                             <td className="px-4 py-2.5 font-mono text-xs text-gray-600">{parseDateTime(timer.end_date).full}</td>
                                             <td className="px-4 py-2.5 font-mono text-xs font-medium">
                                                 {formatDurationMS(timer.duration_seconds)}
-                                                {timer.isNew && <span className="ml-2 text-[9px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">New</span>}
+                                                {timer.isNew && <span className="ms-2 text-[9px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">New</span>}
                                             </td>
                                             <td className="px-4 py-2.5 font-bold text-gray-900">{formatCurrency(timer.amount, invoice_currency)}</td>
                                             <td className="px-4 py-2.5 text-center">
@@ -453,7 +453,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                     <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></div>
                                     <span className="font-semibold uppercase tracking-wider text-xs">Timer running —</span>
                                     <span className="font-bold text-base">{formatDurationMS(liveSeconds)}</span>
-                                    <span className="ml-auto font-bold">{formatCurrency((liveSeconds / 3600) * rate, invoice_currency)}</span>
+                                    <span className="ms-auto font-bold">{formatCurrency((liveSeconds / 3600) * rate, invoice_currency)}</span>
                                 </div>
                             )}
 
@@ -463,7 +463,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                     disabled={isRunning || item.invoice_status !== 'unpaid'} 
                                     className="bg-blue-600 hover:bg-blue-700 shadow-sm"
                                 >
-                                    <Play className="w-4 h-4 mr-2" /> Start
+                                    <Play className="w-4 h-4 me-2" /> Start
                                 </Button>
                                 <Button 
                                     onClick={handleStop} 
@@ -471,10 +471,10 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                     variant="outline" 
                                     className="border-gray-300 text-gray-700 hover:bg-gray-50"
                                 >
-                                    <Pause className="w-4 h-4 mr-2" /> Pause
+                                    <Pause className="w-4 h-4 me-2" /> Pause
                                 </Button>
 
-                                <div className="flex items-center gap-2 ml-2 pl-2 border-l border-gray-200">
+                                <div className="flex items-center gap-2 ms-2 ps-2 border-s border-gray-200">
                                     <Button
                                         variant="outline"
                                         onClick={toggleBridge}
@@ -483,7 +483,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                             (bridgeStatus === 'connecting' ? 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100' : 'bg-gray-50 text-gray-600')
                                         }`}
                                     >
-                                        <div className={`w-2 h-2 rounded-full mr-2 ${
+                                        <div className={`w-2 h-2 rounded-full me-2 ${
                                             bridgeStatus === 'connected' ? 'bg-green-500' : 
                                             (bridgeStatus === 'connecting' ? 'bg-amber-500 animate-pulse' : 'bg-gray-400')
                                         }`}></div>
@@ -494,13 +494,13 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                     )}
                                 </div>
 
-                                <div className="ml-auto">
+                                <div className="ms-auto">
                                     <Button 
                                         onClick={handleSave} 
                                         disabled={isSaving || item.invoice_status !== 'unpaid'} 
                                         className="bg-gray-900 hover:bg-gray-800 text-white shadow-sm px-6"
                                     >
-                                        <Save className="w-4 h-4 mr-2" /> {__('general.save')}
+                                        <Save className="w-4 h-4 me-2" /> {__('general.save')}
                                     </Button>
                                 </div>
                             </div>

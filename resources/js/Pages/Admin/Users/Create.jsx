@@ -74,7 +74,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
                     </div>
                     <Link href={`/admin/users`}>
                         <Button variant="outline">
-                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            <ArrowLeft className="me-2 h-4 w-4" />
                             {__('general.back')}
                         </Button>
                     </Link>
@@ -375,7 +375,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
 
                         <div className="flex justify-end pt-6 border-t">
                             <Button type="submit" disabled={processing} className="w-full md:w-auto">
-                                <Save className="mr-2 h-4 w-4" />{__('general.save')}
+                                <Save className="me-2 h-4 w-4" />{__('general.save')}
                             </Button>
                         </div>
                     </form>

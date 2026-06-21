@@ -158,7 +158,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                     <Button type="submit" disabled={loading || devices.length === 0} className="w-full">
                                         {loading ? __('general.simulating') : (
                                             <>
-                                                <Send className="w-4 h-4 mr-2" />
+                                                <Send className="w-4 h-4 me-2" />
                                                 {__('sms_gateway.simulate_incoming_sms')}
                                             </>
                                         )}
@@ -191,7 +191,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                         <span className="text-sm font-semibold">{webhook ? __('general.configured') : __('general.not_configured')}</span>
                                     </div>
                                     {webhook && (
-                                        <p className="text-xs text-muted-foreground truncate" dir="ltr" title={webhook.webhook_url}>
+                                        <p className="text-xs text-muted-foreground truncate"  title={webhook.webhook_url}>
                                             {webhook.webhook_url}
                                         </p>
                                     )}
@@ -218,7 +218,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                             {result.data?.transaction_detected && (
                                                 <div className="p-3 bg-green-50 border border-green-200 rounded-md text-sm">
                                                     <div className="font-semibold text-green-800 mb-2">{__('erp.transaction_detected_processed')}</div>
-                                                    <pre className="text-xs overflow-auto bg-white p-2 rounded border" dir="ltr">
+                                                    <pre className="text-xs overflow-auto bg-white p-2 rounded border" >
                                                         {JSON.stringify(result.data?.transaction_data, null, 2)}
                                                     </pre>
                                                 </div>
@@ -229,7 +229,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                                     <div className="font-semibold text-yellow-800">{__('erp.no_transaction_detected')}</div>
                                                     <p className="text-yellow-700 mt-1">{__('general.the_system_received_the_sms_but_did_not_detect_a_valid_financial_transaction_in_it')}</p>
                                                     {result.data?.debug && (
-                                                         <pre className="text-xs overflow-auto bg-white p-2 rounded border mt-2 text-gray-700" dir="ltr">
+                                                         <pre className="text-xs overflow-auto bg-white p-2 rounded border mt-2 text-gray-700" >
                                                              {JSON.stringify(result.data?.debug, null, 2)}
                                                          </pre>
                                                     )}
@@ -241,7 +241,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                             <div className="font-semibold text-red-800 mb-2">{__('general.error')}</div>
                                             <p className="text-red-700 mb-2">{result.error}</p>
                                             {result.details && (
-                                                <pre className="text-xs overflow-auto bg-white p-2 rounded border" dir="ltr">
+                                                <pre className="text-xs overflow-auto bg-white p-2 rounded border" >
                                                     {JSON.stringify(result.details, null, 2)}
                                                 </pre>
                                             )}

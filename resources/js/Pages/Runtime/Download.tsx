@@ -28,7 +28,7 @@ export default function DownloadPage({ downloadUrl, password, version }: Props) 
             <Head title="Musoftware Runtime Download" />
             <div className="max-w-3xl mx-auto py-8">
                 <Card className="border-emerald-100 shadow-sm relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+                    <div className="absolute top-0 start-0 w-1 h-full bg-emerald-500"></div>
                     <CardHeader className="pb-4">
                         <div className="flex items-center gap-4">
                             <div className="bg-emerald-100 p-3 rounded-full text-emerald-600">
@@ -61,7 +61,7 @@ export default function DownloadPage({ downloadUrl, password, version }: Props) 
                                         <Input readOnly value={password} className="font-mono text-center font-bold tracking-wider" />
                                         <Button variant="secondary" onClick={copyPassword} className="shrink-0">
                                             {copied ? <Check size={16} className="text-emerald-500" /> : <Copy size={16} />}
-                                            <span className="ml-2">{copied ? 'Copied!' : 'Copy'}</span>
+                                            <span className="ms-2">{copied ? 'Copied!' : 'Copy'}</span>
                                         </Button>
                                     </div>
                                 </div>
@@ -73,7 +73,7 @@ export default function DownloadPage({ downloadUrl, password, version }: Props) 
                                     </p>
                                     <a href={downloadUrl} download>
                                         <Button size="lg" className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700">
-                                            <Download className="mr-2" size={18} />
+                                            <Download className="me-2" size={18} />
                                             Download Runtime ({version})
                                         </Button>
                                     </a>

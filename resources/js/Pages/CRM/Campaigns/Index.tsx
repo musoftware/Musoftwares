@@ -76,7 +76,7 @@ export default function Index({ campaigns }: Props) {
             <div className="mb-6 flex justify-end">
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
-                        <Button><Plus className="w-4 h-4 mr-2" /> {__('general.create_campaign')}</Button>
+                        <Button><Plus className="w-4 h-4 me-2" /> {__('general.create_campaign')}</Button>
                     </DialogTrigger>
                     <DialogContent>
                         <form onSubmit={handleCreate}>
@@ -130,7 +130,7 @@ export default function Index({ campaigns }: Props) {
                     <div key={campaign.id} className="bg-white rounded-lg shadow border overflow-hidden flex flex-col">
                         <div className="p-5 flex-1">
                             <div className="flex justify-between items-start mb-4">
-                                <h3 className="font-semibold text-lg text-gray-900 truncate pr-2">{campaign.name}</h3>
+                                <h3 className="font-semibold text-lg text-gray-900 truncate pe-2">{campaign.name}</h3>
                                 <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${getStatusColor(campaign.status)}`}>
                                     {campaign.status}
                                 </span>
@@ -138,15 +138,15 @@ export default function Index({ campaigns }: Props) {
                             
                             <div className="space-y-3 mb-6">
                                 <div className="flex items-center text-sm text-gray-500">
-                                    <Send className="w-4 h-4 mr-2 text-indigo-400" />
+                                    <Send className="w-4 h-4 me-2 text-indigo-400" />
                                     <span>{__('general.type')} <span className="font-medium text-gray-700 capitalize">{campaign.type}</span></span>
                                 </div>
                                 <div className="flex items-center text-sm text-gray-500">
-                                    <Users className="w-4 h-4 mr-2 text-blue-400" />
+                                    <Users className="w-4 h-4 me-2 text-blue-400" />
                                     <span>{__('general.audience')} <span className="font-medium text-gray-700">{campaign.target_audience.replace('_', ' ')}</span></span>
                                 </div>
                                 <div className="flex items-center text-sm text-gray-500">
-                                    <Clock className="w-4 h-4 mr-2 text-gray-400" />
+                                    <Clock className="w-4 h-4 me-2 text-gray-400" />
                                     <span>
                                         {campaign.status === 'scheduled' ? `${__('general.scheduled')}: ${new Date(campaign.scheduled_at!).toLocaleString()}` : 
                                          campaign.status === 'completed' ? `${__('general.finished')}: ${new Date(campaign.completed_at!).toLocaleDateString()}` : 
@@ -162,7 +162,7 @@ export default function Index({ campaigns }: Props) {
                             </Button>
                             <Link href={route('crm.campaigns.show', campaign.id)}>
                                 <Button size="sm" variant="outline">
-                                    <Edit className="w-4 h-4 mr-2" /> {__('general.manage_content')}
+                                    <Edit className="w-4 h-4 me-2" /> {__('general.manage_content')}
                                 </Button>
                             </Link>
                         </div>

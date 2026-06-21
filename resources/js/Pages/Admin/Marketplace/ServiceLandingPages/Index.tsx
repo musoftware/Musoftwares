@@ -75,7 +75,7 @@ export default function Index({ servicesWithLandingPages, filters, auth, transla
                                         <TableHead>{translations.views_ab}</TableHead>
                                         <TableHead>{translations.leads}</TableHead>
                                         <TableHead>{translations.status}</TableHead>
-                                        <TableHead className="text-right">{translations.actions}</TableHead>
+                                        <TableHead className="text-end">{translations.actions}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -112,7 +112,7 @@ export default function Index({ servicesWithLandingPages, filters, auth, transla
                                                         onCheckedChange={() => toggleStatus(service.landing_page.id)}
                                                     />
                                                 </TableCell>
-                                                <TableCell className="text-right">
+                                                <TableCell className="text-end">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
                                                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -123,12 +123,12 @@ export default function Index({ servicesWithLandingPages, filters, auth, transla
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem asChild>
                                                                 <a href={`/l/${service.landing_page.slug}`} target="_blank" rel="noreferrer" className="cursor-pointer flex items-center">
-                                                                    <Eye className="w-4 h-4 mr-2" />
+                                                                    <Eye className="w-4 h-4 me-2" />
                                                                     {translations.view}
                                                                 </a>
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem onClick={() => deletePage(service.landing_page.id)} className="text-red-600 focus:text-red-700 cursor-pointer flex items-center">
-                                                                <Trash2 className="w-4 h-4 mr-2" />
+                                                                <Trash2 className="w-4 h-4 me-2" />
                                                                 {translations.delete}
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>

@@ -78,7 +78,7 @@ export default function Index({ paymentLinks, currencies }: { paymentLinks: any,
                 <CardContent className="p-4 flex justify-between items-center">
                     <h2 className="text-lg font-semibold">{__('admin.payment_links')}</h2>
                     <Button onClick={() => setIsCreateModalOpen(true)}>
-                        <Plus className="mr-2 h-4 w-4" />{__('admin.create_payment_link', { default: 'Create Link' })}
+                        <Plus className="me-2 h-4 w-4" />{__('admin.create_payment_link', { default: 'Create Link' })}
                     </Button>
                 </CardContent>
             </Card>
@@ -95,7 +95,7 @@ export default function Index({ paymentLinks, currencies }: { paymentLinks: any,
                                     <TableHead className="uppercase text-xs">{__('general.status')}</TableHead>
                                     <TableHead className="uppercase text-xs">{__('admin.created_by')}</TableHead>
                                     <TableHead className="uppercase text-xs">{__('general.date')}</TableHead>
-                                    <TableHead className="text-right uppercase text-xs">{__('general.actions')}</TableHead>
+                                    <TableHead className="text-end uppercase text-xs">{__('general.actions')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -119,7 +119,7 @@ export default function Index({ paymentLinks, currencies }: { paymentLinks: any,
                                         <TableCell data-label={__('general.date')} className="text-muted-foreground text-sm">
                                             {new Date(link.created_at).toLocaleDateString()}
                                         </TableCell>
-                                        <TableCell data-label={__('general.actions')} className="text-right">
+                                        <TableCell data-label={__('general.actions')} className="text-end">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -129,18 +129,18 @@ export default function Index({ paymentLinks, currencies }: { paymentLinks: any,
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem onClick={() => copyToClipboard(link.uuid)}>
-                                                        <Copy className="mr-2 h-4 w-4" />{__('admin.copy_link', { default: 'Copy Link' })}
+                                                        <Copy className="me-2 h-4 w-4" />{__('admin.copy_link', { default: 'Copy Link' })}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
                                                         <a href={route('guest.payment-links.show', link.uuid)} target="_blank" rel="noopener noreferrer" className="flex items-center w-full">
-                                                            <LinkIcon className="mr-2 h-4 w-4" />{__('admin.view_link', { default: 'View Link' })}
+                                                            <LinkIcon className="me-2 h-4 w-4" />{__('admin.view_link', { default: 'View Link' })}
                                                         </a>
                                                     </DropdownMenuItem>
                                                     {link.status === 'pending' && (
                                                         <>
                                                             <DropdownMenuSeparator />
                                                             <DropdownMenuItem onClick={() => handleDelete(link.id)} className="text-red-600 focus:text-red-600">
-                                                                <Trash className="mr-2 h-4 w-4" />{__('general.delete')}
+                                                                <Trash className="me-2 h-4 w-4" />{__('general.delete')}
                                                             </DropdownMenuItem>
                                                         </>
                                                     )}
@@ -171,7 +171,7 @@ export default function Index({ paymentLinks, currencies }: { paymentLinks: any,
                                     link.active 
                                         ? 'z-10 bg-primary border-primary text-primary-foreground font-medium' 
                                         : 'bg-background border-input text-muted-foreground hover:bg-muted'
-                                } ${i === 0 ? 'rounded-l-md' : ''} ${i === paginationLinks.length - 1 ? 'rounded-r-md' : ''}`}
+                                } ${i === 0 ? 'rounded-s-md' : ''} ${i === paginationLinks.length - 1 ? 'rounded-e-md' : ''}`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
                         ))}

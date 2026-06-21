@@ -43,9 +43,9 @@ export default function CostsEdit() {
                         variant="ghost" 
                         size="sm" 
                         onClick={() => router.visit(route('admin.costs.index'))}
-                        className="mr-4 hover:bg-slate-100"
+                        className="me-4 hover:bg-slate-100"
                     >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        <ArrowLeft className="w-4 h-4 me-2" />
                         {__('general.back') || "Back"}
                     </Button>
                 </div>
@@ -199,7 +199,7 @@ export default function CostsEdit() {
                             <Button type="submit" disabled={processing} className="bg-rose-600 hover:bg-rose-700 text-white min-w-[120px]">
                                 {processing ? (
                                     <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        <Loader2 className="me-2 h-4 w-4 animate-spin" />
                                         {__('general.saving') || "Saving..."}
                                     </>
                                 ) : (

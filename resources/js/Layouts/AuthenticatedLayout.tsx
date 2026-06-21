@@ -137,7 +137,7 @@ function AuthenticatedContent({
                     </div>
                     <Link
                         href={route('admin.stop-impersonate')}
-                        className="bg-white/20 hover:bg-white/30 text-white font-bold py-1 px-3 rounded-full border border-white/20 hover:border-white/40 transition-all text-[11px] shrink-0 ml-2"
+                        className="bg-white/20 hover:bg-white/30 text-white font-bold py-1 px-3 rounded-full border border-white/20 hover:border-white/40 transition-all text-[11px] shrink-0 ms-2"
                     >{__('general.stop_impersonation')}</Link>
                 </div>
             )}
@@ -151,7 +151,7 @@ function AuthenticatedContent({
                             {/* Mobile Menu Trigger */}
                             <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                                 <SheetTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="md:hidden -ml-2 text-slate-500">
+                                    <Button variant="ghost" size="icon" className="md:hidden -ms-2 text-slate-500">
                                         <Menu className="h-5 w-5" />
                                     </Button>
                                 </SheetTrigger>
@@ -196,7 +196,7 @@ function AuthenticatedContent({
                                                                         </div>
                                                                     </AccordionTrigger>
                                                                     <AccordionContent className="pb-1 px-2">
-                                                                        <div className="flex flex-col space-y-1 mt-1 border-l-2 border-slate-100 ml-5 pl-4">
+                                                                        <div className="flex flex-col space-y-1 mt-1 border-s-2 border-slate-100 ms-5 ps-4">
                                                                             <Link href={safeRoute('financial.transactions')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-600 font-medium">
                                                                                 <ArrowRightLeft className="w-4 h-4 text-slate-400" /> Transactions
                                                                             </Link>
@@ -223,7 +223,7 @@ function AuthenticatedContent({
                                                                         </div>
                                                                     </AccordionTrigger>
                                                                     <AccordionContent className="pb-1 px-2">
-                                                                        <div className="flex flex-col space-y-1 mt-1 border-l-2 border-slate-100 ml-5 pl-4">
+                                                                        <div className="flex flex-col space-y-1 mt-1 border-s-2 border-slate-100 ms-5 ps-4">
                                                                             <Link href={safeRoute('freelance.dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-emerald-50/50 text-slate-600 font-medium">
                                                                                 <Briefcase className="w-4 h-4 text-emerald-500" /> {__('general.freelance_hub')}
                                                                             </Link>
@@ -241,7 +241,7 @@ function AuthenticatedContent({
                                                                         </div>
                                                                     </AccordionTrigger>
                                                                     <AccordionContent className="pb-1 px-2">
-                                                                        <div className="flex flex-col space-y-1 mt-1 border-l-2 border-slate-100 ml-5 pl-4">
+                                                                        <div className="flex flex-col space-y-1 mt-1 border-s-2 border-slate-100 ms-5 ps-4">
                                                                             <Link href={activeModules.crm ? safeRoute('crm.dashboard') : safeRoute('subscriptions.plans', { module: 'crm' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-indigo-50/50 text-slate-600 font-medium">
                                                                                 <div className="flex items-center gap-3">
                                                                                     <Megaphone className="w-4 h-4 text-indigo-500" /> {__('general.lead_gen_crm')}
@@ -300,7 +300,7 @@ function AuthenticatedContent({
                                         Dashboard
                                     </NavLink>
                                     {(!auth?.team_member && isTourOpen && tourStep === 2) && (
-                                        <span className="absolute -top-1 right-0 flex h-3 w-3">
+                                        <span className="absolute -top-1 end-0 flex h-3 w-3">
                                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
                                             <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500" />
                                         </span>
@@ -313,10 +313,10 @@ function AuthenticatedContent({
                                         <DropdownMenu>
                                     <div className="relative inline-block">
                                         <DropdownMenuTrigger className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none text-slate-500 hover:bg-slate-100/60 hover:text-slate-800 transition-colors duration-150 outline-none select-none">
-                                            More <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-50" />
+                                            More <ChevronDown className="ms-1 h-3.5 w-3.5 opacity-50" />
                                         </DropdownMenuTrigger>
                                         {isTourOpen && tourStep === 5 && (
-                                            <span className="absolute top-1 right-1 flex h-3 w-3">
+                                            <span className="absolute top-1 end-1 flex h-3 w-3">
                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
                                                 <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500" />
                                             </span>
@@ -357,7 +357,7 @@ function AuthenticatedContent({
                                 <DropdownMenu>
                                     <div className="relative inline-block">
                                         <DropdownMenuTrigger className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors duration-150 outline-none select-none">
-                                            <Briefcase className="mr-1.5 h-3.5 w-3.5" /> Services <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-50" />
+                                            <Briefcase className="me-1.5 h-3.5 w-3.5" /> Services <ChevronDown className="ms-1 h-3.5 w-3.5 opacity-50" />
                                         </DropdownMenuTrigger>
                                     </div>
                                     <DropdownMenuContent align="start" className="w-[320px] p-2 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
@@ -415,10 +415,10 @@ function AuthenticatedContent({
                                 <DropdownMenu>
                                     <div className="relative inline-block">
                                         <DropdownMenuTrigger className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-150 outline-none select-none">
-                                            <Sparkles className="mr-1.5 h-3.5 w-3.5" /> iSAAS <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-50" />
+                                            <Sparkles className="me-1.5 h-3.5 w-3.5" /> iSAAS <ChevronDown className="ms-1 h-3.5 w-3.5 opacity-50" />
                                         </DropdownMenuTrigger>
                                         {isTourOpen && tourStep === 4 && (
-                                            <span className="absolute top-1 right-1 flex h-3 w-3">
+                                            <span className="absolute top-1 end-1 flex h-3 w-3">
                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
                                                 <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500" />
                                             </span>
@@ -616,17 +616,17 @@ function AuthenticatedContent({
                         {/* RIGHT: Financials, Tour Button & Profile */}
                         <div className="flex items-center gap-3">
                             {isFreelanceActive && (
-                                <div className="mr-1 sm:mr-2">
+                                <div className="me-1 sm:me-2">
                                     <FreelanceModeToggle />
                                 </div>
                             )}
                             {isMarketplaceActive && (
-                                <div className="mr-1 sm:mr-2">
+                                <div className="me-1 sm:me-2">
                                     <MarketplaceModeToggle />
                                 </div>
                             )}
                             {!auth?.team_member && (
-                                <div className="hidden md:flex items-center gap-2 mr-2">
+                                <div className="hidden md:flex items-center gap-2 me-2">
                                     {/* Add Balance pill — locked geometry */}
                                     <Link
                                         href={safeRoute('financial.add-balance')}
@@ -647,7 +647,7 @@ function AuthenticatedContent({
                                             <span>{wallet ? `${Number(wallet.balance).toFixed(2)} ${wallet.currency}` : '$0.00'}</span>
                                         </Link>
                                         {isTourOpen && tourStep === 3 && (
-                                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                            <span className="absolute -top-1 -end-1 flex h-3 w-3">
                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                                                 <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
                                             </span>
@@ -672,11 +672,11 @@ function AuthenticatedContent({
                                     <DropdownMenuTrigger className="w-9 h-9 rounded-full inline-flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors duration-150 relative outline-none shrink-0">
                                         <Bell className="w-5 h-5" />
                                         {notifications?.unread_count > 0 && (
-                                            <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white" />
+                                            <span className="absolute top-2 end-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white" />
                                         )}
                                     </DropdownMenuTrigger>
                                     {isTourOpen && tourStep === 6 && (
-                                        <span className="absolute top-0 right-0 flex h-3 w-3">
+                                        <span className="absolute top-0 end-0 flex h-3 w-3">
                                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
                                             <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500" />
                                         </span>
@@ -702,7 +702,7 @@ function AuthenticatedContent({
                                                         href={safeRoute('notifications.mark-read', { id: n.id })} 
                                                         method="post" 
                                                         as="button" 
-                                                        className="flex-1 text-left p-1.5 rounded-md outline-none hover:bg-slate-100/50 transition-colors"
+                                                        className="flex-1 text-start p-1.5 rounded-md outline-none hover:bg-slate-100/50 transition-colors"
                                                     >
                                                         <p className="text-slate-800 font-medium leading-tight">{n.data?.title || n.data?.message || __('general.new_notification')}</p>
                                                         {(n.data?.body || (n.data?.title && n.data?.message)) && (
@@ -754,50 +754,50 @@ function AuthenticatedContent({
                                                         className="cursor-pointer rounded-lg text-sm bg-indigo-50 text-indigo-700 focus:bg-indigo-100 focus:text-indigo-800 mb-1"
                                                         render={<Link href={safeRoute('admin.dashboard')} className="flex items-center w-full font-medium" />}
                                                     >
-                                                        <Shield className="mr-2 h-4 w-4 text-indigo-600" />{__('general.admin_dashboard')}</DropdownMenuItem>
+                                                        <Shield className="me-2 h-4 w-4 text-indigo-600" />{__('general.admin_dashboard')}</DropdownMenuItem>
                                                 )}
                                                 {user?.roles?.includes('moderator') && (
                                                     <DropdownMenuItem 
                                                         className="cursor-pointer rounded-lg text-sm bg-blue-50 text-blue-700 focus:bg-blue-100 focus:text-blue-800 mb-1"
                                                         render={<Link href={safeRoute('admin.tickets.index')} className="flex items-center w-full font-medium" />}
                                                     >
-                                                        <LifeBuoy className="mr-2 h-4 w-4 text-blue-600" />{__('general.manage_tickets')}</DropdownMenuItem>
+                                                        <LifeBuoy className="me-2 h-4 w-4 text-blue-600" />{__('general.manage_tickets')}</DropdownMenuItem>
                                                 )}
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
                                                 >
-                                                    <User className="mr-2 h-4 w-4 text-slate-400" />{__('general.my_profile')}</DropdownMenuItem>
+                                                    <User className="me-2 h-4 w-4 text-slate-400" />{__('general.my_profile')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('kyc.index')} className="flex items-center w-full" />}
                                                 >
-                                                    <Shield className="mr-2 h-4 w-4 text-slate-400" />{__('general.identity_verification')}</DropdownMenuItem>
+                                                    <Shield className="me-2 h-4 w-4 text-slate-400" />{__('general.identity_verification')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('financial.transactions')} className="flex items-center w-full" />}
                                                 >
-                                                    <History className="mr-2 h-4 w-4 text-slate-400" />{__('general.balance_history')}</DropdownMenuItem>
+                                                    <History className="me-2 h-4 w-4 text-slate-400" />{__('general.balance_history')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
                                                 >
-                                                    <Shield className="mr-2 h-4 w-4 text-slate-400" />{__('general.security_settings')}</DropdownMenuItem>
+                                                    <Shield className="me-2 h-4 w-4 text-slate-400" />{__('general.security_settings')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('settings.backup.index')} className="flex items-center w-full" />}
                                                 >
-                                                    <Download className="mr-2 h-4 w-4 text-slate-400" />{__('general.backup_restore')}</DropdownMenuItem>
+                                                    <Download className="me-2 h-4 w-4 text-slate-400" />{__('general.backup_restore')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('settings.automations.index')} className="flex items-center w-full" />}
                                                 >
-                                                    <Settings className="mr-2 h-4 w-4 text-slate-400" />Automations</DropdownMenuItem>
+                                                    <Settings className="me-2 h-4 w-4 text-slate-400" />Automations</DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('subscriptions.manage')} className="flex items-center w-full" />}
                                                 >
-                                                    <Box className="mr-2 h-4 w-4 text-slate-400" /> Subscriptions
+                                                    <Box className="me-2 h-4 w-4 text-slate-400" /> Subscriptions
                                                 </DropdownMenuItem>
                                             </DropdownMenuGroup>
                                             
@@ -807,7 +807,7 @@ function AuthenticatedContent({
                                                 className="cursor-pointer rounded-lg text-sm text-rose-600 focus:text-rose-600 focus:bg-rose-50"
                                                 render={<Link href={safeRoute('logout')} method="post" as="button" className="flex items-center w-full font-medium" />}
                                             >
-                                                <LogOut className="mr-2 h-4 w-4" /> Logout
+                                                <LogOut className="me-2 h-4 w-4" /> Logout
                                             </DropdownMenuItem>
                                         </>
                                     ) : (
@@ -815,7 +815,7 @@ function AuthenticatedContent({
                                             className="cursor-pointer rounded-lg text-sm text-rose-600 focus:text-rose-600 focus:bg-rose-50"
                                             render={<Link href={route('erp.team.logout')} method="post" as="button" className="flex items-center w-full font-medium" />}
                                         >
-                                            <LogOut className="mr-2 h-4 w-4" />{__('general.logout_team_member')}</DropdownMenuItem>
+                                            <LogOut className="me-2 h-4 w-4" />{__('general.logout_team_member')}</DropdownMenuItem>
                                     )}
                                 </DropdownMenuContent>
                             </DropdownMenu>

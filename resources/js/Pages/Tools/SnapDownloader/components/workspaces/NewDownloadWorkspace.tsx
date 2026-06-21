@@ -51,12 +51,12 @@ export function NewDownloadWorkspace({
                 <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.target_profile')}</label>
                     <div className="relative">
-                        <Search className="absolute left-4 top-4 w-4 h-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+                        <Search className="absolute start-4 top-4 w-4 h-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
                         <Textarea
                             value={targetUrl}
                             onChange={e => { setTargetUrl(e.target.value); setFormError(''); }}
                             placeholder={__('general.usernames_or_snapchat_urls_one')}
-                            className="w-full pl-11 py-3 text-sm font-medium min-h-[100px] resize-y"
+                            className="w-full ps-11 py-3 text-sm font-medium min-h-[100px] resize-y"
                             style={{
                                 background: 'rgba(255,255,255,0.04)',
                                 borderColor: formError ? '#f43f5e' : 'rgba(255,255,255,0.08)',
@@ -93,7 +93,7 @@ export function NewDownloadWorkspace({
                                 >
                                     {f.icon}
                                     <span className="text-xs font-bold">{f.label}</span>
-                                    {active && <CheckCircle2 className="w-3.5 h-3.5 ml-auto" />}
+                                    {active && <CheckCircle2 className="w-3.5 h-3.5 ms-auto" />}
                                 </Button>
                             );
                         })}

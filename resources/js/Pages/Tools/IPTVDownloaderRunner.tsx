@@ -488,7 +488,7 @@ export default function IPTVDownloaderRunner() {
             <div className="flex-1 flex flex-row overflow-hidden border-b border-slate-300">
                 
                 {/* Left Panel */}
-                <div className="w-80 flex flex-col border-r border-slate-300 bg-white">
+                <div className="w-80 flex flex-col border-e border-slate-300 bg-white">
                     
                     {/* Connection Info GroupBox */}
                     <div className="m-2 p-3 border border-slate-300 rounded-md">
@@ -503,29 +503,29 @@ export default function IPTVDownloaderRunner() {
                         {connectionType === 'xtream' ? (
                             <div className="space-y-2.5">
                                 <div className="flex items-center gap-2">
-                                    <Label className="w-16 text-right text-xs">Server</Label>
+                                    <Label className="w-16 text-end text-xs">Server</Label>
                                     <Input value={xtreamHost} onChange={e => setXtreamHost(e.target.value)} className="h-7 text-xs flex-1 rounded-sm" />
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Label className="w-16 text-right text-xs">Username</Label>
+                                    <Label className="w-16 text-end text-xs">Username</Label>
                                     <Input value={xtreamUser} onChange={e => setXtreamUser(e.target.value)} className="h-7 text-xs flex-1 rounded-sm" />
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Label className="w-16 text-right text-xs">Password</Label>
+                                    <Label className="w-16 text-end text-xs">Password</Label>
                                     <Input type="password" value={xtreamPass} onChange={e => setXtreamPass(e.target.value)} className="h-7 text-xs flex-1 rounded-sm" />
                                 </div>
                             </div>
                         ) : (
                             <div className="space-y-2.5">
                                 <div className="flex items-center gap-2">
-                                    <Label className="w-16 text-right text-xs">URL / Path</Label>
+                                    <Label className="w-16 text-end text-xs">URL / Path</Label>
                                     <Input value={m3uUrl} onChange={e => setM3uUrl(e.target.value)} placeholder="http://..." className="h-7 text-xs flex-1 rounded-sm" />
                                 </div>
                             </div>
                         )}
 
                         <div className="mt-3 flex items-center justify-between">
-                            <div className="flex items-center space-x-1.5 ml-2">
+                            <div className="flex items-center space-x-1.5 ms-2">
                                 <Checkbox id="chkSaveData" checked={saveData} onCheckedChange={(c) => setSaveData(c as boolean)} />
                                 <Label htmlFor="chkSaveData" className="text-xs cursor-pointer text-slate-600">Save Data</Label>
                             </div>
@@ -534,7 +534,7 @@ export default function IPTVDownloaderRunner() {
                                 disabled={isConnecting}
                                 className="h-7 bg-[#2ECC71] hover:bg-[#27AE60] text-white px-8 rounded-sm text-xs shadow-sm"
                             >
-                                {isConnecting ? <RefreshCw className="w-3 h-3 animate-spin mr-2" /> : null}
+                                {isConnecting ? <RefreshCw className="w-3 h-3 animate-spin me-2" /> : null}
                                 Connect
                             </Button>
                         </div>
@@ -676,7 +676,7 @@ export default function IPTVDownloaderRunner() {
                             {/* Header */}
                             <div className="flex border-b border-slate-200 bg-slate-50 px-2 py-1.5">
                                 <div className="w-8"></div>
-                                <div className="w-1/2 text-xs font-bold text-slate-600 border-r border-slate-200 px-2">Name</div>
+                                <div className="w-1/2 text-xs font-bold text-slate-600 border-e border-slate-200 px-2">Name</div>
                                 <div className="flex-1 text-xs font-bold text-slate-600 px-2">Progress / Status</div>
                             </div>
                             {/* Body */}
@@ -693,7 +693,7 @@ export default function IPTVDownloaderRunner() {
                                                 onCheckedChange={() => handleToggleQueueSelection(q.id)} 
                                             />
                                         </div>
-                                        <div className="w-1/2 text-xs truncate border-r border-slate-100 px-2 flex items-center gap-2">
+                                        <div className="w-1/2 text-xs truncate border-e border-slate-100 px-2 flex items-center gap-2">
                                             {q.name}
                                         </div>
                                         <div className="flex-1 text-xs truncate px-2 text-slate-600 font-mono">
@@ -707,12 +707,12 @@ export default function IPTVDownloaderRunner() {
                             <Button 
                                 onClick={handleStartDownload}
                                 disabled={selectedQueueItems.size === 0}
-                                className="bg-[#007ACC] hover:bg-[#005A9E] text-white font-bold h-7 px-6 rounded-sm text-xs shadow-sm absolute left-0"
+                                className="bg-[#007ACC] hover:bg-[#005A9E] text-white font-bold h-7 px-6 rounded-sm text-xs shadow-sm absolute start-0"
                             >
                                 Start Download
                             </Button>
                             
-                            <div className="flex items-center space-x-2 absolute left-[150px]">
+                            <div className="flex items-center space-x-2 absolute start-[150px]">
                                 <Checkbox 
                                     id="chkSelectAllQueue" 
                                     checked={selectedQueueItems.size === downloadQueue.length && downloadQueue.length > 0} 

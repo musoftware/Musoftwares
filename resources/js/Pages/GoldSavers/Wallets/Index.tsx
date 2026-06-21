@@ -158,9 +158,9 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                     {wallets.length > 0 && (
                         <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-100">
                             <div className="relative w-full md:w-96">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                                <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                                 <Input 
-                                    className="pl-9 bg-slate-50 border-slate-200 focus-visible:ring-indigo-500" 
+                                    className="ps-9 bg-slate-50 border-slate-200 focus-visible:ring-indigo-500" 
                                     placeholder={__('general.search_wallets')}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -331,7 +331,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                                             className="bg-indigo-600 h-full rounded-full" 
                                                         />
                                                     </div>
-                                                    <div className="text-xs text-right text-muted-foreground mt-1">{wallet.target_grams} {__('general.g')} {__('general.target')}</div>
+                                                    <div className="text-xs text-end text-muted-foreground mt-1">{wallet.target_grams} {__('general.g')} {__('general.target')}</div>
                                                 </div>
                                             )}
                                         </CardContent>

@@ -170,7 +170,7 @@ export default function AdjustWallet({ client, wallet }: { client: any, wallet: 
                                         <label className="text-sm font-medium text-slate-700">{__('general.amount')} <span className="text-red-500">*</span></label>
                                         <div className="relative">
                                             {currencyCode && (
-                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                                     <span className="text-slate-400 text-xs font-medium">{currencyCode}</span>
                                                 </div>
                                             )}
@@ -182,7 +182,7 @@ export default function AdjustWallet({ client, wallet }: { client: any, wallet: 
                                                 value={form.amount} 
                                                 onChange={e => setForm({...form, amount: e.target.value})} 
                                                 placeholder="0.00" 
-                                                className={`bg-white border-slate-200 text-slate-900 ${currencyCode ? 'pl-12' : ''}`}
+                                                className={`bg-white border-slate-200 text-slate-900 ${currencyCode ? 'ps-12' : ''}`}
                                             />
                                         </div>
                                         {errors.amount && <p className="text-xs text-red-500">{errors.amount}</p>}

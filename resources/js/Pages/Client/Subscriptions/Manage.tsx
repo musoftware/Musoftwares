@@ -154,9 +154,9 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                                 return (
                                     <div key={sub.id} className={cn(
                                         "bg-surface border flex flex-col rounded-xl overflow-hidden shadow-sm transition-all hover:shadow relative",
-                                        isActive ? "border-l-4 border-l-emerald-500 border-border" : 
-                                        isCancelled ? "border-l-4 border-l-amber-500 border-border" : 
-                                        "border-l-4 border-l-danger border-border"
+                                        isActive ? "border-s-4 border-s-emerald-500 border-border" : 
+                                        isCancelled ? "border-s-4 border-s-amber-500 border-border" : 
+                                        "border-s-4 border-s-danger border-border"
                                     )}>
                                         <div className="p-6 space-y-5">
                                             <div className="flex justify-between items-start">
@@ -177,7 +177,7 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
 
                                                 <div>
                                                     {isActive && <StatusBadge status="active" />}
-                                                    {isCancelled && <span className="inline-flex items-center rounded-full border px-2.5 py-1 text-[12px] font-sans font-medium bg-amber-50 text-amber-700 border-amber-100"><span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-amber-500"></span>{__('general.pending_expiry')}</span>}
+                                                    {isCancelled && <span className="inline-flex items-center rounded-full border px-2.5 py-1 text-[12px] font-sans font-medium bg-amber-50 text-amber-700 border-amber-100"><span className="me-1.5 h-1.5 w-1.5 rounded-full bg-amber-500"></span>{__('general.pending_expiry')}</span>}
                                                     {isExpired && <StatusBadge status="expired" />}
                                                 </div>
                                             </div>

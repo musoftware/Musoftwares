@@ -17,7 +17,7 @@ export default function Index({ tickets }: { tickets: any }) {
                             <TableHead>Name</TableHead>
                             <TableHead>Email</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead className="text-end">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -38,7 +38,7 @@ export default function Index({ tickets }: { tickets: any }) {
                                             {ticket.status}
                                         </span>
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-end">
                                         <Link href={route('admin.guest-tickets.show', ticket.id)}>
                                             <Button variant="ghost" size="sm"><Eye className="w-4 h-4" /></Button>
                                         </Link>

@@ -75,7 +75,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     <Card className="lg:col-span-2 relative overflow-hidden bg-primary text-primary-foreground border-none">
-                        <div className="absolute top-0 right-0 p-8 opacity-10">
+                        <div className="absolute top-0 end-0 p-8 opacity-10">
                             <Zap className="w-48 h-48" />
                         </div>
                         <CardHeader>
@@ -160,12 +160,12 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                             <div className="absolute top-0 inset-x-0 h-1 bg-primary" />
                                         )}
                                         {isBest && (
-                                            <div className="absolute top-3 right-3">
+                                            <div className="absolute top-3 end-3">
                                                 <Badge variant="default" className="shadow-sm">{__('general.best_value')}</Badge>
                                             </div>
                                         )}
                                         {!isBest && pkg.discount_percent > 0 && (
-                                            <div className="absolute top-3 right-3">
+                                            <div className="absolute top-3 end-3">
                                                 <Badge variant="secondary">-{pkg.discount_percent}%</Badge>
                                             </div>
                                         )}
@@ -235,7 +235,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                             placeholder={__('general.e_g_500')}
                                             min="1"
                                         />
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
+                                        <div className="absolute end-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
                                             pts
                                         </div>
                                     </div>
@@ -266,7 +266,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                                     <FinancialAmount amount={customPricing.totalCost} currency={globalCurrency} />
                                                 </div>
                                             </div>
-                                            <div className="text-right">
+                                            <div className="text-end">
                                                 <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Wallet</p>
                                                 <div className={`text-sm font-semibold ${wallet_balance >= customPricing.totalCost ? 'text-emerald-600' : 'text-foreground'}`}>
                                                     <FinancialAmount amount={wallet_balance} currency={globalCurrency} />
@@ -316,7 +316,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                 <TableRow>
                                     <TableHead>Date</TableHead>
                                     <TableHead>Description</TableHead>
-                                    <TableHead className="text-right">Points</TableHead>
+                                    <TableHead className="text-end">Points</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -346,7 +346,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                                     </div>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-right">
+                                            <TableCell className="text-end">
                                                 <Badge variant={['purchased', 'earned'].includes(tx.type) ? "secondary" : "destructive"} className="font-semibold">
                                                     {['purchased', 'earned'].includes(tx.type) ? '+' : '-'}{formatNumber(tx.points)}
                                                 </Badge>

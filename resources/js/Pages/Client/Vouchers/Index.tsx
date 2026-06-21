@@ -66,7 +66,7 @@ export default function Index({ auth, vouchers, redemptions }: Props) {
                     </div>
                     <Button asChild size="lg" className="shrink-0">
                         <Link href={route('client.balances.charge')}>
-                            <Wallet className="mr-2 h-5 w-5" />
+                            <Wallet className="me-2 h-5 w-5" />
                             {__('vouchers.add_balance')}
                         </Link>
                     </Button>
@@ -114,7 +114,7 @@ export default function Index({ auth, vouchers, redemptions }: Props) {
                                             </strong>
                                         </div>
                                         <ArrowRight className="h-6 w-6 text-primary/60 mx-2" />
-                                        <div className="text-right">
+                                        <div className="text-end">
                                             <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold block mb-1">
                                                 {__('vouchers.get')}
                                             </span>
@@ -153,7 +153,7 @@ export default function Index({ auth, vouchers, redemptions }: Props) {
 
                                     <Button asChild className="w-full mt-auto" size="lg">
                                         <Link href={route('client.balances.charge')}>
-                                            <Wallet className="mr-2 h-4 w-4" />
+                                            <Wallet className="me-2 h-4 w-4" />
                                             {__('vouchers.add_balance_and_pay')}
                                         </Link>
                                     </Button>

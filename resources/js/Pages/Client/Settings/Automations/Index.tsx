@@ -25,7 +25,7 @@ export default function Index({ auth, rules }) {
                     </div>
                     <Link href={route('settings.automations.create')}>
                         <Button className="bg-indigo-600 hover:bg-indigo-700">
-                            <Plus className="w-4 h-4 mr-2" />
+                            <Plus className="w-4 h-4 me-2" />
                             Create Rule
                         </Button>
                     </Link>

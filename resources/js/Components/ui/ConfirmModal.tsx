@@ -55,7 +55,7 @@ export function ConfirmModal({
                         <DialogTitle className="text-base font-semibold">{title}</DialogTitle>
                     </div>
                     {description && (
-                        <DialogDescription className="mt-2 ml-12 text-sm text-slate-500 leading-relaxed">
+                        <DialogDescription className="mt-2 ms-12 text-sm text-slate-500 leading-relaxed">
                             {description}
                         </DialogDescription>
                     )}

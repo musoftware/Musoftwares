@@ -125,7 +125,7 @@ export function AsyncCombobox({
           <span className="truncate">
             {value ? selectedLabel || "Selected" : placeholder}
           </span>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
         <Command shouldFilter={false}>
@@ -138,7 +138,7 @@ export function AsyncCombobox({
             <CommandEmpty>
               {loading ? (
                 <div className="flex items-center justify-center py-6 text-sm text-slate-500">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />{__('general.searching')}</div>
+                  <Loader2 className="me-2 h-4 w-4 animate-spin" />{__('general.searching')}</div>
               ) : (
                 emptyText
               )}
@@ -158,7 +158,7 @@ export function AsyncCombobox({
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "me-2 h-4 w-4",
                       value?.toString() === option.id.toString() ? "opacity-100" : "opacity-0"
                     )}
                   />
@@ -180,7 +180,7 @@ export function AsyncCombobox({
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "me-2 h-4 w-4",
                       value?.toString() === option.id.toString() ? "opacity-100" : "opacity-0"
                     )}
                   />
@@ -189,7 +189,7 @@ export function AsyncCombobox({
               ))}
               {loading && options.length > 0 && (
                 <div className="flex items-center justify-center py-2 text-xs text-slate-500">
-                  <Loader2 className="mr-2 h-3 w-3 animate-spin" />{__('general.loading_more')}</div>
+                  <Loader2 className="me-2 h-3 w-3 animate-spin" />{__('general.loading_more')}</div>
               )}
             </CommandGroup>
           </CommandList>

@@ -28,7 +28,7 @@ export default function AdminSidebarLayout({ title, header, user, children, acti
             <AppSidebar />
             <main className="flex-1 flex flex-col min-h-screen bg-slate-50 w-full overflow-hidden">
                 <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 border-b bg-white px-4 shadow-sm">
-                    <SidebarTrigger className="-ml-1" />
+                    <SidebarTrigger className="-ms-1" />
                     <div className="flex-1">
                         {header && typeof header === 'string' ? (
                             <h1 className="text-lg font-semibold text-slate-800">{header}</h1>
@@ -64,7 +64,7 @@ export default function AdminSidebarLayout({ title, header, user, children, acti
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem className="cursor-pointer rounded-lg text-sm text-rose-600 focus:bg-rose-50 focus:text-rose-700" asChild>
-                                <Link href={route().has('logout') ? route('logout') : '#'} method="post" as="button" className="w-full text-left">{__('general.log_out')}</Link>
+                                <Link href={route().has('logout') ? route('logout') : '#'} method="post" as="button" className="w-full text-start">{__('general.log_out')}</Link>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

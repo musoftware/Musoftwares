@@ -25,10 +25,10 @@ export default function Index({ articles, filters }) {
                         placeholder={__('general.search_articles_by_title_or_content')}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="pl-10 h-10"
+                        className="ps-10 h-10"
                     />
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Button type="submit" className="ml-2 h-10">Search</Button>
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Button type="submit" className="ms-2 h-10">Search</Button>
                 </form>
                 <Link href={route('admin.blog-articles.create')}>
                     <Button className="h-10 gap-2">
@@ -38,7 +38,7 @@ export default function Index({ articles, filters }) {
 
             <div className="overflow-hidden rounded-lg bg-white shadow border border-gray-200">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm whitespace-nowrap">
+                    <table className="w-full text-start text-sm whitespace-nowrap">
                         <thead className="border-b bg-gray-50">
                             <tr>
                                 <th className="p-4 font-medium text-gray-600 w-16">ID</th>
@@ -47,7 +47,7 @@ export default function Index({ articles, filters }) {
                                 <th className="p-4 font-medium text-gray-600 text-center">Status</th>
                                 <th className="p-4 font-medium text-gray-600 text-center">Date</th>
                                 <th className="p-4 font-medium text-gray-600">Owner</th>
-                                <th className="p-4 font-medium text-gray-600 text-right">Actions</th>
+                                <th className="p-4 font-medium text-gray-600 text-end">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -85,7 +85,7 @@ export default function Index({ articles, filters }) {
                                             <span className="text-gray-400 italic text-sm">{__('general.system_unknown')}</span>
                                         )}
                                     </td>
-                                    <td className="p-4 text-right">
+                                    <td className="p-4 text-end">
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button variant="ghost" className="h-8 w-8 p-0">

@@ -58,7 +58,7 @@ export function ScreenshotGallery({ screenshots }: ScreenshotGalleryProps) {
                         </div>
                     </div>
                     {screenshots[active]?.caption && (
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                        <div className="absolute bottom-0 start-0 end-0 bg-gradient-to-t from-black/70 to-transparent p-4">
                             <p className="text-white text-sm font-medium">{screenshots[active].caption}</p>
                         </div>
                     )}
@@ -91,7 +91,7 @@ export function ScreenshotGallery({ screenshots }: ScreenshotGalleryProps) {
                     onClick={closeLightbox}
                 >
                     <button
-                        className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors p-2"
+                        className="absolute top-4 end-4 text-white/70 hover:text-white transition-colors p-2"
                         onClick={closeLightbox}
                     >
                         <X className="h-6 w-6" />
@@ -100,13 +100,13 @@ export function ScreenshotGallery({ screenshots }: ScreenshotGalleryProps) {
                     {screenshots.length > 1 && (
                         <>
                             <button
-                                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-2 bg-white/10 rounded-full"
+                                className="absolute start-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-2 bg-white/10 rounded-full"
                                 onClick={e => { e.stopPropagation(); prevLight(); }}
                             >
                                 <ChevronLeft className="h-6 w-6" />
                             </button>
                             <button
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-2 bg-white/10 rounded-full"
+                                className="absolute end-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-2 bg-white/10 rounded-full"
                                 onClick={e => { e.stopPropagation(); nextLight(); }}
                             >
                                 <ChevronRight className="h-6 w-6" />

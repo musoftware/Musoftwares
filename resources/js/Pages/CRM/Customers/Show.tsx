@@ -74,7 +74,7 @@ export default function CustomerShow({ customer }: { customer: any }) {
                                 />
                                 <div className="flex justify-end">
                                     <Button onClick={handleAddNote} disabled={savingNote || !note.trim()}>
-                                        {savingNote ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <MessageSquare className="h-4 w-4 mr-2" />}
+                                        {savingNote ? <Loader2 className="h-4 w-4 animate-spin me-2" /> : <MessageSquare className="h-4 w-4 me-2" />}
                                         {__('crm.save_note')}
                                     </Button>
                                 </div>

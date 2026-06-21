@@ -79,7 +79,7 @@ export default function PublicNavbar({ canLogin = true, canRegister = true }: Pu
             {mobileMenuOpen && (
                 <div className="lg:hidden" role="dialog" aria-modal="true">
                     <div className="fixed inset-0 z-50 bg-black/20" onClick={() => setMobileMenuOpen(false)}></div>
-                    <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+                    <div className="fixed inset-y-0 end-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
                         <div className="flex items-center justify-between">
                             <Link href="/" className="-m-1.5 p-1.5 flex items-center gap-2">
                                 <ApplicationLogo className="h-8 w-auto text-emerald-600" />

@@ -98,11 +98,11 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                     </div>
                     <div className="flex gap-2">
                         <Button variant="outline" className="text-destructive hover:bg-destructive/10" onClick={() => setIsSubtractModalOpen(true)}>
-                            <Minus className="w-4 h-4 mr-2" />
+                            <Minus className="w-4 h-4 me-2" />
                             خصم من العداد العام
                         </Button>
                         <Button onClick={() => setIsAddModalOpen(true)}>
-                            <Plus className="w-4 h-4 mr-2" />
+                            <Plus className="w-4 h-4 me-2" />
                             إضافة للعداد العام
                         </Button>
                     </div>
@@ -143,7 +143,7 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                     </CardHeader>
                     <CardContent className="p-6">
                         <div className="grid md:grid-cols-2 gap-6 items-center">
-                            <div className="bg-primary/10 rounded-xl p-6 border border-primary/20 text-center md:text-right">
+                            <div className="bg-primary/10 rounded-xl p-6 border border-primary/20 text-center md:text-end">
                                 <div className="flex items-center justify-center md:justify-start gap-2 text-primary font-semibold mb-2">
                                     <Heart className="w-5 h-5" />
                                     <span>الرصيد العام الحالي</span>
@@ -160,7 +160,7 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                                     className="flex-1 sm:flex-none h-16 text-lg" 
                                     onClick={() => setIsAddModalOpen(true)}
                                 >
-                                    <Plus className="w-5 h-5 mr-2" />
+                                    <Plus className="w-5 h-5 me-2" />
                                     إضافة مبلغ للعداد العام
                                 </Button>
                                 <Button 
@@ -169,7 +169,7 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                                     className="flex-1 sm:flex-none h-16 text-lg border-destructive text-destructive hover:bg-destructive/10" 
                                     onClick={() => setIsSubtractModalOpen(true)}
                                 >
-                                    <Minus className="w-5 h-5 mr-2" />
+                                    <Minus className="w-5 h-5 me-2" />
                                     خصم من العداد العام
                                 </Button>
                             </div>
@@ -187,12 +187,12 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                         
                         <form onSubmit={handleSearch} className="flex gap-2 max-w-sm w-full">
                             <div className="relative flex-1">
-                                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <Search className="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                 <Input 
                                     placeholder="بحث بالاسم أو البريد..." 
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-3 pr-9"
+                                    className="ps-3 pe-9"
                                 />
                             </div>
                             <Button type="submit" variant="secondary">بحث</Button>
@@ -201,7 +201,7 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                     
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-right">
+                            <table className="w-full text-sm text-end">
                                 <thead className="bg-muted/50 border-b">
                                     <tr>
                                         <th className="py-3 px-4 font-semibold text-muted-foreground">المستخدم</th>

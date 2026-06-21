@@ -432,12 +432,12 @@ export default function BroadcastListsWorkspace({ t, locale, callRPC, daemonConn
                 {/* Search */}
                 {members.length > 10 && (
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                             value={searchMembers}
                             onChange={e => setSearchMembers(e.target.value)}
                             placeholder={isRtl ? 'بحث في الأعضاء...' : 'Search members...'}
-                            className="pl-10 rounded-xl text-start"
+                            className="ps-10 rounded-xl text-start"
                         />
                     </div>
                 )}
@@ -561,7 +561,7 @@ export default function BroadcastListsWorkspace({ t, locale, callRPC, daemonConn
                                     <span className="text-xs font-bold">{list.member_count}</span>
                                     <span className="text-[10px] text-muted-foreground">{isRtl ? 'عضو' : 'members'}</span>
                                 </div>
-                                <ChevronRight className={`w-4 h-4 text-muted-foreground/50 ml-auto group-hover:text-cyan-600 transition-colors ${isRtl ? 'rotate-180' : ''}`} />
+                                <ChevronRight className={`w-4 h-4 text-muted-foreground/50 ms-auto group-hover:text-cyan-600 transition-colors ${isRtl ? 'rotate-180' : ''}`} />
                             </div>
                         </CardContent>
                     </Card>

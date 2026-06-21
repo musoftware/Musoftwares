@@ -29,7 +29,7 @@ export function OperationalCard({
                         {title && <h3 className="text-base font-semibold tracking-tight text-slate-900">{title}</h3>}
                         {description && <p className="text-sm text-slate-500">{description}</p>}
                     </div>
-                    {action && <div className="ml-4 shrink-0">{action}</div>}
+                    {action && <div className="ms-4 shrink-0">{action}</div>}
                 </div>
             )}
             <CardContent className={cn('p-6', noPadding && 'p-0 pb-0')}>

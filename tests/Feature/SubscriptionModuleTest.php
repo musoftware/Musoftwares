@@ -477,7 +477,7 @@ class SubscriptionModuleTest extends TestCase
 
         // Check inertia props contain correct subscription data
         $response->assertInertia(fn ($page) =>
-            $page->component('Subscriptions/Manage')
+            $page->component('Client/Subscriptions/Manage')
                  ->has('subscriptions', 1)
                  ->where('subscriptions.0.plan_slug', 'erp')
                  ->where('subscriptions.0.status', 'active')
@@ -515,7 +515,7 @@ class SubscriptionModuleTest extends TestCase
         $response->assertStatus(200);
 
         $response->assertInertia(fn ($page) =>
-            $page->component('Subscriptions/Plans')
+            $page->component('Client/Subscriptions/Plans')
                  ->has('activeSubscription')
                  ->where('activeSubscription.status', 'active')
                  ->has('activeSubscription.owned_features', 2)

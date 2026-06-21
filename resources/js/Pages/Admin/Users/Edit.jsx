@@ -74,7 +74,7 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                     </div>
                     <Link href={`/admin/users/${user.id}`}>
                         <Button variant="outline">
-                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            <ArrowLeft className="me-2 h-4 w-4" />
                             {__('general.back')}
                         </Button>
                     </Link>
@@ -106,7 +106,7 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                     <Label>{__('general.password')}</Label>
                                     <Dialog>
                                         <DialogTrigger asChild>
-                                            <Button type="button" variant="outline" className="w-full justify-start text-left font-normal text-muted-foreground">
+                                            <Button type="button" variant="outline" className="w-full justify-start text-start font-normal text-muted-foreground">
                                                 {data.password ? __('general.password_entered_ready_to_save') : __('general.leave_blank_to_keep_current')}
                                             </Button>
                                         </DialogTrigger>
@@ -337,8 +337,8 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                         </div>
                                     </div>
                                     {user.kyc_verified_at && (
-                                        <div className="ml-7 mt-2 text-sm text-green-600 font-medium flex items-center">
-                                            <CheckCircle className="h-4 w-4 mr-1.5" />
+                                        <div className="ms-7 mt-2 text-sm text-green-600 font-medium flex items-center">
+                                            <CheckCircle className="h-4 w-4 me-1.5" />
                                             {__('general.verified_on')} {user.kyc_verified_at}
                                             {user.kyc_verifier && ` ${__('general.by')} ${user.kyc_verifier.name}`}
                                         </div>
@@ -353,7 +353,7 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                     {user.kyc_documents_count > 0 ? (
                                         <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                             <div className="flex items-start">
-                                                <Info className="h-5 w-5 mr-2 text-blue-600 shrink-0 mt-0.5" />
+                                                <Info className="h-5 w-5 me-2 text-blue-600 shrink-0 mt-0.5" />
                                                 <div>
                                                     <strong className="font-bold">{__('general.kyc_documents')}:</strong> {__('general.this_user_has_n_kyc_documents', { count: user.kyc_documents_count })}
                                                 </div>
@@ -364,7 +364,7 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                         </div>
                                     ) : (
                                         <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 flex items-start">
-                                            <AlertTriangle className="h-5 w-5 mr-2 text-amber-600 shrink-0 mt-0.5" />
+                                            <AlertTriangle className="h-5 w-5 me-2 text-amber-600 shrink-0 mt-0.5" />
                                             <div>
                                                 {__('general.this_user_has_not_uploaded_any_kyc_documents_yet')}
                                             </div>
@@ -424,7 +424,7 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
 
                         <div className="flex justify-end pt-6 border-t">
                             <Button type="submit" disabled={processing} className="w-full md:w-auto">
-                                <Save className="mr-2 h-4 w-4" />{__('general.save_changes')}
+                                <Save className="me-2 h-4 w-4" />{__('general.save_changes')}
                             </Button>
                         </div>
                     </form>

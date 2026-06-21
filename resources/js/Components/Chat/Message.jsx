@@ -26,7 +26,7 @@ export default function Message({ message, isOwnMessage }) {
 
                 <div className="relative flex flex-col">
                     {!isOwnMessage && (
-                        <span className="mb-1 ml-1 text-xs font-medium text-gray-500">
+                        <span className="mb-1 ms-1 text-xs font-medium text-gray-500">
                             {message.sender?.name}
                         </span>
                     )}
@@ -91,7 +91,7 @@ export default function Message({ message, isOwnMessage }) {
                             </span>
                             {isOwnMessage && (
                                 <span
-                                    className="ml-1"
+                                    className="ms-1"
                                     title={message.read ? 'Read' : 'Delivered'}
                                 >
                                     {message.read ? (

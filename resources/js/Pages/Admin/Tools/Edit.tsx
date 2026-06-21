@@ -337,7 +337,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                     type="file"
                                     accept=".zip,.exe"
                                     onChange={e => versionForm.setData('file', e.target.files?.[0] ?? null)}
-                                    className="block w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer"
+                                    className="block w-full text-xs text-slate-600 file:me-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer"
                                 />
                                 {versionForm.errors.file && <p className="text-xs text-red-500">{versionForm.errors.file}</p>}
                             </div>

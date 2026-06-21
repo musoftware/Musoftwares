@@ -104,7 +104,7 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                         <Sheet open={isAddOpen} onOpenChange={setIsAddOpen}>
                             <SheetTrigger asChild>
                                 <Button className="shadow-sm bg-slate-900 text-white hover:bg-slate-800 transition-colors">
-                                    <Plus className="w-4 h-4 mr-2" />{__('general.add_bank_account')}</Button>
+                                    <Plus className="w-4 h-4 me-2" />{__('general.add_bank_account')}</Button>
                             </SheetTrigger>
                             <SheetContent className="sm:max-w-lg overflow-y-auto">
                                 <SheetHeader>
@@ -200,8 +200,8 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                         {paymentMethods.map((pm) => (
                             <div key={pm.id} className={`relative bg-white rounded-2xl border ${pm.is_default ? 'border-indigo-200 shadow-sm ring-1 ring-indigo-50' : 'border-slate-100 shadow-sm'} p-6 transition-all`}>
                                 {pm.is_default && (
-                                    <div className="absolute -top-3 -right-3 bg-indigo-100 text-indigo-700 text-[10px] font-bold px-3 py-1 rounded-full flex items-center border border-indigo-200">
-                                        <Check className="w-3 h-3 mr-1" /> DEFAULT
+                                    <div className="absolute -top-3 -end-3 bg-indigo-100 text-indigo-700 text-[10px] font-bold px-3 py-1 rounded-full flex items-center border border-indigo-200">
+                                        <Check className="w-3 h-3 me-1" /> DEFAULT
                                     </div>
                                 )}
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -213,7 +213,7 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                         <div>
                                             <h3 className="text-lg font-semibold text-slate-900">{pm.bank_name}</h3>
                                             <div className="flex items-center text-sm text-slate-500 mt-1">
-                                                <User className="w-3.5 h-3.5 mr-1.5" /> {pm.account_holder_name}
+                                                <User className="w-3.5 h-3.5 me-1.5" /> {pm.account_holder_name}
                                             </div>
                                         </div>
                                     </div>
@@ -226,14 +226,14 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                     </div>
 
                                     <div className="flex items-center gap-6">
-                                        <div className="text-right">
+                                        <div className="text-end">
                                             <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Status</p>
                                             <StatusBadge status={pm.status} />
                                         </div>
-                                        <div className="text-right">
+                                        <div className="text-end">
                                             <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Currency</p>
                                             <div className="flex items-center text-sm font-medium text-slate-700">
-                                                <Globe className="w-3.5 h-3.5 mr-1.5 text-slate-400" /> {pm.bank_country} • {pm.bank_currency}
+                                                <Globe className="w-3.5 h-3.5 me-1.5 text-slate-400" /> {pm.bank_country} • {pm.bank_currency}
                                             </div>
                                         </div>
 
@@ -246,10 +246,10 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                             <DropdownMenuContent align="end">
                                                 {!pm.is_default && pm.status === 'approved' && (
                                                     <DropdownMenuItem onClick={() => setDefault(pm)} className="cursor-pointer">
-                                                        <Check className="w-4 h-4 mr-2 text-indigo-600" />{__('general.set_default')}</DropdownMenuItem>
+                                                        <Check className="w-4 h-4 me-2 text-indigo-600" />{__('general.set_default')}</DropdownMenuItem>
                                                 )}
                                                 <DropdownMenuItem className="text-rose-600 focus:bg-rose-50 cursor-pointer" onClick={() => deletePM(pm)}>
-                                                    <Trash2 className="w-4 h-4 mr-2 text-rose-600" /> Delete
+                                                    <Trash2 className="w-4 h-4 me-2 text-rose-600" /> Delete
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>

@@ -62,7 +62,7 @@ function AgentCard({ agent, onToggle, onEdit }: { agent: any; onToggle: () => vo
             </div>
 
             <Button variant="outline" onClick={onEdit} className="w-full h-9 bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700 hover:text-slate-300">
-                <Settings className="w-3 h-3 mr-1.5" />{__('general.configure_agent')}</Button>
+                <Settings className="w-3 h-3 me-1.5" />{__('general.configure_agent')}</Button>
         </div>
     );
 }
@@ -125,9 +125,9 @@ function AddAgentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (a: any
                 <div>
                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.openai_api_key')}</label>
                     <div className="relative">
-                        <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                        <Key className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
                         <Input value={apiKey} onChange={e => setApiKey(e.target.value)} type="password" placeholder={__('general.sk')}
-                            className="pl-9 h-10 text-sm bg-slate-800 border-slate-700 focus-visible:ring-indigo-500 text-white font-mono" />
+                            className="ps-9 h-10 text-sm bg-slate-800 border-slate-700 focus-visible:ring-indigo-500 text-white font-mono" />
                     </div>
                 </div>
 

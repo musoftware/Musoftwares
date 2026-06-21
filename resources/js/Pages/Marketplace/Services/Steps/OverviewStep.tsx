@@ -34,13 +34,13 @@ export default function OverviewStep({ data, setData, errors, categories }: any)
                 <Label className="text-sm font-semibold text-slate-700">{__('general.service_title')}<span className="text-red-500">*</span>
                 </Label>
                 <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">{__('general.i_will')}</span>
+                    <span className="absolute start-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">{__('general.i_will')}</span>
                     <Input
                         value={data.title}
                         onChange={e => setData('title', e.target.value)}
                         placeholder={__('general.design_a_professional_logo_for_your_brand')}
                         maxLength={80}
-                        className={cn('h-14 text-base pl-14 font-medium', errors.title && 'border-red-400 focus-visible:ring-red-400')}
+                        className={cn('h-14 text-base ps-14 font-medium', errors.title && 'border-red-400 focus-visible:ring-red-400')}
                     />
                 </div>
                 <div className="flex justify-between text-xs text-slate-400 font-medium">
@@ -63,7 +63,7 @@ export default function OverviewStep({ data, setData, errors, categories }: any)
                             key={cat.id}
                             onClick={() => setData('category_id', String(cat.id))}
                             className={cn(
-                                'px-4 py-3 rounded-xl border text-sm font-medium text-left transition-all',
+                                'px-4 py-3 rounded-xl border text-sm font-medium text-start transition-all',
                                 String(data.category_id) === String(cat.id)
                                     ? 'border-indigo-600 bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600'
                                     : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:bg-slate-50'

@@ -41,7 +41,7 @@ export default function Index({ profiles, filters }: any) {
             </div>
 
             <div className="overflow-hidden rounded-lg bg-white shadow">
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-start text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
                             <th className="p-4 font-medium text-gray-600">ID</th>
@@ -50,7 +50,7 @@ export default function Index({ profiles, filters }: any) {
                             <th className="p-4 font-medium text-gray-600">{__('admin.bio', undefined, 'Bio')}</th>
                             <th className="p-4 font-medium text-gray-600">{__('admin.skills', undefined, 'Skills')}</th>
                             <th className="p-4 font-medium text-gray-600">{__('admin.notifications_enabled', undefined, 'Notifications')}</th>
-                            <th className="p-4 font-medium text-gray-600 text-right">{__('freelance.actions')}</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">{__('freelance.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -88,7 +88,7 @@ export default function Index({ profiles, filters }: any) {
                                         </span>
                                     )}
                                 </td>
-                                <td className="p-4 text-right">
+                                <td className="p-4 text-end">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -101,20 +101,20 @@ export default function Index({ profiles, filters }: any) {
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem asChild className="cursor-pointer">
                                                 <Link href={`/admin/users/${profile.user_id}`}>
-                                                    <User className="mr-2 h-4 w-4 text-purple-600" />
+                                                    <User className="me-2 h-4 w-4 text-purple-600" />
                                                     <span>{__('admin.view_user_profile', undefined, 'View User Profile')}</span>
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild className="cursor-pointer">
                                                 <Link href={route('admin.freelance.profiles.edit', profile.id)}>
-                                                    <Edit className="mr-2 h-4 w-4 text-blue-600" />
+                                                    <Edit className="me-2 h-4 w-4 text-blue-600" />
                                                     <span>{__('freelance.edit')}</span>
                                                 </Link>
                                             </DropdownMenuItem>
 
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem onClick={() => handleDelete(profile.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
-                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                <Trash2 className="me-2 h-4 w-4" />
                                                 <span>{__('freelance.delete')}</span>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>

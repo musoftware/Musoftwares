@@ -104,13 +104,13 @@ export default function AdminToolsIndex({ tools, categories }: Props) {
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-border bg-surface-raised">
-                                            <th className="text-left px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Tool</th>
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden md:table-cell">Category</th>
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden lg:table-cell">Version</th>
+                                            <th className="text-start px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Tool</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden md:table-cell">Category</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden lg:table-cell">Version</th>
                                             <th className="text-center px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden sm:table-cell">Subs</th>
                                             <th className="text-center px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden sm:table-cell">{__('general.active_users')}</th>
                                             <th className="text-center px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Status</th>
-                                            <th className="text-right px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
+                                            <th className="text-end px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/50">

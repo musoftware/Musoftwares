@@ -39,7 +39,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                 {/* Header Summary Card */}
                 <Card className="shadow-none border-primary/20 bg-muted/10">
                     <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div className="space-y-2 text-center md:text-left">
+                        <div className="space-y-2 text-center md:text-start">
                             <span className="text-sm font-semibold text-primary uppercase tracking-wider">{__('general.available_earned_funds')}</span>
                             <div className="text-4xl sm:text-5xl font-bold tracking-tight">
                                 {formatMoney(maxAvailable, wallet?.currency)}
@@ -51,13 +51,13 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                             {!auth.user.kyc_verified ? (
                                 <Button asChild variant="secondary" className="h-12 px-6 shadow-none">
                                     <Link href={route('kyc.index')}>
-                                        <ShieldAlert className="mr-2 h-5 w-5 text-amber-600" /> Verify Identity (KYC)
+                                        <ShieldAlert className="me-2 h-5 w-5 text-amber-600" /> Verify Identity (KYC)
                                     </Link>
                                 </Button>
                             ) : (!payoutMethods || payoutMethods.length === 0) ? (
                                 <Button asChild variant="secondary" className="h-12 px-6 shadow-none">
                                     <Link href={route('financial.payout-methods.index')}>
-                                        <CreditCard className="mr-2 h-5 w-5" />{__('general.setup_payout_method')}</Link>
+                                        <CreditCard className="me-2 h-5 w-5" />{__('general.setup_payout_method')}</Link>
                                 </Button>
                             ) : (
                                 <Button
@@ -65,7 +65,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                                     disabled={maxAvailable <= 0}
                                     className="h-12 px-6 shadow-none"
                                 >
-                                    <ArrowUpRight className="mr-2 h-5 w-5" />{__('general.request_payout')}</Button>
+                                    <ArrowUpRight className="me-2 h-5 w-5" />{__('general.request_payout')}</Button>
                             )}
                         </div>
                     </CardContent>
@@ -85,11 +85,11 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="pl-6">ID #</TableHead>
+                                    <TableHead className="ps-6">ID #</TableHead>
                                     <TableHead>{__('general.payout_method')}</TableHead>
                                     <TableHead>Amount</TableHead>
                                     <TableHead>Status</TableHead>
-                                    <TableHead className="pr-6 text-right">Date</TableHead>
+                                    <TableHead className="pe-6 text-end">Date</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -100,7 +100,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                                 ) : (
                                     withdrawals.data.map((w) => (
                                         <TableRow key={w.id}>
-                                            <TableCell className="pl-6 font-medium">#{w.id}</TableCell>
+                                            <TableCell className="ps-6 font-medium">#{w.id}</TableCell>
                                             <TableCell className="capitalize">
                                                 {w.payout_method ? w.payout_method.type.replace('_', ' ') : 'Standard Method'}
                                             </TableCell>
@@ -116,7 +116,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                                                     {w.status}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="pr-6 text-right text-muted-foreground text-xs">
+                                            <TableCell className="pe-6 text-end text-muted-foreground text-xs">
                                                 {new Date(w.created_at).toLocaleDateString()}
                                             </TableCell>
                                         </TableRow>
@@ -147,7 +147,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                                         max={maxAvailable}
                                         value={data.amount}
                                         onChange={(e) => setData('amount', e.target.value)}
-                                        className="pr-16 shadow-none font-medium"
+                                        className="pe-16 shadow-none font-medium"
                                         placeholder="0.00"
                                         required
                                     />
@@ -156,7 +156,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                                         variant="secondary"
                                         size="sm"
                                         onClick={() => setData('amount', maxAvailable.toString())}
-                                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 px-2 text-xs shadow-none"
+                                        className="absolute end-1 top-1/2 -translate-y-1/2 h-7 px-2 text-xs shadow-none"
                                     >
                                         MAX
                                     </Button>

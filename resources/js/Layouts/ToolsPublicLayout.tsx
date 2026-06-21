@@ -49,7 +49,7 @@ export default function ToolsPublicLayout({
                     <span>{__('general.professional_desktop_tools_for_power_users')}</span>
                     <Link
                         href={route('register')}
-                        className="inline-flex items-center gap-0.5 text-white font-semibold hover:opacity-80 transition-opacity ml-1"
+                        className="inline-flex items-center gap-0.5 text-white font-semibold hover:opacity-80 transition-opacity ms-1"
                     >{__('general.get_started_free')}<ArrowUpRight className="h-3 w-3" />
                     </Link>
                 </div>

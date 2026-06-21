@@ -93,7 +93,7 @@ export function ClientAutocomplete({
                     )}
                 >
                     {selectedName || "Select a Client"}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
                 </PopoverTrigger>
                 <PopoverContent className="w-[300px] p-0 bg-white border border-slate-200 shadow-md">
                     <Command shouldFilter={false}>
@@ -106,7 +106,7 @@ export function ClientAutocomplete({
                         <CommandList className="max-h-60 overflow-y-auto">
                             {isLoading && (
                                 <div className="flex items-center justify-center p-4 text-xs text-slate-500">
-                                    <Loader2 className="h-4 w-4 animate-spin mr-2" />{__('general.searching')}</div>
+                                    <Loader2 className="h-4 w-4 animate-spin me-2" />{__('general.searching')}</div>
                             )}
                             
                             {!isLoading && clients.length === 0 && (

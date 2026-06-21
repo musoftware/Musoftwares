@@ -52,7 +52,7 @@ export default function FinancialHistory({ chartData, activityFeedItems }: Finan
                 <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 h-full flex flex-col">
                     <h2 className="text-xl font-bold text-slate-900 mb-6">{__('general.latest_transactions')}</h2>
                     
-                    <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="flex-1 overflow-y-auto pe-2 custom-scrollbar">
                         {activityFeedItems.length === 0 ? (
                             <div className="text-center py-6">
                                 <Inbox className="w-8 h-8 text-slate-300 mx-auto mb-2" />

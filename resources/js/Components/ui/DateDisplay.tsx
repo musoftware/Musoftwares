@@ -36,7 +36,7 @@ export function DateDisplay({ date, format = 'full', className }: DateDisplayPro
             return (
                 <span className={className}>
                     <span>{formatDateHuman(date)}</span>
-                    <span className="text-slate-400 ml-1.5">· {formatDateRelative(date)}</span>
+                    <span className="text-slate-400 ms-1.5">· {formatDateRelative(date)}</span>
                 </span>
             );
         case 'full':

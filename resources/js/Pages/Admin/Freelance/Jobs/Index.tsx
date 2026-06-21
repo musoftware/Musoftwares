@@ -51,7 +51,7 @@ export default function Index({ jobs, filters }: any) {
             {...({ actions: (
                 <Link href={route('admin.freelance.jobs.create')}>
                     <Button size="sm" className="shadow-none">
-                        <Plus className="mr-1.5 h-3.5 w-3.5" />
+                        <Plus className="me-1.5 h-3.5 w-3.5" />
                         {__('freelance.create_job')}
                     </Button>
                 </Link>
@@ -89,7 +89,7 @@ export default function Index({ jobs, filters }: any) {
             </div>
 
             <div className="overflow-hidden rounded-lg bg-white shadow">
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-start text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
                             <th className="p-4 font-medium text-gray-600">{__('freelance.job_title')}</th>
@@ -98,7 +98,7 @@ export default function Index({ jobs, filters }: any) {
                             <th className="p-4 font-medium text-gray-600">{__('freelance.proposals')}</th>
                             <th className="p-4 font-medium text-gray-600">{__('freelance.status')}</th>
                             <th className="p-4 font-medium text-gray-600">{__('freelance.created_at')}</th>
-                            <th className="p-4 font-medium text-gray-600 text-right">{__('freelance.actions')}</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">{__('freelance.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -122,7 +122,7 @@ export default function Index({ jobs, filters }: any) {
                                     </span>
                                 </td>
                                 <td className="p-4 text-gray-500">{new Date(job.created_at).toLocaleDateString()}</td>
-                                <td className="p-4 text-right">
+                                <td className="p-4 text-end">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -135,13 +135,13 @@ export default function Index({ jobs, filters }: any) {
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem asChild>
                                                 <Link href={route('admin.freelance.jobs.show', job.id)} className="cursor-pointer flex w-full items-center">
-                                                    <Eye className="mr-2 h-4 w-4" />
+                                                    <Eye className="me-2 h-4 w-4" />
                                                     <span>{__('freelance.view')}</span>
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild>
                                                 <Link href={route('admin.freelance.jobs.edit', job.id)} className="cursor-pointer flex w-full items-center">
-                                                    <Edit className="mr-2 h-4 w-4" />
+                                                    <Edit className="me-2 h-4 w-4" />
                                                     <span>{__('freelance.edit')}</span>
                                                 </Link>
                                             </DropdownMenuItem>
@@ -149,28 +149,28 @@ export default function Index({ jobs, filters }: any) {
                                             
                                             {(job.status === 'published' || job.status === 'open') && (
                                                 <DropdownMenuItem onClick={() => updateStatus(job.id, 'suspended')} className="text-yellow-600 focus:text-yellow-600 focus:bg-yellow-50 cursor-pointer">
-                                                    <AlertCircle className="mr-2 h-4 w-4" />
+                                                    <AlertCircle className="me-2 h-4 w-4" />
                                                     <span>{__('freelance.suspend')}</span>
                                                 </DropdownMenuItem>
                                             )}
                                             
                                             {job.status === 'suspended' && (
                                                 <DropdownMenuItem onClick={() => updateStatus(job.id, 'published')} className="text-green-600 focus:text-green-600 focus:bg-green-50 cursor-pointer">
-                                                    <CheckCircle className="mr-2 h-4 w-4" />
+                                                    <CheckCircle className="me-2 h-4 w-4" />
                                                     <span>{__('freelance.restore')}</span>
                                                 </DropdownMenuItem>
                                             )}
 
                                             {(job.status === 'published' || job.status === 'open' || job.status === 'suspended') && (
                                                 <DropdownMenuItem onClick={() => setRefundConfirm({ open: true, id: job.id })} className="text-orange-600 focus:text-orange-600 focus:bg-orange-50 cursor-pointer">
-                                                    <RefreshCw className="mr-2 h-4 w-4" />
+                                                    <RefreshCw className="me-2 h-4 w-4" />
                                                     <span>{__('freelance.force_refund')}</span>
                                                 </DropdownMenuItem>
                                             )}
 
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem onClick={() => setDeleteConfirm({ open: true, id: job.id })} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
-                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                <Trash2 className="me-2 h-4 w-4" />
                                                 <span>{__('freelance.delete')}</span>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>

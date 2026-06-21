@@ -31,7 +31,7 @@ export function Header({
                 <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#10b981', boxShadow: '0 0 5px #10b981' }} />
                     <span className="text-[10px] font-semibold" style={{ color: '#10b981' }}>{__('general.live')}</span>
-                    <Button variant="ghost" size="icon" onClick={loadAll} className="ml-1 h-8 w-8 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
+                    <Button variant="ghost" size="icon" onClick={loadAll} className="ms-1 h-8 w-8 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
                         <RefreshCw className="w-3.5 h-3.5" />
                     </Button>
                 </div>

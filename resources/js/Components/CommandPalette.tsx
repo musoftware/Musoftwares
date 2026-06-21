@@ -90,7 +90,7 @@ export default function CommandPalette() {
                                             <span className="font-medium">
                                                 {result.title}
                                             </span>
-                                            <span className="ml-2 rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
+                                            <span className="ms-2 rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
                                                 {result.type}
                                             </span>
                                         </div>

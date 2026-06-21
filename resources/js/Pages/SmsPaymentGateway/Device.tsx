@@ -125,11 +125,11 @@ export default function Device({ device, transactions }: DeviceProps) {
                                 variant={maskData ? "default" : "outline"}
                                 onClick={() => setMaskData(!maskData)}
                             >
-                                {maskData ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
+                                {maskData ? <EyeOff className="w-4 h-4 me-2" /> : <Eye className="w-4 h-4 me-2" />}
                                 {maskData ? 'Show Stats' : 'Hide Stats'}
                             </Button>
                             <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
-                                <ArrowLeft className="w-4 h-4 mr-2" />
+                                <ArrowLeft className="w-4 h-4 me-2" />
                                 Back
                             </Button>
                         </div>
@@ -189,7 +189,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                 {Object.keys(errors || {}).length > 0 && (
                                     <div className="bg-red-50 text-red-600 p-4 rounded-md text-sm border border-red-200">
                                         <p className="font-semibold mb-2">Please fix the following errors:</p>
-                                        <ul className="list-disc pl-5">
+                                        <ul className="list-disc ps-5">
                                             {Object.entries(errors || {}).map(([key, error]) => (
                                                 <li key={key}>{key}: {error}</li>
                                             ))}
@@ -215,7 +215,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                 <p className="text-xs text-slate-500 mt-0.5">{device.sim1_number ? mask(device.sim1_number, 'phone') : __('general.not_set')}</p>
                                             </div>
                                             <Button type="button" variant="outline" size="sm" onClick={() => addConfig('sim1_configs')}>
-                                                <Plus className="w-4 h-4 mr-2" />
+                                                <Plus className="w-4 h-4 me-2" />
                                                 {__('general.add_sender')}
                                             </Button>
                                         </div>
@@ -228,12 +228,12 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                     type="button" 
                                                     variant="ghost" 
                                                     size="icon" 
-                                                    className="absolute top-2 right-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50"
+                                                    className="absolute top-2 end-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50"
                                                     onClick={() => removeConfig('sim1_configs', idx)}
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </Button>
-                                                <div className="pr-8 space-y-3">
+                                                <div className="pe-8 space-y-3">
                                                     <div className="space-y-1">
                                                         <Label className="text-xs text-slate-500">{__('general.allowed_sender')}</Label>
                                                         <Select
@@ -270,7 +270,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                 <p className="text-xs text-slate-500 mt-0.5">{device.sim2_number ? mask(device.sim2_number, 'phone') : __('general.not_set')}</p>
                                             </div>
                                             <Button type="button" variant="outline" size="sm" onClick={() => addConfig('sim2_configs')}>
-                                                <Plus className="w-4 h-4 mr-2" />
+                                                <Plus className="w-4 h-4 me-2" />
                                                 {__('general.add_sender')}
                                             </Button>
                                         </div>
@@ -283,12 +283,12 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                     type="button" 
                                                     variant="ghost" 
                                                     size="icon" 
-                                                    className="absolute top-2 right-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50"
+                                                    className="absolute top-2 end-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50"
                                                     onClick={() => removeConfig('sim2_configs', idx)}
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </Button>
-                                                <div className="pr-8 space-y-3">
+                                                <div className="pe-8 space-y-3">
                                                     <div className="space-y-1">
                                                         <Label className="text-xs text-slate-500">{__('general.allowed_sender')}</Label>
                                                         <Select
@@ -333,7 +333,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                 <Database className="w-5 h-5 text-indigo-500" />{__('general.diagnostic_log_transactions')}</CardTitle>
                             {transactions.total > 0 && (
                                 <Button variant="destructive" size="sm" onClick={handleClearTransactions}>
-                                    <Eraser className="w-4 h-4 mr-2" />{__('general.clear_history')}</Button>
+                                    <Eraser className="w-4 h-4 me-2" />{__('general.clear_history')}</Button>
                             )}
                         </CardHeader>
                         <CardContent>
@@ -344,14 +344,14 @@ export default function Device({ device, transactions }: DeviceProps) {
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-sm text-slate-600">
+                                    <table className="w-full text-start text-sm text-slate-600">
                                         <thead className="bg-slate-50 text-slate-500 text-xs uppercase border-b border-t">
                                             <tr>
                                                 <th className="px-4 py-3 font-semibold">{__('general.event_date')}</th>
                                                 <th className="px-4 py-3 font-semibold">{__('general.data_stream')}</th>
                                                 <th className="px-4 py-3 font-semibold">{__('general.financial_impact')}</th>
                                                 <th className="px-4 py-3 font-semibold">Integrity</th>
-                                                <th className="px-4 py-3 font-semibold text-right">Actions</th>
+                                                <th className="px-4 py-3 font-semibold text-end">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y">
@@ -376,15 +376,15 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                     <td className="px-4 py-3">
                                                         {tx.is_spoofed ? (
                                                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">
-                                                                <AlertTriangle className="w-3 h-3 mr-1" /> Anomalous
+                                                                <AlertTriangle className="w-3 h-3 me-1" /> Anomalous
                                                             </span>
                                                         ) : (
                                                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
-                                                                <CheckCircle className="w-3 h-3 mr-1" /> Verified
+                                                                <CheckCircle className="w-3 h-3 me-1" /> Verified
                                                             </span>
                                                         )}
                                                     </td>
-                                                    <td className="px-4 py-3 text-right">
+                                                    <td className="px-4 py-3 text-end">
                                                         <Button variant="ghost" size="icon" onClick={() => alert(JSON.stringify(tx, null, 2))}>
                                                             <Code className="w-4 h-4 text-indigo-500" />
                                                         </Button>

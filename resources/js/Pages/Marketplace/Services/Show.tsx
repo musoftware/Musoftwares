@@ -83,7 +83,7 @@ export default function Show({ service }: any) {
                             <div className="flex items-center text-sm text-amber-500">
                                 <span className="flex items-center">
                                     <svg
-                                        className="mr-1 h-4 w-4"
+                                        className="me-1 h-4 w-4"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                     >
@@ -93,7 +93,7 @@ export default function Show({ service }: any) {
                                         4.9
                                     </span>
                                 </span>
-                                <span className="ml-1 text-gray-500">
+                                <span className="ms-1 text-gray-500">
                                     (128 reviews)
                                 </span>
                             </div>
@@ -163,7 +163,7 @@ export default function Show({ service }: any) {
                                             {service.seller?.name?.charAt(0) ||
                                                 '?'}
                                         </div>
-                                        <div className="flex-1 text-center md:text-left">
+                                        <div className="flex-1 text-center md:text-start">
                                             <h4 className="mb-1 text-xl font-bold text-gray-900">
                                                 {service.seller?.name}
                                             </h4>

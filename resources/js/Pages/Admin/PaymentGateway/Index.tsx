@@ -146,12 +146,12 @@ export default function Index({ clients, totals }: Props) {
                     <span>{items.length} client{items.length !== 1 ? 's' : ''}</span>
                 </div>
                 <Button onClick={() => setIsCreateOpen(true)}>
-                    <Plus className="mr-2 h-4 w-4" />{__('general.new_client')}</Button>
+                    <Plus className="me-2 h-4 w-4" />{__('general.new_client')}</Button>
             </div>
 
             {/* ── Table ─────────────────────────────────────────────────── */}
             <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-start text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
                             <th className="p-4 font-medium text-gray-600">Client</th>
@@ -161,7 +161,7 @@ export default function Index({ clients, totals }: Props) {
                             <th className="p-4 font-medium text-gray-600">Volume</th>
                             <th className="p-4 font-medium text-gray-600">{__('general.our_earnings')}</th>
                             <th className="p-4 font-medium text-gray-600">Status</th>
-                            <th className="p-4 font-medium text-gray-600 text-right">Actions</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -187,7 +187,7 @@ export default function Index({ clients, totals }: Props) {
                                 </td>
                                 <td className="p-4 text-gray-700">
                                     {client.stats.successful_count}
-                                    <span className="ml-1 text-xs text-gray-400">
+                                    <span className="ms-1 text-xs text-gray-400">
                                         / {client.stats.total_payments}
                                     </span>
                                 </td>
@@ -208,13 +208,13 @@ export default function Index({ clients, totals }: Props) {
                                         </span>
                                     )}
                                 </td>
-                                <td className="p-4 text-right space-x-2">
+                                <td className="p-4 text-end space-x-2">
                                     <Button
                                         variant="outline"
                                         size="sm"
                                         onClick={() => router.visit(route('admin.musoftware-clients.show', client.id))}
                                     >
-                                        <Eye className="h-3.5 w-3.5 mr-1" /> View
+                                        <Eye className="h-3.5 w-3.5 me-1" /> View
                                     </Button>
                                     <Button
                                         variant="destructive"

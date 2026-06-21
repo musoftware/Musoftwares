@@ -214,7 +214,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                     Client Login
                                 </Link>
                                 <Button onClick={() => setIsGuestTicketOpen(true)} className="bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold h-10 px-6 flex items-center gap-2">
-                                    {__('general.submit_guest_ticket') || 'Submit Guest Ticket'} <Send className="h-4 w-4 ml-1" />
+                                    {__('general.submit_guest_ticket') || 'Submit Guest Ticket'} <Send className="h-4 w-4 ms-1" />
                                 </Button>
                             </>
                         )}
@@ -232,7 +232,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                 {/* Desktop Mega Menu Dropdowns */}
                 {activeDropdown && (
                     <div
-                        className="hidden lg:block absolute top-full left-0 w-full bg-white border-b border-slate-200 shadow-xl shadow-slate-200/20 animate-in fade-in slide-in-from-top-2 duration-200"
+                        className="hidden lg:block absolute top-full start-0 w-full bg-white border-b border-slate-200 shadow-xl shadow-slate-200/20 animate-in fade-in slide-in-from-top-2 duration-200"
                         onMouseEnter={() => setActiveDropdown(activeDropdown)}
                         onMouseLeave={() => setActiveDropdown(null)}
                     >
@@ -302,7 +302,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                     <Button variant="outline" className="w-full rounded-full h-12">Client Login</Button>
                                 </Link>
                                 <Button onClick={() => setIsGuestTicketOpen(true)} className="w-full bg-slate-900 text-white rounded-full h-12 flex items-center justify-center gap-2">
-                                    {__('general.submit_guest_ticket') || 'Submit Guest Ticket'} <Send className="h-4 w-4 ml-1" />
+                                    {__('general.submit_guest_ticket') || 'Submit Guest Ticket'} <Send className="h-4 w-4 ms-1" />
                                 </Button>
                             </>
                         )}
@@ -325,7 +325,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                 </div>
                                 <span className="text-xl font-extrabold text-slate-900">musoftware</span>
                             </Link>
-                            <p className="text-sm leading-relaxed text-slate-500 font-light pr-4">
+                            <p className="text-sm leading-relaxed text-slate-500 font-light pe-4">
                                 We build software infrastructure and systems for growing businesses.
                             </p>
 
@@ -336,7 +336,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.contact_mobile')}</span>
-                                        <span className="font-medium" dir="ltr">+20 101 521 8548</span>
+                                        <span className="font-medium" >+20 101 521 8548</span>
                                     </div>
                                 </a>
 
@@ -346,7 +346,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.contact_whatsapp')}</span>
-                                        <span className="font-medium" dir="ltr">+201015218548</span>
+                                        <span className="font-medium" >+201015218548</span>
                                     </div>
                                 </a>
 

@@ -301,7 +301,7 @@ export default function ChatWindow({
                         })}
 
                         {typingUsers.length > 0 && (
-                            <div className="flex items-center gap-2 text-gray-500 text-sm mt-2 ml-10">
+                            <div className="flex items-center gap-2 text-gray-500 text-sm mt-2 ms-10">
                                 <span className="italic">{typingUsers.join(', ')} is typing...</span>
                             </div>
                         )}
@@ -322,7 +322,7 @@ export default function ChatWindow({
                         />
                         <button
                             onClick={removeAttachment}
-                            className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
+                            className="absolute -top-2 -end-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
                         >
                             &times;
                         </button>

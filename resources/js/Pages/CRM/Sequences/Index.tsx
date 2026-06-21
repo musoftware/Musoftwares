@@ -45,7 +45,7 @@ export default function Index({ sequences }: { sequences: any }) {
             <div className="mb-6 flex justify-end">
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
-                        <Button><Plus className="w-4 h-4 mr-2" />{__('general.create_sequence')}</Button>
+                        <Button><Plus className="w-4 h-4 me-2" />{__('general.create_sequence')}</Button>
                     </DialogTrigger>
                     <DialogContent>
                         <form onSubmit={handleCreate}>
@@ -99,15 +99,15 @@ export default function Index({ sequences }: { sequences: any }) {
                             
                             <div className="space-y-3 mb-6">
                                 <div className="flex items-center text-sm text-gray-500">
-                                    <GitMerge className="w-4 h-4 mr-2 text-gray-400" />
+                                    <GitMerge className="w-4 h-4 me-2 text-gray-400" />
                                     <span>Trigger: <span className="font-medium text-gray-700">{seq.trigger_type.replace('_', ' ')}</span></span>
                                 </div>
                                 <div className="flex items-center text-sm text-gray-500">
-                                    <Users className="w-4 h-4 mr-2 text-blue-400" />
+                                    <Users className="w-4 h-4 me-2 text-blue-400" />
                                     <span>Enrolled: <span className="font-medium text-gray-700">{seq.states_count}</span> Leads</span>
                                 </div>
                                 <div className="flex items-center text-sm text-gray-500">
-                                    <div className="w-4 h-4 mr-2 rounded-full border-2 border-indigo-400 flex items-center justify-center">
+                                    <div className="w-4 h-4 me-2 rounded-full border-2 border-indigo-400 flex items-center justify-center">
                                         <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></div>
                                     </div>
                                     <span>Steps: <span className="font-medium text-gray-700">{seq.steps_count}</span>{__('general.emails_messages')}</span>
@@ -121,7 +121,7 @@ export default function Index({ sequences }: { sequences: any }) {
                             </Button>
                             <Link href={route('crm.sequences.show', seq.id)}>
                                 <Button size="sm" variant="outline">
-                                    <Edit className="w-4 h-4 mr-2" /> Builder
+                                    <Edit className="w-4 h-4 me-2" /> Builder
                                 </Button>
                             </Link>
                         </div>

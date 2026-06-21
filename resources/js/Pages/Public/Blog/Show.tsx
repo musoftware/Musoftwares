@@ -79,14 +79,14 @@ export default function Show({ article }: ShowProps) {
 
             {/* Reading progress indicator */}
             <motion.div
-                className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 origin-[0%] z-[60]"
+                className="fixed top-0 start-0 end-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 origin-[0%] z-[60]"
                 style={{ scaleX }}
             />
 
             <div className="relative min-h-screen py-16 lg:py-24">
                 {/* Visual decorations/gradients */}
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-200/30 rounded-full blur-3xl pointer-events-none z-0" />
-                <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-purple-200/20 rounded-full blur-3xl pointer-events-none z-0" />
+                <div className="absolute top-0 start-1/4 w-96 h-96 bg-indigo-200/30 rounded-full blur-3xl pointer-events-none z-0" />
+                <div className="absolute top-1/3 end-1/4 w-[400px] h-[400px] bg-purple-200/20 rounded-full blur-3xl pointer-events-none z-0" />
 
                 <div className="max-w-4xl mx-auto px-6 relative z-10">
                     {/* Back Button */}
@@ -103,14 +103,14 @@ export default function Show({ article }: ShowProps) {
                         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                     >
                         {/* Article Header Details */}
-                        <div className="space-y-6 mb-8 text-center sm:text-left">
+                        <div className="space-y-6 mb-8 text-center sm:text-start">
                             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
                                 <Badge variant="secondary" className="uppercase font-bold tracking-wider px-3 py-1 bg-indigo-50 text-indigo-700 hover:bg-indigo-100/80 border-none">
-                                    <Globe className="h-3 w-3 mr-1 inline" />
+                                    <Globe className="h-3 w-3 me-1 inline" />
                                     {article.language || 'en'}
                                 </Badge>
                                 <span className="text-slate-400 text-sm flex items-center">
-                                    <Clock className="h-3.5 w-3.5 mr-1" />
+                                    <Clock className="h-3.5 w-3.5 me-1" />
                                     {readTime} min read
                                 </span>
                             </div>
@@ -129,7 +129,7 @@ export default function Show({ article }: ShowProps) {
                                     <div className="h-10 w-10 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
                                         <User className="h-5 w-5" />
                                     </div>
-                                    <div className="text-left">
+                                    <div className="text-start">
                                         <span className="block text-sm font-semibold text-slate-800">
                                             {article.service?.seller?.name || 'System Writer'}
                                         </span>
@@ -181,9 +181,9 @@ export default function Show({ article }: ShowProps) {
                                     prose-p:mb-6 prose-p:text-lg
                                     prose-a:text-indigo-650 prose-a:underline hover:prose-a:text-indigo-800
                                     prose-strong:font-semibold prose-strong:text-slate-900
-                                    prose-ul:list-disc prose-ul:pl-6 prose-ul:mb-6
-                                    prose-ol:list-decimal prose-ol:pl-6 prose-ol:mb-6
-                                    prose-blockquote:border-l-4 prose-blockquote:border-indigo-500 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-slate-600 prose-blockquote:my-8"
+                                    prose-ul:list-disc prose-ul:ps-6 prose-ul:mb-6
+                                    prose-ol:list-decimal prose-ol:ps-6 prose-ol:mb-6
+                                    prose-blockquote:border-s-4 prose-blockquote:border-indigo-500 prose-blockquote:ps-4 prose-blockquote:italic prose-blockquote:text-slate-600 prose-blockquote:my-8"
                                 dangerouslySetInnerHTML={{ __html: cleanHtml }}
                             />
                         </div>

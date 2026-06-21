@@ -27,7 +27,7 @@ export default function ApprovalCenter({ pendingApprovals }) {
                                 <TableHead>{__('general.rule_triggered')}</TableHead>
                                 <TableHead>{__('general.booking_ref')}</TableHead>
                                 <TableHead>Reason</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead className="text-end">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -40,12 +40,12 @@ export default function ApprovalCenter({ pendingApprovals }) {
                                         {/* Grab reason from last log context */}
                                         {exec.logs[0]?.message || 'Manual review required.'}
                                     </TableCell>
-                                    <TableCell className="text-right space-x-2">
+                                    <TableCell className="text-end space-x-2">
                                         <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">
-                                            <XCircle className="h-4 w-4 mr-1" /> Reject
+                                            <XCircle className="h-4 w-4 me-1" /> Reject
                                         </Button>
                                         <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
-                                            <CheckCircle2 className="h-4 w-4 mr-1" /> Approve
+                                            <CheckCircle2 className="h-4 w-4 me-1" /> Approve
                                         </Button>
                                     </TableCell>
                                 </TableRow>

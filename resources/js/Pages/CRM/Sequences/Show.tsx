@@ -61,7 +61,7 @@ export default function Show({ sequence }) {
                     <Dialog open={isAiOpen} onOpenChange={setIsAiOpen}>
                         <DialogTrigger asChild>
                             <Button className="bg-indigo-600 hover:bg-indigo-700">
-                                <Sparkles className="w-4 h-4 mr-2" />{__('general.auto_generate_with_ai')}</Button>
+                                <Sparkles className="w-4 h-4 me-2" />{__('general.auto_generate_with_ai')}</Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[600px]">
                             <DialogHeader>
@@ -97,12 +97,12 @@ export default function Show({ sequence }) {
                                         </div>
                                     </div>
                                     <Button className="w-full" onClick={handleGenerateAI} disabled={isGenerating}>
-                                        {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                                        {isGenerating ? <Loader2 className="w-4 h-4 me-2 animate-spin" /> : <Sparkles className="w-4 h-4 me-2" />}
                                         Generate Steps
                                     </Button>
                                 </div>
                             ) : (
-                                <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto pr-2">
+                                <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto pe-2">
                                     <div className="bg-green-50 text-green-800 p-3 rounded-md text-sm mb-4">
                                         Generated {generatedSteps.length} steps. Review them below and apply to save.
                                     </div>
@@ -134,7 +134,7 @@ export default function Show({ sequence }) {
                 {/* Trigger Node */}
                 <div className="flex flex-col items-center mb-8">
                     <div className="bg-gray-900 text-white px-6 py-3 rounded-full font-medium shadow-lg flex items-center">
-                        <ArrowRight className="w-5 h-5 mr-2 text-indigo-400" />
+                        <ArrowRight className="w-5 h-5 me-2 text-indigo-400" />
                         Trigger: {sequence.trigger_type.toUpperCase()}
                     </div>
                     <div className="w-1 h-8 bg-gray-300 my-2"></div>
@@ -144,11 +144,11 @@ export default function Show({ sequence }) {
                 <div className="space-y-6">
                     {sequence.steps.map((step, index) => (
                         <div key={step.id} className="relative">
-                            <Card className="border-l-4 border-l-indigo-500 shadow-md">
+                            <Card className="border-s-4 border-s-indigo-500 shadow-md">
                                 <CardHeader className="py-4 border-b bg-gray-50 flex flex-row items-center justify-between">
                                     <div className="flex items-center space-x-4">
                                         <div className="flex items-center text-sm font-medium text-gray-600 bg-white border px-3 py-1 rounded-full">
-                                            <Clock className="w-4 h-4 mr-2 text-indigo-500" />
+                                            <Clock className="w-4 h-4 me-2 text-indigo-500" />
                                             Wait {step.delay} {step.unit}s
                                         </div>
                                     </div>
@@ -162,7 +162,7 @@ export default function Show({ sequence }) {
                                     <div className="divide-y">
                                         {step.send_email && (
                                             <div className="p-4 flex items-start">
-                                                <div className="bg-blue-100 p-2 rounded-lg mr-4">
+                                                <div className="bg-blue-100 p-2 rounded-lg me-4">
                                                     <Mail className="w-5 h-5 text-blue-600" />
                                                 </div>
                                                 <div className="flex-1">
@@ -184,7 +184,7 @@ export default function Show({ sequence }) {
                         <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
                             <p className="text-gray-500 mb-4">{__('general.no_steps_in_this_sequence_yet')}</p>
                             <Button variant="outline" onClick={() => setIsAiOpen(true)}>
-                                <Sparkles className="w-4 h-4 mr-2 text-indigo-600" />{__('general.generate_with_ai')}</Button>
+                                <Sparkles className="w-4 h-4 me-2 text-indigo-600" />{__('general.generate_with_ai')}</Button>
                         </div>
                     )}
                 </div>

@@ -130,7 +130,7 @@ export function LeadSlideOver({ leadId, isOpen, onClose }: LeadSlideOverProps) {
                                         onClick={handleAddNote}
                                         disabled={savingNote || !newNote.trim()}
                                     >
-                                        {savingNote ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <MessageSquare className="h-4 w-4 mr-2" />}
+                                        {savingNote ? <Loader2 className="h-4 w-4 animate-spin me-2" /> : <MessageSquare className="h-4 w-4 me-2" />}
                                         Save Note
                                     </Button>
                                 </div>
@@ -142,7 +142,7 @@ export function LeadSlideOver({ leadId, isOpen, onClose }: LeadSlideOverProps) {
                             <h3 className="text-sm font-semibold text-slate-900 mb-6 flex items-center gap-2">
                                 <Activity className="h-4 w-4 text-indigo-500" />{__('general.activity_timeline')}</h3>
                             
-                            <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
+                            <div className="space-y-6 relative before:absolute before:inset-0 before:ms-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
                                 {timeline.map((event, idx) => (
                                     <div key={event.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                                         
@@ -164,7 +164,7 @@ export function LeadSlideOver({ leadId, isOpen, onClose }: LeadSlideOverProps) {
                                             </div>
                                             {event.event === 'note.created' && (
                                                 <div className="mt-2 text-sm text-slate-700 bg-amber-50 p-3 rounded-lg border border-amber-100 relative">
-                                                    {event.is_pinned && <Pin className="absolute top-2 right-2 h-3 w-3 text-amber-600 rotate-45" />}
+                                                    {event.is_pinned && <Pin className="absolute top-2 end-2 h-3 w-3 text-amber-600 rotate-45" />}
                                                     {event.content}
                                                 </div>
                                             )}

@@ -184,7 +184,7 @@ export default function OlxB2CFinderRunner({ auth, tool }: any) {
                                     {results.length === 0 ? (
                                         <div className="text-center text-gray-500 py-8">{__('general.no_results_yet_start_an_extraction_to_see_data_here')}</div>
                                     ) : (
-                                        <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
+                                        <div className="space-y-2 max-h-[500px] overflow-y-auto pe-2">
                                             {results.map((r, i) => (
                                                 <div key={r.id || i} className="p-4 border rounded-xl bg-slate-900/40 border-slate-800/80 flex items-center justify-between hover:bg-slate-900/60 transition duration-200">
                                                     <div className="space-y-1">

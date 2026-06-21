@@ -62,11 +62,11 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                             className="inline-flex items-center gap-3 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition-all shadow-sm hover:shadow-md flex-shrink-0 border border-slate-700 group"
                         >
                             <Smartphone className="w-6 h-6 text-emerald-400" />
-                            <div className="flex flex-col items-start text-left">
+                            <div className="flex flex-col items-start text-start">
                                 <span className="text-[10px] font-medium text-slate-300 uppercase tracking-wider leading-none">{__('admin.install_app')}</span>
                                 <span className="text-sm font-bold leading-tight">{__('admin.setup_guide')}</span>
                             </div>
-                            <Download className="w-4 h-4 ml-2 opacity-50 group-hover:opacity-100 transition-opacity rtl:mr-2 rtl:ml-0" />
+                            <Download className="w-4 h-4 ms-2 opacity-50 group-hover:opacity-100 transition-opacity rtl:me-2 rtl:ms-0" />
                         </Link>
                     </div>
 
@@ -147,7 +147,7 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                 <CardDescription>{__('freelance.connect_android_phone_to_read')}</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <Button className="w-full bg-slate-900 hover:bg-slate-800" onClick={() => router.visit(route('sms-payment-gateway.devices'))}>{__('general.manage_devices')}<ArrowRight className="w-4 h-4 ml-2 rtl:rotate-180" />
+                                <Button className="w-full bg-slate-900 hover:bg-slate-800" onClick={() => router.visit(route('sms-payment-gateway.devices'))}>{__('general.manage_devices')}<ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
                                 </Button>
                             </CardContent>
                         </Card>
@@ -228,14 +228,14 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                     <CardDescription>{__('payment.realtime_payment_receipts_captured_from')}</CardDescription>
                                 </div>
                                 <Button variant="ghost" size="sm" onClick={() => router.visit(route('sms-payment-gateway.transactions'))} className="text-indigo-600 hover:text-indigo-700">
-                                    {__('general.view_all_payments')} <ArrowRight className="w-4 h-4 ml-1" />
+                                    {__('general.view_all_payments')} <ArrowRight className="w-4 h-4 ms-1" />
                                 </Button>
                             </div>
                         </CardHeader>
                         <CardContent className="p-0">
                             {recentTransactions && recentTransactions.length > 0 ? (
                                 <div className="overflow-x-auto">
-                                    <table className="w-full text-sm text-left">
+                                    <table className="w-full text-sm text-start">
                                         <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
                                             <tr>
                                                 <th className="px-6 py-4 font-medium">{__('general.date')}</th>

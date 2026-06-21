@@ -1,84 +1,111 @@
 flowchart TD
-    Core[Musoftwares Ecosystem Core]
-    
-    subgraph Phase1[Phase 1: Foundation & Public]
-        direction TB
-        Auth[Authentication Module]
-        Auth1[Implement Login/Register]
-        Auth2[Setup Password Recovery]
-        Auth3[Develop Onboarding Wizard]
-        Auth --> Auth1 --> Auth2 --> Auth3
+    subgraph Foundation[1. Foundation & Infrastructure]
+        F1[Setup Laravel 12 & PHP 8.2]
+        F2[Install React 18, TypeScript, Vite]
+        F3[Configure Inertia.js Bridge]
+        F4[Setup Tailwind v4 & Shadcn UI]
+        F5[Install nwidart/laravel-modules]
+        F6[Configure Redis, Scout, Meilisearch]
+        F7[Setup Reverb for WebSockets]
         
-        Public[Public & Marketing Pages]
-        Pub1[Setup Home & Info Routes]
-        Pub2[Create Legal & Company Pages]
-        Pub3[Build Platform & Solution Pages]
-        Pub4[Implement Blog System]
-        Public --> Pub1 --> Pub2 --> Pub3 --> Pub4
+        F1 --> F2 --> F3 --> F4 --> F5 --> F6 --> F7
     end
 
-    subgraph Phase2[Phase 2: Management & Portals]
-        direction TB
-        Admin[Admin Panel]
-        Adm1[Build Dashboard]
-        Adm2[Setup Content & Financial Reports]
-        Adm3[Create Overseers]
-        Adm4[Develop Users & Transactions Mgmt]
-        Adm5[Configure System Settings]
-        Admin --> Adm1 --> Adm2 --> Adm3 --> Adm4 --> Adm5
-
-        Client[Client Portal]
-        Cli1[Setup Dashboard & Notifications]
-        Cli2[Implement Financials & Billing]
-        Cli3[Build Chat & Support Tickets]
-        Cli4[Develop Settings & Profile Mgmt]
-        Client --> Cli1 --> Cli2 --> Cli3 --> Cli4
+    subgraph Architecture[2. Core Architecture Rules]
+        A1[Enforce Thin Controllers]
+        A2[Setup Service Layer]
+        A3[Configure Zustand for State]
+        A4[Implement Soft Deletes]
+        A5[Setup Spatie Permissions]
+        
+        A1 --> A2 --> A3 --> A4 --> A5
     end
 
-    subgraph Phase3[Phase 3: Core Business Modules]
-        direction TB
-        ERP[ERP Module]
-        ERP1[Setup Dashboard & Config]
-        ERP2[Implement Client Management]
-        ERP3[Build Full-Page Invoices & Billing]
-        ERP4[Develop Financial Control]
-        ERP5[Create Inventory & POS]
-        ERP6[Setup HR & Project Mgmt]
-        ERP --> ERP1 --> ERP2 --> ERP3 --> ERP4 --> ERP5 --> ERP6
+    Foundation --> Architecture
 
-        CRM[CRM Module]
-        CRM1[Build Role-Based Dashboards]
-        CRM2[Implement Leads & Pipelines]
-        CRM3[Develop Campaigns & Sequences]
-        CRM4[Setup Config & Integrations]
-        CRM --> CRM1 --> CRM2 --> CRM3 --> CRM4
+    subgraph AuthOnboarding[3. Identity, Auth & Onboarding]
+        AO1[Build Login, Register, Forgot Password]
+        AO2[Build Email Verification Flow]
+        AO3[Implement KYC Wizard]
+        AO4[Build Tenant & Workspace Setup]
+        AO5[Implement Role Assignment]
+        
+        AO1 --> AO2 --> AO3 --> AO4 --> AO5
     end
 
-    subgraph Phase4[Phase 4: Specialized Domains & External]
-        direction TB
-        Freelance[Freelance & iSaaS]
-        Free1[Build Landing & Core Pages]
-        Free2[Implement Jobs & Freelancers Browse]
-        Free3[Develop Job Management]
-        Free4[Setup Contracts & Proposals]
-        Freelance --> Free1 --> Free2 --> Free3 --> Free4
+    Architecture --> AuthOnboarding
 
-        Tools[Tools & WebTools]
-        Tool1[Implement Tool Runners]
-        Tool2[Build Tools Portal & Licenses]
-        Tool3[Develop Utility WebTools]
-        Tools --> Tool1 --> Tool2 --> Tool3
-
-        Ext[External Modules & Addons]
-        Ext1[Setup External Marketplace]
-        Ext2[Implement Booking System]
-        Ext3[Develop Affiliate POS]
-        Ext4[Build SMS Gateway]
-        Ext5[Create GoldSavers]
-        Ext --> Ext1 --> Ext2 --> Ext3 --> Ext4 --> Ext5
+    subgraph CoreApp[4. Core Application & Settings]
+        C1[Build Bento-grid Dashboard]
+        C2[Develop Profile Settings]
+        C3[Develop Tenant Global Config]
+        C4[Develop Team Management & Roles]
+        
+        C1 --> C2 --> C3 --> C4
     end
 
-    Core --> Phase1
-    Phase1 --> Phase2
-    Phase2 --> Phase3
-    Phase3 --> Phase4
+    AuthOnboarding --> CoreApp
+
+    subgraph FinanceBilling[5. Financial & Billing Module]
+        FB1[Setup Subscriptions Overview]
+        FB2[Implement Wallet & Top-Up Dual Currency]
+        FB3[Build SaaS Plan Management]
+        FB4[Implement Invoices & PDF Generation]
+        
+        FB1 --> FB2 --> FB3 --> FB4
+    end
+
+    CoreApp --> FinanceBilling
+
+    subgraph ERP_CRM[6. ERP, CRM & Support]
+        EC1[Build CRM Leads & Kanban]
+        EC2[Build Client Directory & Portal]
+        EC3[Develop Marketing Campaigns UI]
+        EC4[Build Support Desk & Tickets]
+        
+        EC1 --> EC2 --> EC3 --> EC4
+    end
+
+    FinanceBilling --> ERP_CRM
+
+    subgraph ProjectsTasks[7. Project & Task Execution]
+        PT1[Build Project Portfolio & Creation]
+        PT2[Develop Project Dashboard]
+        PT3[Implement Task Kanban & Detail View]
+        PT4[Build Time Tracking & Timesheets]
+        
+        PT1 --> PT2 --> PT3 --> PT4
+    end
+
+    ERP_CRM --> ProjectsTasks
+
+    subgraph Marketplace[8. Marketplace & Licensing]
+        ML1[Build Software Store & Product Details]
+        ML2[Implement Checkout & Payment Gateway]
+        ML3[Develop License Management & IP Binding]
+        
+        ML1 --> ML2 --> ML3
+    end
+
+    ProjectsTasks --> Marketplace
+
+    subgraph ExtraModules[9. Additional Modules]
+        EX1[Build Booking & Calendar]
+        EX2[Develop Freelance Job Board & Proposals]
+        EX3[Build Fbmb Dashboard]
+        
+        EX1 --> EX2 --> EX3
+    end
+
+    Marketplace --> ExtraModules
+
+    subgraph UIUX[10. UI/UX Polish & Delivery]
+        U1[Implement Branded Error Pages 403, 404, 500, 503]
+        U2[Add GSAP & Framer Motion Animations]
+        U3[Ensure Accessibility & ARIA]
+        U4[Configure Vite Manual Chunking]
+        
+        U1 --> U2 --> U3 --> U4
+    end
+
+    ExtraModules --> UIUX

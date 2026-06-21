@@ -63,7 +63,7 @@ export default function Referrals({ client, referrals }) {
                                             <TableHead>{__('general.joined_date')}</TableHead>
                                             <TableHead>Email</TableHead>
                                             <TableHead>{__('general.commission_earned')}</TableHead>
-                                            <TableHead className="text-right">Actions</TableHead>
+                                            <TableHead className="text-end">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -74,7 +74,7 @@ export default function Referrals({ client, referrals }) {
                                                 </TableCell>
                                                 <TableCell>
                                                     <Link href={`/admin/users/${referral.id}`} className="flex items-center hover:bg-gray-50 p-1 -m-1 rounded">
-                                                        <div className="h-9 w-9 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold mr-3">
+                                                        <div className="h-9 w-9 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold me-3">
                                                             {getInitials(referral.name)}
                                                         </div>
                                                         <div>
@@ -89,12 +89,12 @@ export default function Referrals({ client, referrals }) {
                                                 <TableCell>
                                                     {referral.email_verified_at ? (
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                            <CheckCircle2 className="w-3 h-3 mr-1" />
+                                                            <CheckCircle2 className="w-3 h-3 me-1" />
                                                             Verified
                                                         </span>
                                                     ) : (
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                            <Clock className="w-3 h-3 mr-1" />
+                                                            <Clock className="w-3 h-3 me-1" />
                                                             Unverified
                                                         </span>
                                                     )}
@@ -102,23 +102,23 @@ export default function Referrals({ client, referrals }) {
                                                 <TableCell>
                                                     {formatMoney(referral.commission_earned || 0, currency)}
                                                 </TableCell>
-                                                <TableCell className="text-right">
+                                                <TableCell className="text-end">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
                                                             <Button variant="outline" size="sm">
-                                                                <Settings className="w-4 h-4 mr-2" />
+                                                                <Settings className="w-4 h-4 me-2" />
                                                                 Actions
                                                             </Button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem asChild>
                                                                 <Link href={`/admin/users/${referral.id}`}>
-                                                                    <User className="mr-2 h-4 w-4" />{__('general.view_profile_1')}</Link>
+                                                                    <User className="me-2 h-4 w-4" />{__('general.view_profile_1')}</Link>
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem onClick={() => handleUnlink(referral.id)} className="text-orange-600 focus:text-orange-600">
-                                                                <Unlink className="mr-2 h-4 w-4" />{__('general.remove_referral')}</DropdownMenuItem>
+                                                                <Unlink className="me-2 h-4 w-4" />{__('general.remove_referral')}</DropdownMenuItem>
                                                             <DropdownMenuItem onClick={() => handleDelete(referral.id)} className="text-red-600 focus:text-red-600">
-                                                                <Trash2 className="mr-2 h-4 w-4" />{__('general.delete_user_account')}</DropdownMenuItem>
+                                                                <Trash2 className="me-2 h-4 w-4" />{__('general.delete_user_account')}</DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
                                                 </TableCell>

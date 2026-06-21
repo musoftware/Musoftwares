@@ -33,13 +33,13 @@ export default function Index({ users, business_currency }: { users: any, busine
 
             <div className="overflow-hidden rounded-lg bg-white shadow">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
+                    <table className="w-full text-start text-sm">
                         <thead className="border-b bg-gray-50">
                             <tr>
                                 <th className="p-4 font-medium text-gray-600">{__('admin.user')}</th>
                                 <th className="p-4 font-medium text-gray-600">{__('admin.total_monthly')}</th>
                                 <th className="p-4 font-medium text-gray-600">{__('admin.first_expire_date')}</th>
-                                <th className="p-4 font-medium text-gray-600 text-right">{__('admin.actions')}</th>
+                                <th className="p-4 font-medium text-gray-600 text-end">{__('admin.actions')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -71,7 +71,7 @@ export default function Index({ users, business_currency }: { users: any, busine
                                             <span className="text-gray-400">--</span>
                                         )}
                                     </td>
-                                    <td className="p-4 text-right">
+                                    <td className="p-4 text-end">
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button 

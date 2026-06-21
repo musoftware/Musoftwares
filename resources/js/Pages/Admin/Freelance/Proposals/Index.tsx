@@ -58,7 +58,7 @@ export default function Index({ proposals, filters }: any) {
             </div>
 
             <div className="overflow-hidden rounded-lg bg-white shadow">
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-start text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
                             <th className="p-4 font-medium text-gray-600">{__('freelance.job_title')}</th>
@@ -66,7 +66,7 @@ export default function Index({ proposals, filters }: any) {
                             <th className="p-4 font-medium text-gray-600">{__('freelance.bid_amount', undefined, 'Bid Amount')}</th>
                             <th className="p-4 font-medium text-gray-600">{__('freelance.status')}</th>
                             <th className="p-4 font-medium text-gray-600">{__('freelance.submitted_at', undefined, 'Submitted At')}</th>
-                            <th className="p-4 font-medium text-gray-600 text-right">{__('freelance.actions')}</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">{__('freelance.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -96,7 +96,7 @@ export default function Index({ proposals, filters }: any) {
                                     </span>
                                 </td>
                                 <td className="p-4 text-gray-500">{new Date(proposal.created_at).toLocaleDateString()}</td>
-                                <td className="p-4 text-right">
+                                <td className="p-4 text-end">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -109,13 +109,13 @@ export default function Index({ proposals, filters }: any) {
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem asChild>
                                                 <Link href={route('admin.freelance.proposals.show', proposal.id)} className="cursor-pointer flex w-full items-center">
-                                                    <Eye className="mr-2 h-4 w-4" />
+                                                    <Eye className="me-2 h-4 w-4" />
                                                     <span>{__('freelance.view_proposal', undefined, 'View Proposal')}</span>
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem onClick={() => setDeleteConfirm(proposal.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
-                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                <Trash2 className="me-2 h-4 w-4" />
                                                 <span>{__('freelance.delete')}</span>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>

@@ -196,7 +196,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                 {/* Team Members List */}
                 <OperationalCard>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm border-collapse">
+                        <table className="w-full text-start text-sm border-collapse">
                             <thead>
                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                     <th className="px-6 py-3.5">Name</th>
@@ -205,7 +205,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                     <th className="px-6 py-3.5">Status</th>
                                     <th className="px-6 py-3.5">Joined</th>
                                     <th className="px-6 py-3.5">{__('general.last_login')}</th>
-                                    <th className="px-6 py-3.5 text-right">Actions</th>
+                                    <th className="px-6 py-3.5 text-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -250,7 +250,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                             <td className="px-6 py-4 text-slate-500 font-mono text-xs">
                                                 {member.last_login_at}
                                             </td>
-                                            <td className="px-6 py-4 text-right">
+                                            <td className="px-6 py-4 text-end">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <button 
                                                         onClick={() => handleEditClick(member)}

@@ -110,7 +110,7 @@ export function PayAllModal({ open, onOpenChange, totalOwed, walletBalance, curr
                         disabled={processing}
                         className={cn(requiresKashier ? "bg-indigo-600 hover:bg-indigo-700" : "bg-slate-900 hover:bg-slate-800")}
                     >
-                        {processing && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                        {processing && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
                         {requiresKashier ? __('general.proceed_to_payment') : __('general.confirm_payment')}
                     </Button>
                 </DialogFooter>

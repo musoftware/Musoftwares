@@ -24,7 +24,7 @@ export function MobileNav({
 
     return (
         <nav
-            className="flex md:hidden fixed bottom-0 left-0 right-0 z-20 border-t"
+            className="flex md:hidden fixed bottom-0 start-0 end-0 z-20 border-t"
             style={{ background: '#13161f', borderColor: 'rgba(255,255,255,0.08)' }}
         >
             {items.map(item => {
@@ -38,14 +38,14 @@ export function MobileNav({
                     >
                         {/* Badge */}
                         {item.badge !== undefined && item.badge > 0 && (
-                            <span className="absolute top-2 right-1/4 w-4 h-4 rounded-full text-[9px] font-black flex items-center justify-center" style={{ background: '#f59e0b', color: '#000' }}>
+                            <span className="absolute top-2 end-1/4 w-4 h-4 rounded-full text-[9px] font-black flex items-center justify-center" style={{ background: '#f59e0b', color: '#000' }}>
                                 {item.badge}
                             </span>
                         )}
                         <span style={{ color: active ? '#f59e0b' : 'rgba(255,255,255,0.3)' }}>{item.icon}</span>
                         <span className="text-[10px] font-semibold">{item.label}</span>
                         {active && (
-                            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full" style={{ background: '#f59e0b' }} />
+                            <span className="absolute bottom-0 start-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full" style={{ background: '#f59e0b' }} />
                         )}
                     </button>
                 );

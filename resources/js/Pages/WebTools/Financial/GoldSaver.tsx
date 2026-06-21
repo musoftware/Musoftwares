@@ -268,7 +268,7 @@ export default function GoldSaver() {
                                         <p className="text-sm text-slate-600">Calculated based on items marked for Zakat in your history (2.5%).</p>
                                     </div>
                                 </div>
-                                <div className="text-right">
+                                <div className="text-end">
                                     <h3 className="text-3xl font-bold text-indigo-600">{formatMoney(totalZakat)} <span className="text-lg">EGP</span></h3>
                                 </div>
                             </CardContent>
@@ -319,9 +319,9 @@ export default function GoldSaver() {
                                             <Input type="number" step="0.01" value={newTax} onChange={e => setNewTax(e.target.value)} placeholder="0.00" />
                                         </div>
                                     </div>
-                                    <div className="text-right pt-4">
+                                    <div className="text-end pt-4">
                                         <Button type="submit" size="lg" className="w-full md:w-auto">
-                                            <Plus className="w-4 h-4 mr-2" /> Record Investment
+                                            <Plus className="w-4 h-4 me-2" /> Record Investment
                                         </Button>
                                     </div>
                                 </form>
@@ -346,7 +346,7 @@ export default function GoldSaver() {
                                             <TableHead>Current Val</TableHead>
                                             <TableHead>Profit/Loss</TableHead>
                                             <TableHead>Date</TableHead>
-                                            <TableHead className="text-right">Actions</TableHead>
+                                            <TableHead className="text-end">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -383,7 +383,7 @@ export default function GoldSaver() {
                                                             </div>
                                                         </TableCell>
                                                         <TableCell className="text-sm text-slate-500">{item.date}</TableCell>
-                                                        <TableCell className="text-right">
+                                                        <TableCell className="text-end">
                                                             <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => handleDelete(item.id)}>
                                                                 <Trash2 className="w-4 h-4" />
                                                             </Button>

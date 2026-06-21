@@ -34,7 +34,7 @@ export function SearchInput({
 
     return (
         <div className={cn('relative flex items-center', className)}>
-            <div className="text-text-muted absolute left-3 flex items-center justify-center">
+            <div className="text-text-muted absolute start-3 flex items-center justify-center">
                 {loading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
@@ -46,13 +46,13 @@ export function SearchInput({
                 value={localValue}
                 onChange={handleChange}
                 placeholder={placeholder}
-                className="bg-surface border-border focus:border-primary focus:ring-primary placeholder:text-text-muted h-9 w-full rounded-md border pr-8 pl-9 text-[13px] shadow-sm transition-colors focus:ring-1"
+                className="bg-surface border-border focus:border-primary focus:ring-primary placeholder:text-text-muted h-9 w-full rounded-md border pe-8 ps-9 text-[13px] shadow-sm transition-colors focus:ring-1"
             />
             {localValue && (
                 <button
                     type="button"
                     onClick={handleClear}
-                    className="text-text-muted hover:text-text-primary absolute right-3 flex items-center justify-center transition-colors"
+                    className="text-text-muted hover:text-text-primary absolute end-3 flex items-center justify-center transition-colors"
                 >
                     <X className="h-3.5 w-3.5" />
                 </button>

@@ -54,7 +54,7 @@ export default function Create({ client }: Props) {
                         </div>
                         <div className="flex flex-wrap gap-2">
                             <Button variant="outline" onClick={() => window.history.back()}>
-                                <ArrowDownLeft className="h-4 w-4 mr-2" style={{ transform: 'rotate(45deg)' }} /> Back
+                                <ArrowDownLeft className="h-4 w-4 me-2" style={{ transform: 'rotate(45deg)' }} /> Back
                             </Button>
                         </div>
                     </div>
@@ -115,7 +115,7 @@ export default function Create({ client }: Props) {
                                 </CardContent>
                                 <CardFooter className="bg-muted/50 flex justify-end">
                                     <Button type="submit" disabled={processing} className="min-w-[150px]">
-                                        <ArrowUpRight className="h-4 w-4 mr-2" />
+                                        <ArrowUpRight className="h-4 w-4 me-2" />
                                         {processing ? 'Processing...' : __('general.submit')}
                                     </Button>
                                 </CardFooter>

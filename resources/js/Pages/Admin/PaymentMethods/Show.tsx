@@ -142,7 +142,7 @@ export default function Show({ paymentMethod }: Props) {
                             <div>
                                 <h2 className="text-lg font-semibold text-slate-800">
                                     {paymentMethod.type_name ?? paymentMethod.type ?? 'Payment Method'}
-                                    <span className="ml-2 text-slate-400 text-sm font-normal">#{paymentMethod.id}</span>
+                                    <span className="ms-2 text-slate-400 text-sm font-normal">#{paymentMethod.id}</span>
                                 </h2>
                                 {paymentMethod.name && (
                                     <p className="text-sm text-slate-500">{paymentMethod.name}</p>

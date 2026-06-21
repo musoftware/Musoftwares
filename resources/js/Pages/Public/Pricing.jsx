@@ -120,7 +120,7 @@ export default function Pricing({ currency = 'USD', serviceItems = [] }) {
 
                         {/* Implementation Block (Most Popular) */}
                         <div className="gsap-fade-up flex flex-col p-10 bg-[#111111] text-white rounded-2xl relative shadow-[0_8px_30px_-10px_rgba(0,0,0,0.2)] scale-[1.02] z-10 border border-[#111111]">
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                            <div className="absolute -top-4 start-1/2 -translate-x-1/2">
                                 <span className="bg-white text-[#111111] text-[11px] font-bold uppercase tracking-widest py-1.5 px-4 rounded-full shadow-sm">
                                     Most Popular
                                 </span>

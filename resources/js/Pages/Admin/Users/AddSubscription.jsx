@@ -91,7 +91,7 @@ export default function AddSubscription({ user, serviceItems }) {
                         disabled={processing || !data.object || !data.duration_days} 
                         className="w-full py-6 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg shadow-sm text-base transition-all"
                     >
-                        <Plus className="mr-2" size={18} />
+                        <Plus className="me-2" size={18} />
                         {processing ? __('general.saving') : __('admin.activate_subscription')}
                     </Button>
                 </form>

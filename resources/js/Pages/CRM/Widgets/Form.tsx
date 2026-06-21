@@ -234,7 +234,7 @@ export default function Form({ widget }: { widget?: any }) {
 
                     <div className="flex justify-end pt-6 border-t border-slate-200">
                         <Button type="submit" disabled={processing} className="min-w-[150px]">
-                            <Save className="w-4 h-4 mr-2" />
+                            <Save className="w-4 h-4 me-2" />
                             {isEdit ? __('general.save_changes') : __('general.create_form')}
                         </Button>
                     </div>

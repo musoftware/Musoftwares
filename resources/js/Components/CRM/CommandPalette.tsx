@@ -40,7 +40,7 @@ export function CommandPalette() {
                     }}
                 >
                     <div className="flex items-center border-b border-slate-100 px-3">
-                        <Search className="h-5 w-5 text-slate-400 mr-2 shrink-0" />
+                        <Search className="h-5 w-5 text-slate-400 me-2 shrink-0" />
                         <Command.Input 
                             autoFocus
                             placeholder={__('general.search_leads_campaigns_or_actions')} 

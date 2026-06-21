@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
+import { __ } from '@/lib/i18n';
 
 type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates' | 'inbox' | 'auto-reply' | 'contacts' | 'dashboard' | 'media' | 'broadcast' | 'deliverability';
 
@@ -75,7 +76,7 @@ export default function Sidebar({
     return (
         <>
             {/* Desktop Sidebar */}
-            <div className="hidden md:flex flex-col h-screen sticky top-0 w-64 bg-background border-r rtl:border-r-0 rtl:border-l shrink-0 shadow-sm z-20">
+            <div className="hidden md:flex flex-col h-screen sticky top-0 w-64 bg-background border-e rtl:border-e-0 rtl:border-s shrink-0 shadow-sm z-20">
                 {/* Logo */}
                 <div className="p-6 border-b flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center shrink-0">
@@ -108,14 +109,14 @@ export default function Sidebar({
                     <div className="p-4 border-b bg-muted/20">
                         <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 flex items-center gap-1.5 px-1">
                             <Users className="w-3 h-3" />
-                            {locale === 'ar' ? 'الحساب النشط' : 'Active Account'}
+                            {__('Active Account')}
                         </label>
                         <select
                             value={selectedAccount || ''}
                             onChange={e => setSelectedAccount?.(e.target.value)}
                             className="flex h-9 w-full rounded-xl border border-muted bg-background px-3 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 font-bold text-foreground cursor-pointer shadow-sm hover:border-teal-500/50 transition-colors"
                         >
-                            <option value="" className="text-muted-foreground font-medium">{locale === 'ar' ? 'كل الحسابات' : 'All Accounts'}</option>
+                            <option value="" className="text-muted-foreground font-medium">{__('All Accounts')}</option>
                             {sessions.map((s: any) => (
                                 <option key={s.accountId} value={s.accountId} className="font-medium text-foreground">
                                     {s.pushName || s.phone_number || s.accountId}
@@ -127,7 +128,7 @@ export default function Sidebar({
 
                 {/* Navigation */}
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-4 pb-2 text-start">{locale === 'ar' ? 'الإرسال' : 'Sending'}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-4 pb-2 text-start">{__('Sending')}</p>
                     {mainItems.map(item => (
                         <NavButton
                             key={item.id}
@@ -138,7 +139,7 @@ export default function Sidebar({
                         />
                     ))}
 
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-4 pb-2 pt-4 text-start">{locale === 'ar' ? 'الإدارة' : 'Management'}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-4 pb-2 pt-4 text-start">{__('Management')}</p>
                     {toolItems.map(item => (
                         <NavButton
                             key={item.id}
@@ -165,7 +166,7 @@ export default function Sidebar({
             </div>
 
             {/* Mobile Bottom Navigation */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-background/90 backdrop-blur-xl border-t flex items-center justify-around px-2 py-2 pb-safe shadow-lg">
+            <div className="md:hidden fixed bottom-0 start-0 end-0 z-[100] bg-background/90 backdrop-blur-xl border-t flex items-center justify-around px-2 py-2 pb-safe shadow-lg">
                 {[
                     { id: 'accounts',       icon: Users,           label: 'Accounts' },
                     { id: 'campaign',       icon: Send,            label: 'Campaign' },

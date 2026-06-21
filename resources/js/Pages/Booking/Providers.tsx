@@ -332,7 +332,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                     <div className="mt-4 sm:mt-0">
                         {activeTab === 'registry' && !isFormOpen && (
                             <Button onClick={handleAddProviderClick} className="bg-slate-900 hover:bg-slate-800 text-white shadow-sm">
-                                <Plus className="w-4 h-4 mr-2" />{__('general.add_provider')}</Button>
+                                <Plus className="w-4 h-4 me-2" />{__('general.add_provider')}</Button>
                         )}
                     </div>
                 </div>
@@ -340,9 +340,9 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                 <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as any)} className="w-full">
                     <TabsList className="bg-slate-100 border border-slate-200/60 p-1">
                         <TabsTrigger value="registry" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                            <Users className="w-4 h-4 mr-2" />{__('general.providers_registry')}</TabsTrigger>
+                            <Users className="w-4 h-4 me-2" />{__('general.providers_registry')}</TabsTrigger>
                         <TabsTrigger value="schedule" className="data-[state=active]:bg-white data-[state=active]:shadow-sm" disabled={!selectedProvider}>
-                            <Calendar className="w-4 h-4 mr-2" />
+                            <Calendar className="w-4 h-4 me-2" />
                             {selectedProvider ? `${selectedProvider.name}'s Schedule` : 'Schedule Builder'}
                         </TabsTrigger>
                     </TabsList>
@@ -492,7 +492,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                         <h3 className="text-lg font-medium text-slate-900 mb-1">{__('general.roster_is_empty')}</h3>
                                         <p className="text-sm text-slate-500 max-w-md mx-auto mb-6">{__('general.register_staff_members_doctors_or_practitioners_to_enable_multi_host_booking_flows')}</p>
                                         <Button onClick={handleAddProviderClick} className="bg-slate-900 hover:bg-slate-800 text-white">
-                                            <Plus className="w-4 h-4 mr-2" />{__('general.register_first_provider')}</Button>
+                                            <Plus className="w-4 h-4 me-2" />{__('general.register_first_provider')}</Button>
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -509,7 +509,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                                     {provider.name}
                                                                 </h4>
                                                                 <p className="text-xs font-medium text-slate-700 flex items-center mt-0.5">
-                                                                    <Stethoscope className="w-3.5 h-3.5 mr-1" />
+                                                                    <Stethoscope className="w-3.5 h-3.5 me-1" />
                                                                     {provider.specialty || 'General Practitioner'}
                                                                 </p>
                                                             </div>
@@ -526,13 +526,13 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                     <div className="mt-4 space-y-2 text-sm text-slate-600 border-t border-slate-100 pt-3">
                                                         {provider.email && (
                                                             <div className="flex items-center text-xs">
-                                                                <Mail className="w-3.5 h-3.5 mr-2 text-slate-400 shrink-0" />
+                                                                <Mail className="w-3.5 h-3.5 me-2 text-slate-400 shrink-0" />
                                                                 <span className="truncate">{provider.email}</span>
                                                             </div>
                                                         )}
                                                         {provider.phone && (
                                                             <div className="flex items-center text-xs">
-                                                                <Phone className="w-3.5 h-3.5 mr-2 text-slate-400 shrink-0" />
+                                                                <Phone className="w-3.5 h-3.5 me-2 text-slate-400 shrink-0" />
                                                                 <span>{provider.phone}</span>
                                                             </div>
                                                         )}
@@ -567,15 +567,15 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                         onClick={() => handleEditProviderClick(provider)} 
                                                         className="flex-1 text-slate-700 bg-white border-slate-200"
                                                     >
-                                                        <Edit2 className="w-3.5 h-3.5 mr-1.5" />{__('general.edit_profile')}</Button>
+                                                        <Edit2 className="w-3.5 h-3.5 me-1.5" />{__('general.edit_profile')}</Button>
                                                     <Button 
                                                         size="sm" 
                                                         onClick={() => handleManageScheduleClick(provider)}
                                                         className="flex-1 bg-slate-900 hover:bg-slate-800 text-white"
                                                     >
-                                                        <Calendar className="w-3.5 h-3.5 mr-1.5" />
+                                                        <Calendar className="w-3.5 h-3.5 me-1.5" />
                                                         Schedules
-                                                        <ArrowRight className="w-3 h-3 ml-1.5" />
+                                                        <ArrowRight className="w-3 h-3 ms-1.5" />
                                                     </Button>
                                                 </CardFooter>
                                             </Card>
@@ -651,7 +651,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                                     onClick={() => addWeeklyShift(value)}
                                                                     className="text-xs text-slate-700 hover:text-slate-900 hover:bg-slate-100 mt-1 w-max h-7 px-2"
                                                                 >
-                                                                    <Plus className="w-3 h-3 mr-1" />{__('general.add_shift')}</Button>
+                                                                    <Plus className="w-3 h-3 me-1" />{__('general.add_shift')}</Button>
                                                             </div>
                                                         ) : (
                                                             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-2 sm:mt-0">{__('general.unavailable_off')}</span>
@@ -664,7 +664,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                         <div className="mt-6 flex justify-end gap-3 border-t border-slate-100 pt-5">
                                             <Button variant="outline" onClick={() => setActiveTab('registry')}>{__('general.back_to_roster')}</Button>
                                             <Button onClick={handleSaveSchedule} className="bg-slate-900 text-white hover:bg-slate-800">
-                                                <Save className="w-4 h-4 mr-2" />{__('general.save_all_schedules')}</Button>
+                                                <Save className="w-4 h-4 me-2" />{__('general.save_all_schedules')}</Button>
                                         </div>
                                         </CardContent>
                                     </Card>
@@ -729,7 +729,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                             )}
 
                                             <Button type="submit" variant="outline" className="w-full border-slate-200 text-slate-900 bg-slate-50/50 hover:bg-slate-100">
-                                                <Plus className="w-4 h-4 mr-2" />{__('general.add_date_override')}</Button>
+                                                <Plus className="w-4 h-4 me-2" />{__('general.add_date_override')}</Button>
                                         </form>
                                         </CardContent>
                                     </Card>

@@ -204,12 +204,12 @@ export default function MediaLibraryWorkspace({ t, locale, callRPC, daemonConnec
             {/* Filters */}
             <div className="flex gap-3 flex-wrap">
                 <div className="relative flex-1 min-w-[200px]">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder={isRtl ? 'بحث بالاسم...' : 'Search by name...'}
-                        className="pl-10 rounded-xl text-start"
+                        className="ps-10 rounded-xl text-start"
                     />
                 </div>
                 <div className="flex gap-1.5">
@@ -225,7 +225,7 @@ export default function MediaLibraryWorkspace({ t, locale, callRPC, daemonConnec
                             >
                                 <Icon className="w-3 h-3" />
                                 {type === 'all' ? (isRtl ? 'الكل' : 'All') : type}
-                                {type !== 'all' && typeCounts[type] ? <Badge variant="secondary" className="text-[9px] px-1 h-3.5 ml-1">{typeCounts[type]}</Badge> : null}
+                                {type !== 'all' && typeCounts[type] ? <Badge variant="secondary" className="text-[9px] px-1 h-3.5 ms-1">{typeCounts[type]}</Badge> : null}
                             </Button>
                         );
                     })}

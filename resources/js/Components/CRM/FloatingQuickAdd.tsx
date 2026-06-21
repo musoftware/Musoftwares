@@ -16,14 +16,14 @@ export function FloatingQuickAdd() {
     ];
 
     return (
-        <div className="fixed bottom-8 right-8 z-50">
+        <div className="fixed bottom-8 end-8 z-50">
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
                         initial={{ opacity: 0, y: 20, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                        className="absolute bottom-16 right-0 mb-4 flex flex-col items-end gap-3"
+                        className="absolute bottom-16 end-0 mb-4 flex flex-col items-end gap-3"
                     >
                         {actions.map((action, index) => (
                             <motion.div

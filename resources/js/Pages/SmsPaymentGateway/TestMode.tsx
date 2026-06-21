@@ -63,7 +63,7 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                             <p className="text-slate-500 mt-1">{__('general.safely_simulate_incoming_sms_payloads_and_test_your_application_integrations')}</p>
                         </div>
                         <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
-                            <ArrowLeft className="w-4 h-4 mr-2" />{__('general.back_to_dashboard')}</Button>
+                            <ArrowLeft className="w-4 h-4 me-2" />{__('general.back_to_dashboard')}</Button>
                     </div>
 
                     <Card className="border-indigo-100 bg-indigo-50/30">
@@ -116,7 +116,7 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                                         />
                                     </div>
                                     <Button type="submit" disabled={processingSms} className="w-full bg-indigo-600 hover:bg-indigo-700">
-                                        <Send className="w-4 h-4 mr-2" />{__('general.dispatch_sms_payload')}</Button>
+                                        <Send className="w-4 h-4 me-2" />{__('general.dispatch_sms_payload')}</Button>
                                 </form>
                             </CardContent>
                         </Card>
@@ -156,7 +156,7 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                                             />
                                         </div>
                                         <Button type="submit" disabled={processingHook} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
-                                            <Send className="w-4 h-4 mr-2" />{__('general.fire_webhook')}</Button>
+                                            <Send className="w-4 h-4 me-2" />{__('general.fire_webhook')}</Button>
                                     </form>
                                 )}
 
@@ -165,7 +165,7 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                                         <h4 className="font-semibold text-slate-800 flex items-center gap-2">
                                             <Database className="w-4 h-4" />{__('general.sandbox_metrics')}</h4>
                                         <Button variant="ghost" size="sm" onClick={handleClear} className="text-rose-600 hover:text-rose-700 hover:bg-rose-50">
-                                            <Trash2 className="w-4 h-4 mr-2" />{__('general.flush_test_data')}</Button>
+                                            <Trash2 className="w-4 h-4 me-2" />{__('general.flush_test_data')}</Button>
                                     </div>
                                     <div className="flex justify-between items-center py-2 border-b text-sm">
                                         <span className="text-slate-500">{__('general.simulated_transactions')}</span>

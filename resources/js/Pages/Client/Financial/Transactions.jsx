@@ -77,12 +77,12 @@ export default function Transactions({ transactions, wallet }) {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="pl-6">Type</TableHead>
+                                    <TableHead className="ps-6">Type</TableHead>
                                     <TableHead>Description</TableHead>
                                     <TableHead>Amount</TableHead>
                                     <TableHead>{__('general.balance_before')}</TableHead>
                                     <TableHead>{__('general.balance_after')}</TableHead>
-                                    <TableHead className="pr-6 text-right">Date</TableHead>
+                                    <TableHead className="pe-6 text-end">Date</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -93,9 +93,9 @@ export default function Transactions({ transactions, wallet }) {
                                 ) : (
                                     transactions.data.map((tx) => (
                                         <TableRow key={tx.id}>
-                                            <TableCell className="pl-6">
+                                            <TableCell className="ps-6">
                                                 <Badge variant={tx.type === 'credit' ? 'outline' : 'secondary'} className={`font-normal tracking-wide bg-opacity-10 ${tx.type === 'credit' ? 'text-emerald-700 border-emerald-200 bg-emerald-50' : 'text-rose-700 border-rose-200 bg-rose-50'}`}>
-                                                    {tx.type === 'credit' ? <ArrowDownLeft className="w-3 h-3 mr-1" /> : <ArrowUpRight className="w-3 h-3 mr-1" />}
+                                                    {tx.type === 'credit' ? <ArrowDownLeft className="w-3 h-3 me-1" /> : <ArrowUpRight className="w-3 h-3 me-1" />}
                                                     {tx.type === 'credit' ? 'Credit' : 'Debit'}
                                                 </Badge>
                                             </TableCell>
@@ -114,7 +114,7 @@ export default function Transactions({ transactions, wallet }) {
                                             <TableCell className="font-medium">
                                                 {Number(tx.balance_after).toFixed(2)}
                                             </TableCell>
-                                            <TableCell className="pr-6 text-right text-muted-foreground text-xs">
+                                            <TableCell className="pe-6 text-end text-muted-foreground text-xs">
                                                 {new Date(tx.created_at).toLocaleDateString(undefined, {
                                                     year: 'numeric', month: 'short', day: 'numeric',
                                                     hour: '2-digit', minute: '2-digit'

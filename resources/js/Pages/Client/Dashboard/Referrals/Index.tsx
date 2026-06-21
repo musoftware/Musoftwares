@@ -46,7 +46,7 @@ export default function Index({ auth, referral, commission_percentage }: any) {
                             <div className="flex items-center space-x-2">
                                 <Input value={referralLink} readOnly className="bg-gray-50" />
                                 <Button onClick={() => handleCopy(referralLink)} variant="outline">
-                                    <Copy className="w-4 h-4 mr-2" />
+                                    <Copy className="w-4 h-4 me-2" />
                                     {copied ? __('general.copied') : __('general.copy')}
                                 </Button>
                             </div>

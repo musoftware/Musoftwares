@@ -99,7 +99,7 @@ export default function ReviewLeave({ leaveRequest }: any) {
                             onClick={handleReject}
                             disabled={processing}
                         >
-                            <XCircle className="w-4 h-4 mr-2" />
+                            <XCircle className="w-4 h-4 me-2" />
                             {__('general.reject')}
                         </Button>
                         <Button 
@@ -108,7 +108,7 @@ export default function ReviewLeave({ leaveRequest }: any) {
                             onClick={handleApprove}
                             disabled={processing}
                         >
-                            <CheckCircle className="w-4 h-4 mr-2" />
+                            <CheckCircle className="w-4 h-4 me-2" />
                             {__('general.approve')}
                         </Button>
                     </CardFooter>

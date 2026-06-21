@@ -170,7 +170,7 @@ export default function DuplicateFinderRunner({ tool }: any) {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans">
             <div className="h-14 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center px-6 sticky top-0 z-10">
-                <Copy className="w-5 h-5 text-amber-500 mr-2" />
+                <Copy className="w-5 h-5 text-amber-500 me-2" />
                 <span className="font-bold text-sm">{__('general.duplicate_file_finder')}</span>
             </div>
 
@@ -188,7 +188,7 @@ export default function DuplicateFinderRunner({ tool }: any) {
                             disabled={status === 'running'}
                         />
                         <Button onClick={handleStart} className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6" disabled={status === 'running' || !targetPath}>
-                            {status === 'running' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Search className="w-4 h-4 mr-2" />}
+                            {status === 'running' ? <Loader2 className="w-4 h-4 me-2 animate-spin" /> : <Search className="w-4 h-4 me-2" />}
                             {status === 'running' ? 'Scanning...' : 'Scan Now'}
                         </Button>
                     </div>
@@ -251,7 +251,7 @@ export default function DuplicateFinderRunner({ tool }: any) {
                                             <span className="text-[10px] text-slate-400 font-mono">MD5: {group.hash.substring(0, 16)}...</span>
                                         </div>
                                         
-                                        <div className="space-y-1.5 pl-2 border-l-2 border-slate-200 dark:border-slate-700 ml-2">
+                                        <div className="space-y-1.5 ps-2 border-s-2 border-slate-200 dark:border-slate-700 ms-2">
                                             <div className="flex items-start gap-3 p-1.5 rounded-md text-sm">
                                                 <input 
                                                     type="checkbox"
@@ -260,7 +260,7 @@ export default function DuplicateFinderRunner({ tool }: any) {
                                                     className="mt-0.5 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
                                                 />
                                                 <span className="text-slate-600 dark:text-slate-400 break-all flex-1">
-                                                    <span className="font-bold text-emerald-600 dark:text-emerald-500 mr-2 text-[10px] uppercase">Original</span>
+                                                    <span className="font-bold text-emerald-600 dark:text-emerald-500 me-2 text-[10px] uppercase">Original</span>
                                                     {group.original}
                                                 </span>
                                             </div>
@@ -274,7 +274,7 @@ export default function DuplicateFinderRunner({ tool }: any) {
                                                         className="mt-0.5 rounded border-red-300 text-red-500 focus:ring-red-500"
                                                     />
                                                     <span className="text-slate-700 dark:text-slate-300 break-all flex-1">
-                                                        <span className="font-bold text-red-500 mr-2 text-[10px] uppercase">Duplicate</span>
+                                                        <span className="font-bold text-red-500 me-2 text-[10px] uppercase">Duplicate</span>
                                                         {dup}
                                                     </span>
                                                 </div>

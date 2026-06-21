@@ -15,7 +15,7 @@ export default function VipDirectory({ vipCustomers }) {
                     <p className="text-muted-foreground mt-2">{__('general.manage_premium_customer_tiers_and_priority_tagging')}</p>
                 </div>
                 <Button>
-                    <Plus className="mr-2 h-4 w-4" />{__('general.add_vip')}</Button>
+                    <Plus className="me-2 h-4 w-4" />{__('general.add_vip')}</Button>
             </div>
 
             <Card>
@@ -30,7 +30,7 @@ export default function VipDirectory({ vipCustomers }) {
                                 <TableHead>Tier</TableHead>
                                 <TableHead>{__('general.assigned_date')}</TableHead>
                                 <TableHead>Reason</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead className="text-end">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -44,7 +44,7 @@ export default function VipDirectory({ vipCustomers }) {
                                     </TableCell>
                                     <TableCell>{new Date(vip.created_at).toLocaleDateString()}</TableCell>
                                     <TableCell className="text-muted-foreground">{vip.reason}</TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-end">
                                         <Button variant="ghost" size="sm">Manage</Button>
                                     </TableCell>
                                 </TableRow>

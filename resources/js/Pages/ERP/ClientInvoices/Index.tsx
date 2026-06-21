@@ -177,7 +177,7 @@ export default function Index({
         {
             key: 'actions',
             label: '',
-            className: 'text-right w-[100px]',
+            className: 'text-end w-[100px]',
             render: (row: Invoice) => (
                 <div className="flex items-center justify-end gap-2">
                     {row.status !== 'paid' && row.status !== 'cancelled' && row.status !== 'refunded' ? (
@@ -189,7 +189,7 @@ export default function Index({
                                 className: 'bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs px-3 shadow-sm h-8 inline-flex items-center'
                             })}
                         >
-                            <CreditCard className="mr-1.5 h-3.5 w-3.5" /> Pay
+                            <CreditCard className="me-1.5 h-3.5 w-3.5" /> Pay
                         </Link>
                     ) : (
                         <Link

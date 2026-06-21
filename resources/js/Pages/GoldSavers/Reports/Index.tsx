@@ -103,7 +103,7 @@ export default function ReportsIndex({ hasReports, wallets }: ReportsProps) {
                                         </div>
 
                                         <Button type="submit" disabled={processing} className="w-full md:w-auto">
-                                            <Download className="h-4 w-4 mr-2" />
+                                            <Download className="h-4 w-4 me-2" />
                                             {__('general.generate_report')}
                                         </Button>
 

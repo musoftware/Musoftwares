@@ -76,12 +76,12 @@ export function LeadsWorkspace(props: LeadsWorkspaceProps) {
 
             <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col md:flex-row items-center gap-3.5">
                 <div className="relative flex-1 w-full">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+                    <Search className="w-4 h-4 text-slate-400 absolute start-3 top-3.5" />
                     <Input 
                         type="text" placeholder={__('general.search_by_name_company_or_email')} 
                         value={props.leadsSearch}
                         onChange={(e) => { props.setLeadsSearch(e.target.value); props.setLeadsOffset(0); }}
-                        className="pl-9 bg-slate-50 border-slate-200 h-10 w-full"
+                        className="ps-9 bg-slate-50 border-slate-200 h-10 w-full"
                     />
                 </div>
 
@@ -118,10 +118,10 @@ export function LeadsWorkspace(props: LeadsWorkspaceProps) {
             ) : (
                 <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
+                        <table className="w-full text-start border-collapse">
                             <thead>
                                 <tr className="bg-slate-50/50 border-b border-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
-                                    <th className="p-4 pl-6">Profile</th>
+                                    <th className="p-4 ps-6">Profile</th>
                                     <th className="p-4">{__('general.corporate_role')}</th>
                                     <th className="p-4">{__('general.contact_info')}</th>
                                     <th className="p-4">{__('general.quality_score')}</th>
@@ -131,7 +131,7 @@ export function LeadsWorkspace(props: LeadsWorkspaceProps) {
                             <tbody className="divide-y divide-slate-100 text-xs">
                                 {props.leads.map(lead => (
                                     <tr key={lead.id} className="hover:bg-slate-50/50 transition-colors">
-                                        <td className="p-4 pl-6">
+                                        <td className="p-4 ps-6">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-8 h-8 bg-gradient-to-tr from-slate-100 to-slate-200 text-slate-600 rounded-lg flex items-center justify-center font-bold text-xs uppercase shadow-sm">
                                                     {lead.name ? lead.name[0] : '?'}

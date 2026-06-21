@@ -431,7 +431,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                         <DropdownMenuItem
                                                             onClick={() => router.visit(route('admin.serial-devices.index', { software_id: sw.id }))}
                                                         >
-                                                            <Eye className="w-4 h-4 mr-2" />
+                                                            <Eye className="w-4 h-4 me-2" />
                                                             {__('general.view_devices')}
                                                         </DropdownMenuItem>
 
@@ -458,7 +458,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                             variant="destructive"
                                                             onClick={() => destroy(sw)}
                                                         >
-                                                            <Trash2 className="w-4 h-4 mr-2" />
+                                                            <Trash2 className="w-4 h-4 me-2" />
                                                             {__('general.delete')}
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>

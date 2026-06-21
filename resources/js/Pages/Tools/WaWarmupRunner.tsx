@@ -101,11 +101,11 @@ function NumberCard({ number, onRemove }: { number: any; onRemove: () => void })
             <div className="flex gap-2 mt-4">
                 {number.status === 'running' ? (
                     <Button variant="outline" className="flex-1 h-9 bg-yellow-500/10 border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/15 hover:text-yellow-400">
-                        <Square className="w-3 h-3 mr-1.5" /> Pause
+                        <Square className="w-3 h-3 me-1.5" /> Pause
                     </Button>
                 ) : (
                     <Button variant="outline" className="flex-1 h-9 bg-green-500/10 border-green-500/20 text-green-400 hover:bg-green-500/15 hover:text-green-400">
-                        <Play className="w-3 h-3 mr-1.5" />{__('general.resume_warmup')}</Button>
+                        <Play className="w-3 h-3 me-1.5" />{__('general.resume_warmup')}</Button>
                 )}
                 <Button variant="outline" size="icon" className="h-9 w-10 bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700 hover:text-slate-300">
                     <Activity className="w-3.5 h-3.5" />

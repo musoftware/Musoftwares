@@ -293,7 +293,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                             >
                                 <Card className="shadow-none border border-border hover:border-primary/20 hover:shadow-md/5 transition-all h-[240px] flex flex-col justify-between overflow-hidden relative group">
                                     {task.archived && (
-                                        <div className="absolute top-0 right-0 bg-zinc-100 border-l border-b border-zinc-200 text-zinc-600 px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase rounded-bl">
+                                        <div className="absolute top-0 end-0 bg-zinc-100 border-s border-b border-zinc-200 text-zinc-600 px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase rounded-bl">
                                             Archived
                                         </div>
                                     )}

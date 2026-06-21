@@ -129,7 +129,7 @@ export default function Show({ host, eventType }: any) {
                                         <div className="min-w-0">
                                             <h4 className="font-semibold text-slate-800 text-sm truncate">{prov.name}</h4>
                                             <p className="text-xs text-slate-900 truncate flex items-center">
-                                                <Stethoscope className="w-3 h-3 mr-0.5" />
+                                                <Stethoscope className="w-3 h-3 me-0.5" />
                                                 {prov.specialty || 'Specialist'}
                                             </p>
                                         </div>
@@ -187,7 +187,7 @@ export default function Show({ host, eventType }: any) {
                     </div>
                     
                     <div className="flex items-center text-xs text-slate-400">
-                        <Globe className="h-3.5 w-3.5 mr-1.5" />
+                        <Globe className="h-3.5 w-3.5 me-1.5" />
                         Timezone: {data.timezone}
                     </div>
                 </div>
@@ -215,7 +215,7 @@ export default function Show({ host, eventType }: any) {
                                     <span className="text-[10px] text-slate-400 mt-1">{__('general.please_select_another_date')}</span>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 gap-2 max-h-[320px] overflow-y-auto pr-1.5 custom-scrollbar">
+                                <div className="grid grid-cols-1 gap-2 max-h-[320px] overflow-y-auto pe-1.5 custom-scrollbar">
                                     {availableSlots.map(slot => {
                                         const isSelected = selectedTime === slot.time;
                                         return (
@@ -223,7 +223,7 @@ export default function Show({ host, eventType }: any) {
                                                 key={slot.time}
                                                 onClick={() => handleSlotSelect(slot)}
                                                 className={`
-                                                    py-3 px-4 rounded-xl border text-sm font-semibold transition-all text-left flex justify-between items-center
+                                                    py-3 px-4 rounded-xl border text-sm font-semibold transition-all text-start flex justify-between items-center
                                                     ${isSelected 
                                                         ? 'border-slate-900 bg-slate-100/50 text-slate-900 ring-1 ring-slate-400' 
                                                         : 'border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'
@@ -264,10 +264,10 @@ export default function Show({ host, eventType }: any) {
     );
 
     const renderDetailsForm = () => (
-        <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
+        <div className="space-y-6 animate-in fade-in slide-in-from-end-8 duration-500">
             <div className="flex items-center text-slate-600 mb-6">
-                <Button variant="ghost" size="sm" onClick={() => setStep(1)} className="mr-2 -ml-3 text-slate-500 hover:text-slate-900 rounded-lg">
-                    <ChevronLeft className="h-4 w-4 mr-1" />{__('general.back_to_calendar')}</Button>
+                <Button variant="ghost" size="sm" onClick={() => setStep(1)} className="me-2 -ms-3 text-slate-500 hover:text-slate-900 rounded-lg">
+                    <ChevronLeft className="h-4 w-4 me-1" />{__('general.back_to_calendar')}</Button>
             </div>
 
             <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs">
@@ -283,7 +283,7 @@ export default function Show({ host, eventType }: any) {
                 </div>
 
                 {data.booking_provider_id && (
-                    <div className="border-t sm:border-t-0 sm:border-l border-slate-200 sm:pl-4 pt-3 sm:pt-0">
+                    <div className="border-t sm:border-t-0 sm:border-s border-slate-200 sm:ps-4 pt-3 sm:pt-0">
                         <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Provider</h4>
                         <span className="text-sm font-semibold text-slate-800 block">
                             {selectedProvider?.name || availableSlots.find(s => s.time === selectedTime)?.provider?.name || 'Assigned Specialist'}
@@ -384,8 +384,8 @@ export default function Show({ host, eventType }: any) {
             <div className="max-w-5xl w-full bg-white rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.03)] overflow-hidden border border-slate-150 flex flex-col md:flex-row">
                 
                 {/* Left Column - Event Info Panel */}
-                <div className="w-full md:w-80 bg-slate-50/50 p-8 border-r border-slate-100 relative overflow-hidden flex flex-col justify-between shrink-0">
-                    <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-slate-100 to-transparent -z-10" />
+                <div className="w-full md:w-80 bg-slate-50/50 p-8 border-e border-slate-100 relative overflow-hidden flex flex-col justify-between shrink-0">
+                    <div className="absolute top-0 start-0 w-full h-32 bg-gradient-to-b from-slate-100 to-transparent -z-10" />
                     
                     <div>
                         <div className="mb-8">
@@ -399,13 +399,13 @@ export default function Show({ host, eventType }: any) {
                         
                         <div className="space-y-3.5">
                             <div className="flex items-center text-xs font-semibold text-slate-600 bg-white p-3 rounded-xl shadow-xs border border-slate-100">
-                                <Clock className="w-4 h-4 mr-2.5 text-slate-400 shrink-0" />
+                                <Clock className="w-4 h-4 me-2.5 text-slate-400 shrink-0" />
                                 Duration: {eventType.duration_minutes} min
                             </div>
                             
                             {eventType.requires_payment && eventType.price > 0 && (
                                 <div className="flex items-center text-xs font-semibold text-slate-800 bg-slate-100 p-3 rounded-xl shadow-xs border border-slate-200">
-                                    <CreditCard className="w-4 h-4 mr-2.5 text-slate-600 shrink-0" />
+                                    <CreditCard className="w-4 h-4 me-2.5 text-slate-600 shrink-0" />
                                     Fee: {eventType.price} {eventType.currency}
                                 </div>
                             )}

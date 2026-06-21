@@ -77,7 +77,7 @@ export default function MarketplaceFooter() {
                             <a href="#" className="text-gray-400 hover:text-gray-900"><Users className="h-5 w-5" /></a>
                         </div>
                         
-                        <div className="hidden md:flex items-center gap-4 ml-4">
+                        <div className="hidden md:flex items-center gap-4 ms-4">
                             <button className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900">
                                 <Globe className="h-4 w-4" /> English
                             </button>

@@ -13,7 +13,7 @@ function FieldTooltip({ text }) {
     return (
         <TooltipProvider delayDuration={200}>
             <Tooltip>
-                <TooltipTrigger type="button" tabIndex={-1} className="inline-flex items-center ml-1.5 focus:outline-none translate-y-0.5">
+                <TooltipTrigger type="button" tabIndex={-1} className="inline-flex items-center ms-1.5 focus:outline-none translate-y-0.5">
                     <Info className="h-4 w-4 text-gray-400 hover:text-indigo-500 transition-colors" />
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs text-sm font-normal">
@@ -338,7 +338,7 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                                                 handleSkillToggle(skill);
                                                 setSkillSearch('');
                                             }}
-                                            className="w-full text-left px-4 py-2 hover:bg-indigo-50 hover:text-indigo-700"
+                                            className="w-full text-start px-4 py-2 hover:bg-indigo-50 hover:text-indigo-700"
                                         >
                                             {skill.name}
                                         </button>

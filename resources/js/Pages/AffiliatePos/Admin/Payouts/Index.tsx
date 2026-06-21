@@ -43,9 +43,9 @@ export default function PayoutsIndex({ payouts, filters }: any) {
                                 <TableHead className="font-semibold text-gray-600">User</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Method</TableHead>
                                 <TableHead className="font-semibold text-gray-600">{__('general.account_info')}</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-right">Amount</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">Amount</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Status</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-right">Actions</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -69,7 +69,7 @@ export default function PayoutsIndex({ payouts, filters }: any) {
                                             <div className="text-sm text-gray-900">{payout.account_name}</div>
                                             <div className="text-sm font-mono text-gray-500">{payout.account_number}</div>
                                         </TableCell>
-                                        <TableCell className="text-right font-semibold text-gray-900">
+                                        <TableCell className="text-end font-semibold text-gray-900">
                                             EGP {payout.amount.toLocaleString()}
                                         </TableCell>
                                         <TableCell>
@@ -89,7 +89,7 @@ export default function PayoutsIndex({ payouts, filters }: any) {
                                                 </Badge>
                                             )}
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-end">
                                             {payout.status === 'pending' ? (
                                                 <div className="flex justify-end gap-2">
                                                     <Button 

@@ -114,10 +114,10 @@ export default function DescriptionStep({ data, setData, errors }: any) {
                 <div className="space-y-4">
                     {data.faq.map((item: any, i: number) => (
                         <div key={i} className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm space-y-3 relative group">
-                            <button type="button" onClick={() => removeFaq(i)} className="absolute right-4 top-4 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                            <button type="button" onClick={() => removeFaq(i)} className="absolute end-4 top-4 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
                                 <Trash2 className="w-4 h-4" />
                             </button>
-                            <div className="pr-8">
+                            <div className="pe-8">
                                 <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Question</Label>
                                 <Input 
                                     value={item.question} 

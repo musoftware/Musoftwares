@@ -59,7 +59,7 @@ export function ActivityTimeline({ items, className, maxItems }: ActivityTimelin
     }
 
     return (
-        <div className={cn('relative border-l border-slate-200 pl-6 ml-3 space-y-6 py-2', className)}>
+        <div className={cn('relative border-s border-slate-200 ps-6 ms-3 space-y-6 py-2', className)}>
             {displayed.map((item, idx) => {
                 const event = item.title || item.event || '';
                 const time = item.time || (item.created_at ? formatDateRelative(item.created_at) : '');
@@ -67,7 +67,7 @@ export function ActivityTimeline({ items, className, maxItems }: ActivityTimelin
 
                 return (
                     <div key={item.id ?? idx} className="relative">
-                        <span className="absolute -left-[31px] top-1 bg-white border border-slate-200 rounded-full p-1 flex items-center justify-center shadow-sm">
+                        <span className="absolute -start-[31px] top-1 bg-white border border-slate-200 rounded-full p-1 flex items-center justify-center shadow-sm">
                             {icon}
                         </span>
                         <div>
@@ -75,7 +75,7 @@ export function ActivityTimeline({ items, className, maxItems }: ActivityTimelin
                                 <span className="font-semibold text-slate-700 capitalize">
                                     {event.replace(/_/g, ' ')}
                                 </span>
-                                <span className="text-slate-400 font-mono ml-4 shrink-0">{time}</span>
+                                <span className="text-slate-400 font-mono ms-4 shrink-0">{time}</span>
                             </div>
                             {item.description && (
                                 <p className="text-[13px] text-slate-500 leading-relaxed">{item.description}</p>

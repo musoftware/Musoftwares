@@ -189,7 +189,7 @@ export default function Index({ methods, filters, stats }: Props) {
         {
             key: 'actions',
             label: '',
-            className: 'w-[60px] text-right',
+            className: 'w-[60px] text-end',
             render: (m: PaymentMethod) => (
                 <DropdownMenu>
                     <DropdownMenuTrigger
@@ -206,7 +206,7 @@ export default function Index({ methods, filters, stats }: Props) {
                                 href={route('admin.payment-methods.show', m.id)}
                                 className="flex items-center w-full"
                             >
-                                <Eye className="mr-2 h-4 w-4" />{__('general.view_details')}</Link>
+                                <Eye className="me-2 h-4 w-4" />{__('general.view_details')}</Link>
                         </DropdownMenuItem>
 
                         {m.status !== 'active' && (
@@ -214,7 +214,7 @@ export default function Index({ methods, filters, stats }: Props) {
                                 className="text-emerald-600 focus:text-emerald-600"
                                 onClick={() => handleUpdate(m.id, 'active')}
                             >
-                                <CheckCircle className="mr-2 h-4 w-4" /> Approve
+                                <CheckCircle className="me-2 h-4 w-4" /> Approve
                             </DropdownMenuItem>
                         )}
 
@@ -223,7 +223,7 @@ export default function Index({ methods, filters, stats }: Props) {
                                 className="text-red-600 focus:text-red-600"
                                 onClick={() => handleUpdate(m.id, 'declined')}
                             >
-                                <XCircle className="mr-2 h-4 w-4" /> Decline
+                                <XCircle className="me-2 h-4 w-4" /> Decline
                             </DropdownMenuItem>
                         )}
 
@@ -232,7 +232,7 @@ export default function Index({ methods, filters, stats }: Props) {
                                 className="text-slate-600"
                                 onClick={() => handleUpdate(m.id, 'pending')}
                             >
-                                <Clock className="mr-2 h-4 w-4" />{__('general.reset_to_pending')}</DropdownMenuItem>
+                                <Clock className="me-2 h-4 w-4" />{__('general.reset_to_pending')}</DropdownMenuItem>
                         )}
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -261,7 +261,7 @@ export default function Index({ methods, filters, stats }: Props) {
                 >
                     {opt.label}
                     {opt.value === 'pending' && stats.pending > 0 && (
-                        <span className="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-yellow-500 px-1 text-[10px] font-bold text-white">
+                        <span className="ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-yellow-500 px-1 text-[10px] font-bold text-white">
                             {stats.pending}
                         </span>
                     )}

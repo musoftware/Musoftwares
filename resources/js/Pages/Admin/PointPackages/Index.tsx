@@ -64,7 +64,7 @@ export default function Index({ pointPackages, search }: Props) {
                     </div>
                     <Button asChild>
                         <Link href={route('admin.point-packages.create')}>
-                            <Plus className="mr-2 h-4 w-4" />
+                            <Plus className="me-2 h-4 w-4" />
                             {__('admin.create_point_package')}
                         </Link>
                     </Button>
@@ -73,12 +73,12 @@ export default function Index({ pointPackages, search }: Props) {
                 {/* Search */}
                 <form onSubmit={handleSearch} className="flex max-w-sm items-center gap-2">
                     <div className="relative w-full">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                         <Input
                             placeholder={__('general.search')}
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
-                            className="pl-9"
+                            className="ps-9"
                         />
                     </div>
                     <Button type="submit" variant="outline">
@@ -89,14 +89,14 @@ export default function Index({ pointPackages, search }: Props) {
                 {/* Table */}
                 <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm">
+                        <table className="w-full text-start text-sm">
                             <thead className="border-b border-slate-200 bg-slate-50">
                                 <tr>
                                     <th className="px-4 py-3 font-semibold text-slate-500">{__('admin.package_name')}</th>
                                     <th className="px-4 py-3 font-semibold text-slate-500">{__('admin.points_amount')}</th>
                                     <th className="px-4 py-3 font-semibold text-slate-500">{__('admin.price')}</th>
                                     <th className="px-4 py-3 font-semibold text-slate-500">{__('general.status')}</th>
-                                    <th className="px-4 py-3 font-semibold text-slate-500 text-right">{__('general.actions')}</th>
+                                    <th className="px-4 py-3 font-semibold text-slate-500 text-end">{__('general.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -115,7 +115,7 @@ export default function Index({ pointPackages, search }: Props) {
                                                     {pkg.is_active ? __('admin.active') : __('general.inactive')}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-right">
+                                            <td className="px-4 py-3 text-end">
                                                 <Dialog>
                                                     <DialogTrigger asChild>
                                                         <Button variant="ghost" className="h-8 w-8 p-0">
@@ -132,7 +132,7 @@ export default function Index({ pointPackages, search }: Props) {
                                                                 className="justify-start"
                                                                 onClick={() => router.visit(route('admin.point-packages.edit', pkg.id))}
                                                             >
-                                                                <Edit className="mr-2 h-4 w-4" />
+                                                                <Edit className="me-2 h-4 w-4" />
                                                                 {__('general.edit')}
                                                             </Button>
                                                             <Button
@@ -140,7 +140,7 @@ export default function Index({ pointPackages, search }: Props) {
                                                                 className="justify-start"
                                                                 onClick={() => setDeleteId(pkg.id)}
                                                             >
-                                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                                <Trash2 className="me-2 h-4 w-4" />
                                                                 {__('general.delete')}
                                                             </Button>
                                                         </div>

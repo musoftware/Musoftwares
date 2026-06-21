@@ -107,13 +107,13 @@ function NewCampaignModal({
                     <div className="space-y-1.5">
                         <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Keyword <span className="text-rose-500">*</span></Label>
                         <div className="relative">
-                            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                            <Search className="w-4 h-4 text-slate-400 absolute start-3.5 top-1/2 -translate-y-1/2" />
                             <Input
                                 type="text"
                                 placeholder='e.g. "Coffee Shop", "Car Wash", "Dentist"'
                                 value={keyword}
                                 onChange={e => setKeyword(e.target.value)}
-                                className="pl-10"
+                                className="ps-10"
                             />
                         </div>
                     </div>
@@ -122,13 +122,13 @@ function NewCampaignModal({
                     <div className="space-y-1.5">
                         <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Location <span className="text-rose-500">*</span></Label>
                         <div className="relative">
-                            <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                            <MapPin className="w-4 h-4 text-slate-400 absolute start-3.5 top-1/2 -translate-y-1/2" />
                             <Input
                                 type="text"
                                 placeholder='e.g. "Amman, Jordan", "Dubai, UAE", "New York"'
                                 value={location}
                                 onChange={e => setLocation(e.target.value)}
-                                className="pl-10"
+                                className="ps-10"
                             />
                         </div>
                     </div>
@@ -251,7 +251,7 @@ function SettingsPanel({ callRPC }: { callRPC: (a: string, d?: any) => Promise<a
                             key={opt.id}
                             type="button"
                             onClick={() => setSettings((s: any) => ({ ...s, speed: opt.id }))}
-                            className={`p-4 rounded-xl border text-left transition-all ${settings.speed === opt.id ? 'border-slate-900 bg-slate-950 text-white' : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300'}`}
+                            className={`p-4 rounded-xl border text-start transition-all ${settings.speed === opt.id ? 'border-slate-900 bg-slate-950 text-white' : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300'}`}
                         >
                             <p className="text-xs font-bold">{opt.label}</p>
                             <p className={`text-[11px] mt-1 ${settings.speed === opt.id ? 'text-slate-300' : 'text-slate-500'}`}>{opt.desc}</p>
@@ -556,7 +556,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
             <div className="flex-1 flex overflow-hidden">
 
                 {/* ── Sidebar: Live Activity ── */}
-                <aside className="w-64 border-r border-slate-200 bg-white hidden lg:flex flex-col shrink-0">
+                <aside className="w-64 border-e border-slate-200 bg-white hidden lg:flex flex-col shrink-0">
                     {/* Stats */}
                     <div className="p-4 border-b border-slate-100 grid grid-cols-3 gap-2">
                         {[
@@ -645,13 +645,13 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                             <Card key={camp.id} className="overflow-hidden hover:shadow-md transition-all relative group border-slate-200/80">
                                                 {/* Running progress bar */}
                                                 {isRunning && (
-                                                    <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-400 via-teal-400 to-sky-400 animate-pulse" />
+                                                    <div className="absolute top-0 start-0 end-0 h-0.5 bg-gradient-to-r from-emerald-400 via-teal-400 to-sky-400 animate-pulse" />
                                                 )}
 
                                                 <CardContent className="p-5">
                                                     {/* Card header */}
                                                     <div className="flex items-start justify-between mb-3">
-                                                        <div className="min-w-0 flex-1 pr-3">
+                                                        <div className="min-w-0 flex-1 pe-3">
                                                             <h3 className="font-bold text-slate-900 text-sm truncate group-hover:text-emerald-700 transition-colors">{camp.name}</h3>
                                                             <div className="flex items-center gap-1.5 mt-0.5">
                                                                 <Search className="w-3 h-3 text-slate-400 shrink-0" />
@@ -697,7 +697,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                                             size="sm"
                                                             onClick={() => { setFilterCampaignId(camp.id); setActiveTab('results'); }}
                                                             className="text-xs h-8 text-slate-500 hover:text-slate-900"
-                                                        >{__('general.view_results')}<ChevronRight className="w-3.5 h-3.5 ml-1" />
+                                                        >{__('general.view_results')}<ChevronRight className="w-3.5 h-3.5 ms-1" />
                                                         </Button>
 
                                                         <div className="flex items-center gap-2">
@@ -718,7 +718,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                                                     onClick={() => handleStop(camp.id)}
                                                                     className="h-8 bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-100 text-[11px]"
                                                                 >
-                                                                    <Square className="w-3 h-3 fill-rose-600 mr-1" /> Pause
+                                                                    <Square className="w-3 h-3 fill-rose-600 me-1" /> Pause
                                                                 </Button>
                                                             ) : (
                                                                 <Button
@@ -727,7 +727,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                                                     onClick={() => handleStart(camp.id)}
                                                                     className="h-8 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-100 text-[11px]"
                                                                 >
-                                                                    <Play className="w-3 h-3 fill-emerald-600 mr-1" />
+                                                                    <Play className="w-3 h-3 fill-emerald-600 me-1" />
                                                                     {camp.status === 'paused' || camp.status === 'completed' || camp.status === 'failed' ? 'Re-run' : 'Start'}
                                                                 </Button>
                                                             )}
@@ -777,12 +777,12 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                             <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
                                 {/* Search */}
                                 <div className="relative flex-1 w-full">
-                                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                    <Search className="w-3.5 h-3.5 text-slate-400 absolute start-3 top-1/2 -translate-y-1/2" />
                                     <Input
                                         placeholder={__('general.search_by_name_address_category_email')}
                                         value={filterSearch}
                                         onChange={e => { setFilterSearch(e.target.value); setResultsOffset(0); }}
-                                        className="pl-8"
+                                        className="ps-8"
                                     />
                                 </div>
 
@@ -831,7 +831,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                             <thead>
                                                 <tr className="border-b border-slate-100 bg-slate-50/80">
                                                     {['Business', 'Category', 'Rating', 'Phone', 'Email', 'Website', 'Address', ''].map(h => (
-                                                        <th key={h} className="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                                                        <th key={h} className="px-4 py-3 text-start text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
                                                     ))}
                                                 </tr>
                                             </thead>

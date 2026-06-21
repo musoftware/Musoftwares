@@ -26,11 +26,11 @@ export default function Index({ webhooks }: Props) {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'processed':
-                return <Badge className="bg-emerald-100 text-emerald-800"><CheckCircle2 className="w-3 h-3 mr-1" /> Processed</Badge>;
+                return <Badge className="bg-emerald-100 text-emerald-800"><CheckCircle2 className="w-3 h-3 me-1" /> Processed</Badge>;
             case 'failed':
-                return <Badge className="bg-rose-100 text-rose-800"><XCircle className="w-3 h-3 mr-1" /> Failed</Badge>;
+                return <Badge className="bg-rose-100 text-rose-800"><XCircle className="w-3 h-3 me-1" /> Failed</Badge>;
             default:
-                return <Badge className="bg-amber-100 text-amber-800"><Clock className="w-3 h-3 mr-1" /> Pending</Badge>;
+                return <Badge className="bg-amber-100 text-amber-800"><Clock className="w-3 h-3 me-1" /> Pending</Badge>;
         }
     };
 
@@ -55,7 +55,7 @@ export default function Index({ webhooks }: Props) {
                     </CardHeader>
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
+                            <table className="w-full text-sm text-start">
                                 <thead className="bg-slate-50 text-slate-500 uppercase text-xs">
                                     <tr>
                                         <th className="px-6 py-3 font-medium">ID</th>
@@ -63,7 +63,7 @@ export default function Index({ webhooks }: Props) {
                                         <th className="px-6 py-3 font-medium">Event Type</th>
                                         <th className="px-6 py-3 font-medium">Status</th>
                                         <th className="px-6 py-3 font-medium">Received At</th>
-                                        <th className="px-6 py-3 font-medium text-right">Action</th>
+                                        <th className="px-6 py-3 font-medium text-end">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
@@ -75,12 +75,12 @@ export default function Index({ webhooks }: Props) {
                                                 <td className="px-6 py-4 text-slate-600">{webhook.event_type || 'Unknown'}</td>
                                                 <td className="px-6 py-4">{getStatusBadge(webhook.status)}</td>
                                                 <td className="px-6 py-4 text-slate-500">{new Date(webhook.created_at).toLocaleString()}</td>
-                                                <td className="px-6 py-4 text-right">
+                                                <td className="px-6 py-4 text-end">
                                                     <Link 
                                                         href={route('admin.settings.incoming-webhooks.show', webhook.id)}
                                                         className="inline-flex items-center text-indigo-600 hover:text-indigo-900"
                                                     >
-                                                        <Eye className="w-4 h-4 mr-1" /> View
+                                                        <Eye className="w-4 h-4 me-1" /> View
                                                     </Link>
                                                 </td>
                                             </tr>

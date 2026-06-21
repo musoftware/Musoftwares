@@ -464,7 +464,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
                                                     {/* Visual arrow pointer */}
-                                                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-t border-l border-slate-200 rotate-45" />
+                                                    <div className="absolute -top-1.5 start-1/2 -translate-x-1/2 w-3 h-3 bg-white border-t border-s border-slate-200 rotate-45" />
 
                                                     <form onSubmit={handleSavePin} className="space-y-3 relative z-10">
                                                         <div className="flex items-center justify-between">

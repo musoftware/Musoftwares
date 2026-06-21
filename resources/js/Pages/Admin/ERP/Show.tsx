@@ -135,7 +135,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                             </div>
                             
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
-                                <div className="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center sm:text-left">
+                                <div className="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center sm:text-start">
                                     <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">{__('general.workspace_revenue')}</span>
                                     <span className="text-lg font-mono font-bold text-slate-900">
                                         {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(tenant.revenue)}
@@ -200,7 +200,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                     {/* CLIENTS TAB */}
                     {activeTab === 'clients' && (
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm border-collapse">
+                            <table className="w-full text-start text-sm border-collapse">
                                 <thead>
                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         <th className="px-6 py-3.5">{__('general.client_name')}</th>
@@ -246,12 +246,12 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                     {/* INVOICES TAB */}
                     {activeTab === 'invoices' && (
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm border-collapse">
+                            <table className="w-full text-start text-sm border-collapse">
                                 <thead>
                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         <th className="px-6 py-3.5">{__('general.invoice_number')}</th>
                                         <th className="px-6 py-3.5">Client</th>
-                                        <th className="px-6 py-3.5 text-right">Amount</th>
+                                        <th className="px-6 py-3.5 text-end">Amount</th>
                                         <th className="px-6 py-3.5">Status</th>
                                         <th className="px-6 py-3.5">{__('general.issued_at')}</th>
                                     </tr>
@@ -270,7 +270,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                                 <td className="px-6 py-4 font-semibold text-slate-900">
                                                     {invoice.client_name}
                                                 </td>
-                                                <td className="px-6 py-4 text-right font-bold text-slate-900 font-mono">
+                                                <td className="px-6 py-4 text-end font-bold text-slate-900 font-mono">
                                                     {formatCurrency(invoice.amount, invoice.currency)}
                                                 </td>
                                                 <td className="px-6 py-4">
@@ -295,7 +295,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                     {/* TEAM TAB */}
                     {activeTab === 'team' && (
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm border-collapse">
+                            <table className="w-full text-start text-sm border-collapse">
                                 <thead>
                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         <th className="px-6 py-3.5">Name</th>
@@ -352,7 +352,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                     {/* TASKS TAB */}
                     {activeTab === 'tasks' && (
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm border-collapse">
+                            <table className="w-full text-start text-sm border-collapse">
                                 <thead>
                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         <th className="px-6 py-3.5">{__('general.task_title')}</th>

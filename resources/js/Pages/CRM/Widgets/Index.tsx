@@ -51,7 +51,7 @@ export default function Index({ widgets }: { widgets: any }) {
 
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left">
+                        <table className="w-full text-sm text-start">
                             <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
                                 <tr>
                                     <th className="px-6 py-4 font-medium">{__('general.form_name')}</th>
@@ -59,7 +59,7 @@ export default function Index({ widgets }: { widgets: any }) {
                                     <th className="px-6 py-4 font-medium">{__('general.allowed_domains')}</th>
                                     <th className="px-6 py-4 font-medium">{__('general.leads_captured')}</th>
                                     <th className="px-6 py-4 font-medium">{__('general.created_at')}</th>
-                                    <th className="px-6 py-4 font-medium text-right">{__('general.actions')}</th>
+                                    <th className="px-6 py-4 font-medium text-end">{__('general.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -100,7 +100,7 @@ export default function Index({ widgets }: { widgets: any }) {
                                         <td className="px-6 py-4 text-slate-500">
                                             {format(new Date(widget.created_at), 'MMM dd, yyyy')}
                                         </td>
-                                        <td className="px-6 py-4 text-right">
+                                        <td className="px-6 py-4 text-end">
                                             <div className="flex items-center justify-end gap-2">
                                                 <Link href={route('crm.widgets.show', widget.id)} title={__('general.get_embed_code')} className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'text-slate-500 hover:text-indigo-600' })}>
                                                     <Code className="w-4 h-4" />
@@ -121,7 +121,7 @@ export default function Index({ widgets }: { widgets: any }) {
                                                 <p className="text-base font-medium text-slate-900">{__('general.no_web_forms_yet')}</p>
                                                 <p className="text-sm mt-1 mb-4">{__('general.create_your_first_embeddable_lead_form')}</p>
                                                 <Link href={route('crm.widgets.create')} className={buttonVariants({ variant: 'outline' })}>
-                                                    <Plus className="w-4 h-4 mr-2" />
+                                                    <Plus className="w-4 h-4 me-2" />
                                                     {__('general.create_new_form')}
                                                 </Link>
                                             </div>

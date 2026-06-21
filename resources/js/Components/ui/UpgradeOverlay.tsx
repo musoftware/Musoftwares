@@ -31,7 +31,7 @@ export function UpgradeOverlay({
 }: UpgradeOverlayProps) {
     return (
         <Card className={`border-primary/20 bg-primary/5 shadow-none overflow-hidden relative ${className}`}>
-            <div className="absolute top-0 right-0 translate-x-12 -translate-y-12 opacity-5 pointer-events-none">
+            <div className="absolute top-0 end-0 translate-x-12 -translate-y-12 opacity-5 pointer-events-none">
                 <Icon className="h-64 w-64 text-primary" />
             </div>
             <CardContent className="p-8 md:p-10 relative z-10 space-y-6">

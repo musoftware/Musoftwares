@@ -52,8 +52,8 @@ export default function Index({ articles }: IndexProps) {
 
             <div className="relative min-h-screen py-16 lg:py-24 bg-slate-50 overflow-hidden">
                 {/* Background Decorations */}
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-200/30 rounded-full blur-3xl pointer-events-none z-0" />
-                <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-purple-200/20 rounded-full blur-3xl pointer-events-none z-0" />
+                <div className="absolute top-0 start-1/4 w-96 h-96 bg-indigo-200/30 rounded-full blur-3xl pointer-events-none z-0" />
+                <div className="absolute top-1/3 end-1/4 w-[400px] h-[400px] bg-purple-200/20 rounded-full blur-3xl pointer-events-none z-0" />
 
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
                     
@@ -113,9 +113,9 @@ export default function Index({ articles }: IndexProps) {
                                         )}
                                         
                                         {article.language && (
-                                            <div className="absolute top-4 left-4">
+                                            <div className="absolute top-4 start-4">
                                                 <Badge className="bg-white/90 backdrop-blur-sm text-slate-800 hover:bg-white uppercase font-bold tracking-wider border-none shadow-sm">
-                                                    <Globe className="h-3 w-3 mr-1 inline" />
+                                                    <Globe className="h-3 w-3 me-1 inline" />
                                                     {article.language}
                                                 </Badge>
                                             </div>

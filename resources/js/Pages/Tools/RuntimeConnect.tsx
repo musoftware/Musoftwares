@@ -141,7 +141,7 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
                         <h1 className="text-2xl font-semibold text-white">{__('general.connected')}</h1>
                         <p className="mt-2 text-slate-400 text-sm">{__('general.the_musoftware_runtime_is_now_connected_to_your_account')}<br />{__('general.you_can_close_this_window')}</p>
                     </div>
-                    <Card className="border-slate-800 bg-slate-900/60 text-left">
+                    <Card className="border-slate-800 bg-slate-900/60 text-start">
                         <CardContent className="p-4 space-y-2">
                             <div className="flex items-center gap-2 text-sm">
                                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />

@@ -72,7 +72,7 @@ export default function SearchIndex() {
 
                     {/* Search Input */}
                     <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
                             {loading ? (
                                 <Loader2 className="h-6 w-6 text-indigo-500 animate-spin" />
                             ) : (
@@ -81,7 +81,7 @@ export default function SearchIndex() {
                         </div>
                         <Input
                             type="text"
-                            className="block w-full pl-12 pr-4 py-6 text-lg border-slate-200 bg-white rounded-2xl shadow-sm focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                            className="block w-full ps-12 pe-4 py-6 text-lg border-slate-200 bg-white rounded-2xl shadow-sm focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
                             placeholder={__('general.type_a_name_email_or_phone_number')}
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}

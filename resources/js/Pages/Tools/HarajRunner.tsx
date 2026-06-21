@@ -196,21 +196,21 @@ export default function HarajRunner({ tool }: any) {
                         <div className="md:col-span-2">
                             <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.keyword_category')}</label>
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <Input
                                     type="text" value={keyword} onChange={e => setKeyword(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && handleStart()}
                                     placeholder={__('general.cars_electronics_furniture_real_estate')}
-                                    className="pl-9 h-11 text-sm bg-slate-50"
+                                    className="ps-9 h-11 text-sm bg-slate-50"
                                 />
                             </div>
                         </div>
                         <div>
                             <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.max_leads')}</label>
                             <div className="relative">
-                                <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <Users className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <Input type="number" min={10} max={500} step={10} value={limit} onChange={e => setLimit(parseInt(e.target.value, 10))}
-                                    className="pl-9 h-11 text-sm bg-slate-50" />
+                                    className="ps-9 h-11 text-sm bg-slate-50" />
                             </div>
                         </div>
                     </div>
