@@ -135,11 +135,37 @@ This section defines the operational capabilities, oversight functions, and syst
 
 ---
 
-## 5. User Role: Musoftwares System
+## 5. User Role: Client
+
+This section defines the autonomous capabilities, financial interactions, and communication workflows executed by the "Client" role within the Client Portal and broader ecosystem.
+
+### 5.1. User Stories
+- **US-CLI-01 (Financial Autonomy & Billing)**: As a Client, I must be able to view, securely pay, and download invoices, as well as manage my wallet balance and payout methods, so I can handle financial obligations smoothly.
+- **US-CLI-02 (Communication & Support)**: As a Client, I must be able to communicate via real-time chat and submit support tickets to the business, ensuring my queries are resolved promptly.
+- **US-CLI-03 (Service Discovery & Orders)**: As a Client, I must be able to browse the marketplace, review available services, and place or manage orders, enabling me to acquire new solutions easily.
+- **US-CLI-04 (Freelance Contracts & Proposals)**: As a Client, I must be able to post jobs, review freelancer proposals, and manage active contracts and escrow releases securely.
+- **US-CLI-05 (Profile & Subscription Management)**: As a Client, I must be able to manage my profile details, complete KYC verification, and independently upgrade, downgrade, or cancel my subscription plans.
+
+### 5.2. Edge Cases
+- **EC-CLI-01 (Real-Time Disconnection)**: If the WebSocket connection fails during an active chat or payment process, the system must gracefully degrade to polling or display an offline warning without losing draft messages.
+- **EC-CLI-02 (Insufficient Wallet Balance)**: When attempting to pay an invoice or transfer funds, if the wallet balance is insufficient, the system must clearly prompt the client to add funds via an external gateway before proceeding.
+- **EC-CLI-03 (Simultaneous Invoice Payment)**: If a client and an admin attempt to mark an invoice as paid simultaneously, or if double-clicking the pay button, the system must prevent double-charging using idempotency keys.
+- **EC-CLI-04 (Subscription Downgrade Constraints)**: If a client attempts to downgrade a subscription while currently using features exceeding the lower plan's limits, they must be prompted to adjust their usage before the downgrade is accepted.
+- **EC-CLI-05 (KYC Verification Delays)**: If a client's KYC verification is pending or rejected, certain financial actions (like large withdrawals) must be strictly locked, with clear feedback on why the action is disabled.
+
+### 5.3. Testing Requirements
+- **TR-CLI-01 (Idempotent Payment Handling)**: Automated tests must simulate rapid double-clicks on payment submission buttons to ensure only one transaction is processed and recorded.
+- **TR-CLI-02 (Data Isolation Verification)**: Integration tests must guarantee that a Client cannot access, view, or modify invoices, tickets, or profile data belonging to another Client, enforcing strict tenant boundaries.
+- **TR-CLI-03 (WebSocket Degradation)**: E2E tests must intentionally block WebSocket connections to verify that the chat UI correctly falls back to long-polling and still delivers messages.
+- **TR-CLI-04 (Subscription Enforcement)**: Tests must mock date/time progression to ensure that an expired or downgraded subscription accurately limits access to premium tools and features in the client portal.
+
+---
+
+## 6. User Role: Musoftwares System
 
 This section defines the automated, background, and programmatic capabilities executed by the "Musoftwares System" itself, acting autonomously to maintain platform health, financial accuracy, and data synchronization.
 
-### 4.1. User Stories
+### 6.1. User Stories
 - **US-SYS-01 (Automated Billing & Subscriptions)**: As the Musoftwares System, I must automatically process recurring subscription renewals, calculate prorations, and gracefully downgrade tenant access if a payment fails, so that revenue collection and access control are hands-free.
 - **US-SYS-02 (Multi-Currency Synchronization)**: As the Musoftwares System, I must periodically fetch exchange rates and accurately compute financial transactions across the dual-currency architecture (Client vs. Business currencies) without rounding errors.
 - **US-SYS-03 (Background Task Orchestration)**: As the Musoftwares System, I must orchestrate long-running asynchronous background tasks (e.g., web scrapers, mass SMS dispatch, data imports) via queues, and publish real-time WebSocket status updates to the end user.
@@ -147,14 +173,14 @@ This section defines the automated, background, and programmatic capabilities ex
 - **US-SYS-05 (Webhook & External API Processing)**: As the Musoftwares System, I must securely receive, validate, and process incoming webhooks from external platforms (e.g., payment gateways, WhatsApp providers) and map them to internal state changes.
 - **US-SYS-06 (Security & Rate Limiting Enforcement)**: As the Musoftwares System, I must actively monitor request velocities, enforce rate limits per module/tenant, and block malicious patterns (e.g., brute-force login, spam) to protect the ecosystem.
 
-### 4.2. Edge Cases
+### 6.2. Edge Cases
 - **EC-SYS-01 (Queue Worker Crashes)**: If a queue worker processing a heavy task crashes midway, the system must either safely retry the job (idempotency) or mark it as failed and alert the admin without corrupting the database state.
 - **EC-SYS-02 (Simultaneous Automation Triggers)**: If a single entity update triggers multiple competing automation rules, the system must process them sequentially or resolve deadlocks to prevent data race conditions.
 - **EC-SYS-03 (External API Rate Limiting)**: When communicating with external APIs (e.g., sending SMS), if the rate limit is hit, the system must pause and requeue the remaining payload using exponential backoff.
 - **EC-SYS-04 (Currency Exchange Service Failure)**: If the primary exchange rate API is down, the system must fall back to the most recently cached rates or pause automated currency-conversion transactions to prevent financial discrepancies.
 - **EC-SYS-05 (Webhook Replays)**: If a payment gateway replays a webhook due to a network timeout, the system must recognize the duplicate transaction ID and gracefully ignore it to prevent double-crediting wallets.
 
-### 4.3. Testing Requirements
+### 6.3. Testing Requirements
 - **TR-SYS-01 (Idempotency Testing)**: All queued jobs and webhook handlers must have automated tests verifying that running the same payload twice does not result in duplicate records or double-billing.
 - **TR-SYS-02 (Concurrency & Race Condition Simulation)**: Integration tests must simulate high concurrency (e.g., multiple rapid wallet deduction requests) to ensure database transactions and locks correctly prevent negative balances.
 - **TR-SYS-03 (Job Failure & Retry Logic)**: Automated tests must mock external API failures to verify that the exponential backoff and dead-letter-queue (DLQ) mechanisms function as intended.
@@ -163,7 +189,7 @@ This section defines the automated, background, and programmatic capabilities ex
 
 ---
 
-## 6. Self-Grilling & Edge Case Resolutions
+## 7. Self-Grilling & Edge Case Resolutions
 
 **Q1: What happens if a user accesses an ERP page without an active subscription?**
 - **Resolution**: The system must intercept the request via middleware and seamlessly render `ERP/UpgradePreview.tsx` or a 403 Forbidden page natively integrated with Shadcn UI. Partial content loads must be strictly blocked to prevent data leaks.
