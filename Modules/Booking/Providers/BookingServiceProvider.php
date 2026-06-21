@@ -2,10 +2,10 @@
 
 namespace Modules\Booking\Providers;
 
-use Nwidart\Modules\Support\ModuleServiceProvider;
+use App\Providers\BaseModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 
-class BookingServiceProvider extends ModuleServiceProvider
+class BookingServiceProvider extends BaseModuleServiceProvider
 {
     /**
      * The name of the module.

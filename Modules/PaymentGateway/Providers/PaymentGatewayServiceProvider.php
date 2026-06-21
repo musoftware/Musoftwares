@@ -2,9 +2,9 @@
 
 namespace Modules\PaymentGateway\Providers;
 
-use Nwidart\Modules\Support\ModuleServiceProvider;
+use App\Providers\BaseModuleServiceProvider;
 
-class PaymentGatewayServiceProvider extends ModuleServiceProvider
+class PaymentGatewayServiceProvider extends BaseModuleServiceProvider
 {
     protected string $name = 'PaymentGateway';
     protected string $nameLower = 'payment-gateway';

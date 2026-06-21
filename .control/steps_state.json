@@ -28,13 +28,13 @@
     {
         "id": "F4",
         "name": "Setup Tailwind v4 & Shadcn UI",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "F5",
         "name": "Install nwidart/laravel-modules",
-        "status": "done",
+        "status": "running",
         "dependencies": []
     },
     {
