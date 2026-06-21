@@ -16,5 +16,6 @@
     "PaymentGateway": true,
     "CRM": true,
     "PasswordSync": true,
-    "WebTools": true
+    "WebTools": true,
+    "Billing": true
 }
