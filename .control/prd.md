@@ -108,7 +108,34 @@ Musoftwares is an enterprise-grade ecosystem combining an ERP, CRM, Client Porta
 
 ---
 
-## 4. User Role: Musoftwares System
+## 4. User Role: Admin
+
+This section defines the operational capabilities, oversight functions, and system management controls executed by the "Admin" role to govern the Musoftwares ecosystem.
+
+### 4.1. User Stories
+- **US-ADM-01 (Tenant Oversight & Support)**: As an Admin, I must be able to view, impersonate, and manage all registered users and client tenants to provide support, troubleshoot issues, and oversee platform usage without requiring their credentials.
+- **US-ADM-02 (Financial Auditing & Reporting)**: As an Admin, I must be able to view aggregated business financials (income, costs, recurring salaries, and profitability) across all modules to assess the overall health of the ecosystem.
+- **US-ADM-03 (Marketplace Moderation)**: As an Admin, I must be able to review, approve, reject, or edit pending marketplace services and orders to maintain quality control and manage disputes between freelancers and clients.
+- **US-ADM-04 (Content & Marketing Management)**: As an Admin, I must be able to create, edit, and publish blog articles, and manage service landing pages to drive SEO and marketing efforts.
+- **US-ADM-05 (System Configuration & Billing)**: As an Admin, I must be able to configure global system settings, payment gateways, subscription plans, and points packages to adapt the platform's offering to changing business needs.
+- **US-ADM-06 (Support & Operational Workflows)**: As an Admin, I must be able to manage support tickets, operational tasks, and global system notifications to ensure prompt customer service and internal efficiency.
+
+### 4.2. Edge Cases
+- **EC-ADM-01 (Impersonation State Management)**: If an Admin impersonates a user and navigates across multiple tabs, the impersonation state must be consistently maintained or clearly indicated (with a persistent exit button) to prevent accidental actions in the wrong context.
+- **EC-ADM-02 (Concurrent Configuration Edits)**: If multiple Admins attempt to edit the same global setting simultaneously, the system must handle the race condition gracefully, either by implementing optimistic locking or alerting the second user.
+- **EC-ADM-03 (Accidental System Lockout)**: If an Admin attempts to delete, disable, or demote their own account, the system must prevent this action if they are the last active super-admin to avoid total system lockout.
+- **EC-ADM-04 (Large Data Export Timeouts)**: If an Admin requests a massive financial report export spanning years of data, the system must process this asynchronously via a background task and notify the Admin upon completion to prevent PHP/Nginx timeouts.
+- **EC-ADM-05 (Destructive Action Safeguards)**: When an Admin initiates a bulk delete on critical resources (e.g., user accounts or transactions), they must be prompted with a strict confirmation dialog (e.g., typing "DELETE") to prevent catastrophic accidental data loss.
+
+### 4.3. Testing Requirements
+- **TR-ADM-01 (Impersonation Privilege Boundary)**: Automated tests must ensure that an impersonating Admin can perform user actions but is strictly blocked from irreversible core actions (like deleting the tenant account permanently) that require the actual user's re-authentication.
+- **TR-ADM-02 (Audit Logging for Admins)**: Integration tests must verify that every sensitive action performed by an Admin (e.g., changing payment settings, impersonation sessions, refunding a transaction) is securely logged in an immutable audit trail.
+- **TR-ADM-03 (Strict Role-Based Access Control)**: Tests must confirm that non-admin users (clients, freelancers, staff) cannot access any `/Admin` routes, and that unauthorized attempts result in a strict 403 Forbidden response.
+- **TR-ADM-04 (Bulk Action Integrity & Reporting)**: E2E tests must validate that bulk actions in the Admin panel process all selected items correctly, handle partial failures gracefully (e.g., skipping locked records), and provide an accurate summary report.
+
+---
+
+## 5. User Role: Musoftwares System
 
 This section defines the automated, background, and programmatic capabilities executed by the "Musoftwares System" itself, acting autonomously to maintain platform health, financial accuracy, and data synchronization.
 
@@ -136,7 +163,7 @@ This section defines the automated, background, and programmatic capabilities ex
 
 ---
 
-## 5. Self-Grilling & Edge Case Resolutions
+## 6. Self-Grilling & Edge Case Resolutions
 
 **Q1: What happens if a user accesses an ERP page without an active subscription?**
 - **Resolution**: The system must intercept the request via middleware and seamlessly render `ERP/UpgradePreview.tsx` or a 403 Forbidden page natively integrated with Shadcn UI. Partial content loads must be strictly blocked to prevent data leaks.
