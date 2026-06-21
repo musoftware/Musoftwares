@@ -5,9 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Redirect;
+use App\Services\OnboardingService;
 
 class OnboardingController extends Controller
 {
+    protected OnboardingService $onboardingService;
+
+    public function __construct(OnboardingService $onboardingService)
+    {
+        $this->onboardingService = $onboardingService;
+    }
     public function show(Request $request)
     {
         $user = $request->user();
@@ -21,49 +28,8 @@ class OnboardingController extends Controller
 
 
 
-        try {
-            $countries = \Illuminate\Support\Facades\DB::table('countries')->pluck('name')->toArray();
-            if (empty($countries)) {
-                \Illuminate\Support\Facades\Artisan::call('db:seed', [
-                    '--class' => 'Database\\Seeders\\CountrySeeder',
-                    '--force' => true,
-                ]);
-                $countries = \Illuminate\Support\Facades\DB::table('countries')->pluck('name')->toArray();
-            }
-        } catch (\Illuminate\Database\QueryException $e) {
-            // If table doesn't exist, run the migration and seeder automatically
-            if (str_contains($e->getMessage(), 'Base table or view not found')) {
-                \Illuminate\Support\Facades\Artisan::call('migrate', [
-                    '--path' => 'database/migrations/2026_05_23_150011_create_countries_table.php',
-                    '--force' => true,
-                ]);
-                \Illuminate\Support\Facades\Artisan::call('db:seed', [
-                    '--class' => 'Database\\Seeders\\CountrySeeder',
-                    '--force' => true,
-                ]);
-                $countries = \Illuminate\Support\Facades\DB::table('countries')->pluck('name')->toArray();
-            } else {
-                throw $e;
-            }
-        }
-
-        $detectedCountry = 'United States'; // Fallback
-        
-        $geoDbPath = storage_path('app/geoip.mmdb');
-        if (file_exists($geoDbPath)) {
-            try {
-                $reader = new \GeoIp2\Database\Reader($geoDbPath);
-                $ip = $request->ip();
-                if ($ip !== '127.0.0.1' && $ip !== '::1') {
-                    $record = $reader->city($ip);
-                    if ($record && $record->country->name) {
-                        $detectedCountry = $record->country->name;
-                    }
-                }
-            } catch (\Exception $e) {
-                // Ignore if IP not found in DB or DB missing
-            }
-        }
+        $countries = $this->onboardingService->getCountries();
+        $detectedCountry = $this->onboardingService->detectCountryFromIp($request->ip());
 
         return Inertia::render('Auth/OnboardingWizard', [
             'user' => [
@@ -108,25 +74,8 @@ class OnboardingController extends Controller
             $validated['telegram_username'] = ltrim($validated['telegram_username'], '@');
         }
 
-        $user->fill($validated);
-
-        if ($action === 'complete') {
-            $user->onboarding_completed = true;
-        }
-
-        try {
-            $user->save();
-        } catch (\Illuminate\Database\QueryException $e) {
-            if (str_contains($e->getMessage(), 'Column not found') || str_contains($e->getMessage(), 'Unknown column')) {
-                \Illuminate\Support\Facades\Artisan::call('migrate', [
-                    '--path' => 'database/migrations/2026_05_23_150449_add_onboarding_fields_to_users_table.php',
-                    '--force' => true,
-                ]);
-                $user->save();
-            } else {
-                throw $e;
-            }
-        }
+        $isComplete = ($action === 'complete');
+        $this->onboardingService->saveOnboardingStep($user, $validated, $isComplete);
 
         if ($action === 'complete') {
             if ($request->getHost() === 'lance.musoftwares.com') {
@@ -149,79 +98,18 @@ class OnboardingController extends Controller
             'reset' => 'nullable|boolean',
         ]);
 
+        $this->onboardingService->updateTourStatus($user, $validated);
+
         if (isset($validated['reset']) && $validated['reset']) {
-            $user->tour_completed = false;
-            $user->tour_skipped = false;
-            $user->current_tour_step = 1;
-            $user->save();
             return response()->json(['status' => 'tour_reset', 'user' => $user]);
         }
-
-        if (isset($validated['step'])) {
-            $user->current_tour_step = $validated['step'];
-        }
-
-        if (isset($validated['skipped']) && $validated['skipped']) {
-            $user->tour_skipped = true;
-        }
-
-        if (isset($validated['completed']) && $validated['completed']) {
-            $user->tour_completed = true;
-            $user->current_tour_step = 7;
-        }
-
-        $user->save();
 
         return response()->json(['status' => 'success', 'user' => $user]);
     }
 
     public function getCities(Request $request, $countryName)
     {
-        $country = \Illuminate\Support\Facades\DB::table('countries')
-            ->where('name', $countryName)
-            ->first();
-
-        if (!$country) {
-            return response()->json([]);
-        }
-
-        try {
-            $cities = \Illuminate\Support\Facades\DB::table('cities')
-                ->where('country_id', $country->id)
-                ->distinct()
-                ->pluck('name')
-                ->toArray();
-                
-            if (\Illuminate\Support\Facades\DB::table('cities')->count() === 0) {
-                \Illuminate\Support\Facades\Artisan::call('db:seed', [
-                    '--class' => 'Database\\Seeders\\CitySeeder',
-                    '--force' => true,
-                ]);
-                $cities = \Illuminate\Support\Facades\DB::table('cities')
-                    ->where('country_id', $country->id)
-                    ->distinct()
-                    ->pluck('name')
-                    ->toArray();
-            }
-        } catch (\Illuminate\Database\QueryException $e) {
-            if (str_contains($e->getMessage(), 'Base table or view not found')) {
-                \Illuminate\Support\Facades\Artisan::call('migrate', [
-                    '--path' => 'database/migrations/2026_05_23_150824_create_cities_table.php',
-                    '--force' => true,
-                ]);
-                \Illuminate\Support\Facades\Artisan::call('db:seed', [
-                    '--class' => 'Database\\Seeders\\CitySeeder',
-                    '--force' => true,
-                ]);
-                $cities = \Illuminate\Support\Facades\DB::table('cities')
-                    ->where('country_id', $country->id)
-                    ->distinct()
-                    ->pluck('name')
-                    ->toArray();
-            } else {
-                throw $e;
-            }
-        }
+        $cities = $this->onboardingService->getCities($countryName);
 
         return response()->json($cities);
     }
