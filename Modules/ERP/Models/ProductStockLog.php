@@ -5,8 +5,12 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class ProductStockLog extends TenantModel
 {
+    use SoftDeletes;
+
     protected $table = 'erp_product_stock_logs';
 
     protected $fillable = [

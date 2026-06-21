@@ -4,8 +4,9 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Log;
 
-class RecurringService
+class RecurringService extends BaseService
 {
+
     /**
      * Process all due recurring entries.
      */

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('entity_id')->nullable();
             $table->json('meta')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('branch_id')->references('id')->on('erp_branches')->onDelete('cascade');
         });

@@ -42,6 +42,7 @@ return new class extends Migration
                 $table->string('currency', 3)->default('EGP');
                 $table->decimal('global_price_usd', 10, 2)->nullable();
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
     }

@@ -33,6 +33,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'active', 'declined'])->default('pending');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -3,10 +3,13 @@
 namespace Modules\WrittenCoursesEngine\app\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
 
 class CourseProgress extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'written_course_progress';
 
     protected $fillable = [

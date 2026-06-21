@@ -27,6 +27,7 @@ return new class extends Migration
             $table->timestamp('last_seen_at')->nullable();
             $table->timestamp('banned_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['user_id', 'status']);
         });
@@ -54,6 +55,7 @@ return new class extends Migration
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['user_id', 'status']);
         });
@@ -75,6 +77,7 @@ return new class extends Migration
             $table->json('custom_fields')->nullable();
             $table->timestamp('last_replied_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['user_id', 'phone']);
             $table->index(['user_id', 'lead_stage']);
@@ -90,6 +93,7 @@ return new class extends Migration
             $table->string('account_id')->nullable();     // which session was used
             $table->timestamp('sent_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['campaign_id', 'contact_id']);
             $table->index(['campaign_id', 'status']);
@@ -112,6 +116,7 @@ return new class extends Migration
             $table->text('ai_summary')->nullable();
             $table->timestamp('last_msg_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['user_id', 'phone', 'account_id']);
             $table->index(['user_id', 'status', 'last_msg_at']);
@@ -135,6 +140,7 @@ return new class extends Migration
             $table->timestamp('delivered_at')->nullable();
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['user_id', 'phone', 'created_at']);
             $table->index(['campaign_id', 'status']);
@@ -154,6 +160,7 @@ return new class extends Migration
             $table->integer('active_contacts')->default(0);
             $table->integer('completed_contacts')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // ── 8. WhatsApp Workflow States ──────────────────────────────────────
@@ -166,6 +173,7 @@ return new class extends Migration
             $table->json('variables')->nullable();           // contextual variables
             $table->timestamp('next_execution_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['workflow_id', 'contact_id']);
             $table->index(['status', 'next_execution_at']);
@@ -191,6 +199,7 @@ return new class extends Migration
             $table->integer('contact_count')->default(0);
             $table->json('filters')->nullable();            // saved filter criteria
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('wa_contact_list_members', function (Blueprint $table) {

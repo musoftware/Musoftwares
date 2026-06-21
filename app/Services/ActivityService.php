@@ -5,8 +5,9 @@ namespace App\Services;
 use App\Models\UserActivity;
 use Illuminate\Support\Facades\Auth;
 
-class ActivityService
+class ActivityService extends BaseService
 {
+
     /**
      * Log user activity. Supports both legacy positional logging and new named/event-driven logging.
      */

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->time('close_time')->nullable();
             $table->boolean('is_closed')->default(false);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['branch_id', 'day']);
             $table->foreign('branch_id')->references('id')->on('erp_branches')->onDelete('cascade');

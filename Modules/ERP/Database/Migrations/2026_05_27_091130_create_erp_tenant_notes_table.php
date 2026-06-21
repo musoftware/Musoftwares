@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('category')->nullable();
             $table->boolean('pinned')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

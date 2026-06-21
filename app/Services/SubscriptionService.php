@@ -11,8 +11,9 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Transaction;
 use Illuminate\Validation\ValidationException;
 
-class SubscriptionService
+class SubscriptionService extends BaseService
 {
+
     /**
      * Get the user's active plan (if any).
      */
@@ -327,7 +328,7 @@ class SubscriptionService
 
     public function processSubscription(User $user, float $amount, int $days, array $items, bool $isNewSystem, string $reason, string $action = 'wallet_subscribe')
     {
-        return DB::transaction(function () use ($user, $amount, $days, $items, $isNewSystem, $reason, $action) {
+        return $this->executeInTransaction(function () use ($user, $amount, $days, $items, $isNewSystem, $reason, $action) {
             $userTenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
             if ($isNewSystem && !$userTenant) {
                 $tenantName = explode(' ', $user->name)[0] . ' Workspace ' . substr(uniqid(), -4);
@@ -385,7 +386,7 @@ class SubscriptionService
 
     public function renewSubscription(User $user, UserSubscription $sub, float $price, array $item, ?int $proratedDays)
     {
-        return DB::transaction(function () use ($user, $sub, $price, $item, $proratedDays) {
+        return $this->executeInTransaction(function () use ($user, $sub, $price, $item, $proratedDays) {
             if ($price > 0) {
                 $itemName = $item['name'] ?? ucfirst($sub->object);
                 $desc = $proratedDays ? "Manual Prorated Subscription Renewal for {$proratedDays} days: " : "Manual Subscription Renewal: ";

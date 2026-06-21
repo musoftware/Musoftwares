@@ -5,8 +5,9 @@ namespace App\Services;
 use App\Models\CurrenciesExchange;
 use Illuminate\Support\Facades\Cache;
 
-class ExchangeRateService
+class ExchangeRateService extends BaseService
 {
+
     /**
      * Get exchange rate between two currencies.
      */

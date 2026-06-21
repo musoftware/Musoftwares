@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('app_type')->default('generic');
             $table->json('meta')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

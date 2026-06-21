@@ -17,6 +17,7 @@ return new class extends Migration
             $table->json('content')->nullable(); // For terms and features
             $table->decimal('total_amount', 12, 2)->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

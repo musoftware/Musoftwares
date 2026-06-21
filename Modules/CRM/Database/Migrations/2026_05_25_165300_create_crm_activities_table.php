@@ -32,6 +32,7 @@ return new class extends Migration
             $table->json('metadata')->nullable();
             
             $table->timestamps();
+            $table->softDeletes();
 
             // Indexing for blazing fast timeline queries
             $table->index(['workspace_id', 'entity_type', 'entity_id']);

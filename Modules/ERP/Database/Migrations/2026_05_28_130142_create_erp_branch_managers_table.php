@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->index();
             $table->timestamp('assigned_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['branch_id', 'user_id']);
             $table->foreign('branch_id')->references('id')->on('erp_branches')->onDelete('cascade');

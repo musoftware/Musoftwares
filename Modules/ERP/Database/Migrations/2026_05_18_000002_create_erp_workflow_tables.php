@@ -33,6 +33,7 @@ return new class extends Migration
 
                 $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
 
@@ -52,6 +53,7 @@ return new class extends Migration
                 $table->foreignId('assigned_to')->nullable()->constrained('users')->nullOnDelete();
                 $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
 
@@ -72,6 +74,7 @@ return new class extends Migration
                 $table->json('properties')->nullable();
 
                 $table->timestamps();
+            $table->softDeletes();
 
                 $table->index(['subject_type', 'subject_id']);
             });

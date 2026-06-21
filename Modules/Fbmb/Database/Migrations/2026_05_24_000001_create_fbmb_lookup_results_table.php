@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('result_path')->nullable(); // path to CSV on disk
             $table->timestamp('expires_at');           // 24h from creation
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['user_id', 'created_at']);
         });

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('resource_id')->references('id')->on('booking_resources')->onDelete('cascade');
         });

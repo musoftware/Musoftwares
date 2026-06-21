@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->boolean('upsell')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -24,6 +24,7 @@ return new class extends Migration
             $table->morphs('activity');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

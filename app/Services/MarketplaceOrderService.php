@@ -4,8 +4,9 @@ namespace App\Services;
 
 use Modules\Marketplace\Models\ServiceOrder;
 
-class MarketplaceOrderService
+class MarketplaceOrderService extends BaseService
 {
+
     public function resolveDispute(ServiceOrder $order, string $action): void
     {
         if ($order->status === 'completed' || $order->status === 'cancelled') {

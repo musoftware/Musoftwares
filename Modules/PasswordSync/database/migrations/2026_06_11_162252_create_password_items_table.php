@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('remote_id')->index(); // ID from extension
             $table->longText('encrypted_data');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

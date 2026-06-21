@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('reason')->nullable();
             $table->timestamp('blocked_until')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('type'); // e.g. 'direct_message', 'support_ticket'
             $table->string('status')->default('open');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('conversation_participants', function (Blueprint $table) {
@@ -26,6 +27,7 @@ return new class extends Migration
             $table->string('role')->nullable(); // e.g. 'client', 'admin', 'buyer', 'seller'
             $table->timestamp('last_read_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('messages', function (Blueprint $table) {
@@ -34,6 +36,7 @@ return new class extends Migration
             $table->foreignId('sender_id')->constrained('users')->cascadeOnDelete();
             $table->text('body');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

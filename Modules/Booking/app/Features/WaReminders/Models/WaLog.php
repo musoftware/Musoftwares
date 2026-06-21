@@ -3,11 +3,14 @@
 namespace Modules\Booking\app\Features\WaReminders\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Booking\Models\Booking;
 
 class WaLog extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking_wa_logs';
 
     protected $fillable = [

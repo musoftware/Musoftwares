@@ -11,8 +11,9 @@ use App\Helpers\BalancesHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class TransactionService
+class TransactionService extends BaseService
 {
+
     public function getIncomeTransactions(array $filters)
     {
         $q = Transaction::with(['user', 'project']);
@@ -57,7 +58,7 @@ class TransactionService
     {
         $added = 0;
 
-        DB::transaction(function () use ($request, $user, $project, $data, $type, &$added) {
+        $this->executeInTransaction(function () use ($request, $user, $project, $data, $type, &$added) {
             foreach ($data as $item) {
                 $itemProject = $project;
                 if (!$itemProject && isset($item['project']) && $item['project']) {
@@ -89,7 +90,7 @@ class TransactionService
 
     public function reverseTransaction(Transaction $transaction): Transaction
     {
-        return DB::transaction(function () use ($transaction) {
+        return $this->executeInTransaction(function () use ($transaction) {
             return $transaction->createReverse();
         });
     }

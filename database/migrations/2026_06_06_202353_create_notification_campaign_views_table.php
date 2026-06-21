@@ -18,6 +18,7 @@ return new class extends Migration
                 $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
                 $table->enum('type', ['view', 'click'])->default('view');
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
     }

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamp('subscription_ends_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // 4. tenant_clients table
@@ -33,6 +34,7 @@ return new class extends Migration
             $table->unsignedBigInteger('country_id')->nullable();
             $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // 5. invoices table
@@ -63,6 +65,7 @@ return new class extends Migration
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['tenant_id', 'invoice_number']);
         });
@@ -80,6 +83,7 @@ return new class extends Migration
             $table->decimal('total', 15, 2);
             $table->integer('sort_order')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // 7. timer_sessions table
@@ -93,6 +97,7 @@ return new class extends Migration
             $table->foreignId('stopped_by')->nullable()->constrained('users')->nullOnDelete();
             $table->text('note')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // 8. invoice_costs table
@@ -117,6 +122,7 @@ return new class extends Migration
 
             $table->text('note')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // 10. client_transactions table
@@ -205,6 +211,7 @@ return new class extends Migration
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // 15. recurring_execution_logs table
@@ -252,6 +259,7 @@ return new class extends Migration
 
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // 17. withdrawals table
@@ -284,6 +292,7 @@ return new class extends Migration
             $table->text('admin_notes')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

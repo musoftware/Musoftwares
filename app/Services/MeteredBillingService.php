@@ -8,8 +8,9 @@ use App\Events\SaaSLimitApproaching;
 use App\Events\SaaSLimitReached;
 use Illuminate\Support\Facades\DB;
 
-class MeteredBillingService
+class MeteredBillingService extends BaseService
 {
+
     /**
      * Resolves the current tenant ID.
      */

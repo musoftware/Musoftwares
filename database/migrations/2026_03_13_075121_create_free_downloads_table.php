@@ -21,6 +21,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->unsignedInteger('order_column')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

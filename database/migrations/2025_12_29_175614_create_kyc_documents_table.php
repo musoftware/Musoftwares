@@ -24,6 +24,7 @@ return new class extends Migration
             $table->foreignId('reviewed_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamp('reviewed_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index(['user_id', 'document_type']);
             $table->index('status');

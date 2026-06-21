@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('currency')->nullable();
             $table->string('mode')->default('live');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

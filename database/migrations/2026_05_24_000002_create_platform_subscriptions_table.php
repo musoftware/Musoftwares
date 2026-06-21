@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('payment_method')->nullable();
             $table->string('payment_reference')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             // Assuming PlatformPlan maps to a table, but not enforcing FK to avoid constraint issues if table names differ

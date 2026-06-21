@@ -4,8 +4,9 @@ namespace App\Services;
 
 use App\Models\ModulePlan;
 
-class PlanService
+class PlanService extends BaseService
 {
+
     public function createPlan(array $data): ModulePlan
     {
         $plan = new ModulePlan();

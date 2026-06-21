@@ -4,8 +4,12 @@ namespace Modules\Booking\app\Features\MultiBranch\Models;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class BookingBranchUser extends Pivot
 {
+    use SoftDeletes;
+
     protected $table = 'booking_branch_users';
 
     protected $fillable = [

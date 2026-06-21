@@ -21,6 +21,7 @@ return new class extends Migration
                 $table->text('comment')->nullable();
                 $table->boolean('is_visible')->default(false);
                 $table->timestamps();
+            $table->softDeletes();
 
                 // Prevent duplicate reviews from same person for same contract
                 $table->unique(['contract_id', 'reviewer_id']);

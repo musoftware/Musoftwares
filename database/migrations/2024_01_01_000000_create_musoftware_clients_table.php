@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('webhook_secret')->nullable();
             $table->json('allowed_ips')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

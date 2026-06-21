@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('symbol', 10);
             $table->string('string_format', 10);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // Seed default currencies for ERP

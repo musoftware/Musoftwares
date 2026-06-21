@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-class PricingService
+class PricingService extends BaseService
 {
+
     /**
      * Get all modules, addons, and tools configured for pricing, 
      * converted to a uniform ServiceItem format.

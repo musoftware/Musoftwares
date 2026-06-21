@@ -17,6 +17,7 @@ return new class extends Migration
             $table->time('start_time')->nullable(); // null means whole day
             $table->time('end_time')->nullable(); // null means whole day
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('resource_id')->references('id')->on('booking_resources')->onDelete('cascade');
         });

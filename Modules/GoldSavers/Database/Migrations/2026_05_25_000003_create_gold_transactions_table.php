@@ -30,6 +30,7 @@ return new class extends Migration
             $table->text('notes')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('wallet_id')->references('id')->on('gold_wallets')->onDelete('cascade');
         });

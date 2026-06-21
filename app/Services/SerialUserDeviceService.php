@@ -5,8 +5,9 @@ namespace App\Services;
 use App\Models\SerialUserDevice;
 use App\Models\User;
 
-class SerialUserDeviceService
+class SerialUserDeviceService extends BaseService
 {
+
     public function assignDevice(array $data): SerialUserDevice
     {
         return SerialUserDevice::create($data);

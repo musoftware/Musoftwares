@@ -26,6 +26,7 @@ return new class extends Migration
             $table->integer('buffer_before')->default(0);
             $table->integer('buffer_after')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

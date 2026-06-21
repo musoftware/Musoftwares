@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('tech_group_name');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

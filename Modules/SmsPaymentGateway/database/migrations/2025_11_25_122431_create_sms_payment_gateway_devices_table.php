@@ -26,6 +26,7 @@ return new class extends Migration
             $table->integer('sim_slot')->nullable();
             $table->json('metadata')->nullable();
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index('user_id');
             $table->index('device_token');

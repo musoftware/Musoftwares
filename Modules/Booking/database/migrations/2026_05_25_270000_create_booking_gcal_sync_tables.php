@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('refresh_token')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('booking_google_calendars', function (Blueprint $table) {
@@ -33,6 +34,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->string('sync_token')->nullable(); // Used for incremental sync
             $table->timestamps();
+            $table->softDeletes();
             
             $table->foreign('account_id')->references('id')->on('booking_google_accounts')->onDelete('cascade');
         });
@@ -46,6 +48,7 @@ return new class extends Migration
             $table->integer('events_synced')->default(0);
             $table->text('error_reason')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('booking_google_sync_events', function (Blueprint $table) {
@@ -55,6 +58,7 @@ return new class extends Migration
             $table->string('google_event_id')->index();
             $table->unsignedBigInteger('calendar_id')->index();
             $table->timestamps();
+            $table->softDeletes();
             
             $table->unique(['booking_id', 'google_event_id']);
         });

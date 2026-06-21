@@ -10,8 +10,9 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use ZipArchive;
 
-class UserFileService
+class UserFileService extends BaseService
 {
+
     private const DISK = 'uploaded_user_files';
 
     public function getFilesAndFolders(int $userId, string $folderId): array

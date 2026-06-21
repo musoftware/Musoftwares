@@ -30,6 +30,7 @@ return new class extends Migration
             $table->timestamp('expires_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['user_id', 'status']);
             $table->index(['session_id', 'status']);

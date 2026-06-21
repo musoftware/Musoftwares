@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('phone_number', 20);
             $table->enum('status', ['pending', 'matched'])->default('pending');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index('user_id');
             $table->index('phone_number');

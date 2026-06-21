@@ -24,6 +24,7 @@ return new class extends Migration
                 $table->decimal('price', 10, 2)->default(0.00);
                 $table->enum('status', ['scheduled', 'ongoing', 'completed', 'cancelled'])->default('scheduled');
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
 
@@ -35,6 +36,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('customer_id')->index();
                 $table->enum('status', ['confirmed', 'cancelled', 'no-show', 'attended'])->default('confirmed');
                 $table->timestamps();
+            $table->softDeletes();
                 
                 $table->foreign('group_session_id')->references('id')->on('booking_group_sessions')->onDelete('cascade');
                 $table->unique(['group_session_id', 'customer_id'], 'booking_gs_part_unique'); // Shorter name to prevent MySQL identifier too long error
@@ -50,6 +52,7 @@ return new class extends Migration
                 $table->timestamp('joined_at')->useCurrent();
                 $table->enum('status', ['waiting', 'promoted', 'expired'])->default('waiting');
                 $table->timestamps();
+            $table->softDeletes();
                 
                 $table->foreign('group_session_id')->references('id')->on('booking_group_sessions')->onDelete('cascade');
             });
@@ -63,6 +66,7 @@ return new class extends Migration
                 $table->string('action'); // e.g. participant_joined, waitlist_promoted
                 $table->text('description')->nullable();
                 $table->timestamps();
+            $table->softDeletes();
                 
                 $table->foreign('group_session_id')->references('id')->on('booking_group_sessions')->onDelete('cascade');
             });

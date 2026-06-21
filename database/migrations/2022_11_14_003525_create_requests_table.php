@@ -27,6 +27,7 @@ return new class extends Migration
             $table->enum('status', ['open', 'closed', 'agent_replied', 'user_replied'])->default('open');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

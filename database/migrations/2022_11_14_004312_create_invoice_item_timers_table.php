@@ -33,6 +33,7 @@ return new class extends Migration
             $table->foreign('currency')->references('id')->on('currencies');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

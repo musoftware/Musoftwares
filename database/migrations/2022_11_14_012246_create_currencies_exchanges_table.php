@@ -29,6 +29,7 @@ return new class extends Migration
             $table->unique(array('date_string', 'currency1', 'currency2'));
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

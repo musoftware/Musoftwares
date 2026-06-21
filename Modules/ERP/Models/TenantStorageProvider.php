@@ -2,8 +2,12 @@
 
 namespace Modules\ERP\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class TenantStorageProvider extends TenantModel
 {
+    use SoftDeletes;
+
     protected $table = 'erp_tenant_storage_providers';
 
     protected $fillable = [

@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('rule_type'); // e.g. except_holidays, specific_dates
             $table->json('rule_data')->nullable(); // holds complex conditions
             $table->timestamps();
+            $table->softDeletes();
             
             $table->foreign('resource_id')->references('id')->on('booking_resources')->onDelete('cascade');
         });

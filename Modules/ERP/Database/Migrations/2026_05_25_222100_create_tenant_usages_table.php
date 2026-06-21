@@ -22,6 +22,7 @@ return new class extends Migration
                 $table->timestamp('last_reset_at')->useCurrent();
                 
                 $table->timestamps();
+            $table->softDeletes();
 
                 $table->unique(['tenant_id', 'usage_key']);
             });

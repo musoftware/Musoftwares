@@ -38,6 +38,7 @@ return new class extends Migration
             $table->enum('status', ['unpaid', 'paid', 'partially_paid', 'cancelled'])->default('unpaid');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('conversion_rate', 5, 2)->default(0);
             
             $table->timestamps();
+            $table->softDeletes();
 
             // Upsert unique key
             $table->unique(['tenant_id', 'user_id', 'date']);

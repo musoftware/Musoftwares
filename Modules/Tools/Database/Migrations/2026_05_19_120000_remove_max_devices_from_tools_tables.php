@@ -39,6 +39,7 @@ return new class extends Migration
             $table->timestamp('revoked_at')->nullable();
             $table->string('ip_address')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['tool_license_id', 'hardware_fingerprint']);
             $table->index(['hardware_fingerprint']);
@@ -76,6 +77,7 @@ return new class extends Migration
             $table->timestamp('revoked_at')->nullable();
             $table->string('ip_address')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['tool_license_id', 'hardware_fingerprint']);
             $table->index(['hardware_fingerprint']);

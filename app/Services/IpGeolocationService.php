@@ -4,8 +4,9 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Log;
 
-class IpGeolocationService
+class IpGeolocationService extends BaseService
 {
+
     /**
      * List of Arab country codes
      */

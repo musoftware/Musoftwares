@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreign('transaction_id')->references('id')->on('transactions')->cascadeOnDelete();
             $table->string('unique_id', 255)->unique();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

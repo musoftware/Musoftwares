@@ -6,8 +6,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use App\Models\User;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Activity extends TenantModel
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'tenant_id', 'client_id', 'subject_type', 'subject_id', 
         'action', 'description', 'causer_id', 'properties'

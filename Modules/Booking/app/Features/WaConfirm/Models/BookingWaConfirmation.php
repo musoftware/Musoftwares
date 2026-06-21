@@ -3,12 +3,15 @@
 namespace Modules\Booking\app\Features\WaConfirm\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Booking\Models\Booking;
 
 class BookingWaConfirmation extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking_wa_confirmations';
 
     protected $fillable = [

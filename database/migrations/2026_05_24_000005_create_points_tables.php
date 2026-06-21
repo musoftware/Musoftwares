@@ -24,6 +24,7 @@ return new class extends Migration
                 $table->integer('points');
                 $table->decimal('price', 10, 2);
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
 
@@ -35,6 +36,7 @@ return new class extends Migration
                 $table->integer('points');
                 $table->string('description')->nullable();
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
     }

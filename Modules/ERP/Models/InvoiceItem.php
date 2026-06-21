@@ -5,8 +5,12 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class InvoiceItem extends TenantModel
 {
+    use SoftDeletes;
+
     protected $table = 'erp_invoice_items';
 
     protected $fillable = [

@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('foldername', 255);
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

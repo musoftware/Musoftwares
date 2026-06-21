@@ -18,6 +18,7 @@ return new class extends Migration
             $table->json('credentials')->nullable();
             $table->string('status')->default('active')->index();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['branch_id', 'provider']);
             $table->foreign('branch_id')->references('id')->on('erp_branches')->onDelete('cascade');

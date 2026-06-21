@@ -3,10 +3,13 @@
 namespace Modules\Booking\app\Features\Recurring\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 
 class RecurringException extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking_recurring_exceptions';
 
     protected $fillable = [

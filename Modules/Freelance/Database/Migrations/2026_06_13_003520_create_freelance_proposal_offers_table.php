@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('currency_id')->default(2)->constrained('currencies')->onDelete('restrict');
             $table->string('status')->default('pending'); // pending, accepted, rejected, superseded
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

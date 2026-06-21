@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('error_message')->nullable();
             $table->timestamp('failed_at');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

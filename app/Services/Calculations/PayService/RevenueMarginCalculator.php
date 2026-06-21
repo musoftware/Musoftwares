@@ -2,8 +2,11 @@
 
 namespace App\Services\Calculations\PayService;
 
-class RevenueMarginCalculator
+use App\Services\BaseService;
+
+class RevenueMarginCalculator extends BaseService
 {
+
     /**
      * Applies the final revenue margin multipliers based on the revenue tier.
      *

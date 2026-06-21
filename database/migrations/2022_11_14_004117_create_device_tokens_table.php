@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->text('token');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

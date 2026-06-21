@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('type')->default('block'); // block, break, personal
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('resource_id')->references('id')->on('booking_resources')->onDelete('cascade');
         });

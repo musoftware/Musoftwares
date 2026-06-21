@@ -2,13 +2,16 @@
 
 namespace App\Services\Calculations\PayService;
 
+use App\Services\BaseService;
+
 use App\Models\CurrenciesExchange;
 use App\Models\GoldWorldPrice;
 use App\Models\GoldPrice;
 use Illuminate\Support\Facades\DB;
 
-class DestinationFeeCalculator
+class DestinationFeeCalculator extends BaseService
 {
+
     /**
      * Applies the fee of the payment destination (e.g., CIB, Redot).
      *

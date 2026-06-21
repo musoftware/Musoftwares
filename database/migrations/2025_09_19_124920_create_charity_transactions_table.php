@@ -22,6 +22,7 @@ return new class extends Migration
             $table->decimal('balance_before', 15, 2);
             $table->decimal('balance_after', 15, 2);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->index(['user_id', 'created_at']);

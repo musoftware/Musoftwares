@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('total_minutes')->default(0);
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['member_id', 'date']);
         });

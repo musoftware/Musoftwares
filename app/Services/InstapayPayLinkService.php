@@ -5,8 +5,9 @@ namespace App\Services;
 /**
  * HMAC signatures for /payment/instapay links so amounts + user_id cannot be forged.
  */
-class InstapayPayLinkService
+class InstapayPayLinkService extends BaseService
 {
+
     public static function secret(): string
     {
         $s = config('services.instapay_pay_link.secret');

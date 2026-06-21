@@ -5,8 +5,12 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Expense extends TenantModel
 {
+    use SoftDeletes;
+
     protected $table = 'erp_expenses';
 
     protected static function booted()

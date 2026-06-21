@@ -3,9 +3,12 @@
 namespace Modules\Booking\app\Features\WaConfirm\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BookingWaTemplate extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking_wa_templates';
 
     protected $fillable = [

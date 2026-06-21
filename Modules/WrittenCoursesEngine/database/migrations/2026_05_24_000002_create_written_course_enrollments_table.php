@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('course_slug');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['user_id', 'course_slug']);
         });

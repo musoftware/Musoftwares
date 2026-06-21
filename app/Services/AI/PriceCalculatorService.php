@@ -2,11 +2,14 @@
 
 namespace App\Services\AI;
 
+use App\Services\BaseService;
+
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class PriceCalculatorService
+class PriceCalculatorService extends BaseService
 {
+
     /**
      * Call OpenAI API to get a structured JSON estimate.
      */

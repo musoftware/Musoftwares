@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('key')->index();
             $table->text('value')->nullable();
             $table->timestamps();
+            $table->softDeletes();
             
             $table->unique(['branch_id', 'key']);
             $table->foreign('branch_id')->references('id')->on('erp_branches')->onDelete('cascade');

@@ -29,6 +29,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
 
             $table->timestamps();
+            $table->softDeletes();
             
             // If users table is in the same DB:
             // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

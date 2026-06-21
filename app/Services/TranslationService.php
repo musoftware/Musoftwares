@@ -6,8 +6,9 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-class TranslationService
+class TranslationService extends BaseService
 {
+
     protected $client;
     protected $provider;
 

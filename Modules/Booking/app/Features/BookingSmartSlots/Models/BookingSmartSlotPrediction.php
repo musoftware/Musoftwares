@@ -3,9 +3,12 @@
 namespace Modules\Booking\app\Features\BookingSmartSlots\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BookingSmartSlotPrediction extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking_smart_slot_predictions';
 
     protected $fillable = [

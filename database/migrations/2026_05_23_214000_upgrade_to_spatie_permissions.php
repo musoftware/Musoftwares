@@ -47,6 +47,7 @@ return new class extends Migration
                 $table->string('guard_name')->default('web');
                 $table->string('slug')->nullable();
                 $table->timestamps();
+            $table->softDeletes();
                 $table->unique(['name', 'guard_name']);
             });
         }
@@ -73,6 +74,7 @@ return new class extends Migration
                 $table->string('guard_name')->default('web');
                 $table->string('slug')->nullable();
                 $table->timestamps();
+            $table->softDeletes();
                 if ($teams) {
                     $table->unique([$columnNames['team_foreign_key'] ?? 'team_id', 'name', 'guard_name']);
                 } else {

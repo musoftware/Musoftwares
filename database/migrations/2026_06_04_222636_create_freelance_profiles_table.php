@@ -21,6 +21,7 @@ return new class extends Migration
                 $table->boolean('receive_job_notifications')->default(true);
                 $table->timestamp('notifications_muted_until')->nullable();
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
     }

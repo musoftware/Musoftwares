@@ -4,8 +4,9 @@ namespace App\Services;
 
 use App\Models\SerialSoftware;
 
-class SerialSoftwareService
+class SerialSoftwareService extends BaseService
 {
+
     public function updateStatus(SerialSoftware $serialSoftware, string $status): void
     {
         $serialSoftware->update(['default_status' => $status]);

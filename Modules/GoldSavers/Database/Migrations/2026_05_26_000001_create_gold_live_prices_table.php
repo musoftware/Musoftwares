@@ -49,6 +49,7 @@ return new class extends Migration
             $table->timestamp('fetched_at')->nullable();
             $table->timestamp('broadcasted_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             // Unique constraint: one live row per tenant per market
             $table->unique(['tenant_id', 'market_key']);

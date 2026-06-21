@@ -18,6 +18,7 @@ return new class extends Migration
                 $table->string('verification_token')->nullable(); // For DNS TXT record validation
                 $table->timestamp('verified_at')->nullable();
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
     }

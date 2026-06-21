@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('pc_serial');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

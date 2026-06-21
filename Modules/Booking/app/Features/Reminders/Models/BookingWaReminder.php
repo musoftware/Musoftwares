@@ -3,10 +3,13 @@
 namespace Modules\Booking\app\Features\Reminders\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 
 class BookingWaReminder extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking_wa_reminders';
 
     protected $fillable = [

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('new_quantity', 15, 2);
             $table->string('reason')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

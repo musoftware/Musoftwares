@@ -27,6 +27,7 @@ return new class extends Migration
             $table->float('qty', 11, 3)->default(1);
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

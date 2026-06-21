@@ -28,6 +28,7 @@ return new class extends Migration
             $table->timestamp('period_start')->nullable();
             $table->timestamp('period_end')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             // One candle per tenant+market+interval+karat+period
             $table->unique(

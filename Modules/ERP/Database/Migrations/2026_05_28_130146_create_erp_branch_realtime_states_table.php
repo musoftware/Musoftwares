@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('value')->nullable();
             $table->timestamp('last_updated_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['branch_id', 'metric']);
             $table->foreign('branch_id')->references('id')->on('erp_branches')->onDelete('cascade');

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->timestamp('paid_at')->nullable();
             $table->json('metadata')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

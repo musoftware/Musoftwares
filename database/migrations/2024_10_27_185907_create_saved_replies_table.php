@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('image', 512)->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

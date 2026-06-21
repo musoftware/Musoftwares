@@ -19,6 +19,7 @@ return new class extends Migration
             $table->json('allowed_ips')->nullable();
             $table->decimal('commission_rate', 5, 2)->default(40.00); // 40%
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

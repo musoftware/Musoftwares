@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('status')->default('active');
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             // Ensure a device can only be assigned to one user
             $table->unique('device_id');

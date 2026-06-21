@@ -22,6 +22,7 @@ return new class extends Migration
             $table->json('scopes')->nullable();
             $table->json('settings')->nullable(); // e.g. custom calendar ID
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['user_id', 'provider']);
         });

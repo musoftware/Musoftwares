@@ -26,6 +26,7 @@ return new class extends Migration
             $table->timestamp('agreed_at')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

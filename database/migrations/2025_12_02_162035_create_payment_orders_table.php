@@ -25,6 +25,7 @@ return new class extends Migration
             $table->timestamp('expires_at')->nullable();
             $table->json('metadata')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             // Indexes for performance
             $table->index('user_id');

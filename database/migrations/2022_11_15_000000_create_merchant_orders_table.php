@@ -30,6 +30,7 @@ class CreateMerchantOrdersTable extends Migration
                 $table->text('error')->nullable();
 
                 $table->timestamps();
+            $table->softDeletes();
             });
         }
     }
