@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware';
+import { subscribeWithSelector, persist } from 'zustand/middleware';
 
 export interface AppState {
     theme: 'light' | 'dark' | 'system';
@@ -14,10 +14,17 @@ export interface AppActions {
 export type AppStore = AppState & AppActions;
 
 export const useAppStore = create<AppStore>()(
-    subscribeWithSelector((set) => ({
-        theme: 'system',
-        sidebarOpen: false,
-        setTheme: (theme) => set({ theme }),
-        toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-    }))
+    subscribeWithSelector(
+        persist(
+            (set) => ({
+                theme: 'system',
+                sidebarOpen: false,
+                setTheme: (theme) => set({ theme }),
+                toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+            }),
+            {
+                name: 'app-storage',
+            }
+        )
+    )
 );
