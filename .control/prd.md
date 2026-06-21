@@ -215,7 +215,33 @@ This section defines the operational tasks, collaboration workflows, and restric
 
 ---
 
-## 8. Self-Grilling & Edge Case Resolutions
+## 8. User Role: Manager
+
+This section defines the oversight capabilities, team coordination, and approval workflows executed by the "Manager" role within specific modules (e.g., ERP, CRM).
+
+### 8.1. User Stories
+- **US-MGR-01 (Team Oversight & Performance)**: As a Manager, I must be able to view dashboards (e.g., `ManagerDashboard.tsx`) detailing my team's performance, lead conversion rates, and task completion, so I can effectively monitor productivity.
+- **US-MGR-02 (Task & Lead Assignment)**: As a Manager, I must be able to assign, reassign, or unassign leads, tasks, and support tickets among my team members to ensure balanced workload and prompt resolution.
+- **US-MGR-03 (Approval Workflows)**: As a Manager, I must be able to review and approve/reject team requests such as leave applications, expense reports, or discount requests on invoices to maintain financial and operational control.
+- **US-MGR-04 (Project & Campaign Oversight)**: As a Manager, I must be able to oversee the progress of projects and marketing campaigns, adjusting timelines and resources as necessary to meet business objectives.
+- **US-MGR-05 (Data Export & Reporting)**: As a Manager, I must be able to generate and export reports specific to my department's activities (e.g., sales reports, support resolution times) for strategic planning.
+
+### 8.2. Edge Cases
+- **EC-MGR-01 (Reassigning Active Tasks)**: If a Manager reassigns a lead or ticket while a team member is actively editing it, the system must handle the transition smoothly, warning the current user and transferring ownership without data loss.
+- **EC-MGR-02 (Approval Deadlocks)**: If an expense requires multi-level approval and a Manager is unavailable, the system should allow a designated delegate or Admin to override or re-route the approval to prevent bottlenecks.
+- **EC-MGR-03 (Cross-Department Visibility Limits)**: A Manager must be strictly restricted from viewing performance metrics or approving expenses for employees outside their assigned department or branch.
+- **EC-MGR-04 (Self-Approval Prevention)**: A Manager attempting to approve their own expenses or leave requests must be blocked by the system, automatically escalating the request to an Admin or higher-level supervisor.
+- **EC-MGR-05 (Mass Assignment Rollback)**: If a Manager performs a bulk assignment of hundreds of leads that fails midway, the system must rollback the changes or clearly flag which assignments succeeded and failed.
+
+### 8.3. Testing Requirements
+- **TR-MGR-01 (Scope of Authority)**: Automated tests must verify that a Manager receives a 403 Forbidden response when attempting to access, modify, or approve records belonging to a different branch or department.
+- **TR-MGR-02 (Self-Approval Block)**: Integration tests must assert that a Manager cannot approve their own requests, ensuring the system enforces escalation rules correctly.
+- **TR-MGR-03 (Bulk Reassignment Integrity)**: E2E tests must simulate bulk reassignment of tasks, validating that the old assignee loses access immediately and the new assignee is notified and granted access.
+- **TR-MGR-04 (Dashboard Data Aggregation)**: Tests must confirm that the Manager Dashboard accurately aggregates data exclusively from the Manager's direct reports, ignoring data from other teams.
+
+---
+
+## 9. Self-Grilling & Edge Case Resolutions
 
 **Q1: What happens if a user accesses an ERP page without an active subscription?**
 - **Resolution**: The system must intercept the request via middleware and seamlessly render `ERP/UpgradePreview.tsx` or a 403 Forbidden page natively integrated with Shadcn UI. Partial content loads must be strictly blocked to prevent data leaks.
