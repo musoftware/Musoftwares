@@ -147,4 +147,43 @@ class BalanceService
 
         return ['eligible' => true];
     }
+
+    /**
+     * Process a withdrawal request transaction.
+     */
+    public function processWithdrawalRequest(User $user, float $amount, int $payoutMethodId): void
+    {
+        $payoutMethod = $user->payoutMethods()->where('id', $payoutMethodId)->firstOrFail();
+
+        DB::transaction(function () use ($user, $amount, $payoutMethod) {
+            $user->add_balance(-1 * $amount, 'Withdrawal request via ' . ucwords(str_replace('_', ' ', $payoutMethod->type)), 'used');
+
+            $withdrawal = new UserReferralRequestWithdraw();
+            $withdrawal->user_id = $user->id;
+            $withdrawal->amount = $amount;
+            $withdrawal->currency = $user->currency;
+            $withdrawal->user_payment_method_id = $payoutMethod->id;
+            $withdrawal->status = 'pending';
+            $withdrawal->save();
+        });
+    }
+
+    /**
+     * Process Kashier deposit webhook.
+     */
+    public function processKashierDepositWebhook(User $user, float $amountPaid, string $trxId): array
+    {
+        // Idempotency check
+        $reason = "Deposit via Kashier online payment (Trx: $trxId)";
+        $alreadyProcessed = Transaction::where('user_id', $user->id)
+            ->where('reason', $reason)
+            ->exists();
+
+        if (!$alreadyProcessed) {
+            $user->add_balance($amountPaid, $reason, 'received');
+            return ['status' => 'success', 'message' => 'Deposit processed successfully', 'already_processed' => false];
+        }
+
+        return ['status' => 'success', 'message' => 'Already processed', 'already_processed' => true];
+    }
 }
