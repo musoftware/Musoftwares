@@ -108,7 +108,35 @@ Musoftwares is an enterprise-grade ecosystem combining an ERP, CRM, Client Porta
 
 ---
 
-## 4. Self-Grilling & Edge Case Resolutions
+## 4. User Role: Musoftwares System
+
+This section defines the automated, background, and programmatic capabilities executed by the "Musoftwares System" itself, acting autonomously to maintain platform health, financial accuracy, and data synchronization.
+
+### 4.1. User Stories
+- **US-SYS-01 (Automated Billing & Subscriptions)**: As the Musoftwares System, I must automatically process recurring subscription renewals, calculate prorations, and gracefully downgrade tenant access if a payment fails, so that revenue collection and access control are hands-free.
+- **US-SYS-02 (Multi-Currency Synchronization)**: As the Musoftwares System, I must periodically fetch exchange rates and accurately compute financial transactions across the dual-currency architecture (Client vs. Business currencies) without rounding errors.
+- **US-SYS-03 (Background Task Orchestration)**: As the Musoftwares System, I must orchestrate long-running asynchronous background tasks (e.g., web scrapers, mass SMS dispatch, data imports) via queues, and publish real-time WebSocket status updates to the end user.
+- **US-SYS-04 (Event-Driven Automation)**: As the Musoftwares System, I must observe internal events (e.g., Lead stage changes) and execute predefined user-configured automation rules (e.g., sending an email, updating a tag) predictably and accurately.
+- **US-SYS-05 (Webhook & External API Processing)**: As the Musoftwares System, I must securely receive, validate, and process incoming webhooks from external platforms (e.g., payment gateways, WhatsApp providers) and map them to internal state changes.
+- **US-SYS-06 (Security & Rate Limiting Enforcement)**: As the Musoftwares System, I must actively monitor request velocities, enforce rate limits per module/tenant, and block malicious patterns (e.g., brute-force login, spam) to protect the ecosystem.
+
+### 4.2. Edge Cases
+- **EC-SYS-01 (Queue Worker Crashes)**: If a queue worker processing a heavy task crashes midway, the system must either safely retry the job (idempotency) or mark it as failed and alert the admin without corrupting the database state.
+- **EC-SYS-02 (Simultaneous Automation Triggers)**: If a single entity update triggers multiple competing automation rules, the system must process them sequentially or resolve deadlocks to prevent data race conditions.
+- **EC-SYS-03 (External API Rate Limiting)**: When communicating with external APIs (e.g., sending SMS), if the rate limit is hit, the system must pause and requeue the remaining payload using exponential backoff.
+- **EC-SYS-04 (Currency Exchange Service Failure)**: If the primary exchange rate API is down, the system must fall back to the most recently cached rates or pause automated currency-conversion transactions to prevent financial discrepancies.
+- **EC-SYS-05 (Webhook Replays)**: If a payment gateway replays a webhook due to a network timeout, the system must recognize the duplicate transaction ID and gracefully ignore it to prevent double-crediting wallets.
+
+### 4.3. Testing Requirements
+- **TR-SYS-01 (Idempotency Testing)**: All queued jobs and webhook handlers must have automated tests verifying that running the same payload twice does not result in duplicate records or double-billing.
+- **TR-SYS-02 (Concurrency & Race Condition Simulation)**: Integration tests must simulate high concurrency (e.g., multiple rapid wallet deduction requests) to ensure database transactions and locks correctly prevent negative balances.
+- **TR-SYS-03 (Job Failure & Retry Logic)**: Automated tests must mock external API failures to verify that the exponential backoff and dead-letter-queue (DLQ) mechanisms function as intended.
+- **TR-SYS-04 (Time-Travel Testing for Billing)**: Subscription lifecycles must be tested using mock clocks (e.g., Carbon's `setTestNow()`) to verify auto-renewals, grace periods, and expiration hooks across month boundaries and leap years.
+- **TR-SYS-05 (Security Payload Validation)**: Webhook endpoints must have tests injecting invalid signatures, missing headers, and malformed JSON to confirm they fail closed and log the incident without crashing.
+
+---
+
+## 5. Self-Grilling & Edge Case Resolutions
 
 **Q1: What happens if a user accesses an ERP page without an active subscription?**
 - **Resolution**: The system must intercept the request via middleware and seamlessly render `ERP/UpgradePreview.tsx` or a 403 Forbidden page natively integrated with Shadcn UI. Partial content loads must be strictly blocked to prevent data leaks.
