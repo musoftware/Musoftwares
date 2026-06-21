@@ -11,31 +11,25 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use App\Services\ReferralService;
 
 class ReferralController extends Controller
 {
     use \App\Traits\ConvertsCurrency;
 
+    protected ReferralService $referralService;
+
+    public function __construct(ReferralService $referralService)
+    {
+        $this->referralService = $referralService;
+    }
+
     public function index(Request $request)
     {
         $user = Auth::user();
 
-        // Auto-activate referral system if not active
-        if ($user->allow_referral_system != '1') {
-            $user->allow_referral_system = '1';
-            $user->save();
-        }
-
-        // Auto-create a primary referral link if none exists
-        $referral = UserReferral::where('user_id', $user->id)->first();
-        
-        if (!$referral) {
-            $referral = new UserReferral();
-            $referral->user_id = $user->id;
-            $referral->title = 'Primary Campaign';
-            $referral->key = sha1(md5(uniqid() . $user->id));
-            $referral->save();
-        }
+        // Auto-activate referral system and get/create primary link
+        $referral = $this->referralService->ensureReferralSystemActive($user);
 
         return Inertia::render('Client/Dashboard/Referrals/Index', [
             'referral' => $referral,
@@ -142,26 +136,7 @@ class ReferralController extends Controller
                 ->paginate(14);
         }
 
-        $ids = $referred_users->pluck('id');
-        $earnings = Earning::query()
-            ->where('user_id', $auth->id)
-            ->whereIn('referred_user_id', $ids)
-            ->get();
-
-        $commissionByUserId = [];
-        foreach ($earnings->groupBy('referred_user_id') as $referred_user_id => $userEarnings) {
-            $total = 0;
-            foreach ($userEarnings as $e) {
-                // Ensure CurrenciesExchange exists or fallback
-                if (class_exists(CurrenciesExchange::class)) {
-                    $total += CurrenciesExchange::RateToday($e->amount, $e->currency, $auth->currency);
-                    // RateToday expects currency IDs in the legacy system.
-                } else {
-                    $total += $e->amount;
-                }
-            }
-            $commissionByUserId[$referred_user_id] = round($total, 2);
-        }
+        $commissionByUserId = $this->referralService->calculateCommissionByUserId($auth, $referred_users);
 
         return Inertia::render('Client/Dashboard/Referrals/Registers', [
             'referred_users' => $referred_users,
@@ -197,16 +172,9 @@ class ReferralController extends Controller
         $valueRef = $request->session()->get('referral');
 
         if ($HasRef) {
-            $referral = UserReferral::resolveRef($valueRef);
+            $referral = $this->referralService->processReferralRedirect($valueRef);
             if (!$referral) {
                 return abort(404, __('messages.bad_referral'));
-            }
-            if (str_contains($_SERVER['HTTP_USER_AGENT'] ?? '', 'FBAV')) {
-                header('X-Frame-Options: DENY');
-                header('Referrer-Policy: origin');
-            }
-            if (empty($_SERVER['HTTP_USER_AGENT']) || !preg_match('~(bot|crawl)~i', $_SERVER['HTTP_USER_AGENT'])) {
-                UserReferral::IncViewRef($valueRef);
             }
         }
 
@@ -251,20 +219,7 @@ class ReferralController extends Controller
                 'affiliate_commission_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
             ]);
 
-            $user = \App\Models\User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => \Illuminate\Support\Facades\Hash::make($request->password),
-                'phone_number' => $request->phone_number,
-                'currency' => Auth::user()->currency_name(),
-                'affiliate_commission_percentage' => $request->affiliate_commission_percentage ?? 1.00,
-                'add_commission_to_total' => $request->has('affiliate_commission_percentage'),
-            ]);
-
-            $user->ref_user_id = Auth::id();
-            $user->save();
-
-            event(new \Illuminate\Auth\Events\Registered($user));
+            $this->referralService->registerReferredUser(Auth::user(), $request->all());
 
             return redirect()->route('referrals.index')->with('success', __('messages.user_created_referral_success'));
         }
