@@ -112,4 +112,46 @@ class PointPurchaseService
             'type' => 'purchased',
         ]);
     }
+
+    /**
+     * Process a points purchase from a webhook payment.
+     */
+    public function processWebhookPurchase(User $user, float $amountPaid, string $reason, int $points, $packageId = null): void
+    {
+        DB::transaction(function () use ($user, $amountPaid, $reason, $points, $packageId) {
+            $user->add_balance($amountPaid, $reason, 'received');
+            
+            // Deduct balance for points
+            $user->add_balance(-$amountPaid, 'Purchased ' . $points . ' points via Kashier', 'used');
+
+            // Add points
+            $user->points_balance = ($user->points_balance ?? 0) + $points;
+            $user->save();
+
+            // Log point transaction
+            $this->logPointTransaction($user->id, $points);
+        });
+    }
+
+    /**
+     * Convert an EGP amount to user's currency.
+     */
+    public function getUserAmountAndCurrency(User $user, float $amountInEgp): array
+    {
+        $egpCurrency = Currency::where('currency', 'EGP')->first();
+        $userCurrencyId = $user->currency;
+        $userCurrency = Currency::find($userCurrencyId);
+        
+        $currencyCode = $userCurrency ? $userCurrency->currency : 'EGP';
+        $rate = 1.0;
+        
+        if ($egpCurrency && $userCurrencyId && $egpCurrency->id != $userCurrencyId) {
+            $rate = CurrenciesExchange::RateToday(1, $egpCurrency->id, $userCurrencyId);
+        }
+        
+        return [
+            'amount' => round($amountInEgp * $rate, 2),
+            'currency' => $currencyCode,
+        ];
+    }
 }

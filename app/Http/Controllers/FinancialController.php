@@ -96,21 +96,8 @@ class FinancialController extends Controller
             return back()->withErrors(['amount' => $eligibility['reason']]);
         }
 
-        $payoutMethod = $user->payoutMethods()->where('id', $request->payout_method_id)->firstOrFail();
-
         try {
-            DB::transaction(function () use ($request, $user, $wallet, $payoutMethod) {
-                $amount = $request->amount;
-                $user->add_balance(-1 * $amount, 'Withdrawal request via ' . ucwords(str_replace('_', ' ', $payoutMethod->type)), 'used');
-
-                $withdrawal = new UserReferralRequestWithdraw();
-                $withdrawal->user_id = $user->id;
-                $withdrawal->amount = $amount;
-                $withdrawal->currency = $user->currency;
-                $withdrawal->user_payment_method_id = $payoutMethod->id;
-                $withdrawal->status = 'pending';
-                $withdrawal->save();
-            });
+            $balanceService->processWithdrawalRequest($user, (float) $request->amount, (int) $request->payout_method_id);
             return back()->with('success', __('general.withdrawal_requested_successfully'));
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => 'An error occurred while processing your withdrawal request.']);
@@ -174,22 +161,15 @@ class FinancialController extends Controller
                 if ($userId && $trxId && $amountPaid > 0) {
                     $user = \App\Models\User::find($userId);
                     if ($user) {
-                        $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
+                        $balanceService = app(\App\Services\BalanceService::class);
+                        $result = $balanceService->processKashierDepositWebhook($user, $amountPaid, $trxId);
 
-                        // Idempotency check
-                        $reason = "Deposit via Kashier online payment (Trx: $trxId)";
-                        $alreadyProcessed = Transaction::where('user_id', $user->id)
-                            ->where('reason', $reason)
-                            ->exists();
-
-                        if (!$alreadyProcessed) {
-                            $user->add_balance($amountPaid, $reason, 'received');
-
+                        if (!$result['already_processed']) {
                             \Illuminate\Support\Facades\Log::info("Kashier deposit processed successfully for User $userId, Amount: $amountPaid");
-                            return response()->json(['status' => 'success', 'message' => 'Deposit processed successfully']);
+                            return response()->json(['status' => 'success', 'message' => $result['message']]);
                         } else {
                             \Illuminate\Support\Facades\Log::warning("Duplicate Kashier webhook received for Trx $trxId - skipped");
-                            return response()->json(['status' => 'success', 'message' => 'Already processed']);
+                            return response()->json(['status' => 'success', 'message' => $result['message']]);
                         }
                     }
                 }

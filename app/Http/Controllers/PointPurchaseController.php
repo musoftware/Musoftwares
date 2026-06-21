@@ -71,7 +71,7 @@ class PointPurchaseController extends Controller
             return back()->with('success', __('general.points_purchased_successfully_using_wallet_balance'));
         } catch (\Exception $e) {
             if ($e->getMessage() === 'INSUFFICIENT_FUNDS') {
-                $paymentDetails = $this->getUserAmountAndCurrency($user, $costInEgp);
+                $paymentDetails = $this->pointsService->getUserAmountAndCurrency($user, $costInEgp);
                 $paymentUrl = KashierHelper::buildPointPurchasePaymentUrl(
                     $paymentDetails['amount'],
                     $user->id,
@@ -98,7 +98,7 @@ class PointPurchaseController extends Controller
             return back()->with('success', __('general.points_purchased_successfully_using_wallet_balance'));
         } catch (\Exception $e) {
             if ($e->getMessage() === 'INSUFFICIENT_FUNDS') {
-                $paymentDetails = $this->getUserAmountAndCurrency($user, $package->price);
+                $paymentDetails = $this->pointsService->getUserAmountAndCurrency($user, $package->price);
                 $paymentUrl = KashierHelper::buildPointPurchasePaymentUrl(
                     $paymentDetails['amount'],
                     $user->id,
@@ -155,23 +155,7 @@ class PointPurchaseController extends Controller
 
                         if (!$alreadyProcessed) {
                             try {
-                                \Illuminate\Support\Facades\DB::transaction(function () use ($user, $amountPaid, $reason, $points, $packageId) {
-                                    $user->add_balance($amountPaid, $reason, 'received');
-                                    
-                                    // Deduct balance for points
-                                    $user->add_balance(-$amountPaid, 'Purchased ' . $points . ' points via Kashier', 'used');
-
-                                    // Add points
-                                    $user->points_balance = ($user->points_balance ?? 0) + $points;
-                                    $user->save();
-
-                                    // Log point transaction
-                                    \App\Models\PointTransaction::create([
-                                        'user_id' => $user->id,
-                                        'points' => $points,
-                                        'type' => 'purchased',
-                                    ]);
-                                });
+                                $this->pointsService->processWebhookPurchase($user, $amountPaid, $reason, $points, $packageId);
                                 \Illuminate\Support\Facades\Log::info("Kashier points purchase processed successfully for User $userId, Points: $points");
                                 return response()->json(['status' => 'success', 'message' => 'Points purchase processed successfully']);
                             } catch (\Exception $e) {
@@ -188,24 +172,5 @@ class PointPurchaseController extends Controller
         }
 
         return response()->json(['error' => 'Invalid webhook signature'], 400);
-    }
-
-    private function getUserAmountAndCurrency($user, $amountInEgp)
-    {
-        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
-        $userCurrencyId = $user->currency;
-        $userCurrency = \App\Models\Currency::find($userCurrencyId);
-        
-        $currencyCode = $userCurrency ? $userCurrency->currency : 'EGP';
-        $rate = 1.0;
-        
-        if ($egpCurrency && $userCurrencyId && $egpCurrency->id != $userCurrencyId) {
-            $rate = \App\Models\CurrenciesExchange::RateToday(1, $egpCurrency->id, $userCurrencyId);
-        }
-        
-        return [
-            'amount' => round($amountInEgp * $rate, 2),
-            'currency' => $currencyCode,
-        ];
     }
 }
