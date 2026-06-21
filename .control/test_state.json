@@ -1,0 +1,320 @@
+[
+    {
+        "id": "Strategy",
+        "name": "Musoftwares Testing Strategy",
+        "status": "running",
+        "dependencies": []
+    },
+    {
+        "id": "Unit",
+        "name": "Unit Testing",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Integration",
+        "name": "Integration Testing",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "E2E",
+        "name": "End-to-End E2E Testing",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "BackendUnit",
+        "name": "Backend - PHPUnit/Pest",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "FrontendUnit",
+        "name": "Frontend - Vitest",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ModelTest",
+        "name": "Models & Relationships",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ServiceTest",
+        "name": "Core Business Services",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "MiddlewareTest",
+        "name": "Middleware & Gates",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "CurrencyTest",
+        "name": "Multi-Currency Formatter",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "InvoiceGenTest",
+        "name": "Invoice Generation",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "BillingLogicTest",
+        "name": "Wallet & Billing Logic",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "TenantIsoTest",
+        "name": "Tenant Isolation",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "SubGateTest",
+        "name": "Subscription Gating",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "RateLimitTest",
+        "name": "Rate Limiting",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "UIComponentTest",
+        "name": "Shadcn UI Components",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "FormatterTest",
+        "name": "Currency & Date Formatter Utilities",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "I18nTest",
+        "name": "i18n Localization Arrays",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "APIControllerTest",
+        "name": "API & Controllers",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "DBTransactionTest",
+        "name": "Database Transactions",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ExtIntegrationTest",
+        "name": "External Integrations",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "WebSocketTest",
+        "name": "WebSockets & SSE Fallbacks",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "TriPathTest",
+        "name": "Tri-Path Validation",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "HappyPathTest",
+        "name": "Happy Path",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "EdgeCaseTest",
+        "name": "Edge Cases & Errors",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "SecurityLimitTest",
+        "name": "Security Limits",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "SMSGateTest",
+        "name": "SMS Gateway API",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "PaymentGateTest",
+        "name": "Payment Gateway Webhooks",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "AuthE2E",
+        "name": "Authentication & Onboarding",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "AdminE2E",
+        "name": "Admin Panel",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ERPE2E",
+        "name": "ERP Module",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "CRME2E",
+        "name": "CRM Module",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ClientPortalE2E",
+        "name": "Client Portal",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ToolsE2E",
+        "name": "Tools & WebTools",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ExtModuleE2E",
+        "name": "External Modules & Addons",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "RegFlowTest",
+        "name": "Register, Verify, Login",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "OnboardFlowTest",
+        "name": "Onboarding Wizard & Tenant Init",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ImpersonateTest",
+        "name": "User Impersonation Flow",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "BulkActionTest",
+        "name": "Bulk Actions & Confirmations",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "VirtualTableTest",
+        "name": "Large Dataset Tables",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ERPFormTest",
+        "name": "Full-Width Add/Edit Forms",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "InvoiceFlowTest",
+        "name": "Invoice Creation to Payment",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "InventoryPOSTest",
+        "name": "Inventory Mgmt & POS",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "MultiBranchTest",
+        "name": "Multi-Branch Data Separation",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "KanbanTest",
+        "name": "Kanban Drag-and-Drop",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "WidgetTest",
+        "name": "Lead Capture Embeds",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "WalletFlowTest",
+        "name": "Wallet Deposit & Withdraw",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "ChatTest",
+        "name": "Real-Time Support Chat",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "RunnerTest",
+        "name": "Task Runner & WS Reconnection",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "FreelanceFlowTest",
+        "name": "Job Proposal & Escrow",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "BookingTest",
+        "name": "Booking & SmartSlots",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "AffiliateTest",
+        "name": "Affiliate POS Flow",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "GoldSaverTest",
+        "name": "GoldSavers Analytics",
+        "status": "pending",
+        "dependencies": []
+    }
+]
