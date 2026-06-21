@@ -30,85 +30,8 @@ class SubscriptionController extends Controller
      */
     public function plans(Request $request)
     {
-        $user = Auth::user();
-        
-        $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
-        $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
-        
-        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
-        $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
-        
-        $userCurrencyId = $user->currency_id ?: $egpCurrencyId;
-        $userCurrency = \App\Models\Currency::find($userCurrencyId);
-        $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
-        
-        $rate = 1.0;
-        if ($usdCurrency && $userCurrencyId && $usdCurrency->id != $userCurrencyId) {
-            $rate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $userCurrencyId);
-        }
-
-        $egpRate = 50; // Fallback
-        if ($usdCurrency && $egpCurrencyId) {
-            $egpRate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
-        }
-
-        // Base prices are given in EGP
-        $basePricesEGP = config('saas.modules', []);
-
-        // Convert EGP to user's currency: (EGP / EGP_Rate) * User_Rate
-        $convertPrice = function($egpPrice) use ($egpRate, $rate, $currencyCode) {
-            if ($currencyCode === 'EGP') {
-                return round($egpPrice);
-            }
-            $usdPrice = $egpPrice / $egpRate;
-            $converted = $usdPrice * $rate;
-            return psychological_price($converted);
-        };
-
-        $pricingService = new \App\Services\PricingService();
-        $serviceItems = $pricingService->getServiceItems($convertPrice);
-
-        $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
-
-        $ownedFeatures = [];
-        $userSubs = \App\Models\UserSubscription::where('user_id', $user->id)
-            ->where('status', 'active')
-            ->get();
-
-        foreach ($userSubs as $sub) {
-            $ownedFeatures[] = [
-                'id' => $sub->object,
-                'status' => \Carbon\Carbon::parse($sub->expires_at)->isFuture() ? 'active' : 'expired',
-                'expires_at' => \Carbon\Carbon::parse($sub->expires_at)->format('M d, Y')
-            ];
-        }
-
-        $hasSub = count($ownedFeatures) > 0;
-        $activeSub = null;
-
-        if ($hasSub) {
-            // Find the closest expiring subscription to use as the primary display date
-            $closestExpiry = $userSubs->min('expires_at');
-            
-            $activeSub = [
-                'id'            => $user->id,
-                'status'        => 'active',
-                'expires_at'    => $closestExpiry ? Carbon::parse($closestExpiry)->format('M d, Y') : '-',
-                'auto_renew'    => false, // Handled per-module now
-                'owned_features' => $ownedFeatures,
-            ];
-        }
-
-        $proratedRefund = 0;
-
-        return Inertia::render('Client/Subscriptions/Plans', [
-            'plans' => [],
-            'serviceItems' => $serviceItems,
-            'activeSubscription' => $activeSub,
-            'walletBalance' => (float) $user->available_balance(),
-            'currency' => $currencyCode,
-            'proratedRefund' => (float) $proratedRefund,
-        ]);
+        $data = $this->subscriptionService->getPlansPageData(Auth::user());
+        return Inertia::render('Client/Subscriptions/Plans', $data);
     }
 
 
@@ -128,99 +51,25 @@ class SubscriptionController extends Controller
         $user = Auth::user();
         $this->subscriptionService->validateAddonParents($request->items, $user);
         
-        $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
-        $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
-        
-        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
-        $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
-        
-        $userCurrencyId = $user->currency_id ?: $egpCurrencyId;
-        $userCurrency = \App\Models\Currency::find($userCurrencyId);
-        $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
-        
+        $currencyDetails = $this->subscriptionService->getUserCurrencyDetails($user);
         $billingCycle = $request->input('billing_cycle', '1_year');
-        $multiplier = 1;
-        $days = 30;
-        
-        if ($billingCycle === '3_months') {
-            $multiplier = 0.25;
-            $days = 90;
-        } elseif ($billingCycle === '6_months') {
-            $multiplier = 0.5;
-            $days = 180;
-        } elseif ($billingCycle === '1_year') {
-            $multiplier = 10; // 2 months free
-            $days = 365;
-        }
+        $billing = $this->subscriptionService->getBillingCycleDetails($billingCycle);
 
         if ($request->has('items') && count($request->items) > 0) {
-            $base_plan_amount = $this->subscriptionService->calculateCustomPriceBackend($request->items, $request->input('billing_cycle', '1_year'), $userCurrencyId);
+            $base_plan_amount = $this->subscriptionService->calculateCustomPriceBackend($request->items, $billingCycle, $currencyDetails['currencyId']);
         } else {
             return back()->withErrors(['error' => 'No modules selected.']);
         }
 
-        $current_plan = null;
-        $plan_amount = $currencyCode === 'EGP' ? round($base_plan_amount) : psychological_price($base_plan_amount);
-        $current_plan_remaining_price = 0; // We no longer offer prorated refunds on module additions. Each module lives independently.
+        $plan_amount = $currencyDetails['currencyCode'] === 'EGP' ? round($base_plan_amount) : psychological_price($base_plan_amount);
         $isNewSystem = $request->input('is_new_system', true);
         
-
-        if (($user->user_balance + $current_plan_remaining_price) < $plan_amount) {
+        if ($user->user_balance < $plan_amount) {
             return back()->withErrors(['error' => 'Insufficient balance.']);
         }
 
         try {
-            DB::transaction(function () use ($user, $plan_amount, $days, $billingCycle, $usdCurrencyId, $isNewSystem, $request) {
-                $userTenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
-                if ($isNewSystem && !$userTenant) {
-                    $tenantName = explode(' ', $user->name)[0] . ' Workspace ' . substr(uniqid(), -4);
-                    $tenant = \Modules\ERP\Models\Tenant::create([
-                        'user_id' => $user->id,
-                        'name' => $tenantName,
-                        'status' => 'active',
-                        'base_currency_id' => $user->currency_id ?: $usdCurrencyId,
-                    ]);
-                    $userTenant = $tenant;
-                }
-
-                if ($plan_amount > 0) {
-                    $user->add_balance(-1 * $plan_amount, 'Subscribe to modules', 'used');
-                }
-
-                // Create subscriptions for each purchased item
-                if (isset($request->items) && is_array($request->items)) {
-                    foreach ($request->items as $item) {
-                        $expiry = \Carbon\Carbon::now()->addDays((int) $days);
-                        
-                        // Check if they already own it, extend expiry
-                        $existing = \App\Models\UserSubscription::where('user_id', $user->id)->where('object', $item)->first();
-                        if ($existing && $existing->status === 'active' && \Carbon\Carbon::parse($existing->expires_at)->isFuture()) {
-                            $expiry = \Carbon\Carbon::parse($existing->expires_at)->addDays((int) $days);
-                        }
-
-                        \App\Models\UserSubscription::updateOrCreate(
-                            ['user_id' => $user->id, 'object' => $item],
-                            [
-                                'status' => 'active',
-                                'started_at' => now(),
-                                'expires_at' => $expiry,
-                                'auto_renew' => true
-                            ]
-                        );
-
-                        // Also update tenant_features for system permissions if tenant exists
-                        if ($userTenant) {
-                            \App\Models\TenantFeature::updateOrCreate(
-                                ['tenant_id' => $userTenant->id, 'feature_key' => $item],
-                                [
-                                    'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : (str_starts_with($item, 'tool') ? 'tools' : 'booking')),
-                                    'expires_at' => $expiry
-                                ]
-                            );
-                        }
-                    }
-                }
-            });
+            $this->subscriptionService->processSubscription($user, $plan_amount, $billing['days'], $request->items ?? [], $isNewSystem, 'Subscribe to modules', 'wallet_subscribe');
 
             return redirect()->route('subscriptions.manage')->with('success', __('general.subscribed_to_modules_successfully'));
 
@@ -244,29 +93,7 @@ class SubscriptionController extends Controller
         ]);
 
         $user = Auth::user();
-        
-        $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
-        $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
-        
-        $currencyId = null;
-        
-        if ($user && $user->currency_id) {
-            $currencyId = $user->currency_id;
-        } else {
-            $ipCurrencyCode = $geoService->getCurrencyCodeForIp($request->ip());
-            if ($ipCurrencyCode) {
-                $ipCurrency = \App\Models\Currency::where('currency', $ipCurrencyCode)->first();
-                if ($ipCurrency) {
-                    $currencyId = $ipCurrency->id;
-                }
-            }
-            if (!$currencyId) {
-                $currencyId = $usdCurrencyId;
-            }
-        }
-        
-        $userCurrency = \App\Models\Currency::find($currencyId);
-        $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
+        $currencyDetails = $this->subscriptionService->getUserCurrencyDetails($user, $request->ip());
 
         $items = $request->input('items', []);
         $billingCycle = $request->input('billing_cycle', '1_month');
@@ -279,9 +106,9 @@ class SubscriptionController extends Controller
             ]);
         }
 
-        $breakdown = $this->subscriptionService->calculateCustomPriceBackend($items, $billingCycle, $currencyId, true);
+        $breakdown = $this->subscriptionService->calculateCustomPriceBackend($items, $billingCycle, $currencyDetails['currencyId'], true);
 
-        if ($currencyCode !== 'EGP') {
+        if ($currencyDetails['currencyCode'] !== 'EGP') {
             $breakdown['total'] = psychological_price($breakdown['total']);
         } else {
             $breakdown['total'] = round($breakdown['total']);
@@ -307,38 +134,17 @@ class SubscriptionController extends Controller
         $this->subscriptionService->validateAddonParents($request->items, $user);
         $isNewSystem = $request->input('is_new_system', false);
         
-        $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
-        $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
-        
-        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
-        $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
-        
-        $userCurrencyId = $user->currency_id ?: $egpCurrencyId;
-        $userCurrency = \App\Models\Currency::find($userCurrencyId);
-        $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
-
+        $currencyDetails = $this->subscriptionService->getUserCurrencyDetails($user);
         $billingCycle = $request->input('billing_cycle', '1_year');
-        $multiplier = 1;
-        $days = 30; 
-        
-        if ($billingCycle === '3_months') {
-            $multiplier = 0.25;
-            $days = 90;
-        } elseif ($billingCycle === '6_months') {
-            $multiplier = 0.5;
-            $days = 180;
-        } elseif ($billingCycle === '1_year') {
-            $multiplier = 10;
-            $days = 365;
-        }
+        $billing = $this->subscriptionService->getBillingCycleDetails($billingCycle);
 
         if ($request->has('items') && count($request->items) > 0) {
-            $base_plan_amount = $this->subscriptionService->calculateCustomPriceBackend($request->items, $request->input('billing_cycle', '1_year'), $userCurrencyId);
+            $base_plan_amount = $this->subscriptionService->calculateCustomPriceBackend($request->items, $billingCycle, $currencyDetails['currencyId']);
         } else {
             return back()->withErrors(['error' => 'No modules selected.']);
         }
 
-        $plan_amount = $currencyCode === 'EGP' ? round($base_plan_amount) : psychological_price($base_plan_amount);
+        $plan_amount = $currencyDetails['currencyCode'] === 'EGP' ? round($base_plan_amount) : psychological_price($base_plan_amount);
 
         $paymentUrl = \App\Helpers\KashierHelper::buildSubscriptionPaymentUrl(
             $plan_amount,
@@ -346,9 +152,9 @@ class SubscriptionController extends Controller
             $user->name,
             $user->email,
             null,
-            $currencyCode,
+            $currencyDetails['currencyCode'],
             $billingCycle,
-            $days,
+            $billing['days'],
             $request->items ?? [],
             $isNewSystem
         );
@@ -386,59 +192,7 @@ class SubscriptionController extends Controller
 
                         if (!$alreadyProcessed) {
                             try {
-                                DB::transaction(function () use ($user, $amountPaid, $reason, $days, $isNewSystem, $metadata) {
-                                    $userTenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
-                                    if ($isNewSystem && !$userTenant) {
-                                        $tenantName = explode(' ', $user->name)[0] . ' Workspace ' . substr(uniqid(), -4);
-                                        $tenant = \Modules\ERP\Models\Tenant::create([
-                                            'user_id' => $user->id,
-                                            'name' => $tenantName,
-                                            'status' => 'active',
-                                            'base_currency_id' => $user->currency_id ?: 1, // fallback to USD
-                                        ]);
-                                        $userTenant = $tenant;
-                                    }
-
-                                    $user->add_balance($amountPaid, $reason, 'received');
-                                    
-                                    // Deduct balance for plan
-                                    \App\Helpers\TimerHelper::instance()->addUsed($user, $amountPaid, 'Subscribe to modules');
-
-                                    // Save capabilities
-                                    $items = $metadata['items'] ?? [];
-                                    if (is_array($items) && !empty($items)) {
-                                        foreach ($items as $item) {
-                                            $expiry = \Carbon\Carbon::now()->addDays((int) $days);
-                                            
-                                            // Check if they already own it, extend expiry
-                                            $existing = \App\Models\UserSubscription::where('user_id', $user->id)->where('object', $item)->first();
-                                            if ($existing && $existing->status === 'active' && \Carbon\Carbon::parse($existing->expires_at)->isFuture()) {
-                                                $expiry = \Carbon\Carbon::parse($existing->expires_at)->addDays((int) $days);
-                                            }
-
-                                            \App\Models\UserSubscription::updateOrCreate(
-                                                ['user_id' => $user->id, 'object' => $item],
-                                                [
-                                                    'status' => 'active',
-                                                    'started_at' => now(),
-                                                    'expires_at' => $expiry,
-                                                    'auto_renew' => true
-                                                ]
-                                            );
-
-                                            // Also update tenant_features
-                                            if ($userTenant) {
-                                                \App\Models\TenantFeature::updateOrCreate(
-                                                    ['tenant_id' => $userTenant->id, 'feature_key' => $item],
-                                                    [
-                                                        'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : (str_starts_with($item, 'tool') ? 'tools' : 'booking')),
-                                                        'expires_at' => $expiry
-                                                    ]
-                                                );
-                                            }
-                                        }
-                                    }
-                                });
+                                $this->subscriptionService->processSubscription($user, $amountPaid, $days, $metadata['items'] ?? [], $isNewSystem, $reason, 'webhook_received');
                                 \Illuminate\Support\Facades\Log::info("Kashier subscription processed successfully for User $userId");
                                 return response()->json(['status' => 'success', 'message' => 'Subscription processed successfully']);
                             } catch (\Exception $e) {
@@ -472,75 +226,8 @@ class SubscriptionController extends Controller
      */
     public function manage(Request $request)
     {
-        $user = Auth::user();
-        
-        $subscriptions = [];
-        
-        $userSubs = \App\Models\UserSubscription::where('user_id', $user->id)
-            ->whereIn('status', ['active', 'expired', 'cancelled'])
-            ->get();
-            
-        $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
-        $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
-        
-        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
-        $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
-        
-        $userCurrencyId = $user->currency_id ?: $egpCurrencyId;
-        $userCurrency = \App\Models\Currency::find($userCurrencyId);
-        $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
-        
-        $rate = 1.0;
-        if ($usdCurrency && $userCurrencyId && $usdCurrency->id != $userCurrencyId) {
-            $rate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $userCurrencyId);
-        }
-
-        $egpRate = 50; // Fallback
-        if ($usdCurrency && $egpCurrencyId) {
-            $egpRate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
-        }
-
-        $convertPrice = function($egpPrice) use ($egpRate, $rate, $currencyCode) {
-            if ($currencyCode === 'EGP') {
-                return round($egpPrice);
-            }
-            $usdPrice = $egpPrice / $egpRate;
-            $converted = $usdPrice * $rate;
-            return psychological_price($converted);
-        };
-
-        $serviceItems = app(\App\Services\PricingService::class)->getServiceItems($convertPrice);
-        
-        if ($userSubs->count() > 0) {
-            foreach ($userSubs as $sub) {
-                $item = collect($serviceItems)->firstWhere('id', $sub->object);
-                $monthlyPrice = $item['monthly_price'] ?? 0;
-
-                $subscriptions[] = [
-                    'id'            => $sub->id,
-                    'plan_name'     => $item['name'] ?? ucfirst(str_replace('-', ' ', $sub->object)),
-                    'plan_slug'     => $sub->object,
-                    'billing_cycle' => 'Module',
-                    'amount'        => $monthlyPrice,
-                    'currency'      => $user->currency_name(),
-                    'status'        => $sub->status,
-                    'started_at'    => \Carbon\Carbon::parse($sub->started_at)->format('M d, Y'),
-                    'expires_at'    => \Carbon\Carbon::parse($sub->expires_at)->format('M d, Y'),
-                    'auto_renew'    => (bool) $sub->auto_renew,
-                    'custom_items'  => [$sub->object],
-                    'is_custom'     => false,
-                ];
-            }
-        }
-
-        $invoices = []; // SubscriptionInvoice might not exist in legacy DB
-
-        return Inertia::render('Client/Subscriptions/Manage', [
-            'subscriptions' => $subscriptions,
-            'invoices'      => $invoices,
-            'walletBalance' => (float) $user->user_balance,
-            'currency'      => $user->currency_name(),
-        ]);
+        $data = $this->subscriptionService->getManagePageData(Auth::user());
+        return Inertia::render('Client/Subscriptions/Manage', $data);
     }
 
     /**
@@ -595,40 +282,7 @@ class SubscriptionController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($user, $sub, $price, $item, $proratedDays) {
-                if ($price > 0) {
-                    $itemName = $item['name'] ?? ucfirst($sub->object);
-                    $desc = $proratedDays ? "Manual Prorated Subscription Renewal for {$proratedDays} days: " : "Manual Subscription Renewal: ";
-                    $user->add_balance(-1 * $price, $desc . $itemName, 'used');
-                }
-
-                $newExpiresAt = $sub->expires_at && \Carbon\Carbon::parse($sub->expires_at)->isFuture() 
-                    ? \Carbon\Carbon::parse($sub->expires_at)
-                    : \Carbon\Carbon::now();
-                
-                if ($proratedDays !== null) {
-                    $newExpiresAt->addDays($proratedDays);
-                } else {
-                    $newExpiresAt->addMonth();
-                }
-
-                $sub->update([
-                    'status' => 'active',
-                    'expires_at' => $newExpiresAt,
-                    'auto_renew' => true
-                ]);
-
-                $tenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
-                if ($tenant) {
-                    \App\Models\TenantFeature::updateOrCreate(
-                        ['tenant_id' => $tenant->id, 'feature_key' => $sub->object],
-                        [
-                            'module' => str_starts_with($sub->object, 'crm') ? 'crm' : (str_starts_with($sub->object, 'erp') ? 'erp' : (str_starts_with($sub->object, 'tool') ? 'tools' : 'booking')),
-                            'expires_at' => $newExpiresAt
-                        ]
-                    );
-                }
-            });
+            $this->subscriptionService->renewSubscription($user, $sub, $price, $item, $proratedDays);
 
             if ($proratedDays) {
                 return back()->with('success', "Subscription partially renewed for {$proratedDays} days.");
