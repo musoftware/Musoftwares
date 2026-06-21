@@ -2,10 +2,10 @@
 
 namespace Modules\SmsPaymentGateway\Providers;
 
-use Nwidart\Modules\Support\ModuleServiceProvider;
+use App\Providers\BaseModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 
-class SmsPaymentGatewayServiceProvider extends ModuleServiceProvider
+class SmsPaymentGatewayServiceProvider extends BaseModuleServiceProvider
 {
     /**
      * The name of the module.

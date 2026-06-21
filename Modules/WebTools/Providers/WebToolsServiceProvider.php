@@ -2,10 +2,10 @@
 
 namespace Modules\WebTools\Providers;
 
-use Nwidart\Modules\Support\ModuleServiceProvider;
+use App\Providers\BaseModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 
-class WebToolsServiceProvider extends ModuleServiceProvider
+class WebToolsServiceProvider extends BaseModuleServiceProvider
 {
     /**
      * The name of the module.

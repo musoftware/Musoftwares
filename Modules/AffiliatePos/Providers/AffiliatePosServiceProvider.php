@@ -2,10 +2,10 @@
 
 namespace Modules\AffiliatePos\Providers;
 
-use Nwidart\Modules\Support\ModuleServiceProvider;
+use App\Providers\BaseModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 
-class AffiliatePosServiceProvider extends ModuleServiceProvider
+class AffiliatePosServiceProvider extends BaseModuleServiceProvider
 {
     /**
      * The name of the module.

@@ -2,10 +2,10 @@
 
 namespace Modules\Core\Providers;
 
-use Nwidart\Modules\Support\ModuleServiceProvider;
+use App\Providers\BaseModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 
-class CoreServiceProvider extends ModuleServiceProvider
+class CoreServiceProvider extends BaseModuleServiceProvider
 {
     /**
      * The name of the module.
