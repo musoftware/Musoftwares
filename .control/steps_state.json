@@ -86,13 +86,13 @@
     {
         "id": "A5",
         "name": "Setup Spatie Permissions",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "AuthOnboarding",
         "name": "3. Identity, Auth & Onboarding",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Architecture"
         ]
@@ -100,7 +100,7 @@
     {
         "id": "AO1",
         "name": "Build Login, Register, Forgot Password",
-        "status": "pending",
+        "status": "running",
         "dependencies": []
     },
     {
