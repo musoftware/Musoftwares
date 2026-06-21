@@ -24,7 +24,7 @@ class CostTransaction extends Model
             $businessCurrencyId = \App\Models\AdminSettings::business_currency();
             
             $date = $costTransaction->created_at ?? now();
-            $costTransaction->business_amount = \App\Models\CurrenciesExchange::RateByDate(
+            $costTransaction->business_amount = \App\Models\CurrenciesExchange::RateByDateNoRound(
                 $date,
                 $costTransaction->amount,
                 $currency,

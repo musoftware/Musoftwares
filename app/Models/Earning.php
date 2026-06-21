@@ -21,7 +21,7 @@ class Earning extends Model
                 
                 if ($currentCurrencyId != $userCurrencyId) {
                     $date = $earning->created_at ?? now();
-                    $earning->amount = \App\Models\CurrenciesExchange::RateByDate(
+                    $earning->amount = \App\Models\CurrenciesExchange::RateByDateNoRound(
                         $date,
                         $earning->amount,
                         $currentCurrencyId,
@@ -59,7 +59,7 @@ class Earning extends Model
         $data = $query->groupBy('currency_id')->get();
         $amount = 0;
         foreach ($data as $commission) {
-            $user_amount = CurrenciesExchange::RateByDate($commission->avg_date, $commission->amount, $commission->currency_id, \App\Models\CurrenciesExchange::BusinessCurrency());
+            $user_amount = CurrenciesExchange::RateByDateNoRound($commission->avg_date, $commission->amount, $commission->currency_id, \App\Models\CurrenciesExchange::BusinessCurrency());
             $amount += $user_amount;
         }
         return $amount;
@@ -101,7 +101,7 @@ class Earning extends Model
 
         $amount = 0;
         foreach ($data as $commission) {
-            $user_amount = CurrenciesExchange::RateByDate($commission->avg_date, $commission->amount, $commission->currency_id, \App\Models\CurrenciesExchange::BusinessCurrency());
+            $user_amount = CurrenciesExchange::RateByDateNoRound($commission->avg_date, $commission->amount, $commission->currency_id, \App\Models\CurrenciesExchange::BusinessCurrency());
             $amount += $user_amount;
         }
         return $amount;

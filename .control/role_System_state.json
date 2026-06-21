@@ -54,19 +54,19 @@
     {
         "id": "Sub1_2",
         "name": "Gracefully downgrade access on payment failure",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Sub2_1",
         "name": "Fetch exchange rates periodically",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Sub2_2",
         "name": "Compute dual-currency transactions accurately",
-        "status": "pending",
+        "status": "running",
         "dependencies": []
     },
     {

@@ -720,7 +720,7 @@ class Invoice extends Model
                 : ('Invoice #' . $this->id . ' — direct cost');
             $c_id = \App\Models\CostTransaction::add_cost_balance(
                 $this->user,
-                CurrenciesExchange::RateToday((float) $line->amount, $this->currency_id, $this->client->currency_id ?? $this->client->currency),
+                        CurrenciesExchange::RateTodayNoRound((float) $line->amount, $this->currency_id, $this->client->currency_id ?? $this->client->currency),
                 $reason,
                 $this->client->currency_id ?? $this->client->currency,
                 $this->project_id
@@ -759,7 +759,7 @@ class Invoice extends Model
                         : ('Invoice #' . $this->id . ' — direct cost');
                     $c_id = \App\Models\CostTransaction::add_cost_balance(
                         $this->user,
-                        CurrenciesExchange::RateToday((float) $line->amount, $this->currency_id, $this->client->currency_id ?? $this->client->currency),
+                        CurrenciesExchange::RateTodayNoRound((float) $line->amount, $this->currency_id, $this->client->currency_id ?? $this->client->currency),
                         $reason,
                         $this->client->currency_id ?? $this->client->currency,
                         $this->project_id
@@ -814,7 +814,7 @@ class Invoice extends Model
         if ($this->cost > 0) {
             $c_id = \App\Models\CostTransaction::add_cost_balance(
                 $this->user,
-                CurrenciesExchange::RateToday($this->cost, $this->currency_id, $this->client->currency_id ?? $this->client->currency),
+                CurrenciesExchange::RateTodayNoRound($this->cost, $this->currency_id, $this->client->currency_id ?? $this->client->currency),
                 'Costs for Invoice #' . $this->id,
                 $this->client->currency_id ?? $this->client->currency,
                 $this->project_id

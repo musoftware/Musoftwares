@@ -56,7 +56,7 @@ class Transaction extends Model
                 
                 if ($currentCurrencyId != $userCurrencyId) {
                     $date = $transaction->created_at ?? now();
-                    $transaction->amount = \App\Models\CurrenciesExchange::RateByDate(
+                    $transaction->amount = \App\Models\CurrenciesExchange::RateByDateNoRound(
                         $date,
                         $transaction->amount,
                         $currentCurrencyId,
@@ -77,7 +77,7 @@ class Transaction extends Model
             }
             
             $date = $transaction->created_at ?? now();
-            $transaction->business_amount = \App\Models\CurrenciesExchange::RateByDate(
+            $transaction->business_amount = \App\Models\CurrenciesExchange::RateByDateNoRound(
                 $date,
                 $transaction->amount,
                 $currency,
