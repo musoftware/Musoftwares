@@ -1,10 +1,24 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import AuthIllustration from '@/Components/AuthIllustration';
 import { Link, router } from '@inertiajs/react';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useRef } from 'react';
 import { __ } from '@/lib/i18n';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 export default function Guest({ children }: PropsWithChildren) {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useGSAP(() => {
+        if (containerRef.current) {
+            gsap.from(containerRef.current, {
+                y: 20,
+                opacity: 0,
+                duration: 0.6,
+                ease: 'power3.out',
+            });
+        }
+    });
     return (
         <div className="min-h-screen flex w-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans selection:bg-zinc-900 selection:text-white dark:selection:bg-white dark:selection:text-zinc-900">
             {/* Desktop Left Column: Calm Minimal Supportive View */}
@@ -52,7 +66,7 @@ export default function Guest({ children }: PropsWithChildren) {
                 </div>
 
                 {/* Centered Compact Auth Card Anchor */}
-                <div className="w-full max-w-[420px] mx-auto bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl shadow-xs p-8 sm:p-10 transition-all">
+                <div ref={containerRef} className="w-full max-w-[420px] mx-auto bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl shadow-xs p-8 sm:p-10 transition-all">
                     {children}
                 </div>
             </div>
