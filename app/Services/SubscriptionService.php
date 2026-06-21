@@ -324,4 +324,100 @@ class SubscriptionService
             }
         }
     }
+
+    public function processSubscription(User $user, float $amount, int $days, array $items, bool $isNewSystem, string $reason, string $action = 'wallet_subscribe')
+    {
+        return DB::transaction(function () use ($user, $amount, $days, $items, $isNewSystem, $reason, $action) {
+            $userTenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
+            if ($isNewSystem && !$userTenant) {
+                $tenantName = explode(' ', $user->name)[0] . ' Workspace ' . substr(uniqid(), -4);
+                $usdCurrencyId = \App\Models\Currency::where('currency', 'USD')->value('id') ?: 1;
+                $tenant = \Modules\ERP\Models\Tenant::create([
+                    'user_id' => $user->id,
+                    'name' => $tenantName,
+                    'status' => 'active',
+                    'base_currency_id' => $user->currency_id ?: $usdCurrencyId,
+                ]);
+                $userTenant = $tenant;
+            }
+
+            if ($action === 'webhook_received') {
+                $user->add_balance($amount, $reason, 'received');
+                \App\Helpers\TimerHelper::instance()->addUsed($user, $amount, 'Subscribe to modules');
+            } elseif ($action === 'wallet_subscribe' && $amount > 0) {
+                $user->add_balance(-1 * $amount, 'Subscribe to modules', 'used');
+            }
+
+            if (!empty($items) && is_array($items)) {
+                foreach ($items as $item) {
+                    $expiry = Carbon::now()->addDays((int) $days);
+                    
+                    // Check if they already own it, extend expiry
+                    $existing = \App\Models\UserSubscription::where('user_id', $user->id)->where('object', $item)->first();
+                    if ($existing && $existing->status === 'active' && Carbon::parse($existing->expires_at)->isFuture()) {
+                        $expiry = Carbon::parse($existing->expires_at)->addDays((int) $days);
+                    }
+
+                    \App\Models\UserSubscription::updateOrCreate(
+                        ['user_id' => $user->id, 'object' => $item],
+                        [
+                            'status' => 'active',
+                            'started_at' => now(),
+                            'expires_at' => $expiry,
+                            'auto_renew' => true
+                        ]
+                    );
+
+                    // Also update tenant_features
+                    if ($userTenant) {
+                        \App\Models\TenantFeature::updateOrCreate(
+                            ['tenant_id' => $userTenant->id, 'feature_key' => $item],
+                            [
+                                'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : (str_starts_with($item, 'tool') ? 'tools' : 'booking')),
+                                'expires_at' => $expiry
+                            ]
+                        );
+                    }
+                }
+            }
+        });
+    }
+
+    public function renewSubscription(User $user, UserSubscription $sub, float $price, array $item, ?int $proratedDays)
+    {
+        return DB::transaction(function () use ($user, $sub, $price, $item, $proratedDays) {
+            if ($price > 0) {
+                $itemName = $item['name'] ?? ucfirst($sub->object);
+                $desc = $proratedDays ? "Manual Prorated Subscription Renewal for {$proratedDays} days: " : "Manual Subscription Renewal: ";
+                $user->add_balance(-1 * $price, $desc . $itemName, 'used');
+            }
+
+            $newExpiresAt = $sub->expires_at && Carbon::parse($sub->expires_at)->isFuture() 
+                ? Carbon::parse($sub->expires_at)
+                : Carbon::now();
+            
+            if ($proratedDays !== null) {
+                $newExpiresAt->addDays($proratedDays);
+            } else {
+                $newExpiresAt->addMonth();
+            }
+
+            $sub->update([
+                'status' => 'active',
+                'expires_at' => $newExpiresAt,
+                'auto_renew' => true
+            ]);
+
+            $tenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
+            if ($tenant) {
+                \App\Models\TenantFeature::updateOrCreate(
+                    ['tenant_id' => $tenant->id, 'feature_key' => $sub->object],
+                    [
+                        'module' => str_starts_with($sub->object, 'crm') ? 'crm' : (str_starts_with($sub->object, 'erp') ? 'erp' : (str_starts_with($sub->object, 'tool') ? 'tools' : 'booking')),
+                        'expires_at' => $newExpiresAt
+                    ]
+                );
+            }
+        });
+    }
 }
