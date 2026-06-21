@@ -15,11 +15,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(\App\Http\Middleware\RemoveSecurityHeaders::class);
         $middleware->web(append: [
+            'throttle:web',
             \Modules\ERP\Http\Middleware\ShareTeamMemberSession::class,
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
             \App\Http\Middleware\EnforceFreelanceDomain::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+        ]);
+        $middleware->api(prepend: [
+            'throttle:api',
         ]);
 
         $middleware->validateCsrfTokens(except: [
@@ -81,7 +85,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             // Web requests - render custom Inertia error page for 404/403/503
-            if (in_array($statusCode, [404, 403, 503]) || ($statusCode === 500 && ! app()->environment(['local', 'testing']))) {
+            if (in_array($statusCode, [404, 403, 503, 429]) || ($statusCode === 500 && ! app()->environment(['local', 'testing']))) {
                 if (class_exists(\Inertia\Inertia::class)) {
                     return \Inertia\Inertia::render('Error', ['status' => $statusCode])
                         ->toResponse($request)

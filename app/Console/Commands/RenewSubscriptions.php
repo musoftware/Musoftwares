@@ -75,8 +75,20 @@ class RenewSubscriptions extends Command
 
                 // Debit balance
                 try {
-                    if ((float) $user->user_balance < $price) {
-                        throw new Exception("Insufficient balance");
+                    $userBalance = (float) $user->user_balance;
+                    if ($userBalance < $price) {
+                        // Calculate prorations if partial balance exists
+                        if ($userBalance > 0 && $price > 0) {
+                            $proratedDays = floor(($userBalance / $price) * 30);
+                            if ($proratedDays >= 1) {
+                                $proratedPrice = ($proratedDays / 30) * $price;
+                                $user->add_balance(-1 * $proratedPrice, 'Prorated Subscription Renewal: ' . $itemName, 'used');
+                                $this->renewSubscription($subscription, $proratedDays);
+                                $this->info("Subscription ID: {$subscription->id} prorated renewed for {$proratedDays} days via balance debit of {$proratedPrice} USD.");
+                                continue;
+                            }
+                        }
+                        throw new Exception("Insufficient balance for even a 1-day proration.");
                     }
                     $user->add_balance(-1 * $price, 'Subscription Renewal: ' . $itemName, 'used');
 
@@ -100,6 +112,9 @@ class RenewSubscriptions extends Command
                             ->update(['expires_at' => now()->subMinute()]);
                     }
 
+                    // Notify the user about the downgrade
+                    $user->notify(new \App\Notifications\SubscriptionPaymentFailedNotification($itemName));
+
                     $this->error("Subscription ID: {$subscription->id} has been marked as expired due to failed payment.");
                 }
             } catch (Exception $e) {
@@ -114,11 +129,15 @@ class RenewSubscriptions extends Command
     /**
      * Helper to extend expires_at based on billing cycle.
      */
-    protected function renewSubscription(UserSubscription $subscription): void
+    protected function renewSubscription(UserSubscription $subscription, ?int $proratedDays = null): void
     {
         $newExpiresAt = $subscription->expires_at ? Carbon::parse($subscription->expires_at) : Carbon::now();
 
-        $newExpiresAt->addMonth(); // default to monthly
+        if ($proratedDays !== null) {
+            $newExpiresAt->addDays($proratedDays);
+        } else {
+            $newExpiresAt->addMonth(); // default to monthly
+        }
 
         $subscription->update([
             'status' => 'active',

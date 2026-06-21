@@ -601,7 +601,7 @@ class SubscriptionController extends Controller
         $subscriptions = [];
         
         $userSubs = \App\Models\UserSubscription::where('user_id', $user->id)
-            ->where('status', 'active')
+            ->whereIn('status', ['active', 'expired', 'cancelled'])
             ->get();
             
         $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
@@ -647,7 +647,7 @@ class SubscriptionController extends Controller
                     'billing_cycle' => 'Module',
                     'amount'        => $monthlyPrice,
                     'currency'      => $user->currency_name(),
-                    'status'        => 'active',
+                    'status'        => $sub->status,
                     'started_at'    => \Carbon\Carbon::parse($sub->started_at)->format('M d, Y'),
                     'expires_at'    => \Carbon\Carbon::parse($sub->expires_at)->format('M d, Y'),
                     'auto_renew'    => (bool) $sub->auto_renew,
@@ -702,21 +702,39 @@ class SubscriptionController extends Controller
         }
 
         $price = $item['monthly_price'] ?? 0;
+        $userBalance = (float) $user->available_balance();
         
-        if ($user->available_balance() < $price) {
-            return back()->withErrors(['error' => 'Insufficient balance to renew.']);
+        $proratedDays = null;
+        if ($userBalance < $price) {
+            if ($userBalance > 0 && $price > 0) {
+                $proratedDays = floor(($userBalance / $price) * 30);
+                if ($proratedDays >= 1) {
+                    $price = ($proratedDays / 30) * $price;
+                } else {
+                    return back()->withErrors(['error' => 'Insufficient balance for even a 1-day proration.']);
+                }
+            } else {
+                return back()->withErrors(['error' => 'Insufficient balance to renew.']);
+            }
         }
 
         try {
-            DB::transaction(function () use ($user, $sub, $price, $item) {
+            DB::transaction(function () use ($user, $sub, $price, $item, $proratedDays) {
                 if ($price > 0) {
                     $itemName = $item['name'] ?? ucfirst($sub->object);
-                    $user->add_balance(-1 * $price, 'Manual Subscription Renewal: ' . $itemName, 'used');
+                    $desc = $proratedDays ? "Manual Prorated Subscription Renewal for {$proratedDays} days: " : "Manual Subscription Renewal: ";
+                    $user->add_balance(-1 * $price, $desc . $itemName, 'used');
                 }
 
                 $newExpiresAt = $sub->expires_at && \Carbon\Carbon::parse($sub->expires_at)->isFuture() 
-                    ? \Carbon\Carbon::parse($sub->expires_at)->addMonth() 
-                    : \Carbon\Carbon::now()->addMonth();
+                    ? \Carbon\Carbon::parse($sub->expires_at)
+                    : \Carbon\Carbon::now();
+                
+                if ($proratedDays !== null) {
+                    $newExpiresAt->addDays($proratedDays);
+                } else {
+                    $newExpiresAt->addMonth();
+                }
 
                 $sub->update([
                     'status' => 'active',
@@ -736,6 +754,9 @@ class SubscriptionController extends Controller
                 }
             });
 
+            if ($proratedDays) {
+                return back()->with('success', "Subscription partially renewed for {$proratedDays} days.");
+            }
             return back()->with('success', __('general.subscription_renewed_successfully'));
         } catch (\Exception $e) {
             Log::error('Manual renewal failed: ' . $e->getMessage());

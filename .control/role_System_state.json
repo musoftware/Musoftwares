@@ -40,7 +40,7 @@
     {
         "id": "US_SYS_06",
         "name": "Step 6: US-SYS-06 - Security & Rate Limiting Enforcement",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "US_SYS_05"
         ]
@@ -48,13 +48,13 @@
     {
         "id": "Sub1_1",
         "name": "Process recurring renewals and prorations",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Sub1_2",
         "name": "Gracefully downgrade access on payment failure",
-        "status": "pending",
+        "status": "running",
         "dependencies": []
     },
     {
