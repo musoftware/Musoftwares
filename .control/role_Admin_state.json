@@ -1,0 +1,64 @@
+[
+    {
+        "id": "Start",
+        "name": "Implementation Start",
+        "status": "completed",
+        "dependencies": []
+    },
+    {
+        "id": "US_ADM_01",
+        "name": "US-ADM-01: Tenant Oversight & Support",
+        "status": "running",
+        "dependencies": [
+            "Start"
+        ]
+    },
+    {
+        "id": "US_ADM_02",
+        "name": "US-ADM-02: Financial Auditing & Reporting",
+        "status": "pending",
+        "dependencies": [
+            "US_ADM_01"
+        ]
+    },
+    {
+        "id": "US_ADM_03",
+        "name": "US-ADM-03: Marketplace Moderation",
+        "status": "pending",
+        "dependencies": [
+            "US_ADM_02"
+        ]
+    },
+    {
+        "id": "US_ADM_04",
+        "name": "US-ADM-04: Content & Marketing Management",
+        "status": "pending",
+        "dependencies": [
+            "US_ADM_03"
+        ]
+    },
+    {
+        "id": "US_ADM_05",
+        "name": "US-ADM-05: System Configuration & Billing",
+        "status": "pending",
+        "dependencies": [
+            "US_ADM_04"
+        ]
+    },
+    {
+        "id": "US_ADM_06",
+        "name": "US-ADM-06: Support & Operational Workflows",
+        "status": "pending",
+        "dependencies": [
+            "US_ADM_05"
+        ]
+    },
+    {
+        "id": "Finish",
+        "name": "Implementation Complete",
+        "status": "pending",
+        "dependencies": [
+            "US_ADM_06"
+        ]
+    }
+]
