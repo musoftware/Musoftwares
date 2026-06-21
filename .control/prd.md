@@ -241,7 +241,33 @@ This section defines the oversight capabilities, team coordination, and approval
 
 ---
 
-## 9. Self-Grilling & Edge Case Resolutions
+## 9. User Role: Collector
+
+This section defines the debt recovery workflows, client interaction tracking, and financial follow-up capabilities executed by the "Collector" role within the CRM and ERP ecosystem.
+
+### 9.1. User Stories
+- **US-COL-01 (Overdue Account Monitoring)**: As a Collector, I must be able to view a dedicated dashboard (`CollectorDashboard.tsx`) highlighting overdue invoices, high-risk accounts, and aging reports so I can prioritize my daily outreach.
+- **US-COL-02 (Client Outreach & Logging)**: As a Collector, I must be able to log calls, emails, and notes directly on a client's profile or specific invoice to maintain a clear history of collection efforts and promises to pay.
+- **US-COL-03 (Payment Plan Structuring)**: As a Collector, I must be able to negotiate and structure installment plans for struggling clients within system-approved parameters to recover debts incrementally.
+- **US-COL-04 (Account Status Management)**: As a Collector, I must be able to update the financial status of a client (e.g., "In Collections", "Legal Action Pending") to alert other departments (like Sales or Support) to restrict further service.
+- **US-COL-05 (Automated Reminder Initiation)**: As a Collector, I must be able to manually trigger or configure automated SMS/email payment reminders for specific delinquent accounts to improve recovery rates.
+
+### 9.2. Edge Cases
+- **EC-COL-01 (Simultaneous Payment and Collection Call)**: If a client pays their overdue invoice online while the Collector is actively logging a collection call, the system must alert the Collector immediately to prevent asking for a payment that was just made.
+- **EC-COL-02 (Invalid Payment Plan Terms)**: If a Collector attempts to set up a payment plan that extends beyond the maximum allowed duration or falls below the minimum installment amount, the system must block the action and prompt for Manager approval.
+- **EC-COL-03 (Service Restriction Overlap)**: If a Collector marks an account as "In Collections", any active recurring subscriptions or services must be automatically paused or flagged, and this must not conflict with a client's active dispute.
+- **EC-COL-04 (Disputed Invoice Handling)**: If a client formally disputes an invoice during a collection attempt, the Collector must be able to pause collection workflows on that specific invoice until the dispute is resolved by an Admin or Manager.
+- **EC-COL-05 (Communication Blackouts)**: The system must prevent the Collector from sending automated SMS/emails during legally restricted hours (e.g., late at night or weekends in the client's timezone).
+
+### 9.3. Testing Requirements
+- **TR-COL-01 (Real-time Payment Updates)**: E2E tests must simulate a client paying an invoice and verify that the Collector's dashboard and active client view reflect the payment instantly (via WebSockets) without a page reload.
+- **TR-COL-02 (Payment Plan Boundary Enforcement)**: Integration tests must attempt to create payment plans with invalid parameters (too long, too small) to ensure strict validation rules and approval workflows are triggered.
+- **TR-COL-03 (Cross-Department Service Locks)**: Automated tests must confirm that when an account status is updated to "In Collections" by a Collector, the Client cannot provision new services and the Sales team is warned when attempting to create new contracts.
+- **TR-COL-04 (Dispute Freeze Logic)**: Tests must verify that marking an invoice as "Disputed" automatically pauses all scheduled automated collection reminders and removes the invoice from the active Collector queue.
+
+---
+
+## 10. Self-Grilling & Edge Case Resolutions
 
 **Q1: What happens if a user accesses an ERP page without an active subscription?**
 - **Resolution**: The system must intercept the request via middleware and seamlessly render `ERP/UpgradePreview.tsx` or a 403 Forbidden page natively integrated with Shadcn UI. Partial content loads must be strictly blocked to prevent data leaks.
