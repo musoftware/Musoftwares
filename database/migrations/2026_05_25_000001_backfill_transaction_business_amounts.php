@@ -21,7 +21,7 @@ return new class extends Migration
                 // If business_amount is 0 or business_calculated is false, calculate it.
                 if (!$t->business_calculated || $t->business_amount == 0) {
                     $currency = $t->currency_id ?? $businessCurrencyId;
-                    $t->business_amount = CurrenciesExchange::RateToday($t->amount, $currency, $businessCurrencyId);
+                    $t->business_amount = CurrenciesExchange::RateTodayNoRound($t->amount, $currency, $businessCurrencyId);
                     $t->business_calculated = true;
                     $t->save();
                 }
@@ -34,7 +34,7 @@ return new class extends Migration
                 // If business_amount is 0 or business_calculated is false, calculate it.
                 if (!$ct->business_calculated || $ct->business_amount == 0) {
                     $currency = $ct->currency_id ?? $businessCurrencyId;
-                    $ct->business_amount = CurrenciesExchange::RateToday($ct->amount, $currency, $businessCurrencyId);
+                    $ct->business_amount = CurrenciesExchange::RateTodayNoRound($ct->amount, $currency, $businessCurrencyId);
                     $ct->business_calculated = true;
                     $ct->save();
                 }

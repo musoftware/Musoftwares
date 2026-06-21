@@ -78,7 +78,7 @@ class UserReferralRequestWithdraw extends Model
         $data = static::query()->where('status', 'approved')->groupBy('currency_id')->select(DB::raw('sum(amount) as amount, currency_id'))->get();
         $amount = 0;
         foreach ($data as $commission) {
-            $user_amount = CurrenciesExchange::RateByDate($commission->created_at, $commission->amount, $commission->currency_id, \App\Models\CurrenciesExchange::BusinessCurrency());
+            $user_amount = CurrenciesExchange::RateByDateNoRound($commission->created_at, $commission->amount, $commission->currency_id, \App\Models\CurrenciesExchange::BusinessCurrency());
             $amount += $user_amount;
         }
         return $amount;

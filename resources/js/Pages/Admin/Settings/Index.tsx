@@ -19,6 +19,7 @@ import {
     Globe,
 } from 'lucide-react';
 import { CurrencySelect } from '@/Components/CurrencySelect';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 
 interface Currency {
     id: number;
@@ -169,6 +170,9 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
     const [updateProjects, setUpdateProjects] = useState(true);
 
     const [computedRate, setComputedRate] = useState<string>('0.00');
+
+    const [recalcConfirmOpen, setRecalcConfirmOpen] = useState(false);
+    const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
 
     useEffect(() => {
         if (!bulkCurrency) return;
@@ -570,8 +574,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                     <p className="text-sm font-medium text-gray-700 mb-4">{__('general.clears_the_daily_server_cache_and_recomputes_the_overhead_hourly_rate_egp_from_latest_cost_data_last_6_months')}</p>
                     <form onSubmit={(e) => {
                         e.preventDefault();
-                        if (!confirm('Are you sure you want to recalculate the overhead hourly rate?')) return;
-                        router.post(route('admin.settings.recalculate-overhead-hourly-rate'));
+                        setRecalcConfirmOpen(true);
                     }} className="space-y-4">
                         <Button type="submit" variant="outline" className="w-full">{__('general.recalculate_rate')}</Button>
                     </form>
@@ -582,13 +585,36 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                     <p className="text-sm font-medium text-gray-700 mb-4">{__('general.fetches_latest_global_exchange_rates_and_updates_internal_caches_for_multi_currency_computations')}</p>
                     <form onSubmit={(e) => {
                         e.preventDefault();
-                        if (!confirm('Are you sure you want to sync exchange rates from the external API?')) return;
-                        router.post(route('admin.settings.sync-exchange-rates'));
+                        setSyncConfirmOpen(true);
                     }} className="space-y-4">
                         <Button type="submit" variant="outline" className="w-full">{__('general.sync_exchange_rates_now')}</Button>
                     </form>
                 </SectionCard>
             </div>
+
+            <ConfirmModal
+                isOpen={recalcConfirmOpen}
+                title={__('general.recalculate_rate') || 'Recalculate Overhead Rate'}
+                description="Are you sure you want to recalculate the overhead hourly rate? This will clear the daily server cache and recompute from the latest cost data."
+                confirmLabel="Yes, Recalculate"
+                onConfirm={() => {
+                    setRecalcConfirmOpen(false);
+                    router.post(route('admin.settings.recalculate-overhead-hourly-rate'));
+                }}
+                onCancel={() => setRecalcConfirmOpen(false)}
+            />
+
+            <ConfirmModal
+                isOpen={syncConfirmOpen}
+                title={__('general.sync_exchange_rates_now') || 'Sync Exchange Rates'}
+                description="Are you sure you want to sync exchange rates from the external API?"
+                confirmLabel="Yes, Sync"
+                onConfirm={() => {
+                    setSyncConfirmOpen(false);
+                    router.post(route('admin.settings.sync-exchange-rates'));
+                }}
+                onCancel={() => setSyncConfirmOpen(false)}
+            />
         </AdminSidebarLayout>
     );
 }

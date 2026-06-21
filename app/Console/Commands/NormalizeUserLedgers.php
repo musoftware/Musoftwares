@@ -59,7 +59,7 @@ class NormalizeUserLedgers extends Command
                     if ($currentCurrencyId != $userCurrencyId) {
                         $date = $transaction->created_at ?? now();
                         
-                        $convertedAmount = CurrenciesExchange::RateByDate(
+                        $convertedAmount = CurrenciesExchange::RateByDateNoRound(
                             $date,
                             $transaction->amount,
                             $currentCurrencyId,
@@ -68,7 +68,7 @@ class NormalizeUserLedgers extends Command
 
                         // Also recalculate business amount if it exists
                         $businessCurrencyId = \App\Models\AdminSettings::business_currency();
-                        $businessAmount = CurrenciesExchange::RateByDate(
+                        $businessAmount = CurrenciesExchange::RateByDateNoRound(
                             $date,
                             $convertedAmount,
                             $userCurrencyId,
@@ -110,7 +110,7 @@ class NormalizeUserLedgers extends Command
                     if ($currentCurrencyId != $userCurrencyId) {
                         $date = $earning->created_at ?? now();
                         
-                        $convertedAmount = CurrenciesExchange::RateByDate(
+                        $convertedAmount = CurrenciesExchange::RateByDateNoRound(
                             $date,
                             $earning->amount,
                             $currentCurrencyId,
@@ -157,7 +157,7 @@ class NormalizeUserLedgers extends Command
                     if ($currentCurrencyId != $userCurrencyId) {
                         $date = $withdraw->created_at ?? now();
                         
-                        $convertedAmount = CurrenciesExchange::RateByDate(
+                        $convertedAmount = CurrenciesExchange::RateByDateNoRound(
                             $date,
                             $withdraw->amount,
                             $currentCurrencyId,

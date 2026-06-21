@@ -47,7 +47,7 @@ class BalancesHelper
         $data = $user->withdraw()->groupBy('currency_id')->where('status', 'approved')->select(DB::raw('sum(amount) as amount, currency_id'))->get();
         $amount = 0;
         foreach ($data as $commission) {
-            $user_amount = CurrenciesExchange::RateByDate($commission->created_at, $commission->amount, $commission->currency_id, $user->currency_id);
+            $user_amount = CurrenciesExchange::RateByDateNoRound($commission->created_at, $commission->amount, $commission->currency_id, $user->currency_id);
             $amount += $user_amount;
         }
         $user->withdrawn_commission = $amount;
@@ -60,7 +60,7 @@ class BalancesHelper
         $data = $user->commissions()->groupBy('currency_id')->where('convert_to_balance_on', '>', DB::raw('NOW()'))->select(DB::raw('sum(amount) as amount, currency_id'))->get();
         $amount = 0;
         foreach ($data as $commission) {
-            $user_amount = CurrenciesExchange::RateByDate($commission->created_at, $commission->amount, $commission->currency_id, $user->currency_id);
+            $user_amount = CurrenciesExchange::RateByDateNoRound($commission->created_at, $commission->amount, $commission->currency_id, $user->currency_id);
             $amount += $user_amount;
         }
         $user->pending_commission = $amount;
@@ -78,7 +78,7 @@ class BalancesHelper
             ->get();
         $total_spend = 0;
         foreach ($balance as $item) {
-            $total_spend += CurrenciesExchange::RateToday($item->total_amount, $item->currency_id, $user->currency_id);
+            $total_spend += CurrenciesExchange::RateTodayNoRound($item->total_amount, $item->currency_id, $user->currency_id);
         }
         if ($project == null) {
             $user->user_balance = $total_spend - $this->CalcWithdrawingCommission($user);
@@ -102,7 +102,7 @@ class BalancesHelper
 
         $total_spend = 0;
         foreach ($total_paid as $item) {
-            $total_spend += CurrenciesExchange::RateToday($item->total_amount, $item->currency_id, $user->currency_id);
+            $total_spend += CurrenciesExchange::RateTodayNoRound($item->total_amount, $item->currency_id, $user->currency_id);
         }
 
         if ($project == null) {
@@ -123,7 +123,7 @@ class BalancesHelper
             ->get();
         $total_spend = 0;
         foreach ($balance as $item) {
-            $total_spend += CurrenciesExchange::RateToday($item->total_amount, $item->currency_id, $user->currency_id);
+            $total_spend += CurrenciesExchange::RateTodayNoRound($item->total_amount, $item->currency_id, $user->currency_id);
         }
         $user->total_cost = $total_spend;
         $user->save();
