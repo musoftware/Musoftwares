@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('currency', 10);
             $table->string('symbol', 10);
             $table->string('string_format', 10);
+            $table->softDeletes();
         });
         \Illuminate\Support\Facades\DB::insert('insert into currencies (id, currency, symbol, string_format) values (?, ?, ?, ?)', [1, 'USD', '$', '$%01.2f']);
         \Illuminate\Support\Facades\DB::insert('insert into currencies (id, currency, symbol, string_format) values (?, ?, ?, ?)', [2, 'EGP', 'e£', 'e£%01.2f']);

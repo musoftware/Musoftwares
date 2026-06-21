@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('mobile')->nullable();
             $table->string('status')->default('active');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('affiliate_pos_payment_requests', function (Blueprint $table) {
@@ -28,6 +29,7 @@ return new class extends Migration
             $table->double('amount', 10, 2)->default(0);
             $table->string('status')->default('pending'); // pending, approved, declined
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

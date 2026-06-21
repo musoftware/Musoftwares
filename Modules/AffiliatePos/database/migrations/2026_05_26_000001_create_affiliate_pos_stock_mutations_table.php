@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('amount');
             $table->text('description')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['reference_type', 'reference_id']);
         });
