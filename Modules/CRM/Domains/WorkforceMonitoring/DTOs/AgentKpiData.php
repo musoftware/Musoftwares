@@ -8,7 +8,8 @@ class AgentKpiData
         public readonly int $agentId,
         public readonly int $callsMade,
         public readonly int $leadsClosed,
-        public readonly float $conversionRate
+        public readonly float $conversionRate,
+        public readonly int $tasksCompleted = 0
     ) {
     }
 }

@@ -11,7 +11,8 @@ import {
     History,
     CheckCircle2,
     XCircle,
-    Clock4
+    Clock4,
+    LayoutDashboard
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -40,6 +41,16 @@ export default function MyPortal({ todayLog, attendanceHistory, leaveRequests, p
     });
 
     const [activeTab, setActiveTab] = useState<'time' | 'leave' | 'payroll'>('time');
+
+    const menuItems = [
+        {
+            id: 'portal',
+            label: __('erp.my_portal'),
+            icon: LayoutDashboard,
+            href: route('erp.team.portal.index'),
+            isActive: true,
+        }
+    ];
 
     const handleClockIn = (e: React.FormEvent) => {
         e.preventDefault();
@@ -72,7 +83,7 @@ export default function MyPortal({ todayLog, attendanceHistory, leaveRequests, p
     };
 
     return (
-        <ERPLayout title={__('erp.my_portal')} workspaceName={member.name}>
+        <ERPLayout title={__('erp.my_portal')} workspaceName={member.name} menuItems={menuItems}>
             <Head title={__('erp.my_portal')} />
 
             <div className="flex justify-between items-center mb-6">

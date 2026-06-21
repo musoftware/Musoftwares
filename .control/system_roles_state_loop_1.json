@@ -24,13 +24,13 @@
     {
         "id": "Team",
         "name": "Team Member",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Manager",
         "name": "Manager",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Team"
         ]
@@ -38,7 +38,7 @@
     {
         "id": "Collector",
         "name": "Collector",
-        "status": "pending",
+        "status": "running",
         "dependencies": [
             "Team"
         ]

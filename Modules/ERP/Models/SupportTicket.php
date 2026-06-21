@@ -11,7 +11,7 @@ class SupportTicket extends TenantModel
     protected $fillable = [
         'tenant_id', 'client_id', 'project_id',
         'subject', 'description', 'status', 'priority',
-        'assigned_to', 'created_by',
+        'assigned_to', 'assigned_team_member_id', 'created_by',
     ];
 
     public function tenant(): BelongsTo
@@ -32,6 +32,11 @@ class SupportTicket extends TenantModel
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'assigned_to');
+    }
+
+    public function assigneeTeamMember(): BelongsTo
+    {
+        return $this->belongsTo(TeamMember::class, 'assigned_team_member_id');
     }
 
     public function creator(): BelongsTo

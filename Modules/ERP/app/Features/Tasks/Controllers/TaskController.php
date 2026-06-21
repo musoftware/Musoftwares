@@ -171,7 +171,7 @@ class TaskController extends Controller implements HasMiddleware
         ]);
     }
 
-    public function show(ERPTask $task)
+    public function show(Request $request, ERPTask $task)
     {
         $tenant = $request->user()->tenant;
         if ($task->tenant_id !== $tenant->id) {
@@ -182,6 +182,7 @@ class TaskController extends Controller implements HasMiddleware
             'client',
             'project',
             'creator',
+            'comments' => fn($q) => $q->orderBy('created_at', 'asc')->with('commenter'),
             'items' => fn($q) => $q->whereNull('parent_id')
                 ->with(['children' => fn($q) => $q->orderBy('sort_index')->orderBy('id')])
                 ->orderBy('completed')
@@ -192,6 +193,7 @@ class TaskController extends Controller implements HasMiddleware
         return Inertia::render('ERP/Tasks/Show', [
             'task'  => $this->shapeTask($task),
             'todos' => $task->items->map(fn($item) => $this->shapeTodo($item)),
+            'comments' => $task->comments,
             'completion' => $task->completionPercentage(),
             'currencies' => \App\Models\Currency::all(),
         ]);
@@ -424,6 +426,63 @@ class TaskController extends Controller implements HasMiddleware
         }
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Add a comment to the task.
+     */
+    public function storeComment(Request $request, ERPTask $task)
+    {
+        $tenant = $request->user()->tenant;
+        if ($task->tenant_id !== $tenant->id) {
+            abort(403, __('general.unauthorized_access'));
+        }
+
+        $request->validate([
+            'comment' => 'required|string|max:2000',
+        ]);
+
+        $comment = $task->comments()->create([
+            'comment' => $request->comment,
+            'commenter_id' => $request->user()->id,
+            'commenter_type' => get_class($request->user()),
+            'approved' => true,
+        ]);
+
+        ActivityService::log(
+            event: 'task.commented',
+            description: "Added a comment to task: {$task->task_name}",
+            subject: $task,
+            workspace: 'erp'
+        );
+
+        return back()->with('success', 'Comment added successfully.');
+    }
+
+    /**
+     * Delete a comment from the task.
+     */
+    public function destroyComment(Request $request, ERPTask $task, \App\Models\Comment $comment)
+    {
+        $tenant = $request->user()->tenant;
+        if ($task->tenant_id !== $tenant->id) {
+            abort(403, __('general.unauthorized_access'));
+        }
+
+        if ($comment->commentable_id !== $task->id || $comment->commentable_type !== ERPTask::class) {
+            abort(403, __('general.unauthorized_access'));
+        }
+
+        $isOwner = get_class($request->user()) === \App\Models\User::class;
+        $isCommenter = $comment->commenter_id === $request->user()->id && $comment->commenter_type === get_class($request->user());
+
+        if (!$isOwner && !$isCommenter) {
+            abort(403, 'Unauthorized to delete this comment.');
+        }
+
+        $comment->delete();
+
+        return back()->with('success', 'Comment deleted successfully.');
     }
 
     /**

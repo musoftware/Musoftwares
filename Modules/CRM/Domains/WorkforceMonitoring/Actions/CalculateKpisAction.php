@@ -34,11 +34,19 @@ class CalculateKpisAction
 
         $conversionRate = $totalAssigned > 0 ? ($leadsClosed / $totalAssigned) * 100 : 0;
 
+        // Calculate tasks completed
+        $tasksCompleted = DB::table('crm_activities')
+            ->where('user_id', $agentId)
+            ->where('event', 'task_completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->count();
+
         return new AgentKpiData(
             agentId: $agentId,
             callsMade: $callsMade,
             leadsClosed: $leadsClosed,
-            conversionRate: round($conversionRate, 2)
+            conversionRate: round($conversionRate, 2),
+            tasksCompleted: $tasksCompleted
         );
     }
 }
