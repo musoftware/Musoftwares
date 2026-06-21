@@ -420,4 +420,168 @@ class SubscriptionService
             }
         });
     }
+
+    public function getUserCurrencyDetails($user, $ip = null)
+    {
+        $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
+        $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
+        
+        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
+        $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
+        
+        $currencyId = null;
+        if ($user && $user->currency_id) {
+            $currencyId = $user->currency_id;
+        } elseif ($ip) {
+            $geoService = app(\App\Services\IpGeolocationService::class);
+            $ipCurrencyCode = $geoService->getCurrencyCodeForIp($ip);
+            if ($ipCurrencyCode) {
+                $ipCurrency = \App\Models\Currency::where('currency', $ipCurrencyCode)->first();
+                if ($ipCurrency) {
+                    $currencyId = $ipCurrency->id;
+                }
+            }
+        }
+        
+        if (!$currencyId) {
+            $currencyId = $user ? ($user->currency_id ?: $egpCurrencyId) : $usdCurrencyId;
+        }
+
+        $userCurrency = \App\Models\Currency::find($currencyId);
+        $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
+        
+        $rate = 1.0;
+        if ($usdCurrency && $currencyId && $usdCurrency->id != $currencyId) {
+            $rate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $currencyId);
+        }
+
+        $egpRate = 50; // Fallback
+        if ($usdCurrency && $egpCurrencyId) {
+            $egpRate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
+        }
+
+        return [
+            'usdCurrencyId' => $usdCurrencyId,
+            'egpCurrencyId' => $egpCurrencyId,
+            'currencyId' => $currencyId,
+            'currencyCode' => $currencyCode,
+            'rate' => $rate,
+            'egpRate' => $egpRate
+        ];
+    }
+
+    public function getConvertPriceClosure($currencyDetails)
+    {
+        return function($egpPrice) use ($currencyDetails) {
+            if ($currencyDetails['currencyCode'] === 'EGP') {
+                return round($egpPrice);
+            }
+            $usdPrice = $egpPrice / $currencyDetails['egpRate'];
+            $converted = $usdPrice * $currencyDetails['rate'];
+            return psychological_price($converted);
+        };
+    }
+
+    public function getBillingCycleDetails(string $billingCycle)
+    {
+        $multiplier = 1;
+        $days = 30;
+        if ($billingCycle === '3_months') {
+            $multiplier = 0.25;
+            $days = 90;
+        } elseif ($billingCycle === '6_months') {
+            $multiplier = 0.5;
+            $days = 180;
+        } elseif ($billingCycle === '1_year') {
+            $multiplier = 10;
+            $days = 365;
+        }
+        return ['multiplier' => $multiplier, 'days' => $days];
+    }
+
+    public function getPlansPageData(User $user)
+    {
+        $currencyDetails = $this->getUserCurrencyDetails($user);
+        $convertPrice = $this->getConvertPriceClosure($currencyDetails);
+
+        $pricingService = app(\App\Services\PricingService::class);
+        $serviceItems = $pricingService->getServiceItems($convertPrice);
+
+        $ownedFeatures = [];
+        $userSubs = \App\Models\UserSubscription::where('user_id', $user->id)
+            ->where('status', 'active')
+            ->get();
+
+        foreach ($userSubs as $sub) {
+            $ownedFeatures[] = [
+                'id' => $sub->object,
+                'status' => \Carbon\Carbon::parse($sub->expires_at)->isFuture() ? 'active' : 'expired',
+                'expires_at' => \Carbon\Carbon::parse($sub->expires_at)->format('M d, Y')
+            ];
+        }
+
+        $hasSub = count($ownedFeatures) > 0;
+        $activeSub = null;
+
+        if ($hasSub) {
+            $closestExpiry = $userSubs->min('expires_at');
+            $activeSub = [
+                'id'            => $user->id,
+                'status'        => 'active',
+                'expires_at'    => $closestExpiry ? Carbon::parse($closestExpiry)->format('M d, Y') : '-',
+                'auto_renew'    => false,
+                'owned_features' => $ownedFeatures,
+            ];
+        }
+
+        return [
+            'plans' => [],
+            'serviceItems' => $serviceItems,
+            'activeSubscription' => $activeSub,
+            'walletBalance' => (float) $user->available_balance(),
+            'currency' => $currencyDetails['currencyCode'],
+            'proratedRefund' => 0.0,
+        ];
+    }
+
+    public function getManagePageData(User $user)
+    {
+        $userSubs = \App\Models\UserSubscription::where('user_id', $user->id)
+            ->whereIn('status', ['active', 'expired', 'cancelled'])
+            ->get();
+            
+        $currencyDetails = $this->getUserCurrencyDetails($user);
+        $convertPrice = $this->getConvertPriceClosure($currencyDetails);
+        $serviceItems = app(\App\Services\PricingService::class)->getServiceItems($convertPrice);
+        
+        $subscriptions = [];
+        if ($userSubs->count() > 0) {
+            foreach ($userSubs as $sub) {
+                $item = collect($serviceItems)->firstWhere('id', $sub->object);
+                $monthlyPrice = $item['monthly_price'] ?? 0;
+
+                $subscriptions[] = [
+                    'id'            => $sub->id,
+                    'plan_name'     => $item['name'] ?? ucfirst(str_replace('-', ' ', $sub->object)),
+                    'plan_slug'     => $sub->object,
+                    'billing_cycle' => 'Module',
+                    'amount'        => $monthlyPrice,
+                    'currency'      => $user->currency_name(),
+                    'status'        => $sub->status,
+                    'started_at'    => \Carbon\Carbon::parse($sub->started_at)->format('M d, Y'),
+                    'expires_at'    => \Carbon\Carbon::parse($sub->expires_at)->format('M d, Y'),
+                    'auto_renew'    => (bool) $sub->auto_renew,
+                    'custom_items'  => [$sub->object],
+                    'is_custom'     => false,
+                ];
+            }
+        }
+
+        return [
+            'subscriptions' => $subscriptions,
+            'invoices'      => [],
+            'walletBalance' => (float) $user->user_balance,
+            'currency'      => $user->currency_name(),
+        ];
+    }
 }
