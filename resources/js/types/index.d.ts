@@ -1,11 +1,12 @@
-export export export interface User {
-    crm_features?: string[];
-    crm_features?: string[];
-    crm_features?: string[];
+export interface User {
     id: number;
     name: string;
     email: string;
     email_verified_at?: string;
+    role?: string;
+    roles?: string[];
+    permissions?: string[];
+    crm_features?: string[];
 }
 
 export type PageProps<
