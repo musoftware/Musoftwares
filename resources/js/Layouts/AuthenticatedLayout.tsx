@@ -790,6 +790,11 @@ function AuthenticatedContent({
                                                     <Download className="mr-2 h-4 w-4 text-slate-400" />{__('general.backup_restore')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
+                                                    render={<Link href={safeRoute('settings.automations.index')} className="flex items-center w-full" />}
+                                                >
+                                                    <Settings className="mr-2 h-4 w-4 text-slate-400" />Automations</DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('subscriptions.manage')} className="flex items-center w-full" />}
                                                 >
                                                     <Box className="mr-2 h-4 w-4 text-slate-400" /> Subscriptions
