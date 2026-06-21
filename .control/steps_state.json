@@ -60,7 +60,7 @@
     {
         "id": "A1",
         "name": "Enforce Thin Controllers",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
