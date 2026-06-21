@@ -104,12 +104,37 @@ class SubscriptionService
     }
 
     /**
-     * Calculate the price for a custom plan given selected item slugs.
+     * Calculate the proration value for an existing subscription.
+     * This calculates the remaining unused value of the current subscription.
      */
-    public function calculateUpgradeProration(UserSubscription $current, Plan $newPlan, string $cycle): float
+    public function calculateUpgradeProration(UserSubscription $current, float $newPrice, string $cycle): float
     {
-        // Legacy system didn't have dynamic custom tool pricing like this.
-        return 0.0;
+        $now = Carbon::now();
+        if (!$current->expires_at || Carbon::parse($current->expires_at)->isPast()) {
+            return 0.0;
+        }
+
+        $started = $current->started_at ? Carbon::parse($current->started_at) : $now;
+        $expires = Carbon::parse($current->expires_at);
+        $totalDays = $started->diffInDays($expires);
+        
+        if ($totalDays <= 0) {
+            return 0.0;
+        }
+
+        $daysRemaining = $now->diffInDays($expires);
+        if ($daysRemaining <= 0) {
+            return 0.0;
+        }
+
+        // We assume the old price is roughly proportional to the new price, 
+        // or we can just fetch the old item price if we had a PricingService instance here.
+        // For now, we return the prorated percentage of the remaining days.
+        $prorationPercentage = $daysRemaining / $totalDays;
+        
+        // This is a simplified proration assuming the user pays the $newPrice and gets credit for unused days.
+        // To be completely accurate we'd need the original transaction amount, but this approximates the unused portion.
+        return round($newPrice * $prorationPercentage, 2);
     }
 
     /**

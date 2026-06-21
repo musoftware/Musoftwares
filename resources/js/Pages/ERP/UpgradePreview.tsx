@@ -25,22 +25,12 @@ export default function UpgradePreview() {
     const [isUpgrading, setIsUpgrading] = useState(false);
     const { toast } = useToast();
 
-    // Simulated upgrade pipeline
+    // Redirect to actual subscription plans
     const handleUpgradeSimulate = () => {
         setIsUpgrading(true);
         setTimeout(() => {
-            // Write simulated activation into sessionStorage so AuthenticatedLayout and other pages reflect the active ERP state instantly!
-            sessionStorage.setItem('is_subscribed_erp', 'true');
-            setIsUpgrading(false);
-            
-            toast({
-                title: "Premium ERP Workspace Unlocked!",
-                description: "Your organization now has active estimates, expense tracking, and reports.",
-            });
-
-            // Redirect back to dashboard where ERP is now fully active
-            router.visit(route('dashboard'));
-        }, 1500);
+            router.visit(route('subscriptions.plans'));
+        }, 800);
     };
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('overview');
 
