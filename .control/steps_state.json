@@ -46,13 +46,13 @@
     {
         "id": "F7",
         "name": "Setup Reverb for WebSockets",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Architecture",
         "name": "2. Core Architecture Rules",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Foundation"
         ]
@@ -60,13 +60,13 @@
     {
         "id": "A1",
         "name": "Enforce Thin Controllers",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "A2",
         "name": "Setup Service Layer",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "A1"
         ]
@@ -74,19 +74,19 @@
     {
         "id": "A3",
         "name": "Configure Zustand for State",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "A4",
         "name": "Implement Soft Deletes",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "A5",
         "name": "Setup Spatie Permissions",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
