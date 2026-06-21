@@ -2,13 +2,13 @@
     {
         "id": "System",
         "name": "Musoftwares System",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Admin",
         "name": "Admin",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "System"
         ]
@@ -16,7 +16,7 @@
     {
         "id": "Client",
         "name": "Client",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "System"
         ]
@@ -24,7 +24,7 @@
     {
         "id": "Team",
         "name": "Team Member",
-        "status": "pending",
+        "status": "running",
         "dependencies": []
     },
     {

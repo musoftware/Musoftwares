@@ -40,6 +40,9 @@ class ERPDashboardController extends Controller
             return redirect()->route('erp.onboarding');
         }
 
+        $isRestrictedMember = Auth::guard('erp_team')->check() && !Auth::guard('erp_team')->user()->isManager();
+
+
         $currency = \App\Models\Currency::find($tenant->base_currency_id);
         $businessCurrency = $currency ? $currency->currency : config('app.business_currency', 'USD');
         $tenantId = $tenant->id;
@@ -50,7 +53,7 @@ class ERPDashboardController extends Controller
         $clientCount = 0;
         $recurringCount = 0;
 
-        if ($tenantId) {
+        if ($tenantId && !$isRestrictedMember) {
             $totalPaidRevenue = WalletTransaction::where('tenant_id', $tenantId)
                 ->whereIn('type', ['received', 'earned', 'refunded', 'sent'])
                 ->sum('business_amount');
@@ -59,11 +62,13 @@ class ERPDashboardController extends Controller
                 ->whereIn('status', ['sent', 'partial'])
                 ->sum('business_amount');
 
-            $clientCount = TenantClient::where('tenant_id', $tenantId)->count();
-
             $recurringCount = RecurringEntry::where('tenant_id', $tenantId)
                 ->where('status', 'active')
                 ->count();
+        }
+        
+        if ($tenantId) {
+            $clientCount = TenantClient::where('tenant_id', $tenantId)->count();
         }
 
         // ── Real Client List ──────────────────────────────────────
@@ -136,7 +141,7 @@ class ERPDashboardController extends Controller
 
         // ── Monthly Revenue Chart Data ────────────────────────────
         $chartData = [];
-        if ($tenantId) {
+        if ($tenantId && !$isRestrictedMember) {
             $startOfYear = Carbon::now()->startOfYear();
             for ($m = 0; $m < min(Carbon::now()->month, 12); $m++) {
                 $monthStart = $startOfYear->copy()->addMonths($m)->startOfMonth();
@@ -171,11 +176,14 @@ class ERPDashboardController extends Controller
         // ── Real Tasks ─────────────────────────────────────────────
         $tasks = collect();
         if ($tenantId && $ownerUser && $ownerUser->hasModuleSubscription('erp-tasks')) {
-            $tasks = \Modules\ERP\Models\ERPTask::with(['creator', 'assignee', 'client'])
+            $tasksQuery = \Modules\ERP\Models\ERPTask::with(['creator', 'assignee', 'client'])
                 ->where('tenant_id', $tenantId)
                 ->where('archived', false)
-                ->latest()
-                ->get()
+                ->latest();
+            if ($isRestrictedMember) {
+                $tasksQuery->where('assigned_to', Auth::guard('erp_team')->id());
+            }
+            $tasks = $tasksQuery->get()
                 ->map(function ($task) {
                     $category = 'Todo';
                     if ($task->status === 'in_progress') $category = 'In Progress';
@@ -199,7 +207,7 @@ class ERPDashboardController extends Controller
 
         // ── Growth Metrics ────────────────────────────────────────
         $growthPercent = null;
-        if ($tenantId) {
+        if ($tenantId && !$isRestrictedMember) {
             // M6 fix: capture subMonth once to avoid calling now() twice
             $lastMonthDate = Carbon::now()->subMonth();
 
@@ -321,7 +329,7 @@ class ERPDashboardController extends Controller
         
         // ── Real Expenses List ─────────────────────────────────────
         $expenses = collect();
-        if ($tenantId) {
+        if ($tenantId && !$isRestrictedMember) {
             $expenses = \Modules\ERP\Models\Expense::latest()
                 ->get()
                 ->map(function ($expense) {
@@ -364,7 +372,7 @@ class ERPDashboardController extends Controller
         $transactionStats = ['totalCredits' => 0, 'totalDebits' => 0, 'netFlow' => 0, 'txnCount' => 0];
 
 
-        if ($tenantId) {
+        if ($tenantId && !$isRestrictedMember) {
             $rawTxns = WalletTransaction::with(['creator', 'client', 'currency'])
                 ->where('tenant_id', $tenantId)
                 ->latest()

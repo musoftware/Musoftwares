@@ -116,16 +116,15 @@ class ContractController extends Controller
         }
     }
 
-    public function dispute(Request $request, Contract $contract)
+    public function deliver(Request $request, Contract $contract)
     {
         $user = $request->user();
-        if ($contract->client_id !== $user->id && $contract->freelancer_id !== $user->id) {
+        if ($contract->freelancer_id !== $user->id) {
             abort(403);
         }
 
-        $contract->update(['status' => 'disputed']);
-        // Here you would typically notify admins or trigger a dispute resolution process.
+        $contract->update(['status' => 'delivered']);
 
-        return back()->with('success', __('general.contract_dispute_initiated'));
+        return back()->with('success', __('general.contract_delivery_submitted'));
     }
 }

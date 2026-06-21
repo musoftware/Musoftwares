@@ -32,4 +32,22 @@ class CustomerController extends Controller
         $customer->delete();
         return redirect()->route('crm.customers.index')->with('success', __('crm.customer_deleted'));
     }
+
+    public function addNote(Request $request, Customer $customer)
+    {
+        $request->validate([
+            'note' => 'required|string|max:10000',
+        ]);
+
+        $customer->activities()->create([
+            'workspace_id' => $customer->workspace_id,
+            'user_id' => auth()->id(),
+            'event' => 'note_added',
+            'metadata' => [
+                'note' => $request->note,
+            ],
+        ]);
+
+        return redirect()->back()->with('success', __('crm.note_added'));
+    }
 }

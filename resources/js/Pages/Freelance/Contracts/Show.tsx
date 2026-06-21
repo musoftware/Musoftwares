@@ -41,12 +41,6 @@ function ShowContractContent({ auth, contract, userCurrency }: any) {
         }
     };
 
-    const handleRaiseDispute = () => {
-        if (confirm(__('freelance.are_you_sure_you_want_2'))) {
-            router.post(route('freelance.contracts.dispute', contract.id));
-        }
-    };
-
     const handleSubmitDelivery = (e: React.FormEvent) => {
         e.preventDefault();
         router.post(route('freelance.contracts.deliver', contract.id), {
@@ -134,7 +128,7 @@ function ShowContractContent({ auth, contract, userCurrency }: any) {
                             </CardHeader>
 
                             <CardContent className="flex-1 p-6 overflow-y-auto space-y-6 bg-slate-50/20">
-                                {contract.chat_messages.map((msg: any) => {
+                                {(contract.chat_messages || []).map((msg: any) => {
                                     const isMe = msg.sender_id === auth.user.id || (isClient && msg.sender_name === contract.client.name) || (!isClient && msg.sender_name === contract.freelancer.name);
 
                                     return (
@@ -175,7 +169,7 @@ function ShowContractContent({ auth, contract, userCurrency }: any) {
 
                     {/* Right Column - Actions (4 cols) */}
                     <div className="lg:col-span-4 space-y-6">
-                        {contract.status === 'active' && (
+                        {(contract.status === 'active' || contract.status === 'delivered') && (
                             <Card className="shadow-sm border-slate-200/60 sticky top-6">
                                 <CardHeader className="border-b border-slate-100 bg-slate-50/50 pb-5">
                                     <CardTitle className="text-base font-semibold text-slate-900">{__('freelance.contract_actions')}</CardTitle>
@@ -187,7 +181,7 @@ function ShowContractContent({ auth, contract, userCurrency }: any) {
                                                 <FileCheck className="h-4 w-4 text-indigo-600" />
                                                 <AlertTitle className="text-indigo-900 font-bold">{__('general.review_approve')}</AlertTitle>
                                                 <AlertDescription className="text-indigo-700 text-xs">
-                                                    {__('general.review_the_work_delivered_in')}
+                                                    {contract.status === 'delivered' ? __('general.freelancer_delivered_work_review') : __('general.review_the_work_delivered_in')}
                                                 </AlertDescription>
                                             </Alert>
 
@@ -198,52 +192,46 @@ function ShowContractContent({ auth, contract, userCurrency }: any) {
                                                 >
                                                     <CheckCircle2 className="mr-2 h-5 w-5" /> {__('general.approve_and_complete')}
                                                 </Button>
-                                                <Button
-                                                    onClick={handleRaiseDispute}
-                                                    variant="outline"
-                                                    className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 h-12 font-bold"
-                                                >
-                                                    <AlertCircle className="mr-2 h-4 w-4" /> {__('general.raise_dispute')}
-                                                </Button>
                                             </div>
                                         </div>
                                     ) : (
-                                        <form onSubmit={handleSubmitDelivery} className="space-y-4">
-                                            <Alert className="bg-indigo-50 border-indigo-100 text-indigo-800 mb-2">
-                                                <UploadCloud className="h-4 w-4 text-indigo-600" />
-                                                <AlertTitle className="text-indigo-900 font-bold">{__('general.submit_work')}</AlertTitle>
-                                                <AlertDescription className="text-indigo-700 text-xs">
-                                                    {__('general.ready_to_submit_your_final')}
+                                        contract.status === 'active' ? (
+                                            <form onSubmit={handleSubmitDelivery} className="space-y-4">
+                                                <Alert className="bg-indigo-50 border-indigo-100 text-indigo-800 mb-2">
+                                                    <UploadCloud className="h-4 w-4 text-indigo-600" />
+                                                    <AlertTitle className="text-indigo-900 font-bold">{__('general.submit_work')}</AlertTitle>
+                                                    <AlertDescription className="text-indigo-700 text-xs">
+                                                        {__('general.ready_to_submit_your_final')}
+                                                    </AlertDescription>
+                                                </Alert>
+
+                                                <div className="space-y-1.5">
+                                                    <label className="text-sm font-bold text-slate-700">{__('general.delivery_notes')}</label>
+                                                    <Textarea
+                                                        value={deliveryDescription}
+                                                        onChange={(e) => setDeliveryDescription(e.target.value)}
+                                                        className="resize-none h-24 focus-visible:ring-indigo-500"
+                                                        placeholder={__('general.describe_what_you_have_completed')}
+                                                        required
+                                                    />
+                                                </div>
+
+                                                <Button
+                                                    type="submit"
+                                                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-12 mt-2"
+                                                >
+                                                    <CheckCircle2 className="mr-2 h-5 w-5" /> {__('general.submit_delivery')}
+                                                </Button>
+                                            </form>
+                                        ) : (
+                                            <Alert className="bg-emerald-50 border-emerald-100 text-emerald-800">
+                                                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                                                <AlertTitle className="text-emerald-900 font-bold">{__('general.delivery_submitted')}</AlertTitle>
+                                                <AlertDescription className="text-emerald-700 text-xs">
+                                                    {__('general.waiting_for_client_approval')}
                                                 </AlertDescription>
                                             </Alert>
-
-                                            <div className="space-y-1.5">
-                                                <label className="text-sm font-bold text-slate-700">{__('general.delivery_notes')}</label>
-                                                <Textarea
-                                                    value={deliveryDescription}
-                                                    onChange={(e) => setDeliveryDescription(e.target.value)}
-                                                    className="resize-none h-24 focus-visible:ring-indigo-500"
-                                                    placeholder={__('general.describe_what_you_have_completed')}
-                                                    required
-                                                />
-                                            </div>
-
-                                            <div className="space-y-1.5">
-                                                <label className="text-sm font-bold text-slate-700">{__('general.attach_files')}</label>
-                                                <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 flex flex-col items-center justify-center text-center hover:bg-slate-50 hover:border-indigo-300 cursor-pointer transition-colors">
-                                                    <UploadCloud className="h-8 w-8 text-slate-400 mb-2" />
-                                                    <p className="text-sm font-medium text-slate-600">{__('general.click_to_upload_or_drag')}</p>
-                                                    <p className="text-xs text-slate-400 mt-1">{__('general.svg_png_jpg_or_pdf')}</p>
-                                                </div>
-                                            </div>
-
-                                            <Button
-                                                type="submit"
-                                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-12 mt-2"
-                                            >
-                                                <CheckCircle2 className="mr-2 h-5 w-5" /> {__('general.submit_delivery')}
-                                            </Button>
-                                        </form>
+                                        )
                                     )}
                                 </CardContent>
                             </Card>
@@ -309,17 +297,7 @@ function ShowContractContent({ auth, contract, userCurrency }: any) {
                             </Card>
                         )}
 
-                        {contract.status === 'disputed' && (
-                            <Card className="shadow-sm border-red-200 bg-red-50 overflow-hidden">
-                                <CardContent className="p-8 flex flex-col items-center justify-center text-center">
-                                    <div className="h-16 w-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                                        <AlertCircle className="h-8 w-8 text-red-600" />
-                                    </div>
-                                    <h3 className="text-xl font-bold text-red-900 mb-2">{__('freelance.contract_disputed')}</h3>
-                                    <p className="text-sm text-red-700 font-medium">{__('admin.an_admin_will_review_the')}</p>
-                                </CardContent>
-                            </Card>
-                        )}
+
                     </div>
                 </div>
             </div>

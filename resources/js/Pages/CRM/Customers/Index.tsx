@@ -1,11 +1,11 @@
 import React from 'react';
-import ERPLayout from '@/Layouts/ERPLayout';
+import CrmLayout from '@/Layouts/CrmLayout';
 import { Head, Link } from '@inertiajs/react';
 import { __ } from '@/lib/i18n';
 
 export default function CustomersIndex({ customers }: { customers: any }) {
     return (
-        <ERPLayout title="Customers">
+        <CrmLayout title="Customers" activeMenu="customers">
             <Head title={__('crm.customers')} />
             <div className="p-6">
                 <div className="mb-6 flex justify-between items-center">
@@ -41,6 +41,6 @@ export default function CustomersIndex({ customers }: { customers: any }) {
                     </table>
                 </div>
             </div>
-        </ERPLayout>
+        </CrmLayout>
     );
 }

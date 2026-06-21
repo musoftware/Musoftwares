@@ -57,8 +57,20 @@ class TaskController extends Controller implements HasMiddleware
         $tenant = $request->user()->tenant;
 
         $query = ERPTask::where('tenant_id', $tenant->id)
-            ->with(['client', 'project', 'creator'])
+            ->with(['client', 'project', 'creator', 'assigneeTeamMember'])
             ->withCount(['items', 'items as completed_items_count' => fn($q) => $q->where('completed', true)]);
+
+        if (Auth::guard('erp_team')->check()) {
+            $teamMember = Auth::guard('erp_team')->user();
+            if (!$teamMember->isManager()) {
+                $query->where(function ($q) use ($teamMember) {
+                    $q->where('assigned_team_member_id', $teamMember->id)
+                      ->orWhereHas('items', function ($iq) use ($teamMember) {
+                          $iq->where('assigned_team_member_id', $teamMember->id);
+                      });
+                });
+            }
+        }
 
         if ($request->filled('client_id')) {
             $query->where('client_id', $request->client_id);
@@ -93,11 +105,24 @@ class TaskController extends Controller implements HasMiddleware
             ->whereHas('task', function ($q) {
                 $q->where('archived', false);
             })
-            ->with(['task.client', 'task.creator', 'children' => function($q) {
+            ->with(['task.client', 'task.creator', 'assigneeTeamMember', 'children' => function($q) {
                 $q->orderBy('sort_index')->orderBy('id');
             }])
-            ->orderBy('id')
-            ->get();
+            ->orderBy('id');
+
+        if (Auth::guard('erp_team')->check()) {
+            $teamMember = Auth::guard('erp_team')->user();
+            if (!$teamMember->isManager()) {
+                $todos->where(function ($q) use ($teamMember) {
+                    $q->where('assigned_team_member_id', $teamMember->id)
+                      ->orWhereHas('task', function ($tq) use ($teamMember) {
+                          $tq->where('assigned_team_member_id', $teamMember->id);
+                      });
+                });
+            }
+        }
+
+        $todos = $todos->get();
 
         $data = [];
 

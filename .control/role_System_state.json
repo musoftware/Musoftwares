@@ -114,7 +114,7 @@
     {
         "id": "Sub6_2",
         "name": "Block malicious patterns to protect the ecosystem",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     }
 ]

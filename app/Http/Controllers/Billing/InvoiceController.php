@@ -245,4 +245,22 @@ class InvoiceController extends Controller
 
         return response()->json(['status' => 'success']);
     }
+
+    /**
+     * Download the invoice as a PDF.
+     */
+    public function downloadPdf(Request $request, $uuid)
+    {
+        $user = Auth::user();
+
+        $invoice = Invoice::where('uuid', $uuid)
+            ->where('user_id', $user->id)
+            ->with(['items'])
+            ->firstOrFail();
+
+        $invoice->loadMissing(['user.projects', 'project', 'items.timers', 'costLines.creditUser']);
+        $pdf = \App\Helpers\TextHelper::pdfInvoice($invoice);
+        $clientName = $invoice->user ? $invoice->user->name : 'Client';
+        return $pdf->download(str_replace(' ', '-', $clientName) . '-' . $invoice->id . '.pdf');
+    }
 }

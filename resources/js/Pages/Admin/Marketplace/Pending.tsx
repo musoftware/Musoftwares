@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Modal from '@/Components/Modal';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
-import { Search, FilterX, Check, X, Eye, FileWarning } from 'lucide-react';
+import { Search, FilterX, Check, X, Eye, FileWarning, Pencil } from 'lucide-react';
 import { DateDisplay } from '@/Components/ui/DateDisplay';
 import { Badge } from '@/Components/ui/badge';
 import { __ } from '@/lib/i18n';
@@ -163,6 +163,15 @@ export default function Pending({ auth, services, filters }: any) {
                                         >
                                             <X className="h-4 w-4" />
                                             Reject
+                                        </Button>
+
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => router.get(route('admin.marketplace.services.edit', service.id))}
+                                            className="w-full font-bold gap-2 bg-white"
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                            Edit
                                         </Button>
 
                                         <a

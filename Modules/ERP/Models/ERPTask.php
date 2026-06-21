@@ -21,7 +21,7 @@ class ERPTask extends TenantModel
     protected $fillable = [
         'tenant_id', 'task_name', 'task_description',
         'client_id', 'project_id', 'status', 'archived',
-        'priority', 'created_by', 'assigned_to',
+        'priority', 'created_by', 'assigned_to', 'assigned_team_member_id',
         'due_date', 'completed_at',
     ];
 
@@ -59,6 +59,11 @@ class ERPTask extends TenantModel
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function assigneeTeamMember(): BelongsTo
+    {
+        return $this->belongsTo(TeamMember::class, 'assigned_team_member_id');
     }
 
     // ── Business Logic ───────────────────────────────────────────────
