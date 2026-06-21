@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class TenantFeature extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'tenant_features';
 
     protected $guarded = ['id'];

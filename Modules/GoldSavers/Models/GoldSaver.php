@@ -2,10 +2,14 @@
 
 namespace Modules\GoldSavers\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class GoldSaver extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'gram_price',
         'additional_price',

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Helpers\BalancesHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 class InvoiceCostAccrual extends Model
 {
+    use SoftDeletes;
+
     protected $guarded = [];
 
     public function invoice(): BelongsTo

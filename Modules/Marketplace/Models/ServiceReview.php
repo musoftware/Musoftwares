@@ -2,12 +2,16 @@
 
 namespace Modules\Marketplace\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
 
 class ServiceReview extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'service_reviews';
 
     protected $fillable = [

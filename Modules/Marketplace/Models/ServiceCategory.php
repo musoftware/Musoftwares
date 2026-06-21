@@ -2,11 +2,15 @@
 
 namespace Modules\Marketplace\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ServiceCategory extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'marketplace_service_categories';
 
     protected $fillable = ['name', 'slug', 'description'];

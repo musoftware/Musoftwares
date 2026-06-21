@@ -2,10 +2,14 @@
 
 namespace Modules\Marketplace\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class ServiceDiscount extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'marketplace_service_discounts';
 
     protected $fillable = [

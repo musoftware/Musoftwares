@@ -11,10 +11,11 @@ use Laravel\Scout\Searchable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Traits\IsPlatformClient;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, Searchable, IsPlatformClient;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, Searchable, IsPlatformClient, SoftDeletes;
 
     protected $fillable = [
         'name',

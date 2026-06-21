@@ -2,6 +2,8 @@
 
 namespace Modules\Tools\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +11,8 @@ use App\Models\User;
 
 class WaContact extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'wa_contacts';
 
     protected $fillable = [
@@ -51,6 +55,8 @@ class WaContact extends Model
 
 class WaConversation extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'wa_conversations';
 
     protected $fillable = [
@@ -81,6 +87,8 @@ class WaConversation extends Model
 
 class WaMessage extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'wa_messages';
 
     protected $fillable = [
@@ -103,6 +111,8 @@ class WaMessage extends Model
 
 class WaWorkflow extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'wa_workflows';
 
     protected $fillable = [
@@ -124,6 +134,8 @@ class WaWorkflow extends Model
 
 class WaQualityEvent extends Model
 {
+    use SoftDeletes;
+
     public $timestamps = false;
     protected $table   = 'wa_quality_events';
 

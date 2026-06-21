@@ -2,11 +2,15 @@
 
 namespace Modules\Tools\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ActivatedDevice extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'tool_license_id', 'user_id', 'hardware_fingerprint',
         'device_name', 'os', 'app_version', 'status',

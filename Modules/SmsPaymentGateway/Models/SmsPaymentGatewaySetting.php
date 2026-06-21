@@ -2,10 +2,14 @@
 
 namespace Modules\SmsPaymentGateway\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class SmsPaymentGatewaySetting extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'sms_payment_gateway_settings';
 
     protected $fillable = [

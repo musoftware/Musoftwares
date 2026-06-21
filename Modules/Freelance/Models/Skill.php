@@ -2,12 +2,14 @@
 
 namespace Modules\Freelance\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Skill extends Model
 {
-    use HasFactory;
+    use SoftDeletes, HasFactory;
     protected $table = 'freelance_skills';
     protected $fillable = ['name', 'type', 'description', 'status', 'created_by'];
 

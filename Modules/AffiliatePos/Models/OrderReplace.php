@@ -2,11 +2,15 @@
 
 namespace Modules\AffiliatePos\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class OrderReplace extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'affiliate_pos_order_replaces';
     protected $guarded = [];
 

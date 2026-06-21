@@ -2,12 +2,16 @@
 
 namespace Modules\ERP\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RecurringExecutionLog extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'erp_recurring_execution_logs';
 
     protected $fillable = [

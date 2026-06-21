@@ -2,11 +2,15 @@
 
 namespace Modules\Marketplace\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
 class Order extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'marketplace_orders';
     protected $guarded = [];
 

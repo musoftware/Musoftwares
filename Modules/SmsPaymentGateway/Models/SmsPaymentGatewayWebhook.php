@@ -2,13 +2,15 @@
 
 namespace Modules\SmsPaymentGateway\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SmsPaymentGatewayWebhook extends Model
 {
-    use HasFactory;
+    use SoftDeletes, HasFactory;
 
     protected $table = 'sms_payment_gateway_webhooks';
     protected $fillable = [

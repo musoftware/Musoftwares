@@ -2,11 +2,15 @@
 
 namespace Modules\Booking\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
 class BookingDailyMetric extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking_daily_metrics';
 
     protected $fillable = [

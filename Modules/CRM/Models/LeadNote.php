@@ -2,6 +2,8 @@
 
 namespace Modules\CRM\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\CRM\app\Traits\BelongsToWorkspace;
@@ -9,7 +11,7 @@ use App\Models\User;
 
 class LeadNote extends Model
 {
-    use HasFactory, BelongsToWorkspace;
+    use SoftDeletes, HasFactory, BelongsToWorkspace;
 
     protected $fillable = [
         'lead_id',
