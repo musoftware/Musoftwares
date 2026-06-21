@@ -2,11 +2,15 @@
 
 namespace Modules\Tools\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ResellerUserSession extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'reseller_user_id', 'ip_address', 'user_agent', 'last_seen_at',
     ];

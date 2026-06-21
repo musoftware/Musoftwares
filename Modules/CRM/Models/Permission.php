@@ -2,10 +2,14 @@
 
 namespace Modules\CRM\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class Permission extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'crm_permissions';
 
     protected $fillable = [

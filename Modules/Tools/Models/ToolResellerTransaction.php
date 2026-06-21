@@ -2,12 +2,16 @@
 
 namespace Modules\Tools\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
 
 class ToolResellerTransaction extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'reseller_id', 'user_id', 'type', 'amount', 'balance_after',
         'currency_id', 'description', 'reference',

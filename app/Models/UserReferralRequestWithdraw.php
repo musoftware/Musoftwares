@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Helpers\BalancesHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class UserReferralRequestWithdraw extends Model
 {
-    use HasFactory;
+    use SoftDeletes, HasFactory;
 
     protected $guarded = [];
     protected $appends = [];

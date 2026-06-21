@@ -2,11 +2,15 @@
 
 namespace Modules\Freelance\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
 class FreelanceProfile extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'user_id',
         'title',

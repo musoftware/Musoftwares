@@ -2,6 +2,8 @@
 
 namespace Modules\ERP\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +11,7 @@ use App\Models\User;
 
 class TeamMember extends Authenticatable
 {
-    use Notifiable;
+    use SoftDeletes, Notifiable;
 
     protected $table = 'erp_team_members';
 

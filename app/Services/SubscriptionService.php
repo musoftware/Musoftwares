@@ -7,6 +7,9 @@ use App\Models\Plan;
 use App\Models\UserSubscription;
 use App\Models\Service;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use App\Models\Transaction;
+use Illuminate\Validation\ValidationException;
 
 class SubscriptionService
 {
@@ -195,5 +198,130 @@ class SubscriptionService
         }
 
         return $currentCount < $maxVal;
+    }
+
+    public function calculateCustomPriceBackend($selectedItems, $billingCycle, $currencyId, $returnArray = false)
+    {
+        $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
+        $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
+        
+        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
+        $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
+        
+        $rate = 1.0;
+        if ($usdCurrency && $currencyId && $usdCurrency->id != $currencyId) {
+            $rate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $currencyId);
+        }
+
+        $egpRate = 50;
+        if ($usdCurrency && $egpCurrencyId) {
+            $egpRate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
+        }
+
+        // EGP Base prices per year
+        $basePricesEGP = array_merge(
+            config('saas.modules', []),
+            array_map(fn($addon) => $addon['price'], config('saas.addons', []))
+        );
+        
+        $configTools = config('tools', []);
+        $baseMonthlyEGP = 0;
+        $toolsMonthlyEGP = [];
+
+        foreach ($selectedItems as $item) {
+            if (isset($basePricesEGP[$item])) {
+                $baseMonthlyEGP += ($basePricesEGP[$item] / 10);
+            } elseif (str_starts_with($item, 'tool-')) {
+                $guid = preg_replace('/^tool-/', '', $item);
+                $tool = $configTools[$guid] ?? null;
+                $isFree = $tool['is_free'] ?? false;
+                if (!$isFree && $tool) {
+                    $toolMonthlyPrice = 100; // Fallback
+                    if (isset($tool['plans']) && is_array($tool['plans']) && count($tool['plans']) > 0) {
+                        $firstPlan = reset($tool['plans']);
+                        if (isset($firstPlan['price_monthly'])) {
+                            $toolMonthlyPrice = $firstPlan['price_monthly'];
+                        }
+                    }
+                    $toolsMonthlyEGP[] = $toolMonthlyPrice;
+                }
+            }
+        }
+
+        $months = 1;
+        $multiplier = 1;
+        if ($billingCycle === '6_months') {
+            $months = 6;
+            $multiplier = 6;
+        } elseif ($billingCycle === '1_year') {
+            $months = 12;
+            $multiplier = 10; // 2 months free
+        }
+
+        // Apply progressive tool volume discount
+        rsort($toolsMonthlyEGP);
+        $toolsBaseTotalMonthlyEGP = 0;
+        $toolsDiscountedTotalMonthlyEGP = 0;
+
+        foreach ($toolsMonthlyEGP as $index => $price) {
+            $toolsBaseTotalMonthlyEGP += $price;
+            $discountPercent = min(50, $index * 10);
+            $toolsDiscountedTotalMonthlyEGP += $price * (1 - ($discountPercent / 100));
+        }
+
+        $subtotalMonthlyEGP = $baseMonthlyEGP + $toolsDiscountedTotalMonthlyEGP;
+        
+        $originalTotalEGP = ($baseMonthlyEGP + $toolsBaseTotalMonthlyEGP) * $months;
+        $totalEGP = $subtotalMonthlyEGP * $multiplier;
+        
+        $toolsDiscountEGP = ($toolsBaseTotalMonthlyEGP - $toolsDiscountedTotalMonthlyEGP) * $months;
+        $annualDiscountEGP = ($subtotalMonthlyEGP * $months) - ($subtotalMonthlyEGP * $multiplier);
+
+        $toTargetCurrency = function($amountEgp) use ($egpRate, $rate) {
+            $usd = $amountEgp / $egpRate;
+            return $usd * $rate;
+        };
+
+        if ($returnArray) {
+            return [
+                'subtotal' => $toTargetCurrency($subtotalMonthlyEGP * $months),
+                'tools_discount' => $toTargetCurrency($toolsDiscountEGP),
+                'annual_discount' => $toTargetCurrency($annualDiscountEGP),
+                'total' => $toTargetCurrency($totalEGP),
+            ];
+        }
+
+        return $toTargetCurrency($totalEGP);
+    }
+
+    public function validateAddonParents($items, $user = null)
+    {
+        if (!$items || !is_array($items)) return;
+
+        $addonsConfig = config('saas.addons', []);
+        foreach ($items as $item) {
+            if (isset($addonsConfig[$item])) {
+                $parent = $addonsConfig[$item]['parent'];
+                
+                // Check if parent is in the cart
+                $inCart = in_array($parent, $items);
+                
+                // Check if user already owns the parent
+                $alreadyOwned = false;
+                if ($user && !$inCart) {
+                    $alreadyOwned = \App\Models\UserSubscription::where('user_id', $user->id)
+                        ->where('object', $parent)
+                        ->where('status', 'active')
+                        ->where('expires_at', '>', now())
+                        ->exists();
+                }
+
+                if (!$inCart && !$alreadyOwned) {
+                    throw ValidationException::withMessages([
+                        'error' => "You cannot subscribe to {$addonsConfig[$item]['name']} without its parent module."
+                    ]);
+                }
+            }
+        }
     }
 }

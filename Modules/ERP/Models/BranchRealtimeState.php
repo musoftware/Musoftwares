@@ -2,10 +2,14 @@
 
 namespace Modules\ERP\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class BranchRealtimeState extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'erp_branch_realtime_states';
     protected $guarded = [];
 

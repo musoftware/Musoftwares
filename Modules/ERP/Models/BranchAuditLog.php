@@ -2,10 +2,14 @@
 
 namespace Modules\ERP\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class BranchAuditLog extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'erp_branch_audit_logs';
     protected $guarded = [];
 

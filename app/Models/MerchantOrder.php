@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Helpers\FinanceHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MerchantOrder extends Model
 {
-    use HasFactory;
+    use SoftDeletes, HasFactory;
 
     public function amount_str()
     {

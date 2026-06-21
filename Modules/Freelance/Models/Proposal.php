@@ -2,6 +2,8 @@
 
 namespace Modules\Freelance\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
@@ -9,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Proposal extends Model
 {
-    use HasFactory;
+    use SoftDeletes, HasFactory;
     
     protected static function newFactory()
     {

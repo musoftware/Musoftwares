@@ -2,10 +2,14 @@
 
 namespace Modules\AffiliatePos\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class SkuValue extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'affiliate_pos_product_sku_values';
     protected $guarded = [];
 

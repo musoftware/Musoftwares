@@ -2,6 +2,8 @@
 
 namespace Modules\Tools\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +12,8 @@ use App\Models\User;
 
 class ToolResellerUser extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'reseller_id', 'user_id', 'status', 'joined_at',
         'sharing_check_enabled', 'is_sharing_flagged',

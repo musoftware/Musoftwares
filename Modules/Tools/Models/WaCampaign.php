@@ -2,6 +2,8 @@
 
 namespace Modules\Tools\Models;
 
+
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -9,6 +11,8 @@ use App\Models\User;
 
 class WaCampaign extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'wa_campaigns';
 
     protected $fillable = [
