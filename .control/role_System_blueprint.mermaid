@@ -1,0 +1,31 @@
+flowchart TD
+    US_SYS_01[Step 1: US-SYS-01 - Automated Billing & Subscriptions]
+    US_SYS_02[Step 2: US-SYS-02 - Multi-Currency Synchronization]
+    US_SYS_03[Step 3: US-SYS-03 - Background Task Orchestration]
+    US_SYS_04[Step 4: US-SYS-04 - Event-Driven Automation]
+    US_SYS_05[Step 5: US-SYS-05 - Webhook & External API Processing]
+    US_SYS_06[Step 6: US-SYS-06 - Security & Rate Limiting Enforcement]
+
+    US_SYS_01 --> US_SYS_02
+    US_SYS_02 --> US_SYS_03
+    US_SYS_03 --> US_SYS_04
+    US_SYS_04 --> US_SYS_05
+    US_SYS_05 --> US_SYS_06
+
+    US_SYS_01 --> Sub1_1[Process recurring renewals and prorations]
+    US_SYS_01 --> Sub1_2[Gracefully downgrade access on payment failure]
+
+    US_SYS_02 --> Sub2_1[Fetch exchange rates periodically]
+    US_SYS_02 --> Sub2_2[Compute dual-currency transactions accurately]
+
+    US_SYS_03 --> Sub3_1[Orchestrate long-running async tasks via queues]
+    US_SYS_03 --> Sub3_2[Publish real-time WebSocket status updates]
+
+    US_SYS_04 --> Sub4_1[Observe internal events like Lead stage changes]
+    US_SYS_04 --> Sub4_2[Execute user-configured automation rules]
+
+    US_SYS_05 --> Sub5_1[Securely receive and validate external webhooks]
+    US_SYS_05 --> Sub5_2[Map webhooks to internal state changes]
+
+    US_SYS_06 --> Sub6_1[Actively monitor request velocities and enforce rate limits]
+    US_SYS_06 --> Sub6_2[Block malicious patterns to protect the ecosystem]

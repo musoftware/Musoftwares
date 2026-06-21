@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import CommandPalette from '@/Components/CommandPalette';
 import ProductTourModal from '@/Components/ProductTourModal';
+import BackgroundTaskStatus from '@/Components/Tools/BackgroundTaskStatus';
 
 import axios from 'axios';
 import FreelanceModeToggle from '@/Components/Freelance/FreelanceModeToggle';
@@ -859,6 +860,7 @@ function AuthenticatedContent({
                 {children}
             </main>
 
+            <BackgroundTaskStatus />
             <ProductTourModal 
                 user={user}
                 isOpen={isTourOpen}

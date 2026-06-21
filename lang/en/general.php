@@ -5905,4 +5905,11 @@ return [
     'if_you_did_not_request_a_password_reset_no_further_action_is_required' => 'If you did not request a password reset, no further action is required.',
     'show_password' => 'Show password',
     'hide_password' => 'Hide password',
+    
+    // Exchange Rates
+    'exchange_rates_synchronization' => 'Exchange Rates Synchronization',
+    'fetches_latest_global_exchange_rates_and_updates_internal_caches_for_multi_currency_computations' => 'Fetches latest global exchange rates and updates internal caches for multi-currency computations.',
+    'sync_exchange_rates_now' => 'Sync Exchange Rates Now',
+    'exchange_rates_synced_successfully' => 'Exchange rates synchronized successfully.',
+    'failed_to_sync_exchange_rates' => 'Failed to sync exchange rates',
 ];

@@ -368,6 +368,9 @@ Route::middleware(['auth', 'verified'])->prefix('settings')->name('settings.')->
     Route::get('/backup', [\App\Http\Controllers\TenantBackupController::class, 'index'])->name('backup.index');
     Route::get('/backup/export', [\App\Http\Controllers\TenantBackupController::class, 'export'])->name('backup.export');
     Route::post('/backup/import', [\App\Http\Controllers\TenantBackupController::class, 'import'])->name('backup.import');
+    
+    // Automations
+    Route::resource('automations', \App\Http\Controllers\AutomationRuleController::class)->except(['show']);
 });
 
 if (file_exists(base_path('Modules/CRM/routes/web.php'))) {
@@ -572,6 +575,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('settings/do-update-prices', [\App\Http\Controllers\Admin\AdminSettingController::class, 'doUpdatePrices'])->name('settings.do-update-prices');
     Route::post('settings/calculate-hourly-rate', [\App\Http\Controllers\Admin\AdminSettingController::class, 'calculateHourlyRate'])->name('settings.calculate-hourly-rate');
     Route::post('settings/recalculate-overhead-hourly-rate', [\App\Http\Controllers\Admin\AdminSettingController::class, 'recalculateOverheadHourlyRate'])->name('settings.recalculate-overhead-hourly-rate');
+    Route::post('settings/sync-exchange-rates', [\App\Http\Controllers\Admin\AdminSettingController::class, 'syncExchangeRates'])->name('settings.sync-exchange-rates');
 
     Route::resource('language-lines', \App\Http\Controllers\Admin\AdminLanguageLineController::class)->except(['create', 'show', 'edit']);
     Route::post('language-lines/auto-translate', [\App\Http\Controllers\Admin\AdminLanguageLineController::class, 'autoTranslate'])->name('language-lines.auto-translate');
@@ -975,4 +979,10 @@ require __DIR__.'/auth.php';
 // ── Google Socialite Login ───────────────────────────────────────────
 Route::get('/auth/google/redirect', [\App\Http\Controllers\Auth\SocialLoginController::class, 'redirect'])->name('social.google.redirect');
 Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\SocialLoginController::class, 'callback'])->name('social.google.callback');
+
+
+Route::middleware(['auth', 'verified'])->prefix('api')->name('api.')->group(function () {
+    Route::get('/background-tasks', [\App\Http\Controllers\BackgroundTaskController::class, 'index'])->name('background-tasks.index');
+    Route::get('/background-tasks/{backgroundTask}', [\App\Http\Controllers\BackgroundTaskController::class, 'show'])->name('background-tasks.show');
+});
 

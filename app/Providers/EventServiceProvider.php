@@ -59,5 +59,7 @@ class EventServiceProvider extends ServiceProvider
     public function boot(): void
     {
         parent::boot();
+
+        \Illuminate\Support\Facades\Event::listen('*', [\App\Listeners\AutomationEngineListener::class, 'handle']);
     }
 }

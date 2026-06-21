@@ -1,0 +1,118 @@
+[
+    {
+        "id": "System",
+        "name": "Musoftwares System",
+        "status": "running",
+        "dependencies": []
+    },
+    {
+        "id": "Admin",
+        "name": "Admin",
+        "status": "pending",
+        "dependencies": [
+            "System"
+        ]
+    },
+    {
+        "id": "Client",
+        "name": "Client",
+        "status": "pending",
+        "dependencies": [
+            "System"
+        ]
+    },
+    {
+        "id": "Team",
+        "name": "Team Member",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Manager",
+        "name": "Manager",
+        "status": "pending",
+        "dependencies": [
+            "Team"
+        ]
+    },
+    {
+        "id": "Collector",
+        "name": "Collector",
+        "status": "pending",
+        "dependencies": [
+            "Team"
+        ]
+    },
+    {
+        "id": "Marketing",
+        "name": "Marketing",
+        "status": "pending",
+        "dependencies": [
+            "Team"
+        ]
+    },
+    {
+        "id": "Support",
+        "name": "Support",
+        "status": "pending",
+        "dependencies": [
+            "Team"
+        ]
+    },
+    {
+        "id": "Telesales",
+        "name": "Telesales",
+        "status": "pending",
+        "dependencies": [
+            "Team"
+        ]
+    },
+    {
+        "id": "Freelancer",
+        "name": "Freelancer",
+        "status": "pending",
+        "dependencies": [
+            "System"
+        ]
+    },
+    {
+        "id": "Seller",
+        "name": "Seller",
+        "status": "pending",
+        "dependencies": [
+            "System"
+        ]
+    },
+    {
+        "id": "Provider",
+        "name": "Provider",
+        "status": "pending",
+        "dependencies": [
+            "System"
+        ]
+    },
+    {
+        "id": "Affiliate",
+        "name": "Affiliate",
+        "status": "pending",
+        "dependencies": [
+            "System"
+        ]
+    },
+    {
+        "id": "Reseller",
+        "name": "Reseller",
+        "status": "pending",
+        "dependencies": [
+            "System"
+        ]
+    },
+    {
+        "id": "Guest",
+        "name": "Guest",
+        "status": "pending",
+        "dependencies": [
+            "System"
+        ]
+    }
+]
