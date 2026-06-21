@@ -672,9 +672,12 @@ class SubscriptionController extends Controller
      */
     public function cancel(Request $request)
     {
-        $user = Auth::user();
-        $user->subscription_force = 0;
-        $user->save();
+        $request->validate(['id' => 'required|exists:user_subscriptions,id']);
+        $sub = \App\Models\UserSubscription::where('id', $request->id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $sub->update(['auto_renew' => false]);
 
         return back()->with('success', __('general.your_subscription_auto_renewal_has_been_cancelled'));
     }
@@ -684,6 +687,60 @@ class SubscriptionController extends Controller
      */
     public function renew(Request $request)
     {
-        return back()->withErrors(['error' => 'Direct renewal not supported yet, please use standard subscription process.']);
+        $request->validate(['id' => 'required|exists:user_subscriptions,id']);
+        $user = Auth::user();
+        $sub = \App\Models\UserSubscription::where('id', $request->id)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+
+        // get pricing
+        $pricingService = app(\App\Services\PricingService::class);
+        $serviceItems = $pricingService->getServiceItems();
+        $item = collect($serviceItems)->firstWhere('id', $sub->object);
+        if (!$item) {
+            return back()->withErrors(['error' => 'Module no longer available.']);
+        }
+
+        $price = $item['monthly_price'] ?? 0;
+        
+        if ($user->available_balance() < $price) {
+            return back()->withErrors(['error' => 'Insufficient balance to renew.']);
+        }
+
+        try {
+            DB::transaction(function () use ($user, $sub, $price, $item) {
+                if ($price > 0) {
+                    $itemName = $item['name'] ?? ucfirst($sub->object);
+                    $user->add_balance(-1 * $price, 'Manual Subscription Renewal: ' . $itemName, 'used');
+                }
+
+                $newExpiresAt = $sub->expires_at && \Carbon\Carbon::parse($sub->expires_at)->isFuture() 
+                    ? \Carbon\Carbon::parse($sub->expires_at)->addMonth() 
+                    : \Carbon\Carbon::now()->addMonth();
+
+                $sub->update([
+                    'status' => 'active',
+                    'expires_at' => $newExpiresAt,
+                    'auto_renew' => true
+                ]);
+
+                $tenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
+                if ($tenant) {
+                    \App\Models\TenantFeature::updateOrCreate(
+                        ['tenant_id' => $tenant->id, 'feature_key' => $sub->object],
+                        [
+                            'module' => str_starts_with($sub->object, 'crm') ? 'crm' : (str_starts_with($sub->object, 'erp') ? 'erp' : (str_starts_with($sub->object, 'tool') ? 'tools' : 'booking')),
+                            'expires_at' => $newExpiresAt
+                        ]
+                    );
+                }
+            });
+
+            return back()->with('success', __('general.subscription_renewed_successfully'));
+        } catch (\Exception $e) {
+            Log::error('Manual renewal failed: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Failed to renew: ' . $e->getMessage()]);
+        }
     }
 }
+

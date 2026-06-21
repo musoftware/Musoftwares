@@ -91,6 +91,15 @@ class RenewSubscriptions extends Command
                     $subscription->update([
                         'status' => 'expired'
                     ]);
+
+                    // Downgrade tenant access gracefully
+                    $tenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
+                    if ($tenant) {
+                        \App\Models\TenantFeature::where('tenant_id', $tenant->id)
+                            ->where('feature_key', $subscription->object)
+                            ->update(['expires_at' => now()->subMinute()]);
+                    }
+
                     $this->error("Subscription ID: {$subscription->id} has been marked as expired due to failed payment.");
                 }
             } catch (Exception $e) {
@@ -115,5 +124,16 @@ class RenewSubscriptions extends Command
             'status' => 'active',
             'expires_at' => $newExpiresAt,
         ]);
+
+        $tenant = \Modules\ERP\Models\Tenant::where('user_id', $subscription->user_id)->first();
+        if ($tenant) {
+            \App\Models\TenantFeature::updateOrCreate(
+                ['tenant_id' => $tenant->id, 'feature_key' => $subscription->object],
+                [
+                    'module' => str_starts_with($subscription->object, 'crm') ? 'crm' : (str_starts_with($subscription->object, 'erp') ? 'erp' : (str_starts_with($subscription->object, 'tool') ? 'tools' : 'booking')),
+                    'expires_at' => $newExpiresAt
+                ]
+            );
+        }
     }
 }

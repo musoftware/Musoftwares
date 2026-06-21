@@ -54,6 +54,11 @@ class SubscriptionMiddleware
                     'redirect' => route('subscriptions.plans', ['module' => $module])
                 ], 403);
             }
+
+            if ($module === 'erp') {
+                return \Inertia\Inertia::render('ERP/UpgradePreview');
+            }
+
             return redirect()->route('subscriptions.plans', ['module' => $module]);
         }
 
