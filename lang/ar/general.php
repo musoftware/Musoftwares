@@ -5728,4 +5728,11 @@ return [
     'if_you_did_not_request_a_password_reset_no_further_action_is_required' => 'إذا لم تطلب إعادة تعيين كلمة المرور، فلا يلزم اتخاذ أي إجراء آخر.',
     'show_password' => 'إظهار كلمة المرور',
     'hide_password' => 'إخفاء كلمة المرور',
+
+    // Exchange Rates
+    'exchange_rates_synchronization' => 'مزامنة أسعار الصرف',
+    'fetches_latest_global_exchange_rates_and_updates_internal_caches_for_multi_currency_computations' => 'يجلب أحدث أسعار الصرف العالمية ويحدث التخزين المؤقت الداخلي لحسابات العملات المتعددة.',
+    'sync_exchange_rates_now' => 'مزامنة أسعار الصرف الآن',
+    'exchange_rates_synced_successfully' => 'تمت مزامنة أسعار الصرف بنجاح.',
+    'failed_to_sync_exchange_rates' => 'فشلت مزامنة أسعار الصرف',
 ];

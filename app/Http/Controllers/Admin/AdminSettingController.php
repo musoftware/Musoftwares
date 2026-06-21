@@ -173,4 +173,14 @@ class AdminSettingController extends Controller
 
         return response()->json(['rate' => round($rate, 2)]);
     }
+
+    public function syncExchangeRates()
+    {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('currency:fetch-rates');
+            return redirect()->back()->with('success', __('general.exchange_rates_synced_successfully'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', __('general.failed_to_sync_exchange_rates') . ': ' . $e->getMessage());
+        }
+    }
 }

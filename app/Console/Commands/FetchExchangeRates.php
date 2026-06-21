@@ -3,45 +3,59 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use App\Models\Currency;
+use App\Models\CurrenciesExchange;
 
 class FetchExchangeRates extends Command
 {
     protected $signature = 'currency:fetch-rates';
-    protected $description = 'Fetch daily exchange rates and update exchange_rates table';
+    protected $description = 'Fetch daily exchange rates and update currencies_exchanges table';
 
     public function handle()
     {
-        $this->info('Fetching exchange rates...');
+        $this->info('Fetching exchange rates from open.er-api.com...');
 
-        // Mock fetch for demonstration
-        $rates = [
-            'EUR' => 0.92,
-            'GBP' => 0.79,
-            'JPY' => 150.23,
-            'EGP' => 30.90,
-            'SAR' => 3.75,
-        ];
+        try {
+            $response = Http::timeout(10)->withoutVerifying()->get('https://open.er-api.com/v6/latest/USD');
+            
+            if (!$response->successful() || !isset($response['rates'])) {
+                $this->error('Failed to fetch exchange rates. Falling back to cached rates.');
+                return;
+            }
 
-        $date = now()->toDateString();
+            $rates = $response['rates'];
+            $date = now()->toDateString();
+            $currencies = Currency::all();
 
-        foreach ($rates as $code => $rate) {
-            DB::table('exchange_rates')->updateOrInsert(
-                [
-                    'from_currency' => 'USD',
-                    'to_currency' => $code,
-                    'effective_date' => $date,
-                ],
-                [
-                    'rate' => $rate,
-                    'source' => 'api_auto',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]
-            );
+            foreach ($currencies as $from) {
+                foreach ($currencies as $to) {
+                    if ($from->id === $to->id) continue;
+
+                    // Calculate cross rate via USD
+                    $fromRate = $rates[$from->currency] ?? null;
+                    $toRate = $rates[$to->currency] ?? null;
+
+                    if ($fromRate && $toRate && $fromRate > 0) {
+                        $crossRate = $toRate / $fromRate;
+
+                        CurrenciesExchange::updateOrCreate(
+                            [
+                                'currency1' => $from->id,
+                                'currency2' => $to->id,
+                                'date_string' => $date,
+                            ],
+                            [
+                                'rate' => $crossRate,
+                            ]
+                        );
+                    }
+                }
+            }
+
+            $this->info('Exchange rates updated successfully.');
+        } catch (\Exception $e) {
+            $this->error('Exception fetching rates: ' . $e->getMessage());
         }
-
-        $this->info('Exchange rates updated successfully.');
     }
 }

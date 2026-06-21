@@ -215,6 +215,11 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                     {flash.success}
                 </div>
             )}
+            {(flash as any)?.error && (
+                <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                    {(flash as any).error}
+                </div>
+            )}
 
             <form onSubmit={handleSettingsSave} className="space-y-6">
                 {/* Row 1: Business + Work */}
@@ -569,6 +574,18 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                         router.post(route('admin.settings.recalculate-overhead-hourly-rate'));
                     }} className="space-y-4">
                         <Button type="submit" variant="outline" className="w-full">{__('general.recalculate_rate')}</Button>
+                    </form>
+                </SectionCard>
+
+                {/* Sync Exchange Rates */}
+                <SectionCard title={__('general.exchange_rates_synchronization')} icon={Globe}>
+                    <p className="text-sm font-medium text-gray-700 mb-4">{__('general.fetches_latest_global_exchange_rates_and_updates_internal_caches_for_multi_currency_computations')}</p>
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        if (!confirm('Are you sure you want to sync exchange rates from the external API?')) return;
+                        router.post(route('admin.settings.sync-exchange-rates'));
+                    }} className="space-y-4">
+                        <Button type="submit" variant="outline" className="w-full">{__('general.sync_exchange_rates_now')}</Button>
                     </form>
                 </SectionCard>
             </div>

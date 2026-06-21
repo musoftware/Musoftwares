@@ -81,6 +81,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
 });
 
 // Unauthenticated Webhooks & Public Routes
+Route::post('wa-webhook', [\Modules\Booking\app\Features\WaReminders\Http\Controllers\WaWebhookController::class, 'handle'])->name('booking.wa.webhook');
 
 // Booking Widgets (Public CORS Guarded)
 Route::group(['prefix' => 'public/widgets/{uuid}', 'middleware' => [\Modules\Booking\app\Features\Widget\Http\Middleware\ValidateWidgetDomain::class]], function () {
