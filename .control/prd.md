@@ -189,7 +189,33 @@ This section defines the automated, background, and programmatic capabilities ex
 
 ---
 
-## 7. Self-Grilling & Edge Case Resolutions
+## 7. User Role: Team Member
+
+This section defines the operational tasks, collaboration workflows, and restricted capabilities executed by the "Team Member" role within an organization's workspace (ERP, CRM, etc.).
+
+### 7.1. User Stories
+- **US-TM-01 (Task & Project Execution)**: As a Team Member, I must be able to view, update, and complete tasks assigned to me within projects so that work progresses efficiently without bottlenecks.
+- **US-TM-02 (CRM Lead & Customer Interaction)**: As a Team Member, I must be able to interact with assigned leads, update pipeline stages, and add notes to customer profiles based on my permissions, enabling seamless sales and support operations.
+- **US-TM-03 (Time Tracking & Payroll Visibility)**: As a Team Member, I must be able to log my working hours, request leaves, and view my payroll slips, so that I have clear visibility into my employment and compensation records.
+- **US-TM-04 (Internal Communication & Collaboration)**: As a Team Member, I must be able to communicate with other team members via internal chat or task comments to ensure clear operational alignment.
+- **US-TM-05 (Restricted Access & Role Permissions)**: As a Team Member, I must only have access to the modules and data permitted by my role (e.g., HR vs Sales), protecting sensitive business financial data from unauthorized internal viewing.
+
+### 7.2. Edge Cases
+- **EC-TM-01 (Permission Revocation During Active Session)**: If an admin revokes a team member's permission to a module while they are actively using it, the system must immediately restrict access on the next API request or page load and redirect them with a clear message.
+- **EC-TM-02 (Concurrent Task Updates)**: If two team members attempt to edit the same task, ticket, or lead simultaneously, the system must handle the conflict gracefully (e.g., via real-time WebSocket syncing or optimistic locking) to prevent silent data overwrites.
+- **EC-TM-03 (Account Deactivation)**: If a team member is deactivated or terminated, they must be instantly logged out from all devices, and their historical data (logs, comments, performed actions) must be strictly preserved for auditing purposes.
+- **EC-TM-04 (Cross-Branch Constraints)**: If a team member is restricted to a specific branch in a multi-branch setup, they must be prevented from viewing, creating, or manipulating data (inventory, clients, invoices) belonging to other branches.
+- **EC-TM-05 (Task Reassignment on Deactivation)**: When a team member with pending critical tasks is deactivated, the system must either prompt the admin to reassign those tasks or move them to a generic pool to avoid abandoned workflows.
+
+### 7.3. Testing Requirements
+- **TR-TM-01 (Role-Based Access Control Verification)**: Automated tests must verify that team members with specific roles (e.g., "Sales Rep") receive a strict 403 Forbidden response when attempting to access unauthorized routes (e.g., "Payroll" or "Settings").
+- **TR-TM-02 (Session Termination on Deactivation)**: Integration tests must simulate account deactivation and verify that all active session tokens and WebSocket connections for the team member are instantly invalidated.
+- **TR-TM-03 (Branch Isolation)**: E2E tests must confirm that branch-restricted team members only see clients, inventory, and tasks explicitly associated with their assigned branch.
+- **TR-TM-04 (Concurrent Edit Conflict Resolution)**: Tests must simulate concurrent edits to a single entity (e.g., updating a lead's status) and verify the system correctly processes the requests without corruption.
+
+---
+
+## 8. Self-Grilling & Edge Case Resolutions
 
 **Q1: What happens if a user accesses an ERP page without an active subscription?**
 - **Resolution**: The system must intercept the request via middleware and seamlessly render `ERP/UpgradePreview.tsx` or a 403 Forbidden page natively integrated with Shadcn UI. Partial content loads must be strictly blocked to prevent data leaks.
