@@ -9,6 +9,7 @@ import {
 import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
+import { __ } from '@/lib/i18n';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -34,9 +35,9 @@ function CampaignCardActions({ campaign, onStart, onRetry, onPause, onResume, on
         <div className="flex items-center gap-1.5">
             {/* Start — for fresh / stopped campaigns */}
             {(status === 'created' || status === 'stopped') && (
-                <Button size="sm" onClick={() => onStart(campaign.id)} title={locale === 'ar' ? "بدء" : "Start"} className="h-8 px-3 gap-1.5 bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold rounded-xl">
+                <Button size="sm" onClick={() => onStart(campaign.id)} title={__('Start')} className="h-8 px-3 gap-1.5 bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold rounded-xl">
                     <Play className="w-3 h-3 fill-white rtl:rotate-180" />
-                    {locale === 'ar' ? 'بدء' : 'Start'}
+                    {__('Start')}
                 </Button>
             )}
 
@@ -52,22 +53,22 @@ function CampaignCardActions({ campaign, onStart, onRetry, onPause, onResume, on
                 </Button>
             )}
             {(status === 'running' || status === 'processing') && (
-                <Button size="sm" onClick={() => onPause(campaign.id)} title={locale === 'ar' ? "إيقاف مؤقت" : "Pause"} className="h-8 px-3 gap-1.5 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold rounded-xl">
+                <Button size="sm" onClick={() => onPause(campaign.id)} title={__('Pause')} className="h-8 px-3 gap-1.5 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold rounded-xl">
                     <Pause className="w-3 h-3 fill-white" />
-                    {locale === 'ar' ? 'إيقاف' : 'Pause'}
+                    {__('Pause')}
                 </Button>
             )}
             {status === 'paused' && (
-                <Button size="sm" onClick={() => onResume(campaign.id)} title={locale === 'ar' ? "استئناف" : "Resume"} className="h-8 px-3 gap-1.5 bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold rounded-xl">
+                <Button size="sm" onClick={() => onResume(campaign.id)} title={__('Resume')} className="h-8 px-3 gap-1.5 bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold rounded-xl">
                     <Play className="w-3 h-3 fill-white rtl:rotate-180" />
-                    {locale === 'ar' ? 'استئناف' : 'Resume'}
+                    {__('Resume')}
                 </Button>
             )}
 
             {/* View Report */}
-            <Button size="sm" variant="outline" onClick={() => onViewReport(campaign.id, campaign.name)} title={locale === 'ar' ? "عرض التقرير" : "View Report"} className="h-8 px-3 gap-1.5 text-[11px] font-bold rounded-xl border-muted">
+            <Button size="sm" variant="outline" onClick={() => onViewReport(campaign.id, campaign.name)} title={__('View Report')} className="h-8 px-3 gap-1.5 text-[11px] font-bold rounded-xl border-muted">
                 <Eye className="w-3 h-3" />
-                {locale === 'ar' ? 'التقرير' : 'Report'}
+                {__('Report')}
             </Button>
 
             {/* More menu */}
@@ -75,7 +76,7 @@ function CampaignCardActions({ campaign, onStart, onRetry, onPause, onResume, on
                 <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-xl h-8 w-8 bg-muted/50 hover:bg-muted text-muted-foreground transition-colors duration-150 outline-none select-none cursor-pointer focus:ring-0">
                     <MoreVertical className="w-3.5 h-3.5" />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align={locale === 'ar' ? 'start' : 'end'} className="min-w-[140px]">
+                <DropdownMenuContent align={__('end')} className="min-w-[140px]">
                     {(status === 'running' || status === 'processing' || status === 'paused') && (
                         <DropdownMenuItem onClick={() => onStop(campaign.id)} className="font-bold flex items-center gap-2 cursor-pointer text-start justify-start w-full">
                             <Square className="w-3.5 h-3.5 text-muted-foreground" />
@@ -91,12 +92,12 @@ function CampaignCardActions({ campaign, onStart, onRetry, onPause, onResume, on
                     {(status === 'completed' || status === 'stopped' || status === 'failed') && campaign.sent_count > 0 && (
                         <DropdownMenuItem onClick={() => onFollowUp?.(campaign)} className="font-bold flex items-center gap-2 cursor-pointer text-blue-600 text-start justify-start w-full">
                             <Reply className="w-3.5 h-3.5" />
-                            <span>{locale === 'ar' ? 'متابعة غير الرادّين' : 'Follow-up Non-Replied'}</span>
+                            <span>{__('Follow-up Non-Replied')}</span>
                         </DropdownMenuItem>
                     )}
                     <DropdownMenuItem onClick={() => onDelete(campaign.id)} variant="destructive" className="font-bold flex items-center gap-2 cursor-pointer text-start justify-start w-full">
                         <Trash2 className="w-3.5 h-3.5" />
-                        <span>{locale === 'ar' ? "حذف" : "Delete"}</span>
+                        <span>{__('Delete')}</span>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -395,7 +396,7 @@ export default function CampaignsListWorkspace({ t, locale, callRPC, onViewRepor
                             >
                                 {/* Live pulse indicator */}
                                 {isLive && (
-                                    <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-teal-500 to-blue-500 animate-pulse" />
+                                    <div className="absolute top-0 start-0 end-0 h-0.5 bg-gradient-to-r from-blue-500 via-teal-500 to-blue-500 animate-pulse" />
                                 )}
 
                                 <CardContent className="p-5 space-y-4">
@@ -528,7 +529,7 @@ export default function CampaignsListWorkspace({ t, locale, callRPC, onViewRepor
                                             <td className="px-6 py-4 text-start">
                                                 <Badge variant="outline" className={`text-[10px] gap-1 ${c.type === 'group' ? 'bg-violet-50 text-violet-600' : 'bg-muted text-muted-foreground'}`}>
                                                     {c.type === 'group' ? <Users className="w-3 h-3" /> : <Layers className="w-3 h-3" />}
-                                                    {c.type === 'group' ? (locale === 'ar' ? 'مجموعات' : 'Group') : (locale === 'ar' ? 'أرقام' : 'Bulk')}
+                                                    {c.type === 'group' ? (__('Group')) : (__('Bulk'))}
                                                 </Badge>
                                             </td>
                                             <td className="px-6 py-4 text-start">
@@ -539,7 +540,7 @@ export default function CampaignsListWorkspace({ t, locale, callRPC, onViewRepor
                                                     {campaignDelays?.[c.id] && (c.status === 'running' || c.status === 'processing') && (
                                                         <div className="flex items-center gap-1 text-[10px] font-mono text-amber-600 dark:text-amber-400 animate-pulse">
                                                             <Timer className="w-3 h-3" />
-                                                            <span>{t.history.nextIn} {campaignDelays[c.id]}{locale === 'ar' ? ' ثانية' : 's'}</span>
+                                                            <span>{t.history.nextIn} {campaignDelays[c.id]}{__('s')}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -639,7 +640,7 @@ export default function CampaignsListWorkspace({ t, locale, callRPC, onViewRepor
                                 <h3 className="font-bold text-sm">{isRtl ? 'حملة متابعة' : 'Follow-up Campaign'}</h3>
                                 <p className="text-xs text-muted-foreground">{followUpModal.campaign.name}</p>
                             </div>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg ml-auto" onClick={() => setFollowUpModal(null)}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg ms-auto" onClick={() => setFollowUpModal(null)}>
                                 <X className="w-4 h-4" />
                             </Button>
                         </div>
