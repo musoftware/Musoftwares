@@ -1,0 +1,69 @@
+graph TD
+    Strategy[Musoftwares Testing Strategy] --> Unit[Unit Testing]
+    Strategy --> Integration[Integration Testing]
+    Strategy --> E2E[End-to-End E2E Testing]
+
+    Unit --> BackendUnit[Backend - PHPUnit/Pest]
+    Unit --> FrontendUnit[Frontend - Vitest]
+
+    BackendUnit --> ModelTest[Models & Relationships]
+    BackendUnit --> ServiceTest[Core Business Services]
+    BackendUnit --> MiddlewareTest[Middleware & Gates]
+    
+    ServiceTest --> CurrencyTest[Multi-Currency Formatter]
+    ServiceTest --> InvoiceGenTest[Invoice Generation]
+    ServiceTest --> BillingLogicTest[Wallet & Billing Logic]
+
+    MiddlewareTest --> TenantIsoTest[Tenant Isolation]
+    MiddlewareTest --> SubGateTest[Subscription Gating]
+    MiddlewareTest --> RateLimitTest[Rate Limiting]
+
+    FrontendUnit --> UIComponentTest[Shadcn UI Components]
+    FrontendUnit --> FormatterTest[Currency & Date Formatter Utilities]
+    FrontendUnit --> I18nTest[i18n Localization Arrays]
+
+    Integration --> APIControllerTest[API & Controllers]
+    Integration --> DBTransactionTest[Database Transactions]
+    Integration --> ExtIntegrationTest[External Integrations]
+    Integration --> WebSocketTest[WebSockets & SSE Fallbacks]
+
+    APIControllerTest --> TriPathTest[Tri-Path Validation]
+    TriPathTest --> HappyPathTest[Happy Path]
+    TriPathTest --> EdgeCaseTest[Edge Cases & Errors]
+    TriPathTest --> SecurityLimitTest[Security Limits]
+
+    ExtIntegrationTest --> SMSGateTest[SMS Gateway API]
+    ExtIntegrationTest --> PaymentGateTest[Payment Gateway Webhooks]
+
+    E2E --> AuthE2E[Authentication & Onboarding]
+    E2E --> AdminE2E[Admin Panel]
+    E2E --> ERPE2E[ERP Module]
+    E2E --> CRME2E[CRM Module]
+    E2E --> ClientPortalE2E[Client Portal]
+    E2E --> ToolsE2E[Tools & WebTools]
+    E2E --> ExtModuleE2E[External Modules & Addons]
+
+    AuthE2E --> RegFlowTest[Register, Verify, Login]
+    AuthE2E --> OnboardFlowTest[Onboarding Wizard & Tenant Init]
+    
+    AdminE2E --> ImpersonateTest[User Impersonation Flow]
+    AdminE2E --> BulkActionTest[Bulk Actions & Confirmations]
+    AdminE2E --> VirtualTableTest[Large Dataset Tables]
+
+    ERPE2E --> ERPFormTest[Full-Width Add/Edit Forms]
+    ERPE2E --> InvoiceFlowTest[Invoice Creation to Payment]
+    ERPE2E --> InventoryPOSTest[Inventory Mgmt & POS]
+    ERPE2E --> MultiBranchTest[Multi-Branch Data Separation]
+
+    CRME2E --> KanbanTest[Kanban Drag-and-Drop]
+    CRME2E --> WidgetTest[Lead Capture Embeds]
+    
+    ClientPortalE2E --> WalletFlowTest[Wallet Deposit & Withdraw]
+    ClientPortalE2E --> ChatTest[Real-Time Support Chat]
+    
+    ToolsE2E --> RunnerTest[Task Runner & WS Reconnection]
+    ToolsE2E --> FreelanceFlowTest[Job Proposal & Escrow]
+
+    ExtModuleE2E --> BookingTest[Booking & SmartSlots]
+    ExtModuleE2E --> AffiliateTest[Affiliate POS Flow]
+    ExtModuleE2E --> GoldSaverTest[GoldSavers Analytics]
