@@ -939,7 +939,7 @@ parameters:
 		-
 			message: '#^Relation ''currency'' is not found in Modules\\ERP\\Models\\TenantClient model\.$#'
 			identifier: larastan.relationExistence
-			count: 3
+			count: 1
 			path: Modules/ERP/Http/Controllers/InvoiceController.php
 
 		-

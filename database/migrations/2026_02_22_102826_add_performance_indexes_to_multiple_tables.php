@@ -40,9 +40,16 @@ return new class extends Migration
         
         $sm = \Illuminate\Support\Facades\Schema::getConnection()->getSchemaBuilder();
         if (!$sm->hasIndex($table, $indexName)) {
-            \Illuminate\Support\Facades\Schema::table($table, function (Blueprint $t) use ($columns, $indexName) {
-                $t->index($columns, $indexName);
-            });
+            try {
+                \Illuminate\Support\Facades\Schema::table($table, function (Blueprint $t) use ($columns, $indexName) {
+                    $t->index($columns, $indexName);
+                });
+            } catch (\Illuminate\Database\QueryException $e) {
+                // Error 1061 is Duplicate key name
+                if ($e->errorInfo[1] !== 1061) {
+                    throw $e;
+                }
+            }
         }
     }
 
