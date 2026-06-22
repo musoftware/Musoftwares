@@ -111,7 +111,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
         }
     };
 
-    const renderDropzone = (docDef: any) => {
+    const DropzoneStep = ({ docDef, documents, data, uploadingType, processing, errors, onDrop, handleUpload, handleDelete }: any) => {
         const { getRootProps, getInputProps, isDragActive } = useDropzone({
             onDrop: (files) => onDrop(files, docDef.id),
             accept: {
@@ -123,7 +123,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
             multiple: false
         });
 
-        const uploadedDoc = documents.find(d => d.document_type === docDef.id);
+        const uploadedDoc = documents.find((d: any) => d.document_type === docDef.id);
         const isCurrentUploading = data.document && data.document_type === docDef.id;
 
         if (uploadedDoc) {
@@ -191,7 +191,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
     };
 
     return (
-        <AuthenticatedLayout user={auth.user} header={<h2 className="font-semibold text-xl text-foreground leading-tight">{__('general.identity_verification')}</h2>}>
+        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-foreground leading-tight">{__('general.identity_verification')}</h2>}>
             <Head title={__('general.kyc_verification')} />
 
             <div className="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8">
@@ -295,7 +295,17 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                                             </div>
                                         </CardHeader>
                                         <CardContent>
-                                            {renderDropzone(STEPS[activeStep])}
+                                            <DropzoneStep 
+                                                docDef={STEPS[activeStep]} 
+                                                documents={documents} 
+                                                data={data} 
+                                                uploadingType={uploadingType} 
+                                                processing={processing} 
+                                                errors={errors} 
+                                                onDrop={onDrop} 
+                                                handleUpload={handleUpload} 
+                                                handleDelete={handleDelete} 
+                                            />
                                         </CardContent>
                                         <CardFooter className="bg-slate-50 border-t flex justify-between p-6">
                                             <Button 

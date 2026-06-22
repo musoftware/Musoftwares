@@ -64,6 +64,16 @@ Route::middleware(['web', 'auth'])
         Route::post('/landing-pages/{service}/generate-content', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generateLandingPageContent'])->name('landing-pages.generate-content');
     });
 
+// -- Seller Portal -------------------------------------------------
+Route::middleware(['web', 'auth', 'role:seller'])
+    ->prefix('seller')
+    ->name('seller.')
+    ->group(function () {
+        Route::get('/dashboard', [\Modules\Marketplace\Http\Controllers\Seller\SellerPortalController::class, 'dashboard'])->name('dashboard');
+        Route::get('/products', [\Modules\Marketplace\Http\Controllers\Seller\SellerPortalController::class, 'products'])->name('products');
+        Route::get('/payouts', [\Modules\Marketplace\Http\Controllers\Seller\SellerPortalController::class, 'payouts'])->name('payouts');
+    });
+
 // -- Public Landing Page Routes ------------------------------------
 Route::middleware(['web'])
     ->name('services.')

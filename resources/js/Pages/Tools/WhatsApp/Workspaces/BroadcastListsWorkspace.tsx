@@ -477,7 +477,6 @@ export default function BroadcastListsWorkspace({ t, locale, callRPC, daemonConn
                             <p className="text-sm font-bold">{isRtl ? 'لا أعضاء بعد' : 'No members yet'}</p>
                             <p className="text-xs text-muted-foreground mt-1">
                                 {isRtl ? 'أضف أعضاء يدوياً أو استورد من مجلدات الكونتاكت' : 'Add members manually or import from contact folders'}
-import { __ } from '@/lib/i18n';
                             </p>
                         </div>
                     )}

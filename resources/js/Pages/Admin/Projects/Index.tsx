@@ -14,11 +14,13 @@ import {
 } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { DataTable } from '@/Components/ui/DataTable';
+import { ClientAutocomplete } from '@/Components/ClientAutocomplete';
 import ProjectActionsSheet from './ProjectActionsSheet';
 import { formatMoney } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
-export default function Index({ projects, clients, currentTab }) {
+export default function Index({ projects, currentTab }) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [editingProject, setEditingProject] = useState<any>(null);
@@ -81,6 +83,92 @@ export default function Index({ projects, clients, currentTab }) {
         }
     };
 
+    const columns = [
+        {
+            key: 'name',
+            label: __('general.name'),
+            render: (project) => (
+                <>
+                    <button 
+                        onClick={() => openProjectSheet(project)}
+                        className="hover:text-blue-600 hover:underline text-start font-semibold cursor-pointer outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                    >
+                        {project.project_name}
+                    </button>
+                    {project.invoices && project.invoices.length > 0 && (
+                        <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded w-fit" title="Unpaid Invoices / Milestones">
+                            <AlertCircle className="w-3 h-3" /> {__('general.unpaid_dues')}
+                        </div>
+                    )}
+                </>
+            )
+        },
+        {
+            key: 'client',
+            label: __('general.client'),
+            render: (project) => (
+                project.client ? (
+                    <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10 border border-slate-200">
+                            <AvatarImage src={project.client.avatar_url || ''} alt={project.client.name} />
+                            <AvatarFallback className="bg-blue-50 text-blue-500">
+                                <User className="h-5 w-5" />
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col text-start">
+                            <span className="font-semibold text-slate-900">
+                                {project.client.name}
+                            </span>
+                            <span className="text-sm text-slate-500">
+                                {project.client.email}
+                            </span>
+                        </div>
+                    </div>
+                ) : (
+                    'Unknown'
+                )
+            )
+        },
+        {
+            key: 'budget',
+            label: __('general.budget'),
+            render: (project) => project.project_balance ? formatMoney(project.project_balance, 'USD') : '-'
+        },
+        {
+            key: 'status',
+            label: __('general.status'),
+            render: (project) => (
+                <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${project.archived === 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                    {project.archived === 0 ? project.status : 'Archived'}
+                </span>
+            )
+        },
+        {
+            key: 'actions',
+            label: __('general.actions'),
+            className: 'text-end',
+            render: (project) => (
+                <div className="flex justify-end space-x-2">
+                    <Button variant="outline" size="sm" onClick={() => openEditModal(project)}>
+                        {__('general.edit')}
+                    </Button>
+                    {project.archived === 0 ? (
+                        <Button variant="outline" size="sm" onClick={() => handleArchive(project.id)}>
+                            {__('general.archive')}
+                        </Button>
+                    ) : (
+                        <Button variant="outline" size="sm" onClick={() => handleRestore(project.id)}>
+                            {__('general.restore')}
+                        </Button>
+                    )}
+                    <Button variant="destructive" size="sm" onClick={() => handleDelete(project.id)}>
+                        {__('general.delete')}
+                    </Button>
+                </div>
+            )
+        }
+    ];
+
     return (
         <AdminSidebarLayout title={__('general.projects')} header="Projects Manager">
             <div className="mb-6 flex items-center justify-between">
@@ -103,22 +191,14 @@ export default function Index({ projects, clients, currentTab }) {
                             <DialogTitle>{__('general.create_new_project')}</DialogTitle>
                         </DialogHeader>
                         <form onSubmit={handleCreateSubmit} className="space-y-4">
-                            <div>
+                            <div className="z-50 relative">
                                 <Label htmlFor="client_id">{__('general.client')}</Label>
-                                <select
-                                    id="user_id"
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                <ClientAutocomplete 
                                     value={formData.user_id}
-                                    onChange={(e) => setFormData({ ...formData, user_id: e.target.value })}
-                                    required
-                                >
-                                    <option value="">{__('general.select_a_client')}</option>
-                                    {clients.map((client) => (
-                                        <option key={client.id} value={client.id}>
-                                            {client.name} ({client.email})
-                                        </option>
-                                    ))}
-                                </select>
+                                    onChange={(val) => setFormData({ ...formData, user_id: val })}
+                                    searchEndpoint={route('admin.projects.search-clients')}
+                                    className="mt-1"
+                                />
                             </div>
                             <div>
                                 <Label htmlFor="project_name">{__('general.project_name')}</Label>
@@ -149,82 +229,13 @@ export default function Index({ projects, clients, currentTab }) {
                 </Dialog>
             </div>
 
-            <div className="overflow-hidden rounded-lg bg-white shadow">
-                <table className="w-full text-start text-sm">
-                    <thead className="border-b bg-gray-50">
-                        <tr>
-                            <th className="p-4 font-medium text-gray-600">{__('general.name')}</th>
-                            <th className="p-4 font-medium text-gray-600">{__('general.client')}</th>
-                            <th className="p-4 font-medium text-gray-600">{__('general.budget')}</th>
-                            <th className="p-4 font-medium text-gray-600">{__('general.status')}</th>
-                            <th className="p-4 font-medium text-gray-600 text-end">{__('general.actions')}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {projects.map((project) => (
-                            <tr key={project.id} className="border-b hover:bg-gray-50">
-                                <td className="p-4 font-medium text-gray-900">
-                                    <button 
-                                        onClick={() => openProjectSheet(project)}
-                                        className="hover:text-blue-600 hover:underline text-start font-semibold cursor-pointer outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                                    >
-                                        {project.project_name}
-                                    </button>
-                                    {project.invoices && project.invoices.length > 0 && (
-                                        <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded w-fit" title="Unpaid Invoices / Milestones">
-                                            <AlertCircle className="w-3 h-3" /> {__('general.unpaid_dues')}</div>
-                                    )}
-                                </td>
-                                <td className="p-4">
-                                    {project.client ? (
-                                        <div className="flex items-center gap-3">
-                                            <Avatar className="h-10 w-10 border border-slate-200">
-                                                <AvatarImage src={project.client.avatar_url || ''} alt={project.client.name} />
-                                                <AvatarFallback className="bg-blue-50 text-blue-500">
-                                                    <User className="h-5 w-5" />
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="flex flex-col text-start">
-                                                <span className="font-semibold text-slate-900">
-                                                    {project.client.name}
-                                                </span>
-                                                <span className="text-sm text-slate-500">
-                                                    {project.client.email}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        'Unknown'
-                                    )}
-                                </td>
-                                <td className="p-4">{project.project_balance ? formatMoney(project.project_balance, 'USD') : '-'}</td>
-                                <td className="p-4">
-                                    <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${project.archived === 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                                        {project.archived === 0 ? project.status : 'Archived'}
-                                    </span>
-                                </td>
-                                <td className="p-4 space-x-2 text-end">
-                                    <Button variant="outline" size="sm" onClick={() => openEditModal(project)}>
-                                        {__('general.edit')}</Button>
-                                    {project.archived === 0 ? (
-                                        <Button variant="outline" size="sm" onClick={() => handleArchive(project.id)}>
-                                            {__('general.archive')}</Button>
-                                    ) : (
-                                        <Button variant="outline" size="sm" onClick={() => handleRestore(project.id)}>
-                                            {__('general.restore')}</Button>
-                                    )}
-                                    <Button variant="destructive" size="sm" onClick={() => handleDelete(project.id)}>
-                                        {__('general.delete')}</Button>
-                                </td>
-                            </tr>
-                        ))}
-                        {projects.length === 0 && (
-                            <tr>
-                                <td colSpan={5} className="p-4 text-center text-gray-500">{__('general.no_projects_found')}</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+            <div className="mb-4">
+                <DataTable
+                    columns={columns}
+                    data={projects.data}
+                    pagination={projects}
+                    onPageChange={(page) => router.get(route('admin.projects.index', { status: currentTab, page }))}
+                />
             </div>
 
             {/* Edit Modal */}

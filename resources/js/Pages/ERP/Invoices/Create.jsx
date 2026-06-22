@@ -6,6 +6,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
+import { AsyncAutocomplete } from '@/Components/AsyncAutocomplete';
 import { useToast } from '@/Components/ui/use-toast';
 import { Plus, Trash2, Clock, Send, ChevronDown, ChevronUp, DollarSign, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -22,7 +23,7 @@ function FieldError({ message }) {
     );
 }
 
-export default function CreateEdit({ invoice, clients = [], projects = [], products = [], has_inventory_addon, currencies, business_currency, pre_selected_client_id, pre_selected_project_id }) {
+export default function CreateEdit({ invoice, has_inventory_addon, currencies, business_currency, pre_selected_client_id, pre_selected_project_id, pre_selected_client }) {
     const isEdit = !!invoice;
     const [showCosts, setShowCosts] = useState(false);
     const [clientError, setClientError] = useState('');
@@ -46,28 +47,6 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
     });
 
 
-    useEffect(() => {
-        if (data.client_id) {
-            const client = clients.find(c => String(c.id) === String(data.client_id));
-            if (client) {
-                setData('amount_currency', client.currency);
-            }
-
-            if (data.project_id) {
-                const project = projects.find(p => String(p.id) === String(data.project_id));
-                if (project && String(project.client_id) !== String(data.client_id)) {
-                    setData('project_id', '');
-                }
-            }
-        } else {
-            setData('project_id', '');
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [data.client_id, clients, projects]);
-
-    const filteredProjects = data.client_id
-        ? projects.filter(p => String(p.client_id) === String(data.client_id))
-        : [];
 
     const addItem = (type = 'simple') => {
         setData('items', [
@@ -210,45 +189,43 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                 <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                     {__('general.client')}<span className="text-red-500">*</span>
                                 </Label>
-                                <select
-                                    className={cn(
-                                        "flex h-11 w-full rounded-lg border bg-slate-50/50 px-3 py-2 text-sm transition-colors",
-                                        "focus:border-slate-800 focus:ring-1 focus:ring-slate-800 focus:bg-white",
-                                        clientError ? "border-red-300 bg-red-50/30" : "border-slate-200"
-                                    )}
+                                <AsyncAutocomplete
+                                    searchEndpoint={route('erp.clients.search')}
+                                    placeholder={__('general.select_a_client')}
                                     value={data.client_id}
-                                    onChange={(e) => {
-                                        setData('client_id', e.target.value);
+                                    initialItem={pre_selected_client}
+                                    onChange={(val) => {
+                                        setData('client_id', val);
                                         setClientError('');
                                     }}
-                                >
-                                    <option value="">{__('general.select_a_client')}</option>
-                                    {clients.map((c) => (
-                                        <option key={c.id} value={c.id}>
-                                            {c.name} ({c.currency?.currency || c.currency_code || 'N/A'})
-                                        </option>
-                                    ))}
-                                </select>
+                                    onSelectFull={(client) => {
+                                        setData(prev => ({
+                                            ...prev,
+                                            client_id: client.id,
+                                            amount_currency: client.currency?.currency || client.currency_code || null,
+                                            project_id: ''
+                                        }));
+                                    }}
+                                    getDisplayName={(c) => `${c.name} (${c.currency?.currency || c.currency_code || 'N/A'})`}
+                                    error={clientError || errors.client_id}
+                                />
                                 <FieldError message={clientError || errors.client_id} />
                             </div>
 
-                            {data.client_id && filteredProjects.length > 0 && (
+                            {data.client_id && (
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         Associated Project (Optional)
                                     </Label>
-                                    <select
-                                        className="flex h-11 w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm focus:border-slate-800 focus:ring-1 focus:ring-slate-800 focus:bg-white transition-colors"
+                                    <AsyncAutocomplete
+                                        searchEndpoint={route('erp.projects.search')}
+                                        placeholder="None (Independent Invoice)"
                                         value={data.project_id}
-                                        onChange={(e) => setData('project_id', e.target.value)}
-                                    >
-                                        <option value="">None (Independent Invoice)</option>
-                                        {filteredProjects.map((p) => (
-                                            <option key={p.id} value={p.id}>
-                                                {p.name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        initialItem={invoice?.project ? { id: invoice.project.id, name: invoice.project.name } : null}
+                                        onChange={(val) => setData('project_id', val)}
+                                        extraParams={{ client_id: data.client_id }}
+                                        disabled={!data.client_id}
+                                    />
                                     <FieldError message={errors.project_id} />
                                 </div>
                             )}
@@ -327,36 +304,29 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                     <div key={index} className="flex items-start gap-4 p-4 group hover:bg-slate-50/50 transition-colors">
                                         <div className="flex-1 space-y-1">
                                             {has_inventory_addon && (
-                                                <select
-                                                    className="mb-1 h-8 w-full text-sm text-slate-600 shadow-none border-slate-200 bg-slate-50 px-2 rounded hover:border-slate-300 focus:border-slate-800 transition-all"
+                                                <AsyncAutocomplete
+                                                    searchEndpoint={route('erp.inventory.products.search')}
+                                                    placeholder="+ Load from Inventory..."
                                                     value={item.product_id || ''}
-                                                    onChange={e => {
-                                                        const productId = e.target.value;
-                                                        const product = products.find(p => String(p.id) === String(productId));
+                                                    onChange={(val) => {}}
+                                                    onSelectFull={(product) => {
                                                         const newItems = [...data.items];
-                                                        if (product) {
-                                                            newItems[index] = { 
-                                                                ...newItems[index], 
-                                                                product_id: productId,
-                                                                title: product.name,
-                                                                unit_price: parseFloat(product.price),
-                                                                description: product.sku ? `SKU: ${product.sku}` : '',
-                                                                uom: product.uom
-                                                            };
-                                                        } else {
-                                                            newItems[index] = { ...newItems[index], product_id: '', uom: null };
-                                                        }
+                                                        newItems[index] = { 
+                                                            ...newItems[index], 
+                                                            product_id: product.id,
+                                                            title: product.name,
+                                                            unit_price: parseFloat(product.price || 0),
+                                                            description: product.sku ? `SKU: ${product.sku}` : '',
+                                                            uom: product.uom
+                                                        };
                                                         setData('items', newItems);
                                                         if (itemErrors[index]) {
                                                             setItemErrors(prev => ({ ...prev, [index]: undefined }));
                                                         }
                                                     }}
-                                                >
-                                                    <option value="">+ Load from Inventory...</option>
-                                                    {products.map(p => (
-                                                        <option key={p.id} value={p.id}>{p.name} ({p.price})</option>
-                                                    ))}
-                                                </select>
+                                                    getDisplayName={(p) => `${p.name} (${p.price})`}
+                                                    className="mb-2"
+                                                />
                                             )}
                                             <Input
                                                 className={cn(

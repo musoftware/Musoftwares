@@ -82,6 +82,7 @@ Route::middleware(['web', 'auth:web,erp_team', 'tenant.active', 'erp.team.permis
         Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
 
         // ── Projects ──
+        Route::get('projects/search', [\Modules\ERP\app\Features\Projects\Controllers\ProjectController::class, 'search'])->name('projects.search');
         Route::get('projects/create', [\Modules\ERP\app\Features\Projects\Controllers\ProjectController::class, 'create'])->name('projects.create');
         Route::get('projects/{project}/edit', [\Modules\ERP\app\Features\Projects\Controllers\ProjectController::class, 'edit'])->name('projects.edit');
         Route::get('projects/{project}', [\Modules\ERP\app\Features\Projects\Controllers\ProjectController::class, 'show'])->name('projects.show');

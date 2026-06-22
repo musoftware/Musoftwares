@@ -103,9 +103,7 @@ class InvoiceController extends Controller
         $hasProjectsAddon = $user ? $user->hasModuleSubscription('erp-projects') : false;
         $hasInventoryAddon = $user ? $user->hasModuleSubscription('erp-inventory') : false;
 
-        $clients = TenantClient::with('currency')
-            ->where('tenant_id', $tenant->id)
-            ->get();
+
 
         $preSelectedProjectId = $request->query('project_id') ? (int) $request->query('project_id') : null;
         $preSelectedClientId = $request->query('client_id') ? (int) $request->query('client_id') : null;
@@ -134,16 +132,13 @@ class InvoiceController extends Controller
         }
 
         return Inertia::render('ERP/Invoices/Create', [
-            'clients'           => $clients,
-            'pre_selected_client' => $preSelectedClient,
-            'projects'          => $hasProjectsAddon ? \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get() : [],
             'has_projects_addon'=> $hasProjectsAddon,
-            'products'          => $hasInventoryAddon ? \Modules\ERP\Models\Product::where('tenant_id', $tenant->id)->where('is_active', true)->get() : [],
             'has_inventory_addon'=> $hasInventoryAddon,
             'currencies'        => Currency::all(),
             'business_currency' => $baseCurrency,
             'pre_selected_client_id' => $preSelectedClientId,
             'pre_selected_project_id' => $hasProjectsAddon ? $preSelectedProjectId : null,
+            'pre_selected_client' => $preSelectedClient,
         ]);
     }
 
@@ -211,9 +206,7 @@ class InvoiceController extends Controller
             throw new \Exception("Tenant base currency not found.");
         }
 
-        $clients = TenantClient::with('currency')
-            ->where('tenant_id', $tenant->id)
-            ->get();
+
 
         // Only send the invoice's current client
         $currentClient = $invoice->client ? [
@@ -225,11 +218,8 @@ class InvoiceController extends Controller
 
         return Inertia::render('ERP/Invoices/Edit', [
             'invoice'           => $invoice,
-            'clients'           => $clients,
             'pre_selected_client' => $currentClient,
-            'projects'          => $hasProjectsAddon ? \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get() : [],
             'has_projects_addon'=> $hasProjectsAddon,
-            'products'          => $hasInventoryAddon ? \Modules\ERP\Models\Product::where('tenant_id', $tenant->id)->where('is_active', true)->get() : [],
             'has_inventory_addon'=> $hasInventoryAddon,
             'currencies'        => Currency::all(),
             'business_currency' => $baseCurrency,

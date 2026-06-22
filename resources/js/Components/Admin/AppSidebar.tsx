@@ -146,21 +146,38 @@ export function AppSidebar() {
   const { auth } = props as any;
   const userRoles = auth?.user?.roles || [];
   
-  // If the user is purely a moderator and not an admin
-  const isOnlyModerator = userRoles.includes('moderator') && !userRoles.includes('admin') && !userRoles.includes('super_admin');
+  const isAdmin = userRoles.includes('admin') || userRoles.includes('super_admin');
+  const isAccountant = userRoles.includes('accountant') && !isAdmin;
+  const isSupportAgent = userRoles.includes('support_agent') && !isAdmin;
+  const isOnlyModerator = userRoles.includes('moderator') && !isAdmin;
 
-  // Filter items for moderators to ONLY see Operations -> Tickets
-  const visibleItems = isOnlyModerator
-    ? items.map(item => {
-        if (item.title === 'Operations') {
-            return {
-                ...item,
-                subItems: item.subItems?.filter(sub => sub.title === 'Tickets')
-            };
-        }
-        return null;
-    }).filter(Boolean) as typeof items
-    : items;
+  let visibleItems = items;
+
+  if (isAccountant) {
+      visibleItems = items.filter(item => 
+          ['Invoices', 'Finance & Business', 'Seller & Payout'].includes(item.title)
+      );
+  } else if (isSupportAgent) {
+      visibleItems = items.map(item => {
+          if (item.title === 'Operations') {
+              return {
+                  ...item,
+                  subItems: item.subItems?.filter(sub => sub.title === 'Tickets' || sub.title === 'Guest Tickets')
+              };
+          }
+          return null;
+      }).filter(Boolean) as typeof items;
+  } else if (isOnlyModerator) {
+      visibleItems = items.map(item => {
+          if (item.title === 'Operations') {
+              return {
+                  ...item,
+                  subItems: item.subItems?.filter(sub => sub.title === 'Tickets')
+              };
+          }
+          return null;
+      }).filter(Boolean) as typeof items;
+  }
 
   return (
     <Sidebar>

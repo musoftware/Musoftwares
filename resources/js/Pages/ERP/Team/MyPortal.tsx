@@ -213,7 +213,7 @@ export default function MyPortal({ todayLog, attendanceHistory, leaveRequests, p
                                     <Label>{__('erp.leave_type')}</Label>
                                     <Select 
                                         value={leaveForm.data.type} 
-                                        onValueChange={v => leaveForm.setData('type', v)}
+                                        onValueChange={v => leaveForm.setData('type', v || '')}
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder={__('erp.select_leave_type')} />

@@ -5,17 +5,19 @@ export function usePermissions() {
     const { auth } = usePage<PageProps>().props;
 
     const hasRole = (role: string | string[]) => {
-        if (!auth?.user?.roles) return false;
+        const userRoles = auth?.user?.roles;
+        if (!userRoles) return false;
         
         if (Array.isArray(role)) {
-            return role.some(r => auth.user.roles.includes(r.toLowerCase()));
+            return role.some(r => userRoles.includes(r.toLowerCase()));
         }
         
-        return auth.user.roles.includes(role.toLowerCase());
+        return userRoles.includes(role.toLowerCase());
     };
 
     const can = (permission: string | string[]) => {
-        if (!auth?.user?.permissions) return false;
+        const userPermissions = auth?.user?.permissions;
+        if (!userPermissions) return false;
 
         // Super admins can do everything
         if (hasRole('super_admin') || hasRole('admin')) {
@@ -23,10 +25,10 @@ export function usePermissions() {
         }
         
         if (Array.isArray(permission)) {
-            return permission.some(p => auth.user.permissions.includes(p.toLowerCase()));
+            return permission.some(p => userPermissions.includes(p.toLowerCase()));
         }
         
-        return auth.user.permissions.includes(permission.toLowerCase());
+        return userPermissions.includes(permission.toLowerCase());
     };
 
     return { hasRole, can };

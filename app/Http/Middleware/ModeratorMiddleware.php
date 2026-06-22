@@ -22,7 +22,7 @@ class ModeratorMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || !auth()->user()->hasAnyRole(['admin', 'Admin', 'super_admin', 'superadmin', 'moderator'])) {
+        if (!auth()->check() || !auth()->user()->hasAnyRole(['admin', 'Admin', 'super_admin', 'superadmin', 'moderator', 'support_agent'])) {
             abort(403, __('general.unauthorized_access'));
         }
 

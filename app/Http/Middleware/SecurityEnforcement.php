@@ -24,7 +24,7 @@ class SecurityEnforcement
     /**
      * Handle an incoming request.
      *
-     * @param  Closure(Request): (Response)  $next
+     * @param Closure(Request): (Response) $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -32,14 +32,18 @@ class SecurityEnforcement
 
         // 1. Check if IP is already blocked
         $isBlocked = Cache::remember("blocked_ip:{$ip}", 3600, function () use ($ip) {
-            $block = BlockedIp::where('ip_address', $ip)->first();
-            if (!$block) return false;
-            
-            if ($block->blocked_until && now()->greaterThan($block->blocked_until)) {
-                $block->delete();
+            try {
+                $block = BlockedIp::where('ip_address', $ip)->first();
+                if (!$block) return false;
+
+                if ($block->blocked_until && now()->greaterThan($block->blocked_until)) {
+                    $block->delete();
+                    return false;
+                }
+                return true;
+            } catch (\Exception $ex) {
                 return false;
             }
-            return true;
         });
 
         if ($isBlocked) {

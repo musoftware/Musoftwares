@@ -98,6 +98,25 @@ class ProjectController extends Controller implements HasMiddleware
         ]);
     }
 
+    public function search(Request $request)
+    {
+        $search = $request->input('q');
+        $tenant = $request->user()->tenant;
+        
+        if (!$tenant) {
+            return response()->json([]);
+        }
+
+        $projects = Project::where('tenant_id', $tenant->id)
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->limit(20)
+            ->get(['id', 'name', 'client_id']);
+            
+        return response()->json($projects);
+    }
+
     /**
      * Update the specified project in storage.
      */

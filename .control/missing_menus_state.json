@@ -20,25 +20,25 @@
     {
         "id": "acc2",
         "name": "Filter items array",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "acc3",
         "name": "Show only 'Invoices', 'Finance & Business', 'Seller & Payout'",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "support",
         "name": "2. Support Agent Role Isolation",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "sup1",
         "name": "Update AppSidebar.tsx for Support Agent",
-        "status": "pending",
+        "status": "running",
         "dependencies": []
     },
     {

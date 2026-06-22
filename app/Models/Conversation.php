@@ -17,7 +17,7 @@ class Conversation extends Model
         return $this->hasMany(Message::class);
     }
 
-    public function participants()
+    public function participants(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ConversationParticipant::class);
     }

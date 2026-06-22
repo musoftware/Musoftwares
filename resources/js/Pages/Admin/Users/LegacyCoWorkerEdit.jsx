@@ -3,6 +3,7 @@ import { Head, Link, useForm, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Users, Save, ChevronLeft, ArrowLeft } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
 import { __ } from '@/lib/i18n';
 
 export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {

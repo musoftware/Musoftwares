@@ -16,6 +16,7 @@ interface ClientAutocompleteProps {
     error?: string;
     className?: string;
     initialClient?: { id: number; name: string } | null;
+    searchEndpoint?: string;
 }
 
 export function ClientAutocomplete({
@@ -23,7 +24,8 @@ export function ClientAutocomplete({
     onChange,
     error,
     className,
-    initialClient
+    initialClient,
+    searchEndpoint
 }: ClientAutocompleteProps) {
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState('');
@@ -57,7 +59,9 @@ export function ClientAutocomplete({
         let active = true;
         setIsLoading(true);
 
-        axios.get(route('erp.clients.search'), {
+        const endpoint = searchEndpoint || route('erp.clients.search');
+
+        axios.get(endpoint, {
             params: { q: debouncedSearch }
         })
         .then(response => {

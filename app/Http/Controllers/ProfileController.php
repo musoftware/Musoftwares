@@ -46,7 +46,7 @@ class ProfileController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         if (session()->has('impersonator_id')) {
-            abort(403, __('general.impersonators_cannot_perform_this_action', default: 'Impersonators cannot perform this action.'));
+            abort(403, __('general.impersonators_cannot_perform_this_action'));
         }
 
         $request->validate([

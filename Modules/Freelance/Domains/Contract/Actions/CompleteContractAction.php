@@ -19,7 +19,7 @@ class CompleteContractAction
             throw new \Exception('Only active contracts can be completed.');
         }
 
-        DB::transaction(function () use ($contract, $client) {
+        DB::transaction(function () use ($contract) {
             // Update contract and job status
             $contract->update([
                 'status' => 'completed',

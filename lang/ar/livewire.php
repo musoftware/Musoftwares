@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'percentage' => 'percentage'
+    'percentage' => 'Percentage'
 ];

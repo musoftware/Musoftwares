@@ -113,7 +113,7 @@ export default function ReportsIndex({ kpis }: { kpis: any }) {
                                     <label className="text-sm font-medium">{__('reports.report_type') ?? 'Report Type'}</label>
                                     <Select 
                                         value={data.report_type} 
-                                        onValueChange={(val) => setData('report_type', val)}
+                                        onValueChange={(val) => setData('report_type', val || '')}
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder={__('reports.select_report_type') ?? 'Select Report Type'} />

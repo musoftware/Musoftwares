@@ -11,43 +11,39 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('transactions', function (Blueprint $table) {
-            $table->index(['type', 'created_at'], 'idx_transactions_type_created');
-            $table->index('created_at', 'idx_transactions_created');
-        });
+        $this->addIndexIfNotExists('transactions', ['type', 'created_at'], 'idx_transactions_type_created');
+        $this->addIndexIfNotExists('transactions', 'created_at', 'idx_transactions_created');
 
-        Schema::table('invoice_item_timers', function (Blueprint $table) {
-            $table->index('created_at', 'idx_timers_created');
-        });
+        $this->addIndexIfNotExists('invoice_item_timers', 'created_at', 'idx_timers_created');
 
-        Schema::table('users', function (Blueprint $table) {
-            $table->index('created_at', 'idx_users_created');
-            $table->index('subscription_date', 'idx_users_subscription');
-        });
+        $this->addIndexIfNotExists('users', 'created_at', 'idx_users_created');
+        $this->addIndexIfNotExists('users', 'subscription_date', 'idx_users_subscription');
 
-        Schema::table('cost_transactions', function (Blueprint $table) {
-            $table->index('created_at', 'idx_cost_transactions_created');
-        });
+        $this->addIndexIfNotExists('cost_transactions', 'created_at', 'idx_cost_transactions_created');
 
-        Schema::table('recurring_incomes', function (Blueprint $table) {
-            $table->index('current_date', 'idx_recurring_incomes_date');
-        });
+        $this->addIndexIfNotExists('recurring_incomes', 'current_date', 'idx_recurring_incomes_date');
 
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->index(['status', 'archive', 'created_at'], 'idx_invoices_status_archive_created');
-        });
+        $this->addIndexIfNotExists('invoices', ['status', 'archive', 'created_at'], 'idx_invoices_status_archive_created');
 
-        Schema::table('tickets', function (Blueprint $table) {
-            $table->index(['ticket_status', 'priority', 'created_at'], 'idx_tickets_status_priority_created');
-        });
+        $this->addIndexIfNotExists('tickets', ['ticket_status', 'priority', 'created_at'], 'idx_tickets_status_priority_created');
 
-        Schema::table('user_referral_request_withdraws', function (Blueprint $table) {
-            $table->index(['status', 'created_at'], 'idx_withdraw_status_created');
-        });
+        $this->addIndexIfNotExists('user_referral_request_withdraws', ['status', 'created_at'], 'idx_withdraw_status_created');
 
-        Schema::table('user_activities', function (Blueprint $table) {
-            $table->index('activity_date', 'idx_user_activities_date');
-        });
+        $this->addIndexIfNotExists('user_activities', 'activity_date', 'idx_user_activities_date');
+    }
+
+    private function addIndexIfNotExists(string $table, $columns, string $indexName): void
+    {
+        if (!\Illuminate\Support\Facades\Schema::hasTable($table)) {
+            return;
+        }
+        
+        $sm = \Illuminate\Support\Facades\Schema::getConnection()->getSchemaBuilder();
+        if (!$sm->hasIndex($table, $indexName)) {
+            \Illuminate\Support\Facades\Schema::table($table, function (Blueprint $t) use ($columns, $indexName) {
+                $t->index($columns, $indexName);
+            });
+        }
     }
 
     /**

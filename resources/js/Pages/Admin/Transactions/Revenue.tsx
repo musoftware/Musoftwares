@@ -82,7 +82,7 @@ export default function Revenue({ income, cost, filters, businessCurrency, filte
                     <p className="text-sm text-slate-500">{__('erp.view_combined_income_and_costs')}</p>
                 </div>
                 <Button asChild>
-                    <Link href="/admin/transactions/create">{__('erp.create_transaction')}</Link>
+                    <Link href={`/admin/transactions/create${filteredUser ? `?user_id=${filteredUser.id}` : ''}`}>{__('erp.create_transaction')}</Link>
                 </Button>
             </div>
 

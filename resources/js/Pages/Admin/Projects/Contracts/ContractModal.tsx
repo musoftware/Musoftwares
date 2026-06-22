@@ -68,7 +68,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
             setAiPrompt('');
         }
         setActiveTab('details');
-    }, [contract, isOpen]);
+    }, [contract, isOpen, project.client?.currency_id]);
 
     const handleGenerateAi = async () => {
         if (!aiPrompt) return alert('Please enter requirements for the AI to generate the contract.');

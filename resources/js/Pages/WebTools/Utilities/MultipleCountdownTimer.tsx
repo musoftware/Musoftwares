@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Head } from '@inertiajs/react';
 import WebToolsLayout from '@/Layouts/WebToolsLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -27,12 +27,29 @@ export default function MultipleCountdownTimer() {
     // We use a ref to hold an audio element so we don't trigger re-renders
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
+    const addTimer = useCallback((label?: string) => {
+        setTimers(prev => {
+            const defaultLabel = label || `Timer ${prev.length + 1}`;
+            const newTimer: TimerData = {
+                id: Math.random().toString(36).substring(2, 9),
+                label: defaultLabel,
+                hours: 0,
+                minutes: 0,
+                seconds: 0,
+                totalSeconds: 0,
+                remainingSeconds: 0,
+                isRunning: false
+            };
+            return [...prev, newTimer];
+        });
+    }, []);
+
     useEffect(() => {
         audioRef.current = new Audio('/sounds/mixkit-short-rooster-crowing-2470.wav');
         
         // Add a default timer
         addTimer('Timer 1');
-    }, []);
+    }, [addTimer]);
 
     // Main interval to tick timers
     useEffect(() => {
@@ -59,20 +76,7 @@ export default function MultipleCountdownTimer() {
         return () => clearInterval(interval);
     }, [toast]);
 
-    const addTimer = (label?: string) => {
-        const defaultLabel = label || `Timer ${timers.length + 1}`;
-        const newTimer: TimerData = {
-            id: Math.random().toString(36).substring(2, 9),
-            label: defaultLabel,
-            hours: 0,
-            minutes: 0,
-            seconds: 0,
-            totalSeconds: 0,
-            remainingSeconds: 0,
-            isRunning: false
-        };
-        setTimers(prev => [...prev, newTimer]);
-    };
+
 
     const handleAddClick = () => {
         addTimer(newLabel.trim());
