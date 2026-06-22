@@ -110,6 +110,21 @@ This section acts as a strict checklist for every expected route in the applicat
 | `/500` | Server error | Apologetic text. "Try Again" button. "Contact Support" link. |
 | `/503` | Maintenance mode | "We'll be right back" messaging. Estimated downtime display. |
 
+### 4.9. Missing Menus & Role Isolations (Identified Gaps)
+Based on the defined user roles (`accountant`, `support_agent`, `seller`), the following menu items and isolations are logically required but currently missing from the frontend implementation:
+
+1. **Accountant Role Isolation (Admin Panel)**
+   - **User Story:** As an Accountant, I want to access the Admin Panel and see ONLY the "Invoices", "Finance & Business", and "Seller & Payout" menus, so that I am not distracted by or given unauthorized access to System Settings, User Management, or Marketplace configurations.
+   - **Acceptance Criteria:** Update `AppSidebar.tsx` to check if the user is an `accountant` (and not an admin) and filter the `items` array to only show the relevant financial groups.
+
+2. **Support Agent Role Isolation (Admin Panel)**
+   - **User Story:** As a Support Agent, I want to access the Admin Panel and see ONLY the "Operations -> Tickets" and "Operations -> Guest Tickets" menus, so that I can focus solely on resolving user issues without accessing other operational or financial data.
+   - **Acceptance Criteria:** Update `AppSidebar.tsx` to check if the user is a `support_agent` and filter the `items` array accordingly.
+
+3. **Seller Dashboard (Frontend/Marketplace)**
+   - **User Story:** As a Seller on the Marketplace, I need a dedicated "Seller Portal" accessible from the main navigation, where I can manage my product listings, view sales, and request payouts.
+   - **Acceptance Criteria:** Create routes like `/seller/dashboard`, `/seller/products`, and `/seller/payouts`. Add a "Seller Portal" link in the Services Mega Menu or User Dropdown in `AuthenticatedLayout.tsx` that is visible if the user has the `seller` role.
+
 ---
 
 ## 5. Database & Service Logic Execution Rules
