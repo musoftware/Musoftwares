@@ -1,0 +1,234 @@
+[
+    {
+        "id": "Start",
+        "name": "Start: Large Data Optimization",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "Phase1",
+        "name": "Phase 1: High-Risk Components",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "HR1",
+        "name": "Admin/Projects/Index.tsx",
+        "status": "running",
+        "dependencies": [
+            "Phase1"
+        ]
+    },
+    {
+        "id": "HR1_A",
+        "name": "Convert projects table to Paginated DataTable",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "HR1_B",
+        "name": "Convert clients select to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "HR2",
+        "name": "ERP/Invoices/Create.jsx",
+        "status": "pending",
+        "dependencies": [
+            "Phase1"
+        ]
+    },
+    {
+        "id": "HR2_A",
+        "name": "Convert clients select to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "HR2_B",
+        "name": "Convert filteredProjects select to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "HR2_C",
+        "name": "Convert products select to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Phase2",
+        "name": "Phase 2: Client Dropdowns",
+        "status": "pending",
+        "dependencies": [
+            "HR1_B",
+            "HR2_A",
+            "HR2_B",
+            "HR2_C"
+        ]
+    },
+    {
+        "id": "CD1",
+        "name": "Admin/Tasks/AsList.tsx: Convert clients select to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "CD2",
+        "name": "Admin/Tasks/TaskCalendar.tsx: Convert clients select to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "CD3",
+        "name": "ERP/Tasks/Index.tsx: Convert clients select to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "CD4",
+        "name": "ERP/Contracts/Create.tsx: Convert clients select to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Phase3",
+        "name": "Phase 3: User Dropdowns",
+        "status": "pending",
+        "dependencies": [
+            "CD2",
+            "CD3",
+            "CD4"
+        ]
+    },
+    {
+        "id": "UD1",
+        "name": "Admin/Business/CostsEdit.tsx: Convert users to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "UD2",
+        "name": "Admin/EmployeeTodos/Index.tsx: Convert users to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "UD3",
+        "name": "Admin/Business/RecurringSalaries/Index.tsx: Convert users to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "UD4",
+        "name": "Admin/Business/RecurringSalaries/Edit.tsx: Convert users to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "UD5",
+        "name": "Admin/Finance/Index.tsx: Convert users to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "UD6",
+        "name": "Admin/SerialUserDevices/Assign.tsx: Convert users to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Phase4",
+        "name": "Phase 4: Project Dropdowns",
+        "status": "pending",
+        "dependencies": [
+            "UD2",
+            "UD3",
+            "UD4",
+            "UD5",
+            "UD6"
+        ]
+    },
+    {
+        "id": "PD1",
+        "name": "Admin/Business/CostsEdit.tsx: Convert projects to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "PD2",
+        "name": "Admin/Transactions/Transfer.tsx: Convert projects to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "PD3",
+        "name": "Admin/Transactions/Components/TransactionEntryForm.tsx: Convert projects to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "PD4",
+        "name": "ERP/Dashboard.tsx: Convert projects to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Phase5",
+        "name": "Phase 5: Tool Data Dropdowns",
+        "status": "pending",
+        "dependencies": [
+            "PD2",
+            "PD3",
+            "PD4"
+        ]
+    },
+    {
+        "id": "TD1",
+        "name": "Tools/WhatsApp/Workspaces/GroupsWorkspace.tsx: Convert groups to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "TD2",
+        "name": "Tools/WhatsApp/Workspaces/CampaignWorkspace.tsx: Convert presetsList/dbTags to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "TD3",
+        "name": "Tools/EmailSenderRunner.tsx: Convert lists/templates to Async Search Dropdown",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Phase6",
+        "name": "Phase 6: Unpaginated Data Tables",
+        "status": "pending",
+        "dependencies": [
+            "TD2",
+            "TD3"
+        ]
+    },
+    {
+        "id": "DT1",
+        "name": "Admin/Marketplace/Categories.tsx: Convert categories table to Paginated DataTable",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "DT2",
+        "name": "ERP/Referrals/Index.tsx: Convert clients table to Paginated DataTable",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "Done",
+        "name": "End: All Optimizations Complete",
+        "status": "pending",
+        "dependencies": [
+            "DT2"
+        ]
+    }
+]

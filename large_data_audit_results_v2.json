@@ -1,0 +1,805 @@
+[
+  {
+    "file": "resources/js\\Components\\CurrencySelect.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "currencies"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Components\\Tools\\SettingsModal.tsx",
+    "matches": [
+      [
+        "<select>",
+        "displayWallpapers"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\HoursCalendar.tsx",
+    "matches": [
+      [
+        "<select>",
+        "years"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Business\\BalanceReport.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "years"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Business\\CostsCreate.tsx",
+    "matches": [
+      [
+        "PremiumCombobox",
+        "currencies"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Business\\CostsEdit.tsx",
+    "matches": [
+      [
+        "PremiumCombobox",
+        "currencies"
+      ],
+      [
+        "PremiumCombobox",
+        "users"
+      ],
+      [
+        "PremiumCombobox",
+        "projects"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Business\\RecurringCosts\\Create.tsx",
+    "matches": [
+      [
+        "<select>",
+        "weekDays"
+      ],
+      [
+        "<select>",
+        "monthDays"
+      ],
+      [
+        "<select>",
+        "yearDaysList"
+      ],
+      [
+        "<select>",
+        "currenciesList"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Business\\RecurringCosts\\Edit.tsx",
+    "matches": [
+      [
+        "<select>",
+        "weekDays"
+      ],
+      [
+        "<select>",
+        "monthDays"
+      ],
+      [
+        "<select>",
+        "yearDaysList"
+      ],
+      [
+        "<select>",
+        "currenciesList"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Business\\RecurringIncome\\Edit.tsx",
+    "matches": [
+      [
+        "<select>",
+        "weekDays"
+      ],
+      [
+        "<select>",
+        "monthDays"
+      ],
+      [
+        "<select>",
+        "yearDaysList"
+      ],
+      [
+        "<select>",
+        "currenciesList"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Business\\RecurringIncome\\Index.tsx",
+    "matches": [
+      [
+        "<select>",
+        "weekDays"
+      ],
+      [
+        "<select>",
+        "monthDays"
+      ],
+      [
+        "<select>",
+        "yearDaysList"
+      ],
+      [
+        "<select>",
+        "currenciesList"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Business\\RecurringSalaries\\Edit.tsx",
+    "matches": [
+      [
+        "<select>",
+        "yearDaysList"
+      ],
+      [
+        "<select>",
+        "currenciesList"
+      ],
+      [
+        "<select>",
+        "monthDays"
+      ],
+      [
+        "<select>",
+        "usersList"
+      ],
+      [
+        "<select>",
+        "weekDays"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Business\\RecurringSalaries\\Index.tsx",
+    "matches": [
+      [
+        "<select>",
+        "yearDaysList"
+      ],
+      [
+        "<select>",
+        "currenciesList"
+      ],
+      [
+        "<select>",
+        "monthDays"
+      ],
+      [
+        "<select>",
+        "usersList"
+      ],
+      [
+        "<select>",
+        "weekDays"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\BusyTimes\\Index.tsx",
+    "matches": [
+      [
+        "<select>",
+        "DAYS_OF_WEEK"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\EmployeeTodos\\Index.tsx",
+    "matches": [
+      [
+        "PremiumCombobox",
+        "users"
+      ],
+      [
+        "<SelectContent>",
+        "users"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Finance\\Index.tsx",
+    "matches": [
+      [
+        "<select>",
+        "categoriesList"
+      ],
+      [
+        "<select>",
+        "users"
+      ],
+      [
+        "<select>",
+        "currenciesList"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Invoices\\Index.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "bulkActionOptions"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Marketplace\\Edit.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "categories"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Projects\\Index.tsx",
+    "matches": [
+      [
+        "<select>",
+        "clients"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Projects\\Contracts\\ContractModal.tsx",
+    "matches": [
+      [
+        "<select>",
+        "currencies"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\SerialDevices\\Index.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "perPageOptions"
+      ],
+      [
+        "<SelectContent>",
+        "softwares"
+      ],
+      [
+        "<SelectContent>",
+        "osVersions"
+      ],
+      [
+        "<SelectContent>",
+        "statuses"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\SerialUserDevices\\Assign.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "users"
+      ],
+      [
+        "<SelectContent>",
+        "availableDevices"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\SerialUserDevices\\Index.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "statuses"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Tasks\\AsList.tsx",
+    "matches": [
+      [
+        "<select>",
+        "clients"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Tasks\\TaskCalendar.tsx",
+    "matches": [
+      [
+        "<select>",
+        "clients"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Tickets\\Show.tsx",
+    "matches": [
+      [
+        "<select>",
+        "supportAgents"
+      ],
+      [
+        "<select>",
+        "cannedResponses"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Tools\\Create.tsx",
+    "matches": [
+      [
+        "<select>",
+        "OS_OPTIONS"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Tools\\Edit.tsx",
+    "matches": [
+      [
+        "<select>",
+        "OS_OPTIONS"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Transactions\\Transfer.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "activeProjects"
+      ],
+      [
+        "<SelectContent>",
+        "currencies"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Transactions\\Components\\TransactionEntryForm.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "activeProjects"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Users\\AddSubscription.jsx",
+    "matches": [
+      [
+        "<select>",
+        "serviceItems"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Users\\Create.jsx",
+    "matches": [
+      [
+        "<select>",
+        "plans"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Users\\Edit.jsx",
+    "matches": [
+      [
+        "<select>",
+        "plans"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Users\\Notes.jsx",
+    "matches": [
+      [
+        "<select>",
+        "filteredNotes"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Users\\Show.jsx",
+    "matches": [
+      [
+        "<select>",
+        "modulePlans"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Admin\\Users\\UserLoansTab.jsx",
+    "matches": [
+      [
+        "<select>",
+        "currencies"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Booking\\Appointments.tsx",
+    "matches": [
+      [
+        "<select>",
+        "providers"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Booking\\Exceptions.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "providers"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\CRM\\Sequences\\Show.tsx",
+    "matches": [
+      [
+        "<select>",
+        "generatedSteps"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\ERP\\Dashboard.tsx",
+    "matches": [
+      [
+        "<select>",
+        "calendarCells"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\ERP\\Contracts\\Create.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "clients"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\ERP\\Inventory\\Products\\Create.tsx",
+    "matches": [
+      [
+        "<select>",
+        "categories"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\ERP\\Inventory\\Products\\Edit.tsx",
+    "matches": [
+      [
+        "<select>",
+        "categories"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\ERP\\Invoices\\Create.jsx",
+    "matches": [
+      [
+        "<select>",
+        "products"
+      ],
+      [
+        "<select>",
+        "clients"
+      ],
+      [
+        "<select>",
+        "filteredProjects"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\ERP\\PaymentMethods\\Index.jsx",
+    "matches": [
+      [
+        "<select>",
+        "paymentMethods"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\ERP\\Recurring\\RecurringForm.jsx",
+    "matches": [
+      [
+        "<select>",
+        "months"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\ERP\\Tasks\\Index.tsx",
+    "matches": [
+      [
+        "<select>",
+        "clients"
+      ],
+      [
+        "<SelectContent>",
+        "clients"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\ERP\\Team\\MyPortal.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "leaveRequests"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\GoldSavers\\Reports\\Index.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "wallets"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\GoldSavers\\Wallets\\Index.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "goalTypes"
+      ],
+      [
+        "<SelectContent>",
+        "filteredWallets"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\iSaaS\\Contracts\\Components\\ContractForm.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "clientSearchResults"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Marketplace\\Services\\Steps\\PricingStep.tsx",
+    "matches": [
+      [
+        "<select>",
+        "CURRENCIES"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\SmsPaymentGateway\\SmsSimulator.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "devices"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\SmsPaymentGateway\\Wallets.tsx",
+    "matches": [
+      [
+        "<select>",
+        "wallets"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\ArticleMakerRunner.tsx",
+    "matches": [
+      [
+        "<select>",
+        "AUDIENCES"
+      ],
+      [
+        "<select>",
+        "SOURCES"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\EmailSenderRunner.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "templates"
+      ],
+      [
+        "<SelectContent>",
+        "accounts"
+      ],
+      [
+        "<SelectContent>",
+        "lists"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\ExcelMergerRunner.tsx",
+    "matches": [
+      [
+        "<select>",
+        "transformations"
+      ],
+      [
+        "<select>",
+        "headers"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\FbInboxSenderRunner.tsx",
+    "matches": [
+      [
+        "<select>",
+        "profiles"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\GoogleMapsRunner.tsx",
+    "matches": [
+      [
+        "<select>",
+        "campaigns"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\OlxB2CFinderRunner.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "countries"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\OpensooqRunner.tsx",
+    "matches": [
+      [
+        "<select>",
+        "COUNTRIES"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\PropertyFinderRunner.tsx",
+    "matches": [
+      [
+        "<select>",
+        "COUNTRIES"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\TikTokIntelligenceRunner.tsx",
+    "matches": [
+      [
+        "<select>",
+        "NICHES"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\WaAiAgentRunner.tsx",
+    "matches": [
+      [
+        "<select>",
+        "agents"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\SnapDownloader\\components\\workspaces\\AutomationsWorkspace.tsx",
+    "matches": [
+      [
+        "<select>",
+        "automations"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\WhatsApp\\Components\\Sidebar.tsx",
+    "matches": [
+      [
+        "<select>",
+        "sessions"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\WhatsApp\\Workspaces\\BroadcastListsWorkspace.tsx",
+    "matches": [
+      [
+        "<select>",
+        "sessions"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\WhatsApp\\Workspaces\\CampaignWorkspace.tsx",
+    "matches": [
+      [
+        "<select>",
+        "presetsList"
+      ],
+      [
+        "<select>",
+        "dbTags"
+      ],
+      [
+        "<select>",
+        "steps"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\WhatsApp\\Workspaces\\GroupCampaignWorkspace.tsx",
+    "matches": [
+      [
+        "<select>",
+        "connectedSessions"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\Tools\\WhatsApp\\Workspaces\\GroupsWorkspace.tsx",
+    "matches": [
+      [
+        "<select>",
+        "groups"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\WebTools\\Financial\\PayGuest.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "payGuestCurrencies"
+      ]
+    ]
+  },
+  {
+    "file": "resources/js\\Pages\\WebTools\\Financial\\WithdrawInstapay.tsx",
+    "matches": [
+      [
+        "<SelectContent>",
+        "withdrawInstapayCurrencies"
+      ]
+    ]
+  }
+]
