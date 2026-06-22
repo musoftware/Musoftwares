@@ -281,8 +281,8 @@ export default function Income() {
             </div>
 
             <Card className="border-none shadow-sm shadow-slate-200/50">
-                <CardHeader className="pb-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
+                <CardHeader className="pb-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4">
+                    <div className="flex-1">
                         <CardTitle className="text-lg font-semibold text-slate-900">{__('general.income_entries')}</CardTitle>
                         <CardDescription>{__('general.recent_income_transactions')}</CardDescription>
                     </div>
