@@ -322,7 +322,13 @@
             "edit_cost": "تعديل التكلفة",
             "edit_direct_cost": "تعديل التكلفة المباشرة",
             "edit_direct_cost_description": "تحديث تفاصيل التكلفة المباشرة",
-            "reverse_transaction": "عكس المعاملة"
+            "reverse_transaction": "عكس المعاملة",
+            "cannot_delete_paid_payout": "لا يمكن حذف عملية دفع مدفوعة.",
+            "cannot_edit_paid_payout": "لا يمكن تعديل عملية دفع مدفوعة.",
+            "payout_created": "تم إنشاء عملية الدفع بنجاح.",
+            "payout_deleted": "تم حذف عملية الدفع بنجاح.",
+            "payout_marked_paid": "تم تحديد عملية الدفع كمدفوعة.",
+            "payout_updated": "تم تحديث عملية الدفع بنجاح."
         },
         "auth": {
             "failed": "Failed",
@@ -9383,7 +9389,13 @@
             "edit_cost": "Edit Cost",
             "edit_direct_cost": "Edit Direct Cost",
             "edit_direct_cost_description": "Update the details of this direct cost",
-            "reverse_transaction": "Reverse Transaction"
+            "reverse_transaction": "Reverse Transaction",
+            "cannot_delete_paid_payout": "Cannot delete a paid payout.",
+            "cannot_edit_paid_payout": "Cannot edit a paid payout.",
+            "payout_created": "Payout created successfully.",
+            "payout_deleted": "Payout deleted successfully.",
+            "payout_marked_paid": "Payout marked as paid.",
+            "payout_updated": "Payout updated successfully."
         },
         "auth": {
             "failed": "Failed",

@@ -303,4 +303,10 @@ return [
     'edit_direct_cost' => 'تعديل التكلفة المباشرة',
     'edit_direct_cost_description' => 'تحديث تفاصيل التكلفة المباشرة',
     'reverse_transaction' => 'عكس المعاملة',
+    'cannot_delete_paid_payout' => 'لا يمكن حذف عملية دفع مدفوعة.',
+    'cannot_edit_paid_payout' => 'لا يمكن تعديل عملية دفع مدفوعة.',
+    'payout_created' => 'تم إنشاء عملية الدفع بنجاح.',
+    'payout_deleted' => 'تم حذف عملية الدفع بنجاح.',
+    'payout_marked_paid' => 'تم تحديد عملية الدفع كمدفوعة.',
+    'payout_updated' => 'تم تحديث عملية الدفع بنجاح.',
 ];

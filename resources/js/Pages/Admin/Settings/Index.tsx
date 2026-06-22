@@ -67,6 +67,7 @@ interface SettingsData {
 interface Props {
     currencies: Currency[];
     whatsappChannels: WhatsAppChannel[];
+    settings: SettingsData;
     hasGoogleCalendar?: boolean;
     overheadHourlyRateEgp: number;
 }
