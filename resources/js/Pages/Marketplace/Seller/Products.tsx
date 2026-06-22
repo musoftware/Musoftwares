@@ -5,6 +5,7 @@ import { formatMoney, formatDate } from '@/lib/utils';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { SellerNav } from '@/Components/Marketplace/Seller/SellerNav';
 
 export default function SellerProducts({ products }: any) {
     return (
@@ -19,10 +20,13 @@ export default function SellerProducts({ products }: any) {
                             href="/marketplace/services/create"
                             className="inline-flex items-center justify-center bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs h-9 px-3.5 rounded-lg transition-colors shadow-sm"
                         >
-                            <Plus className="w-3.5 h-3.5 me-1.5" /> Publish New
+                            <Plus className="h-3.5 w-3.5 mr-1.5" />
+                            Create Product
                         </Link>
                     }
                 />
+
+                <SellerNav />
 
                 <OperationalCard noPadding>
                     <div className="divide-y divide-slate-100">

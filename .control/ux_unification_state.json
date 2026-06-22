@@ -2,25 +2,25 @@
     {
         "id": "Start",
         "name": "Start UX Unification",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Cat_BP",
         "name": "1. Button Placements",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Cat_SL",
         "name": "2. Spacing & Layout Widths",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Cat_CT",
         "name": "3. Colors and Typography",
-        "status": "pending",
+        "status": "running",
         "dependencies": []
     },
     {

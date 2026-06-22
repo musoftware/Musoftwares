@@ -58,7 +58,7 @@ export default function AddBalance({ wallet }) {
         <AuthenticatedLayout header={undefined}>
             <Head title={__('general.add_balance')} />
 
-            <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+            <div className="max-w-7xl w-full mx-auto px-4 py-8 space-y-6">
                 {/* Header */}
                 <div className="space-y-1">
                     <Link

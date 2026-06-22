@@ -41,7 +41,7 @@ export default function Backup({ auth, flash }) {
         <AuthenticatedLayout user={auth.user} header={<h2 className="font-semibold text-xl text-slate-800 leading-tight">{__('general.data_management')}</h2>}>
             <Head title={__('general.backup_restore')} />
 
-            <div className="py-12 max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-8">
+            <div className="py-12 max-w-7xl w-full mx-auto sm:px-6 lg:px-8 space-y-8">
                 
                 {flash?.success && (
                     <Alert className="bg-emerald-50 border-emerald-200 text-emerald-800">

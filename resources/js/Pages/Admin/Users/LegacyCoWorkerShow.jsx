@@ -45,7 +45,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                     <ArrowLeft className="w-4 h-4 me-1" />{__('general.back_to_co_work')}</Link>
             </div>
 
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden max-w-4xl">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden max-w-7xl mx-auto w-full">
                 {/* Header Section */}
                 <div className="p-6 sm:p-8 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between">
                     <div className="flex items-center gap-5">

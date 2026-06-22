@@ -18,7 +18,7 @@ export default function EditJob({ auth, job }) {
 
     return (
         <FreelanceLayout>
-            <div className="mx-auto max-w-2xl">
+            <div className="mx-auto max-w-7xl w-full">
                 <h2 className="mb-6 text-2xl font-bold">
                     {__('freelance.edit_job')}: {job.title}
                 </h2>

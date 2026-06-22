@@ -14,6 +14,7 @@ import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { MetricCard } from '@/Components/ui/MetricCard';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { SellerNav } from '@/Components/Marketplace/Seller/SellerNav';
 
 export default function SellerDashboard({ stats, recent_orders }: any) {
     return (
@@ -24,6 +25,8 @@ export default function SellerDashboard({ stats, recent_orders }: any) {
                     title="Seller Dashboard"
                     description="Overview of your seller account, sales, and products."
                 />
+
+                <SellerNav />
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <MetricCard 

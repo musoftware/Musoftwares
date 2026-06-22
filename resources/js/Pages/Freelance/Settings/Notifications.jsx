@@ -47,7 +47,7 @@ export default function NotificationSettings({ profile }) {
         <FreelanceLayout>
             <Head title={__('general.settings')} />
 
-            <div className="max-w-3xl mx-auto space-y-6">
+            <div className="max-w-7xl w-full mx-auto space-y-6">
                 <div className="flex items-center gap-3 mb-6">
                     <Settings className="w-8 h-8 text-emerald-600" />
                     <h1 className="text-2xl font-bold text-slate-900">{__('general.settings')}</h1>

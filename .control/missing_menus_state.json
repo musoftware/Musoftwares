@@ -84,7 +84,7 @@
     {
         "id": "sel4",
         "name": "/seller/payouts",
-        "status": "running",
+        "status": "done",
         "dependencies": [
             "sel1"
         ]
@@ -92,13 +92,13 @@
     {
         "id": "sel5",
         "name": "Update AuthenticatedLayout.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "sel6",
         "name": "Add Seller Portal link for seller role in Services Mega Menu or User Dropdown",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     }
 ]

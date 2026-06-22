@@ -24,7 +24,7 @@ export default function Show({ proposal }: { proposal: any }) {
                 </Button>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6 max-w-4xl">
+            <div className="bg-white rounded-lg shadow p-6 max-w-7xl mx-auto w-full">
                 <div className="flex justify-between items-start border-b pb-4 mb-4">
                     <div>
                         <h2 className="text-xl font-bold text-gray-900 mb-1">
