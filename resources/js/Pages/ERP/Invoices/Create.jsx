@@ -9,6 +9,7 @@ import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { useToast } from '@/Components/ui/use-toast';
 import { Plus, Trash2, Clock, Send, ChevronDown, ChevronUp, DollarSign, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 function FieldError({ message }) {
     if (!message) return null;
@@ -183,7 +184,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                     </div>
                     <div className="flex items-center gap-3">
                         <Button type="button" variant="ghost" asChild className="hover:bg-slate-100 text-slate-600">
-                            <Link href={route('erp.invoices.index')}>Cancel</Link>
+                            <Link href={route('erp.invoices.index')}>{__('general.cancel')}</Link>
                         </Button>
                         <Button
                             type="submit"
@@ -207,7 +208,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                         <div className="md:col-span-8 bg-white p-6 rounded-xl border border-slate-100 shadow-sm space-y-6">
                             <div className="space-y-1.5">
                                 <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    Client <span className="text-red-500">*</span>
+                                    {__('general.client')}<span className="text-red-500">*</span>
                                 </Label>
                                 <select
                                     className={cn(
@@ -265,8 +266,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                 </div>
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Currency
-                                    </Label>
+                                        {__('general.currency')}</Label>
                                     <Input
                                         className="h-11 rounded-lg border-slate-200 bg-slate-100/50 text-slate-700 font-medium"
                                         value={data.amount_currency}
@@ -317,8 +317,8 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                             <div className="flex items-center px-6 py-3 border-b border-slate-100 bg-slate-50/50 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
                                 <div className="flex-1">{__('general.item_description')}</div>
                                 <div className="w-24 text-end">Qty</div>
-                                <div className="w-32 text-end">Price</div>
-                                <div className="w-32 text-end">Total</div>
+                                <div className="w-32 text-end">{__('general.price')}</div>
+                                <div className="w-32 text-end">{__('general.total')}</div>
                                 <div className="w-10" />
                             </div>
 
@@ -507,11 +507,11 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                         <div className="md:col-span-6 md:ps-12">
                             <div className="bg-slate-50 rounded-xl p-6 border border-slate-100 space-y-4">
                                 <div className="flex justify-between items-center text-sm">
-                                    <span className="text-slate-500 font-medium">Subtotal</span>
+                                    <span className="text-slate-500 font-medium">{__('general.subtotal')}</span>
                                     <CurrencyDisplay amount={subtotal} currency={data.amount_currency} />
                                 </div>
                                 <div className="flex justify-between items-center text-sm">
-                                    <span className="text-slate-500 font-medium">Discount</span>
+                                    <span className="text-slate-500 font-medium">{__('general.discount')}</span>
                                     <div className="w-24">
                                         <Input
                                             type="number"

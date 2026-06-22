@@ -77,7 +77,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                                             <div className="flex items-center gap-1.5 mt-0.5">
                                                 <span className="text-xs text-slate-400 font-mono">v{t.version}</span>
                                                 <span className="w-1 h-1 rounded-full bg-emerald-400 inline-block" />
-                                                <span className="text-xs text-emerald-600 font-medium">Active</span>
+                                                <span className="text-xs text-emerald-600 font-medium">{__('general.active')}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -144,8 +144,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                             <CardHeader className="pb-2">
                                 <CardTitle className="flex items-center gap-3 text-sm">
                                     <Globe className="h-5 w-5 text-emerald-500" />{__('general.browser_extension')}<Badge className="ms-2 text-[10px] uppercase tracking-wider bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800 shadow-none">
-                                        New
-                                    </Badge>
+                                        {__('general.new')}</Badge>
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="flex-1">
@@ -187,8 +186,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                                         <span className="text-xs text-slate-400">{d.downloaded_at}</span>
                                         <Link href={route('tools.show', d.tool.slug)}>
                                             <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-indigo-600">
-                                                <ExternalLink className="h-3 w-3" /> Open
-                                            </Button>
+                                                <ExternalLink className="h-3 w-3" /> {__('general.open')}</Button>
                                         </Link>
                                     </div>
                                 </div>

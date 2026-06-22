@@ -122,7 +122,7 @@ function AnalysisCard({ a, idx }: { a: any; idx: number }) {
                     {/* Improvement suggestions */}
                     {a.suggestions?.length > 0 && (
                         <div className="space-y-2">
-                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">Improvements</p>
+                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">{__('general.improvements')}</p>
                             {a.suggestions.map((s: any, i: number) => (
                                 <div key={i} className={`flex items-start gap-2 px-3 py-2.5 rounded-xl border ${s.priority === 'high' ? 'bg-rose-50 border-rose-100' : 'bg-amber-50 border-amber-100'}`}>
                                     <AlertCircle className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${s.priority === 'high' ? 'text-rose-500' : 'text-amber-500'}`} />

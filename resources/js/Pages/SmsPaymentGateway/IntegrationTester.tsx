@@ -142,7 +142,7 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
                                 ) : (
                                     <div className="p-4 space-y-6">
                                         <div>
-                                            <h3 className="text-slate-400 mb-2 uppercase tracking-wider font-semibold border-b border-slate-800 pb-1">Status</h3>
+                                            <h3 className="text-slate-400 mb-2 uppercase tracking-wider font-semibold border-b border-slate-800 pb-1">{__('general.status')}</h3>
                                             {result.success && result.status >= 200 && result.status < 300 ? (
                                                 <div className="flex items-center text-emerald-400 gap-2 text-sm">
                                                     <CheckCircle className="w-4 h-4" /> HTTP {result.status} OK

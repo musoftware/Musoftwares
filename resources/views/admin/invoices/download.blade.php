@@ -151,7 +151,7 @@
             border-top: 1px solid #e2e8f0;
         }
 
-        .items-table th.text-right {
+        .items-table th.text-end {
             text-align: right;
         }
 
@@ -170,7 +170,7 @@
             background-color: #f8f9fc;
         }
 
-        .items-table td.text-right {
+        .items-table td.text-end {
             text-align: right;
         }
 
@@ -302,8 +302,8 @@
                     <th style="width: 5%;" class="text-center">#</th>
                     <th style="width: 50%;">{{ __('erp.description') }}</th>
                     <th style="width: 15%;" class="text-center">{{ __('erp.qty') }}</th>
-                    <th style="width: 15%;" class="text-right">{{ __('erp.rate') }}</th>
-                    <th style="width: 15%;" class="text-right">{{ __('erp.total') }}</th>
+                    <th style="width: 15%;" class="text-end">{{ __('erp.rate') }}</th>
+                    <th style="width: 15%;" class="text-end">{{ __('erp.total') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -316,13 +316,13 @@
                         <td class="text-center">
                             {{ $item->qty }}
                         </td>
-                        <td class="text-right money-code">
+                        <td class="text-end money-code">
                             @php
                                 $true_rate = $item->qty > 0 ? ($item->total() / $item->qty) : 0;
                             @endphp
                             {{ \App\Helpers\FinanceHelper::instance()->format_money($true_rate, $invoice->currency_id) }}
                         </td>
-                        <td class="text-right money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($item->total(), $invoice->currency_id) }}</td>
+                        <td class="text-end money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($item->total(), $invoice->currency_id) }}</td>
                     </tr>
                 @empty
                     <tr>

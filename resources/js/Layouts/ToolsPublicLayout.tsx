@@ -68,7 +68,7 @@ export default function ToolsPublicLayout({
                                 musoftware
                             </span>
                             <span className="hidden sm:block text-slate-300 text-xs font-light">/</span>
-                            <span className="hidden sm:block text-[13px] font-medium text-slate-500">Tools</span>
+                            <span className="hidden sm:block text-[13px] font-medium text-slate-500">{__('general.tools')}</span>
                         </Link>
 
                         {/* Nav tabs */}
@@ -102,8 +102,7 @@ export default function ToolsPublicLayout({
                                     onClick={() => router.visit(route('dashboard'))}
                                     className="text-[13px] text-slate-500 hover:text-slate-800 h-8"
                                 >
-                                    Dashboard
-                                </Button>
+                                    {__('general.dashboard')}</Button>
                             ) : (
                                 <>
                                     <Link href={route('login')}>
@@ -122,7 +121,7 @@ export default function ToolsPublicLayout({
                                             className="gap-1.5 text-[13px] bg-slate-900 hover:bg-slate-800 text-white h-8 px-3.5"
                                         >
                                             <UserPlus className="h-3.5 w-3.5" />
-                                            <span className="hidden sm:inline">Register</span>
+                                            <span className="hidden sm:inline">{__('general.register')}</span>
                                         </Button>
                                     </Link>
                                 </>
@@ -149,8 +148,8 @@ export default function ToolsPublicLayout({
                         </div>
                         <div className="flex items-center gap-6 text-xs text-slate-400">
                             <span>© {new Date().getFullYear()} musoftware</span>
-                            <Link href="/" className="hover:text-slate-600 transition-colors">Home</Link>
-                            <Link href={route('tools.explore')} className="hover:text-slate-600 transition-colors">Marketplace</Link>
+                            <Link href="/" className="hover:text-slate-600 transition-colors">{__('general.home')}</Link>
+                            <Link href={route('tools.explore')} className="hover:text-slate-600 transition-colors">{__('general.marketplace')}</Link>
                         </div>
                     </div>
                 </div>

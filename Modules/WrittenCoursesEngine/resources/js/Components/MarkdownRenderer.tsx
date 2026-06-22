@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import mermaid from 'mermaid';
+import { __ } from '@/lib/i18n';
 
 interface MarkdownRendererProps {
     content: string;
@@ -39,10 +40,9 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
                             <div className="relative group">
                                 <button
                                     onClick={() => navigator.clipboard.writeText(String(children))}
-                                    className="absolute right-2 top-2 p-1.5 bg-gray-700 hover:bg-gray-600 text-white rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="absolute end-2 top-2 p-1.5 bg-gray-700 hover:bg-gray-600 text-white rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                                 >
-                                    Copy
-                                </button>
+                                    {__('general.copy')}</button>
                                 <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono mt-4 mb-4">
                                     <code className={className} {...props}>
                                         {children}

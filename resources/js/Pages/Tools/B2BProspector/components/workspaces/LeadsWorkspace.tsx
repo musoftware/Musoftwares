@@ -104,7 +104,7 @@ export function LeadsWorkspace(props: LeadsWorkspaceProps) {
                         <option value="valid">{__('general.verified_clean')}</option>
                         <option value="invalid">{__('general.risky_bounce')}</option>
                         <option value="catchall">{__('general.accept_all')}</option>
-                        <option value="unverified">Unverified</option>
+                        <option value="unverified">{__('general.unverified')}</option>
                     </select>
                 </div>
             </div>
@@ -121,7 +121,7 @@ export function LeadsWorkspace(props: LeadsWorkspaceProps) {
                         <table className="w-full text-start border-collapse">
                             <thead>
                                 <tr className="bg-slate-50/50 border-b border-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
-                                    <th className="p-4 ps-6">Profile</th>
+                                    <th className="p-4 ps-6">{__('general.profile')}</th>
                                     <th className="p-4">{__('general.corporate_role')}</th>
                                     <th className="p-4">{__('general.contact_info')}</th>
                                     <th className="p-4">{__('general.quality_score')}</th>
@@ -180,12 +180,12 @@ export function LeadsWorkspace(props: LeadsWorkspaceProps) {
                                 onClick={() => props.setLeadsOffset(prev => Math.max(0, prev - props.leadsLimit))}
                                 disabled={props.leadsOffset === 0}
                                 variant="outline" size="sm"
-                            >Back</Button>
+                            >{__('general.back')}</Button>
                             <Button 
                                 onClick={() => props.setLeadsOffset(prev => prev + props.leadsLimit)}
                                 disabled={props.leadsOffset + props.leadsLimit >= props.totalLeads}
                                 variant="outline" size="sm"
-                            >Next</Button>
+                            >{__('general.next')}</Button>
                         </div>
                     </div>
                 </div>

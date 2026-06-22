@@ -30,11 +30,11 @@ export default function AffiliatePayoutsIndex({ payouts }: any) {
                         <TableHeader>
                             <TableRow className="bg-gray-50/80">
                                 <TableHead className="font-semibold text-gray-600">ID</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Method</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Account</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.method')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.account')}</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Amount (EGP)</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Status</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Date</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.status')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.date')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -55,9 +55,9 @@ export default function AffiliatePayoutsIndex({ payouts }: any) {
                                         </TableCell>
                                         <TableCell className="font-semibold">{payout.amount}</TableCell>
                                         <TableCell>
-                                            {payout.status === 'pending' && <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-none"><Clock className="w-3 h-3 me-1" /> Pending</Badge>}
-                                            {payout.status === 'approved' && <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-none"><CheckCircle2 className="w-3 h-3 me-1" /> Approved</Badge>}
-                                            {payout.status === 'declined' && <Badge className="bg-red-100 text-red-800 hover:bg-red-100 border-none"><XCircle className="w-3 h-3 me-1" /> Declined</Badge>}
+                                            {payout.status === 'pending' && <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-none"><Clock className="w-3 h-3 me-1" /> {__('general.pending')}</Badge>}
+                                            {payout.status === 'approved' && <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-none"><CheckCircle2 className="w-3 h-3 me-1" /> {__('general.approved')}</Badge>}
+                                            {payout.status === 'declined' && <Badge className="bg-red-100 text-red-800 hover:bg-red-100 border-none"><XCircle className="w-3 h-3 me-1" /> {__('general.declined')}</Badge>}
                                         </TableCell>
                                         <TableCell className="text-sm text-gray-500">
                                             {new Date(payout.created_at).toLocaleDateString()}

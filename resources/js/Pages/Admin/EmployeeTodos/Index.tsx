@@ -308,16 +308,14 @@ export default function Index({ todos, filters, stats, users }: Props) {
                         <MoreHorizontal className="h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuLabel>{__('general.actions')}</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => openEdit(t)}>
-                            <Pencil className="me-2 h-4 w-4" /> Edit
-                        </DropdownMenuItem>
+                            <Pencil className="me-2 h-4 w-4" /> {__('general.edit')}</DropdownMenuItem>
                         <DropdownMenuItem
                             className="text-red-600 focus:text-red-600"
                             onClick={() => setDeleteId(t.id)}
                         >
-                            <Trash2 className="me-2 h-4 w-4" /> Delete
-                        </DropdownMenuItem>
+                            <Trash2 className="me-2 h-4 w-4" /> {__('general.delete')}</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             ),
@@ -334,10 +332,10 @@ export default function Index({ todos, filters, stats, users }: Props) {
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="all">{__('general.all_frequencies')}</SelectItem>
-                    <SelectItem value="day">Daily</SelectItem>
-                    <SelectItem value="week">Weekly</SelectItem>
-                    <SelectItem value="month">Monthly</SelectItem>
-                    <SelectItem value="year">Yearly</SelectItem>
+                    <SelectItem value="day">{__('general.daily')}</SelectItem>
+                    <SelectItem value="week">{__('general.weekly')}</SelectItem>
+                    <SelectItem value="month">{__('general.monthly')}</SelectItem>
+                    <SelectItem value="year">{__('general.yearly')}</SelectItem>
                 </SelectContent>
             </Select>
 
@@ -347,8 +345,8 @@ export default function Index({ todos, filters, stats, users }: Props) {
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="all">{__('general.all_priorities')}</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">{__('general.high')}</SelectItem>
+                    <SelectItem value="medium">{__('general.medium')}</SelectItem>
                     <SelectItem value="low">Low</SelectItem>
                 </SelectContent>
             </Select>
@@ -417,7 +415,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                     <form onSubmit={handleSubmit} className="space-y-4 mt-2">
                         {/* Employee */}
                         <div className="space-y-1">
-                            <Label htmlFor="et-user_id">Employee</Label>
+                            <Label htmlFor="et-user_id">{__('general.employee')}</Label>
                             <PremiumCombobox
                                 value={data.user_id}
                                 onChange={(val) => setData('user_id', val ? String(val) : '')}
@@ -430,7 +428,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
 
                         {/* Title */}
                         <div className="space-y-1">
-                            <Label htmlFor="et-title">Title</Label>
+                            <Label htmlFor="et-title">{__('general.title')}</Label>
                             <Input
                                 id="et-title"
                                 value={data.title}
@@ -444,7 +442,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
 
                         {/* Description */}
                         <div className="space-y-1">
-                            <Label htmlFor="et-description">Description <span className="text-slate-400 font-normal">(optional)</span></Label>
+                            <Label htmlFor="et-description">{__('general.description')}<span className="text-slate-400 font-normal">(optional)</span></Label>
                             <Textarea
                                 id="et-description"
                                 value={data.description}
@@ -458,15 +456,15 @@ export default function Index({ todos, filters, stats, users }: Props) {
                         {/* Priority + Recurring side-by-side */}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
-                                <Label htmlFor="et-priority">Priority</Label>
+                                <Label htmlFor="et-priority">{__('general.priority')}</Label>
                                 <Select value={data.priority} onValueChange={(v) => setData('priority', (v as string) || '')}>
                                     <SelectTrigger className="w-full bg-white h-11 rounded-xl shadow-sm">
                                         <SelectValue placeholder={__('general.select_priority')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="low">Low</SelectItem>
-                                        <SelectItem value="medium">Medium</SelectItem>
-                                        <SelectItem value="high">High</SelectItem>
+                                        <SelectItem value="medium">{__('general.medium')}</SelectItem>
+                                        <SelectItem value="high">{__('general.high')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 {errors.priority && <p className="text-xs text-red-500">{errors.priority}</p>}
@@ -480,9 +478,9 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="day">Day</SelectItem>
-                                        <SelectItem value="week">Week</SelectItem>
-                                        <SelectItem value="month">Month</SelectItem>
-                                        <SelectItem value="year">Year</SelectItem>
+                                        <SelectItem value="week">{__('general.week')}</SelectItem>
+                                        <SelectItem value="month">{__('general.month')}</SelectItem>
+                                        <SelectItem value="year">{__('general.year')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 {errors.recurring && <p className="text-xs text-red-500">{errors.recurring}</p>}
@@ -561,8 +559,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
 
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setShowModal(false)}>
-                                Cancel
-                            </Button>
+                                {__('general.cancel')}</Button>
                             <Button type="submit" disabled={processing}>
                                 {processing ? 'Saving…' : editingId ? 'Save Changes' : 'Create Todo'}
                             </Button>
@@ -581,8 +578,8 @@ export default function Index({ todos, filters, stats, users }: Props) {
                     <p className="text-sm text-slate-600 mt-2">{__('general.this_will_permanently_delete_the_recurring_todo')}<strong>{__('general.and_all_its_transaction_history')}</strong>. This action cannot be undone.
                     </p>
                     <DialogFooter className="mt-4">
-                        <Button variant="outline" onClick={() => setDeleteId(null)}>Cancel</Button>
-                        <Button variant="destructive" onClick={handleDelete}>Delete</Button>
+                        <Button variant="outline" onClick={() => setDeleteId(null)}>{__('general.cancel')}</Button>
+                        <Button variant="destructive" onClick={handleDelete}>{__('general.delete')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

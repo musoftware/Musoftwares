@@ -355,10 +355,10 @@ export default function ProjectShow({
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                                         <th className="px-6 py-3">{__('general.invoice_number')}</th>
-                                                        <th className="px-6 py-3">Date</th>
-                                                        <th className="px-6 py-3 text-end">Amount</th>
+                                                        <th className="px-6 py-3">{__('general.date')}</th>
+                                                        <th className="px-6 py-3 text-end">{__('general.amount')}</th>
                                                         <th className="px-6 py-3 text-end">Value (Base)</th>
-                                                        <th className="px-6 py-3 text-center">Status</th>
+                                                        <th className="px-6 py-3 text-center">{__('general.status')}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-slate-100 text-[13px] text-slate-600">
@@ -449,9 +449,9 @@ export default function ProjectShow({
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                                         <th className="px-6 py-3">{__('general.cost_item')}</th>
-                                                        <th className="px-6 py-3">Date</th>
-                                                        <th className="px-6 py-3">Payer</th>
-                                                        <th className="px-6 py-3 text-end">Amount</th>
+                                                        <th className="px-6 py-3">{__('general.date')}</th>
+                                                        <th className="px-6 py-3">{__('general.payer')}</th>
+                                                        <th className="px-6 py-3 text-end">{__('general.amount')}</th>
                                                         <th className="px-6 py-3 text-end">Value (Base)</th>
                                                     </tr>
                                                 </thead>
@@ -524,11 +524,11 @@ export default function ProjectShow({
                                             <table className="w-full text-start text-sm border-collapse">
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                                        <th className="px-6 py-3">Subject</th>
-                                                        <th className="px-6 py-3">Date</th>
-                                                        <th className="px-6 py-3">Assignee</th>
-                                                        <th className="px-6 py-3 text-center">Priority</th>
-                                                        <th className="px-6 py-3 text-center">Status</th>
+                                                        <th className="px-6 py-3">{__('general.subject')}</th>
+                                                        <th className="px-6 py-3">{__('general.date')}</th>
+                                                        <th className="px-6 py-3">{__('general.assignee')}</th>
+                                                        <th className="px-6 py-3 text-center">{__('general.priority')}</th>
+                                                        <th className="px-6 py-3 text-center">{__('general.status')}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-slate-100 text-[13px] text-slate-600">
@@ -592,7 +592,7 @@ export default function ProjectShow({
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
-                                    <span>Completed</span>
+                                    <span>{__('general.completed')}</span>
                                     <span>{completedTasks} / {totalTasks} ({taskProgress}%)</span>
                                 </div>
                                 <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">

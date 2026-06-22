@@ -152,11 +152,11 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
     const getPriorityBadge = (priority: string) => {
         switch (priority) {
             case 'urgent':
-                return <Badge variant="destructive" className="bg-rose-500 hover:bg-rose-600 text-white font-medium uppercase text-[10px]">Urgent</Badge>;
+                return <Badge variant="destructive" className="bg-rose-500 hover:bg-rose-600 text-white font-medium uppercase text-[10px]">{__('general.urgent')}</Badge>;
             case 'high':
-                return <Badge variant="secondary" className="bg-amber-500 hover:bg-amber-600 text-white font-medium uppercase text-[10px]">High</Badge>;
+                return <Badge variant="secondary" className="bg-amber-500 hover:bg-amber-600 text-white font-medium uppercase text-[10px]">{__('general.high')}</Badge>;
             case 'normal':
-                return <Badge variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-white font-medium uppercase text-[10px]">Normal</Badge>;
+                return <Badge variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-white font-medium uppercase text-[10px]">{__('general.normal')}</Badge>;
             default:
                 return <Badge variant="outline" className="text-muted-foreground uppercase text-[10px]">Low</Badge>;
         }
@@ -166,15 +166,15 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
         const classes = "text-xs font-semibold px-2 py-0.5 rounded shadow-none border";
         switch (status) {
             case 'completed':
-                return <span className={`${classes} bg-emerald-50 text-emerald-700 border-emerald-200`}>Completed</span>;
+                return <span className={`${classes} bg-emerald-50 text-emerald-700 border-emerald-200`}>{__('general.completed')}</span>;
             case 'review':
-                return <span className={`${classes} bg-indigo-50 text-indigo-700 border-indigo-200`}>Review</span>;
+                return <span className={`${classes} bg-indigo-50 text-indigo-700 border-indigo-200`}>{__('general.review')}</span>;
             case 'in_progress':
                 return <span className={`${classes} bg-blue-50 text-blue-700 border-blue-200`}>{__('general.in_progress')}</span>;
             case 'archived':
-                return <span className={`${classes} bg-zinc-100 text-zinc-700 border-zinc-300`}>Archived</span>;
+                return <span className={`${classes} bg-zinc-100 text-zinc-700 border-zinc-300`}>{__('general.archived')}</span>;
             default:
-                return <span className={`${classes} bg-slate-50 text-slate-700 border-slate-200`}>Open</span>;
+                return <span className={`${classes} bg-slate-50 text-slate-700 border-slate-200`}>{__('general.open')}</span>;
         }
     };
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('tasks');
@@ -237,10 +237,10 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">{__('general.all_statuses')}</SelectItem>
-                                        <SelectItem value="open">Open</SelectItem>
+                                        <SelectItem value="open">{__('general.open')}</SelectItem>
                                         <SelectItem value="in_progress">{__('general.in_progress')}</SelectItem>
-                                        <SelectItem value="review">Review</SelectItem>
-                                        <SelectItem value="completed">Completed</SelectItem>
+                                        <SelectItem value="review">{__('general.review')}</SelectItem>
+                                        <SelectItem value="completed">{__('general.completed')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -293,9 +293,8 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                             >
                                 <Card className="shadow-none border border-border hover:border-primary/20 hover:shadow-md/5 transition-all h-[240px] flex flex-col justify-between overflow-hidden relative group">
                                     {task.archived && (
-                                        <div className="absolute top-0 end-0 bg-zinc-100 border-s border-b border-zinc-200 text-zinc-600 px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase rounded-bl">
-                                            Archived
-                                        </div>
+                                        <div className="absolute top-0 end-0 bg-zinc-100 border-s border-b border-zinc-200 text-zinc-600 px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase rounded-bs">
+                                            {__('general.archived')}</div>
                                     )}
                                     
                                     <CardHeader className="p-5 pb-3 space-y-2">
@@ -499,9 +498,9 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                     className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
                                 >
                                     <option value="low">Low</option>
-                                    <option value="normal">Normal</option>
-                                    <option value="high">High</option>
-                                    <option value="urgent">Urgent</option>
+                                    <option value="normal">{__('general.normal')}</option>
+                                    <option value="high">{__('general.high')}</option>
+                                    <option value="urgent">{__('general.urgent')}</option>
                                 </select>
                                 {errors.priority && <p className="text-rose-500 text-[11px] font-medium">{errors.priority}</p>}
                             </div>
@@ -515,10 +514,10 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                     onChange={(e) => setData('status', e.target.value)}
                                     className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
                                 >
-                                    <option value="open">Open</option>
+                                    <option value="open">{__('general.open')}</option>
                                     <option value="in_progress">{__('general.in_progress')}</option>
-                                    <option value="review">Review</option>
-                                    <option value="completed">Completed</option>
+                                    <option value="review">{__('general.review')}</option>
+                                    <option value="completed">{__('general.completed')}</option>
                                 </select>
                                 {errors.status && <p className="text-rose-500 text-[11px] font-medium">{errors.status}</p>}
                             </div>
@@ -545,8 +544,7 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                                 className="shadow-none text-xs"
                                 disabled={processing}
                             >
-                                Cancel
-                            </Button>
+                                {__('general.cancel')}</Button>
                             <Button 
                                 type="submit" 
                                 className="shadow-none text-xs gap-2"

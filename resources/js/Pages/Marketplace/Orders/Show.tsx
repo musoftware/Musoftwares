@@ -108,21 +108,18 @@ export default function Show({ order, conversation }: any) {
                                 <div
                                     className={`text-start ${currentStepIndex >= 0 ? 'font-bold text-indigo-600' : ''}`}
                                 >
-                                    Placed
-                                </div>
+                                    {__('general.placed')}</div>
                                 <div
                                     className={`text-center ${currentStepIndex >= 1 ? 'font-bold text-indigo-600' : ''}`}
                                 >{__('general.in_progress')}</div>
                                 <div
                                     className={`text-center ${currentStepIndex >= 2 ? 'font-bold text-indigo-600' : ''}`}
                                 >
-                                    Delivered
-                                </div>
+                                    {__('general.delivered')}</div>
                                 <div
                                     className={`text-end ${currentStepIndex >= 3 ? 'font-bold text-indigo-600' : ''}`}
                                 >
-                                    Completed
-                                </div>
+                                    {__('general.completed')}</div>
                             </div>
                         </div>
                     </div>
@@ -148,10 +145,7 @@ export default function Show({ order, conversation }: any) {
                                     </svg>{__('general.buyer_requirements')}</h4>
                                 <div className="rounded-lg border border-gray-100 bg-gray-50 p-4 text-sm text-gray-700">
                                     <p>
-                                        I need a clean and modern logo for my
-                                        startup. The color scheme should be blue
-                                        and white. Please include source files.
-                                    </p>
+                                        {__('general.i_need_a_clean_and_modern_logo_for_my_st')}</p>
                                 </div>
                             </div>
 
@@ -281,7 +275,7 @@ export default function Show({ order, conversation }: any) {
                                                                           ?.name}
                                                             </span>
                                                             <div
-                                                                className={`rounded-2xl px-4 py-2.5 ${isMe ? 'rounded-tr-none bg-indigo-600 text-white' : 'rounded-tl-none border border-gray-200 bg-white text-gray-900 shadow-sm'}`}
+                                                                className={`rounded-2xl px-4 py-2.5 ${isMe ? 'rounded-te-none bg-indigo-600 text-white' : 'rounded-ts-none border border-gray-200 bg-white text-gray-900 shadow-sm'}`}
                                                             >
                                                                 <p className="text-sm whitespace-pre-wrap">
                                                                     {msg.body}
@@ -419,8 +413,7 @@ export default function Show({ order, conversation }: any) {
                                     <div className="p-6">
                                         <div className="mb-4 flex items-center justify-between">
                                             <span className="text-sm text-gray-500">
-                                                Package
-                                            </span>
+                                                {__('general.package')}</span>
                                             <span className="rounded bg-indigo-50 px-2 py-0.5 text-sm font-bold text-gray-900 text-indigo-700">
                                                 {order.package?.name}
                                             </span>
@@ -477,7 +470,7 @@ export default function Show({ order, conversation }: any) {
                                             {isSeller ? (
                                                 <div className="space-y-2 text-sm">
                                                     <div className="flex justify-between text-gray-500">
-                                                        <span>Price</span>
+                                                        <span>{__('general.price')}</span>
                                                         <span>
                                                             {formatCurrency(order.amount, order.currency)}
                                                         </span>
@@ -608,14 +601,9 @@ export default function Show({ order, conversation }: any) {
                                                                 ></path>
                                                             </svg>
                                                             <p className="text-sm text-gray-600">
-                                                                Click to browse
-                                                                or drag & drop
-                                                                files here
-                                                            </p>
+                                                                {__('general.click_to_browse_or_drag_drop_files_here')}</p>
                                                             <p className="mt-1 text-xs text-gray-500">
-                                                                Max 100MB per
-                                                                file
-                                                            </p>
+                                                                {__('general.max_100mb_per_file')}</p>
                                                         </div>
                                                     </div>
                                                     <button

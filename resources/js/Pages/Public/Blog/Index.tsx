@@ -75,8 +75,7 @@ export default function Index({ articles }: IndexProps) {
                             transition={{ duration: 0.5, delay: 0.1 }}
                             className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 mb-6"
                         >
-                            Insights, tutorials & updates
-                        </motion.h1>
+                            {__('general.insights_tutorials_updates')}</motion.h1>
 
                         <motion.p 
                             initial={{ opacity: 0, y: 20 }}
@@ -84,8 +83,7 @@ export default function Index({ articles }: IndexProps) {
                             transition={{ duration: 0.5, delay: 0.2 }}
                             className="text-lg sm:text-xl text-slate-600 font-light"
                         >
-                            Discover the latest ideas and best practices in modern software development, business management, and digital transformation.
-                        </motion.p>
+                            {__('general.discover_the_latest_ideas_and_best_pract')}</motion.p>
                     </div>
 
                     {/* Articles Grid */}
@@ -169,8 +167,8 @@ export default function Index({ articles }: IndexProps) {
                             <div className="h-20 w-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <BookOpen className="h-10 w-10 text-slate-300" />
                             </div>
-                            <h3 className="text-2xl font-bold text-slate-900 mb-2">No articles found</h3>
-                            <p className="text-slate-500">We're currently working on creating amazing content for you. Check back soon!</p>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-2">{__('general.no_articles_found')}</h3>
+                            <p className="text-slate-500">{__('general.were_currently_working_on_creating_amazi')}</p>
                         </div>
                     )}
 

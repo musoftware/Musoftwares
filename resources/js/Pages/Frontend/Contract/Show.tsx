@@ -33,15 +33,13 @@ export default function Show({ contract, invoices, project }) {
                 <div className="flex justify-between items-center mb-8">
                     <div className="flex items-center gap-3">
                         <div className="h-10 w-10 bg-indigo-600 rounded flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                            M
-                        </div>
-                        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Musoftware</h1>
+                            {__('general.m')}</div>
+                        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{__('general.musoftware')}</h1>
                     </div>
                     {contract.status === 'signed' && (
                         <div className="flex items-center gap-2 bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full font-semibold text-sm shadow-sm border border-emerald-200">
                             <CheckCircle2 className="w-5 h-5" />
-                            Signed & Accepted
-                        </div>
+                            {__('general.signed_accepted')}</div>
                     )}
                 </div>
 
@@ -52,8 +50,7 @@ export default function Show({ contract, invoices, project }) {
                             <CardHeader className="bg-white border-b pb-4">
                                 <CardTitle className="text-xl flex items-center gap-2">
                                     <FileText className="w-5 h-5 text-indigo-500" />
-                                    Project Proposal & Scope
-                                </CardTitle>
+                                    {__('general.project_proposal_scope')}</CardTitle>
                             </CardHeader>
                             <CardContent className="pt-6 prose prose-slate max-w-none">
                                 <h3>{contract.project_name}</h3>
@@ -63,7 +60,7 @@ export default function Show({ contract, invoices, project }) {
 
                                 {contract.content?.key_features?.length > 0 && (
                                     <>
-                                        <h4 className="text-slate-900 font-semibold mt-6 mb-3">Key Deliverables & Features</h4>
+                                        <h4 className="text-slate-900 font-semibold mt-6 mb-3">{__('general.key_deliverables_features')}</h4>
                                         <ul className="space-y-2">
                                             {contract.content.key_features.map((feature, idx) => (
                                                 <li key={idx} className="flex items-start gap-2 text-slate-700">
@@ -80,18 +77,18 @@ export default function Show({ contract, invoices, project }) {
                         {/* Financials & Milestones */}
                         <Card className="shadow-sm overflow-hidden border-slate-200">
                             <CardHeader className="bg-white border-b pb-4">
-                                <CardTitle className="text-xl">Financial Summary & Milestones</CardTitle>
+                                <CardTitle className="text-xl">{__('general.financial_summary_milestones')}</CardTitle>
                             </CardHeader>
                             <CardContent className="pt-6">
                                 <div className="bg-slate-50 p-6 rounded-lg mb-6 border border-slate-100 flex justify-between items-center">
                                     <div>
-                                        <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">Total Investment</p>
+                                        <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">{__('general.total_investment')}</p>
                                         <p className="text-3xl font-bold text-slate-900 mt-1">
                                             {formatMoney(contract.total_amount, contract.currency)}
                                         </p>
                                     </div>
                                     <div className="text-end">
-                                        <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">Duration</p>
+                                        <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">{__('general.duration')}</p>
                                         <p className="text-xl font-semibold text-slate-900 mt-1">
                                             {contract.content?.duration || 'TBD'}
                                         </p>
@@ -100,15 +97,15 @@ export default function Show({ contract, invoices, project }) {
 
                                 {contract.content?.pricing_items?.length > 0 && (
                                     <div className="mb-6">
-                                        <h4 className="font-semibold text-slate-900 mb-4">Investment Breakdown</h4>
+                                        <h4 className="font-semibold text-slate-900 mb-4">{__('general.investment_breakdown')}</h4>
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-start border-collapse">
                                                 <thead>
                                                     <tr className="border-b border-slate-200 text-sm text-slate-500">
-                                                        <th className="pb-3 font-medium">Item</th>
+                                                        <th className="pb-3 font-medium">{__('general.item')}</th>
                                                         <th className="pb-3 font-medium text-end">Hours/Qty</th>
-                                                        <th className="pb-3 font-medium text-end">Rate</th>
-                                                        <th className="pb-3 font-medium text-end">Total</th>
+                                                        <th className="pb-3 font-medium text-end">{__('general.rate')}</th>
+                                                        <th className="pb-3 font-medium text-end">{__('general.total')}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="text-sm">
@@ -130,7 +127,7 @@ export default function Show({ contract, invoices, project }) {
                                 )}
 
                                 <div>
-                                    <h4 className="font-semibold text-slate-900 mb-2">Payment Terms</h4>
+                                    <h4 className="font-semibold text-slate-900 mb-2">{__('general.payment_terms')}</h4>
                                     <p className="whitespace-pre-line text-slate-600 text-sm bg-white p-4 border border-slate-200 rounded">
                                         {contract.payment_terms || 'Standard payment terms apply.'}
                                     </p>
@@ -142,7 +139,7 @@ export default function Show({ contract, invoices, project }) {
                         {contract.content?.terms && (
                             <Card className="shadow-sm overflow-hidden border-slate-200">
                                 <CardHeader className="bg-white border-b pb-4">
-                                    <CardTitle className="text-xl">Terms & Conditions</CardTitle>
+                                    <CardTitle className="text-xl">{__('general.terms_conditions')}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="pt-6">
                                     <div className="prose prose-sm prose-slate max-w-none whitespace-pre-line text-slate-600">
@@ -157,18 +154,18 @@ export default function Show({ contract, invoices, project }) {
                         {/* Status & Actions */}
                         <Card className="shadow-sm border-slate-200 sticky top-6">
                             <CardHeader className="bg-slate-900 text-white rounded-t-lg">
-                                <CardTitle className="text-lg">Contract Status</CardTitle>
+                                <CardTitle className="text-lg">{__('general.contract_status')}</CardTitle>
                             </CardHeader>
                             <CardContent className="pt-6">
                                 {contract.status === 'signed' ? (
                                     <div className="space-y-4">
                                         <div className="bg-emerald-50 text-emerald-800 p-4 rounded-lg border border-emerald-100">
-                                            <p className="font-bold text-emerald-900 mb-1">Contract Executed</p>
+                                            <p className="font-bold text-emerald-900 mb-1">{__('general.contract_executed')}</p>
                                             <p className="text-sm">Signed on {new Date(contract.signed_at).toLocaleDateString()}</p>
                                         </div>
                                         
                                         <div>
-                                            <p className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-1">Client Signature</p>
+                                            <p className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-1">{__('general.client_signature')}</p>
                                             <div className="font-signature text-2xl text-slate-900 p-4 bg-slate-50 border border-slate-200 rounded">
                                                 {contract.content?.client_signature || contract.client_name}
                                             </div>
@@ -176,14 +173,12 @@ export default function Show({ contract, invoices, project }) {
                                         </div>
 
                                         <Button variant="outline" className="w-full gap-2 mt-4" onClick={() => window.print()}>
-                                            <Download className="w-4 h-4" /> Download PDF
-                                        </Button>
+                                            <Download className="w-4 h-4" /> {__('general.download_pdf')}</Button>
                                     </div>
                                 ) : (
                                     <form onSubmit={handleSign} className="space-y-4">
                                         <div className="bg-blue-50 text-blue-800 p-4 rounded-lg border border-blue-100 mb-4 text-sm">
-                                            Please review the scope and terms. By typing your name and signing below, you agree to the conditions outlined in this document.
-                                        </div>
+                                            {__('general.please_review_the_scope_and_terms_by_typ')}</div>
                                         
                                         <div>
                                             <Label htmlFor="client_name">Full Name / Company Representative</Label>
@@ -203,7 +198,7 @@ export default function Show({ contract, invoices, project }) {
                                                 value={signature}
                                                 onChange={e => setSignature(e.target.value)}
                                                 required 
-                                                placeholder="Type your name to sign"
+                                                placeholder={__('general.type_your_name_to_sign')}
                                                 className="mt-1 font-signature text-lg"
                                             />
                                         </div>
@@ -219,7 +214,7 @@ export default function Show({ contract, invoices, project }) {
                         {invoices && invoices.length > 0 && (
                             <Card className="shadow-sm border-slate-200">
                                 <CardHeader className="bg-slate-50 border-b pb-4">
-                                    <CardTitle className="text-md">Related Invoices</CardTitle>
+                                    <CardTitle className="text-md">{__('general.related_invoices')}</CardTitle>
                                 </CardHeader>
                                 <div className="divide-y divide-slate-100">
                                     {invoices.map(invoice => (
@@ -240,7 +235,7 @@ export default function Show({ contract, invoices, project }) {
                                                 </div>
                                             </div>
                                             <Button variant="outline" size="sm" asChild>
-                                                <a href={`/billing/invoices/${invoice.uuid}/pay`}>View</a>
+                                                <a href={`/billing/invoices/${invoice.uuid}/pay`}>{__('general.view')}</a>
                                             </Button>
                                         </div>
                                     ))}

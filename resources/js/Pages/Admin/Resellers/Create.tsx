@@ -123,7 +123,7 @@ export default function ResellersCreate() {
 
                         {/* Currency */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="currency">Currency</Label>
+                            <Label htmlFor="currency">{__('general.currency')}</Label>
                             <select
                                 id="currency"
                                 value={form.currency}

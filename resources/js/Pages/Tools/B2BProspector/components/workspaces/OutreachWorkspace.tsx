@@ -64,7 +64,7 @@ export function OutreachWorkspace(props: OutreachWorkspaceProps) {
                     {props.selectedSequenceCampaignId ? (
                         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
                             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                                <h3 className="font-bold text-slate-900 text-xs uppercase tracking-wider">Outreach Sequence Step 1</h3>
+                                <h3 className="font-bold text-slate-900 text-xs uppercase tracking-wider">{__('general.outreach_sequence_step_1')}</h3>
                                 <span className="px-2 py-0.5 rounded-full text-[9px] bg-slate-50 text-slate-500 font-bold border border-slate-200">{__('general.step_1_outreach')}</span>
                             </div>
 

@@ -7,6 +7,7 @@ import { StatusBadge } from '@/Components/ui/StatusBadge';
 import Pagination from '@/Components/Pagination';
 import { format } from 'date-fns';
 import { ArrowLeft, CheckCircle2, XCircle } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function Logs({ entry, logs }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('invoices');
@@ -34,12 +35,12 @@ export default function Logs({ entry, logs }) {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.date')}</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.amount')}</th>
                                     <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.business_amount')}</th>
                                     <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.exchange_rate')}</th>
-                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Note</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.status')}</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.note')}</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">

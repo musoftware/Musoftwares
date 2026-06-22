@@ -68,33 +68,33 @@ function LeadCard({ lead, idx }: { lead: any; idx: number }) {
                     {/* Property details grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-x-4 gap-y-1.5">
                         <div className="min-w-0">
-                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">Type</p>
+                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">{__('general.type')}</p>
                             <p className="text-xs text-slate-600 truncate">{lead.property_type || '—'}</p>
                         </div>
                         <div className="min-w-0">
-                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">Beds</p>
+                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">{__('general.beds')}</p>
                             <p className="text-xs text-slate-600 truncate flex items-center gap-1">
                                 <BedDouble className="w-3 h-3 text-indigo-400" />{lead.bedrooms || '—'}
                             </p>
                         </div>
                         <div className="min-w-0">
-                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">Baths</p>
+                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">{__('general.baths')}</p>
                             <p className="text-xs text-slate-600 truncate flex items-center gap-1">
                                 <Bath className="w-3 h-3 text-blue-400" />{lead.bathrooms || '—'}
                             </p>
                         </div>
                         <div className="min-w-0">
-                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">Area</p>
+                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">{__('general.area')}</p>
                             <p className="text-xs text-slate-600 truncate flex items-center gap-1">
                                 <Ruler className="w-3 h-3 text-teal-400" />{lead.area || '—'}
                             </p>
                         </div>
                         <div className="min-w-0">
-                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">Phone</p>
+                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">{__('general.phone')}</p>
                             <p className="text-xs font-mono text-slate-600 truncate">{lead.phone || '—'}</p>
                         </div>
                         <div className="min-w-0">
-                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">WhatsApp</p>
+                            <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">{__('general.whatsapp')}</p>
                             <p className="text-xs font-mono text-emerald-600 truncate">{lead.whatsapp || '—'}</p>
                         </div>
                     </div>
@@ -111,8 +111,7 @@ function LeadCard({ lead, idx }: { lead: any; idx: number }) {
                         )}
                         {lead.url && (
                             <a href={lead.url} target="_blank" rel="noreferrer" className="text-[10px] text-blue-500 hover:underline flex items-center gap-0.5 ms-auto">
-                                <ExternalLink className="w-3 h-3" /> View
-                            </a>
+                                <ExternalLink className="w-3 h-3" /> {__('general.view')}</a>
                         )}
                     </div>
                 </div>
@@ -578,8 +577,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                                         onClick={handleStop}
                                         className="h-11 gap-2 px-6 bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100 hover:text-rose-800 text-sm font-bold"
                                     >
-                                        <Square className="w-4 h-4" /> Stop
-                                    </Button>
+                                        <Square className="w-4 h-4" /> {__('general.stop')}</Button>
                                 ) : (
                                     <Button
                                         onClick={handleStart}
@@ -599,8 +597,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                                         }}
                                         className="h-11 px-4 border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-600 text-sm font-medium"
                                     >
-                                        Clear
-                                    </Button>
+                                        {__('general.clear')}</Button>
                                 )}
                             </div>
 
@@ -632,11 +629,11 @@ export default function PropertyFinderRunner({ tool }: any) {
                         {/* Stats */}
                         {leads.length > 0 && (
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 animate-in fade-in duration-300">
-                                <StatCard label="Total" value={leads.length} icon={Building2} color="bg-indigo-50 border-indigo-200" />
+                                <StatCard label={__('general.total')} value={leads.length} icon={Building2} color="bg-indigo-50 border-indigo-200" />
                                 <StatCard label={__('general.with_phone')} value={leads.filter((l: any) => l.phone).length} icon={Phone} />
-                                <StatCard label="WhatsApp" value={leads.filter((l: any) => l.whatsapp).length} icon={MessageCircle} color="bg-emerald-50 border-emerald-200" />
+                                <StatCard label={__('general.whatsapp')} value={leads.filter((l: any) => l.whatsapp).length} icon={MessageCircle} color="bg-emerald-50 border-emerald-200" />
                                 <StatCard label={__('general.with_beds')} value={leads.filter((l: any) => l.bedrooms).length} icon={BedDouble} color="bg-blue-50 border-blue-200" />
-                                <StatCard label="Country" value={COUNTRIES.find(c => c.code === country)?.name} icon={MapPin} />
+                                <StatCard label={__('general.country')} value={COUNTRIES.find(c => c.code === country)?.name} icon={MapPin} />
                             </div>
                         )}
 
@@ -695,9 +692,9 @@ export default function PropertyFinderRunner({ tool }: any) {
                                     {/* Stats */}
                                     {campaignLeads.length > 0 && (
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
-                                            <StatCard label="Total" value={campaignLeads.length} icon={Building2} color="bg-indigo-50 border-indigo-200" />
+                                            <StatCard label={__('general.total')} value={campaignLeads.length} icon={Building2} color="bg-indigo-50 border-indigo-200" />
                                             <StatCard label={__('general.with_phone')} value={campaignLeads.filter(l => l.phone).length} icon={Phone} />
-                                            <StatCard label="WhatsApp" value={campaignLeads.filter(l => l.whatsapp).length} icon={MessageCircle} color="bg-emerald-50 border-emerald-200" />
+                                            <StatCard label={__('general.whatsapp')} value={campaignLeads.filter(l => l.whatsapp).length} icon={MessageCircle} color="bg-emerald-50 border-emerald-200" />
                                             <StatCard label={__('general.with_beds')} value={campaignLeads.filter(l => l.bedrooms).length} icon={BedDouble} color="bg-blue-50 border-blue-200" />
                                         </div>
                                     )}
@@ -734,8 +731,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                                         disabled={loadingCampaigns}
                                         className="h-8 gap-1.5 text-xs font-bold"
                                     >
-                                        <RefreshCw className={`w-3.5 h-3.5 ${loadingCampaigns ? 'animate-spin' : ''}`} /> Refresh
-                                    </Button>
+                                        <RefreshCw className={`w-3.5 h-3.5 ${loadingCampaigns ? 'animate-spin' : ''}`} /> {__('general.refresh')}</Button>
                                 </div>
 
                                 {loadingCampaigns && campaigns.length === 0 ? (

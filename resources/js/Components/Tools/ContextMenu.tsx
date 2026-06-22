@@ -81,31 +81,25 @@ export function ContextMenu({ menu, onClose, onAction }: ContextMenuProps) {
                     <button onClick={(e) => handleAction(e, 'auto_arrange')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-start">
                         <LayoutGrid className="w-4 h-4 text-emerald-400" />{__('general.auto_arrange')}</button>
                     <button onClick={(e) => handleAction(e, 'categorize_icons')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-start">
-                        <Layers className="w-4 h-4 text-indigo-400" /> Categorize Icons
-                    </button>
+                        <Layers className="w-4 h-4 text-indigo-400" /> {__('general.categorize_icons')}</button>
                     <button onClick={(e) => handleAction(e, 'reset_positions')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-start text-rose-400">
-                        <RotateCcw className="w-4 h-4" /> Reset Positions
-                    </button>
+                        <RotateCcw className="w-4 h-4" /> {__('general.reset_positions')}</button>
                     <div className="h-px bg-white/10 my-1 mx-2"></div>
                     <button onClick={(e) => handleAction(e, 'settings')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-start">
-                        <Settings className="w-4 h-4 text-slate-400" /> Settings
-                    </button>
+                        <Settings className="w-4 h-4 text-slate-400" /> {__('general.settings')}</button>
                 </>
             )}
 
             {(menu.type === 'icon' || menu.type === 'folder') && (
                 <>
                     <button onClick={(e) => handleAction(e, 'open')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-start font-medium text-white">
-                        <MonitorUp className="w-4 h-4 text-blue-400" /> Open
-                    </button>
+                        <MonitorUp className="w-4 h-4 text-blue-400" /> {__('general.open')}</button>
                     <div className="h-px bg-white/10 my-1 mx-2"></div>
                     <button onClick={(e) => handleAction(e, 'rename')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-start">
-                        <Pencil className="w-4 h-4 text-amber-400" /> Rename
-                    </button>
+                        <Pencil className="w-4 h-4 text-amber-400" /> {__('general.rename')}</button>
                     {menu.type === 'icon' && (
                         <button onClick={(e) => handleAction(e, 'duplicate')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-start">
-                            <Copy className="w-4 h-4 text-slate-400" /> Duplicate
-                        </button>
+                            <Copy className="w-4 h-4 text-slate-400" /> {__('general.duplicate')}</button>
                     )}
                     {menu.type === 'icon' && (
                         <button onClick={(e) => handleAction(e, 'move_to_desktop')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-white/10 transition-colors w-full text-start">
@@ -113,8 +107,7 @@ export function ContextMenu({ menu, onClose, onAction }: ContextMenuProps) {
                     )}
                     <div className="h-px bg-white/10 my-1 mx-2"></div>
                     <button onClick={(e) => handleAction(e, 'delete')} className="flex items-center gap-3 px-4 py-2.5 md:px-3 md:py-1.5 hover:bg-red-500/20 text-red-400 transition-colors w-full text-start">
-                        <Trash2 className="w-4 h-4" /> Delete
-                    </button>
+                        <Trash2 className="w-4 h-4" /> {__('general.delete')}</button>
                 </>
             )}
         </div>

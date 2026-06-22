@@ -4,6 +4,7 @@ import { Download, Star, Cpu, CheckCircle2, ChevronRight, Users } from 'lucide-r
 import { Badge } from '@/Components/ui/badge';
 import { PlatformBadges } from './PlatformBadge';
 import { RuntimeBadge } from './RuntimeBadge';
+import { __ } from '@/lib/i18n';
 
 interface ToolHeaderProps {
     tool: {
@@ -35,8 +36,7 @@ export function ToolHeader({ tool, isSubscribed }: ToolHeaderProps) {
                     onClick={() => router.visit(route('tools.explore'))}
                     className="hover:text-slate-600 transition-colors"
                 >
-                    Marketplace
-                </button>
+                    {__('general.marketplace')}</button>
                 <ChevronRight className="h-3 w-3" />
                 <span className="capitalize text-slate-500">{tool.category_label}</span>
                 <ChevronRight className="h-3 w-3" />
@@ -61,14 +61,12 @@ export function ToolHeader({ tool, isSubscribed }: ToolHeaderProps) {
                         {isSubscribed && (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 <CheckCircle2 className="h-3 w-3" />
-                                Subscribed
-                            </span>
+                                {__('general.subscribed')}</span>
                         )}
                         {tool.is_featured && (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
                                 <Star className="h-3 w-3" />
-                                Featured
-                            </span>
+                                {__('general.featured')}</span>
                         )}
                     </div>
 

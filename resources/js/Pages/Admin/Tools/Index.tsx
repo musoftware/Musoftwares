@@ -104,13 +104,13 @@ export default function AdminToolsIndex({ tools, categories }: Props) {
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-border bg-surface-raised">
-                                            <th className="text-start px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Tool</th>
-                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden md:table-cell">Category</th>
-                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden lg:table-cell">Version</th>
-                                            <th className="text-center px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden sm:table-cell">Subs</th>
+                                            <th className="text-start px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.tool')}</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden md:table-cell">{__('general.category')}</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden lg:table-cell">{__('general.version')}</th>
+                                            <th className="text-center px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden sm:table-cell">{__('general.subs')}</th>
                                             <th className="text-center px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider hidden sm:table-cell">{__('general.active_users')}</th>
-                                            <th className="text-center px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Status</th>
-                                            <th className="text-end px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
+                                            <th className="text-center px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.status')}</th>
+                                            <th className="text-end px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.actions')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/50">
@@ -174,7 +174,7 @@ export default function AdminToolsIndex({ tools, categories }: Props) {
                                                 {/* Status */}
                                                 <td className="px-4 py-3.5 text-center">
                                                     {tool.deleted_at ? (
-                                                        <StatusBadge status="danger" label="Archived" size="sm" />
+                                                        <StatusBadge status="danger" label={__('general.archived')} size="sm" />
                                                     ) : (
                                                         <StatusBadge
                                                             status={tool.is_active ? 'success' : 'neutral'}
@@ -198,7 +198,7 @@ export default function AdminToolsIndex({ tools, categories }: Props) {
                                                                 <Link
                                                                     href={route('admin.tools.edit', tool.id)}
                                                                     className="p-1.5 rounded-md text-text-muted hover:text-text-primary hover:bg-surface-raised transition-colors"
-                                                                    title="Edit"
+                                                                    title={__('general.edit')}
                                                                 >
                                                                     <Edit2 className="h-3.5 w-3.5" />
                                                                 </Link>
@@ -209,20 +209,18 @@ export default function AdminToolsIndex({ tools, categories }: Props) {
                                                                             onClick={() => handleDelete(tool.id)}
                                                                             className="px-2 py-1 text-xs bg-red-500 text-white rounded-md font-medium hover:bg-red-600 transition-colors"
                                                                         >
-                                                                            Confirm
-                                                                        </button>
+                                                                            {__('general.confirm')}</button>
                                                                         <button
                                                                             onClick={() => setConfirmDelete(null)}
                                                                             className="px-2 py-1 text-xs border border-border rounded-md font-medium hover:bg-surface-raised transition-colors"
                                                                         >
-                                                                            Cancel
-                                                                        </button>
+                                                                            {__('general.cancel')}</button>
                                                                     </div>
                                                                 ) : (
                                                                     <button
                                                                         onClick={() => setConfirmDelete(tool.id)}
                                                                         className="p-1.5 rounded-md text-text-muted hover:text-red-500 hover:bg-red-50 transition-colors"
-                                                                        title="Archive"
+                                                                        title={__('general.archive')}
                                                                     >
                                                                         <Trash2 className="h-3.5 w-3.5" />
                                                                     </button>

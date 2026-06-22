@@ -1,6 +1,7 @@
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { __ } from '@/lib/i18n';
 
 export default function ConversationList({ onSelectConversation, selectedId }) {
     const { auth } = usePage().props;
@@ -169,8 +170,7 @@ export default function ConversationList({ onSelectConversation, selectedId }) {
         <div className="flex h-[600px] w-80 flex-col rounded-lg border bg-white shadow-sm">
             <div className="flex items-center justify-between border-b p-4">
                 <h2 className="text-lg font-semibold text-gray-900">
-                    Messages
-                </h2>
+                    {__('general.messages')}</h2>
             </div>
             <div className="flex-1 overflow-y-auto">
                 {conversations.length === 0 ? (

@@ -242,8 +242,7 @@ export default function Show({ client, payments, stats }: Props) {
                 <div className="flex items-center gap-3">
                     <Button variant="outline" size="sm" onClick={() => router.visit(route('admin.musoftware-clients.index'))}>
                         <ArrowLeft className="h-4 w-4 me-1" />
-                        Back
-                    </Button>
+                        {__('general.back')}</Button>
                     <div>
                         <h1 className="text-xl font-bold text-gray-900">{client.name}</h1>
                         <p className="text-sm text-gray-400">{client.website ?? 'No website'}</p>
@@ -279,7 +278,7 @@ export default function Show({ client, payments, stats }: Props) {
                 />
                 <StatCard
                     icon={Activity}
-                    label="Payments"
+                    label={__('general.payments')}
                     value={String(stats.total_payments)}
                     sub={`${stats.pending_count} pending · ${stats.failed_count} failed`}
                 />
@@ -326,12 +325,12 @@ export default function Show({ client, payments, stats }: Props) {
                     <thead className="border-b bg-gray-50">
                         <tr>
                             <th className="p-4 font-medium text-gray-600">{__('general.order_id')}</th>
-                            <th className="p-4 font-medium text-gray-600">Customer</th>
-                            <th className="p-4 font-medium text-gray-600">Amount</th>
-                            <th className="p-4 font-medium text-gray-600">Commission</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.customer')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.amount')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.commission')}</th>
                             <th className="p-4 font-medium text-gray-600">{__('general.net_to_client')}</th>
-                            <th className="p-4 font-medium text-gray-600">Status</th>
-                            <th className="p-4 font-medium text-gray-600">Date</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.status')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.date')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -400,11 +399,11 @@ export default function Show({ client, payments, stats }: Props) {
                     <form onSubmit={handleEdit}>
                         <div className="space-y-4 py-2">
                             <div>
-                                <Label>Name</Label>
+                                <Label>{__('general.name')}</Label>
                                 <Input value={editForm.name} onChange={e => setEdit('name', e.target.value)} required />
                             </div>
                             <div>
-                                <Label>Website</Label>
+                                <Label>{__('general.website')}</Label>
                                 <Input type="url" value={editForm.website} onChange={e => setEdit('website', e.target.value)} />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
@@ -417,14 +416,14 @@ export default function Show({ client, payments, stats }: Props) {
                                     />
                                 </div>
                                 <div>
-                                    <Label>Status</Label>
+                                    <Label>{__('general.status')}</Label>
                                     <select
                                         className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                                         value={editForm.status}
                                         onChange={e => setEdit('status', e.target.value)}
                                     >
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
+                                        <option value="active">{__('general.active')}</option>
+                                        <option value="inactive">{__('general.inactive')}</option>
                                     </select>
                                 </div>
                             </div>
@@ -438,7 +437,7 @@ export default function Show({ client, payments, stats }: Props) {
                             </div>
                         </div>
                         <DialogFooter className="mt-6">
-                            <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
+                            <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>{__('general.cancel')}</Button>
                             <Button type="submit">{__('general.save_changes')}</Button>
                         </DialogFooter>
                     </form>
@@ -458,7 +457,7 @@ export default function Show({ client, payments, stats }: Props) {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsRegenOpen(false)}>Cancel</Button>
+                        <Button variant="outline" onClick={() => setIsRegenOpen(false)}>{__('general.cancel')}</Button>
                         <Button variant="destructive" onClick={handleRegenerate}>
                             <RefreshCw className="h-4 w-4 me-1" />{__('general.yes_regenerate')}</Button>
                     </DialogFooter>
@@ -494,7 +493,7 @@ $isValid = hash_equals($signature, $request->header('X-Gateway-Signature'));`}
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button onClick={() => setIsDocsOpen(false)}>Close</Button>
+                        <Button onClick={() => setIsDocsOpen(false)}>{__('general.close')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

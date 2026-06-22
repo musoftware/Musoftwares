@@ -5,6 +5,7 @@ import { Head, usePage } from '@inertiajs/react';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
+import { __ } from '@/lib/i18n';
 
 export default function Edit({
     mustVerifyEmail,
@@ -17,11 +18,10 @@ export default function Edit({
         <Layout
             header={
                 <h2 className="text-xl leading-tight font-semibold text-gray-800">
-                    Profile
-                </h2>
+                    {__('general.profile')}</h2>
             }
         >
-            <Head title="Profile" />
+            <Head title={__('general.profile')} />
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">

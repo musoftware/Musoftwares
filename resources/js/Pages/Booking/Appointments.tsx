@@ -98,7 +98,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
     };
 
     const getPaymentBadge = (status: string, method?: string) => {
-        if (status === 'free') return <Badge variant="outline" className="text-slate-500">Free</Badge>;
+        if (status === 'free') return <Badge variant="outline" className="text-slate-500">{__('general.free')}</Badge>;
         if (status === 'pending') return <Badge variant="outline" className="text-amber-600 border-amber-200">{__('general.payment_pending')}</Badge>;
         if (status === 'paid') return <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50">Paid via {method}</Badge>;
         return null;
@@ -106,7 +106,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
 
     return (
         <WorkspaceLayout
-            title="Appointments"
+            title={__('general.appointments')}
             workspaceName="Booking Settings"
             tenantId="SYS-BOOKING"
             menuItems={[
@@ -117,12 +117,12 @@ export default function Appointments({ bookings, providers, filters }: any) {
                 { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
-            <Head title="Appointments" />
+            <Head title={__('general.appointments')} />
 
             <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">Appointments</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">{__('general.appointments')}</h1>
                         <p className="text-muted-foreground">{__('general.manage_your_bookings_consultations_and_operational_pipeline')}</p>
                     </div>
                     
@@ -153,14 +153,12 @@ export default function Appointments({ bookings, providers, filters }: any) {
                                 onClick={() => setViewMode('list')}
                                 className={`px-3 py-1.5 rounded-sm text-sm font-medium flex items-center transition-colors ${viewMode === 'list' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
                             >
-                                <LayoutList className="w-4 h-4 me-1.5" /> List
-                            </button>
+                                <LayoutList className="w-4 h-4 me-1.5" /> {__('general.list')}</button>
                             <button
                                 onClick={() => setViewMode('calendar')}
                                 className={`px-3 py-1.5 rounded-sm text-sm font-medium flex items-center transition-colors ${viewMode === 'calendar' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
                             >
-                                <CalendarDays className="w-4 h-4 me-1.5" /> Calendar
-                            </button>
+                                <CalendarDays className="w-4 h-4 me-1.5" /> {__('general.calendar')}</button>
                         </div>
                     </div>
                 </div>
@@ -313,8 +311,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
                         />
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsNotesModalOpen(false)}>
-                                Cancel
-                            </Button>
+                                {__('general.cancel')}</Button>
                             <Button type="submit" disabled={processingNotes}>{__('general.save_notes')}</Button>
                         </DialogFooter>
                     </form>

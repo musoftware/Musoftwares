@@ -28,7 +28,7 @@ export default function QueueManager({ queueItems }) {
                                 <div>
                                     <div className="font-medium text-lg flex items-center gap-2">
                                         {item.customer_name} 
-                                        {item.priority_weight > 100 && <Badge variant="destructive">Emergency</Badge>}
+                                        {item.priority_weight > 100 && <Badge variant="destructive">{__('general.emergency')}</Badge>}
                                         {item.priority_weight > 0 && item.priority_weight <= 100 && <Badge variant="default" className="bg-amber-500 hover:bg-amber-600">VIP</Badge>}
                                     </div>
                                     <div className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
@@ -37,7 +37,7 @@ export default function QueueManager({ queueItems }) {
                                 </div>
                             </div>
                             <div>
-                                <Button variant="outline" size="sm">Manage</Button>
+                                <Button variant="outline" size="sm">{__('general.manage')}</Button>
                             </div>
                         </CardContent>
                     </Card>

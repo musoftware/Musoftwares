@@ -43,11 +43,10 @@ export default function Index({ orders, tab }: any) {
         <AuthenticatedLayout
             header={
                 <h2 className="text-2xl leading-tight font-bold text-gray-800">
-                    Orders
-                </h2>
+                    {__('general.orders')}</h2>
             }
         >
-            <Head title="Orders" />
+            <Head title={__('general.orders')} />
             <div className="min-h-screen bg-gray-50 py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     {/* Tabs */}
@@ -81,14 +80,12 @@ export default function Index({ orders, tab }: any) {
                                                 scope="col"
                                                 className="px-6 py-4 text-start text-xs font-semibold tracking-wider text-gray-500 uppercase"
                                             >
-                                                Service
-                                            </th>
+                                                {__('general.service')}</th>
                                             <th
                                                 scope="col"
                                                 className="px-6 py-4 text-start text-xs font-semibold tracking-wider text-gray-500 uppercase"
                                             >
-                                                Package
-                                            </th>
+                                                {__('general.package')}</th>
                                             <th
                                                 scope="col"
                                                 className="px-6 py-4 text-start text-xs font-semibold tracking-wider text-gray-500 uppercase"
@@ -97,26 +94,22 @@ export default function Index({ orders, tab }: any) {
                                                 scope="col"
                                                 className="px-6 py-4 text-start text-xs font-semibold tracking-wider text-gray-500 uppercase"
                                             >
-                                                Amount
-                                            </th>
+                                                {__('general.amount')}</th>
                                             <th
                                                 scope="col"
                                                 className="px-6 py-4 text-start text-xs font-semibold tracking-wider text-gray-500 uppercase"
                                             >
-                                                Status
-                                            </th>
+                                                {__('general.status')}</th>
                                             <th
                                                 scope="col"
                                                 className="px-6 py-4 text-start text-xs font-semibold tracking-wider text-gray-500 uppercase"
                                             >
-                                                Deadline
-                                            </th>
+                                                {__('general.deadline')}</th>
                                             <th
                                                 scope="col"
                                                 className="px-6 py-4 text-end text-xs font-semibold tracking-wider text-gray-500 uppercase"
                                             >
-                                                Action
-                                            </th>
+                                                {__('general.action')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 bg-white">

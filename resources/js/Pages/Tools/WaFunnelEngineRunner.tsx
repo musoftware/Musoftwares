@@ -66,21 +66,21 @@ function FunnelCard({ funnel, onOpen, onDelete, onToggle }: any) {
             <div className="grid grid-cols-3 gap-2 mb-4">
                 <div className="bg-slate-800/60 rounded-xl p-2.5 text-center">
                     <p className="text-sm font-black text-white">{funnel.entered ?? 0}</p>
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">Entered</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">{__('general.entered')}</p>
                 </div>
                 <div className="bg-slate-800/60 rounded-xl p-2.5 text-center">
                     <p className="text-sm font-black text-emerald-400">{funnel.converted ?? 0}</p>
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">Converted</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">{__('general.converted')}</p>
                 </div>
                 <div className="bg-slate-800/60 rounded-xl p-2.5 text-center">
                     <p className="text-sm font-black text-indigo-400">{funnel.conversion_rate ?? '0%'}</p>
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">Rate</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">{__('general.rate')}</p>
                 </div>
             </div>
             <div className="flex gap-2">
                 <Button variant="outline" onClick={e => { e.stopPropagation(); onToggle(funnel); }}
                     className={`flex-1 h-9 rounded-xl text-xs font-bold transition-all ${funnel.status === 'active' ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/15 hover:text-yellow-400' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/15 hover:text-emerald-400'}`}>
-                    {funnel.status === 'active' ? <><Square className="w-3 h-3 inline me-1" />Pause</> : <><Play className="w-3 h-3 inline me-1" />Activate</>}
+                    {funnel.status === 'active' ? <><Square className="w-3 h-3 inline me-1" />{__('general.pause')}</> : <><Play className="w-3 h-3 inline me-1" />{__('general.activate')}</>}
                 </Button>
                 <Button variant="outline" size="icon" onClick={e => { e.stopPropagation(); onOpen(funnel); }}
                     className="h-9 w-10 bg-blue-500/10 border-blue-500/20 text-blue-400 rounded-xl hover:bg-blue-500/15 hover:text-blue-400 transition-all">
@@ -199,7 +199,7 @@ function FunnelBuilder({ funnel, onClose, onSave }: { funnel: any; onClose: () =
                                             <div className="flex gap-2">
                                                 <Input type="number" min={1} defaultValue={1} className="h-9 text-xs bg-slate-800 border-slate-700 text-white focus-visible:ring-blue-500" />
                                                 <select className="h-9 px-3 text-xs bg-slate-800 border border-slate-700 rounded-md outline-none text-white focus:border-blue-500">
-                                                    <option>Hours</option><option>Days</option>
+                                                    <option>{__('general.hours')}</option><option>{__('general.days')}</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -281,8 +281,8 @@ export default function WaFunnelEngineRunner({ tool }: any) {
                                 className="h-10 text-sm bg-slate-800 border-slate-700 focus-visible:ring-blue-500 text-white" autoFocus />
                         </div>
                         <div className="flex gap-3">
-                            <Button variant="outline" onClick={() => setShowNew(false)} className="flex-1 h-10 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-400 transition-all">Cancel</Button>
-                            <Button onClick={createFunnel} disabled={!newName.trim()} className="flex-1 h-10 bg-blue-500 text-white hover:bg-blue-400 transition-all">Create</Button>
+                            <Button variant="outline" onClick={() => setShowNew(false)} className="flex-1 h-10 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-400 transition-all">{__('general.cancel')}</Button>
+                            <Button onClick={createFunnel} disabled={!newName.trim()} className="flex-1 h-10 bg-blue-500 text-white hover:bg-blue-400 transition-all">{__('general.create')}</Button>
                         </div>
                     </div>
                 </div>

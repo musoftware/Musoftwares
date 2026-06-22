@@ -12,6 +12,7 @@ import { Plus, Search, FileText, Download, MoreHorizontal, Eye, Edit, Send, Wall
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
 import { EmptyState } from '@/Components/ui/EmptyState';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ invoices, stats, filters }) {
     // ── DataTable columns using {key, label, render} format ─────────────────
@@ -112,8 +113,7 @@ export default function Index({ invoices, stats, filters }) {
                             {!['paid', 'cancelled', 'refunded'].includes(row.status) && (
                                 <DropdownMenuItem asChild>
                                     <Link href={route('erp.invoices.edit', row.id)}>
-                                        <Edit className="me-2 h-4 w-4 text-slate-400" /> Edit
-                                    </Link>
+                                        <Edit className="me-2 h-4 w-4 text-slate-400" /> {__('general.edit')}</Link>
                                 </DropdownMenuItem>
                             )}
                             {row.status === 'draft' && (
@@ -164,19 +164,18 @@ export default function Index({ invoices, stats, filters }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (
-        <ERPLayout title="Invoices" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__('general.invoices')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans space-y-8">
 
                 {/* ── Header ───────────────────────────────────────────────── */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Invoices</h1>
+                        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">{__('general.invoices')}</h1>
                         <p className="text-sm text-slate-500 mt-1">{__('general.manage_billing_track_payments_and_follow_up_on_overdues')}</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <Button variant="outline" size="sm" className="shadow-none border-slate-200">
-                            <FileText className="me-2 h-4 w-4" /> Export
-                        </Button>
+                            <FileText className="me-2 h-4 w-4" /> {__('general.export')}</Button>
                         <Button asChild size="sm" className="shadow-none bg-slate-900 text-white hover:bg-slate-800">
                             <Link href={route('erp.invoices.create')}>
                                 <Plus className="me-2 h-4 w-4" />{__('general.new_invoice')}</Link>
@@ -226,11 +225,11 @@ export default function Index({ invoices, stats, filters }) {
                             onChange={(e) => handleFilterChange('status', e.target.value)}
                         >
                             <option value="">{__('general.all_statuses')}</option>
-                            <option value="draft">Draft</option>
-                            <option value="sent">Sent</option>
-                            <option value="paid">Paid</option>
-                            <option value="overdue">Overdue</option>
-                            <option value="cancelled">Cancelled</option>
+                            <option value="draft">{__('general.draft')}</option>
+                            <option value="sent">{__('general.sent')}</option>
+                            <option value="paid">{__('general.paid')}</option>
+                            <option value="overdue">{__('general.overdue')}</option>
+                            <option value="cancelled">{__('general.cancelled')}</option>
                         </select>
                         <Input
                             type="date"

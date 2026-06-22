@@ -139,8 +139,7 @@ export default function TikTokBoosterRunner({ tool }: any) {
                     <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                         <h2 className="text-lg font-bold">{__('general.active_past_campaigns')}</h2>
                         <Button variant="ghost" size="sm" onClick={fetchCampaigns}>
-                            <RefreshCw className="w-4 h-4 me-2" /> Refresh
-                        </Button>
+                            <RefreshCw className="w-4 h-4 me-2" /> {__('general.refresh')}</Button>
                     </div>
                     
                     {campaigns.length === 0 ? (
@@ -150,11 +149,11 @@ export default function TikTokBoosterRunner({ tool }: any) {
                             <thead className="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase">
                                 <tr>
                                     <th className="px-6 py-4 tracking-wider">URL</th>
-                                    <th className="px-6 py-4 tracking-wider">Type</th>
-                                    <th className="px-6 py-4 tracking-wider">Status</th>
-                                    <th className="px-6 py-4 tracking-wider">Counter</th>
-                                    <th className="px-6 py-4 tracking-wider">Cooldown</th>
-                                    <th className="px-6 py-4 tracking-wider text-end">Actions</th>
+                                    <th className="px-6 py-4 tracking-wider">{__('general.type')}</th>
+                                    <th className="px-6 py-4 tracking-wider">{__('general.status')}</th>
+                                    <th className="px-6 py-4 tracking-wider">{__('general.counter')}</th>
+                                    <th className="px-6 py-4 tracking-wider">{__('general.cooldown')}</th>
+                                    <th className="px-6 py-4 tracking-wider text-end">{__('general.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">

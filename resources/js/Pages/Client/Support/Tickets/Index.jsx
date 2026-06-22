@@ -18,6 +18,7 @@ import TextInput from '@/Components/TextInput';
 import { AppPage } from '@/Components/ui/AppPage';
 import { SectionCard } from '@/Components/ui/SectionCard';
 import { ActionBar } from '@/Components/ui/ActionBar';
+import { __ } from '@/lib/i18n';
 
 export default function TicketsIndex({ tickets, isAdmin }) {
     const { auth, errors } = usePage().props;
@@ -141,9 +142,9 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                 className="h-9 w-full rounded-md border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
                             >
                                 <option value="">{__('general.all_statuses')}</option>
-                                <option value="open">Open</option>
+                                <option value="open">{__('general.open')}</option>
                                 <option value="in_progress">{__('general.in_progress')}</option>
-                                <option value="closed">Resolved</option>
+                                <option value="closed">{__('general.resolved')}</option>
                             </select>
                             <select
                                 value={filterPriority}
@@ -151,8 +152,8 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                 className="h-9 w-full rounded-md border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
                             >
                                 <option value="">{__('general.all_priorities')}</option>
-                                <option value="High">High</option>
-                                <option value="Medium">Medium</option>
+                                <option value="High">{__('general.high')}</option>
+                                <option value="Medium">{__('general.medium')}</option>
                                 <option value="Low">Low</option>
                             </select>
                         </div>
@@ -238,8 +239,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
 
                         <div className="pt-4 flex justify-end gap-3 border-t border-gray-100">
                             <Button type="button" variant="outline" onClick={() => setIsCreating(false)}>
-                                Cancel
-                            </Button>
+                                {__('general.cancel')}</Button>
                             <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">{__('general.submit_ticket')}</Button>
                         </div>
                     </form>
@@ -277,8 +277,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                     >{__('general.mark_as_resolved')}</Button>
                                 )}
                                 <Button variant="secondary" onClick={() => setSelectedTicket(null)}>
-                                    Close
-                                </Button>
+                                    {__('general.close')}</Button>
                             </div>
                         </div>
 

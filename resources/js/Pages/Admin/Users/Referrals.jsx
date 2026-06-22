@@ -9,6 +9,7 @@ import { Button } from '@/Components/ui/button';
 import Pagination from '@/Components/Pagination';
 import { formatMoney } from '@/lib/utils';
 import { format } from 'date-fns';
+import { __ } from '@/lib/i18n';
 
 export default function Referrals({ client, referrals }) {
     const currency = client.currency;
@@ -59,11 +60,11 @@ export default function Referrals({ client, referrals }) {
                                     <TableHeader>
                                         <TableRow className="bg-gray-50">
                                             <TableHead className="w-16">ID</TableHead>
-                                            <TableHead>User</TableHead>
+                                            <TableHead>{__('general.user')}</TableHead>
                                             <TableHead>{__('general.joined_date')}</TableHead>
-                                            <TableHead>Email</TableHead>
+                                            <TableHead>{__('general.email')}</TableHead>
                                             <TableHead>{__('general.commission_earned')}</TableHead>
-                                            <TableHead className="text-end">Actions</TableHead>
+                                            <TableHead className="text-end">{__('general.actions')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -90,13 +91,11 @@ export default function Referrals({ client, referrals }) {
                                                     {referral.email_verified_at ? (
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                             <CheckCircle2 className="w-3 h-3 me-1" />
-                                                            Verified
-                                                        </span>
+                                                            {__('general.verified')}</span>
                                                     ) : (
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                                             <Clock className="w-3 h-3 me-1" />
-                                                            Unverified
-                                                        </span>
+                                                            {__('general.unverified')}</span>
                                                     )}
                                                 </TableCell>
                                                 <TableCell>
@@ -107,8 +106,7 @@ export default function Referrals({ client, referrals }) {
                                                         <DropdownMenuTrigger asChild>
                                                             <Button variant="outline" size="sm">
                                                                 <Settings className="w-4 h-4 me-2" />
-                                                                Actions
-                                                            </Button>
+                                                                {__('general.actions')}</Button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem asChild>

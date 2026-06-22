@@ -81,15 +81,15 @@ export default function SerialUserDevicesByUser({ users, filters }: Props) {
                                 <div className="flex items-center gap-6 text-sm">
                                     <div className="text-center">
                                         <p className="text-white font-semibold">{user.total_devices}</p>
-                                        <p className="text-zinc-500 text-xs">Total</p>
+                                        <p className="text-zinc-500 text-xs">{__('general.total')}</p>
                                     </div>
                                     <div className="text-center">
                                         <p className="text-emerald-400 font-semibold">{user.active_devices}</p>
-                                        <p className="text-zinc-500 text-xs">Active</p>
+                                        <p className="text-zinc-500 text-xs">{__('general.active')}</p>
                                     </div>
                                     <div className="text-center">
                                         <p className="text-zinc-400 font-semibold">{user.inactive_devices}</p>
-                                        <p className="text-zinc-500 text-xs">Inactive</p>
+                                        <p className="text-zinc-500 text-xs">{__('general.inactive')}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">

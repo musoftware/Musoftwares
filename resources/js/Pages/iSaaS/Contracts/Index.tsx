@@ -28,14 +28,14 @@ export default function Index({ contracts, currentTab }) {
     const getStatusBadge = (status) => {
         switch (status) {
             case 'signed':
-                return <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Signed</span>;
+                return <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">{__('general.signed')}</span>;
             case 'sent':
-                return <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Sent</span>;
+                return <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">{__('general.sent')}</span>;
             case 'cancelled':
-                return <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">Cancelled</span>;
+                return <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">{__('general.cancelled')}</span>;
             case 'draft':
             default:
-                return <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">Draft</span>;
+                return <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">{__('general.draft')}</span>;
         }
     };
 
@@ -62,20 +62,17 @@ export default function Index({ contracts, currentTab }) {
                             href={route('isaas.contracts.index', { status: 'draft' })}
                             className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'draft' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                         >
-                            Drafts
-                        </Link>
+                            {__('general.drafts')}</Link>
                         <Link
                             href={route('isaas.contracts.index', { status: 'sent' })}
                             className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'sent' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                         >
-                            Sent
-                        </Link>
+                            {__('general.sent')}</Link>
                         <Link
                             href={route('isaas.contracts.index', { status: 'signed' })}
                             className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'signed' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                         >
-                            Signed
-                        </Link>
+                            {__('general.signed')}</Link>
                     </div>
                     <Link href={route('isaas.contracts.create')}>
                         <Button className="bg-slate-900 hover:bg-slate-800 text-white">
@@ -88,13 +85,13 @@ export default function Index({ contracts, currentTab }) {
                     <table className="w-full text-start text-sm">
                         <thead className="border-b bg-gray-50/55">
                             <tr>
-                                <th className="p-4 font-semibold text-slate-600">Reference</th>
+                                <th className="p-4 font-semibold text-slate-600">{__('general.reference')}</th>
                                 <th className="p-4 font-semibold text-slate-600">{__('general.client_user')}</th>
-                                <th className="p-4 font-semibold text-slate-600">Project</th>
-                                <th className="p-4 font-semibold text-slate-600 text-end">Amount</th>
-                                <th className="p-4 font-semibold text-slate-600 text-center">Status</th>
+                                <th className="p-4 font-semibold text-slate-600">{__('general.project')}</th>
+                                <th className="p-4 font-semibold text-slate-600 text-end">{__('general.amount')}</th>
+                                <th className="p-4 font-semibold text-slate-600 text-center">{__('general.status')}</th>
                                 <th className="p-4 font-semibold text-slate-600 text-center">{__('general.valid_until')}</th>
-                                <th className="p-4 font-semibold text-slate-600 text-end">Actions</th>
+                                <th className="p-4 font-semibold text-slate-600 text-end">{__('general.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -125,7 +122,7 @@ export default function Index({ contracts, currentTab }) {
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                <DropdownMenuLabel>{__('general.actions')}</DropdownMenuLabel>
                                                 <DropdownMenuItem onClick={() => router.get(route('isaas.contracts.edit', contract.id))}>
                                                     <FileText className="me-2 h-4 w-4" />{__('general.view_edit')}</DropdownMenuItem>
                                                 <DropdownMenuSeparator />

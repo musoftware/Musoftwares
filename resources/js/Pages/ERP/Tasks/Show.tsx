@@ -357,11 +357,11 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
     const getPriorityBadge = (priority: string) => {
         switch (priority) {
             case 'urgent':
-                return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-rose-50 border border-rose-200 text-rose-700">Urgent</span>;
+                return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-rose-50 border border-rose-200 text-rose-700">{__('general.urgent')}</span>;
             case 'high':
-                return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-amber-50 border border-amber-200 text-amber-700">High</span>;
+                return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-amber-50 border border-amber-200 text-amber-700">{__('general.high')}</span>;
             case 'normal':
-                return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-blue-50 border border-blue-200 text-blue-700">Normal</span>;
+                return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-blue-50 border border-blue-200 text-blue-700">{__('general.normal')}</span>;
             default:
                 return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-slate-50 border border-slate-200 text-slate-500">Low</span>;
         }
@@ -470,7 +470,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                         <CardContent className="p-5 pt-0 space-y-4">
                             <div className="flex items-baseline gap-2">
                                 <span className="text-4xl font-extrabold text-foreground tracking-tight">{completion}%</span>
-                                <span className="text-muted-foreground text-xs font-medium">Finished</span>
+                                <span className="text-muted-foreground text-xs font-medium">{__('general.finished')}</span>
                             </div>
 
                             <div className="h-2 w-full bg-border rounded-full overflow-hidden">
@@ -555,7 +555,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                                                             {getPriorityBadge(todo.priority)}
                                                             
                                                             {todo.paused && (
-                                                                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-0.5"><Pause className="h-2 w-2" /> Paused</span>
+                                                                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-0.5"><Pause className="h-2 w-2" /> {__('general.paused')}</span>
                                                             )}
                                                             
                                                             {todo.is_paid && (
@@ -644,13 +644,13 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                 {/* Comments Section */}
                 <Card className="shadow-none border-border bg-card mt-8">
                     <CardHeader className="p-5 pb-2">
-                        <CardTitle className="text-sm font-bold">Comments & Activity</CardTitle>
-                        <CardDescription className="text-[11px]">Discuss this task and leave updates</CardDescription>
+                        <CardTitle className="text-sm font-bold">{__('general.comments_activity')}</CardTitle>
+                        <CardDescription className="text-[11px]">{__('general.discuss_this_task_and_leave_updates')}</CardDescription>
                     </CardHeader>
                     <CardContent className="p-5 pt-0 space-y-4">
                         <div className="space-y-4 max-h-[400px] overflow-y-auto pe-2">
                             {comments.length === 0 ? (
-                                <div className="text-center text-muted-foreground text-xs italic py-4">No comments yet.</div>
+                                <div className="text-center text-muted-foreground text-xs italic py-4">{__('general.no_comments_yet')}</div>
                             ) : (
                                 comments.map(comment => (
                                     <div key={comment.id} className="flex gap-3 text-sm">
@@ -670,7 +670,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                                             <button 
                                                 onClick={() => handleDeleteComment(comment.id)}
                                                 className="absolute top-2 end-2 opacity-0 group-hover:opacity-100 text-rose-500 hover:text-rose-700 transition-opacity"
-                                                title="Delete comment"
+                                                title={__('general.delete_comment')}
                                             >
                                                 <Trash2 className="h-3 w-3" />
                                             </button>
@@ -683,7 +683,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                             <Textarea 
                                 value={newComment}
                                 onChange={(e) => setNewComment(e.target.value)}
-                                placeholder="Write a comment..."
+                                placeholder={__('general.write_a_comment')}
                                 className="min-h-[40px] h-[40px] shadow-none text-xs resize-none flex-1"
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' && !e.shiftKey) {
@@ -729,7 +729,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
 
                         {/* Description */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="edit_task_description" className="text-xs font-semibold text-foreground">Description</Label>
+                            <Label htmlFor="edit_task_description" className="text-xs font-semibold text-foreground">{__('general.description')}</Label>
                             <Textarea 
                                 id="edit_task_description"
                                 value={boardForm.data.task_description}
@@ -742,7 +742,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                         <div className="grid grid-cols-3 gap-4">
                             {/* Priority */}
                             <div className="space-y-1.5 col-span-1">
-                                <Label htmlFor="edit_priority" className="text-xs font-semibold text-foreground">Priority</Label>
+                                <Label htmlFor="edit_priority" className="text-xs font-semibold text-foreground">{__('general.priority')}</Label>
                                 <select
                                     id="edit_priority"
                                     value={boardForm.data.priority}
@@ -750,26 +750,26 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                                     className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
                                 >
                                     <option value="low">Low</option>
-                                    <option value="normal">Normal</option>
-                                    <option value="high">High</option>
-                                    <option value="urgent">Urgent</option>
+                                    <option value="normal">{__('general.normal')}</option>
+                                    <option value="high">{__('general.high')}</option>
+                                    <option value="urgent">{__('general.urgent')}</option>
                                 </select>
                             </div>
 
                             {/* Status */}
                             <div className="space-y-1.5 col-span-1">
-                                <Label htmlFor="edit_status" className="text-xs font-semibold text-foreground">Status</Label>
+                                <Label htmlFor="edit_status" className="text-xs font-semibold text-foreground">{__('general.status')}</Label>
                                 <select
                                     id="edit_status"
                                     value={boardForm.data.status}
                                     onChange={(e) => boardForm.setData('status', e.target.value as any)}
                                     className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
                                 >
-                                    <option value="open">Open</option>
+                                    <option value="open">{__('general.open')}</option>
                                     <option value="in_progress">{__('general.in_progress')}</option>
-                                    <option value="review">Review</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="archived">Archived</option>
+                                    <option value="review">{__('general.review')}</option>
+                                    <option value="completed">{__('general.completed')}</option>
+                                    <option value="archived">{__('general.archived')}</option>
                                 </select>
                             </div>
 
@@ -803,8 +803,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                                     className="shadow-none text-xs"
                                     disabled={boardForm.processing}
                                 >
-                                    Cancel
-                                </Button>
+                                    {__('general.cancel')}</Button>
                                 <Button 
                                     type="submit" 
                                     className="shadow-none text-xs gap-2"
@@ -859,7 +858,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                         <div className="grid grid-cols-3 gap-4">
                             {/* Priority */}
                             <div className="space-y-1.5 col-span-1">
-                                <Label htmlFor="todo_priority" className="text-xs font-semibold text-foreground">Priority</Label>
+                                <Label htmlFor="todo_priority" className="text-xs font-semibold text-foreground">{__('general.priority')}</Label>
                                 <select
                                     id="todo_priority"
                                     value={todoData.priority}
@@ -867,9 +866,9 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                                     className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
                                 >
                                     <option value="low">Low</option>
-                                    <option value="normal">Normal</option>
-                                    <option value="high">High</option>
-                                    <option value="urgent">Urgent</option>
+                                    <option value="normal">{__('general.normal')}</option>
+                                    <option value="high">{__('general.high')}</option>
+                                    <option value="urgent">{__('general.urgent')}</option>
                                 </select>
                             </div>
 
@@ -890,7 +889,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
 
                             {/* Cost Currency */}
                             <div className="space-y-1.5 col-span-1">
-                                <Label htmlFor="todo_currency" className="text-xs font-semibold text-foreground">Currency</Label>
+                                <Label htmlFor="todo_currency" className="text-xs font-semibold text-foreground">{__('general.currency')}</Label>
                                 <CurrencySelect 
                                     currencies={currencies}
                                     value={todoData.cost_currency ?? undefined}
@@ -946,8 +945,7 @@ const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
                                 className="shadow-none text-xs"
                                 disabled={submittingTodo}
                             >
-                                Cancel
-                            </Button>
+                                {__('general.cancel')}</Button>
                             <Button 
                                 type="submit" 
                                 className="shadow-none text-xs gap-2"

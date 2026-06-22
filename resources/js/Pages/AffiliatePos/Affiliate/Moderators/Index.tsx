@@ -28,10 +28,10 @@ export default function AffiliateModeratorsIndex({ moderators }: any) {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-gray-50/80">
-                                <TableHead className="font-semibold text-gray-600">Name</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Email</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Joined</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-end">Actions</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.name')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.email')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.joined')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">{__('general.actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>

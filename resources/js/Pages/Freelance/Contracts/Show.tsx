@@ -136,7 +136,7 @@ function ShowContractContent({ auth, contract, userCurrency }: any) {
                                             <span className="text-[10px] text-slate-400 font-medium mb-1 mx-1">
                                                 {msg.sender_name} • {msg.time}
                                             </span>
-                                            <div className={`px-4 py-2.5 rounded-2xl max-w-[85%] text-sm shadow-sm ${isMe ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-white border border-slate-200 text-slate-800 rounded-tl-sm'
+                                            <div className={`px-4 py-2.5 rounded-2xl max-w-[85%] text-sm shadow-sm ${isMe ? 'bg-indigo-600 text-white rounded-te-sm' : 'bg-white border border-slate-200 text-slate-800 rounded-ts-sm'
                                                 }`}>
                                                 {msg.text}
                                             </div>

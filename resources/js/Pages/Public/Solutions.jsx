@@ -7,6 +7,7 @@ import { Button } from '@/Components/ui/button';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import { __ } from '@/lib/i18n';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -96,28 +97,24 @@ export default function Solutions() {
                     <div className="max-w-4xl">
                         <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-8 bg-white">
                             <span className="flex h-1.5 w-1.5 rounded-full bg-[#111111]"></span>
-                            Custom Solutions
-                        </div>
+                            {__('general.custom_solutions')}</div>
                         <h1 className="gsap-fade-up text-5xl lg:text-7xl font-extrabold text-[#111111] tracking-tight leading-[1.05] mb-6">
-                            Software Built for Your Business.
-                        </h1>
+                            {__('general.software_built_for_your_business')}</h1>
                         <p className="gsap-fade-up text-xl text-[#666666] font-normal leading-relaxed max-w-2xl mb-10">
-                            We don't sell templates. We engineer robust, scalable systems that solve complex operational problems and drive revenue.
-                        </p>
+                            {__('general.we_dont_sell_templates_we_engineer_robus')}</p>
                         <Button 
                             onClick={() => openWhatsApp("Hello Mahmoud, I need a custom software solution.")}
                             className="gsap-fade-up bg-[#111111] text-white hover:bg-[#333333] rounded-xl px-8 py-6 text-sm font-bold uppercase tracking-wide transition-all"
                         >
-                            Discuss Your Project
-                        </Button>
+                            {__('general.discuss_your_project')}</Button>
                     </div>
                 </section>
 
                 {/* Solutions Grid */}
                 <section className="py-24 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
                     <div className="text-center mb-16">
-                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">Core Competencies</h2>
-                        <p className="gsap-fade-up text-lg text-[#666666]">What we excel at building.</p>
+                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">{__('general.core_competencies')}</h2>
+                        <p className="gsap-fade-up text-lg text-[#666666]">{__('general.what_we_excel_at_building')}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -147,16 +144,14 @@ export default function Solutions() {
                 <section className="py-32 bg-[#111111] text-white text-center reveal-section px-6">
                     <div className="max-w-3xl mx-auto">
                         <h2 className="gsap-fade-up text-4xl md:text-5xl font-extrabold mb-6">
-                            Have a complex problem?
-                        </h2>
+                            {__('general.have_a_complex_problem')}</h2>
                         <p className="gsap-fade-up text-xl text-[#a3a3a3] mb-12 leading-relaxed">
-                            Let's map out the architecture. The consultation is free, and we speak plain English.
-                        </p>
+                            {__('general.lets_map_out_the_architecture_the_consul')}</p>
                         <Button 
                             onClick={() => openWhatsApp("Hello Mahmoud, I have a complex problem and need a technical consultation.")}
                             className="gsap-fade-up bg-white text-[#111111] hover:bg-[#e5e5e5] rounded-xl px-10 py-7 text-sm font-bold tracking-wide uppercase transition-all flex items-center justify-center gap-3 mx-auto"
                         >
-                            Book a Consultation <ArrowRight className="w-4 h-4" />
+                            {__('general.book_a_consultation')}<ArrowRight className="w-4 h-4" />
                         </Button>
                     </div>
                 </section>

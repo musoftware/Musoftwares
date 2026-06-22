@@ -41,7 +41,7 @@ export default function Billing({ subscriptions }: Props) {
     }, [subscriptions]);
 
     return (
-        <ToolsPublicLayout title="Billing" activeNav="billing">
+        <ToolsPublicLayout title={__('general.billing')} activeNav="billing">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
                 {/* Page header */}
                 <div className="flex items-start justify-between">
@@ -113,12 +113,10 @@ export default function Billing({ subscriptions }: Props) {
                                         <div className="flex gap-3 mt-5 pt-4 border-t border-slate-100 dark:border-slate-800">
                                             <Button variant="outline" size="sm" className="gap-2 h-8"
                                                 onClick={() => router.visit(route('tools.download.generate', sub.tool.slug))}>
-                                                <Download className="h-3.5 w-3.5" /> Download
-                                            </Button>
+                                                <Download className="h-3.5 w-3.5" /> {__('general.download')}</Button>
                                             <Button variant="outline" size="sm" className="gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 dark:border-red-900/30 dark:hover:bg-red-900/10 h-8"
                                                 onClick={() => handleCancel(sub.id)}>
-                                                <XCircle className="h-3.5 w-3.5" /> Cancel
-                                            </Button>
+                                                <XCircle className="h-3.5 w-3.5" /> {__('general.cancel')}</Button>
                                         </div>
                                     )}
                                 </div>

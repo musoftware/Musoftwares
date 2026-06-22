@@ -7,6 +7,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Button } from '@/Components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/Components/ui/alert';
+import { __ } from '@/lib/i18n';
 
 // Simple debounce helper
 function useDebounce(value, delay) {
@@ -140,7 +141,7 @@ export default function Create({ user, wallet }) {
                         <p className="text-sm text-muted-foreground">{__('general.send_funds_instantly_to_another_platform_user_s_wallet')}</p>
                     </div>
                     <Button variant="outline" size="sm" asChild className="shadow-none">
-                        <Link href={route('financial.transfer.history')}>History</Link>
+                        <Link href={route('financial.transfer.history')}>{__('general.history')}</Link>
                     </Button>
                 </div>
 
@@ -244,8 +245,7 @@ export default function Create({ user, wallet }) {
                                             </div>
                                         </div>
                                         <Button type="button" variant="ghost" size="sm" className="text-xs text-rose-600 hover:text-rose-700" onClick={clearRecipient}>
-                                            Change
-                                        </Button>
+                                            {__('general.change')}</Button>
                                     </div>
 
                                     {/* Amount Input */}
@@ -350,8 +350,7 @@ export default function Create({ user, wallet }) {
                                     {/* Action Buttons */}
                                     <div className="flex items-center justify-between pt-4">
                                         <Button type="button" variant="outline" className="shadow-none" onClick={() => setStep(1)}>
-                                            <ArrowLeft className="w-4 h-4 me-2" /> Back
-                                        </Button>
+                                            <ArrowLeft className="w-4 h-4 me-2" /> {__('general.back')}</Button>
                                         <Button
                                             type="button"
                                             className="shadow-none"
@@ -426,8 +425,7 @@ export default function Create({ user, wallet }) {
                                     {/* Action Buttons */}
                                     <div className="flex items-center justify-between pt-4">
                                         <Button type="button" variant="outline" className="shadow-none" onClick={() => setStep(2)}>
-                                            <ArrowLeft className="w-4 h-4 me-2" /> Back
-                                        </Button>
+                                            <ArrowLeft className="w-4 h-4 me-2" /> {__('general.back')}</Button>
                                         <Button
                                             type="submit"
                                             className="shadow-none bg-primary hover:bg-primary/95 text-primary-foreground font-semibold px-6"

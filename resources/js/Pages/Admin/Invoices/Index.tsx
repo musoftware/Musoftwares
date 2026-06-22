@@ -194,11 +194,11 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     const getJobStatusBadge = (status) => {
         switch (status) {
             case 'done':
-                return <StatusBadge status="done" label="Done" className="bg-emerald-50 text-emerald-700 border-emerald-100" />;
+                return <StatusBadge status="done" label={__('general.done')} className="bg-emerald-50 text-emerald-700 border-emerald-100" />;
             case 'processing':
-                return <StatusBadge status="processing" label="Processing" className="bg-amber-50 text-amber-700 border-amber-100" />;
+                return <StatusBadge status="processing" label={__('general.processing')} className="bg-amber-50 text-amber-700 border-amber-100" />;
             default:
-                return <StatusBadge status="pending" label="Pending" className="bg-slate-50 text-slate-700 border-slate-100" />;
+                return <StatusBadge status="pending" label={__('general.pending')} className="bg-slate-50 text-slate-700 border-slate-100" />;
         }
     };
 
@@ -223,13 +223,13 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     </Card>
                     <Card>
                         <CardContent className="p-5">
-                            <dt className="text-sm font-medium text-muted-foreground truncate">Paid</dt>
+                            <dt className="text-sm font-medium text-muted-foreground truncate">{__('general.paid')}</dt>
                             <dd className="mt-1 text-3xl font-semibold text-foreground">{stats.paid}</dd>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardContent className="p-5">
-                            <dt className="text-sm font-medium text-muted-foreground truncate">Unpaid</dt>
+                            <dt className="text-sm font-medium text-muted-foreground truncate">{__('general.unpaid')}</dt>
                             <dd className="mt-1 text-3xl font-semibold text-foreground">{stats.unpaid}</dd>
                         </CardContent>
                     </Card>
@@ -252,8 +252,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                         href={buildTabUrl('unpaid')}
                         className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentTab === 'unpaid' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
                     >
-                        Unpaid
-                    </Link>
+                        {__('general.unpaid')}</Link>
                     <Link
                         href={buildTabUrl('archive')}
                         className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentTab === 'archive' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
@@ -283,7 +282,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                         </div>
 
                         <div className="w-full md:w-32">
-                            <Label className="mb-2 block text-xs uppercase text-muted-foreground">Show</Label>
+                            <Label className="mb-2 block text-xs uppercase text-muted-foreground">{__('general.show')}</Label>
                             <PremiumCombobox
                                 value={perPage}
                                 onChange={(val) => { setPerPage(String(val)); setTimeout(handleFilter, 50); }}
@@ -327,14 +326,14 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                         />
                                     </TableHead>
                                     <TableHead className="hidden sm:table-cell uppercase text-xs">ID</TableHead>
-                                    <TableHead className="uppercase text-xs">Customer</TableHead>
-                                    <TableHead className="uppercase text-xs">Project</TableHead>
-                                    <TableHead className="uppercase text-xs">Date</TableHead>
+                                    <TableHead className="uppercase text-xs">{__('general.customer')}</TableHead>
+                                    <TableHead className="uppercase text-xs">{__('general.project')}</TableHead>
+                                    <TableHead className="uppercase text-xs">{__('general.date')}</TableHead>
                                     <TableHead className="uppercase text-xs">{__('general.schedule_date')}</TableHead>
-                                    <TableHead className="text-end uppercase text-xs">Total</TableHead>
+                                    <TableHead className="text-end uppercase text-xs">{__('general.total')}</TableHead>
                                     <TableHead className="text-center uppercase text-xs">{__('general.job_status')}</TableHead>
                                     <TableHead className="text-center uppercase text-xs">{__('general.invoice_status')}</TableHead>
-                                    <TableHead className="text-end uppercase text-xs">Actions</TableHead>
+                                    <TableHead className="text-end uppercase text-xs">{__('general.actions')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -353,7 +352,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                 {invoice.invoice_number}
                                             </Link>
                                         </TableCell>
-                                        <TableCell data-label="Customer">
+                                        <TableCell data-label={__('general.customer')}>
                                             {invoice.user ? (
                                                 <div className="flex items-center gap-3">
                                                     <Avatar className="h-10 w-10 border border-slate-200">
@@ -377,19 +376,19 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <span className="font-semibold text-muted-foreground">Unknown</span>
+                                                <span className="font-semibold text-muted-foreground">{__('general.unknown')}</span>
                                             )}
                                         </TableCell>
-                                        <TableCell className="font-medium text-foreground" data-label="Project">
+                                        <TableCell className="font-medium text-foreground" data-label={__('general.project')}>
                                             {invoice.project ? invoice.project.project_name : '-'}
                                         </TableCell>
-                                        <TableCell className="text-muted-foreground text-sm" data-label="Date">
+                                        <TableCell className="text-muted-foreground text-sm" data-label={__('general.date')}>
                                             {new Date(invoice.created_at).toLocaleDateString()}
                                         </TableCell>
                                         <TableCell className="text-muted-foreground text-sm" data-label={__('general.schedule_date')}>
                                             {invoice.scheduled_start_date ? new Date(invoice.scheduled_start_date).toLocaleDateString() : '-'}
                                         </TableCell>
-                                        <TableCell className="text-end" data-label="Total">
+                                        <TableCell className="text-end" data-label={__('general.total')}>
                                             <div className="flex flex-col items-end gap-1">
                                                 <span className="font-semibold text-emerald-600">
                                                     {formatCurrency(invoice.amount, invoice.currency)}
@@ -423,7 +422,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                 {getStatusBadge(invoice.status)}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-end" data-label="Actions">
+                                        <TableCell className="text-end" data-label={__('general.actions')}>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -490,12 +489,10 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                 
                                 {((filters as any).client_id || (filters as any).search === 'unpaid_partial' || (filters as any).search === 'archived') && (invoices.data as any).length > 0 && (
                                     <TableRow className="bg-muted/30 font-semibold border-t">
-                                        <TableCell colSpan={6} className="text-end hidden sm:table-cell pe-4" data-label="Total">
-                                            Total
-                                        </TableCell>
-                                        <TableCell className="text-end sm:hidden" data-label="Total">
-                                            Total
-                                        </TableCell>
+                                        <TableCell colSpan={6} className="text-end hidden sm:table-cell pe-4" data-label={__('general.total')}>
+                                            {__('general.total')}</TableCell>
+                                        <TableCell className="text-end sm:hidden" data-label={__('general.total')}>
+                                            {__('general.total')}</TableCell>
                                         <TableCell className="text-end" data-label={__('general.total_amount')}>
                                             {formatCurrency(
                                                 invoices.data.reduce((sum, inv) => sum + (Number(inv.business_amount) || Number(inv.amount) || 0), 0),
@@ -549,8 +546,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                             )}
 
                             <Button onClick={applyBulkAction} size="sm" className="h-9">
-                                Apply
-                            </Button>
+                                {__('general.apply')}</Button>
                         </div>
 
                         <div className="w-full md:ms-auto md:w-auto">
@@ -592,20 +588,20 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                         <DialogTitle>{__('general.change_job_status')}</DialogTitle>
                     </DialogHeader>
                     <div className="py-4">
-                        <Label>Status</Label>
+                        <Label>{__('general.status')}</Label>
                         <Select value={newJobStatus} onValueChange={(val) => setNewJobStatus(val || '')}>
                             <SelectTrigger className="mt-2">
                                 <SelectValue placeholder={__('general.select_status')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="pending">Pending</SelectItem>
-                                <SelectItem value="processing">Processing</SelectItem>
-                                <SelectItem value="done">Done</SelectItem>
+                                <SelectItem value="pending">{__('general.pending')}</SelectItem>
+                                <SelectItem value="processing">{__('general.processing')}</SelectItem>
+                                <SelectItem value="done">{__('general.done')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setJobStatusDialog(null)}>Cancel</Button>
+                        <Button variant="outline" onClick={() => setJobStatusDialog(null)}>{__('general.cancel')}</Button>
                         <Button onClick={handleChangeJobStatus}>{__('general.save_status')}</Button>
                     </DialogFooter>
                 </DialogContent>

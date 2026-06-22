@@ -9,6 +9,7 @@ import Modal from '@/Components/Modal';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
+import { __ } from '@/lib/i18n';
 
 export default function MessagesIndex({ conversations, users }) {
     const { auth } = usePage().props;
@@ -73,7 +74,7 @@ export default function MessagesIndex({ conversations, users }) {
 
     return (
         <AuthenticatedLayout header="Messages & Communications">
-            <Head title="Messages" />
+            <Head title={__('general.messages')} />
 
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header Controls & Tabs */}
@@ -238,7 +239,7 @@ export default function MessagesIndex({ conversations, users }) {
                             </div>
 
                             <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                                <SecondaryButton onClick={() => setIsNewModalOpen(false)}>Cancel</SecondaryButton>
+                                <SecondaryButton onClick={() => setIsNewModalOpen(false)}>{__('general.cancel')}</SecondaryButton>
                                 <PrimaryButton type="submit" disabled={processing}>{__('general.start_chat')}</PrimaryButton>
                             </div>
                         </form>

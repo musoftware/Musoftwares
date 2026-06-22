@@ -1,5 +1,6 @@
 import React from 'react';
 import { useFreelanceMode } from './FreelanceModeContext';
+import { __ } from '@/lib/i18n';
 
 export default function FreelanceModeToggle() {
     const { mode, setMode } = useFreelanceMode();
@@ -14,8 +15,7 @@ export default function FreelanceModeToggle() {
                         : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50/50'
                 }`}
             >
-                Client
-            </button>
+                {__('general.client')}</button>
             <button
                 onClick={() => setMode('freelancer')}
                 className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
@@ -24,8 +24,7 @@ export default function FreelanceModeToggle() {
                         : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50/50'
                 }`}
             >
-                Freelancer
-            </button>
+                {__('general.freelancer')}</button>
         </div>
     );
 }

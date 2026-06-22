@@ -130,7 +130,7 @@ export default function ObfuscatorRunner({ tool }: any) {
 
             <div className="max-w-3xl mx-auto px-4 py-8">
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
-                    <h2 className="text-lg font-bold mb-4">Configuration</h2>
+                    <h2 className="text-lg font-bold mb-4">{__('general.configuration')}</h2>
                     
                     <div className="space-y-4 mb-6">
                         <div>
@@ -142,7 +142,7 @@ export default function ObfuscatorRunner({ tool }: any) {
                                     placeholder={__('general.c_projects_my_app_src')} 
                                     className="flex-1"
                                 />
-                                <Button onClick={handleScan} variant="secondary">Scan</Button>
+                                <Button onClick={handleScan} variant="secondary">{__('general.scan')}</Button>
                             </div>
                         </div>
 

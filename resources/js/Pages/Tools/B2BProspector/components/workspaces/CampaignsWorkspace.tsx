@@ -88,7 +88,7 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
 
                                     <div className="grid grid-cols-3 gap-2.5 my-5">
                                         <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100 text-center">
-                                            <span className="text-slate-400 text-[10px] font-semibold block">Extracted</span>
+                                            <span className="text-slate-400 text-[10px] font-semibold block">{__('general.extracted')}</span>
                                             <span className="text-slate-900 text-sm font-bold block mt-0.5">{stats.total}</span>
                                         </div>
                                         <div className="bg-emerald-50/20 p-2.5 rounded-xl border border-emerald-100/30 text-center">
@@ -96,7 +96,7 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
                                             <span className="text-emerald-700 text-sm font-bold block mt-0.5">{stats.valid}</span>
                                         </div>
                                         <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100 text-center">
-                                            <span className="text-slate-400 text-[10px] font-semibold block">Emailed</span>
+                                            <span className="text-slate-400 text-[10px] font-semibold block">{__('general.emailed')}</span>
                                             <span className="text-slate-900 text-sm font-bold block mt-0.5">{stats.emailed}</span>
                                         </div>
                                     </div>
@@ -177,7 +177,7 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
                                 <Input type="number" min={10} max={1000} value={props.newCampLimit} onChange={e => props.setNewCampLimit(parseInt(e.target.value) || 100)} className="text-center font-bold" />
                             </div>
                             <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3.5">
-                                <Button type="button" variant="ghost" onClick={() => props.setShowNewCampaignModal(false)}>Cancel</Button>
+                                <Button type="button" variant="ghost" onClick={() => props.setShowNewCampaignModal(false)}>{__('general.cancel')}</Button>
                                 <Button type="submit">{__('general.save_draft_campaign')}</Button>
                             </div>
                         </form>

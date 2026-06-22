@@ -79,7 +79,7 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
                             <form onSubmit={submit} className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label>Provider</Label>
+                                        <Label>{__('general.provider')}</Label>
                                         <Select onValueChange={(value) => setData('booking_provider_id', String(value))} value={data.booking_provider_id}>
                                             <SelectTrigger>
                                                 <SelectValue placeholder={__('general.select_provider')} />
@@ -108,7 +108,7 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
                                     </div>
                                 </div>
                                 <div className="flex justify-end gap-2 pt-4">
-                                    <Button type="button" variant="outline" onClick={() => setIsAdding(false)}>Cancel</Button>
+                                    <Button type="button" variant="outline" onClick={() => setIsAdding(false)}>{__('general.cancel')}</Button>
                                     <Button type="submit" disabled={processing} className="bg-slate-900 hover:bg-slate-800 text-white">{__('general.save_exception')}</Button>
                                 </div>
                             </form>

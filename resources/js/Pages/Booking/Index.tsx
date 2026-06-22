@@ -81,8 +81,7 @@ export default function Index({ events }: { events: EventType[] }) {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem className="cursor-pointer" onClick={() => window.location.href = route('booking.events.edit', event.slug)}>
-                                                    Edit
-                                                </DropdownMenuItem>
+                                                    {__('general.edit')}</DropdownMenuItem>
                                                 <DropdownMenuItem className="cursor-pointer" onClick={() => copyLink(event.slug)}>{__('general.copy_link')}</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>

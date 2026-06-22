@@ -16,8 +16,8 @@
         }
 
         .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .text-left { text-align: left; }
+        .text-end { text-align: right; }
+        .text-start { text-align: left; }
         .font-bold { font-weight: 700; }
         .mb-1 { margin-bottom: 4px; }
         .mb-2 { margin-bottom: 8px; }
@@ -92,20 +92,20 @@
     <table class="items-table mb-2">
         <thead>
             <tr>
-                <th class="text-left">{{ __('erp.item') }}</th>
+                <th class="text-start">{{ __('erp.item') }}</th>
                 <th class="text-center">{{ __('erp.qty') }}</th>
-                <th class="text-right">{{ __('erp.total') }}</th>
+                <th class="text-end">{{ __('erp.total') }}</th>
             </tr>
         </thead>
         <tbody>
             @foreach($invoice->items as $item)
                 <tr>
-                    <td colspan="3" class="text-left font-bold" style="padding-top:4px;">{{ $item->title }}</td>
+                    <td colspan="3" class="text-start font-bold" style="padding-top:4px;">{{ $item->title }}</td>
                 </tr>
                 <tr>
-                    <td class="text-left" style="color: #444;">{{ \App\Helpers\FinanceHelper::instance()->format_money($item->unit_price, $invoice->currency_id) }}</td>
+                    <td class="text-start" style="color: #444;">{{ \App\Helpers\FinanceHelper::instance()->format_money($item->unit_price, $invoice->currency_id) }}</td>
                     <td class="text-center">{{ $item->quantity }}</td>
-                    <td class="text-right">{{ \App\Helpers\FinanceHelper::instance()->format_money($item->total, $invoice->currency_id) }}</td>
+                    <td class="text-end">{{ \App\Helpers\FinanceHelper::instance()->format_money($item->total, $invoice->currency_id) }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -118,24 +118,24 @@
             $subtotal = $invoice->items->sum('total') ?? $invoice->amount;
         @endphp
         <tr>
-            <td class="text-left">{{ __('erp.subtotal') }}</td>
-            <td class="text-right">{{ \App\Helpers\FinanceHelper::instance()->format_money($subtotal, $invoice->currency_id) }}</td>
+            <td class="text-start">{{ __('erp.subtotal') }}</td>
+            <td class="text-end">{{ \App\Helpers\FinanceHelper::instance()->format_money($subtotal, $invoice->currency_id) }}</td>
         </tr>
         @if($invoice->discount_amount > 0)
             <tr>
-                <td class="text-left">{{ __('erp.discount') }}</td>
-                <td class="text-right">-{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->discount_amount, $invoice->currency_id) }}</td>
+                <td class="text-start">{{ __('erp.discount') }}</td>
+                <td class="text-end">-{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->discount_amount, $invoice->currency_id) }}</td>
             </tr>
         @endif
         @if($invoice->tax_amount > 0)
             <tr>
-                <td class="text-left">{{ __('erp.tax') }} ({{ number_format($invoice->tax_rate, 0) }}%)</td>
-                <td class="text-right">{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->tax_amount, $invoice->currency_id) }}</td>
+                <td class="text-start">{{ __('erp.tax') }} ({{ number_format($invoice->tax_rate, 0) }}%)</td>
+                <td class="text-end">{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->tax_amount, $invoice->currency_id) }}</td>
             </tr>
         @endif
         <tr class="grand-total">
-            <td class="text-left">{{ strtoupper(__('erp.total')) }}</td>
-            <td class="text-right">{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->amount, $invoice->currency_id) }}</td>
+            <td class="text-start">{{ strtoupper(__('erp.total')) }}</td>
+            <td class="text-end">{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->amount, $invoice->currency_id) }}</td>
         </tr>
     </table>
 

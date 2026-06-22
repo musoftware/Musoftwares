@@ -30,7 +30,7 @@ interface Template {
 interface Props {
     t: any;
     locale: 'en' | 'ar';
-    callRPC: (action: string, data?: any) => Promise<any>;
+    callRPC: (action: string, data?: any) => {__('general.promise')}<any>;
     onUseTemplate?: (template: Template) => void;
     onTemplatesChange?: (templates: Template[]) => void;
     initialEditTemplateId?: string | null;

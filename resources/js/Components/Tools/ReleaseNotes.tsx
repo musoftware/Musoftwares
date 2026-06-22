@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Badge } from '@/Components/ui/badge';
+import { __ } from '@/lib/i18n';
 
 interface ToolVersion {
     version: string;
@@ -40,13 +41,11 @@ export function ReleaseNotes({ versions, defaultExpanded }: ReleaseNotesProps) {
                                 <code className="font-mono text-sm font-semibold text-slate-800">v{v.version}</code>
                                 {v.is_latest && (
                                     <Badge className="bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-50 text-[11px] px-2 py-0 font-medium">
-                                        Latest
-                                    </Badge>
+                                        {__('general.latest')}</Badge>
                                 )}
                                 {v.is_beta && (
                                     <Badge className="bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-50 text-[11px] px-2 py-0 font-medium">
-                                        Beta
-                                    </Badge>
+                                        {__('general.beta')}</Badge>
                                 )}
                                 <span className="text-xs text-slate-400 hidden sm:block">{v.released_at}</span>
                                 {v.file_size && (

@@ -10,6 +10,7 @@ import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
 import Modal from '@/Components/Modal';
 import { formatMoney } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,7 +33,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
 
     return (
         <AuthenticatedLayout header="Request Withdrawal">
-            <Head title="Withdrawals" />
+            <Head title={__('general.withdrawals')} />
 
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-8">
                 
@@ -87,9 +88,9 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                                 <TableRow>
                                     <TableHead className="ps-6">ID #</TableHead>
                                     <TableHead>{__('general.payout_method')}</TableHead>
-                                    <TableHead>Amount</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="pe-6 text-end">Date</TableHead>
+                                    <TableHead>{__('general.amount')}</TableHead>
+                                    <TableHead>{__('general.status')}</TableHead>
+                                    <TableHead className="pe-6 text-end">{__('general.date')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -158,8 +159,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                                         onClick={() => setData('amount', maxAvailable.toString())}
                                         className="absolute end-1 top-1/2 -translate-y-1/2 h-7 px-2 text-xs shadow-none"
                                     >
-                                        MAX
-                                    </Button>
+                                        {__('general.max')}</Button>
                                 </div>
                                 {errors.amount && <p className="text-sm text-destructive">{errors.amount}</p>}
                             </div>
@@ -183,7 +183,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                             </div>
 
                             <div className="flex items-center justify-end gap-3 pt-4 border-t">
-                                <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+                                <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>{__('general.cancel')}</Button>
                                 <Button type="submit" disabled={processing} className="shadow-none">{__('general.confirm_withdrawal')}</Button>
                             </div>
                         </form>

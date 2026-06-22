@@ -103,9 +103,7 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
                     <div className="flex items-start gap-2.5 text-xs text-slate-500">
                         <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-slate-600" />
                         <span>
-                            The device code is a one-time token that securely links your runtime to your account.
-                            It cannot be entered manually.
-                        </span>
+                            {__('general.the_device_code_is_a_onetime_token_that')}</span>
                     </div>
 
                     <div className="flex gap-3">
@@ -249,8 +247,7 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
                         disabled={loading}
                         className="flex-1 border-slate-700 bg-transparent text-slate-400 hover:bg-slate-800 hover:text-white"
                     >
-                        Deny
-                    </Button>
+                        {__('general.deny')}</Button>
                     <Button
                         onClick={handleAllow}
                         disabled={loading}

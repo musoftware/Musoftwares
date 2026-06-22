@@ -96,8 +96,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                             <StatusBadge status={statusMap[reseller.status] || 'neutral'} label={reseller.status} />
                             <Link href="/admin/resellers">
                                 <Button variant="outline" size="sm" className="gap-1.5">
-                                    <ArrowLeft className="w-3.5 h-3.5" /> Back
-                                </Button>
+                                    <ArrowLeft className="w-3.5 h-3.5" /> {__('general.back')}</Button>
                             </Link>
                         </div>
                     }
@@ -145,8 +144,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                         {/* iFrame URL */}
                         <OperationalCard title={__('general.portal_url_iframe_embed')}>
                             <p className="text-xs text-text-muted mb-3">
-                                Share this URL with the reseller. Their sub-users access the full tools platform through this link.
-                                It can also be embedded as an <code className="bg-surface-raised px-1 py-0.5 rounded text-[11px]">&lt;iframe&gt;</code>{__('general.on_their_website')}</p>
+                                {__('general.share_this_url_with_the_reseller_their_s')}<code className="bg-surface-raised px-1 py-0.5 rounded text-[11px]">&lt;iframe&gt;</code>{__('general.on_their_website')}</p>
                             <div className="flex items-center gap-2">
                                 <div className="flex-1 bg-surface-raised border border-border rounded-lg px-3 py-2 font-mono text-xs text-text-primary break-all">
                                     {iframeUrl}
@@ -157,8 +155,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                 </Button>
                                 <a href={iframeUrl} target="_blank" rel="noopener noreferrer">
                                     <Button variant="outline" size="sm" className="shrink-0 gap-1.5">
-                                        <ExternalLink className="w-3.5 h-3.5" /> Open
-                                    </Button>
+                                        <ExternalLink className="w-3.5 h-3.5" /> {__('general.open')}</Button>
                                 </a>
                             </div>
 
@@ -172,7 +169,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
 
                         {/* Notes */}
                         {reseller.notes && (
-                            <OperationalCard title="Notes">
+                            <OperationalCard title={__('general.notes')}>
                                 <p className="text-sm text-text-primary">{reseller.notes}</p>
                             </OperationalCard>
                         )}
@@ -204,11 +201,11 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-border/60">
-                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">User</th>
-                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Status</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.user')}</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.status')}</th>
                                             <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.anti_sharing')}</th>
-                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Joined</th>
-                                            <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.joined')}</th>
+                                            <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.actions')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/40">
@@ -237,12 +234,10 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                                     <div className="flex items-center justify-end gap-2">
                                                         {u.status === 'active' ? (
                                                             <button onClick={() => suspendUser(u.user_id)} className="text-xs text-orange-600 hover:underline font-medium flex items-center gap-1">
-                                                                <UserX className="w-3.5 h-3.5" /> Suspend
-                                                            </button>
+                                                                <UserX className="w-3.5 h-3.5" /> {__('general.suspend')}</button>
                                                         ) : (
                                                             <button onClick={() => activateUser(u.user_id)} className="text-xs text-emerald-600 hover:underline font-medium flex items-center gap-1">
-                                                                <UserCheck className="w-3.5 h-3.5" /> Activate
-                                                            </button>
+                                                                <UserCheck className="w-3.5 h-3.5" /> {__('general.activate')}</button>
                                                         )}
                                                     </div>
                                                 </td>
@@ -267,10 +262,10 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-border/60">
-                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">User</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.user')}</th>
                                             <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.flagged_ips')}</th>
-                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Detected</th>
-                                            <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.detected')}</th>
+                                            <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.actions')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/40">
@@ -301,8 +296,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                                             onClick={() => suspendUser(u.user_id)}
                                                             className="text-xs text-red-600 hover:underline font-semibold flex items-center gap-1"
                                                         >
-                                                            <UserX className="w-3.5 h-3.5" /> Suspend
-                                                        </button>
+                                                            <UserX className="w-3.5 h-3.5" /> {__('general.suspend')}</button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -324,12 +318,12 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-border/60">
-                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Type</th>
-                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Description</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.type')}</th>
+                                            <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.description')}</th>
                                             <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.sub_user')}</th>
-                                            <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Amount</th>
+                                            <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.amount')}</th>
                                             <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.balance_after')}</th>
-                                            <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Date</th>
+                                            <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.date')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/40">

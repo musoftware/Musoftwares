@@ -8,6 +8,7 @@ import { format, addDays, addWeeks, addMonths, addYears, nextDay, parseISO, set 
 import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Calendar as CalendarIcon } from 'lucide-react';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
+import { __ } from '@/lib/i18n';
 
 export default function RecurringForm({ entry = null, business_currency = 'USD' }) {
     const isEditing = !!entry;
@@ -121,15 +122,13 @@ export default function RecurringForm({ entry = null, business_currency = 'USD' 
                                 onClick={() => setData('type', 'income')}
                                 className={`flex-1 py-2 px-4 border rounded-md flex items-center justify-center ${data.type === 'income' ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}`}
                             >
-                                <TrendingUp className="w-4 h-4 me-2" /> Income
-                            </button>
+                                <TrendingUp className="w-4 h-4 me-2" /> {__('general.income')}</button>
                             <button
                                 type="button"
                                 onClick={() => setData('type', 'expense')}
                                 className={`flex-1 py-2 px-4 border rounded-md flex items-center justify-center ${data.type === 'expense' ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}`}
                             >
-                                <TrendingDown className="w-4 h-4 me-2" /> Expense
-                            </button>
+                                <TrendingDown className="w-4 h-4 me-2" /> {__('general.expense')}</button>
                         </div>
                         <InputError message={errors.type} className="mt-2" />
                     </div>
@@ -336,8 +335,7 @@ export default function RecurringForm({ entry = null, business_currency = 'USD' 
 
             <div className="flex items-center justify-between pt-4">
                 <SecondaryButton onClick={() => window.history.back()}>
-                    Cancel
-                </SecondaryButton>
+                    {__('general.cancel')}</SecondaryButton>
                 <PrimaryButton disabled={processing}>
                     {isEditing ? 'Update Recurring Entry' : 'Save Recurring Entry'}
                 </PrimaryButton>

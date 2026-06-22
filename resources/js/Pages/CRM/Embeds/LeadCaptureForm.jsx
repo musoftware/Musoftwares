@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { __ } from '@/lib/i18n';
 
 export default function LeadCaptureForm({ campaign, token, flash }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -112,7 +113,7 @@ export default function LeadCaptureForm({ campaign, token, flash }) {
                 </CardContent>
             </Card>
             <div className="mt-4 text-center">
-                <a href="https://musoftwares.com" target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-400 font-medium hover:text-slate-500 transition-colors uppercase tracking-widest flex items-center justify-center gap-1">{__('general.powered_by')}<span className="font-bold">Musoftware</span>
+                <a href="https://musoftwares.com" target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-400 font-medium hover:text-slate-500 transition-colors uppercase tracking-widest flex items-center justify-center gap-1">{__('general.powered_by')}<span className="font-bold">{__('general.musoftware')}</span>
                 </a>
             </div>
         </div>

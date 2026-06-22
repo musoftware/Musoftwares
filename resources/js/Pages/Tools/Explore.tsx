@@ -1177,7 +1177,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 <ApplicationLogo className="w-6 h-6 text-blue-400 fill-current" />
                             </div>
                             <div>
-                                <h3 className="text-white font-medium">Musoftware</h3>
+                                <h3 className="text-white font-medium">{__('general.musoftware')}</h3>
                                 <p className="text-xs text-slate-400">{__('general.tools_workspace')}</p>
                             </div>
                         </div>

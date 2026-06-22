@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Download, Upload, AlertTriangle, FileJson } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { __ } from '@/lib/i18n';
 
 export default function Backup({ auth, flash }) {
     const fileInputRef = useRef(null);
@@ -44,14 +45,14 @@ export default function Backup({ auth, flash }) {
                 
                 {flash?.success && (
                     <Alert className="bg-emerald-50 border-emerald-200 text-emerald-800">
-                        <AlertTitle>Success</AlertTitle>
+                        <AlertTitle>{__('general.success')}</AlertTitle>
                         <AlertDescription>{flash.success}</AlertDescription>
                     </Alert>
                 )}
 
                 {flash?.error && (
                     <Alert className="bg-red-50 border-red-200 text-red-800">
-                        <AlertTitle>Error</AlertTitle>
+                        <AlertTitle>{__('general.error')}</AlertTitle>
                         <AlertDescription>{flash.error}</AlertDescription>
                     </Alert>
                 )}

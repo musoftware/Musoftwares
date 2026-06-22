@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
 import { useToast } from '@/Components/ui/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/Components/ui/dialog";
 import { Input } from "@/Components/ui/input";
+import { __ } from '@/lib/i18n';
 
 export default function AdminKycIndex({ auth, users }) {
     const { toast } = useToast();
@@ -63,11 +64,11 @@ export default function AdminKycIndex({ auth, users }) {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="ps-6 py-4">Client</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Documents</TableHead>
-                                    <TableHead>Submitted</TableHead>
-                                    <TableHead className="text-end pe-6">Action</TableHead>
+                                    <TableHead className="ps-6 py-4">{__('general.client')}</TableHead>
+                                    <TableHead>{__('general.status')}</TableHead>
+                                    <TableHead>{__('general.documents')}</TableHead>
+                                    <TableHead>{__('general.submitted')}</TableHead>
+                                    <TableHead className="text-end pe-6">{__('general.action')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -90,9 +91,9 @@ export default function AdminKycIndex({ auth, users }) {
                                             {user.kyc_status === 'pending_review' ? (
                                                 <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100">{__('general.review_required')}</Badge>
                                             ) : user.kyc_status === 'verified' ? (
-                                                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Verified</Badge>
+                                                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">{__('general.verified')}</Badge>
                                             ) : (
-                                                <Badge variant="outline">Unverified</Badge>
+                                                <Badge variant="outline">{__('general.unverified')}</Badge>
                                             )}
                                         </TableCell>
                                         <TableCell>
@@ -111,8 +112,7 @@ export default function AdminKycIndex({ auth, users }) {
                                         </TableCell>
                                         <TableCell className="text-end pe-6">
                                             <Button variant="outline" size="sm" className="h-8" onClick={() => setSelectedUser(user)}>
-                                                Review
-                                            </Button>
+                                                {__('general.review')}</Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -152,8 +152,7 @@ export default function AdminKycIndex({ auth, users }) {
                                         </div>
                                         <Button variant="secondary" size="sm" asChild>
                                             <a href={route('kyc.download', doc.id)} target="_blank" rel="noreferrer">
-                                                <Eye className="w-4 h-4 me-1" /> View
-                                            </a>
+                                                <Eye className="w-4 h-4 me-1" /> {__('general.view')}</a>
                                         </Button>
                                     </div>
                                 ))}
@@ -163,11 +162,10 @@ export default function AdminKycIndex({ auth, users }) {
                             </div>
 
                             <DialogFooter className="flex gap-2 sm:justify-between border-t pt-4">
-                                <Button variant="outline" onClick={() => setSelectedUser(null)}>Cancel</Button>
+                                <Button variant="outline" onClick={() => setSelectedUser(null)}>{__('general.cancel')}</Button>
                                 <div className="flex gap-2">
                                     <Button variant="destructive" onClick={() => setIsRejectDialogOpen(true)}>
-                                        <X className="w-4 h-4 me-1" /> Reject
-                                    </Button>
+                                        <X className="w-4 h-4 me-1" /> {__('general.reject')}</Button>
                                     <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleApprove(selectedUser.id)}>
                                         <Check className="w-4 h-4 me-1" />{__('general.approve_verification')}</Button>
                                 </div>
@@ -194,7 +192,7 @@ export default function AdminKycIndex({ auth, users }) {
                                 {errors.reason && <p className="text-rose-500 text-xs">{errors.reason}</p>}
                             </div>
                             <DialogFooter>
-                                <Button type="button" variant="outline" onClick={() => setIsRejectDialogOpen(false)}>Cancel</Button>
+                                <Button type="button" variant="outline" onClick={() => setIsRejectDialogOpen(false)}>{__('general.cancel')}</Button>
                                 <Button type="submit" variant="destructive" disabled={processing}>{__('general.confirm_rejection')}</Button>
                             </DialogFooter>
                         </form>

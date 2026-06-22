@@ -15,8 +15,8 @@ export function ActiveProcessesWorkspace({
     setActiveWorkspace
 }: {
     activeProcesses: Process[];
-    callRPC: (action: string, data?: any) => Promise<any>;
-    loadAll: () => Promise<void>;
+    callRPC: (action: string, data?: any) => {__('general.promise')}<any>;
+    loadAll: () => {__('general.promise')}<void>;
     setActiveWorkspace: (ws: WorkspaceType) => void;
 }) {
     const [selectedProcessId, setSelectedProcessId] = useState<string | null>(null);

@@ -12,6 +12,7 @@ import {
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { __ } from '@/lib/i18n';
 
 export default function LegacyCoWorkerShow({ worker }) {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -75,7 +76,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-56">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuLabel>{__('general.actions')}</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem asChild>
                                     <Link href={`/admin/users/legacy-coworker/${worker.id}/edit`} className="cursor-pointer flex items-center">
@@ -138,7 +139,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                                             </svg>
                                         </div>
                                         <div>
-                                            <p className="text-xs font-medium text-slate-500 mb-0.5">WhatsApp</p>
+                                            <p className="text-xs font-medium text-slate-500 mb-0.5">{__('general.whatsapp')}</p>
                                             <a
                                                 href={`https://wa.me/${worker.whatsapp.replace(/\D/g, '')}`}
                                                 target="_blank"

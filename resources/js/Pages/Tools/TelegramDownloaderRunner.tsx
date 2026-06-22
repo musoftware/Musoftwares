@@ -164,8 +164,7 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
                     
                     <nav className="flex items-center gap-1.5">
                         <Button variant={activeTab === 'auth' ? 'default' : 'ghost'} size="sm" onClick={() => setActiveTab('auth')}>
-                            Authentication
-                        </Button>
+                            {__('general.authentication')}</Button>
                         <Button variant={activeTab === 'channels' ? 'default' : 'ghost'} size="sm" onClick={() => setActiveTab('channels')} disabled={!isAuthenticated}>{__('general.channels_downloads')}</Button>
                     </nav>
                 </div>
@@ -192,7 +191,7 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
                                         <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3">
                                             <CheckCircle className="w-6 h-6 text-emerald-600" />
                                             <div>
-                                                <h4 className="font-bold text-emerald-900 text-sm">Authenticated</h4>
+                                                <h4 className="font-bold text-emerald-900 text-sm">{__('general.authenticated')}</h4>
                                                 <p className="text-xs text-emerald-700">{__('general.your_session_is_active_and_securely_saved')}</p>
                                             </div>
                                         </div>
@@ -223,7 +222,7 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
                                                             autoFocus
                                                             onKeyDown={(e) => e.key === 'Enter' && handleProvideAuthInput()}
                                                         />
-                                                        <Button onClick={handleProvideAuthInput}>Submit</Button>
+                                                        <Button onClick={handleProvideAuthInput}>{__('general.submit')}</Button>
                                                     </div>
                                                 </div>
                                             ) : (

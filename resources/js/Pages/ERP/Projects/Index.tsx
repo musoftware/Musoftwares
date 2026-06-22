@@ -43,13 +43,13 @@ export default function ProjectsIndex({ projects }: Props) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('projects');
 
     return (
-        <ERPLayout title="Projects" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__('general.projects')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Projects</h1>
+                        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{__('general.projects')}</h1>
                         <p className="text-slate-500 text-sm mt-1">{stats.total} projects · {stats.active} active</p>
                     </div>
                 </div>

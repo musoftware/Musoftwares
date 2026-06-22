@@ -498,11 +498,11 @@ export default function DataFilterRunner({ tool }: any) {
                                     <table className="w-full text-sm text-start">
                                         <thead className="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 font-semibold uppercase">
                                             <tr>
-                                                <th className="px-6 py-4 tracking-wider">Date</th>
-                                                <th className="px-6 py-4 tracking-wider">Mode</th>
+                                                <th className="px-6 py-4 tracking-wider">{__('general.date')}</th>
+                                                <th className="px-6 py-4 tracking-wider">{__('general.mode')}</th>
                                                 <th className="px-6 py-4 tracking-wider">{__('general.rows_read')}</th>
                                                 <th className="px-6 py-4 tracking-wider">{__('general.rows_written')}</th>
-                                                <th className="px-6 py-4 tracking-wider">Status</th>
+                                                <th className="px-6 py-4 tracking-wider">{__('general.status')}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">

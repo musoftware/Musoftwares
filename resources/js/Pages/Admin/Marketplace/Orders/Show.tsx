@@ -48,11 +48,11 @@ export default function Show({ order }) {
 
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                                <span className="text-slate-500 block">Buyer</span>
+                                <span className="text-slate-500 block">{__('general.buyer')}</span>
                                 <span className="font-medium">{order.buyer?.name} ({order.buyer?.email})</span>
                             </div>
                             <div>
-                                <span className="text-slate-500 block">Seller</span>
+                                <span className="text-slate-500 block">{__('general.seller')}</span>
                                 <span className="font-medium">{order.seller?.name} ({order.seller?.email})</span>
                             </div>
                             <div>

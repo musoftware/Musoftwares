@@ -71,7 +71,7 @@ export default function Dashboard({
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">Overview</span>
+                            <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">{__('general.overview')}</span>
                         </div>
                         <h1 className="text-2xl font-bold text-slate-900">{__('general.admin_dashboard')}</h1>
                         <p className="text-sm text-slate-500 mt-1">{__('general.monitor_global_platform_revenue_tenants_and_infrastructure')}</p>
@@ -107,10 +107,10 @@ export default function Dashboard({
                             <Briefcase className="w-4 h-4" /> <span className="font-medium text-sm">{__('general.new_project')}</span>
                         </Link>
                         <Link href="/admin/calculator" className="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 p-3 rounded-lg border border-slate-200 transition-colors">
-                            <Calculator className="w-4 h-4" /> <span className="font-medium text-sm">Calculator</span>
+                            <Calculator className="w-4 h-4" /> <span className="font-medium text-sm">{__('general.calculator')}</span>
                         </Link>
                         <Link href="/admin/settings" className="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 p-3 rounded-lg border border-slate-200 transition-colors">
-                            <Settings className="w-4 h-4" /> <span className="font-medium text-sm">Settings</span>
+                            <Settings className="w-4 h-4" /> <span className="font-medium text-sm">{__('general.settings')}</span>
                         </Link>
                     </div>
                 </OperationalCard>
@@ -186,7 +186,7 @@ export default function Dashboard({
                             <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex items-center gap-3">
                                 <Database className="w-8 h-8 text-green-500" />
                                 <div>
-                                    <p className="text-xs text-slate-500 font-semibold uppercase">Database</p>
+                                    <p className="text-xs text-slate-500 font-semibold uppercase">{__('general.database')}</p>
                                     <p className="text-lg font-bold text-slate-900">{systemHealth?.database}</p>
                                 </div>
                             </div>
@@ -207,7 +207,7 @@ export default function Dashboard({
                             <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex items-center gap-3">
                                 <Activity className="w-8 h-8 text-indigo-500" />
                                 <div>
-                                    <p className="text-xs text-slate-500 font-semibold uppercase">Memory</p>
+                                    <p className="text-xs text-slate-500 font-semibold uppercase">{__('general.memory')}</p>
                                     <p className="text-lg font-bold text-slate-900">{systemHealth?.memoryUsage}</p>
                                 </div>
                             </div>
@@ -266,7 +266,7 @@ export default function Dashboard({
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600"><DollarSign className="w-5 h-5"/></div>
-                                <h3 className="font-bold text-slate-800">Financials</h3>
+                                <h3 className="font-bold text-slate-800">{__('general.financials')}</h3>
                             </div>
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center border-b border-slate-100 pb-2">
@@ -291,7 +291,7 @@ export default function Dashboard({
                                     <span className="font-bold text-slate-900">{maskValue(operationalStats?.activeUsers30d)}</span>
                                 </div>
                                 <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                                    <span className="text-sm text-slate-600">Engagement</span>
+                                    <span className="text-sm text-slate-600">{__('general.engagement')}</span>
                                     <span className="font-bold text-slate-900">{stats?.totalUsers > 0 ? maskValue(Math.round((operationalStats?.activeUsers30d / stats?.totalUsers) * 100)) : 0}%</span>
                                 </div>
                             </div>

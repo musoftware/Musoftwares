@@ -205,14 +205,12 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                         {auth?.user ? (
                             <Link href="/dashboard">
                                 <Button className="bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold h-10 px-6">
-                                    Dashboard
-                                </Button>
+                                    {__('general.dashboard')}</Button>
                             </Link>
                         ) : (
                             <>
                                 <Link href="/login" className="text-sm font-semibold text-slate-600 hover:text-slate-900 px-3 py-2 transition-all">
-                                    Client Login
-                                </Link>
+                                    {__('general.client_login')}</Link>
                                 <Button onClick={() => setIsGuestTicketOpen(true)} className="bg-slate-900 hover:bg-slate-800 text-white rounded-full font-semibold h-10 px-6 flex items-center gap-2">
                                     {__('general.submit_guest_ticket') || 'Submit Guest Ticket'} <Send className="h-4 w-4 ms-1" />
                                 </Button>
@@ -294,12 +292,12 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                     <div className="p-6 border-t border-slate-100 bg-slate-50 space-y-4">
                         {auth?.user ? (
                             <Link href="/dashboard" className="block w-full">
-                                <Button className="w-full bg-slate-900 text-white rounded-full h-12">Dashboard</Button>
+                                <Button className="w-full bg-slate-900 text-white rounded-full h-12">{__('general.dashboard')}</Button>
                             </Link>
                         ) : (
                             <>
                                 <Link href="/login" className="block w-full">
-                                    <Button variant="outline" className="w-full rounded-full h-12">Client Login</Button>
+                                    <Button variant="outline" className="w-full rounded-full h-12">{__('general.client_login')}</Button>
                                 </Link>
                                 <Button onClick={() => setIsGuestTicketOpen(true)} className="w-full bg-slate-900 text-white rounded-full h-12 flex items-center justify-center gap-2">
                                     {__('general.submit_guest_ticket') || 'Submit Guest Ticket'} <Send className="h-4 w-4 ms-1" />
@@ -326,8 +324,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                 <span className="text-xl font-extrabold text-slate-900">musoftware</span>
                             </Link>
                             <p className="text-sm leading-relaxed text-slate-500 font-light pe-4">
-                                We build software infrastructure and systems for growing businesses.
-                            </p>
+                                {__('general.we_build_software_infrastructure_and_sys')}</p>
 
                             <div className="space-y-3 pt-4 border-t border-slate-200/60">
                                 <a href="tel:201015218548" className="flex items-center gap-3 text-sm text-slate-600 hover:text-slate-900 transition-colors group">
@@ -366,7 +363,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.contact_location')}</span>
-                                        <span className="font-medium">Suez, Egypt</span>
+                                        <span className="font-medium">{__('general.suez_egypt')}</span>
                                     </div>
                                 </div>
                             </div>
@@ -374,44 +371,44 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
 
                         {/* SaaS Tools */}
                         <div>
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">SaaS Tools</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">{__('general.saas_tools')}</h3>
                             <ul className="space-y-4">
-                                <li><Link href="/platforms/erp" className="text-sm hover:text-slate-900 transition-colors">MU ERP</Link></li>
-                                <li><Link href="/platforms/crm" className="text-sm hover:text-slate-900 transition-colors">MU CRM</Link></li>
-                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">Smart Booking</Link></li>
-                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">Affiliate & POS</Link></li>
-                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">Gold Saver</Link></li>
+                                <li><Link href="/platforms/erp" className="text-sm hover:text-slate-900 transition-colors">{__('general.mu_erp')}</Link></li>
+                                <li><Link href="/platforms/crm" className="text-sm hover:text-slate-900 transition-colors">{__('general.mu_crm')}</Link></li>
+                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">{__('general.smart_booking')}</Link></li>
+                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">{__('general.affiliate_pos')}</Link></li>
+                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">{__('general.gold_saver')}</Link></li>
                             </ul>
                         </div>
 
                         {/* Platforms */}
                         <div>
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">Platforms</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">{__('general.platforms')}</h3>
                             <ul className="space-y-4">
-                                <li><Link href="/platforms" className="text-sm hover:text-slate-900 transition-colors">MU CRM</Link></li>
-                                <li><Link href="/platforms" className="text-sm hover:text-slate-900 transition-colors">MU ERP</Link></li>
-                                <li><Link href="/platforms" className="text-sm hover:text-slate-900 transition-colors">MU Cloud</Link></li>
+                                <li><Link href="/platforms" className="text-sm hover:text-slate-900 transition-colors">{__('general.mu_crm')}</Link></li>
+                                <li><Link href="/platforms" className="text-sm hover:text-slate-900 transition-colors">{__('general.mu_erp')}</Link></li>
+                                <li><Link href="/platforms" className="text-sm hover:text-slate-900 transition-colors">{__('general.mu_cloud')}</Link></li>
                             </ul>
                         </div>
 
                         {/* Company */}
                         <div>
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">Company</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">{__('general.company')}</h3>
                             <ul className="space-y-4">
-                                <li><Link href="/company" className="text-sm hover:text-slate-900 transition-colors">About Us</Link></li>
-                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">Pricing</Link></li>
-                                <li><Link href="/company" className="text-sm hover:text-slate-900 transition-colors">Contact</Link></li>
+                                <li><Link href="/company" className="text-sm hover:text-slate-900 transition-colors">{__('general.about_us')}</Link></li>
+                                <li><Link href="/pricing" className="text-sm hover:text-slate-900 transition-colors">{__('general.pricing')}</Link></li>
+                                <li><Link href="/company" className="text-sm hover:text-slate-900 transition-colors">{__('general.contact')}</Link></li>
                             </ul>
                         </div>
 
                         {/* Resources */}
                         <div>
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">Resources</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">{__('general.resources')}</h3>
                             <ul className="space-y-4">
-                                <li><Link href="/portfolio" className="text-sm hover:text-slate-900 transition-colors">Case Studies</Link></li>
-                                <li><a href="mailto:admin@musoftwares.com" className="text-sm hover:text-slate-900 transition-colors">Documentation</a></li>
-                                <li><a href="mailto:admin@musoftwares.com" className="text-sm hover:text-slate-900 transition-colors">API Reference</a></li>
-                                <li><Link href="/company" className="text-sm hover:text-slate-900 transition-colors">Security</Link></li>
+                                <li><Link href="/portfolio" className="text-sm hover:text-slate-900 transition-colors">{__('general.case_studies')}</Link></li>
+                                <li><a href="mailto:admin@musoftwares.com" className="text-sm hover:text-slate-900 transition-colors">{__('general.documentation')}</a></li>
+                                <li><a href="mailto:admin@musoftwares.com" className="text-sm hover:text-slate-900 transition-colors">{__('general.api_reference')}</a></li>
+                                <li><Link href="/company" className="text-sm hover:text-slate-900 transition-colors">{__('general.security')}</Link></li>
                             </ul>
                         </div>
                     </div>
@@ -421,9 +418,9 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             &copy; {new Date().getFullYear()} musoftware. All rights reserved.
                         </p>
                         <div className="flex gap-6 text-sm font-light text-slate-500">
-                            <Link href="/privacy-policy" className="hover:text-slate-900">Privacy Policy</Link>
-                            <Link href="/terms-of-service" className="hover:text-slate-900">Terms of Service</Link>
-                            <Link href="/cookie-policy" className="hover:text-slate-900">Cookie Policy</Link>
+                            <Link href="/privacy-policy" className="hover:text-slate-900">{__('general.privacy_policy')}</Link>
+                            <Link href="/terms-of-service" className="hover:text-slate-900">{__('general.terms_of_service')}</Link>
+                            <Link href="/cookie-policy" className="hover:text-slate-900">{__('general.cookie_policy')}</Link>
                         </div>
                     </div>
                 </div>
@@ -435,8 +432,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                     <DialogHeader>
                         <DialogTitle>{__('general.submit_guest_ticket') || 'Submit Guest Ticket'}</DialogTitle>
                         <DialogDescription>
-                            Please fill out the form below and we will get back to you shortly.
-                        </DialogDescription>
+                            {__('general.please_fill_out_the_form_below_and_we_wi')}</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={submitGuestTicket} className="space-y-4">
                         <div className="space-y-2">

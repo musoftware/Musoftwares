@@ -41,8 +41,7 @@ export default function Contracts({ project, contracts, currencies }) {
                 <div className="flex gap-2">
                     <Button onClick={handleCreate} className="gap-2">
                         <Plus className="w-4 h-4" />
-                        Create Contract
-                    </Button>
+                        {__('general.create_contract')}</Button>
                 </div>
             </div>
 
@@ -53,15 +52,13 @@ export default function Contracts({ project, contracts, currencies }) {
                             <FileText className="h-6 w-6 text-indigo-600" />
                         </div>
                         <div>
-                            <h3 className="text-lg font-semibold text-slate-900">No contracts yet</h3>
+                            <h3 className="text-lg font-semibold text-slate-900">{__('general.no_contracts_yet')}</h3>
                             <p className="text-slate-500 max-w-sm mt-1">
-                                Create a contract or proposal for this project. You can use AI to generate the scope of work and milestones.
-                            </p>
+                                {__('general.create_a_contract_or_proposal_for_this_p')}</p>
                         </div>
                         <Button onClick={handleCreate} className="mt-2 gap-2">
                             <Sparkles className="w-4 h-4" />
-                            Generate with AI
-                        </Button>
+                            {__('general.generate_with_ai')}</Button>
                     </div>
                 </Card>
             ) : (
@@ -114,7 +111,7 @@ export default function Contracts({ project, contracts, currencies }) {
                                     <Button variant="outline" size="sm" className="flex-1" onClick={() => handleEdit(contract)}>
                                         Edit / View
                                     </Button>
-                                    <Button variant="outline" size="sm" className="px-3 text-slate-500 hover:text-indigo-600" onClick={() => handleCopyLink(contract.uuid)} title="Copy Public Link">
+                                    <Button variant="outline" size="sm" className="px-3 text-slate-500 hover:text-indigo-600" onClick={() => handleCopyLink(contract.uuid)} title={__('general.copy_public_link')}>
                                         <Copy className="w-4 h-4" />
                                     </Button>
                                 </div>

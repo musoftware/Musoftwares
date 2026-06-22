@@ -26,11 +26,11 @@ export default function VipDirectory({ vipCustomers }) {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Customer</TableHead>
-                                <TableHead>Tier</TableHead>
+                                <TableHead>{__('general.customer')}</TableHead>
+                                <TableHead>{__('general.tier')}</TableHead>
                                 <TableHead>{__('general.assigned_date')}</TableHead>
-                                <TableHead>Reason</TableHead>
-                                <TableHead className="text-end">Actions</TableHead>
+                                <TableHead>{__('general.reason')}</TableHead>
+                                <TableHead className="text-end">{__('general.actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -45,7 +45,7 @@ export default function VipDirectory({ vipCustomers }) {
                                     <TableCell>{new Date(vip.created_at).toLocaleDateString()}</TableCell>
                                     <TableCell className="text-muted-foreground">{vip.reason}</TableCell>
                                     <TableCell className="text-end">
-                                        <Button variant="ghost" size="sm">Manage</Button>
+                                        <Button variant="ghost" size="sm">{__('general.manage')}</Button>
                                     </TableCell>
                                 </TableRow>
                             ))}

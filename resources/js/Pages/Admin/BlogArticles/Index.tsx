@@ -28,7 +28,7 @@ export default function Index({ articles, filters }) {
                         className="ps-10 h-10"
                     />
                     <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Button type="submit" className="ms-2 h-10">Search</Button>
+                    <Button type="submit" className="ms-2 h-10">{__('general.search')}</Button>
                 </form>
                 <Link href={route('admin.blog-articles.create')}>
                     <Button className="h-10 gap-2">
@@ -42,12 +42,12 @@ export default function Index({ articles, filters }) {
                         <thead className="border-b bg-gray-50">
                             <tr>
                                 <th className="p-4 font-medium text-gray-600 w-16">ID</th>
-                                <th className="p-4 font-medium text-gray-600">Title</th>
-                                <th className="p-4 font-medium text-gray-600 text-center">Language</th>
-                                <th className="p-4 font-medium text-gray-600 text-center">Status</th>
-                                <th className="p-4 font-medium text-gray-600 text-center">Date</th>
-                                <th className="p-4 font-medium text-gray-600">Owner</th>
-                                <th className="p-4 font-medium text-gray-600 text-end">Actions</th>
+                                <th className="p-4 font-medium text-gray-600">{__('general.title')}</th>
+                                <th className="p-4 font-medium text-gray-600 text-center">{__('general.language')}</th>
+                                <th className="p-4 font-medium text-gray-600 text-center">{__('general.status')}</th>
+                                <th className="p-4 font-medium text-gray-600 text-center">{__('general.date')}</th>
+                                <th className="p-4 font-medium text-gray-600">{__('general.owner')}</th>
+                                <th className="p-4 font-medium text-gray-600 text-end">{__('general.actions')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -67,12 +67,10 @@ export default function Index({ articles, filters }) {
                                     <td className="p-4 text-center">
                                         {article.is_published ? (
                                             <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200 border-none shadow-none">
-                                                Published
-                                            </Badge>
+                                                {__('general.published')}</Badge>
                                         ) : (
                                             <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border-none shadow-none">
-                                                Draft
-                                            </Badge>
+                                                {__('general.draft')}</Badge>
                                         )}
                                     </td>
                                     <td className="p-4 text-center text-gray-500">
@@ -95,26 +93,23 @@ export default function Index({ articles, filters }) {
                                             </DialogTrigger>
                                             <DialogContent className="sm:max-w-xs">
                                                 <DialogHeader>
-                                                    <DialogTitle>Actions</DialogTitle>
+                                                    <DialogTitle>{__('general.actions')}</DialogTitle>
                                                 </DialogHeader>
                                                 <div className="flex flex-col gap-2 py-2">
                                                     <a href={route('blog.show', { slug: article.slug })} target="_blank" rel="noopener noreferrer" className="w-full">
                                                         <Button variant="outline" className="w-full justify-start gap-2">
                                                             <ExternalLink className="h-4 w-4" />
-                                                            View
-                                                        </Button>
+                                                            {__('general.view')}</Button>
                                                     </a>
                                                     <Link href={route('admin.blog-articles.edit', article.id)} className="w-full">
                                                         <Button variant="outline" className="w-full justify-start gap-2">
                                                             <Pencil className="h-4 w-4" />
-                                                            Edit
-                                                        </Button>
+                                                            {__('general.edit')}</Button>
                                                     </Link>
                                                     <Link href={route('admin.blog-articles.destroy', article.id)} method="delete" as="button" className="w-full">
                                                         <Button variant="destructive" className="w-full justify-start gap-2">
                                                             <Trash2 className="h-4 w-4" />
-                                                            Delete
-                                                        </Button>
+                                                            {__('general.delete')}</Button>
                                                     </Link>
                                                 </div>
                                             </DialogContent>

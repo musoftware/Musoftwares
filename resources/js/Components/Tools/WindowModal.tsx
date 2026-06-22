@@ -176,21 +176,21 @@ export function WindowModal({
                     <button 
                         onClick={(e) => { e.stopPropagation(); onMinimize(); }}
                         className="h-full w-12 hover:bg-slate-200 text-slate-600 transition-colors flex items-center justify-center"
-                        title="Minimize"
+                        title={__('general.minimize')}
                     >
                         <Minus className="w-4 h-4" />
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); onMaximize(); }}
                         className="h-full w-12 hover:bg-slate-200 text-slate-600 transition-colors flex items-center justify-center"
-                        title="Maximize"
+                        title={__('general.maximize')}
                     >
                         <Square className="w-3.5 h-3.5" />
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); onClose(); }}
                         className="h-full w-12 hover:bg-red-500 hover:text-white text-slate-600 transition-colors flex items-center justify-center"
-                        title="Close"
+                        title={__('general.close')}
                     >
                         <X className="w-4 h-4" />
                     </button>

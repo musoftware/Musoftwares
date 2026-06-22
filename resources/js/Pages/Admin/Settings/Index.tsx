@@ -210,7 +210,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
     };
 
     return (
-        <AdminSidebarLayout title="Settings" header="System Settings">
+        <AdminSidebarLayout title={__('general.settings')} header="System Settings">
             <Head title={__('general.admin_settings')} />
 
             {/* Flash message */}
@@ -393,7 +393,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                     id="google_analytics_id"
                                     value={form.google_analytics_id ?? ''}
                                     onChange={(e) => set('google_analytics_id', e.target.value)}
-                                    placeholder="G-..."
+                                    placeholder={__('general.g')}
                                 />
                             </Field>
                             <Field label="Google Tag Manager ID (e.g. GTM-XXXXX)">
@@ -401,10 +401,10 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                     id="google_tag_manager_id"
                                     value={form.google_tag_manager_id ?? ''}
                                     onChange={(e) => set('google_tag_manager_id', e.target.value)}
-                                    placeholder="GTM-..."
+                                    placeholder={__('general.gtm')}
                                 />
                             </Field>
-                            <Field label="Meta Pixel ID">
+                            <Field label={__('general.meta_pixel_id')}>
                                 <Input
                                     id="meta_pixel_id"
                                     value={form.meta_pixel_id ?? ''}
@@ -538,7 +538,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                         <div className="grid grid-cols-2 gap-4">
                         <div className="grid grid-cols-2 gap-4">
                             <CurrencySelect
-                                label="Currency"
+                                label={__('general.currency')}
                                 currencies={currencies}
                                 value={bulkCurrency}
                                 onChange={setBulkCurrency}
@@ -591,11 +591,10 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                     </form>
                 </SectionCard>
                 {/* Incoming Webhooks */}
-                <SectionCard title="Incoming Webhooks" icon={Globe}>
+                <SectionCard title={__('general.incoming_webhooks')} icon={Globe}>
                     <p className="text-sm font-medium text-gray-700 mb-4">View and monitor webhooks received from external platforms (e.g., Kashier, Stripe, WhatsApp).</p>
                     <Button type="button" variant="outline" className="w-full" onClick={() => router.visit(route('admin.settings.incoming-webhooks.index'))}>
-                        View Webhooks Log
-                    </Button>
+                        {__('general.view_webhooks_log')}</Button>
                 </SectionCard>
             </div>
 

@@ -52,7 +52,7 @@ export function DownloadPanel({
                 {/* Version */}
                 {latestVersion && (
                     <div className="flex items-center justify-between text-sm">
-                        <span className="text-slate-500">Version</span>
+                        <span className="text-slate-500">{__('general.version')}</span>
                         <code className="font-mono text-slate-800 font-semibold">v{latestVersion.version}</code>
                     </div>
                 )}

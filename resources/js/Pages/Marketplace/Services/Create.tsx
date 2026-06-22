@@ -71,8 +71,7 @@ export default function CreateService({ categories, seller }: Props) {
                 <div className="bg-white border-b border-slate-200 sticky top-0 z-30">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
                         <Link href="/marketplace/dashboard" className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors">
-                            <ArrowLeft className="w-4 h-4" /> Back
-                        </Link>
+                            <ArrowLeft className="w-4 h-4" /> {__('general.back')}</Link>
                         <h1 className="text-base font-semibold text-slate-900">{__('general.publish_a_service')}</h1>
                         <div className="text-xs text-slate-400">Step {step} of {STEPS.length}</div>
                     </div>
@@ -133,15 +132,14 @@ export default function CreateService({ categories, seller }: Props) {
                                         disabled={step === 1}
                                         className="gap-2"
                                     >
-                                        <ChevronLeft className="w-4 h-4" /> Back
-                                    </Button>
+                                        <ChevronLeft className="w-4 h-4" /> {__('general.back')}</Button>
                                     <Button
                                         type="button"
                                         onClick={() => setStep(s => s + 1)}
                                         disabled={!canNext()}
                                         className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
                                     >
-                                        Continue <ChevronRight className="w-4 h-4" />
+                                        {__('general.continue')}<ChevronRight className="w-4 h-4" />
                                     </Button>
                                 </div>
                             )}

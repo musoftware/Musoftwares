@@ -80,9 +80,9 @@ export default function Show({ proposal, auth }: Props) {
                                         <table className="w-full text-sm text-start">
                                             <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                                                 <tr>
-                                                    <th className="px-4 py-3 rounded-tl-lg">{__('general.line_item')}</th>
-                                                    <th className="px-4 py-3 text-end">Duration</th>
-                                                    <th className="px-4 py-3 text-end rounded-tr-lg">Cost</th>
+                                                    <th className="px-4 py-3 rounded-ts-lg">{__('general.line_item')}</th>
+                                                    <th className="px-4 py-3 text-end">{__('general.duration')}</th>
+                                                    <th className="px-4 py-3 text-end rounded-te-lg">{__('general.cost')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

@@ -220,14 +220,14 @@ export default function AdminToolCreate({ categories }: Props) {
                                         onChange={e => setData('is_featured', e.target.checked)}
                                         className="w-4 h-4 rounded border-slate-300"
                                     />
-                                    <span className="text-sm font-medium">Featured</span>
+                                    <span className="text-sm font-medium">{__('general.featured')}</span>
                                 </label>
                             </div>
                         </div>
                     </OperationalCard>
 
                     {/* Features */}
-                    <OperationalCard title="Features">
+                    <OperationalCard title={__('general.features')}>
                         <div className="space-y-3">
                             <div className="flex gap-2">
                                 <Input
@@ -244,8 +244,7 @@ export default function AdminToolCreate({ categories }: Props) {
                                     className="h-9 gap-1"
                                     onClick={() => addItem('features', newFeature, () => setNewFeature(''))}
                                 >
-                                    <Plus className="h-3.5 w-3.5" /> Add
-                                </Button>
+                                    <Plus className="h-3.5 w-3.5" /> {__('general.add')}</Button>
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 {data.features.map((f, i) => (
@@ -281,8 +280,7 @@ export default function AdminToolCreate({ categories }: Props) {
                                     className="h-9 gap-1"
                                     onClick={() => addItem('requirements', newRequirement, () => setNewRequirement(''))}
                                 >
-                                    <Plus className="h-3.5 w-3.5" /> Add
-                                </Button>
+                                    <Plus className="h-3.5 w-3.5" /> {__('general.add')}</Button>
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 {data.requirements.map((r, i) => (
@@ -308,8 +306,7 @@ export default function AdminToolCreate({ categories }: Props) {
                             size="sm"
                             onClick={() => router.visit(route('admin.tools.index'))}
                         >
-                            Cancel
-                        </Button>
+                            {__('general.cancel')}</Button>
                         <Button
                             type="submit"
                             size="sm"

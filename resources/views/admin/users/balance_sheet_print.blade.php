@@ -115,7 +115,7 @@
             border-bottom: 2px solid #d1d5db;
         }
 
-        table.invoice-table thead th.text-right {
+        table.invoice-table thead th.text-end {
             text-align: right;
         }
 
@@ -125,7 +125,7 @@
             color: #374151;
         }
 
-        table.invoice-table tbody td.text-right {
+        table.invoice-table tbody td.text-end {
             text-align: right;
         }
 
@@ -272,22 +272,22 @@
                 <thead>
                     <tr>
                         <th>{{ __('erp.invoice_2') }}</th>
-                        <th class="text-right">{{ __('general.paid') }}</th>
-                        <th class="text-right">{{ __('general.total') }}</th>
-                        <th class="text-right">{{ __('general.discount') }}</th>
-                        <th class="text-right">{{ __('general.remaining') }}</th>
-                        <th class="text-right">{{ __('general.date') }}</th>
+                        <th class="text-end">{{ __('general.paid') }}</th>
+                        <th class="text-end">{{ __('general.total') }}</th>
+                        <th class="text-end">{{ __('general.discount') }}</th>
+                        <th class="text-end">{{ __('general.remaining') }}</th>
+                        <th class="text-end">{{ __('general.date') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($invoices as $invoice)
                         <tr>
                             <td class="invoice-id">{{ $invoice->enc_id() }}</td>
-                            <td class="text-right">{{ $invoice->paid_str() }}</td>
-                            <td class="text-right">{{ $invoice->sub_total_str() }}</td>
-                            <td class="text-right">{{ $invoice->discount }}</td>
-                            <td class="text-right amount-unpaid">{{ $invoice->unpaid_str() }}</td>
-                            <td class="text-right date-cell">{{ $invoice->created_at->format('Y-m-d') }}</td>
+                            <td class="text-end">{{ $invoice->paid_str() }}</td>
+                            <td class="text-end">{{ $invoice->sub_total_str() }}</td>
+                            <td class="text-end">{{ $invoice->discount }}</td>
+                            <td class="text-end amount-unpaid">{{ $invoice->unpaid_str() }}</td>
+                            <td class="text-end date-cell">{{ $invoice->created_at->format('Y-m-d') }}</td>
                         </tr>
                     @empty
                         <tr class="empty-row">

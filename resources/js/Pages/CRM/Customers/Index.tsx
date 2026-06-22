@@ -5,7 +5,7 @@ import { __ } from '@/lib/i18n';
 
 export default function CustomersIndex({ customers }: { customers: any }) {
     return (
-        <CrmLayout title="Customers" activeMenu="customers">
+        <CrmLayout title={__('general.customers')} activeMenu="customers">
             <Head title={__('crm.customers')} />
             <div className="p-6">
                 <div className="mb-6 flex justify-between items-center">

@@ -12,6 +12,7 @@ import { Checkbox } from '@/Components/ui/checkbox';
 import { Coins, Wallet, TrendingUp, TrendingDown, Plus, List, LayoutGrid, Trash2, Edit2, CheckCircle } from 'lucide-react';
 import { useToast } from '@/Components/ui/use-toast';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { __ } from '@/lib/i18n';
 
 interface GoldItem {
     id: number;
@@ -103,19 +104,16 @@ export default function GoldSaver() {
     ];
 
     return (
-        <WebToolsLayout title="Gold Saver" activeNav="explore">
+        <WebToolsLayout title={__('general.gold_saver')} activeNav="explore">
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6">
                 <div className="mb-8">
                     <span className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-sm font-medium mb-3">
-                        Financial Tools
-                    </span>
+                        {__('general.financial_tools')}</span>
                     <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
                         <Wallet className="w-8 h-8 text-amber-500" />
-                        Gold Saver
-                    </h1>
+                        {__('general.gold_saver')}</h1>
                     <p className="mt-2 text-lg text-slate-600">
-                        Track your gold investments and monitor real-time market trends.
-                    </p>
+                        {__('general.track_your_gold_investments_and_monitor')}</p>
                 </div>
 
                 {/* Today's Prices */}
@@ -151,7 +149,7 @@ export default function GoldSaver() {
                                 <Wallet className="w-6 h-6" />
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-slate-500">Total Investment</p>
+                                <p className="text-sm font-medium text-slate-500">{__('general.total_investment')}</p>
                                 <h4 className="text-2xl font-bold text-slate-900">{formatMoney(totalInvestment)}</h4>
                             </div>
                         </CardContent>
@@ -162,7 +160,7 @@ export default function GoldSaver() {
                                 <Coins className="w-6 h-6" />
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-slate-500">Current Value</p>
+                                <p className="text-sm font-medium text-slate-500">{__('general.current_value')}</p>
                                 <h4 className="text-2xl font-bold text-slate-900">{formatMoney(currentValue)}</h4>
                             </div>
                         </CardContent>
@@ -189,9 +187,9 @@ export default function GoldSaver() {
 
                 <Tabs defaultValue="overview" className="w-full">
                     <TabsList className="mb-6 bg-slate-100/50 p-1">
-                        <TabsTrigger value="overview" className="gap-2"><LayoutGrid className="w-4 h-4" /> Overview</TabsTrigger>
-                        <TabsTrigger value="new" className="gap-2"><Plus className="w-4 h-4" /> New Saving</TabsTrigger>
-                        <TabsTrigger value="history" className="gap-2"><List className="w-4 h-4" /> Items History</TabsTrigger>
+                        <TabsTrigger value="overview" className="gap-2"><LayoutGrid className="w-4 h-4" /> {__('general.overview')}</TabsTrigger>
+                        <TabsTrigger value="new" className="gap-2"><Plus className="w-4 h-4" /> {__('general.new_saving')}</TabsTrigger>
+                        <TabsTrigger value="history" className="gap-2"><List className="w-4 h-4" /> {__('general.items_history')}</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="overview">
@@ -217,12 +215,12 @@ export default function GoldSaver() {
                                                 </div>
                                             </div>
                                             <div className="mb-4">
-                                                <span className="text-sm text-slate-500 block">Total Grams</span>
+                                                <span className="text-sm text-slate-500 block">{__('general.total_grams')}</span>
                                                 <span className="text-xl font-bold">{grams.toFixed(2)} g</span>
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
-                                                    <span className="text-xs text-slate-500 block">Current Val</span>
+                                                    <span className="text-xs text-slate-500 block">{__('general.current_val')}</span>
                                                     <span className="font-semibold">{formatMoney(val)}</span>
                                                 </div>
                                                 <div>
@@ -264,7 +262,7 @@ export default function GoldSaver() {
                                         <Wallet className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-slate-900">Zakat Requirement</h4>
+                                        <h4 className="font-bold text-slate-900">{__('general.zakat_requirement')}</h4>
                                         <p className="text-sm text-slate-600">Calculated based on items marked for Zakat in your history (2.5%).</p>
                                     </div>
                                 </div>
@@ -278,16 +276,16 @@ export default function GoldSaver() {
                     <TabsContent value="new">
                         <Card className="border-slate-200 shadow-sm max-w-3xl mx-auto">
                             <CardHeader>
-                                <CardTitle>Record Investment</CardTitle>
-                                <CardDescription>Add a new gold purchase to your portfolio.</CardDescription>
+                                <CardTitle>{__('general.record_investment')}</CardTitle>
+                                <CardDescription>{__('general.add_a_new_gold_purchase_to_your_portfoli')}</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <form onSubmit={handleAdd} className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <Label>Carat</Label>
+                                            <Label>{__('general.carat')}</Label>
                                             <Select value={newCarat} onValueChange={(val) => setNewCarat(val || '')} required>
-                                                <SelectTrigger><SelectValue placeholder="Select Carat" /></SelectTrigger>
+                                                <SelectTrigger><SelectValue placeholder={__('general.select_carat')} /></SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="10">10K</SelectItem>
                                                     <SelectItem value="14">14K</SelectItem>
@@ -299,7 +297,7 @@ export default function GoldSaver() {
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Bought Date</Label>
+                                            <Label>{__('general.bought_date')}</Label>
                                             <Input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} required />
                                         </div>
                                         <div className="space-y-2">
@@ -311,7 +309,7 @@ export default function GoldSaver() {
                                             <Input type="number" step="0.01" value={newMfgPrice} onChange={e => setNewMfgPrice(e.target.value)} required placeholder="0.00" />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Total Grams</Label>
+                                            <Label>{__('general.total_grams')}</Label>
                                             <Input type="number" step="0.001" value={newGrams} onChange={e => setNewGrams(e.target.value)} required placeholder="0.000" />
                                         </div>
                                         <div className="space-y-2">
@@ -321,8 +319,7 @@ export default function GoldSaver() {
                                     </div>
                                     <div className="text-end pt-4">
                                         <Button type="submit" size="lg" className="w-full md:w-auto">
-                                            <Plus className="w-4 h-4 me-2" /> Record Investment
-                                        </Button>
+                                            <Plus className="w-4 h-4 me-2" /> {__('general.record_investment')}</Button>
                                     </div>
                                 </form>
                             </CardContent>
@@ -332,27 +329,27 @@ export default function GoldSaver() {
                     <TabsContent value="history">
                         <Card className="border-slate-200 shadow-sm">
                             <CardHeader>
-                                <CardTitle>Items History</CardTitle>
+                                <CardTitle>{__('general.items_history')}</CardTitle>
                             </CardHeader>
                             <CardContent className="p-0">
                                 <Table>
                                     <TableHeader>
                                         <TableRow className="bg-slate-50">
-                                            <TableHead className="w-16 text-center">Zakat</TableHead>
-                                            <TableHead>Carat</TableHead>
-                                            <TableHead>Grams</TableHead>
-                                            <TableHead>Unit Cost</TableHead>
-                                            <TableHead>Total Cost</TableHead>
-                                            <TableHead>Current Val</TableHead>
+                                            <TableHead className="w-16 text-center">{__('general.zakat')}</TableHead>
+                                            <TableHead>{__('general.carat')}</TableHead>
+                                            <TableHead>{__('general.grams')}</TableHead>
+                                            <TableHead>{__('general.unit_cost')}</TableHead>
+                                            <TableHead>{__('general.total_cost')}</TableHead>
+                                            <TableHead>{__('general.current_val')}</TableHead>
                                             <TableHead>Profit/Loss</TableHead>
-                                            <TableHead>Date</TableHead>
-                                            <TableHead className="text-end">Actions</TableHead>
+                                            <TableHead>{__('general.date')}</TableHead>
+                                            <TableHead className="text-end">{__('general.actions')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {items.length === 0 ? (
                                             <TableRow>
-                                                <TableCell colSpan={9} className="text-center py-8 text-slate-500">No items found.</TableCell>
+                                                <TableCell colSpan={9} className="text-center py-8 text-slate-500">{__('general.no_items_found')}</TableCell>
                                             </TableRow>
                                         ) : (
                                             items.map(item => {

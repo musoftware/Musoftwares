@@ -25,8 +25,7 @@ export default function View({ salary, transactions, upcomingSchedule, total_sta
                 <div className="flex gap-2">
                     <Link href={route('admin.recurring_salaries.edit', salary.id)}>
                         <Button variant="outline" size="sm" className="flex items-center gap-1.5">
-                            <Edit className="w-4 h-4" /> Edit
-                        </Button>
+                            <Edit className="w-4 h-4" /> {__('general.edit')}</Button>
                     </Link>
                     <Button variant="destructive" size="sm" className="flex items-center gap-1.5" onClick={handleDelete}>
                         <Trash2 className="w-4 h-4" />{__('general.delete_schedule')}</Button>
@@ -40,7 +39,7 @@ export default function View({ salary, transactions, upcomingSchedule, total_sta
                     <h3 className="text-lg font-bold text-slate-900 mb-4 pb-2 border-b">{__('general.recurrence_overview')}</h3>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Employee</span>
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">{__('general.employee')}</span>
                             <div className="flex items-center mt-1">
                                 <div className="bg-slate-100 p-1.5 rounded-full me-2 text-slate-650 border">
                                     <User className="w-4 h-4" />
@@ -145,8 +144,8 @@ export default function View({ salary, transactions, upcomingSchedule, total_sta
                                             <tr>
                                                 <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.date_recorded')}</th>
                                                 <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.transaction_id')}</th>
-                                                <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">Reason</th>
-                                                <th className="px-4 py-2 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
+                                                <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.reason')}</th>
+                                                <th className="px-4 py-2 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.amount')}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-200">
@@ -179,7 +178,7 @@ export default function View({ salary, transactions, upcomingSchedule, total_sta
                                 <thead className="bg-slate-50">
                                     <tr>
                                         <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.projected_date')}</th>
-                                        <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th className="px-4 py-2 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.status')}</th>
                                         <th className="px-4 py-2 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider">{__('general.amount')}</th>
                                     </tr>
                                 </thead>

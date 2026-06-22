@@ -57,7 +57,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                         <form onSubmit={submit} className="space-y-5">
                             {/* Device Selection */}
                             <div className="space-y-2">
-                                <Label className="text-zinc-300 font-medium">Device</Label>
+                                <Label className="text-zinc-300 font-medium">{__('general.device')}</Label>
                                 <Select value={form.device_id} onValueChange={v => setForm(f => ({ ...f, device_id: v || '' }))}>
                                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                                         <SelectValue placeholder={__('general.select_a_device')} />
@@ -112,8 +112,8 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent className="bg-zinc-900 border-zinc-700">
-                                        <SelectItem value="active">Active</SelectItem>
-                                        <SelectItem value="inactive">Inactive</SelectItem>
+                                        <SelectItem value="active">{__('general.active')}</SelectItem>
+                                        <SelectItem value="inactive">{__('general.inactive')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -133,7 +133,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                             <div className="flex gap-3 pt-2">
                                 <Button type="submit" className="bg-violet-600 hover:bg-violet-500 text-white">{__('general.assign_device')}</Button>
                                 <Link href={route('admin.serial-user-devices.index')}>
-                                    <Button type="button" variant="ghost" className="text-zinc-400 hover:text-white">Cancel</Button>
+                                    <Button type="button" variant="ghost" className="text-zinc-400 hover:text-white">{__('general.cancel')}</Button>
                                 </Link>
                             </div>
                         </form>

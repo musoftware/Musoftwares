@@ -101,7 +101,7 @@ export default function EditClient({ client, currencies }: { client: any, curren
                                     {errors.currency && <p className="text-xs text-red-500">{errors.currency}</p>}
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
-                                    <label className="text-sm font-medium text-slate-700">Address</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.address')}</label>
                                     <Input 
                                         value={form.address} 
                                         onChange={e => setForm({...form, address: e.target.value})} 
@@ -115,8 +115,7 @@ export default function EditClient({ client, currencies }: { client: any, curren
                             <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
                                 <Link href={route('erp.dashboard', { section: 'clients' })}>
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-900 hover:bg-slate-100">
-                                        Cancel
-                                    </Button>
+                                        {__('general.cancel')}</Button>
                                 </Link>
                                 <Button type="submit" disabled={isSubmitting}>
                                     {isSubmitting ? 'Saving...' : 'Save Changes'}

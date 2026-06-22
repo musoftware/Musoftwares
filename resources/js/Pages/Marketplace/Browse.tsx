@@ -85,8 +85,7 @@ export default function Browse({ services, categories, filters }: any) {
                             type="submit"
                             className="absolute top-2 end-2 bottom-2 rounded-full bg-indigo-600 px-6 font-semibold text-white transition hover:bg-indigo-700"
                         >
-                            Search
-                        </button>
+                            {__('general.search')}</button>
                     </form>
                 </div>
             </div>
@@ -169,8 +168,7 @@ export default function Browse({ services, categories, filters }: any) {
                                             )}
                                             {service.is_featured && (
                                                 <div className="absolute top-3 start-3 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-amber-900 shadow">
-                                                    FEATURED
-                                                </div>
+                                                    {__('general.featured')}</div>
                                             )}
                                             <button className="absolute top-3 end-3 rounded-full bg-white/80 p-2 text-gray-400 transition-colors hover:text-red-500">
                                                 <svg

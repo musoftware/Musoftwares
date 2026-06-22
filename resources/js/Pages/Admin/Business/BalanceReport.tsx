@@ -32,6 +32,7 @@ import {
 } from "@/Components/ui/table";
 import { formatCurrency } from '@/lib/utils';
 import {
+import { __ } from '@/lib/i18n';
     AreaChart,
     Area,
     XAxis,
@@ -82,7 +83,7 @@ export default function BalanceReport() {
 
     return (
         <AdminSidebarLayout 
-            title="Balance Report" 
+            title={__('general.balance_report')} 
             header="Balance Report"
             actions={
                 <div className="flex items-center gap-2">
@@ -91,7 +92,7 @@ export default function BalanceReport() {
                     </Button>
                     <Select value={String(stats.year)} onValueChange={(val) => router.get(route('admin.reports.balance'), { year: val }, { preserveState: true })}>
                         <SelectTrigger className="w-[100px]">
-                            <SelectValue placeholder="Year" />
+                            <SelectValue placeholder={__('general.year')} />
                         </SelectTrigger>
                         <SelectContent>
                             {years.map(y => (
@@ -228,10 +229,10 @@ export default function BalanceReport() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Month</TableHead>
-                                <TableHead className="text-end">Income</TableHead>
-                                <TableHead className="text-end">Costs</TableHead>
-                                <TableHead className="text-end">Profit</TableHead>
+                                <TableHead>{__('general.month')}</TableHead>
+                                <TableHead className="text-end">{__('general.income')}</TableHead>
+                                <TableHead className="text-end">{__('general.costs')}</TableHead>
+                                <TableHead className="text-end">{__('general.profit')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>

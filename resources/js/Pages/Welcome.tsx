@@ -20,7 +20,7 @@ export default function Welcome({
 
     return (
         <>
-            <Head title="Welcome" />
+            <Head title={__('general.welcome')} />
             <div className="bg-gray-50 text-black/50 dark:bg-black dark:text-white/50">
                 <img
                     id="background"
@@ -49,8 +49,7 @@ export default function Welcome({
                                         href={route('dashboard')}
                                         className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                                     >
-                                        Dashboard
-                                    </Link>
+                                        {__('general.dashboard')}</Link>
                                 ) : (
                                     <>
                                         <Link
@@ -61,8 +60,7 @@ export default function Welcome({
                                             href={route('register')}
                                             className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                                         >
-                                            Register
-                                        </Link>
+                                            {__('general.register')}</Link>
                                     </>
                                 )}
                             </nav>
@@ -118,19 +116,10 @@ export default function Welcome({
 
                                             <div className="pt-3 sm:pt-5 lg:pt-0">
                                                 <h2 className="text-xl font-semibold text-black dark:text-white">
-                                                    Documentation
-                                                </h2>
+                                                    {__('general.documentation')}</h2>
 
                                                 <p className="mt-4 text-sm/relaxed">
-                                                    Laravel has wonderful
-                                                    documentation covering every
-                                                    aspect of the framework.
-                                                    Whether you are a newcomer
-                                                    or have prior experience
-                                                    with Laravel, we recommend
-                                                    reading our documentation
-                                                    from beginning to end.
-                                                </p>
+                                                    {__('general.laravel_has_wonderful_documentation_cove')}</p>
                                             </div>
                                         </div>
 
@@ -169,17 +158,10 @@ export default function Welcome({
 
                                     <div className="pt-3 sm:pt-5">
                                         <h2 className="text-xl font-semibold text-black dark:text-white">
-                                            Laracasts
-                                        </h2>
+                                            {__('general.laracasts')}</h2>
 
                                         <p className="mt-4 text-sm/relaxed">
-                                            Laracasts offers thousands of video
-                                            tutorials on Laravel, PHP, and
-                                            JavaScript development. Check them
-                                            out, see for yourself, and massively
-                                            level up your development skills in
-                                            the process.
-                                        </p>
+                                            {__('general.laracasts_offers_thousands_of_video_tuto')}</p>
                                     </div>
 
                                     <svg
@@ -220,13 +202,7 @@ export default function Welcome({
                                         <h2 className="text-xl font-semibold text-black dark:text-white">{__('general.laravel_news')}</h2>
 
                                         <p className="mt-4 text-sm/relaxed">
-                                            Laravel News is a community driven
-                                            portal and newsletter aggregating
-                                            all of the latest and most important
-                                            news in the Laravel ecosystem,
-                                            including new package releases and
-                                            tutorials.
-                                        </p>
+                                            {__('general.laravel_news_is_a_community_driven_porta')}</p>
                                     </div>
 
                                     <svg
@@ -269,36 +245,31 @@ export default function Welcome({
                                                 href="https://forge.laravel.com"
                                                 className="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white dark:focus-visible:ring-[#FF2D20]"
                                             >
-                                                Forge
-                                            </a>
+                                                {__('general.forge')}</a>
                                             ,{' '}
                                             <a
                                                 href="https://vapor.laravel.com"
                                                 className="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white"
                                             >
-                                                Vapor
-                                            </a>
+                                                {__('general.vapor')}</a>
                                             ,{' '}
                                             <a
                                                 href="https://nova.laravel.com"
                                                 className="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white"
                                             >
-                                                Nova
-                                            </a>
+                                                {__('general.nova')}</a>
                                             ,{' '}
                                             <a
                                                 href="https://envoyer.io"
                                                 className="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white"
                                             >
-                                                Envoyer
-                                            </a>
+                                                {__('general.envoyer')}</a>
                                             , and{' '}
                                             <a
                                                 href="https://herd.laravel.com"
                                                 className="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white"
                                             >
-                                                Herd
-                                            </a>{' '}
+                                                {__('general.herd')}</a>{' '}
                                             help you take your projects to the
                                             next level. Pair them with powerful
                                             open source libraries like{' '}
@@ -306,43 +277,37 @@ export default function Welcome({
                                                 href="https://laravel.com/docs/billing"
                                                 className="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white"
                                             >
-                                                Cashier
-                                            </a>
+                                                {__('general.cashier')}</a>
                                             ,{' '}
                                             <a
                                                 href="https://laravel.com/docs/dusk"
                                                 className="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white"
                                             >
-                                                Dusk
-                                            </a>
+                                                {__('general.dusk')}</a>
                                             ,{' '}
                                             <a
                                                 href="https://laravel.com/docs/broadcasting"
                                                 className="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white"
                                             >
-                                                Echo
-                                            </a>
+                                                {__('general.echo')}</a>
                                             ,{' '}
                                             <a
                                                 href="https://laravel.com/docs/horizon"
                                                 className="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white"
                                             >
-                                                Horizon
-                                            </a>
+                                                {__('general.horizon')}</a>
                                             ,{' '}
                                             <a
                                                 href="https://laravel.com/docs/sanctum"
                                                 className="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white"
                                             >
-                                                Sanctum
-                                            </a>
+                                                {__('general.sanctum')}</a>
                                             ,{' '}
                                             <a
                                                 href="https://laravel.com/docs/telescope"
                                                 className="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white"
                                             >
-                                                Telescope
-                                            </a>
+                                                {__('general.telescope')}</a>
                                             , and more.
                                         </p>
                                     </div>

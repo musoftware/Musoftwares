@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 
 export default function History({ transfers }) {
     return (
@@ -41,14 +42,14 @@ export default function History({ transfers }) {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="ps-6">Type</TableHead>
+                                    <TableHead className="ps-6">{__('general.type')}</TableHead>
                                     <TableHead>{__('general.recipient_sender')}</TableHead>
                                     <TableHead>{__('general.reason_memo')}</TableHead>
-                                    <TableHead>Amount</TableHead>
+                                    <TableHead>{__('general.amount')}</TableHead>
                                     <TableHead>{__('general.fees_paid')}</TableHead>
-                                    <TableHead>Status</TableHead>
+                                    <TableHead>{__('general.status')}</TableHead>
                                     <TableHead>{__('general.processed_date')}</TableHead>
-                                    <TableHead className="pe-6 text-end">Actions</TableHead>
+                                    <TableHead className="pe-6 text-end">{__('general.actions')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -85,12 +86,10 @@ export default function History({ transfers }) {
                                                 >
                                                     {tx.type === 'sent' ? (
                                                         <>
-                                                            <ArrowUpRight className="w-3 h-3 me-1" /> Sent
-                                                        </>
+                                                            <ArrowUpRight className="w-3 h-3 me-1" /> {__('general.sent')}</>
                                                     ) : (
                                                         <>
-                                                            <ArrowDownLeft className="w-3 h-3 me-1" /> Received
-                                                        </>
+                                                            <ArrowDownLeft className="w-3 h-3 me-1" /> {__('general.received')}</>
                                                     )}
                                                 </Badge>
                                             </TableCell>
@@ -162,8 +161,7 @@ export default function History({ transfers }) {
                                             <TableCell className="pe-6 text-end">
                                                 <Button variant="ghost" size="sm" asChild className="shadow-none hover:bg-muted">
                                                     <Link href={route('financial.transfer.show', tx.id)}>
-                                                        <FileText className="w-4 h-4 me-1" /> Receipt
-                                                    </Link>
+                                                        <FileText className="w-4 h-4 me-1" /> {__('general.receipt')}</Link>
                                                 </Button>
                                             </TableCell>
 

@@ -131,17 +131,15 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                 <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl">
                     <CheckCircle2 className="w-12 h-12 text-emerald-500 mb-3" />
                     <h4 className="text-sm font-semibold text-slate-900">{uploadedDoc.original_filename}</h4>
-                    <p className="text-xs text-slate-500 mt-1 mb-4">Uploaded successfully</p>
+                    <p className="text-xs text-slate-500 mt-1 mb-4">{__('general.uploaded_successfully')}</p>
                     <div className="flex gap-2">
                         <Button variant="outline" size="sm" asChild>
                             <a href={route('kyc.download', uploadedDoc.id)} target="_blank" rel="noreferrer">
-                                <Download className="w-4 h-4 mr-2" /> View
-                            </a>
+                                <Download className="w-4 h-4 me-2" /> {__('general.view')}</a>
                         </Button>
                         {!isPendingReview && uploadedDoc.status !== 'approved' && (
                             <Button variant="destructive" size="sm" onClick={() => handleDelete(uploadedDoc.id)}>
-                                <Trash2 className="w-4 h-4 mr-2" /> Remove
-                            </Button>
+                                <Trash2 className="w-4 h-4 me-2" /> {__('general.remove')}</Button>
                         )}
                     </div>
                 </div>
@@ -163,13 +161,13 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                     {isCurrentUploading ? (
                         <div className="text-center">
                             <p className="text-sm font-semibold text-slate-900">{data.document?.name}</p>
-                            <p className="text-xs text-slate-500 mt-1">Ready to upload</p>
+                            <p className="text-xs text-slate-500 mt-1">{__('general.ready_to_upload')}</p>
                         </div>
                     ) : (
                         <div className="text-center">
-                            <p className="text-sm font-semibold text-slate-900">Drag & drop your file here</p>
+                            <p className="text-sm font-semibold text-slate-900">{__('general.drag_drop_your_file_here')}</p>
                             <p className="text-xs text-slate-500 mt-1">or click to browse from your device</p>
-                            <p className="text-xs text-slate-400 mt-2">JPG, PNG, PDF up to 5MB</p>
+                            <p className="text-xs text-slate-400 mt-2">{__('general.jpg_png_pdf_up_to_5mb')}</p>
                         </div>
                     )}
                 </div>
@@ -193,7 +191,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
     };
 
     return (
-        <AuthenticatedLayout user={auth.user} header={<h2 className="font-semibold text-xl text-foreground leading-tight">Identity Verification</h2>}>
+        <AuthenticatedLayout user={auth.user} header={<h2 className="font-semibold text-xl text-foreground leading-tight">{__('general.identity_verification')}</h2>}>
             <Head title={__('general.kyc_verification')} />
 
             <div className="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8">
@@ -238,7 +236,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                         {/* WIZARD SIDEBAR */}
                         <div className="md:col-span-1 space-y-6">
                             <div className="space-y-4">
-                                <h3 className="text-lg font-bold text-slate-900">Verification Steps</h3>
+                                <h3 className="text-lg font-bold text-slate-900">{__('general.verification_steps')}</h3>
                                 <div className="space-y-3 relative">
                                     <div className="absolute left-[15px] top-4 bottom-4 w-0.5 bg-slate-200" />
                                     {STEPS.map((step, idx) => {
@@ -259,7 +257,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                                                 </div>
                                                 <div>
                                                     <p className={`text-sm font-semibold ${isActive ? 'text-indigo-900' : 'text-slate-700'}`}>{step.label}</p>
-                                                    {step.required && <span className="text-[10px] uppercase font-bold text-rose-500 tracking-wider">Required</span>}
+                                                    {step.required && <span className="text-[10px] uppercase font-bold text-rose-500 tracking-wider">{__('general.required')}</span>}
                                                 </div>
                                             </div>
                                         );
@@ -270,11 +268,9 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                             <div className="bg-slate-50 p-5 rounded-xl border border-slate-100">
                                 <h4 className="font-semibold text-slate-900 text-sm flex items-center gap-2 mb-2">
                                     <ShieldCheck className="w-4 h-4 text-indigo-500"/>
-                                    Bank-Grade Security
-                                </h4>
+                                    {__('general.bankgrade_security')}</h4>
                                 <p className="text-xs text-slate-600 leading-relaxed">
-                                    Your documents are encrypted and stored securely. They are only used for identity verification and are never shared.
-                                </p>
+                                    {__('general.your_documents_are_encrypted_and_stored')}</p>
                             </div>
                         </div>
 
@@ -307,12 +303,11 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                                                 onClick={() => setActiveStep(prev => Math.max(0, prev - 1))}
                                                 disabled={activeStep === 0}
                                             >
-                                                <ArrowLeft className="w-4 h-4 mr-2" /> Back
-                                            </Button>
+                                                <ArrowLeft className="w-4 h-4 me-2" /> {__('general.back')}</Button>
                                             
                                             {activeStep < STEPS.length - 1 ? (
                                                 <Button onClick={() => setActiveStep(prev => prev + 1)}>
-                                                    Next <ArrowRight className="w-4 h-4 ml-2" />
+                                                    {__('general.next')}<ArrowRight className="w-4 h-4 ms-2" />
                                                 </Button>
                                             ) : (
                                                 <Button 
@@ -320,8 +315,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                                                     disabled={!canSubmit}
                                                     className={canSubmit ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''}
                                                 >
-                                                    <CheckCircle2 className="w-4 h-4 mr-2" /> Submit Application
-                                                </Button>
+                                                    <CheckCircle2 className="w-4 h-4 me-2" /> {__('general.submit_application')}</Button>
                                             )}
                                         </CardFooter>
                                     </motion.div>
@@ -336,10 +330,9 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                         <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
                             <CheckCircle2 className="w-10 h-10 text-indigo-500" />
                         </div>
-                        <h2 className="text-2xl font-bold text-slate-900 mb-2">Application Received</h2>
+                        <h2 className="text-2xl font-bold text-slate-900 mb-2">{__('general.application_received')}</h2>
                         <p className="text-slate-600 max-w-md mx-auto">
-                            Thank you for submitting your documents. Our compliance team is currently reviewing your application. You will be notified via email once the review is complete.
-                        </p>
+                            {__('general.thank_you_for_submitting_your_documents')}</p>
                     </div>
                 )}
             </div>

@@ -40,6 +40,7 @@ import {
     Legend
 } from 'recharts';
 import {
+import { __ } from '@/lib/i18n';
     Table,
     TableBody,
     TableCell,
@@ -136,14 +137,14 @@ export default function Income() {
 
     return (
         <AdminSidebarLayout 
-            title="Business Income" 
+            title={__('general.business_income')} 
             header="Business Income"
         >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                 <Card className="border-none shadow-sm shadow-slate-200/50">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between space-y-0 pb-2">
-                            <p className="text-sm font-medium text-slate-500">Monthly Net Income</p>
+                            <p className="text-sm font-medium text-slate-500">{__('general.monthly_net_income')}</p>
                             <div className="p-2 bg-emerald-50 rounded-xl">
                                 <ArrowUpRight className="h-4 w-4 text-emerald-600" />
                             </div>
@@ -152,9 +153,8 @@ export default function Income() {
                             {formatCurrency(stats.total_monthly_income, stats.business_currency_code)}
                         </div>
                         <p className="text-xs text-slate-500 mt-2 font-medium">
-                            <span className="text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded me-1">This Month</span>
-                            Net Income
-                        </p>
+                            <span className="text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded me-1">{__('general.this_month')}</span>
+                            {__('general.net_income')}</p>
                     </CardContent>
                 </Card>
             </div>
@@ -163,8 +163,7 @@ export default function Income() {
                 <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
                         <CalendarIcon className="w-5 h-5 text-indigo-500" />
-                        Income Trends
-                    </CardTitle>
+                        {__('general.income_trends')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="h-[250px] mt-4">
@@ -212,8 +211,7 @@ export default function Income() {
                     <CardHeader className="pb-2">
                         <CardTitle className="text-lg font-semibold flex items-center gap-2">
                             <CalendarIcon className="w-5 h-5 text-indigo-500" />
-                            Current Month Income by Client
-                        </CardTitle>
+                            {__('general.current_month_income_by_client')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="h-[450px] mt-4">
@@ -239,8 +237,7 @@ export default function Income() {
                                 </ResponsiveContainer>
                             ) : (
                                 <div className="h-full flex items-center justify-center text-sm text-slate-500">
-                                    No income data for current month.
-                                </div>
+                                    {__('general.no_income_data_for_current_month')}</div>
                             )}
                         </div>
                     </CardContent>
@@ -250,8 +247,7 @@ export default function Income() {
                     <CardHeader className="pb-2">
                         <CardTitle className="text-lg font-semibold flex items-center gap-2">
                             <CalendarIcon className="w-5 h-5 text-indigo-500" />
-                            Current Year Income by Client
-                        </CardTitle>
+                            {__('general.current_year_income_by_client')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="h-[450px] mt-4">
@@ -277,8 +273,7 @@ export default function Income() {
                                 </ResponsiveContainer>
                             ) : (
                                 <div className="h-full flex items-center justify-center text-sm text-slate-500">
-                                    No income data for current year.
-                                </div>
+                                    {__('general.no_income_data_for_current_year')}</div>
                             )}
                         </div>
                     </CardContent>
@@ -288,31 +283,31 @@ export default function Income() {
             <Card className="border-none shadow-sm shadow-slate-200/50">
                 <CardHeader className="pb-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <CardTitle className="text-lg font-semibold text-slate-900">Income Entries</CardTitle>
-                        <CardDescription>Recent income transactions</CardDescription>
+                        <CardTitle className="text-lg font-semibold text-slate-900">{__('general.income_entries')}</CardTitle>
+                        <CardDescription>{__('general.recent_income_transactions')}</CardDescription>
                     </div>
                     <form onSubmit={handleSearch} className="flex items-center w-full sm:w-auto gap-2">
                         <div className="relative w-full sm:w-64">
                             <Search className="absolute start-2.5 top-2.5 h-4 w-4 text-slate-400" />
                             <Input
                                 type="text"
-                                placeholder="Search reason..."
+                                placeholder={__('general.search_reason')}
                                 className="ps-9 h-9 border-slate-200 focus-visible:ring-emerald-500 rounded-lg w-full text-sm"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-                        <Button type="submit" size="sm" variant="secondary">Search</Button>
+                        <Button type="submit" size="sm" variant="secondary">{__('general.search')}</Button>
                     </form>
                 </CardHeader>
                 <div className="overflow-x-auto">
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                                <TableHead className="w-[120px] font-semibold">Date</TableHead>
-                                <TableHead className="font-semibold">Reason</TableHead>
+                                <TableHead className="w-[120px] font-semibold">{__('general.date')}</TableHead>
+                                <TableHead className="font-semibold">{__('general.reason')}</TableHead>
                                 <TableHead className="font-semibold">Project/Client</TableHead>
-                                <TableHead className="text-end font-semibold">Amount</TableHead>
+                                <TableHead className="text-end font-semibold">{__('general.amount')}</TableHead>
                                 <TableHead className="w-[80px]"></TableHead>
                             </TableRow>
                         </TableHeader>
@@ -326,8 +321,7 @@ export default function Income() {
                                         <div className="font-medium text-slate-900">{entry.title}</div>
                                         {entry.is_recurring && (
                                             <span className="inline-flex items-center mt-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700">
-                                                Recurring
-                                            </span>
+                                                {__('general.recurring')}</span>
                                         )}
                                     </TableCell>
                                     <TableCell>
@@ -353,7 +347,7 @@ export default function Income() {
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                                    <span className="sr-only">Open menu</span>
+                                                    <span className="sr-only">{__('general.open_menu')}</span>
                                                     <MoreHorizontal className="h-4 w-4 text-slate-500" />
                                                 </Button>
                                             </DropdownMenuTrigger>
@@ -378,8 +372,7 @@ export default function Income() {
                             {entries?.data?.length === 0 && (
                                 <TableRow>
                                     <TableCell colSpan={5} className="h-32 text-center text-slate-500">
-                                        No income records found for this period.
-                                    </TableCell>
+                                        {__('general.no_income_records_found_for_this_period')}</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
@@ -389,7 +382,7 @@ export default function Income() {
 
             <ConfirmModal
                 isOpen={deleteId !== null}
-                title="Delete Income Transaction"
+                title={__('general.delete_income_transaction')}
                 description="Are you sure you want to delete this transaction? This will recalculate the associated user's ledger. This action cannot be undone."
                 confirmLabel="Delete Transaction"
                 variant="danger"
@@ -400,9 +393,9 @@ export default function Income() {
 
             <PromptModal
                 isOpen={reverseId !== null}
-                title="Reverse Transaction"
+                title={__('general.reverse_transaction')}
                 description="This will create a negative transaction to nullify this entry in the ledger."
-                label="Reversal Reason"
+                label={__('general.reversal_reason')}
                 placeholder={`Reversal of transaction #${reverseId}`}
                 confirmLabel="Reverse Transaction"
                 onConfirm={handleReverse}

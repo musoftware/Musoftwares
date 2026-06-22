@@ -130,8 +130,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                             </Button>
                             <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                                 <ArrowLeft className="w-4 h-4 me-2" />
-                                Back
-                            </Button>
+                                {__('general.back')}</Button>
                         </div>
                     </div>
 
@@ -350,8 +349,8 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                 <th className="px-4 py-3 font-semibold">{__('general.event_date')}</th>
                                                 <th className="px-4 py-3 font-semibold">{__('general.data_stream')}</th>
                                                 <th className="px-4 py-3 font-semibold">{__('general.financial_impact')}</th>
-                                                <th className="px-4 py-3 font-semibold">Integrity</th>
-                                                <th className="px-4 py-3 font-semibold text-end">Actions</th>
+                                                <th className="px-4 py-3 font-semibold">{__('general.integrity')}</th>
+                                                <th className="px-4 py-3 font-semibold text-end">{__('general.actions')}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y">
@@ -376,12 +375,10 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                     <td className="px-4 py-3">
                                                         {tx.is_spoofed ? (
                                                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">
-                                                                <AlertTriangle className="w-3 h-3 me-1" /> Anomalous
-                                                            </span>
+                                                                <AlertTriangle className="w-3 h-3 me-1" /> {__('general.anomalous')}</span>
                                                         ) : (
                                                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
-                                                                <CheckCircle className="w-3 h-3 me-1" /> Verified
-                                                            </span>
+                                                                <CheckCircle className="w-3 h-3 me-1" /> {__('general.verified')}</span>
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-3 text-end">

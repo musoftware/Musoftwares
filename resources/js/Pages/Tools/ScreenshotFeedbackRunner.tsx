@@ -191,7 +191,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                         <div className="w-5 h-5 bg-black rounded-md flex items-center justify-center">
                             <ImageIcon className="w-3 h-3 text-white" />
                         </div>
-                        <span className="font-semibold text-sm tracking-tight">Feedback</span>
+                        <span className="font-semibold text-sm tracking-tight">{__('general.feedback')}</span>
                     </div>
                     
                     <div className="h-4 w-px bg-slate-200" />
@@ -202,8 +202,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                             onClick={() => setActiveTab('projects')}
                             className={`h-8 px-3 text-sm font-medium transition-colors ${activeTab === 'projects' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
                         >
-                            Projects
-                        </Button>
+                            {__('general.projects')}</Button>
                         {selectedProjectId && (
                             <>
                                 <Button 
@@ -211,8 +210,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                     onClick={() => setActiveTab('screenshots')}
                                     className={`h-8 px-3 text-sm font-medium transition-colors ${(activeTab === 'screenshots' || activeTab === 'review') ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
                                 >
-                                    Screenshots
-                                </Button>
+                                    {__('general.screenshots')}</Button>
                                 <Button 
                                     variant="ghost"
                                     onClick={() => setActiveTab('activity')}
@@ -237,7 +235,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-2xl font-bold tracking-tight">Workspaces</h1>
+                                <h1 className="text-2xl font-bold tracking-tight">{__('general.workspaces')}</h1>
                                 <p className="text-sm text-slate-500 mt-1">{__('general.select_a_project_to_view_and_annotate_screenshots')}</p>
                             </div>
                             <Button onClick={handleCreateProject} className="gap-1.5 h-9 bg-black text-white hover:bg-slate-800 shadow-sm">
@@ -288,16 +286,15 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                 {activeTab === 'screenshots' && selectedProjectId && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="flex items-center gap-2 text-sm text-slate-500 mb-2">
-                            <Button variant="link" onClick={() => setActiveTab('projects')} className="h-auto p-0 text-slate-500 hover:text-slate-900 transition-colors font-normal">Workspaces</Button>
+                            <Button variant="link" onClick={() => setActiveTab('projects')} className="h-auto p-0 text-slate-500 hover:text-slate-900 transition-colors font-normal">{__('general.workspaces')}</Button>
                             <ChevronRight className="w-3 h-3" />
                             <span className="font-medium text-slate-900">{projects.find(p => p.id === selectedProjectId)?.name}</span>
                         </div>
                         
                         <div className="flex items-center justify-between">
-                            <h1 className="text-2xl font-bold tracking-tight">Screenshots</h1>
+                            <h1 className="text-2xl font-bold tracking-tight">{__('general.screenshots')}</h1>
                             <Button onClick={handleUploadScreenshot} className="gap-1.5 h-9 bg-black text-white hover:bg-slate-800 shadow-sm">
-                                <Upload className="w-4 h-4" /> Upload
-                            </Button>
+                                <Upload className="w-4 h-4" /> {__('general.upload')}</Button>
                         </div>
 
                         {screenshots.length === 0 ? (
@@ -328,8 +325,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                                 onClick={() => handleReviewClick(s.id)}
                                                 className="h-8 text-xs font-medium bg-slate-50 hover:bg-slate-100"
                                             >
-                                                Review
-                                            </Button>
+                                                {__('general.review')}</Button>
                                         </div>
                                     </div>
                                 ))}
@@ -341,7 +337,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                 {activeTab === 'activity' && selectedProjectId && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 max-w-2xl mx-auto">
                         <div className="flex items-center justify-between mb-8">
-                            <h1 className="text-2xl font-bold tracking-tight">Timeline</h1>
+                            <h1 className="text-2xl font-bold tracking-tight">{__('general.timeline')}</h1>
                         </div>
                         
                         <div className="space-y-4">
@@ -369,7 +365,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             {/* Breadcrumbs / Back navigation */}
                             <div className="flex items-center gap-2 text-sm text-slate-500 mb-2">
-                                <Button variant="link" onClick={() => setActiveTab('projects')} className="h-auto p-0 text-slate-500 hover:text-slate-900 transition-colors font-normal">Workspaces</Button>
+                                <Button variant="link" onClick={() => setActiveTab('projects')} className="h-auto p-0 text-slate-500 hover:text-slate-900 transition-colors font-normal">{__('general.workspaces')}</Button>
                                 <ChevronRight className="w-3 h-3" />
                                 <Button variant="link" onClick={() => setActiveTab('screenshots')} className="h-auto p-0 text-slate-500 hover:text-slate-900 transition-colors font-normal">{projects.find(p => p.id === selectedProjectId)?.name}</Button>
                                 <ChevronRight className="w-3 h-3" />
@@ -495,8 +491,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                                                 onClick={() => setPendingPin(null)}
                                                                 className="h-7 text-xs font-medium text-slate-600"
                                                             >
-                                                                Cancel
-                                                            </Button>
+                                                                {__('general.cancel')}</Button>
                                                             <Button 
                                                                 size="sm"
                                                                 type="submit"
@@ -515,7 +510,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                 <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-[65vh]">
                                     {/* Header with total and count */}
                                     <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-                                        <h3 className="font-bold text-sm tracking-tight text-slate-800">Annotations</h3>
+                                        <h3 className="font-bold text-sm tracking-tight text-slate-800">{__('general.annotations')}</h3>
                                         
                                         {/* Sidebar Navigation Tabs */}
                                         <div className="flex bg-slate-100 rounded-lg p-0.5 mt-3 text-xs">
@@ -602,8 +597,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                                         
                                                         {!isOpen && (
                                                             <div className="mt-2.5 flex items-center gap-1 text-[10px] text-emerald-600 font-medium bg-emerald-50/50 w-fit px-2 py-0.5 rounded-md border border-emerald-100/50">
-                                                                <CheckCircle2 className="w-3 h-3" /> Resolved
-                                                            </div>
+                                                                <CheckCircle2 className="w-3 h-3" /> {__('general.resolved')}</div>
                                                         )}
                                                     </div>
                                                 );

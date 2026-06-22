@@ -136,17 +136,16 @@ export default function NotificationSettings({ profile }) {
                             <CardTitle>iOS Shortcut Notifications</CardTitle>
                         </div>
                         <CardDescription>
-                            Since iPhones do not support web push notifications natively in Chrome, you can set up an iOS Shortcut to receive alerts.
-                        </CardDescription>
+                            {__('general.since_iphones_do_not_support_web_push_no')}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4">
-                            <h3 className="text-indigo-900 font-semibold mb-2">Setup Guide</h3>
+                            <h3 className="text-indigo-900 font-semibold mb-2">{__('general.setup_guide')}</h3>
                             <ol className="list-decimal list-inside text-sm text-indigo-800 space-y-2">
-                                <li>Click the button below to generate your secure API Token.</li>
-                                <li>Copy the generated token.</li>
-                                <li><a href="#" className="underline font-medium">Download the iOS Shortcut</a> (iCloud Link).</li>
-                                <li>When installing the shortcut on your iPhone, paste the token when prompted.</li>
+                                <li>{__('general.click_the_button_below_to_generate_your')}</li>
+                                <li>{__('general.copy_the_generated_token')}</li>
+                                <li><a href="#" className="underline font-medium">{__('general.download_the_ios_shortcut')}</a> (iCloud Link).</li>
+                                <li>{__('general.when_installing_the_shortcut_on_your_iph')}</li>
                                 <li>Set up an iOS Personal Automation (in the Shortcuts app) to run this shortcut automatically (e.g. at 9 AM, or when you open Chrome).</li>
                             </ol>
                         </div>
@@ -157,7 +156,7 @@ export default function NotificationSettings({ profile }) {
                                 <div className="mt-2 p-3 bg-white border border-green-300 rounded font-mono text-sm break-all select-all">
                                     {flash.ios_shortcut_token}
                                 </div>
-                                <p className="text-xs text-green-700 mt-2">This token will not be shown again. Keep it secret.</p>
+                                <p className="text-xs text-green-700 mt-2">{__('general.this_token_will_not_be_shown_again_keep')}</p>
                             </div>
                         )}
 

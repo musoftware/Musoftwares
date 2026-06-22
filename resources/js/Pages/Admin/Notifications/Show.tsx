@@ -36,8 +36,7 @@ export default function Show({ campaign }: { campaign: any }) {
                                 {campaign.title}
                                 {campaign.audience_type === 'personal' && (
                                     <Badge variant="outline" className="ms-2 bg-indigo-50 text-indigo-700 border-indigo-200">
-                                        Personal
-                                    </Badge>
+                                        {__('general.personal')}</Badge>
                                 )}
                             </h1>
                             <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
@@ -67,8 +66,7 @@ export default function Show({ campaign }: { campaign: any }) {
                                 {campaign.views_count?.toLocaleString() || 0}
                             </div>
                             <p className="text-xs text-slate-500 mt-1">
-                                Total unique device fetches
-                            </p>
+                                {__('general.total_unique_device_fetches')}</p>
                         </CardContent>
                     </Card>
 
@@ -84,16 +82,14 @@ export default function Show({ campaign }: { campaign: any }) {
                                 {campaign.clicks_count?.toLocaleString() || 0}
                             </div>
                             <p className="text-xs text-slate-500 mt-1">
-                                Users who clicked the notification
-                            </p>
+                                {__('general.users_who_clicked_the_notification')}</p>
                         </CardContent>
                     </Card>
 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium text-slate-500">
-                                Click-Through Rate
-                            </CardTitle>
+                                {__('general.clickthrough_rate')}</CardTitle>
                             <BarChart3 className="w-4 h-4 text-emerald-500" />
                         </CardHeader>
                         <CardContent>
@@ -101,8 +97,7 @@ export default function Show({ campaign }: { campaign: any }) {
                                 {ctr}%
                             </div>
                             <p className="text-xs text-slate-500 mt-1">
-                                Clicks per view ratio
-                            </p>
+                                {__('general.clicks_per_view_ratio')}</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -119,15 +114,14 @@ export default function Show({ campaign }: { campaign: any }) {
                             <CardContent>
                                 {views.length === 0 ? (
                                     <div className="text-center py-4 text-slate-500 text-sm">
-                                        No views tracked yet.
-                                    </div>
+                                        {__('general.no_views_tracked_yet')}</div>
                                 ) : (
                                     <div className="max-h-64 overflow-y-auto pe-2 border rounded-md">
                                         <Table>
                                             <TableHeader className="bg-slate-50 sticky top-0">
                                                 <TableRow>
-                                                    <TableHead>User</TableHead>
-                                                    <TableHead className="text-end">Time</TableHead>
+                                                    <TableHead>{__('general.user')}</TableHead>
+                                                    <TableHead className="text-end">{__('general.time')}</TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
@@ -154,15 +148,14 @@ export default function Show({ campaign }: { campaign: any }) {
                             <CardContent>
                                 {clicks.length === 0 ? (
                                     <div className="text-center py-4 text-slate-500 text-sm">
-                                        No clicks tracked yet.
-                                    </div>
+                                        {__('general.no_clicks_tracked_yet')}</div>
                                 ) : (
                                     <div className="max-h-64 overflow-y-auto pe-2 border rounded-md">
                                         <Table>
                                             <TableHeader className="bg-slate-50 sticky top-0">
                                                 <TableRow>
-                                                    <TableHead>User</TableHead>
-                                                    <TableHead className="text-end">Time</TableHead>
+                                                    <TableHead>{__('general.user')}</TableHead>
+                                                    <TableHead className="text-end">{__('general.time')}</TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
@@ -186,11 +179,9 @@ export default function Show({ campaign }: { campaign: any }) {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Send className="w-5 h-5 text-indigo-500" />
-                            Payload Details
-                        </CardTitle>
+                            {__('general.payload_details')}</CardTitle>
                         <CardDescription>
-                            The exact content that was delivered to the devices.
-                        </CardDescription>
+                            {__('general.the_exact_content_that_was_delivered_to')}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="space-y-2">
@@ -214,8 +205,7 @@ export default function Show({ campaign }: { campaign: any }) {
                         {campaign.target_url && (
                             <div className="space-y-2">
                                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                                    <LinkIcon className="w-3 h-3" /> Target URL
-                                </span>
+                                    <LinkIcon className="w-3 h-3" /> {__('general.target_url')}</span>
                                 <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 text-blue-600 font-medium text-sm truncate">
                                     <a href={campaign.target_url} target="_blank" rel="noreferrer" className="hover:underline">
                                         {campaign.target_url}

@@ -2,26 +2,24 @@ import React from 'react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 
 export default function Finance({ canLogin, canRegister }) {
     return (
         <PublicLayout auth={{ user: null }}>
-            <Head title="Financial Platforms - musoftware" />
+            <Head title={__('general.financial_platforms_musoftware')} />
 
             <section className="relative pt-32 pb-24 overflow-hidden bg-white">
                 <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="max-w-4xl">
                         <h1 className="text-5xl sm:text-7xl font-extrabold text-slate-900 tracking-tight mb-8">
-                            Compliant Financial Platforms
-                        </h1>
+                            {__('general.compliant_financial_platforms')}</h1>
                         <p className="text-xl text-slate-600 font-light mb-12 max-w-2xl leading-relaxed">
-                            Bank-grade ledger accuracy and security. We build platforms that handle high-frequency transactions with perfect consistency and regulatory compliance.
-                        </p>
+                            {__('general.bankgrade_ledger_accuracy_and_security_w')}</p>
                         <div className="flex flex-col sm:flex-row gap-4">
                             <a href="mailto:admin@musoftwares.com">
                                 <Button size="lg" className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white rounded-full px-10 h-14 text-base font-semibold transition-all">
-                                    Discuss Financial Needs
-                                </Button>
+                                    {__('general.discuss_financial_needs')}</Button>
                             </a>
                         </div>
                     </div>
@@ -32,16 +30,16 @@ export default function Finance({ canLogin, canRegister }) {
                 <div className="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                         <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-4">Ledger Immutability</h3>
-                            <p className="text-slate-600 font-light">Double-entry accounting architecture ensuring perfect balancing of all financial records.</p>
+                            <h3 className="text-xl font-bold text-slate-900 mb-4">{__('general.ledger_immutability')}</h3>
+                            <p className="text-slate-600 font-light">{__('general.doubleentry_accounting_architecture_ensu')}</p>
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-4">Regulatory Compliance</h3>
-                            <p className="text-slate-600 font-light">Built-in reporting tools designed to meet local and international tax and auditing standards.</p>
+                            <h3 className="text-xl font-bold text-slate-900 mb-4">{__('general.regulatory_compliance')}</h3>
+                            <p className="text-slate-600 font-light">{__('general.builtin_reporting_tools_designed_to_meet')}</p>
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-4">Fraud Detection</h3>
-                            <p className="text-slate-600 font-light">Automated anomaly detection across massive volumes of transaction data.</p>
+                            <h3 className="text-xl font-bold text-slate-900 mb-4">{__('general.fraud_detection')}</h3>
+                            <p className="text-slate-600 font-light">{__('general.automated_anomaly_detection_across_massi')}</p>
                         </div>
                     </div>
                 </div>

@@ -311,7 +311,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                     <p className="text-sm text-slate-500">{invoice.client?.email}</p>
                                     {invoice.project && (
                                         <div className="mt-3">
-                                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Project</p>
+                                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{__('general.project')}</p>
                                             <p className="text-sm font-medium text-indigo-600">{invoice.project.name}</p>
                                         </div>
                                     )}
@@ -385,7 +385,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                             <div className="flex justify-end">
                                 <div className="w-full md:w-1/2 space-y-3">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-slate-500 font-medium">Subtotal</span>
+                                        <span className="text-slate-500 font-medium">{__('general.subtotal')}</span>
                                         <span className="font-medium text-slate-900"><CurrencyDisplay amount={parseFloat(invoice.amount || 0) - parseFloat(invoice.tax_amount || 0) + parseFloat(invoice.discount_amount || 0)} currency={invoice.currency} /></span>
                                     </div>
                                     <div className="pt-3 border-t border-slate-100 flex justify-between items-center">

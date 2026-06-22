@@ -100,13 +100,13 @@
     {
         "id": "AO1",
         "name": "Build Login, Register, Forgot Password",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "AO2",
         "name": "Build Email Verification Flow",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "AO1"
         ]
@@ -114,25 +114,25 @@
     {
         "id": "AO3",
         "name": "Implement KYC Wizard",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "AO4",
         "name": "Build Tenant & Workspace Setup",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "AO5",
         "name": "Implement Role Assignment",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "CoreApp",
         "name": "4. Core Application & Settings",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "AuthOnboarding"
         ]
@@ -140,13 +140,13 @@
     {
         "id": "C1",
         "name": "Build Bento-grid Dashboard",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "C2",
         "name": "Develop Profile Settings",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "C1"
         ]
@@ -154,19 +154,19 @@
     {
         "id": "C3",
         "name": "Develop Tenant Global Config",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "C4",
         "name": "Develop Team Management & Roles",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "FinanceBilling",
         "name": "5. Financial & Billing Module",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CoreApp"
         ]
@@ -174,13 +174,13 @@
     {
         "id": "FB1",
         "name": "Setup Subscriptions Overview",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "FB2",
         "name": "Implement Wallet & Top-Up Dual Currency",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "FB1"
         ]
@@ -188,19 +188,19 @@
     {
         "id": "FB3",
         "name": "Build SaaS Plan Management",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "FB4",
         "name": "Implement Invoices & PDF Generation",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "ERP_CRM",
         "name": "6. ERP, CRM & Support",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "FinanceBilling"
         ]
@@ -208,13 +208,13 @@
     {
         "id": "EC1",
         "name": "Build CRM Leads & Kanban",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "EC2",
         "name": "Build Client Directory & Portal",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "EC1"
         ]
@@ -222,19 +222,19 @@
     {
         "id": "EC3",
         "name": "Develop Marketing Campaigns UI",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "EC4",
         "name": "Build Support Desk & Tickets",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "ProjectsTasks",
         "name": "7. Project & Task Execution",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "ERP_CRM"
         ]
@@ -242,13 +242,13 @@
     {
         "id": "PT1",
         "name": "Build Project Portfolio & Creation",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "PT2",
         "name": "Develop Project Dashboard",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "PT1"
         ]
@@ -256,19 +256,19 @@
     {
         "id": "PT3",
         "name": "Implement Task Kanban & Detail View",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "PT4",
         "name": "Build Time Tracking & Timesheets",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Marketplace",
         "name": "8. Marketplace & Licensing",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "ProjectsTasks"
         ]
@@ -276,13 +276,13 @@
     {
         "id": "ML1",
         "name": "Build Software Store & Product Details",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "ML2",
         "name": "Implement Checkout & Payment Gateway",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "ML1"
         ]
@@ -290,13 +290,13 @@
     {
         "id": "ML3",
         "name": "Develop License Management & IP Binding",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "ExtraModules",
         "name": "9. Additional Modules",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Marketplace"
         ]
@@ -304,13 +304,13 @@
     {
         "id": "EX1",
         "name": "Build Booking & Calendar",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "EX2",
         "name": "Develop Freelance Job Board & Proposals",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "EX1"
         ]
@@ -318,13 +318,13 @@
     {
         "id": "EX3",
         "name": "Build Fbmb Dashboard",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "UIUX",
         "name": "10. UI/UX Polish & Delivery",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "ExtraModules"
         ]
@@ -332,13 +332,13 @@
     {
         "id": "U1",
         "name": "Implement Branded Error Pages 403, 404, 500, 503",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "U2",
         "name": "Add GSAP & Framer Motion Animations",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "U1"
         ]
@@ -346,13 +346,13 @@
     {
         "id": "U3",
         "name": "Ensure Accessibility & ARIA",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "U4",
         "name": "Configure Vite Manual Chunking",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     }
 ]

@@ -7,6 +7,7 @@ import { Textarea } from '@/Components/ui/textarea';
 import { Badge } from '@/Components/ui/badge';
 import { Copy, Search, ShieldAlert, KeyRound } from 'lucide-react';
 import { useToast } from '@/Components/ui/use-toast';
+import { __ } from '@/lib/i18n';
 
 interface MatchResult {
     id: string;
@@ -195,16 +196,15 @@ export default function CipherIdentifier() {
     };
 
     return (
-        <WebToolsLayout title="Cipher Identifier Online" activeNav="explore">
+        <WebToolsLayout title={__('general.cipher_identifier_online')} activeNav="explore">
             <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6">
                 <div className="text-center mb-10">
                     <div className="inline-flex items-center justify-center p-3 bg-indigo-100 text-indigo-700 rounded-2xl mb-4">
                         <KeyRound className="w-8 h-8" />
                     </div>
-                    <h1 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">Cipher Identifier</h1>
+                    <h1 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">{__('general.cipher_identifier')}</h1>
                     <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
-                        Paste your cryptic text below, and we'll attempt to identify the encoding, hash type, or cipher used.
-                    </p>
+                        {__('general.paste_your_cryptic_text_below_and_well_a')}</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -212,7 +212,7 @@ export default function CipherIdentifier() {
                         <Card className="shadow-sm border-slate-200">
                             <CardHeader>
                                 <CardTitle className="text-lg">Cipher / Encoded Text</CardTitle>
-                                <CardDescription>Enter the text you want to analyze</CardDescription>
+                                <CardDescription>{__('general.enter_the_text_you_want_to_analyze')}</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <Textarea 
@@ -224,15 +224,14 @@ export default function CipherIdentifier() {
                                 <div className="mt-4 flex justify-end">
                                     <Button onClick={analyzeText} size="lg" className="gap-2">
                                         <Search className="w-4 h-4" />
-                                        Analyze Text
-                                    </Button>
+                                        {__('general.analyze_text')}</Button>
                                 </div>
                             </CardContent>
                         </Card>
 
                         {results && (
                             <div className="space-y-4">
-                                <h3 className="text-xl font-bold text-slate-900 border-b pb-2">Analysis Results</h3>
+                                <h3 className="text-xl font-bold text-slate-900 border-b pb-2">{__('general.analysis_results')}</h3>
                                 {results.map(match => (
                                     <Card key={match.id} className="shadow-sm border-slate-200 overflow-hidden">
                                         <CardHeader className="bg-slate-50 border-b border-slate-100 py-3">
@@ -267,18 +266,17 @@ export default function CipherIdentifier() {
                             <CardHeader>
                                 <CardTitle className="text-base flex items-center gap-2">
                                     <ShieldAlert className="w-4 h-4 text-slate-500" />
-                                    Supported Detectors
-                                </CardTitle>
+                                    {__('general.supported_detectors')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <ul className="space-y-2 text-sm text-slate-600">
-                                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />Base64 & URL Encoding</li>
-                                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />Hexadecimal & Binary</li>
-                                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />Morse Code</li>
-                                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />ROT13 & Caesar</li>
+                                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />{__('general.base64_url_encoding')}</li>
+                                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />{__('general.hexadecimal_binary')}</li>
+                                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />{__('general.morse_code')}</li>
+                                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />{__('general.rot13_caesar')}</li>
                                     <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />A1Z26 (Numbers)</li>
-                                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />MD5, SHA-1, SHA-256</li>
-                                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />Bcrypt & Argon2</li>
+                                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />{__('general.md5_sha1_sha256')}</li>
+                                    <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />{__('general.bcrypt_argon2')}</li>
                                     <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />JSON Web Token (JWT)</li>
                                 </ul>
                             </CardContent>

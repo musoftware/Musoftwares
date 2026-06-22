@@ -202,7 +202,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                             </div>
                             <div className="md:col-span-2 text-end">
                                 <Button type="button" onClick={applyExchange} className="w-full">
-                                    Apply <Plus className="h-4 w-4 ms-1" />
+                                    {__('general.apply')}<Plus className="h-4 w-4 ms-1" />
                                 </Button>
                             </div>
                         </div>
@@ -399,9 +399,9 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                             <table className="w-full text-sm text-start">
                                 <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
                                     <tr>
-                                        <th className="px-4 py-3 font-semibold">Reason</th>
-                                        {projectSplits.length > 0 && <th className="px-4 py-3 font-semibold">Project</th>}
-                                        <th className="px-4 py-3 font-semibold text-end">Gross</th>
+                                        <th className="px-4 py-3 font-semibold">{__('general.reason')}</th>
+                                        {projectSplits.length > 0 && <th className="px-4 py-3 font-semibold">{__('general.project')}</th>}
+                                        <th className="px-4 py-3 font-semibold text-end">{__('general.gross')}</th>
                                         <th className="px-4 py-3 font-semibold text-end">Fee</th>
                                         <th className="px-4 py-3 font-semibold text-end">Net</th>
                                         <th className="px-4 py-3 font-semibold text-end w-16"></th>

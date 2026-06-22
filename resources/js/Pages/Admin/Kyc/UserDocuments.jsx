@@ -8,6 +8,7 @@ import { Badge } from '@/Components/ui/badge';
 import { useToast } from '@/Components/ui/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/Components/ui/dialog";
 import { Input } from "@/Components/ui/input";
+import { __ } from '@/lib/i18n';
 
 export default function AdminKycUserDocuments({ auth, user }) {
     const { toast } = useToast();
@@ -50,7 +51,7 @@ export default function AdminKycUserDocuments({ auth, user }) {
                         </Link>
                     </Button>
                     <div>
-                        <h1 className="text-3xl font-bold font-sora tracking-tight">KYC Documents</h1>
+                        <h1 className="text-3xl font-bold font-sora tracking-tight">{__('general.kyc_documents')}</h1>
                         <p className="text-sm text-muted-foreground mt-1">Reviewing documents for {user.name}</p>
                     </div>
                 </div>
@@ -67,9 +68,9 @@ export default function AdminKycUserDocuments({ auth, user }) {
                             {user.kyc_status === 'pending_review' ? (
                                 <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100 px-3 py-1 text-sm">{__('general.review_required')}</Badge>
                             ) : user.kyc_status === 'verified' ? (
-                                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 px-3 py-1 text-sm">Verified</Badge>
+                                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 px-3 py-1 text-sm">{__('general.verified')}</Badge>
                             ) : (
-                                <Badge variant="outline" className="px-3 py-1 text-sm">Unverified</Badge>
+                                <Badge variant="outline" className="px-3 py-1 text-sm">{__('general.unverified')}</Badge>
                             )}
                         </div>
                     </CardHeader>
@@ -88,19 +89,16 @@ export default function AdminKycUserDocuments({ auth, user }) {
                                     </div>
                                     <Button variant="secondary" size="sm" asChild>
                                         <a href={route('kyc.download', doc.id)} target="_blank" rel="noreferrer">
-                                            <Eye className="w-4 h-4 me-1" /> View
-                                        </a>
+                                            <Eye className="w-4 h-4 me-1" /> {__('general.view')}</a>
                                     </Button>
                                     
                                     {doc.status === 'rejected' && (
-                                        <div className="absolute top-0 end-0 px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-bl-lg">
-                                            REJECTED
-                                        </div>
+                                        <div className="absolute top-0 end-0 px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-bs-lg">
+                                            {__('general.rejected')}</div>
                                     )}
                                     {doc.status === 'approved' && (
-                                        <div className="absolute top-0 end-0 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-bl-lg">
-                                            APPROVED
-                                        </div>
+                                        <div className="absolute top-0 end-0 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-bs-lg">
+                                            {__('general.approved')}</div>
                                     )}
                                 </div>
                             ))}
@@ -115,8 +113,7 @@ export default function AdminKycUserDocuments({ auth, user }) {
                         {user.kyc_status === 'pending_review' && (
                             <div className="flex gap-2 sm:justify-end border-t mt-8 pt-6">
                                 <Button variant="destructive" onClick={() => setIsRejectDialogOpen(true)}>
-                                    <X className="w-4 h-4 me-1" /> Reject
-                                </Button>
+                                    <X className="w-4 h-4 me-1" /> {__('general.reject')}</Button>
                                 <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleApprove}>
                                     <Check className="w-4 h-4 me-1" /> {__('general.approve_verification')}
                                 </Button>
@@ -143,7 +140,7 @@ export default function AdminKycUserDocuments({ auth, user }) {
                                 {errors.reason && <p className="text-rose-500 text-xs">{errors.reason}</p>}
                             </div>
                             <DialogFooter>
-                                <Button type="button" variant="outline" onClick={() => setIsRejectDialogOpen(false)}>Cancel</Button>
+                                <Button type="button" variant="outline" onClick={() => setIsRejectDialogOpen(false)}>{__('general.cancel')}</Button>
                                 <Button type="submit" variant="destructive" disabled={processing}>{__('general.confirm_rejection')}</Button>
                             </DialogFooter>
                         </form>

@@ -51,10 +51,10 @@ export default function PriorityDashboard({ stats, recentEscalations }) {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Date</TableHead>
+                                <TableHead>{__('general.date')}</TableHead>
                                 <TableHead>{__('general.booking_ref')}</TableHead>
-                                <TableHead>Level</TableHead>
-                                <TableHead>Reason</TableHead>
+                                <TableHead>{__('general.level')}</TableHead>
+                                <TableHead>{__('general.reason')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>

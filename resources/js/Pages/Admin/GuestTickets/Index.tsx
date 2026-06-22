@@ -4,26 +4,27 @@ import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Eye } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ tickets }: { tickets: any }) {
     return (
         <AdminSidebarLayout header="Guest Tickets">
-            <Head title="Guest Tickets" />
+            <Head title={__('general.guest_tickets')} />
             <div className="bg-white rounded-xl shadow-sm border border-slate-200">
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-end">Actions</TableHead>
+                            <TableHead>{__('general.date')}</TableHead>
+                            <TableHead>{__('general.name')}</TableHead>
+                            <TableHead>{__('general.email')}</TableHead>
+                            <TableHead>{__('general.status')}</TableHead>
+                            <TableHead className="text-end">{__('general.actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {tickets.data.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center py-8 text-slate-500">No guest tickets found.</TableCell>
+                                <TableCell colSpan={5} className="text-center py-8 text-slate-500">{__('general.no_guest_tickets_found')}</TableCell>
                             </TableRow>
                         ) : (
                             tickets.data.map((ticket: any) => (

@@ -138,7 +138,7 @@ export function InvoiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                             <span className="font-medium text-text-primary mt-0.5 block">{formatDate(data.dueDate)}</span>
                         </div>
                         <div className="mt-2">
-                            <span className="text-text-muted text-[11px] block">Project</span>
+                            <span className="text-text-muted text-[11px] block">{__('general.project')}</span>
                             <span className="font-medium text-text-primary mt-0.5 block">{data.project || 'Development Services'}</span>
                         </div>
                     </div>
@@ -224,7 +224,7 @@ export function WalletQuickView({ isOpen, onClose, data }: QuickViewProps) {
                         <span className="flex items-center gap-1.5">
                             <Lock className="h-3.5 w-3.5 text-indigo-300" /> Locked Holds: $0.00
                         </span>
-                        <span className="bg-white/15 px-2 py-0.5 rounded text-[10px] text-white">Active</span>
+                        <span className="bg-white/15 px-2 py-0.5 rounded text-[10px] text-white">{__('general.active')}</span>
                     </div>
                 </div>
 
@@ -339,14 +339,14 @@ export function ContractQuickView({ isOpen, onClose, data }: QuickViewProps) {
                             <CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 shrink-0" />
                             <div className="flex-1">
                                 <div className="font-medium text-text-primary line-through opacity-60">{__('general.phase_1_brand_ux_wireframes_architecture')}</div>
-                                <div className="text-[10px] text-emerald-700">Completed May 5, 2026</div>
+                                <div className="text-[10px] text-emerald-700">{__('general.completed_may_5_2026')}</div>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 p-2.5 rounded-lg border border-emerald-100 bg-emerald-50/20">
                             <CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 shrink-0" />
                             <div className="flex-1">
                                 <div className="font-medium text-text-primary line-through opacity-60">{__('general.phase_2_database_schema_modular_migrations')}</div>
-                                <div className="text-[10px] text-emerald-700">Completed May 12, 2026</div>
+                                <div className="text-[10px] text-emerald-700">{__('general.completed_may_12_2026')}</div>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 p-2.5 rounded-lg border border-border bg-white">
@@ -443,15 +443,15 @@ export function CustomerQuickView({ isOpen, onClose, data }: QuickViewProps) {
                     <div className="divide-y divide-border/60 rounded-xl border border-border bg-slate-50/50 px-4">
                         <div className="py-2.5 text-xs flex justify-between">
                             <span className="text-text-primary">{__('general.contract_saas_design_shell_launched')}</span>
-                            <span className="text-[10px] text-text-muted self-center">May 12</span>
+                            <span className="text-[10px] text-text-muted self-center">{__('general.may_12')}</span>
                         </div>
                         <div className="py-2.5 text-xs flex justify-between">
                             <span className="text-text-primary">{__('general.invoice_inv_302_paid_by_client')}</span>
-                            <span className="text-[10px] text-text-muted self-center">May 08</span>
+                            <span className="text-[10px] text-text-muted self-center">{__('general.may_08')}</span>
                         </div>
                         <div className="py-2.5 text-xs flex justify-between">
                             <span className="text-text-primary">{__('general.support_ticket_reopened_stripe_hook_lag')}</span>
-                            <span className="text-[10px] text-text-muted self-center">May 01</span>
+                            <span className="text-[10px] text-text-muted self-center">{__('general.may_01')}</span>
                         </div>
                     </div>
                 </div>
@@ -532,7 +532,7 @@ export function ServiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                         </div>
                         <div className="flex justify-between p-3 border-s-2 border-indigo-500 bg-indigo-50/5">
                             <div>
-                                <span className="font-bold text-indigo-950 flex items-center gap-1">{__('general.standard_full_core')}<Badge className="bg-indigo-100 text-indigo-700 text-[8px] font-bold py-0">POPULAR</Badge>
+                                <span className="font-bold text-indigo-950 flex items-center gap-1">{__('general.standard_full_core')}<Badge className="bg-indigo-100 text-indigo-700 text-[8px] font-bold py-0">{__('general.popular')}</Badge>
                                 </span>
                                 <p className="text-[10px] text-text-muted mt-0.5">10 screens, advanced layouts, state controls</p>
                             </div>

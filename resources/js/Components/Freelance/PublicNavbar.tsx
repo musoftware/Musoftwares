@@ -22,11 +22,11 @@ export default function PublicNavbar({ canLogin = true, canRegister = true }: Pu
 
     return (
         <header className="absolute inset-x-0 top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-            <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+            <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label={__('general.global')}>
                 <div className="flex lg:flex-1">
                     <Link href="/" className="-m-1.5 p-1.5 flex items-center gap-2">
                         <ApplicationLogo className="h-8 w-auto text-emerald-600" />
-                        <span className="font-bold text-xl tracking-tight text-slate-900">ArabiJobs</span>
+                        <span className="font-bold text-xl tracking-tight text-slate-900">{__('general.arabijobs')}</span>
                     </Link>
                 </div>
                 
@@ -36,7 +36,7 @@ export default function PublicNavbar({ canLogin = true, canRegister = true }: Pu
                         className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
                         onClick={() => setMobileMenuOpen(true)}
                     >
-                        <span className="sr-only">Open main menu</span>
+                        <span className="sr-only">{__('general.open_main_menu')}</span>
                         <Menu className="h-6 w-6" aria-hidden="true" />
                     </button>
                 </div>
@@ -83,14 +83,14 @@ export default function PublicNavbar({ canLogin = true, canRegister = true }: Pu
                         <div className="flex items-center justify-between">
                             <Link href="/" className="-m-1.5 p-1.5 flex items-center gap-2">
                                 <ApplicationLogo className="h-8 w-auto text-emerald-600" />
-                                <span className="font-bold text-xl tracking-tight text-slate-900">ArabiJobs</span>
+                                <span className="font-bold text-xl tracking-tight text-slate-900">{__('general.arabijobs')}</span>
                             </Link>
                             <button
                                 type="button"
                                 className="-m-2.5 rounded-md p-2.5 text-gray-700"
                                 onClick={() => setMobileMenuOpen(false)}
                             >
-                                <span className="sr-only">Close menu</span>
+                                <span className="sr-only">{__('general.close_menu')}</span>
                                 <X className="h-6 w-6" aria-hidden="true" />
                             </button>
                         </div>

@@ -181,8 +181,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                             </div>
 
                             <Button type="submit" size="sm" className="h-9 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-none border-0 text-xs">
-                                Apply
-                            </Button>
+                                {__('general.apply')}</Button>
 
                             {(search || clientFilter) && (
                                 <button
@@ -190,8 +189,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                     onClick={() => { setSearch(''); setClient(''); router.get(route('admin.tasks.as_list')); }}
                                     className="text-xs text-slate-400 hover:text-slate-600 underline"
                                 >
-                                    Clear
-                                </button>
+                                    {__('general.clear')}</button>
                             )}
                         </form>
                     </CardContent>
@@ -289,14 +287,12 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
 
                                                                     {todo.paused && (
                                                                         <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-0.5">
-                                                                            <Pause className="h-2 w-2" /> Paused
-                                                                        </span>
+                                                                            <Pause className="h-2 w-2" /> {__('general.paused')}</span>
                                                                     )}
 
                                                                     {todo.is_paid && (
                                                                         <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                                            Paid
-                                                                        </span>
+                                                                            {__('general.paid')}</span>
                                                                     )}
 
                                                                     {(todo.tags || []).slice(0, 3).map((tag, i) => (

@@ -3,6 +3,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Button } from '@/Components/ui/button';
 import { 
+import { __ } from '@/lib/i18n';
     Calculator, 
     Coins, 
     CreditCard, 
@@ -60,7 +61,7 @@ export default function WebToolsLayout({ children, title, activeNav = '' }: WebT
                                     <ApplicationLogo className="w-4 h-4 text-white fill-current" />
                                 </div>
                                 <span className="font-bold text-lg tracking-tight text-slate-900">
-                                    musoftware <span className="font-light text-slate-500">Tools</span>
+                                    musoftware <span className="font-light text-slate-500">{__('general.tools')}</span>
                                 </span>
                             </Link>
 
@@ -68,8 +69,7 @@ export default function WebToolsLayout({ children, title, activeNav = '' }: WebT
                             <nav className="hidden md:flex items-center gap-6">
                                 <div className="relative group">
                                     <button className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 py-2">
-                                        Financial
-                                        <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
+                                        {__('general.financial')}<ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
                                     </button>
                                     <div className="absolute top-full start-0 w-64 bg-white border border-slate-200 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2 flex flex-col gap-1 z-50">
                                         {financialTools.map((tool, idx) => {
@@ -86,8 +86,7 @@ export default function WebToolsLayout({ children, title, activeNav = '' }: WebT
 
                                 <div className="relative group">
                                     <button className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 py-2">
-                                        Utilities
-                                        <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
+                                        {__('general.utilities')}<ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
                                     </button>
                                     <div className="absolute top-full start-0 w-64 bg-white border border-slate-200 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2 flex flex-col gap-1 z-50">
                                         {utilityTools.map((tool, idx) => {
@@ -109,18 +108,15 @@ export default function WebToolsLayout({ children, title, activeNav = '' }: WebT
                             {isAuthed ? (
                                 <Link href="/dashboard">
                                     <Button variant="outline" className="rounded-full text-sm font-medium">
-                                        Dashboard
-                                    </Button>
+                                        {__('general.dashboard')}</Button>
                                 </Link>
                             ) : (
                                 <>
                                     <Link href={route('login')} className="hidden sm:block text-sm font-medium text-slate-600 hover:text-slate-900">
-                                        Sign In
-                                    </Link>
+                                        {__('general.sign_in')}</Link>
                                     <Link href={route('register')}>
                                         <Button className="rounded-full bg-slate-900 text-white hover:bg-slate-800 text-sm">
-                                            Register Free
-                                        </Button>
+                                            {__('general.register_free')}</Button>
                                     </Link>
                                 </>
                             )}
@@ -146,7 +142,7 @@ export default function WebToolsLayout({ children, title, activeNav = '' }: WebT
                         </div>
                         <div className="flex items-center gap-6 text-sm text-slate-500">
                             <span>© {new Date().getFullYear()} musoftware. All rights reserved.</span>
-                            <Link href="/" className="hover:text-slate-900 transition-colors">Main Site</Link>
+                            <Link href="/" className="hover:text-slate-900 transition-colors">{__('general.main_site')}</Link>
                         </div>
                     </div>
                 </div>

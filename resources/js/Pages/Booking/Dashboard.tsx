@@ -39,7 +39,7 @@ export default function Dashboard({ stats, upcoming_bookings }: DashboardProps) 
             <div className="space-y-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">{__('general.dashboard')}</h1>
                         <p className="text-muted-foreground">{__('general.overview_of_your_booking_statistics_and_upcoming_appointments')}</p>
                     </div>
                 </div>
@@ -67,7 +67,7 @@ export default function Dashboard({ stats, upcoming_bookings }: DashboardProps) 
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+                            <CardTitle className="text-sm font-medium">{__('general.revenue')}</CardTitle>
                             <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
@@ -77,7 +77,7 @@ export default function Dashboard({ stats, upcoming_bookings }: DashboardProps) 
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Cancellations</CardTitle>
+                            <CardTitle className="text-sm font-medium">{__('general.cancellations')}</CardTitle>
                             <XCircle className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>

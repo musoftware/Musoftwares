@@ -104,7 +104,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                     </div>
                     <Select onValueChange={v => applyFilter('status', v)} defaultValue={filters.status ?? 'all'}>
                         <SelectTrigger className="w-36 bg-zinc-900 border-zinc-700 text-white">
-                            <SelectValue placeholder="Status" />
+                            <SelectValue placeholder={__('general.status')} />
                         </SelectTrigger>
                         <SelectContent className="bg-zinc-900 border-zinc-700">
                             <SelectItem value="all">{__('general.all_statuses')}</SelectItem>
@@ -122,10 +122,10 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                     <tr className="border-b border-zinc-800">
                                         <th className="text-start px-4 py-3 text-zinc-400 font-medium">{__('general.device_id')}</th>
                                         <th className="text-start px-4 py-3 text-zinc-400 font-medium">{__('general.assigned_user')}</th>
-                                        <th className="text-start px-4 py-3 text-zinc-400 font-medium">Notes</th>
-                                        <th className="text-start px-4 py-3 text-zinc-400 font-medium">Assigned</th>
-                                        <th className="text-start px-4 py-3 text-zinc-400 font-medium">Status</th>
-                                        <th className="text-end px-4 py-3 text-zinc-400 font-medium">Actions</th>
+                                        <th className="text-start px-4 py-3 text-zinc-400 font-medium">{__('general.notes')}</th>
+                                        <th className="text-start px-4 py-3 text-zinc-400 font-medium">{__('general.assigned')}</th>
+                                        <th className="text-start px-4 py-3 text-zinc-400 font-medium">{__('general.status')}</th>
+                                        <th className="text-end px-4 py-3 text-zinc-400 font-medium">{__('general.actions')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>

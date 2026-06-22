@@ -53,7 +53,7 @@ function AgentCard({ agent, onToggle, onEdit }: { agent: any; onToggle: () => vo
                 </div>
                 <div className="bg-slate-800/60 rounded-xl p-2.5 text-center">
                     <p className="text-sm font-black text-emerald-400">{agent.qualified_leads ?? 0}</p>
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">Qualified</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">{__('general.qualified')}</p>
                 </div>
                 <div className="bg-slate-800/60 rounded-xl p-2.5 text-center">
                     <p className="text-sm font-black text-indigo-400">{agent.response_rate ?? '—'}%</p>
@@ -103,7 +103,7 @@ function AddAgentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (a: any
                         </select>
                     </div>
                     <div>
-                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Tone</label>
+                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.tone')}</label>
                         <select value={tone} onChange={e => setTone(e.target.value)} className="w-full h-10 px-3 text-sm bg-slate-800 border border-slate-700 focus:border-indigo-500 rounded-md outline-none text-white">
                             {['Professional', 'Friendly', 'Persuasive', 'Formal', 'Casual'].map(t => <option key={t}>{t}</option>)}
                         </select>
@@ -132,7 +132,7 @@ function AddAgentModal({ onClose, onAdd }: { onClose: () => void; onAdd: (a: any
                 </div>
 
                 <div className="flex gap-3 pt-2 border-t border-slate-800">
-                    <Button variant="outline" onClick={onClose} className="flex-1 h-10 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-400">Cancel</Button>
+                    <Button variant="outline" onClick={onClose} className="flex-1 h-10 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-400">{__('general.cancel')}</Button>
                     <Button onClick={() => { if (!name.trim() || !number.trim()) return; onAdd({ name, number, dialect, tone, context, goal, apiKey, active: false, conversations_today: 0, qualified_leads: 0, response_rate: 0 }); onClose(); }}
                         disabled={!name.trim() || !number.trim()}
                         className="flex-1 h-10 bg-indigo-600 text-white hover:bg-indigo-500">{__('general.deploy_agent')}</Button>

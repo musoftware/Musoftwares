@@ -219,7 +219,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                         onChange={e => setData('is_active', e.target.checked)}
                                         className="w-4 h-4 rounded border-slate-300"
                                     />
-                                    <span className="text-sm font-medium">Active</span>
+                                    <span className="text-sm font-medium">{__('general.active')}</span>
                                 </label>
                                 <label className="flex items-center gap-2 cursor-pointer">
                                     <input
@@ -228,7 +228,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                         onChange={e => setData('is_featured', e.target.checked)}
                                         className="w-4 h-4 rounded border-slate-300"
                                     />
-                                    <span className="text-sm font-medium">Featured</span>
+                                    <span className="text-sm font-medium">{__('general.featured')}</span>
                                 </label>
                             </div>
 
@@ -250,7 +250,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                         </div>
                     </OperationalCard>
 
-                    <OperationalCard title="Features">
+                    <OperationalCard title={__('general.features')}>
                         <div className="space-y-3">
                             <div className="flex gap-2">
                                 <Input
@@ -262,8 +262,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                 />
                                 <Button type="button" variant="outline" size="sm" className="h-9 gap-1"
                                     onClick={() => addItem('features', newFeature, () => setNewFeature(''))}>
-                                    <Plus className="h-3.5 w-3.5" /> Add
-                                </Button>
+                                    <Plus className="h-3.5 w-3.5" /> {__('general.add')}</Button>
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 {data.features.map((f, i) => (
@@ -289,8 +288,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                 />
                                 <Button type="button" variant="outline" size="sm" className="h-9 gap-1"
                                     onClick={() => addItem('requirements', newRequirement, () => setNewRequirement(''))}>
-                                    <Plus className="h-3.5 w-3.5" /> Add
-                                </Button>
+                                    <Plus className="h-3.5 w-3.5" /> {__('general.add')}</Button>
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 {data.requirements.map((r, i) => (
@@ -306,8 +304,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
 
                     <div className="flex justify-end gap-3">
                         <Button type="button" variant="outline" size="sm" onClick={() => router.visit(route('admin.tools.index'))}>
-                            Cancel
-                        </Button>
+                            {__('general.cancel')}</Button>
                         <Button type="submit" size="sm" disabled={processing} className="gap-1.5 bg-slate-900 hover:bg-slate-800 text-white">
                             {processing ? 'Saving...' : 'Save Changes'}
                         </Button>
@@ -343,12 +340,12 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                             </div>
 
                             <div className="space-y-1.5 sm:col-span-2">
-                                <Label htmlFor="changelog" className="text-xs font-semibold">Changelog</Label>
+                                <Label htmlFor="changelog" className="text-xs font-semibold">{__('general.changelog')}</Label>
                                 <textarea
                                     id="changelog"
                                     value={versionForm.data.changelog}
                                     onChange={e => versionForm.setData('changelog', e.target.value)}
-                                    placeholder="What's new in this release..."
+                                    placeholder={__('general.whats_new_in_this_release')}
                                     rows={3}
                                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
                                 />

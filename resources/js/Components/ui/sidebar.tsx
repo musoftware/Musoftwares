@@ -197,7 +197,7 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Sidebar</SheetTitle>
+            <SheetTitle>{__('general.sidebar')}</SheetTitle>
             <SheetDescription>{__('general.displays_the_mobile_sidebar')}</SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>

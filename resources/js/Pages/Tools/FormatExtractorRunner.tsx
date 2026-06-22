@@ -258,7 +258,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                                 </div>
                                 <div className="flex items-center gap-4 pt-3 border-t border-teal-900">
                                     <div>
-                                        <p className="text-[9px] font-bold text-slate-400 uppercase">Plays</p>
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase">{__('general.plays')}</p>
                                         <p className="text-sm font-black text-white">{Number(src?.plays).toLocaleString()}</p>
                                     </div>
                                     <div>
@@ -266,7 +266,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                                         <p className="text-sm font-black text-white">{src?.like_rate}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[9px] font-bold text-slate-400 uppercase">Niche</p>
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase">{__('general.niche')}</p>
                                         <p className="text-sm font-black text-white capitalize">{result.niche_context}</p>
                                     </div>
                                 </div>
@@ -284,7 +284,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <BlueprintBlock icon={AlignLeft} label={__('general.hook_template')} value={qs?.hook_template} copyable color="bg-teal-50 border-teal-200" iconColor="text-teal-600" />
-                                <BlueprintBlock icon={Layout} label="Structure" value={qs?.structure} copyable color="bg-violet-50 border-violet-200" iconColor="text-violet-600" />
+                                <BlueprintBlock icon={Layout} label={__('general.structure')} value={qs?.structure} copyable color="bg-violet-50 border-violet-200" iconColor="text-violet-600" />
                                 <BlueprintBlock icon={Clock} label={__('general.target_duration')} value={qs?.duration_target} color="bg-blue-50 border-blue-200" iconColor="text-blue-600" />
                                 <BlueprintBlock icon={Music} label={__('general.sound_strategy')} value={qs?.sound_strategy} color="bg-pink-50 border-pink-200" iconColor="text-pink-600" />
                             </div>
@@ -302,7 +302,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                                 <AlignLeft className="w-4 h-4 text-teal-500" />{__('general.hook_breakdown')}</h3>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="bg-slate-50 border border-slate-100 rounded-xl p-3">
-                                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Type</p>
+                                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">{__('general.type')}</p>
                                     <p className="text-xs font-bold text-slate-800">{bp.hook?.type_label}</p>
                                 </div>
                                 <div className="bg-slate-50 border border-slate-100 rounded-xl p-3">
@@ -351,7 +351,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                                 <Music className="w-4 h-4 text-pink-500" />{__('general.sound_strategy')}</h3>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="bg-pink-50 border border-pink-100 rounded-xl p-3">
-                                    <p className="text-[9px] font-black uppercase tracking-wider text-pink-400 mb-1">Strategy</p>
+                                    <p className="text-[9px] font-black uppercase tracking-wider text-pink-400 mb-1">{__('general.strategy')}</p>
                                     <p className="text-xs font-bold text-pink-800 capitalize">{bp.sound?.strategy?.replace('_', ' ')}</p>
                                 </div>
                                 <div className="bg-pink-50 border border-pink-100 rounded-xl p-3">
@@ -378,7 +378,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                             <div className="flex items-center gap-4">
                                 <div className="text-center">
                                     <div className="text-3xl font-black text-blue-700">{bp.duration?.seconds}s</div>
-                                    <p className="text-[9px] font-bold uppercase text-blue-400">Original</p>
+                                    <p className="text-[9px] font-bold uppercase text-blue-400">{__('general.original')}</p>
                                 </div>
                                 <div className="flex-1 bg-blue-50 border border-blue-100 rounded-xl p-3">
                                     <p className="text-xs text-blue-700 font-medium leading-relaxed">{bp.duration?.recommendation}</p>

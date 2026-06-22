@@ -98,12 +98,12 @@ export default function Edit({ salary, currencies, users }) {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <Label htmlFor="amount">Amount</Label>
+                            <Label htmlFor="amount">{__('general.amount')}</Label>
                             <Input id="amount" type="number" step="any" required value={editSalary.amount} onChange={e => setEditSalary({...editSalary, amount: e.target.value})} placeholder="0.00" />
                             {errors.amount && <span className="text-red-600 text-xs block">{errors.amount}</span>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="currency">Currency</Label>
+                            <Label htmlFor="currency">{__('general.currency')}</Label>
                             <select id="currency" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={editSalary.currency} onChange={e => setEditSalary({...editSalary, currency: e.target.value})}>
                                 {currenciesList.map(c => <option key={c.id} value={c.id}>{c.currency} ({c.symbol})</option>)}
                             </select>
@@ -125,12 +125,12 @@ export default function Edit({ salary, currencies, users }) {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <Label htmlFor="frequency">Frequency</Label>
+                            <Label htmlFor="frequency">{__('general.frequency')}</Label>
                             <select id="frequency" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={editSalary.recurring} onChange={e => setEditSalary({...editSalary, recurring: e.target.value})}>
-                                <option value="day">Daily</option>
-                                <option value="week">Weekly</option>
-                                <option value="month">Monthly</option>
-                                <option value="year">Annually</option>
+                                <option value="day">{__('general.daily')}</option>
+                                <option value="week">{__('general.weekly')}</option>
+                                <option value="month">{__('general.monthly')}</option>
+                                <option value="year">{__('general.annually')}</option>
                             </select>
                         </div>
                         <div className="space-y-2">
@@ -204,7 +204,7 @@ export default function Edit({ salary, currencies, users }) {
                         <Button type="submit" className="bg-black hover:bg-slate-800 text-white flex items-center gap-2">
                             <Save className="w-4 h-4" />{__('general.save_changes')}</Button>
                         <Link href={route('admin.recurring_salaries.index')}>
-                            <Button type="button" variant="outline">Cancel</Button>
+                            <Button type="button" variant="outline">{__('general.cancel')}</Button>
                         </Link>
                     </div>
                 </form>

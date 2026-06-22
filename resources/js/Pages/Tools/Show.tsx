@@ -81,8 +81,7 @@ export default function Show({ tool, userSubscription }: Props) {
                         {safeFeatures.length > 0 && (
                             <section>
                                 <h2 className="text-base font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100">
-                                    Features
-                                </h2>
+                                    {__('general.features')}</h2>
                                 <FeatureList features={safeFeatures} columns={2} />
                             </section>
                         )}
@@ -140,14 +139,14 @@ export default function Show({ tool, userSubscription }: Props) {
 
                         {/* Info meta card */}
                         <Card className="p-4 space-y-3">
-                            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Details</p>
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{__('general.details')}</p>
                             <div className="space-y-2">
                                 <div className="flex justify-between text-xs">
-                                    <span className="text-muted-foreground">Version</span>
+                                    <span className="text-muted-foreground">{__('general.version')}</span>
                                     <code className="font-mono text-foreground font-medium">v{tool.current_version}</code>
                                 </div>
                                 <div className="flex justify-between text-xs">
-                                    <span className="text-muted-foreground">Category</span>
+                                    <span className="text-muted-foreground">{__('general.category')}</span>
                                     <span className="text-foreground capitalize">{tool.category_label}</span>
                                 </div>
                             </div>

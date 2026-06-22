@@ -35,8 +35,8 @@ export default function SmartRules({ rules }: { rules: Rule[] }) {
                             <TableRow>
                                 <TableHead>{__('general.rule_name')}</TableHead>
                                 <TableHead>{__('general.target_metric')}</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="text-end">Actions</TableHead>
+                                <TableHead>{__('general.status')}</TableHead>
+                                <TableHead className="text-end">{__('general.actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -52,7 +52,7 @@ export default function SmartRules({ rules }: { rules: Rule[] }) {
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-end">
-                                        <Button variant="ghost" size="sm">Edit</Button>
+                                        <Button variant="ghost" size="sm">{__('general.edit')}</Button>
                                     </TableCell>
                                 </TableRow>
                             ))}

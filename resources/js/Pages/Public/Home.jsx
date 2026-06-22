@@ -8,6 +8,7 @@ import { Smartphone, Globe, Bot, Server, CheckCircle2, MessageSquare, ArrowRight
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import { __ } from '@/lib/i18n';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -164,11 +165,9 @@ export default function Home() {
                 <section className="pt-32 pb-20 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
                     <div className="text-center mb-16">
                         <h1 className="gsap-fade-up text-5xl md:text-6xl font-extrabold tracking-tight mb-6 text-[#111111]">
-                            What can we build for you?
-                        </h1>
+                            {__('general.what_can_we_build_for_you')}</h1>
                         <p className="gsap-fade-up text-xl text-[#666666] max-w-2xl mx-auto leading-relaxed">
-                            Stop wrestling with disjointed tools. We engineer highly cohesive and horizontally scalable software tailored to your business needs.
-                        </p>
+                            {__('general.stop_wrestling_with_disjointed_tools_we')}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -203,19 +202,19 @@ export default function Home() {
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
                             <div className="gsap-fade-up flex flex-col items-center">
                                 <span className="text-5xl font-extrabold mb-3 text-white">100<span className="text-[#888888]">+</span></span>
-                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">Projects Delivered</span>
+                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">{__('general.projects_delivered')}</span>
                             </div>
                             <div className="gsap-fade-up flex flex-col items-center">
                                 <span className="text-5xl font-extrabold mb-3 text-white">50<span className="text-[#888888]">+</span></span>
-                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">Happy Clients</span>
+                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">{__('general.happy_clients')}</span>
                             </div>
                             <div className="gsap-fade-up flex flex-col items-center">
                                 <span className="text-5xl font-extrabold mb-3 text-white">10<span className="text-[#888888]">+</span></span>
-                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">Years Experience</span>
+                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">{__('general.years_experience')}</span>
                             </div>
                             <div className="gsap-fade-up flex flex-col items-center">
                                 <span className="text-5xl font-extrabold mb-3 text-white">&lt;1<span className="text-[#888888]">hr</span></span>
-                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">Avg Response Time</span>
+                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#a3a3a3]">{__('general.avg_response_time')}</span>
                             </div>
                         </div>
                     </div>
@@ -224,8 +223,8 @@ export default function Home() {
                 {/* 3. Story-Format Portfolio */}
                 <section className="py-24 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
                     <div className="mb-16">
-                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">Our Success Stories</h2>
-                        <p className="gsap-fade-up text-lg text-[#666666]">Real problems. Engineered solutions. Measurable results.</p>
+                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">{__('general.our_success_stories')}</h2>
+                        <p className="gsap-fade-up text-lg text-[#666666]">{__('general.real_problems_engineered_solutions_measu')}</p>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -234,8 +233,8 @@ export default function Home() {
                                 <div className="h-56 overflow-hidden relative bg-[#f4f4f5]">
                                     {project.isPromotional ? (
                                         <div className="absolute inset-0 bg-[#111111] text-white flex flex-col items-center justify-center p-6 text-center">
-                                            <span className="text-sm font-bold uppercase tracking-widest text-[#a3a3a3] mb-2">Reserved for</span>
-                                            <span className="text-3xl font-extrabold">Your Vision</span>
+                                            <span className="text-sm font-bold uppercase tracking-widest text-[#a3a3a3] mb-2">{__('general.reserved_for')}</span>
+                                            <span className="text-3xl font-extrabold">{__('general.your_vision')}</span>
                                         </div>
                                     ) : (
                                         <img src={project.img} alt={project.name} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
@@ -246,7 +245,7 @@ export default function Home() {
                                     <p className="text-[#666666] leading-relaxed text-[15px] mb-8">{project.description}</p>
                                     
                                     <div className="mb-8 flex-grow">
-                                        <h4 className="font-bold text-[#111111] uppercase text-xs tracking-widest mb-4">Key Features</h4>
+                                        <h4 className="font-bold text-[#111111] uppercase text-xs tracking-widest mb-4">{__('general.key_features')}</h4>
                                         <ul className="space-y-3">
                                             {project.features.map((feature, i) => (
                                                 <li key={i} className="flex items-start gap-3 text-[#444444]">
@@ -279,7 +278,7 @@ export default function Home() {
 
                     <div className="mt-16 text-center">
                         <Link href="/portfolio" className="inline-flex items-center gap-3 px-8 py-5 bg-[#f4f4f5] hover:bg-[#e5e5e5] text-[#111111] rounded-xl text-sm font-bold uppercase tracking-widest transition-colors duration-300">
-                            View All Projects <ArrowRight className="w-5 h-5" />
+                            {__('general.view_all_projects')}<ArrowRight className="w-5 h-5" />
                         </Link>
                     </div>
                 </section>
@@ -288,8 +287,8 @@ export default function Home() {
                 <section className="py-24 bg-[#fafafa] border-y border-[#e5e5e5] px-6 lg:px-8 reveal-section">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center mb-16">
-                            <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">Real Experiences</h2>
-                            <p className="gsap-fade-up text-lg text-[#666666]">Don't just take our word for it.</p>
+                            <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">{__('general.real_experiences')}</h2>
+                            <p className="gsap-fade-up text-lg text-[#666666]">{__('general.dont_just_take_our_word_for_it')}</p>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -314,8 +313,8 @@ export default function Home() {
                                             <UserCircle className="w-7 h-7 text-[#888888]" />
                                         </div>
                                         <div>
-                                            <h5 className="font-bold text-[#111111]">Verified Client</h5>
-                                            <span className="text-[11px] font-semibold text-[#888888] uppercase tracking-wider">Business Owner</span>
+                                            <h5 className="font-bold text-[#111111]">{__('general.verified_client')}</h5>
+                                            <span className="text-[11px] font-semibold text-[#888888] uppercase tracking-wider">{__('general.business_owner')}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -327,8 +326,8 @@ export default function Home() {
                 {/* 5. Process Section */}
                 <section className="py-24 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
                     <div className="text-center mb-20">
-                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">How to Start?</h2>
-                        <p className="gsap-fade-up text-lg text-[#666666]">A simple, transparent 4-step process.</p>
+                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">{__('general.how_to_start')}</h2>
+                        <p className="gsap-fade-up text-lg text-[#666666]">{__('general.a_simple_transparent_4step_process')}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 relative">
@@ -361,10 +360,9 @@ export default function Home() {
                             <img src="/images/mahmoud-photo.jpg" alt="Eng. Mahmoud" className="w-full h-full object-cover relative z-0" />
                         </div>
                         <div className="text-center md:text-start flex-1">
-                            <h2 className="gsap-fade-up text-4xl lg:text-5xl font-extrabold mb-4">About Eng. Mahmoud</h2>
+                            <h2 className="gsap-fade-up text-4xl lg:text-5xl font-extrabold mb-4">{__('general.about_eng_mahmoud')}</h2>
                             <h3 className="gsap-fade-up text-[#888888] text-sm font-bold mb-8 uppercase tracking-[0.2em]">
-                                Software Architect & Developer
-                            </h3>
+                                {__('general.software_architect_developer')}</h3>
                             <p className="gsap-fade-up text-lg leading-loose text-[#d4d4d4] mb-10 max-w-2xl">
                                 I believe in direct communication and engineering excellence. You aren't dealing with a faceless agency; you are working directly with the architect building your system. My philosophy is simple: focus on quality, ensure absolute clarity, and deliver highly scalable solutions that drive real business value.
                             </p>
@@ -372,7 +370,7 @@ export default function Home() {
                                 onClick={() => openWhatsApp("Hello Engineer Mahmoud, I read your profile and would like to discuss a project.")}
                                 className="gsap-fade-up bg-white text-[#111111] hover:bg-[#e5e5e5] rounded-xl px-10 py-7 text-sm font-bold tracking-wide uppercase transition-colors inline-flex items-center gap-3"
                             >
-                                Let's Work Together <ArrowRight className="w-5 h-5" />
+                                {__('general.lets_work_together')}<ArrowRight className="w-5 h-5" />
                             </Button>
                         </div>
                     </div>
@@ -381,35 +379,31 @@ export default function Home() {
                 {/* 7 & 8. FAQ and Tech Kitchen */}
                 <section className="py-24 px-6 lg:px-8 max-w-4xl mx-auto reveal-section">
                     <div className="text-center mb-16">
-                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">Curious Questions</h2>
-                        <p className="gsap-fade-up text-lg text-[#666666]">Everything you need to know before we start.</p>
+                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">{__('general.curious_questions')}</h2>
+                        <p className="gsap-fade-up text-lg text-[#666666]">{__('general.everything_you_need_to_know_before_we_st')}</p>
                     </div>
 
                     <div className="gsap-fade-up mb-16">
                         <Accordion type="single" collapsible className="w-full">
                             <AccordionItem value="item-1" className="border-[#e5e5e5] py-2">
-                                <AccordionTrigger className="text-xl font-bold hover:no-underline text-[#111111]">Why are there no fixed prices?</AccordionTrigger>
+                                <AccordionTrigger className="text-xl font-bold hover:no-underline text-[#111111]">{__('general.why_are_there_no_fixed_prices')}</AccordionTrigger>
                                 <AccordionContent className="text-[#666666] leading-relaxed text-base pt-2 pb-6">
-                                    Every project has its own unique requirements, scale, and technical challenges. We provide custom quotes based on exactly what you need to succeed, avoiding bloated generic packages.
-                                </AccordionContent>
+                                    {__('general.every_project_has_its_own_unique_require')}</AccordionContent>
                             </AccordionItem>
                             <AccordionItem value="item-2" className="border-[#e5e5e5] py-2">
-                                <AccordionTrigger className="text-xl font-bold hover:no-underline text-[#111111]">What technologies do you use?</AccordionTrigger>
+                                <AccordionTrigger className="text-xl font-bold hover:no-underline text-[#111111]">{__('general.what_technologies_do_you_use')}</AccordionTrigger>
                                 <AccordionContent className="text-[#666666] leading-relaxed text-base pt-2 pb-6">
-                                    We use the right technology for the job, not just the most popular framework. Our stack is chosen based on scalability, security, and performance requirements for your specific use case.
-                                </AccordionContent>
+                                    {__('general.we_use_the_right_technology_for_the_job')}</AccordionContent>
                             </AccordionItem>
                             <AccordionItem value="item-3" className="border-[#e5e5e5] py-2">
-                                <AccordionTrigger className="text-xl font-bold hover:no-underline text-[#111111]">I don't know programming, what should I do?</AccordionTrigger>
+                                <AccordionTrigger className="text-xl font-bold hover:no-underline text-[#111111]">{__('general.i_dont_know_programming_what_should_i_do')}</AccordionTrigger>
                                 <AccordionContent className="text-[#666666] leading-relaxed text-base pt-2 pb-6">
-                                    Don't worry! Just explain your business idea and goals in plain language. We will handle all the technical architecture, development, and deployment for you.
-                                </AccordionContent>
+                                    {__('general.dont_worry_just_explain_your_business_id')}</AccordionContent>
                             </AccordionItem>
                             <AccordionItem value="item-4" className="border-[#e5e5e5] py-2">
-                                <AccordionTrigger className="text-xl font-bold hover:no-underline text-[#111111]">How long does execution take?</AccordionTrigger>
+                                <AccordionTrigger className="text-xl font-bold hover:no-underline text-[#111111]">{__('general.how_long_does_execution_take')}</AccordionTrigger>
                                 <AccordionContent className="text-[#666666] leading-relaxed text-base pt-2 pb-6">
-                                    The timeline depends entirely on the project's size and complexity. After our initial discussion, you will receive a detailed roadmap with clear milestones.
-                                </AccordionContent>
+                                    {__('general.the_timeline_depends_entirely_on_the_pro')}</AccordionContent>
                             </AccordionItem>
                         </Accordion>
                     </div>
@@ -423,14 +417,12 @@ export default function Home() {
                                         <div className="w-10 h-10 bg-[#111111] text-white rounded-md flex items-center justify-center">
                                             <Terminal className="w-5 h-5" />
                                         </div>
-                                        Under the Hood... What powers your project?
-                                    </div>
+                                        {__('general.under_the_hood_what_powers_your_project')}</div>
                                 </AccordionTrigger>
                                 <AccordionContent className="px-2 pt-6">
                                     <p className="text-[#666666] mb-4 text-base font-medium">For the curious minds, here's some of the tech we use depending on the project's needs:</p>
                                     <p className="text-[#111111] font-bold text-lg mb-8 leading-relaxed">
-                                        We don't lock projects into a specific stack. We choose the tools that make the most sense for the job.
-                                    </p>
+                                        {__('general.we_dont_lock_projects_into_a_specific_st')}</p>
                                     
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-10">
                                         {techCategories.map((category, idx) => (
@@ -461,18 +453,15 @@ export default function Home() {
                     
                     <div className="max-w-4xl mx-auto relative z-10">
                         <h2 className="gsap-fade-up text-5xl md:text-7xl font-extrabold tracking-tight mb-8 drop-shadow-sm">
-                            Ready to turn your idea into a real project?
-                        </h2>
+                            {__('general.ready_to_turn_your_idea_into_a_real_proj')}</h2>
                         <p className="gsap-fade-up text-xl md:text-2xl text-[#e8fceb] mb-12 max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-sm">
-                            Don't wait. Let's start the conversation and build something amazing together.
-                        </p>
+                            {__('general.dont_wait_lets_start_the_conversation_an')}</p>
                         <Button 
                             onClick={() => openWhatsApp("Hello Mahmoud, I'm ready to start!")}
                             size="lg" 
                             className="gsap-fade-up bg-white text-[#1DA851] hover:bg-[#f4f4f5] rounded-full px-12 h-20 text-xl font-bold tracking-wide transition-all duration-300 hover:scale-105 shadow-2xl flex items-center justify-center gap-3 mx-auto border-4 border-white/20 bg-clip-padding"
                         >
-                            <MessageSquare className="w-7 h-7" /> Start the Conversation Now
-                        </Button>
+                            <MessageSquare className="w-7 h-7" /> {__('general.start_the_conversation_now')}</Button>
                     </div>
                 </section>
 

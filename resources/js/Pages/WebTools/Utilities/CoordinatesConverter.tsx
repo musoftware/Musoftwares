@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Copy, MapPin, ArrowRightLeft } from 'lucide-react';
 import { useToast } from '@/Components/ui/use-toast';
+import { __ } from '@/lib/i18n';
 
 export default function CoordinatesConverter() {
     const { toast } = useToast();
@@ -95,7 +96,7 @@ export default function CoordinatesConverter() {
                     <div className="inline-flex items-center justify-center p-3 bg-blue-100 text-blue-700 rounded-2xl mb-4">
                         <MapPin className="w-8 h-8" />
                     </div>
-                    <h1 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">Decimal to Degrees Converter</h1>
+                    <h1 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">{__('general.decimal_to_degrees_converter')}</h1>
                     <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
                         Convert GPS coordinates between Decimal Degrees (DD) and Degrees, Minutes, Seconds (DMS).
                     </p>
@@ -107,8 +108,8 @@ export default function CoordinatesConverter() {
                             <CardContent className="pt-6">
                                 <Tabs defaultValue="dd-to-dms" className="w-full">
                                     <TabsList className="grid w-full grid-cols-2 mb-6">
-                                        <TabsTrigger value="dd-to-dms">Decimal to DMS</TabsTrigger>
-                                        <TabsTrigger value="dms-to-dd">DMS to Decimal</TabsTrigger>
+                                        <TabsTrigger value="dd-to-dms">{__('general.decimal_to_dms')}</TabsTrigger>
+                                        <TabsTrigger value="dms-to-dd">{__('general.dms_to_decimal')}</TabsTrigger>
                                     </TabsList>
                                     
                                     <TabsContent value="dd-to-dms">
@@ -138,24 +139,23 @@ export default function CoordinatesConverter() {
                                             
                                             <Button onClick={convertDDtoDMS} className="w-full gap-2">
                                                 <ArrowRightLeft className="w-4 h-4" />
-                                                Convert to DMS
-                                            </Button>
+                                                {__('general.convert_to_dms')}</Button>
 
                                             {dmsResult && (
                                                 <div className="mt-6 p-4 bg-slate-50 border border-slate-100 rounded-lg">
-                                                    <h3 className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">Result</h3>
+                                                    <h3 className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">{__('general.result')}</h3>
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                                         <div>
-                                                            <div className="text-xs text-slate-400 mb-1">Latitude</div>
+                                                            <div className="text-xs text-slate-400 mb-1">{__('general.latitude')}</div>
                                                             <div className="text-lg font-semibold text-slate-800">{dmsResult.lat}</div>
                                                         </div>
                                                         <div>
-                                                            <div className="text-xs text-slate-400 mb-1">Longitude</div>
+                                                            <div className="text-xs text-slate-400 mb-1">{__('general.longitude')}</div>
                                                             <div className="text-lg font-semibold text-slate-800">{dmsResult.lng}</div>
                                                         </div>
                                                     </div>
                                                     <div className="pt-4 border-t border-slate-200">
-                                                        <div className="text-xs text-slate-400 mb-1">Combined</div>
+                                                        <div className="text-xs text-slate-400 mb-1">{__('general.combined')}</div>
                                                         <div className="flex items-center justify-between bg-white p-2 rounded border border-slate-200">
                                                             <code className="text-sm font-mono text-slate-800">{dmsResult.combined}</code>
                                                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => copyToClipboard(dmsResult.combined)}>
@@ -172,7 +172,7 @@ export default function CoordinatesConverter() {
                                         <div className="space-y-6">
                                             {/* Latitude Input */}
                                             <div className="space-y-2">
-                                                <Label>Latitude</Label>
+                                                <Label>{__('general.latitude')}</Label>
                                                 <div className="flex gap-2">
                                                     <Input type="number" placeholder="Deg" value={dmsLatDeg} onChange={(e) => setDmsLatDeg(e.target.value)} className="flex-1" />
                                                     <div className="flex items-center text-slate-400 font-serif">°</div>
@@ -194,7 +194,7 @@ export default function CoordinatesConverter() {
 
                                             {/* Longitude Input */}
                                             <div className="space-y-2">
-                                                <Label>Longitude</Label>
+                                                <Label>{__('general.longitude')}</Label>
                                                 <div className="flex gap-2">
                                                     <Input type="number" placeholder="Deg" value={dmsLngDeg} onChange={(e) => setDmsLngDeg(e.target.value)} className="flex-1" />
                                                     <div className="flex items-center text-slate-400 font-serif">°</div>
@@ -216,12 +216,11 @@ export default function CoordinatesConverter() {
 
                                             <Button onClick={convertDMStoDD} className="w-full gap-2">
                                                 <ArrowRightLeft className="w-4 h-4" />
-                                                Convert to Decimal
-                                            </Button>
+                                                {__('general.convert_to_decimal')}</Button>
 
                                             {ddResult && (
                                                 <div className="mt-6 p-4 bg-slate-50 border border-slate-100 rounded-lg">
-                                                    <h3 className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">Result</h3>
+                                                    <h3 className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">{__('general.result')}</h3>
                                                     <div className="flex items-center justify-between bg-white p-3 rounded-md border border-slate-200">
                                                         <code className="text-lg font-mono text-slate-800">{ddResult}</code>
                                                         <Button variant="ghost" size="icon" onClick={() => copyToClipboard(ddResult)}>
@@ -242,8 +241,7 @@ export default function CoordinatesConverter() {
                             <CardHeader>
                                 <CardTitle className="text-base flex items-center gap-2">
                                     <MapPin className="w-4 h-4 text-slate-500" />
-                                    About Formats
-                                </CardTitle>
+                                    {__('general.about_formats')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4 text-sm text-slate-600">

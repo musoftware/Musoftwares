@@ -492,37 +492,30 @@ export default function ExcelMergerRunner() {
                     <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" accept=".xlsx,.xls,.csv" />
                     
                     <select value={csvEncoding} onChange={(e) => setCsvEncoding(e.target.value)} className="h-8 text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 rounded-md px-2 outline-none">
-                        <option value="utf-8">UTF-8</option>
+                        <option value="utf-8">{__('general.utf8')}</option>
                         <option value="windows-1256">Windows-1256 (Arabic)</option>
                     </select>
 
                     <Button onClick={() => fileInputRef.current?.click()} size="sm" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold border border-indigo-200 gap-1.5 shrink-0">
-                        <UploadCloud className="w-4 h-4" /> Upload
-                    </Button>
+                        <UploadCloud className="w-4 h-4" /> {__('general.upload')}</Button>
 
                     <div className="h-6 w-px bg-slate-200 mx-2 shrink-0" />
 
                     <Button onClick={handleApplyFilter} disabled={headers.length === 0} size="sm" className="bg-slate-800 text-white hover:bg-slate-700 font-bold gap-1.5 shrink-0">
-                        <Filter className="w-4 h-4" /> Apply Pipeline
-                    </Button>
+                        <Filter className="w-4 h-4" /> {__('general.apply_pipeline')}</Button>
                     <Button onClick={handleClearFilter} disabled={headers.length === 0} variant="outline" size="sm" className="font-bold gap-1.5 shrink-0">
-                        <RefreshCw className="w-4 h-4" /> Clear Filters
-                    </Button>
+                        <RefreshCw className="w-4 h-4" /> {__('general.clear_filters')}</Button>
                     <Button onClick={handleDistinct} disabled={headers.length === 0} variant="outline" size="sm" className="font-bold shrink-0">
-                        Distinct
-                    </Button>
+                        {__('general.distinct')}</Button>
                     <Button onClick={handleClearAll} disabled={headers.length === 0} size="sm" className="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold shrink-0">
-                        Clear All
-                    </Button>
+                        {__('general.clear_all')}</Button>
 
                     <div className="h-6 w-px bg-slate-200 mx-2 shrink-0" />
 
                     <Button onClick={() => exportData(false)} disabled={headers.length === 0} size="sm" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold border border-emerald-200 gap-1.5 shrink-0">
-                        <Save className="w-4 h-4" /> Save To File
-                    </Button>
+                        <Save className="w-4 h-4" /> {__('general.save_to_file')}</Button>
                     <Button onClick={() => exportData(true)} disabled={headers.length === 0} size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700 font-bold gap-1.5 shrink-0">
-                        <Download className="w-4 h-4" /> Save Checked
-                    </Button>
+                        <Download className="w-4 h-4" /> {__('general.save_checked')}</Button>
                 </div>
 
                 <div className="flex items-center gap-4 shrink-0 ps-4 border-s border-slate-200">
@@ -544,8 +537,7 @@ export default function ExcelMergerRunner() {
                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
                         {headers.length === 0 ? (
                             <div className="text-center p-8 text-slate-400 font-medium text-sm">
-                                Please upload a file to view and configure field filters.
-                            </div>
+                                {__('general.please_upload_a_file_to_view_and_configu')}</div>
                         ) : (
                             headers.map((h, i) => {
                                 const filter = fieldFilters[h];
@@ -585,7 +577,7 @@ export default function ExcelMergerRunner() {
                                                 <input 
                                                     type="text" 
                                                     id={`input-${h}`}
-                                                    placeholder="Add keyword..."
+                                                    placeholder={__('general.add_keyword')}
                                                     className="flex-1 text-xs border border-slate-200 rounded-md p-1.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
                                                     onKeyDown={(e) => {
                                                         if (e.key === 'Enter') {
@@ -648,8 +640,7 @@ export default function ExcelMergerRunner() {
                         {transformations.length > 0 && (
                             <div className="space-y-2">
                                 <h4 className="text-xs font-black text-emerald-700 uppercase flex items-center gap-1">
-                                    <Settings className="w-3.5 h-3.5" /> Active Transformations
-                                </h4>
+                                    <Settings className="w-3.5 h-3.5" /> {__('general.active_transformations')}</h4>
                                 <div className="space-y-1 max-h-24 overflow-y-auto border border-emerald-100 rounded p-1 bg-emerald-50/50">
                                     {transformations.map(t => (
                                         <div key={t.id} className="flex items-center justify-between bg-white text-[10px] p-1.5 rounded border border-emerald-100">
@@ -667,18 +658,17 @@ export default function ExcelMergerRunner() {
 
                         <div className="space-y-2 pt-3 border-t border-slate-100">
                             <h4 className="text-xs font-black text-slate-800 uppercase flex items-center gap-1">
-                                <Wand2 className="w-3.5 h-3.5" /> Find & Replace
-                            </h4>
+                                <Wand2 className="w-3.5 h-3.5" /> {__('general.find_replace')}</h4>
                             <div className="flex gap-2">
-                                <input type="text" placeholder="Find..." value={replaceFindText} onChange={e => setReplaceFindText(e.target.value)} className="flex-1 min-w-0 text-xs border border-slate-200 rounded p-1.5" />
-                                <input type="text" placeholder="Replace..." value={replaceWithText} onChange={e => setReplaceWithText(e.target.value)} className="flex-1 min-w-0 text-xs border border-slate-200 rounded p-1.5" />
+                                <input type="text" placeholder={__('general.find')} value={replaceFindText} onChange={e => setReplaceFindText(e.target.value)} className="flex-1 min-w-0 text-xs border border-slate-200 rounded p-1.5" />
+                                <input type="text" placeholder={__('general.replace')} value={replaceWithText} onChange={e => setReplaceWithText(e.target.value)} className="flex-1 min-w-0 text-xs border border-slate-200 rounded p-1.5" />
                             </div>
                             <div className="flex gap-2">
                                 <select value={replaceColumn} onChange={e => setReplaceColumn(e.target.value)} className="flex-1 text-xs border border-slate-200 rounded p-1.5 bg-white">
-                                    <option value="">Column...</option>
+                                    <option value="">{__('general.column')}</option>
                                     {headers.map(h => <option key={h} value={h}>{h}</option>)}
                                 </select>
-                                <Button onClick={applyReplace} disabled={!replaceColumn || !replaceFindText} size="sm" className="h-auto py-1 bg-indigo-600 hover:bg-indigo-700 text-[11px]">Replace</Button>
+                                <Button onClick={applyReplace} disabled={!replaceColumn || !replaceFindText} size="sm" className="h-auto py-1 bg-indigo-600 hover:bg-indigo-700 text-[11px]">{__('general.replace')}</Button>
                             </div>
                         </div>
 
@@ -687,16 +677,16 @@ export default function ExcelMergerRunner() {
                                 <Plus className="w-3.5 h-3.5" /> Addition (Prefix/Suffix)
                             </h4>
                             <div className="flex gap-2">
-                                <input type="text" placeholder="Text..." value={additionText} onChange={e => setAdditionText(e.target.value)} className="flex-1 min-w-0 text-xs border border-slate-200 rounded p-1.5" />
+                                <input type="text" placeholder={__('general.text')} value={additionText} onChange={e => setAdditionText(e.target.value)} className="flex-1 min-w-0 text-xs border border-slate-200 rounded p-1.5" />
                                 <select value={additionPos} onChange={e => setAdditionPos(e.target.value as any)} className="w-20 text-xs border border-slate-200 rounded p-1.5 bg-white shrink-0">
-                                    <option value="Left">Left</option>
-                                    <option value="Right">Right</option>
-                                    <option value="Double">Double</option>
+                                    <option value="Left">{__('general.left')}</option>
+                                    <option value="Right">{__('general.right')}</option>
+                                    <option value="Double">{__('general.double')}</option>
                                 </select>
                             </div>
                             <div className="flex gap-2">
                                 <select value={additionColumn} onChange={e => setAdditionColumn(e.target.value)} className="flex-1 text-xs border border-slate-200 rounded p-1.5 bg-white">
-                                    <option value="">Column...</option>
+                                    <option value="">{__('general.column')}</option>
                                     {headers.map(h => <option key={h} value={h}>{h}</option>)}
                                 </select>
                                 <Button onClick={applyAddition} disabled={!additionColumn || !additionText} size="sm" className="h-auto py-1 bg-indigo-600 hover:bg-indigo-700 text-[11px]">Add</Button>
@@ -705,15 +695,12 @@ export default function ExcelMergerRunner() {
 
                         <div className="space-y-2 pt-3 border-t border-slate-100">
                             <h4 className="text-xs font-black text-slate-800 uppercase flex items-center gap-1">
-                                <Layers className="w-3.5 h-3.5" /> More Functions
-                            </h4>
+                                <Layers className="w-3.5 h-3.5" /> {__('general.more_functions')}</h4>
                             <div className="flex gap-2">
                                 <Button onClick={() => setMergeModalOpen(true)} size="sm" className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold h-auto py-2 gap-1.5">
-                                    <Layers className="w-4 h-4" /> Merge
-                                </Button>
+                                    <Layers className="w-4 h-4" /> {__('general.merge')}</Button>
                                 <Button onClick={() => setSplitModalOpen(true)} disabled={headers.length === 0} size="sm" className="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold h-auto py-2 gap-1.5">
-                                    <SplitSquareHorizontal className="w-4 h-4" /> Split
-                                </Button>
+                                    <SplitSquareHorizontal className="w-4 h-4" /> {__('general.split')}</Button>
                             </div>
                         </div>
                     </div>
@@ -725,7 +712,7 @@ export default function ExcelMergerRunner() {
                         {headers.length === 0 ? (
                             <div className="h-full flex flex-col items-center justify-center text-slate-400">
                                 <FileSpreadsheet className="w-16 h-16 text-slate-200 mb-4" />
-                                <p className="font-bold text-lg text-slate-300">No Data Loaded</p>
+                                <p className="font-bold text-lg text-slate-300">{__('general.no_data_loaded')}</p>
                                 <p className="text-sm">Click "Upload" to select an Excel or CSV file.</p>
                             </div>
                         ) : (
@@ -759,8 +746,7 @@ export default function ExcelMergerRunner() {
                                     {currentTableData.length === 0 && (
                                         <tr>
                                             <td colSpan={headers.length + 1} className="text-center py-8 text-slate-400 font-medium border-b border-slate-100">
-                                                No rows match the current filters.
-                                            </td>
+                                                {__('general.no_rows_match_the_current_filters')}</td>
                                         </tr>
                                     )}
                                 </tbody>
@@ -796,8 +782,7 @@ export default function ExcelMergerRunner() {
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                             <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
-                                <Layers className="w-5 h-5 text-indigo-600" /> Merge Files
-                            </h3>
+                                <Layers className="w-5 h-5 text-indigo-600" /> {__('general.merge_files')}</h3>
                             <button onClick={() => setMergeModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                                 <XCircle className="w-6 h-6" />
                             </button>
@@ -816,7 +801,7 @@ export default function ExcelMergerRunner() {
                                 <h3 className="text-sm font-bold text-slate-800 mb-1">
                                     {mergeActive ? 'Drop files here...' : 'Drag & drop Excel or CSV files to merge'}
                                 </h3>
-                                <p className="text-xs font-medium text-slate-500">Files will be merged vertically. Columns will be correctly mapped by Header Name.</p>
+                                <p className="text-xs font-medium text-slate-500">{__('general.files_will_be_merged_vertically_columns')}</p>
                             </div>
 
                             {mergeFiles.length > 0 && (
@@ -835,15 +820,14 @@ export default function ExcelMergerRunner() {
                                             </div>
                                         ))}
                                     </div>
-                                    <Button onClick={() => setMergeFiles([])} variant="ghost" size="sm" className="text-rose-500 h-6 px-2 text-xs">Clear all</Button>
+                                    <Button onClick={() => setMergeFiles([])} variant="ghost" size="sm" className="text-rose-500 h-6 px-2 text-xs">{__('general.clear_all')}</Button>
                                 </div>
                             )}
                         </div>
                         <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-2">
-                            <Button onClick={() => setMergeModalOpen(false)} variant="outline">Cancel</Button>
+                            <Button onClick={() => setMergeModalOpen(false)} variant="outline">{__('general.cancel')}</Button>
                             <Button onClick={executeMerge} disabled={mergeFiles.length === 0} className="bg-indigo-600 hover:bg-indigo-700 text-white gap-1.5">
-                                <Layers className="w-4 h-4" /> Merge & Load
-                            </Button>
+                                <Layers className="w-4 h-4" /> {__('general.merge_load')}</Button>
                         </div>
                     </div>
                 </div>
@@ -855,8 +839,7 @@ export default function ExcelMergerRunner() {
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                             <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
-                                <SplitSquareHorizontal className="w-5 h-5 text-indigo-600" /> Split Data
-                            </h3>
+                                <SplitSquareHorizontal className="w-5 h-5 text-indigo-600" /> {__('general.split_data')}</h3>
                             <button onClick={() => setSplitModalOpen(false)} className="text-slate-400 hover:text-slate-700">
                                 <XCircle className="w-6 h-6" />
                             </button>
@@ -866,7 +849,7 @@ export default function ExcelMergerRunner() {
                                 The current filtered dataset ({filteredData.length} rows) will be divided into multiple smaller Excel files.
                             </p>
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-1">Max Rows Per File</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-1">{__('general.max_rows_per_file')}</label>
                                 <input 
                                     type="number" 
                                     min="1"
@@ -880,10 +863,9 @@ export default function ExcelMergerRunner() {
                             </div>
                         </div>
                         <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-2">
-                            <Button onClick={() => setSplitModalOpen(false)} variant="outline">Cancel</Button>
+                            <Button onClick={() => setSplitModalOpen(false)} variant="outline">{__('general.cancel')}</Button>
                             <Button onClick={executeSplit} disabled={filteredData.length === 0} className="bg-indigo-600 hover:bg-indigo-700 text-white gap-1.5">
-                                <Download className="w-4 h-4" /> Download Parts
-                            </Button>
+                                <Download className="w-4 h-4" /> {__('general.download_parts')}</Button>
                         </div>
                     </div>
                 </div>

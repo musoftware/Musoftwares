@@ -6,13 +6,13 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 export default function PublicFooter() {
     return (
         <footer className="bg-slate-50 border-t border-slate-200" aria-labelledby="footer-heading">
-            <h2 id="footer-heading" className="sr-only">Footer</h2>
+            <h2 id="footer-heading" className="sr-only">{__('general.footer')}</h2>
             <div className="mx-auto max-w-7xl px-6 pb-8 pt-16 sm:pt-24 lg:px-8 lg:pt-32">
                 <div className="xl:grid xl:grid-cols-3 xl:gap-8">
                     <div className="space-y-8">
                         <Link href="/" className="flex items-center gap-2">
                             <ApplicationLogo className="h-8 w-auto text-emerald-600" />
-                            <span className="font-bold text-xl tracking-tight text-slate-900">ArabiJobs</span>
+                            <span className="font-bold text-xl tracking-tight text-slate-900">{__('general.arabijobs')}</span>
                         </Link>
                         <p className="text-sm leading-6 text-slate-600 max-w-xs">
                             {__('freelance.footer_desc', undefined, 'Connecting top talent with great businesses. The premier platform for freelance work in the Arab world.')}

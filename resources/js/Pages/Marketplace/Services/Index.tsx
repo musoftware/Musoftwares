@@ -24,7 +24,7 @@ export default function Index({ services }: any) {
                 <h2 className="text-xl leading-tight font-semibold text-gray-800">{__('general.marketplace_services')}</h2>
             }
         >
-            <Head title="Services" />
+            <Head title={__('general.services')} />
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="relative overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
@@ -33,7 +33,7 @@ export default function Index({ services }: any) {
                                 <div className="font-medium text-indigo-600">{__('general.loading')}</div>
                             </div>
                         )}
-                        <h3 className="mb-4 text-lg font-bold">Services</h3>
+                        <h3 className="mb-4 text-lg font-bold">{__('general.services')}</h3>
 
                         {(services.data as any).length > 0 ? (
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">

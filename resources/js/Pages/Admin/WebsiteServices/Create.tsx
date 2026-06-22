@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Textarea } from '@/Components/ui/textarea';
 import { Label } from '@/Components/ui/label';
+import { __ } from '@/lib/i18n';
 
 export default function Create() {
     const { data, setData, post, processing, errors } = useForm({
@@ -31,7 +32,7 @@ export default function Create() {
 
     return (
         <AdminSidebarLayout header="Create Service">
-            <Head title="Create Service" />
+            <Head title={__('general.create_service')} />
             <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                 <form onSubmit={submit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -85,7 +86,7 @@ export default function Create() {
                     
                     <div className="border-t border-slate-200 pt-6 mt-6">
                         <h3 className="text-lg font-semibold text-slate-900 mb-4">Advanced SEO Overrides (Optional)</h3>
-                        <p className="text-sm text-slate-500 mb-6">Leave these blank to have our AI automatically generate them based on the service description.</p>
+                        <p className="text-sm text-slate-500 mb-6">{__('general.leave_these_blank_to_have_our_ai_automat')}</p>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div className="space-y-2">
@@ -123,9 +124,9 @@ export default function Create() {
 
                     <div className="flex justify-end gap-2">
                         <Link href={route('admin.website-services.index')}>
-                            <Button variant="outline" type="button">Cancel</Button>
+                            <Button variant="outline" type="button">{__('general.cancel')}</Button>
                         </Link>
-                        <Button type="submit" disabled={processing}>Save</Button>
+                        <Button type="submit" disabled={processing}>{__('general.save')}</Button>
                     </div>
                 </form>
             </div>

@@ -165,8 +165,7 @@ export default function WebsiteServiceShow({ service }) {
                                     {__('general.service_description') || 'Service Description'}
                                 </h2>
                                 <h3 className="gsap-fade-up text-2xl font-bold text-[#111111] tracking-tight">
-                                    Deep Dive
-                                </h3>
+                                    {__('general.deep_dive')}</h3>
                             </div>
                             <div className="lg:col-span-8">
                                 <div 

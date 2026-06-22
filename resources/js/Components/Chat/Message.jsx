@@ -34,8 +34,8 @@ export default function Message({ message, isOwnMessage }) {
                     <div
                         className={`flex max-w-[280px] flex-col rounded-2xl px-4 py-2 sm:max-w-md lg:max-w-lg ${
                             isOwnMessage
-                                ? 'rounded-br-sm bg-indigo-600 text-white'
-                                : 'rounded-bl-sm border bg-white text-gray-900 shadow-sm'
+                                ? 'rounded-be-sm bg-indigo-600 text-white'
+                                : 'rounded-bs-sm border bg-white text-gray-900 shadow-sm'
                         }`}
                         title={`${formattedDate}, ${formattedTime}`}
                     >

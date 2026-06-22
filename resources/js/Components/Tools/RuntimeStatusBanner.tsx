@@ -67,16 +67,14 @@ export function RuntimeStatusBanner({ toolSlug }: Props) {
                             className="flex items-center gap-1.5 px-3 py-1 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white rounded text-xs font-medium transition-colors"
                         >
                             <RefreshCw className="h-3 w-3" />
-                            Restart
-                        </button>
+                            {__('general.restart')}</button>
                         <button
                             onClick={() => { send('runtime.close'); }}
                             title={__('general.close_runtime')}
                             className="flex items-center gap-1.5 px-3 py-1 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded text-xs font-medium transition-colors"
                         >
                             <Power className="h-3 w-3" />
-                            Close
-                        </button>
+                            {__('general.close')}</button>
                     </>
                 )}
             </div>
@@ -146,8 +144,7 @@ export function RuntimeStatusBanner({ toolSlug }: Props) {
                         target="_blank"
                         className="ms-auto text-violet-400 hover:text-violet-200 underline" rel="noreferrer"
                     >
-                        Update
-                    </a>
+                        {__('general.update')}</a>
                 </div>
             )}
         </div>

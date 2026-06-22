@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import axios from 'axios';
+import { __ } from '@/lib/i18n';
 
 export interface PipelineLead {
     id: number;
@@ -21,7 +22,7 @@ interface PipelineState {
     stages: PipelineStage[];
     isLoading: boolean;
     setStages: (stages: PipelineStage[]) => void;
-    fetchPipeline: () => Promise<void>;
+    fetchPipeline: () => {__('general.promise')}<void>;
     moveLead: (leadId: number, sourceStageId: number, destStageId: number, destinationIndex: number) => void;
 }
 

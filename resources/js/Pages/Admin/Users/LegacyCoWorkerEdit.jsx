@@ -3,6 +3,7 @@ import { Head, Link, useForm, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Users, Save, ChevronLeft, ArrowLeft } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 
 export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -89,7 +90,7 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                             </div>
                             
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">WhatsApp</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.whatsapp')}</label>
                                 <input
                                     type="text"
                                     value={data.whatsapp}
@@ -179,8 +180,7 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                             href={`/admin/users/legacy-coworker/${worker.id}`}
                             className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
-                            Cancel
-                        </Link>
+                            {__('general.cancel')}</Link>
                         <Button type="submit" disabled={processing} className="flex items-center gap-2">
                             <Save className="w-4 h-4" />{__('general.save_changes')}</Button>
                     </div>

@@ -189,8 +189,7 @@ export default function Index({
                                 className: 'bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs px-3 shadow-sm h-8 inline-flex items-center'
                             })}
                         >
-                            <CreditCard className="me-1.5 h-3.5 w-3.5" /> Pay
-                        </Link>
+                            <CreditCard className="me-1.5 h-3.5 w-3.5" /> {__('general.pay')}</Link>
                     ) : (
                         <Link
                             href={route('erp.client-invoices.pay', row.id)}

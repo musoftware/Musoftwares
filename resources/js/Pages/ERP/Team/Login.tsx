@@ -67,8 +67,7 @@ export default function Login({ status }: { status?: string }) {
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
                             <Label htmlFor="password" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                                Password
-                            </Label>
+                                {__('general.password')}</Label>
                         </div>
                         <div className="relative">
                             <Input

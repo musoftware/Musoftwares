@@ -54,10 +54,10 @@ export default function MarketplaceFooter() {
                     <div>
                         <h4 className="font-bold text-gray-900 mb-6">{__('general.more_from_musoftware')}</h4>
                         <ul className="space-y-4 text-sm text-gray-500">
-                            <li><Link href="/erp" className="hover:underline">Musoftware ERP</Link></li>
-                            <li><Link href="/crm" className="hover:underline">Musoftware CRM</Link></li>
-                            <li><Link href="/pos" className="hover:underline">Point of Sale</Link></li>
-                            <li><Link href="/business" className="hover:underline">Musoftware Business</Link></li>
+                            <li><Link href="/erp" className="hover:underline">{__('general.musoftware_erp')}</Link></li>
+                            <li><Link href="/crm" className="hover:underline">{__('general.musoftware_crm')}</Link></li>
+                            <li><Link href="/pos" className="hover:underline">{__('general.point_of_sale')}</Link></li>
+                            <li><Link href="/business" className="hover:underline">{__('general.musoftware_business')}</Link></li>
                         </ul>
                     </div>
                 </div>
@@ -79,11 +79,9 @@ export default function MarketplaceFooter() {
                         
                         <div className="hidden md:flex items-center gap-4 ms-4">
                             <button className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900">
-                                <Globe className="h-4 w-4" /> English
-                            </button>
+                                <Globe className="h-4 w-4" /> {__('general.english')}</button>
                             <button className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900">
-                                <DollarSign className="h-4 w-4" /> USD
-                            </button>
+                                <DollarSign className="h-4 w-4" /> {__('general.usd')}</button>
                         </div>
                     </div>
                 </div>

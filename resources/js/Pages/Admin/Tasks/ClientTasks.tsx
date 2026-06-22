@@ -456,12 +456,10 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                                                         📌 {todo.task_name}
                                                                     </Badge>
                                                                     <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-1.5 py-0.5 shadow-none hover:bg-emerald-100">
-                                                                        Paid
-                                                                    </Badge>
+                                                                        {__('general.paid')}</Badge>
                                                                     {todo.start_at ? (
                                                                         <Badge className="bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold px-1.5 py-0.5 shadow-none hover:bg-indigo-50 flex items-center gap-0.5">
-                                                                            <CalendarCheck className="h-2.5 w-2.5" /> Scheduled
-                                                                        </Badge>
+                                                                            <CalendarCheck className="h-2.5 w-2.5" /> {__('general.scheduled')}</Badge>
                                                                     ) : (
                                                                         <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 text-[10px] font-bold px-1.5 py-0.5">{__('general.awaiting_scheduling_1')}</Badge>
                                                                     )}
@@ -469,8 +467,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                                             )}
                                                             {todo.refunded && (
                                                                 <Badge className="bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 shadow-none rounded-none uppercase">
-                                                                    REFUNDED
-                                                                </Badge>
+                                                                    {__('general.refunded')}</Badge>
                                                             )}
                                                             <div className="ms-auto md:hidden">
                                                                 <span className="font-bold text-slate-900">
@@ -567,7 +564,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                 <CardContent className="p-5 space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-1">
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email</span>
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{__('general.email')}</span>
                                             <p className="text-sm font-bold text-slate-800 break-all">{selectedClient.email}</p>
                                         </div>
                                         <div className="space-y-1">

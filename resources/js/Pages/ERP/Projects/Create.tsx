@@ -70,7 +70,7 @@ export default function CreateProject({ clients = [] }: { clients?: any[] }) {
                                     {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Client <span className="text-red-500">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.client')}<span className="text-red-500">*</span></label>
                                     <ClientAutocomplete
                                         value={form.client_id}
                                         onChange={(val) => setForm({...form, client_id: val})}
@@ -79,17 +79,17 @@ export default function CreateProject({ clients = [] }: { clients?: any[] }) {
                                     {errors.client_id && <p className="text-xs text-red-500">{errors.client_id}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Status</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.status')}</label>
                                     <Select value={form.status} onValueChange={(val) => setForm({...form, status: val || ''})}>
                                         <SelectTrigger className="bg-white border-slate-200 text-slate-900">
                                             <SelectValue placeholder={__('general.select_status_1')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white border-slate-200 text-slate-900">
-                                            <SelectItem value="Planning">Planning</SelectItem>
-                                            <SelectItem value="Active">Active</SelectItem>
+                                            <SelectItem value="Planning">{__('general.planning')}</SelectItem>
+                                            <SelectItem value="Active">{__('general.active')}</SelectItem>
                                             <SelectItem value="On Hold">{__('general.on_hold')}</SelectItem>
-                                            <SelectItem value="Completed">Completed</SelectItem>
-                                            <SelectItem value="Cancelled">Cancelled</SelectItem>
+                                            <SelectItem value="Completed">{__('general.completed')}</SelectItem>
+                                            <SelectItem value="Cancelled">{__('general.cancelled')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     {errors.status && <p className="text-xs text-red-500">{errors.status}</p>}
@@ -122,8 +122,7 @@ export default function CreateProject({ clients = [] }: { clients?: any[] }) {
                             <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
                                 <Link href={route('erp.dashboard', { section: 'projects' })}>
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-900 hover:bg-slate-100">
-                                        Cancel
-                                    </Button>
+                                        {__('general.cancel')}</Button>
                                 </Link>
                                 <Button type="submit" disabled={isSubmitting}>
                                     {isSubmitting ? 'Creating...' : 'Create Project'}

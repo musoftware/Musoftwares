@@ -26,11 +26,11 @@ export default function Show({ webhook }: Props) {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'processed':
-                return <Badge className="bg-emerald-100 text-emerald-800"><CheckCircle2 className="w-4 h-4 me-1" /> Processed</Badge>;
+                return <Badge className="bg-emerald-100 text-emerald-800"><CheckCircle2 className="w-4 h-4 me-1" /> {__('general.processed')}</Badge>;
             case 'failed':
-                return <Badge className="bg-rose-100 text-rose-800"><XCircle className="w-4 h-4 me-1" /> Failed</Badge>;
+                return <Badge className="bg-rose-100 text-rose-800"><XCircle className="w-4 h-4 me-1" /> {__('general.failed')}</Badge>;
             default:
-                return <Badge className="bg-amber-100 text-amber-800"><Clock className="w-4 h-4 me-1" /> Pending</Badge>;
+                return <Badge className="bg-amber-100 text-amber-800"><Clock className="w-4 h-4 me-1" /> {__('general.pending')}</Badge>;
         }
     };
 
@@ -58,7 +58,7 @@ export default function Show({ webhook }: Props) {
                                 <XCircle className="h-5 w-5 text-rose-500" aria-hidden="true" />
                             </div>
                             <div className="ms-3">
-                                <h3 className="text-sm font-medium text-rose-800">Processing Failed</h3>
+                                <h3 className="text-sm font-medium text-rose-800">{__('general.processing_failed')}</h3>
                                 <div className="mt-2 text-sm text-rose-700 font-mono bg-white/50 p-2 rounded">
                                     {webhook.error_message}
                                 </div>
@@ -70,24 +70,24 @@ export default function Show({ webhook }: Props) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-lg">Metadata</CardTitle>
+                            <CardTitle className="text-lg">{__('general.metadata')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <p className="text-sm font-medium text-slate-500">Source</p>
+                                    <p className="text-sm font-medium text-slate-500">{__('general.source')}</p>
                                     <p className="font-semibold text-slate-900 mt-1 uppercase">{webhook.source}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-slate-500">Event Type</p>
+                                    <p className="text-sm font-medium text-slate-500">{__('general.event_type')}</p>
                                     <p className="font-semibold text-slate-900 mt-1">{webhook.event_type || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-slate-500">Received At</p>
+                                    <p className="text-sm font-medium text-slate-500">{__('general.received_at')}</p>
                                     <p className="font-semibold text-slate-900 mt-1">{new Date(webhook.created_at).toLocaleString()}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-slate-500">Processed At</p>
+                                    <p className="text-sm font-medium text-slate-500">{__('general.processed_at')}</p>
                                     <p className="font-semibold text-slate-900 mt-1">
                                         {webhook.processed_at ? new Date(webhook.processed_at).toLocaleString() : 'Not processed yet'}
                                     </p>
@@ -99,8 +99,7 @@ export default function Show({ webhook }: Props) {
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-lg flex items-center gap-2">
-                                <FileJson className="w-5 h-5 text-slate-400" /> Headers
-                            </CardTitle>
+                                <FileJson className="w-5 h-5 text-slate-400" /> {__('general.headers')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="bg-slate-900 rounded-md p-4 overflow-x-auto">
@@ -115,8 +114,7 @@ export default function Show({ webhook }: Props) {
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
-                            <FileJson className="w-5 h-5 text-slate-400" /> Payload
-                        </CardTitle>
+                            <FileJson className="w-5 h-5 text-slate-400" /> {__('general.payload')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="bg-slate-900 rounded-md p-4 overflow-x-auto">

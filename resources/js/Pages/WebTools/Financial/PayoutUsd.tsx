@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { DollarSign, ShieldCheck, HelpCircle, Receipt, Percent, Settings, ArrowRight, Wallet } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function PayoutUsd() {
     const [usdAmount, setUsdAmount] = useState(10);
@@ -92,19 +93,16 @@ export default function PayoutUsd() {
         new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(val);
 
     return (
-        <WebToolsLayout title="USD Payout Tool" activeNav="explore">
+        <WebToolsLayout title={__('general.usd_payout_tool')} activeNav="explore">
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6">
                 <div className="mb-8">
                     <span className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium mb-3">
-                        Global Service Calculator
-                    </span>
+                        {__('general.global_service_calculator')}</span>
                     <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
                         <DollarSign className="w-8 h-8 text-emerald-500" />
-                        USD Payout Calculator
-                    </h1>
+                        {__('general.usd_payout_calculator')}</h1>
                     <p className="mt-2 text-lg text-slate-600">
-                        Real-time EGP conversion for global software and hosting services.
-                    </p>
+                        {__('general.realtime_egp_conversion_for_global_softw')}</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -113,7 +111,7 @@ export default function PayoutUsd() {
                         <Card className="border-slate-200 shadow-sm border-t-4 border-t-emerald-500">
                             <CardHeader className="bg-slate-50 border-b border-slate-100">
                                 <CardTitle className="text-lg">Amount to Pay (USD)</CardTitle>
-                                <CardDescription>Enter the service invoice amount in USD</CardDescription>
+                                <CardDescription>{__('general.enter_the_service_invoice_amount_in_usd')}</CardDescription>
                             </CardHeader>
                             <CardContent className="pt-6">
                                 <div className="space-y-4">
@@ -142,11 +140,10 @@ export default function PayoutUsd() {
                             <CardContent className="p-5">
                                 <div className="flex items-center gap-3 mb-2">
                                     <HelpCircle className="w-5 h-5 text-blue-500" />
-                                    <h5 className="font-bold text-slate-900">What is this tool?</h5>
+                                    <h5 className="font-bold text-slate-900">{__('general.what_is_this_tool')}</h5>
                                 </div>
                                 <p className="text-sm text-slate-600 leading-relaxed">
-                                    This tool calculates the total EGP amount required to purchase USD-denominated services when paying through local providers. It accounts for market exchange rates and all intermediary processing fees.
-                                </p>
+                                    {__('general.this_tool_calculates_the_total_egp_amoun')}</p>
                             </CardContent>
                         </Card>
 
@@ -154,7 +151,7 @@ export default function PayoutUsd() {
                             <CardContent className="p-5">
                                 <div className="flex items-center gap-3 mb-2">
                                     <ShieldCheck className="w-5 h-5 text-amber-500" />
-                                    <h5 className="font-bold text-slate-900">Transparency & Fees</h5>
+                                    <h5 className="font-bold text-slate-900">{__('general.transparency_fees')}</h5>
                                 </div>
                                 <p className="text-sm text-slate-600 leading-relaxed">
                                     Our calculation includes standard conversion fees (1%), processing (4.4%), and regulatory transaction fees typical for EGP-to-USD service flows.
@@ -182,7 +179,7 @@ export default function PayoutUsd() {
                                                 <p className="text-xl font-bold">{formatMoney(results.effectiveRate, 'EGP')}</p>
                                             </div>
                                             <div>
-                                                <p className="text-slate-500 text-sm mb-1">Total Fees</p>
+                                                <p className="text-slate-500 text-sm mb-1">{__('general.total_fees')}</p>
                                                 <p className="text-xl font-bold text-amber-400">{formatMoney(results.totalFees, 'EGP')}</p>
                                             </div>
                                         </div>
@@ -191,7 +188,7 @@ export default function PayoutUsd() {
 
                                 <Card className="border-slate-200 shadow-sm">
                                     <CardHeader className="pb-4 border-b border-slate-100">
-                                        <CardTitle className="text-lg">Fee Breakdown Step-by-Step</CardTitle>
+                                        <CardTitle className="text-lg">{__('general.fee_breakdown_stepbystep')}</CardTitle>
                                     </CardHeader>
                                     <CardContent className="p-0">
                                         <div className="divide-y divide-slate-100">
@@ -223,8 +220,8 @@ export default function PayoutUsd() {
                         ) : (
                             <Card className="h-full flex flex-col items-center justify-center p-12 text-center text-slate-500 border-dashed border-2 border-slate-200 bg-slate-50/50">
                                 <DollarSign className="w-16 h-16 text-slate-300 mb-4" />
-                                <h3 className="text-xl font-medium text-slate-700">Enter USD Amount</h3>
-                                <p className="mt-2 text-sm">Please provide a valid USD amount to calculate the final EGP payout requirement.</p>
+                                <h3 className="text-xl font-medium text-slate-700">{__('general.enter_usd_amount')}</h3>
+                                <p className="mt-2 text-sm">{__('general.please_provide_a_valid_usd_amount_to_cal')}</p>
                             </Card>
                         )}
                     </div>

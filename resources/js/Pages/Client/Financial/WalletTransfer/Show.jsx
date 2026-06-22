@@ -5,6 +5,7 @@ import { CheckCircle, Printer, ArrowLeft, Send, ShieldCheck, Mail, Calendar, Hel
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 
 export default function Show({ transfer }) {
     const handlePrint = () => {
@@ -23,17 +24,14 @@ export default function Show({ transfer }) {
                 <div className="flex items-center justify-between print:hidden">
                     <Button variant="outline" size="sm" asChild className="shadow-none">
                         <Link href={route('financial.transfer.history')}>
-                            <ArrowLeft className="w-4 h-4 me-2" /> History
-                        </Link>
+                            <ArrowLeft className="w-4 h-4 me-2" /> {__('general.history')}</Link>
                     </Button>
                     <div className="flex items-center gap-2">
                         <Button variant="outline" size="sm" onClick={handlePrint} className="shadow-none gap-1.5">
-                            <Printer className="w-4 h-4" /> Print
-                        </Button>
+                            <Printer className="w-4 h-4" /> {__('general.print')}</Button>
                         <Button size="sm" asChild className="shadow-none gap-1.5">
                             <Link href={route('financial.transfer.create')}>
-                                <Send className="w-4 h-4" /> Transfer
-                            </Link>
+                                <Send className="w-4 h-4" /> {__('general.transfer')}</Link>
                         </Button>
                     </div>
                 </div>

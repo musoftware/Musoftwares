@@ -199,7 +199,7 @@ export default function Index({ methods, filters, stats }: Props) {
                         <MoreHorizontal className="h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-44">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuLabel>{__('general.actions')}</DropdownMenuLabel>
 
                         <DropdownMenuItem>
                             <Link
@@ -214,8 +214,7 @@ export default function Index({ methods, filters, stats }: Props) {
                                 className="text-emerald-600 focus:text-emerald-600"
                                 onClick={() => handleUpdate(m.id, 'active')}
                             >
-                                <CheckCircle className="me-2 h-4 w-4" /> Approve
-                            </DropdownMenuItem>
+                                <CheckCircle className="me-2 h-4 w-4" /> {__('general.approve')}</DropdownMenuItem>
                         )}
 
                         {m.status !== 'declined' && (
@@ -223,8 +222,7 @@ export default function Index({ methods, filters, stats }: Props) {
                                 className="text-red-600 focus:text-red-600"
                                 onClick={() => handleUpdate(m.id, 'declined')}
                             >
-                                <XCircle className="me-2 h-4 w-4" /> Decline
-                            </DropdownMenuItem>
+                                <XCircle className="me-2 h-4 w-4" /> {__('general.decline')}</DropdownMenuItem>
                         )}
 
                         {m.status !== 'pending' && (
@@ -283,28 +281,28 @@ export default function Index({ methods, filters, stats }: Props) {
                         <Layers className="h-4 w-4 text-slate-400" />
                         <span className="text-2xl font-semibold text-slate-800">{stats.total}</span>
                     </div>
-                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Total</span>
+                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">{__('general.total')}</span>
                 </div>
                 <div className="bg-white rounded-xl border border-yellow-200 p-4 shadow-sm flex flex-col items-center justify-center">
                     <div className="flex items-center gap-1.5 mb-1">
                         <Clock className="h-4 w-4 text-yellow-500" />
                         <span className="text-2xl font-semibold text-yellow-600">{stats.pending}</span>
                     </div>
-                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Pending</span>
+                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">{__('general.pending')}</span>
                 </div>
                 <div className="bg-white rounded-xl border border-emerald-200 p-4 shadow-sm flex flex-col items-center justify-center">
                     <div className="flex items-center gap-1.5 mb-1">
                         <ShieldCheck className="h-4 w-4 text-emerald-500" />
                         <span className="text-2xl font-semibold text-emerald-600">{stats.active}</span>
                     </div>
-                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Approved</span>
+                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">{__('general.approved')}</span>
                 </div>
                 <div className="bg-white rounded-xl border border-red-200 p-4 shadow-sm flex flex-col items-center justify-center">
                     <div className="flex items-center gap-1.5 mb-1">
                         <ShieldX className="h-4 w-4 text-red-500" />
                         <span className="text-2xl font-semibold text-red-600">{stats.declined}</span>
                     </div>
-                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Declined</span>
+                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">{__('general.declined')}</span>
                 </div>
             </div>
 

@@ -341,8 +341,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                                     : 'text-slate-400 hover:text-white hover:bg-white/5'
                             }`}
                         >
-                            Collections
-                        </Button>
+                            {__('general.collections')}</Button>
                         {activeView !== 'collections' && (
                             <Button
                                 variant="ghost"
@@ -369,7 +368,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                     )}
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Online</span>
+                        <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">{__('general.online')}</span>
                     </div>
                 </div>
             </div>
@@ -382,7 +381,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="flex items-center justify-between flex-wrap gap-4">
                             <div>
-                                <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white">Collections</h1>
+                                <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white">{__('general.collections')}</h1>
                                 <p className="text-sm text-slate-500 mt-1">{__('general.organize_your_creative_inspiration_into_themed_boards')}</p>
                             </div>
                             <Button
@@ -417,7 +416,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                                         <FolderOpen className="w-5 h-5 text-slate-300" />
                                     </div>
                                     <div>
-                                        <h3 className="text-sm font-bold text-white">Uncategorized</h3>
+                                        <h3 className="text-sm font-bold text-white">{__('general.uncategorized')}</h3>
                                         <p className="text-xs text-slate-500">{stats?.uncategorized || 0} items</p>
                                     </div>
                                 </div>
@@ -510,7 +509,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                     <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         {/* Breadcrumb */}
                         <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                            <button onClick={() => setActiveView('collections')} className="hover:text-white transition-colors">Collections</button>
+                            <button onClick={() => setActiveView('collections')} className="hover:text-white transition-colors">{__('general.collections')}</button>
                             <ChevronRight className="w-3 h-3" />
                             <span className="text-white font-medium">{getCollectionName(selectedCollectionId)}</span>
                         </div>
@@ -617,7 +616,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                 {activeView === 'detail' && selectedSwipe && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                            <button onClick={() => setActiveView('collections')} className="hover:text-white transition-colors">Collections</button>
+                            <button onClick={() => setActiveView('collections')} className="hover:text-white transition-colors">{__('general.collections')}</button>
                             <ChevronRight className="w-3 h-3" />
                             <button onClick={() => setActiveView('swipes')} className="hover:text-white transition-colors">{getCollectionName(selectedCollectionId)}</button>
                             <ChevronRight className="w-3 h-3" />
@@ -658,8 +657,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                                     {selectedSwipe.notes && (
                                         <div className="pt-3 border-t border-white/[0.06]">
                                             <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">
-                                                <StickyNote className="w-3 h-3" /> Notes
-                                            </div>
+                                                <StickyNote className="w-3 h-3" /> {__('general.notes')}</div>
                                             <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{selectedSwipe.notes}</p>
                                         </div>
                                     )}
@@ -667,8 +665,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                                     {selectedSwipe.tags && selectedSwipe.tags.length > 0 && (
                                         <div className="pt-3 border-t border-white/[0.06]">
                                             <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">
-                                                <Tag className="w-3 h-3" /> Tags
-                                            </div>
+                                                <Tag className="w-3 h-3" /> {__('general.tags')}</div>
                                             <div className="flex flex-wrap gap-1.5">
                                                 {selectedSwipe.tags.map(t => (
                                                     <Badge key={t} variant="secondary" className="bg-white/[0.06] text-slate-300 border-white/10 text-[10px]">
@@ -686,11 +683,9 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
 
                                 <div className="flex gap-2">
                                     <Button variant="outline" size="sm" onClick={() => openEditSwipe(selectedSwipe)} className="flex-1 h-9 text-xs bg-white/[0.04] border-white/10 text-slate-300 hover:text-white hover:bg-white/[0.08] gap-1.5">
-                                        <Edit3 className="w-3.5 h-3.5" /> Edit
-                                    </Button>
+                                        <Edit3 className="w-3.5 h-3.5" /> {__('general.edit')}</Button>
                                     <Button variant="outline" size="sm" onClick={() => handleDeleteSwipe(selectedSwipe.id)} className="h-9 text-xs bg-white/[0.04] border-white/10 text-red-400 hover:text-red-300 hover:bg-red-500/10 gap-1.5">
-                                        <Trash2 className="w-3.5 h-3.5" /> Delete
-                                    </Button>
+                                        <Trash2 className="w-3.5 h-3.5" /> {__('general.delete')}</Button>
                                 </div>
                             </div>
                         </div>
@@ -707,7 +702,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                     </DialogHeader>
                     <div className="space-y-4 pt-2">
                         <div>
-                            <Label className="text-xs text-slate-400 mb-1.5 block">Name</Label>
+                            <Label className="text-xs text-slate-400 mb-1.5 block">{__('general.name')}</Label>
                             <Input
                                 value={newCollectionName}
                                 onChange={(e) => setNewCollectionName(e.target.value)}
@@ -717,7 +712,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                             />
                         </div>
                         <div>
-                            <Label className="text-xs text-slate-400 mb-1.5 block">Color</Label>
+                            <Label className="text-xs text-slate-400 mb-1.5 block">{__('general.color')}</Label>
                             <div className="flex gap-2 flex-wrap">
                                 {COLLECTION_COLORS.map(c => (
                                     <button
@@ -731,8 +726,8 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                         </div>
                     </div>
                     <DialogFooter className="pt-4">
-                        <Button variant="ghost" onClick={() => setShowNewCollection(false)} className="text-slate-400 hover:text-white">Cancel</Button>
-                        <Button onClick={handleCreateCollection} disabled={!newCollectionName.trim()} className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 font-bold">Create</Button>
+                        <Button variant="ghost" onClick={() => setShowNewCollection(false)} className="text-slate-400 hover:text-white">{__('general.cancel')}</Button>
+                        <Button onClick={handleCreateCollection} disabled={!newCollectionName.trim()} className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 font-bold">{__('general.create')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -747,7 +742,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                     <div className="space-y-4 pt-2 max-h-[60vh] overflow-y-auto">
                         {/* Image upload */}
                         <div>
-                            <Label className="text-xs text-slate-400 mb-1.5 block">Image</Label>
+                            <Label className="text-xs text-slate-400 mb-1.5 block">{__('general.image')}</Label>
                             {addBase64 ? (
                                 <div className="relative rounded-xl overflow-hidden border border-white/10">
                                     <img src={addBase64} alt="Preview" className="w-full max-h-48 object-contain bg-black/30" />
@@ -773,7 +768,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                         </div>
 
                         <div>
-                            <Label className="text-xs text-slate-400 mb-1.5 block">Title</Label>
+                            <Label className="text-xs text-slate-400 mb-1.5 block">{__('general.title')}</Label>
                             <Input
                                 value={addTitle}
                                 onChange={(e) => setAddTitle(e.target.value)}
@@ -814,7 +809,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                         </div>
                     </div>
                     <DialogFooter className="pt-4">
-                        <Button variant="ghost" onClick={() => setShowAddSwipe(false)} className="text-slate-400 hover:text-white">Cancel</Button>
+                        <Button variant="ghost" onClick={() => setShowAddSwipe(false)} className="text-slate-400 hover:text-white">{__('general.cancel')}</Button>
                         <Button onClick={handleAddSwipe} disabled={!addBase64 && !addUrl.trim() && !addTitle.trim()} className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 font-bold">{__('general.save_swipe')}</Button>
                     </DialogFooter>
                 </DialogContent>
@@ -829,11 +824,11 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                     </DialogHeader>
                     <div className="space-y-4 pt-2">
                         <div>
-                            <Label className="text-xs text-slate-400 mb-1.5 block">Title</Label>
+                            <Label className="text-xs text-slate-400 mb-1.5 block">{__('general.title')}</Label>
                             <Input value={addTitle} onChange={(e) => setAddTitle(e.target.value)} className="bg-white/[0.04] border-white/[0.08] text-white" />
                         </div>
                         <div>
-                            <Label className="text-xs text-slate-400 mb-1.5 block">Notes</Label>
+                            <Label className="text-xs text-slate-400 mb-1.5 block">{__('general.notes')}</Label>
                             <Textarea value={addNotes} onChange={(e) => setAddNotes(e.target.value)} rows={3} className="bg-white/[0.04] border-white/[0.08] text-white resize-none" />
                         </div>
                         <div>
@@ -842,7 +837,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                         </div>
                     </div>
                     <DialogFooter className="pt-4">
-                        <Button variant="ghost" onClick={() => setShowEditSwipe(false)} className="text-slate-400 hover:text-white">Cancel</Button>
+                        <Button variant="ghost" onClick={() => setShowEditSwipe(false)} className="text-slate-400 hover:text-white">{__('general.cancel')}</Button>
                         <Button onClick={handleUpdateSwipe} className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 font-bold">{__('general.save_changes')}</Button>
                     </DialogFooter>
                 </DialogContent>
@@ -861,7 +856,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                             className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.06] transition-all text-start"
                         >
                             <div className="w-3 h-3 rounded-full bg-slate-500" />
-                            <span className="text-sm text-slate-300">Uncategorized</span>
+                            <span className="text-sm text-slate-300">{__('general.uncategorized')}</span>
                         </button>
                         {collections.map(c => (
                             <button
@@ -933,17 +928,15 @@ function SwipeCard({ swipe, onOpen, onEdit, onDelete, onMove, collectionColor }:
                         </DialogTrigger>
                         <DialogContent className="bg-[#1a1a1e] border-white/10 text-white sm:max-w-xs" onClick={(e) => e.stopPropagation()}>
                             <DialogHeader>
-                                <DialogTitle className="text-white text-sm">Actions</DialogTitle>
+                                <DialogTitle className="text-white text-sm">{__('general.actions')}</DialogTitle>
                             </DialogHeader>
                             <div className="flex flex-col gap-2 py-2">
                                 <Button variant="outline" className="justify-start bg-white/[0.04] border-white/10 text-slate-300 hover:text-white hover:bg-white/[0.08] gap-2" onClick={(e) => { e.stopPropagation(); onEdit(); }}>
-                                    <Edit3 className="w-4 h-4" /> Edit
-                                </Button>
+                                    <Edit3 className="w-4 h-4" /> {__('general.edit')}</Button>
                                 <Button variant="outline" className="justify-start bg-white/[0.04] border-white/10 text-slate-300 hover:text-white hover:bg-white/[0.08] gap-2" onClick={(e) => { e.stopPropagation(); onMove(); }}>
                                     <MoveRight className="w-4 h-4" />{__('general.move_to_collection')}</Button>
                                 <Button variant="destructive" className="justify-start gap-2" onClick={(e) => { e.stopPropagation(); onDelete(); }}>
-                                    <Trash2 className="w-4 h-4" /> Delete
-                                </Button>
+                                    <Trash2 className="w-4 h-4" /> {__('general.delete')}</Button>
                             </div>
                         </DialogContent>
                     </Dialog>

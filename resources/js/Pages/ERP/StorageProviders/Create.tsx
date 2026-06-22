@@ -76,10 +76,10 @@ export default function CreateStorageProvider() {
                                             <SelectValue placeholder={__('general.select_driver')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white border-slate-200 text-slate-900">
-                                            <SelectItem value="s3">AWS S3</SelectItem>
-                                            <SelectItem value="s3-cloudflare">Cloudflare R2</SelectItem>
+                                            <SelectItem value="s3">{__('general.aws_s3')}</SelectItem>
+                                            <SelectItem value="s3-cloudflare">{__('general.cloudflare_r2')}</SelectItem>
                                             <SelectItem value="s3-digitalocean">{__('general.digitalocean_spaces')}</SelectItem>
-                                            <SelectItem value="s3-wasabi">Wasabi</SelectItem>
+                                            <SelectItem value="s3-wasabi">{__('general.wasabi')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     {errors.driver && <p className="text-xs text-red-500">{errors.driver}</p>}
@@ -90,7 +90,7 @@ export default function CreateStorageProvider() {
                                         required
                                         value={form.key} 
                                         onChange={e => setForm({...form, key: e.target.value})} 
-                                        placeholder="AKIAIOSFODNN7EXAMPLE" 
+                                        placeholder={__('general.akiaiosfodnn7example')} 
                                         className="bg-white border-slate-200 text-slate-900 font-mono text-sm"
                                     />
                                     {errors.key && <p className="text-xs text-red-500">{errors.key}</p>}

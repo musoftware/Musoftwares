@@ -55,7 +55,7 @@ export default function LessonViewer({ course, currentLesson, lessonContent }: L
                                                                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white'
                                                             }`}
                                                         >
-                                                            <span className={`w-6 h-6 mr-3 flex items-center justify-center rounded-full border text-xs ${
+                                                            <span className={`w-6 h-6 me-3 flex items-center justify-center rounded-full border text-xs ${
                                                                 isActive 
                                                                     ? 'border-indigo-600 bg-indigo-600 text-white dark:border-indigo-500 dark:bg-indigo-500' 
                                                                     : 'border-gray-300 text-gray-500 dark:border-gray-600 dark:text-gray-400 group-hover:border-gray-400'
@@ -87,7 +87,7 @@ export default function LessonViewer({ course, currentLesson, lessonContent }: L
                                 {/* Navigation buttons would go here (Previous / Next) */}
                                 <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">{__('general.previous_lesson')}</button>
                                 
-                                <button className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none transition-colors flex items-center">{__('general.mark_as_complete_next')}<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                                <button className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none transition-colors flex items-center">{__('general.mark_as_complete_next')}<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ms-2" viewBox="0 0 20 20" fill="currentColor">
                                         <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
                                     </svg>
                                 </button>

@@ -139,7 +139,7 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
                                 <span className="text-xs text-gray-500">{new Date(note.created_at).toLocaleString()}</span>
                             </div>
                             <div className="flex space-x-2 items-center">
-                                {note.is_pinned && <span className="px-2 py-1 text-xs bg-slate-800 text-white rounded font-bold uppercase tracking-wider">Pinned</span>}
+                                {note.is_pinned && <span className="px-2 py-1 text-xs bg-slate-800 text-white rounded font-bold uppercase tracking-wider">{__('general.pinned')}</span>}
                                 <span className="px-2 py-1 text-xs bg-slate-100 text-slate-700 rounded capitalize font-medium flex items-center gap-1">
                                     {getCategoryIcon(note.category)}
                                     {note.category}
@@ -156,8 +156,7 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
                                             {note.category === 'archived' ? 'Unarchive' : 'Archive'}
                                         </button>
                                         <button onClick={() => handleDelete(note.id)} className="block w-full text-start px-4 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2">
-                                            <Trash2 size={12} /> Delete
-                                        </button>
+                                            <Trash2 size={12} /> {__('general.delete')}</button>
                                     </div>
                                 </div>
                             </div>
@@ -196,7 +195,7 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
                         <select className="border-slate-300 rounded-[8px] text-sm focus:border-slate-900 focus:ring-slate-900" value={category} onChange={e => setCategory(e.target.value)} disabled={loading}>
                             <option value="notes">{__('general.general_notes')}</option>
                             <option value="password">{__('general.password_credentials')}</option>
-                            <option value="anydesk">AnyDesk</option>
+                            <option value="anydesk">{__('general.anydesk')}</option>
                         </select>
                         <button type="submit" disabled={loading || !content.trim() || !title.trim()} className="w-full px-4 py-2 bg-slate-900 text-white text-sm font-bold rounded-[8px] hover:bg-slate-800 disabled:opacity-50 font-sora">
                             {loading ? 'Adding...' : 'Add Note'}

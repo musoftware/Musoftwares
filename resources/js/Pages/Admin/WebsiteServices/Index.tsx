@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Plus, MoreHorizontal, Edit, Trash } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ services }: { services: any[] }) {
     return (
@@ -12,25 +13,25 @@ export default function Index({ services }: { services: any[] }) {
             header="Website Services"
             actions={
                 <Link href={route('admin.website-services.create')}>
-                    <Button><Plus className="w-4 h-4 me-2" /> Add Service</Button>
+                    <Button><Plus className="w-4 h-4 me-2" /> {__('general.add_service')}</Button>
                 </Link>
             }
         >
-            <Head title="Website Services" />
+            <Head title={__('general.website_services')} />
             <div className="bg-white rounded-xl shadow-sm border border-slate-200">
                 <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead>Icon/Image</TableHead>
-                            <TableHead>Title</TableHead>
-                            <TableHead>Subtitle</TableHead>
-                            <TableHead className="text-end">Actions</TableHead>
+                            <TableHead>{__('general.title')}</TableHead>
+                            <TableHead>{__('general.subtitle')}</TableHead>
+                            <TableHead className="text-end">{__('general.actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {services.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={4} className="text-center py-8 text-slate-500">No services found.</TableCell>
+                                <TableCell colSpan={4} className="text-center py-8 text-slate-500">{__('general.no_services_found')}</TableCell>
                             </TableRow>
                         ) : (
                             services.map((service) => (
@@ -48,20 +49,18 @@ export default function Index({ services }: { services: any[] }) {
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" className="h-8 w-8 p-0">
-                                                    <span className="sr-only">Open menu</span>
+                                                    <span className="sr-only">{__('general.open_menu')}</span>
                                                     <MoreHorizontal className="h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem asChild>
                                                     <Link href={route('admin.website-services.edit', service.id)} className="flex items-center">
-                                                        <Edit className="w-4 h-4 me-2" /> Edit
-                                                    </Link>
+                                                        <Edit className="w-4 h-4 me-2" /> {__('general.edit')}</Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem asChild className="text-red-600 focus:bg-red-50 focus:text-red-700">
                                                     <Link href={route('admin.website-services.destroy', service.id)} method="delete" as="button" className="w-full flex items-center">
-                                                        <Trash className="w-4 h-4 me-2" /> Delete
-                                                    </Link>
+                                                        <Trash className="w-4 h-4 me-2" /> {__('general.delete')}</Link>
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>

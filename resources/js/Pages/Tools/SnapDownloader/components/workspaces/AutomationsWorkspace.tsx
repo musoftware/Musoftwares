@@ -12,8 +12,8 @@ export function AutomationsWorkspace({
     loadAll,
     automations
 }: {
-    callRPC: (action: string, data?: any) => Promise<any>;
-    loadAll: () => Promise<void>;
+    callRPC: (action: string, data?: any) => {__('general.promise')}<any>;
+    loadAll: () => {__('general.promise')}<void>;
     automations: any[];
 }) {
     const [autoForm, setAutoForm] = useState({

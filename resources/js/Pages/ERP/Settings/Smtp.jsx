@@ -148,7 +148,7 @@ export default function Smtp({ smtp }) {
                                 >
                                     <option value="tls">TLS</option>
                                     <option value="ssl">SSL</option>
-                                    <option value="">None</option>
+                                    <option value="">{__('general.none')}</option>
                                 </select>
                                 {errors.encryption && <p className="text-xs text-destructive">{errors.encryption}</p>}
                             </div>

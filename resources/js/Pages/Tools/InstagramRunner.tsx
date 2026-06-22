@@ -47,7 +47,7 @@ function UserCard({ user, idx }: { user: any; idx: number }) {
             </div>
             <div className="flex-1 grid grid-cols-2 md:grid-cols-7 gap-3 min-w-0 items-center">
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Username</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.username')}</p>
                     <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1">
                         @{user.username || '—'}
                         {user.is_verified ? <BadgeCheck className="w-3 h-3 text-blue-500 shrink-0" /> : null}
@@ -58,29 +58,28 @@ function UserCard({ user, idx }: { user: any; idx: number }) {
                     <p className="text-xs text-slate-600 dark:text-slate-400 truncate">{user.full_name || '—'}</p>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Email</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.email')}</p>
                     <p className="text-xs text-slate-600 dark:text-slate-400 truncate" title={user.email}>{user.email || '—'}</p>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Phone</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.phone')}</p>
                     <p className="text-xs text-slate-600 dark:text-slate-400 truncate">{user.phone || '—'}</p>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Privacy</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.privacy')}</p>
                     <p className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                        {user.is_private ? <><Lock className="w-3 h-3 text-amber-500" /> Private</> : <><Globe2 className="w-3 h-3 text-emerald-500" /> Public</>}
+                        {user.is_private ? <><Lock className="w-3 h-3 text-amber-500" /> {__('general.private')}</> : <><Globe2 className="w-3 h-3 text-emerald-500" /> {__('general.public')}</>}
                     </p>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Source</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.source')}</p>
                     <Badge variant="outline" className="text-[9px] font-bold uppercase px-1.5 py-0">{user.source_type || '—'}</Badge>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Profile</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.profile')}</p>
                     {user.profile_url ? (
                         <a href={user.profile_url} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline truncate block flex items-center gap-1">
-                            <ExternalLink className="w-3 h-3 shrink-0" /> View
-                        </a>
+                            <ExternalLink className="w-3 h-3 shrink-0" /> {__('general.view')}</a>
                     ) : (
                         <p className="text-xs text-slate-500">—</p>
                     )}
@@ -733,7 +732,7 @@ export default function InstagramRunner({ tool }: any) {
 
                                 {/* Target */}
                                 <div className="md:col-span-2">
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Target</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.target')}</label>
                                     <div className="relative">
                                         <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
@@ -801,8 +800,7 @@ export default function InstagramRunner({ tool }: any) {
                                         onClick={handleStop}
                                         className="h-11 gap-2 px-6 bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100 hover:text-rose-800 dark:bg-rose-950 dark:border-rose-800 dark:text-rose-300 text-sm font-bold"
                                     >
-                                        <Square className="w-4 h-4" /> Stop
-                                    </Button>
+                                        <Square className="w-4 h-4" /> {__('general.stop')}</Button>
                                 ) : (
                                     <Button
                                         onClick={handleStart}
@@ -822,8 +820,7 @@ export default function InstagramRunner({ tool }: any) {
                                         }}
                                         className="h-11 px-4 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-slate-600 text-sm font-medium"
                                     >
-                                        Clear
-                                    </Button>
+                                        {__('general.clear')}</Button>
                                 )}
                             </div>
 
@@ -855,10 +852,10 @@ export default function InstagramRunner({ tool }: any) {
                         {/* Stats */}
                         {users.length > 0 && (
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-in fade-in duration-300">
-                                <StatCard label="Total" value={users.length} icon={Users} color="bg-purple-50 border-purple-200 dark:bg-purple-950 dark:border-purple-800" />
-                                <StatCard label="Private" value={users.filter((u: any) => u.is_private).length} icon={Lock} />
-                                <StatCard label="Verified" value={users.filter((u: any) => u.is_verified).length} icon={BadgeCheck} color="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800" />
-                                <StatCard label="Type" value={currentType.label} icon={currentType.icon} />
+                                <StatCard label={__('general.total')} value={users.length} icon={Users} color="bg-purple-50 border-purple-200 dark:bg-purple-950 dark:border-purple-800" />
+                                <StatCard label={__('general.private')} value={users.filter((u: any) => u.is_private).length} icon={Lock} />
+                                <StatCard label={__('general.verified')} value={users.filter((u: any) => u.is_verified).length} icon={BadgeCheck} color="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800" />
+                                <StatCard label={__('general.type')} value={currentType.label} icon={currentType.icon} />
                             </div>
                         )}
 
@@ -917,8 +914,7 @@ export default function InstagramRunner({ tool }: any) {
                                                     onClick={() => handleResume(selectedCampaign)}
                                                     className="h-8 gap-1.5 px-3 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold"
                                                 >
-                                                    <Play className="w-3 h-3" /> Resume
-                                                </Button>
+                                                    <Play className="w-3 h-3" /> {__('general.resume')}</Button>
                                             )}
                                             {statusBadge(selectedCampaign.status)}
                                         </div>
@@ -926,10 +922,10 @@ export default function InstagramRunner({ tool }: any) {
 
                                     {campaignUsers.length > 0 && (
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
-                                            <StatCard label="Total" value={campaignUsers.length} icon={Users} color="bg-purple-50 border-purple-200 dark:bg-purple-950 dark:border-purple-800" />
-                                            <StatCard label="Private" value={campaignUsers.filter(u => u.is_private).length} icon={Lock} />
-                                            <StatCard label="Verified" value={campaignUsers.filter(u => u.is_verified).length} icon={BadgeCheck} color="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800" />
-                                            <StatCard label="Type" value={selectedCampaign.type} icon={Hash} />
+                                            <StatCard label={__('general.total')} value={campaignUsers.length} icon={Users} color="bg-purple-50 border-purple-200 dark:bg-purple-950 dark:border-purple-800" />
+                                            <StatCard label={__('general.private')} value={campaignUsers.filter(u => u.is_private).length} icon={Lock} />
+                                            <StatCard label={__('general.verified')} value={campaignUsers.filter(u => u.is_verified).length} icon={BadgeCheck} color="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800" />
+                                            <StatCard label={__('general.type')} value={selectedCampaign.type} icon={Hash} />
                                         </div>
                                     )}
                                 </div>
@@ -963,8 +959,7 @@ export default function InstagramRunner({ tool }: any) {
                                         disabled={loadingCampaigns}
                                         className="h-8 gap-1.5 text-xs font-bold"
                                     >
-                                        <RefreshCw className={`w-3.5 h-3.5 ${loadingCampaigns ? 'animate-spin' : ''}`} /> Refresh
-                                    </Button>
+                                        <RefreshCw className={`w-3.5 h-3.5 ${loadingCampaigns ? 'animate-spin' : ''}`} /> {__('general.refresh')}</Button>
                                 </div>
 
                                 {loadingCampaigns && campaigns.length === 0 ? (
