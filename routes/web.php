@@ -518,6 +518,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/users/create', [\App\Http\Controllers\Admin\UsersController::class, 'create'])->name('users.create');
     Route::post('/users', [\App\Http\Controllers\Admin\UsersController::class, 'store'])->name('users.store');
     Route::get('/users/problematic', [\App\Http\Controllers\Admin\UsersController::class, 'problematic'])->name('users.problematic');
+    Route::get('/users/co-work', [\App\Http\Controllers\Admin\UsersController::class, 'coWork'])->name('users.co-work');
+    Route::get('/users/earning-analyze', [\App\Http\Controllers\Admin\UsersController::class, 'earningAnalyze'])->name('users.earning-analyze');
     Route::get('/users/legacy-coworker/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'showLegacyCoWorker'])->name('users.legacy-coworker.show');
     Route::get('/users/legacy-coworker/{id}/edit', [\App\Http\Controllers\Admin\UsersController::class, 'editLegacyCoWorker'])->name('users.legacy-coworker.edit');
     Route::put('/users/legacy-coworker/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'updateLegacyCoWorker'])->name('users.legacy-coworker.update');
@@ -1011,9 +1013,5 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::resource('payment-methods', \App\Http\Controllers\Admin\AdminPaymentMethodController::class)->only(['index', 'show', 'update']);
 
     Route::resource('withdraw-requests', \App\Http\Controllers\Admin\AdminWithdrawRequestController::class)->only(['index', 'show', 'update']);
-
-    Route::get('/users/co-work', [\App\Http\Controllers\Admin\UsersController::class, 'coWork'])->name('users.co-work');
-
-    Route::get('/users/earning-analyze', [\App\Http\Controllers\Admin\UsersController::class, 'earningAnalyze'])->name('users.earning-analyze');
 
 });
