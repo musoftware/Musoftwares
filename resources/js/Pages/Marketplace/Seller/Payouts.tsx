@@ -5,6 +5,7 @@ import { formatMoney, formatDate } from '@/lib/utils';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { SellerNav } from '@/Components/Marketplace/Seller/SellerNav';
 
 export default function SellerPayouts({ escrows }: any) {
     return (
@@ -23,6 +24,8 @@ export default function SellerPayouts({ escrows }: any) {
                         </Link>
                     }
                 />
+
+                <SellerNav />
 
                 <OperationalCard noPadding>
                     <div className="divide-y divide-slate-100">

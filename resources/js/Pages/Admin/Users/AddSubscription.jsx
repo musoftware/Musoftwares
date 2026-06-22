@@ -38,7 +38,7 @@ export default function AddSubscription({ user, serviceItems }) {
                 </div>
             </div>
 
-            <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div className="max-w-7xl w-full mx-auto bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <div className="flex items-center gap-3 mb-6 border-b pb-4">
                     <div className="w-10 h-10 rounded-lg bg-slate-900 text-white flex items-center justify-center">
                         <ShieldCheck size={20} />

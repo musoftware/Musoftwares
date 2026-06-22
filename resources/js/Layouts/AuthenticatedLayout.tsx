@@ -223,6 +223,11 @@ function AuthenticatedContent({
                                                                             <Link href={safeRoute('marketplace.dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-violet-50/50 text-slate-600 font-medium">
                                                                                 <Megaphone className="w-4 h-4 text-violet-500" /> {__('general.marketing_suite')}
                                                                             </Link>
+                                                                            {user?.roles?.includes('seller') && (
+                                                                                <Link href={safeRoute('seller.dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-amber-50/50 text-slate-600 font-medium">
+                                                                                    <Building2 className="w-4 h-4 text-amber-500" /> Seller Portal
+                                                                                </Link>
+                                                                            )}
                                                                         </div>
                                                                     </AccordionContent>
                                                                 </AccordionItem>
@@ -766,6 +771,13 @@ function AuthenticatedContent({
                                                         render={<Link href={safeRoute('admin.dashboard')} className="flex items-center w-full font-medium" />}
                                                     >
                                                         <Shield className="me-2 h-4 w-4 text-indigo-600" />{__('general.admin_dashboard')}</DropdownMenuItem>
+                                                )}
+                                                {user?.roles?.includes('seller') && (
+                                                    <DropdownMenuItem 
+                                                        className="cursor-pointer rounded-lg text-sm bg-amber-50 text-amber-700 focus:bg-amber-100 focus:text-amber-800 mb-1"
+                                                        render={<Link href={safeRoute('seller.dashboard')} className="flex items-center w-full font-medium" />}
+                                                    >
+                                                        <Building2 className="me-2 h-4 w-4 text-amber-600" />Seller Portal</DropdownMenuItem>
                                                 )}
                                                 {(user?.roles?.includes('moderator') || user?.roles?.includes('support_agent')) && (
                                                     <DropdownMenuItem 

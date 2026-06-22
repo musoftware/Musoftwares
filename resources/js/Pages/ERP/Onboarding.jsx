@@ -40,7 +40,7 @@ export default function Onboarding({ currencies = [] }) {
     return (
         <ERPLayout title={__('general.configure_erp')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
-            <div className="py-12 px-4 max-w-2xl mx-auto">
+            <div className="py-12 px-4 max-w-7xl w-full mx-auto">
                 <Card className="shadow-none border bg-card text-card-foreground">
                     <CardContent className="p-8">
                         {/* Progress Bar */}

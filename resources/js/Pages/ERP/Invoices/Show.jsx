@@ -66,7 +66,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
     return (
             <div className="min-h-screen bg-background p-4 md:p-8">
                 <Head title={`Invoice ${invoice.invoice_number}`} />
-                <div className="max-w-4xl mx-auto bg-card text-card-foreground shadow-sm rounded-xl overflow-hidden border">
+                <div className="max-w-7xl mx-auto bg-card text-card-foreground shadow-sm rounded-xl overflow-hidden border w-full">
                     {invoice.status === 'paid' ? (
                         <div className="bg-primary/10 text-primary p-4 text-center font-bold flex items-center justify-center gap-2 border-b">
                             <CheckCircle className="h-5 w-5" /> {__('general.paid_on')} <DateDisplay date={invoice.paid_at} />

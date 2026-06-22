@@ -45,7 +45,7 @@ export default function Smtp({ smtp }) {
 
     return (
         <ERPLayout title={__('general.smtp_settings')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
-            <div className="max-w-4xl mx-auto px-4 py-10">
+            <div className="max-w-7xl w-full mx-auto px-4 py-10">
                 <div className="mb-8">
                     <h1 className="text-2xl font-bold tracking-tight">{__('general.email_delivery_smtp')}</h1>
                     <p className="text-muted-foreground mt-1">{__('general.configure_your_smtp_server_to_send_invoices_and_notifications_directly_from_your_own_email_address')}</p>

@@ -122,7 +122,7 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
 
     return (
         <FreelanceLayout>
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-7xl w-full mx-auto">
                 <div className="mb-8">
                     <h2 className="text-3xl font-bold text-gray-900">{__('freelance.post_a_new_job')}</h2>
                     <p className="text-gray-600 mt-2">{__('erp.find_the_right_talent_for')}</p>
