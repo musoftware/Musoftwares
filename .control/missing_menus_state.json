@@ -1,0 +1,104 @@
+[
+    {
+        "id": "root",
+        "name": "Missing Menus & Role Isolations",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "accountant",
+        "name": "1. Accountant Role Isolation",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "acc1",
+        "name": "Update AppSidebar.tsx for Accountant",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "acc2",
+        "name": "Filter items array",
+        "status": "running",
+        "dependencies": []
+    },
+    {
+        "id": "acc3",
+        "name": "Show only 'Invoices', 'Finance & Business', 'Seller & Payout'",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "support",
+        "name": "2. Support Agent Role Isolation",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "sup1",
+        "name": "Update AppSidebar.tsx for Support Agent",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "sup2",
+        "name": "Filter items array",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "sup3",
+        "name": "Show only 'Operations -> Tickets', 'Operations -> Guest Tickets'",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "seller",
+        "name": "3. Seller Dashboard Frontend/Marketplace",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "sel1",
+        "name": "Create dedicated Seller Portal routes",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "sel2",
+        "name": "/seller/dashboard",
+        "status": "pending",
+        "dependencies": [
+            "sel1"
+        ]
+    },
+    {
+        "id": "sel3",
+        "name": "/seller/products",
+        "status": "pending",
+        "dependencies": [
+            "sel1"
+        ]
+    },
+    {
+        "id": "sel4",
+        "name": "/seller/payouts",
+        "status": "pending",
+        "dependencies": [
+            "sel1"
+        ]
+    },
+    {
+        "id": "sel5",
+        "name": "Update AuthenticatedLayout.tsx",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "sel6",
+        "name": "Add Seller Portal link for seller role in Services Mega Menu or User Dropdown",
+        "status": "pending",
+        "dependencies": []
+    }
+]
