@@ -151,8 +151,8 @@ export default function Income({ transactions, filters, filteredUser }) {
         <AdminSidebarLayout title={__('erp.income_transactions')} header={__('erp.transactions')}>
             {filteredUser && <TransactionUserCard user={filteredUser} />}
             
-            <div className="flex justify-between items-center mb-6">
-                <div>
+            <div className="flex justify-end items-center mb-6 gap-4">
+                <div className="flex-1">
                     <h2 className="text-lg font-semibold text-slate-900">{__('erp.income_transactions')}</h2>
                     <p className="text-sm text-slate-500">{__('erp.view_all_income_and_related')}</p>
                 </div>
