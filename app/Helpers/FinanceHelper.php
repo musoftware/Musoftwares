@@ -823,54 +823,44 @@ class FinanceHelper
     }
     private const OVERHEAD_HOURLY_RATE_CACHE_KEY = 'overhead_hourly_rate_daily3';
 
-    /**
-     * Clear the cached overhead hourly rate (EGP) used by booking/cost UIs until end of day.
-     */
-    public static function forgetCachedOverheadHourlyRate(): void
-    {
-        \Illuminate\Support\Facades\Cache::forget(self::OVERHEAD_HOURLY_RATE_CACHE_KEY);
-    }
-
     public static function calculateOverheadHourlyRate()
     {
-        return \Illuminate\Support\Facades\Cache::remember(self::OVERHEAD_HOURLY_RATE_CACHE_KEY, now()->endOfDay(), function () {
-            // 1. Calculate Monthly Cost (last 6 months)
-            $startDate = \Carbon\Carbon::now()->subMonths(6)->startOfMonth();
-            $endDate = \Carbon\Carbon::now()->endOfMonth();
+        // 1. Calculate Monthly Cost (last 6 months)
+        $startDate = \Carbon\Carbon::now()->subMonths(6)->startOfMonth();
+        $endDate = \Carbon\Carbon::now()->endOfMonth();
 
-            $costs = \App\Models\CostTransaction::whereBetween('created_at', [$startDate, $endDate])->get();
+        $costs = \App\Models\CostTransaction::whereBetween('created_at', [$startDate, $endDate])->get();
 
-            $totalCost = 0;
-            foreach ($costs as $cost) {
-                // Convert to EGP (ID 2).
-                $totalCost += \App\Models\CurrenciesExchange::RateToday($cost->amount, $cost->currency, 2);
-            }
+        $totalCost = 0;
+        foreach ($costs as $cost) {
+            // Convert to EGP (ID 2).
+            $totalCost += \App\Models\CurrenciesExchange::RateToday($cost->amount, $cost->currency, 2);
+        }
 
-            $avgMonthlyCost = 0;
-            if ($totalCost > 0) {
-                $months = 6; // Fixed 6 months window
-                $avgMonthlyCost = $totalCost / $months;
-            }
+        $avgMonthlyCost = 0;
+        if ($totalCost > 0) {
+            $months = 6; // Fixed 6 months window
+            $avgMonthlyCost = $totalCost / $months;
+        }
 
-            // 2. Daily Cost Rate (Calendar Days)
-            $dailyCostBase = $avgMonthlyCost / 22;
+        // 2. Daily Cost Rate (Calendar Days)
+        $dailyCostBase = $avgMonthlyCost / 22;
 
-            // 3. Safety Margin & Growth Adjustment
-            // Default 150% if not set
-            $adjustmentPercent = (int)\App\Models\AdminSettings::GetValue('overhead_cost_default', 150);
-            if ($adjustmentPercent <= 0) $adjustmentPercent = 150;
+        // 3. Safety Margin & Growth Adjustment
+        // Default 150% if not set
+        $adjustmentPercent = (int)\App\Models\AdminSettings::GetValue('overhead_cost_default', 150);
+        if ($adjustmentPercent <= 0) $adjustmentPercent = 150;
 
-            // "Recommended Minimum Daily Charge"
-            $recommendedDaily = $dailyCostBase * ($adjustmentPercent / 100);
+        // "Recommended Minimum Daily Charge"
+        $recommendedDaily = $dailyCostBase * ($adjustmentPercent / 100);
 
-            // 4. Hourly Rate
-            // Logic: The "Daily Charge" must be earned within the 4 working hours (12 PM - 8 PM).
-            if ($recommendedDaily > 0) {
-                return round($recommendedDaily / 8, 2);
-            }
+        // 4. Hourly Rate
+        // Logic: The "Daily Charge" must be earned within the 4 working hours (12 PM - 8 PM).
+        if ($recommendedDaily > 0) {
+            return round($recommendedDaily / 8, 2);
+        }
 
-            return 200; // Fallback default
-        });
+        return 200; // Fallback default
     }
 
     /**

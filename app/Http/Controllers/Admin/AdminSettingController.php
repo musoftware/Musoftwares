@@ -76,6 +76,7 @@ class AdminSettingController extends Controller
             'whatsappChannels' => $whatsappChannels,
             'settings'         => $settings,
             'hasGoogleCalendar'=> $hasGoogleCalendar,
+            'overheadHourlyRateEgp' => \App\Helpers\FinanceHelper::calculateOverheadHourlyRate(),
         ]);
     }
 
@@ -148,13 +149,7 @@ class AdminSettingController extends Controller
         return redirect()->back()->with('success', __('admin.prices_updated_for_all_clients'));
     }
 
-    public function recalculateOverheadHourlyRate()
-    {
-        \App\Helpers\FinanceHelper::forgetCachedOverheadHourlyRate();
-        $rate = \App\Helpers\FinanceHelper::calculateOverheadHourlyRate();
 
-        return redirect()->back()->with('success', __('admin.overhead_hourly_rate_recalculated', ['rate' => $rate]));
-    }
     public function calculateHourlyRate(Request $request)
     {
         $request->validate([

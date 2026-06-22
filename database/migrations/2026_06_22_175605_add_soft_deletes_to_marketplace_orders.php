@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('marketplace_orders', function (Blueprint $table) {
-            $table->softDeletes();
-        });
+        if (!Schema::hasColumn('marketplace_orders', 'deleted_at')) {
+            Schema::table('marketplace_orders', function (Blueprint $table) {
+                $table->softDeletes();
+            });
+        }
 
-        Schema::table('marketplace_reviews', function (Blueprint $table) {
-            $table->softDeletes();
-        });
+        if (!Schema::hasColumn('marketplace_reviews', 'deleted_at')) {
+            Schema::table('marketplace_reviews', function (Blueprint $table) {
+                $table->softDeletes();
+            });
+        }
     }
 
     /**
@@ -25,12 +29,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('marketplace_reviews', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        if (Schema::hasColumn('marketplace_reviews', 'deleted_at')) {
+            Schema::table('marketplace_reviews', function (Blueprint $table) {
+                $table->dropSoftDeletes();
+            });
+        }
 
-        Schema::table('marketplace_orders', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        if (Schema::hasColumn('marketplace_orders', 'deleted_at')) {
+            Schema::table('marketplace_orders', function (Blueprint $table) {
+                $table->dropSoftDeletes();
+            });
+        }
     }
 };

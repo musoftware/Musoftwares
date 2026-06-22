@@ -67,8 +67,8 @@ interface SettingsData {
 interface Props {
     currencies: Currency[];
     whatsappChannels: WhatsAppChannel[];
-    settings: SettingsData;
     hasGoogleCalendar?: boolean;
+    overheadHourlyRateEgp: number;
 }
 
 function SectionCard({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
@@ -161,7 +161,7 @@ function Toggle({
     );
 }
 
-export default function Index({ currencies, whatsappChannels, settings, hasGoogleCalendar }: Props) {
+export default function Index({ currencies, whatsappChannels, settings, hasGoogleCalendar, overheadHourlyRateEgp }: Props) {
     const { props } = usePage<any>();
     const flash = props.flash as { success?: string } | undefined;
 
@@ -171,7 +171,6 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
 
     const [computedRate, setComputedRate] = useState<string>('0.00');
 
-    const [recalcConfirmOpen, setRecalcConfirmOpen] = useState(false);
     const [syncConfirmOpen, setSyncConfirmOpen] = useState(false);
 
     useEffect(() => {
@@ -300,7 +299,9 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                         onChange={(e) => set('overhead_cost_default', e.target.value)}
                                         placeholder="150"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">{__('general.the_derived_overhead_hourly_rate_egp_is_cached_use_recalculate_below_if_needed')}</p>
+                                    <p className="text-xs font-semibold text-green-600 mt-1">
+                                        Current Derived Rate: {overheadHourlyRateEgp} EGP / Hour
+                                    </p>
                                 </Field>
                                 <Field label={__('general.max_devices_per_tenant_default')}>
                                     <Input
@@ -569,16 +570,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                     </form>
                 </SectionCard>
 
-                {/* Recalculate Overhead Rate */}
-                <SectionCard title={__('general.overhead_hourly_rate')} icon={RefreshCw}>
-                    <p className="text-sm font-medium text-gray-700 mb-4">{__('general.clears_the_daily_server_cache_and_recomputes_the_overhead_hourly_rate_egp_from_latest_cost_data_last_6_months')}</p>
-                    <form onSubmit={(e) => {
-                        e.preventDefault();
-                        setRecalcConfirmOpen(true);
-                    }} className="space-y-4">
-                        <Button type="submit" variant="outline" className="w-full">{__('general.recalculate_rate')}</Button>
-                    </form>
-                </SectionCard>
+
 
                 {/* Sync Exchange Rates */}
                 <SectionCard title={__('general.exchange_rates_synchronization')} icon={Globe}>
@@ -598,17 +590,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                 </SectionCard>
             </div>
 
-            <ConfirmModal
-                isOpen={recalcConfirmOpen}
-                title={__('general.recalculate_rate') || 'Recalculate Overhead Rate'}
-                description="Are you sure you want to recalculate the overhead hourly rate? This will clear the daily server cache and recompute from the latest cost data."
-                confirmLabel="Yes, Recalculate"
-                onConfirm={() => {
-                    setRecalcConfirmOpen(false);
-                    router.post(route('admin.settings.recalculate-overhead-hourly-rate'));
-                }}
-                onCancel={() => setRecalcConfirmOpen(false)}
-            />
+
 
             <ConfirmModal
                 isOpen={syncConfirmOpen}

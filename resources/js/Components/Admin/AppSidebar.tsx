@@ -119,6 +119,7 @@ const items: MenuItem[] = [
     url: "/admin/seller", 
     icon: CreditCard,
     subItems: [
+        { title: "Payouts", url: "/admin/payouts" },
         { title: "Payment Methods", url: "/admin/payment-methods" },
         { title: "Withdraw Requests", url: "/admin/withdraw-requests" },
         { title: "Earning Analyze", url: "/admin/users/earning-analyze" },
