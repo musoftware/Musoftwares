@@ -16,13 +16,18 @@
             <meta property="og:title" content="{{ $meta['title'] ?? '' }}">
             <meta property="og:description" content="{{ $meta['description'] ?? '' }}">
             <meta property="og:image" content="{{ $meta['image'] ?? '' }}">
-            <meta property="og:url" content="{{ $meta['url'] ?? '' }}">
-            <meta property="og:type" content="website">
+            <meta property="og:url" content="{{ $meta['url'] ?? url()->current() }}">
+            <meta property="og:type" content="{{ $meta['type'] ?? 'website' }}">
+            <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
             <meta name="twitter:card" content="summary_large_image">
             <meta name="twitter:title" content="{{ $meta['title'] ?? '' }}">
             <meta name="twitter:description" content="{{ $meta['description'] ?? '' }}">
             <meta name="twitter:image" content="{{ $meta['image'] ?? '' }}">
             <link rel="canonical" href="{{ $meta['url'] ?? url()->current() }}">
+            <meta name="robots" content="{{ $meta['robots'] ?? 'index, follow' }}">
+        @else
+            <meta name="robots" content="index, follow">
+            <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
         @endif
 
         @php
@@ -86,8 +91,9 @@
         <link rel="apple-touch-icon" href="/icons/pwa-192.png">
 
         <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+        <link rel="preload" href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+        <noscript><link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" /></noscript>
 
         <!-- Scripts -->
         @php

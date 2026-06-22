@@ -118,13 +118,8 @@
     color: var(--text-primary);
     font-family: var(--font-sans);
   }
-  /* Global transition requested */
-  *, ::before, ::after {
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-    /* Smooth, professional ease-out curve */
-    transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
-    transition-duration: 300ms;
-  }
+  /* Global transition on ALL elements removed to prevent extreme performance bottlenecks and layout thrashing. */
+  /* If you need transitions, use Tailwind's transition utilities (e.g., transition-colors, transition-all) on specific elements. */
 }
 
 @layer utilities {

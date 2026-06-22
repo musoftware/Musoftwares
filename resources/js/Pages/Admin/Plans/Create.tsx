@@ -90,7 +90,7 @@ export default function Create({ services }) {
         >
             <Head title={__('admin.add_subscription')} />
 
-            <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
+            <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-7xl">
                 {/* User Selection */}
                 <Card>
                     <CardHeader>
@@ -98,7 +98,7 @@ export default function Create({ services }) {
                         <CardDescription>{__('admin.select_user_to_assign_subscription')}</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="max-w-md space-y-2">
+                        <div className="w-full max-w-7xl space-y-2">
                             <Label htmlFor="user_id">{__('admin.user')}</Label>
                             <AsyncCombobox
                                 endpoint={route('admin.plans.search-users')}
@@ -127,11 +127,11 @@ export default function Create({ services }) {
                                         key={service.id}
                                         onClick={() => handleServiceSelect(service.id)}
                                         className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 flex flex-col gap-3 ${
-                                            isSelected ? 'border-blue-600 bg-blue-50/50' : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                                            isSelected ? 'border-slate-900 bg-slate-100/50' : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
                                         }`}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${isSelected ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                                            <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${isSelected ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-600'}`}>
                                                 <Icon className="h-5 w-5" />
                                             </div>
                                             <div>

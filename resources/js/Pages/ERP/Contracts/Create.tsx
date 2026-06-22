@@ -36,7 +36,7 @@ export default function CreateContract({ clients = [] }: { clients?: any[] }) {
     return (
         <ERPLayout title={__('general.draft_contract')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">
                     <Link href={route('erp.dashboard', { section: 'documents' })} className="text-slate-400 hover:text-slate-900 transition-colors">
                         <ArrowLeft className="w-5 h-5" />

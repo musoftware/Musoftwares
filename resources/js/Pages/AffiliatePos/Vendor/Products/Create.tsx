@@ -21,7 +21,7 @@ export default function VendorProductsCreate() {
     };
 
     return (
-        <div className="p-6 max-w-4xl mx-auto space-y-6 font-sans">
+        <div className="p-6 w-full max-w-7xl mx-auto space-y-6 font-sans">
             <Head title={__('general.add_product')} />
 
             <div className="flex items-center gap-4">
@@ -96,7 +96,7 @@ export default function VendorProductsCreate() {
                 <div className="flex justify-end gap-3">
                     <Button type="button" variant="outline" onClick={() => window.history.back()} disabled={processing}>
                         {__('general.cancel')}</Button>
-                    <Button type="submit" className="bg-blue-600 hover:bg-blue-700 shadow-md" disabled={processing}>
+                    <Button type="submit" className="bg-slate-900 hover:bg-slate-900 shadow-md" disabled={processing}>
                         <Save className="w-4 h-4 me-2" />{__('general.save_product')}</Button>
                 </div>
             </form>

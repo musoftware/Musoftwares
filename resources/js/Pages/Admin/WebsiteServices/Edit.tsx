@@ -34,7 +34,7 @@ export default function Edit({ service }: { service: any }) {
     return (
         <AdminSidebarLayout header="Edit Service">
             <Head title={__('general.edit_service')} />
-            <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div className="w-full max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                 <form onSubmit={submit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">

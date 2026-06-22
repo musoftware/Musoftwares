@@ -10,8 +10,8 @@ import {
 import { Button } from '@/Components/ui/button';
 import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
 import { Separator } from '@/Components/ui/separator';
-import {
 import { __ } from '@/lib/i18n';
+import {
     Wallet,
     FileText,
     FilePlus,

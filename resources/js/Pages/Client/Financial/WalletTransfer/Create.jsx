@@ -132,7 +132,7 @@ export default function Create({ user, wallet }) {
         <AuthenticatedLayout header="Send Wallet Funds">
             <Head title={__('general.send_transfer')} />
 
-            <div className="max-w-[700px] mx-auto px-4 py-8 space-y-8">
+            <div className="w-full max-w-7xl mx-auto px-4 py-8 space-y-8">
                 
                 {/* Header with back link */}
                 <div className="flex items-center justify-between">
@@ -199,7 +199,7 @@ export default function Create({ user, wallet }) {
                                     ) : searchResults.length > 0 ? (
                                         <div className="border rounded-lg divide-y bg-background shadow-sm max-h-[300px] overflow-y-auto">
                                             {searchResults.map((userMatch) => (
-                                                <button
+                                                <Button
                                                     key={userMatch.id}
                                                     type="button"
                                                     className="w-full px-4 py-3 flex items-center justify-between text-start hover:bg-muted/30 transition-colors"
@@ -210,7 +210,7 @@ export default function Create({ user, wallet }) {
                                                         <span className="text-xs text-muted-foreground">{userMatch.email}</span>
                                                     </div>
                                                     <ArrowRight className="w-4 h-4 text-muted-foreground" />
-                                                </button>
+                                                </Button>
                                             ))}
                                         </div>
                                     ) : searchQuery.length >= 5 ? (

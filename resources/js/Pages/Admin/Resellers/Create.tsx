@@ -59,7 +59,7 @@ export default function ResellersCreate() {
     return (
         <WorkspaceLayout title={__('general.new_reseller')} workspaceName="Musoftware Admin" tenantId="SYS-ADMIN" menuItems={menuItems}>
             <Head title={__('general.new_reseller')} />
-            <div className="max-w-2xl mx-auto space-y-6">
+            <div className="w-full max-w-7xl mx-auto space-y-6">
                 <ModulePageHeader
                     title={__('general.create_reseller_account')}
                     description={__('general.designate_a_platform_user_as_a_reseller_they_ll_get_a_unique_portal_url_for_their_sub_users')}
@@ -83,7 +83,7 @@ export default function ResellersCreate() {
                             {userResults.length > 0 && (
                                 <div className="border border-border rounded-lg shadow-sm bg-surface overflow-hidden">
                                     {userResults.map((u: any) => (
-                                        <button
+                                        <Button
                                             key={u.id}
                                             type="button"
                                             onClick={() => selectUser(u)}
@@ -96,7 +96,7 @@ export default function ResellersCreate() {
                                                 <p className="text-sm font-semibold text-text-primary">{u.name}</p>
                                                 <p className="text-xs text-text-muted">{u.email}</p>
                                             </div>
-                                        </button>
+                                        </Button>
                                     ))}
                                 </div>
                             )}

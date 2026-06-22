@@ -30,7 +30,7 @@ interface Template {
 interface Props {
     t: any;
     locale: 'en' | 'ar';
-    callRPC: (action: string, data?: any) => {__('general.promise')}<any>;
+    callRPC: (action: string, data?: any) => Promise<any>;
     onUseTemplate?: (template: Template) => void;
     onTemplatesChange?: (templates: Template[]) => void;
     initialEditTemplateId?: string | null;
@@ -1002,3 +1002,4 @@ export default function TemplatesWorkspace({
         </div>
     );
 }
+

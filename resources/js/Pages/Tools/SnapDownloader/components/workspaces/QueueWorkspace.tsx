@@ -13,8 +13,8 @@ export function QueueWorkspace({
     loadAll
 }: {
     queue: QueueJob[];
-    callRPC: (action: string, data?: any) => {__('general.promise')}<any>;
-    loadAll: () => {__('general.promise')}<void>;
+    callRPC: (action: string, data?: any) => Promise<any>;
+    loadAll: () => Promise<void>;
 }) {
     const handleQueueRemove = async (jobId: string) => {
         try { await callRPC('queue_remove', { jobId }); loadAll(); }
@@ -77,3 +77,4 @@ export function QueueWorkspace({
         </div>
     );
 }
+

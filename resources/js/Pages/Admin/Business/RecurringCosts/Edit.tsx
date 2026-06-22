@@ -75,7 +75,7 @@ export default function Edit({ cost, currencies, categories }) {
                     <ArrowLeft className="w-4 h-4" />{__('general.back_to_recurring_costs')}</Link>
             </div>
 
-            <div className="bg-white border rounded-xl shadow-sm max-w-2xl overflow-hidden">
+            <div className="bg-white border rounded-xl shadow-sm w-full max-w-7xl overflow-hidden">
                 <div className="border-b px-6 py-4 bg-slate-50">
                     <h2 className="text-lg font-bold text-slate-900">{__('general.edit_recurring_cost_details')}</h2>
                     <p className="text-sm text-gray-500 mt-0.5">{__('general.modify_the_parameters_for_this_recurring_automated_expense')}</p>

@@ -22,7 +22,7 @@ interface PipelineState {
     stages: PipelineStage[];
     isLoading: boolean;
     setStages: (stages: PipelineStage[]) => void;
-    fetchPipeline: () => {__('general.promise')}<void>;
+    fetchPipeline: () => Promise<void>;
     moveLead: (leadId: number, sourceStageId: number, destStageId: number, destinationIndex: number) => void;
 }
 
@@ -77,3 +77,4 @@ export const usePipelineStore = create<PipelineState>((set, get) => ({
         });
     }
 }));
+

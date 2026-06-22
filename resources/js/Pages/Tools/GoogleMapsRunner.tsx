@@ -44,7 +44,7 @@ function NewCampaignModal({
 }: {
     onClose: () => void;
     onCreated: (c: any) => void;
-    callRPC: (a: string, d?: any) => {__('general.promise')}<any>;
+    callRPC: (a: string, d?: any) => Promise<any>;
 }) {
     const [name, setName]           = useState('');
     const [keyword, setKeyword]     = useState('');
@@ -196,7 +196,7 @@ function NewCampaignModal({
 }
 
 // ── Settings Panel ────────────────────────────────────────────────────────────
-function SettingsPanel({ callRPC }: { callRPC: (a: string, d?: any) => {__('general.promise')}<any> }) {
+function SettingsPanel({ callRPC }: { callRPC: (a: string, d?: any) => Promise<any> }) {
     const [settings, setSettings]   = useState<any>(null);
     const [proxiesText, setProxies] = useState('');
     const [saving, setSaving]       = useState(false);
@@ -931,3 +931,4 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
         </div>
     );
 }
+

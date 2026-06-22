@@ -36,7 +36,7 @@ export default function Create() {
                 <span>{__('freelance.create_job')}</span>
             </div>
         }>
-            <div className="space-y-6 max-w-4xl mx-auto">
+            <div className="space-y-6 w-full max-w-7xl mx-auto">
 
                 <form onSubmit={submit}>
                     <Card className="shadow-sm border-slate-200">
@@ -78,7 +78,7 @@ export default function Create() {
                                         value={data.title}
                                         onChange={(e) => setData('title', e.target.value)}
                                         placeholder={__('freelance.job_title_placeholder', undefined, 'e.g. Build an E-commerce Website')}
-                                        className="h-10 transition-shadow focus-visible:ring-indigo-500/20 focus-visible:border-indigo-500"
+                                        className="h-10 transition-shadow focus-visible:ring-slate-800/20 focus-visible:border-slate-800"
                                     />
                                     {errors.title && <p className="text-[13px] text-rose-500 font-medium">{errors.title}</p>}
                                 </div>
@@ -111,7 +111,7 @@ export default function Create() {
                                         value={data.budget}
                                         onChange={(e) => setData('budget', e.target.value)}
                                         placeholder="0.00"
-                                        className="h-10 transition-shadow focus-visible:ring-indigo-500/20 focus-visible:border-indigo-500"
+                                        className="h-10 transition-shadow focus-visible:ring-slate-800/20 focus-visible:border-slate-800"
                                     />
                                     {errors.budget && <p className="text-[13px] text-rose-500 font-medium">{errors.budget}</p>}
                                 </div>
@@ -125,7 +125,7 @@ export default function Create() {
                                         value={data.duration}
                                         onChange={(e) => setData('duration', e.target.value)}
                                         placeholder={__('freelance.duration_placeholder', undefined, 'e.g. 2-4 weeks, Less than 1 month')}
-                                        className="h-10 transition-shadow focus-visible:ring-indigo-500/20 focus-visible:border-indigo-500"
+                                        className="h-10 transition-shadow focus-visible:ring-slate-800/20 focus-visible:border-slate-800"
                                     />
                                     {errors.duration && <p className="text-[13px] text-rose-500 font-medium">{errors.duration}</p>}
                                 </div>
@@ -140,7 +140,7 @@ export default function Create() {
                                         onChange={(e) => setData('description', e.target.value)}
                                         placeholder={__('freelance.job_description_placeholder', undefined, 'Describe the job requirements in detail...')}
                                         rows={6}
-                                        className="resize-none transition-shadow focus-visible:ring-indigo-500/20 focus-visible:border-indigo-500"
+                                        className="resize-none transition-shadow focus-visible:ring-slate-800/20 focus-visible:border-slate-800"
                                     />
                                     {errors.description && <p className="text-[13px] text-rose-500 font-medium">{errors.description}</p>}
                                 </div>
