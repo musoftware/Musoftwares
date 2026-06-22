@@ -26,11 +26,11 @@ export default function Index({ webhooks }: Props) {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'processed':
-                return <Badge className="bg-emerald-100 text-emerald-800"><CheckCircle2 className="w-3 h-3 me-1" /> {__('general.processed')}</Badge>;
+                return <Badge className="bg-green-100 text-green-800"><CheckCircle2 className="w-3 h-3 me-1" /> {__('general.processed')}</Badge>;
             case 'failed':
-                return <Badge className="bg-rose-100 text-rose-800"><XCircle className="w-3 h-3 me-1" /> {__('general.failed')}</Badge>;
+                return <Badge className="bg-red-100 text-red-800"><XCircle className="w-3 h-3 me-1" /> {__('general.failed')}</Badge>;
             default:
-                return <Badge className="bg-amber-100 text-amber-800"><Clock className="w-3 h-3 me-1" /> {__('general.pending')}</Badge>;
+                return <Badge className="bg-yellow-100 text-yellow-800"><Clock className="w-3 h-3 me-1" /> {__('general.pending')}</Badge>;
         }
     };
 
@@ -77,7 +77,7 @@ export default function Index({ webhooks }: Props) {
                                                 <td className="px-6 py-4 text-end">
                                                     <Link 
                                                         href={route('admin.settings.incoming-webhooks.show', webhook.id)}
-                                                        className="inline-flex items-center text-slate-900 hover:text-indigo-900"
+                                                        className="inline-flex items-center text-slate-900 hover:text-slate-900"
                                                     >
                                                         <Eye className="w-4 h-4 me-1" /> {__('general.view')}</Link>
                                                 </td>

@@ -84,21 +84,21 @@ const renderMarkdown = (text: string) => {
 
 /* ─── Maps ──────────────────────────────────────────────────── */
 const STATUS_STYLES: Record<string, { badge: string; dot: string; label: string }> = {
-    open:          { badge: 'bg-blue-100 text-blue-800 ring-blue-200',       dot: 'bg-slate-900',    label: 'Open' },
-    agent_replied: { badge: 'bg-amber-100 text-amber-800 ring-amber-200',    dot: 'bg-amber-500',   label: 'Agent Replied' },
-    user_replied:  { badge: 'bg-violet-100 text-violet-800 ring-violet-200', dot: 'bg-violet-500',  label: 'User Replied' },
-    closed:        { badge: 'bg-emerald-100 text-emerald-800 ring-emerald-200', dot: 'bg-slate-900', label: 'Resolved' },
+    open:          { badge: 'bg-slate-50 text-slate-900 ring-slate-200',       dot: 'bg-slate-900',    label: 'Open' },
+    agent_replied: { badge: 'bg-yellow-100 text-yellow-800 ring-yellow-200',    dot: 'bg-yellow-600',   label: 'Agent Replied' },
+    user_replied:  { badge: 'bg-slate-50 text-slate-900 ring-slate-200', dot: 'bg-slate-900',  label: 'User Replied' },
+    closed:        { badge: 'bg-green-100 text-green-800 ring-green-200', dot: 'bg-slate-900', label: 'Resolved' },
 };
 
 const PRIORITY_STYLES: Record<string, { badge: string; icon: string }> = {
     high:   { badge: 'bg-red-100 text-red-700 ring-red-200',         icon: '🔴' },
-    medium: { badge: 'bg-orange-100 text-orange-700 ring-orange-200', icon: '🟡' },
+    medium: { badge: 'bg-yellow-100 text-yellow-700 ring-yellow-200', icon: '🟡' },
     low:    { badge: 'bg-slate-100 text-slate-600 ring-slate-200',   icon: '🟢' },
 };
 
 const AVATAR_COLORS = [
-    'bg-violet-500', 'bg-slate-900', 'bg-slate-900',
-    'bg-slate-900',   'bg-amber-500', 'bg-slate-900',
+    'bg-slate-900', 'bg-slate-900', 'bg-slate-900',
+    'bg-slate-900',   'bg-yellow-600', 'bg-slate-900',
 ];
 
 /* ─── Avatar ────────────────────────────────────────────────── */
@@ -265,11 +265,11 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                     </span>
                     {!isClosed ? (
                         <Button size="sm" variant="outline" onClick={() => setCloseModalOpen(true)}
-                            className="border-emerald-200 text-slate-900 hover:bg-emerald-50">
+                            className="border-green-200 text-slate-900 hover:bg-green-50">
                             <CheckCircle className="me-1.5 h-4 w-4" />{__('general.close_ticket')}</Button>
                     ) : (
                         <Button size="sm" variant="outline" onClick={handleReopen}
-                            className="border-amber-200 text-amber-700 hover:bg-amber-50">
+                            className="border-yellow-200 text-yellow-700 hover:bg-yellow-50">
                             <RotateCcw className="me-1.5 h-4 w-4" /> {__('general.reopen')}</Button>
                     )}
                 </div>
@@ -283,8 +283,8 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                 </div>
             )}
             {ticket.needs_attention && !ticket.is_urgent && !isClosed && (
-                <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                    <AlertTriangle className="h-4 w-4 flex-shrink-0 text-amber-500" />
+                <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-700">
+                    <AlertTriangle className="h-4 w-4 flex-shrink-0 text-yellow-600" />
                     <span>{__('general.this_ticket_needs_attention_the_client_is_waiting_for_a_reply')}</span>
                 </div>
             )}
@@ -359,7 +359,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                             // Style differences for Internal Notes
                             const isInternal = msg.is_internal;
                             const bubbleBg = isInternal 
-                                ? 'bg-amber-50 border border-amber-200 text-amber-900 rounded-te-none' 
+                                ? 'bg-yellow-50 border border-yellow-200 text-yellow-900 rounded-te-none' 
                                 : isAdminMsg
                                     ? 'bg-slate-900 text-white rounded-te-none'
                                     : 'bg-white border border-slate-200 text-slate-800 rounded-ts-none';
@@ -373,10 +373,10 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                                 {msg.sender?.name ?? 'Unknown'}
                                             </span>
                                             {isAdminMsg && (
-                                                <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold text-slate-900">{__('general.support_agent')}</span>
+                                                <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-900">{__('general.support_agent')}</span>
                                             )}
                                             {isInternal && (
-                                                <span className="flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                                                <span className="flex items-center gap-1 rounded-full bg-yellow-100 px-2 py-0.5 text-[10px] font-semibold text-yellow-700">
                                                     <Lock className="h-3 w-3" />{__('general.private_note')}</span>
                                             )}
                                             <span className="text-[10px] text-slate-400" title={fullDate(msg.created_at)}>
@@ -397,10 +397,10 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
 
                     {/* Reply composer */}
                     {!isClosed ? (
-                        <div className={`rounded-2xl border transition-colors shadow-sm overflow-hidden ${isInternal ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'}`}>
-                            <div className={`border-b px-5 py-3 flex items-center justify-between ${isInternal ? 'border-amber-200' : 'border-slate-100'}`}>
+                        <div className={`rounded-2xl border transition-colors shadow-sm overflow-hidden ${isInternal ? 'border-yellow-300 bg-yellow-50' : 'border-slate-200 bg-white'}`}>
+                            <div className={`border-b px-5 py-3 flex items-center justify-between ${isInternal ? 'border-yellow-200' : 'border-slate-100'}`}>
                                 <span className="text-xs font-semibold uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                                    {isInternal ? <Lock className="h-3.5 w-3.5 text-amber-500" /> : <MessageSquare className="h-3.5 w-3.5" />}
+                                    {isInternal ? <Lock className="h-3.5 w-3.5 text-yellow-600" /> : <MessageSquare className="h-3.5 w-3.5" />}
                                     {isInternal ? 'Internal Note (Hidden from client)' : 'Reply to Client'}
                                 </span>
                                 <div className="flex items-center gap-2">
@@ -409,7 +409,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                             type="checkbox" 
                                             checked={isInternal}
                                             onChange={(e) => setIsInternal(e.target.checked)}
-                                            className="rounded text-amber-500 border-slate-300 focus:ring-amber-500 h-3.5 w-3.5"
+                                            className="rounded text-yellow-600 border-slate-300 focus:ring-yellow-500 h-3.5 w-3.5"
                                         />{__('general.internal_note')}</label>
                                 </div>
                             </div>
@@ -419,7 +419,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                 {cannedResponses.length > 0 && !isInternal && (
                                     <div className="flex justify-end mb-1">
                                         <select 
-                                            className="text-xs border-slate-200 rounded-lg py-1 ps-2 pe-6 text-slate-600 bg-slate-50 focus:ring-indigo-200"
+                                            className="text-xs border-slate-200 rounded-lg py-1 ps-2 pe-6 text-slate-600 bg-slate-50 focus:ring-slate-200"
                                             onChange={insertCannedResponse}
                                             defaultValue=""
                                         >
@@ -434,8 +434,8 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                 <textarea
                                     className={`w-full rounded-xl border px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:ring-2 resize-none transition-all outline-none ${
                                         isInternal 
-                                            ? 'bg-amber-100/50 border-amber-200 focus:border-amber-400 focus:ring-amber-100 focus:bg-white' 
-                                            : 'bg-slate-50 border-slate-200 focus:border-indigo-400 focus:ring-indigo-100 focus:bg-white'
+                                            ? 'bg-yellow-100/50 border-yellow-200 focus:border-yellow-400 focus:ring-yellow-100 focus:bg-white' 
+                                            : 'bg-slate-50 border-slate-200 focus:border-slate-500 focus:ring-slate-50 focus:bg-white'
                                     }`}
                                     rows={5}
                                     placeholder={isInternal ? "Type an internal note for the team..." : "Type your reply... (Markdown supported. Ctrl+Enter to send)"}
@@ -483,7 +483,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                             disabled={submitting || (!replyBody.trim() && attachments.length === 0)}
                                             className={`text-white min-w-[110px] ${
                                                 isInternal 
-                                                    ? 'bg-amber-600 hover:bg-amber-700' 
+                                                    ? 'bg-yellow-600 hover:bg-yellow-700' 
                                                     : 'bg-slate-900 hover:bg-slate-900'
                                             }`}
                                         >
@@ -504,16 +504,16 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                             </form>
                         </div>
                     ) : (
-                        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 flex items-center gap-3">
+                        <div className="rounded-2xl border border-green-200 bg-green-50 px-6 py-4 flex items-center gap-3">
                             <CheckCircle className="h-5 w-5 text-slate-900 flex-shrink-0" />
                             <div>
-                                <p className="text-sm font-semibold text-emerald-800">{__('general.this_ticket_has_been_resolved')}</p>
+                                <p className="text-sm font-semibold text-green-800">{__('general.this_ticket_has_been_resolved')}</p>
                                 {ticket.closed_at && (
                                     <p className="text-xs text-slate-900 mt-0.5">Closed on {fullDate(ticket.closed_at)}</p>
                                 )}
                                 <button
                                     onClick={handleReopen}
-                                    className="mt-1 text-xs text-slate-900 underline underline-offset-2 hover:text-emerald-900"
+                                    className="mt-1 text-xs text-slate-900 underline underline-offset-2 hover:text-green-900"
                                 >{__('general.reopen_ticket')}</button>
                             </div>
                         </div>
@@ -576,7 +576,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                 {ticket.user && (
                                     <Link
                                         href={`/admin/users/${ticket.user.id}`}
-                                        className="mt-2 inline-flex items-center gap-1 text-xs text-slate-900 hover:text-indigo-800 font-medium transition-colors"
+                                        className="mt-2 inline-flex items-center gap-1 text-xs text-slate-900 hover:text-slate-900 font-medium transition-colors"
                                     >
                                         <User className="h-3.5 w-3.5" />{__('general.view_profile')}<ExternalLink className="h-3 w-3" />
                                     </Link>
@@ -592,7 +592,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                         </div>
                         <div className="px-5 py-4">
                             <select 
-                                className="w-full text-sm rounded-lg border-slate-200 focus:ring-indigo-200 disabled:opacity-50"
+                                className="w-full text-sm rounded-lg border-slate-200 focus:ring-slate-200 disabled:opacity-50"
                                 value={ticket.assigned_employee_id ?? ''}
                                 onChange={handleAssign}
                                 disabled={!!assigningId}
@@ -614,13 +614,13 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                             {!isClosed ? (
                                 <button
                                     onClick={() => setCloseModalOpen(true)}
-                                    className="w-full flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 bg-emerald-50 hover:bg-emerald-100 transition-colors border border-emerald-200"
+                                    className="w-full flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 bg-green-50 hover:bg-green-100 transition-colors border border-green-200"
                                 >
                                     <CheckCircle className="h-4 w-4" />{__('general.mark_as_resolved')}</button>
                             ) : (
                                 <button
                                     onClick={handleReopen}
-                                    className="w-full flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 transition-colors border border-amber-200"
+                                    className="w-full flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-yellow-700 bg-yellow-50 hover:bg-yellow-100 transition-colors border border-yellow-200"
                                 >
                                     <RotateCcw className="h-4 w-4" />{__('general.reopen_ticket_1')}</button>
                             )}
@@ -645,7 +645,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                     <div className="py-4">
                         <p className="text-sm text-slate-600 mb-4">{__('general.you_are_about_to_mark_this_ticket_as_resolved_you_can_optionally_send_a_final_comment_to_the_user_before_closing_it')}</p>
                         <textarea
-                            className="w-full rounded-lg border-slate-200 text-sm focus:ring-emerald-200 focus:border-emerald-400 placeholder-slate-400"
+                            className="w-full rounded-lg border-slate-200 text-sm focus:ring-green-200 focus:border-green-400 placeholder-slate-400"
                             rows={4}
                             placeholder={__('general.optional_final_comment')}
                             value={closeComment}

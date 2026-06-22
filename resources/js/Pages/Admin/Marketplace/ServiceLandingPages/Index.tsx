@@ -96,7 +96,7 @@ export default function Index({ servicesWithLandingPages, filters, auth, transla
                                                 <TableCell>{service.landing_page.hero_title}</TableCell>
                                                 <TableCell>
                                                     {service.landing_page.variants?.length > 0 ? (
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-50 text-slate-900">
                                                             {service.landing_page.variants.length} {translations.variants}
                                                         </span>
                                                     ) : (

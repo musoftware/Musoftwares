@@ -24,7 +24,7 @@ interface Props {
 
 const statusStyles: Record<string, { cls: string; label: string }> = {
     pending:   { cls: 'bg-yellow-100 text-yellow-800 border-yellow-200', label: 'Pending' },
-    reviewing: { cls: 'bg-blue-100 text-blue-800 border-blue-200',       label: 'Reviewing' },
+    reviewing: { cls: 'bg-slate-50 text-slate-900 border-slate-200',       label: 'Reviewing' },
     approved:  { cls: 'bg-green-100 text-green-800 border-green-200',    label: 'Approved' },
     declined:  { cls: 'bg-red-100 text-red-800 border-red-200',          label: 'Declined' },
 };
@@ -131,7 +131,7 @@ export default function Show({ withdrawRequest }: Props) {
                         <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
                             {__('general.user')}</h3>
                         <div className="flex items-center gap-3">
-                            <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+                            <div className="h-9 w-9 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
                                 <User className="h-4 w-4 text-slate-900" />
                             </div>
                             <div>
@@ -146,7 +146,7 @@ export default function Show({ withdrawRequest }: Props) {
                         {withdrawRequest.user && (
                             <Link
                                 href={`/admin/users/${withdrawRequest.user.id}`}
-                                className="mt-3 block text-center text-xs text-slate-900 hover:text-indigo-800 font-medium transition-colors"
+                                className="mt-3 block text-center text-xs text-slate-900 hover:text-slate-900 font-medium transition-colors"
                             >
                                 View User Profile →
                             </Link>

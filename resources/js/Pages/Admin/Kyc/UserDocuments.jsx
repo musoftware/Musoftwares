@@ -60,15 +60,15 @@ export default function AdminKycUserDocuments({ auth, user }) {
                     <CardHeader className="bg-slate-50/50 border-b border-slate-100 flex flex-row items-center justify-between">
                         <div>
                             <CardTitle className="text-lg flex items-center gap-2">
-                                <User className="w-5 h-5 text-indigo-600" /> {user.name}
+                                <User className="w-5 h-5 text-slate-900" /> {user.name}
                             </CardTitle>
                             <CardDescription className="mt-1">{user.email}</CardDescription>
                         </div>
                         <div>
                             {user.kyc_status === 'pending_review' ? (
-                                <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100 px-3 py-1 text-sm">{__('general.review_required')}</Badge>
+                                <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 px-3 py-1 text-sm">{__('general.review_required')}</Badge>
                             ) : user.kyc_status === 'verified' ? (
-                                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 px-3 py-1 text-sm">{__('general.verified')}</Badge>
+                                <Badge className="bg-green-100 text-green-700 hover:bg-green-100 px-3 py-1 text-sm">{__('general.verified')}</Badge>
                             ) : (
                                 <Badge variant="outline" className="px-3 py-1 text-sm">{__('general.unverified')}</Badge>
                             )}
@@ -80,7 +80,7 @@ export default function AdminKycUserDocuments({ auth, user }) {
                                 <div key={doc.id} className="border border-slate-200 rounded-xl p-4 bg-slate-50 flex justify-between items-center relative overflow-hidden">
                                     <div className="flex items-center gap-3 overflow-hidden">
                                         <div className="w-10 h-10 rounded bg-white border border-slate-200 flex items-center justify-center flex-shrink-0">
-                                            <FileText className="w-5 h-5 text-indigo-500" />
+                                            <FileText className="w-5 h-5 text-slate-700" />
                                         </div>
                                         <div className="truncate pe-4">
                                             <h4 className="text-sm font-semibold uppercase tracking-wider">{doc.type.replace('_', ' ')}</h4>
@@ -93,11 +93,11 @@ export default function AdminKycUserDocuments({ auth, user }) {
                                     </Button>
                                     
                                     {doc.status === 'rejected' && (
-                                        <div className="absolute top-0 end-0 px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-bs-lg">
+                                        <div className="absolute top-0 end-0 px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded-bs-lg">
                                             {__('general.rejected')}</div>
                                     )}
                                     {doc.status === 'approved' && (
-                                        <div className="absolute top-0 end-0 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-bs-lg">
+                                        <div className="absolute top-0 end-0 px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-bs-lg">
                                             {__('general.approved')}</div>
                                     )}
                                 </div>
@@ -114,7 +114,7 @@ export default function AdminKycUserDocuments({ auth, user }) {
                             <div className="flex gap-2 sm:justify-end border-t mt-8 pt-6">
                                 <Button variant="destructive" onClick={() => setIsRejectDialogOpen(true)}>
                                     <X className="w-4 h-4 me-1" /> {__('general.reject')}</Button>
-                                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleApprove}>
+                                <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleApprove}>
                                     <Check className="w-4 h-4 me-1" /> {__('general.approve_verification')}
                                 </Button>
                             </div>
@@ -126,7 +126,7 @@ export default function AdminKycUserDocuments({ auth, user }) {
                 <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle className="text-rose-600">{__('general.reject_application')}</DialogTitle>
+                            <DialogTitle className="text-red-600">{__('general.reject_application')}</DialogTitle>
                             <DialogDescription>{__('general.please_provide_a_reason_for_rejecting_this_kyc_application_the_user_will_see_this_message')}</DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleReject} className="space-y-4">
@@ -137,7 +137,7 @@ export default function AdminKycUserDocuments({ auth, user }) {
                                     onChange={e => setData('reason', e.target.value)}
                                     required
                                 />
-                                {errors.reason && <p className="text-rose-500 text-xs">{errors.reason}</p>}
+                                {errors.reason && <p className="text-red-600 text-xs">{errors.reason}</p>}
                             </div>
                             <DialogFooter>
                                 <Button type="button" variant="outline" onClick={() => setIsRejectDialogOpen(false)}>{__('general.cancel')}</Button>

@@ -61,7 +61,7 @@ interface Props {
 
 const statusStyles: Record<string, string> = {
     pending:  'bg-yellow-100 text-yellow-700 border-yellow-200',
-    active:   'bg-emerald-100 text-slate-900 border-emerald-200',
+    active:   'bg-green-100 text-slate-900 border-green-200',
     declined: 'bg-red-100 text-red-700 border-red-200',
 };
 
@@ -136,7 +136,7 @@ export default function Show({ paymentMethod }: Props) {
                     {/* Header */}
                     <div className="flex items-start justify-between pb-4 border-b border-slate-100">
                         <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+                            <div className="h-10 w-10 rounded-lg bg-slate-50 flex items-center justify-center">
                                 <CreditCard className="h-5 w-5 text-slate-900" />
                             </div>
                             <div>
@@ -224,7 +224,7 @@ export default function Show({ paymentMethod }: Props) {
                         {paymentMethod.user ? (
                             <>
                                 <div className="flex items-center gap-3">
-                                    <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                                    <div className="h-9 w-9 rounded-full bg-slate-50 flex items-center justify-center flex-shrink-0">
                                         <UserIcon className="h-4 w-4 text-slate-900" />
                                     </div>
                                     <div>
@@ -234,7 +234,7 @@ export default function Show({ paymentMethod }: Props) {
                                 </div>
                                 <Link
                                     href={route('admin.users.show', paymentMethod.user.id)}
-                                    className="mt-3 block text-center text-xs text-slate-900 hover:text-indigo-800 transition-colors"
+                                    className="mt-3 block text-center text-xs text-slate-900 hover:text-slate-900 transition-colors"
                                 >
                                     View User Profile →
                                 </Link>

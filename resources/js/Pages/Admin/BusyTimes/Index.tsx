@@ -116,7 +116,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                         <>
                             <Link
                                 href={`/admin/users/${row.user.id}`}
-                                className="font-medium text-slate-900 hover:text-blue-800 transition-colors"
+                                className="font-medium text-slate-900 hover:text-slate-900 transition-colors"
                             >
                                 {row.user.name}
                             </Link>
@@ -135,8 +135,8 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                 <span
                     className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
                         row.is_recurring
-                            ? 'bg-indigo-100 text-indigo-800'
-                            : 'bg-amber-100 text-amber-800'
+                            ? 'bg-slate-50 text-slate-900'
+                            : 'bg-yellow-100 text-yellow-800'
                     }`}
                 >
                     {row.is_recurring ? (
@@ -242,7 +242,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
     const advancedFilters = (
         <div className="flex items-center gap-2 flex-wrap">
             <select
-                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                 value={filters.is_recurring ?? ''}
                 onChange={(e) => handleFilter('is_recurring', e.target.value)}
             >
@@ -251,7 +251,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                 <option value="0">{__('general.one_off')}</option>
             </select>
             <select
-                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                 value={filters.is_active ?? ''}
                 onChange={(e) => handleFilter('is_active', e.target.value)}
             >
@@ -260,7 +260,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                 <option value="0">{__('general.inactive')}</option>
             </select>
             <select
-                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                 value={filters.day_of_week ?? ''}
                 onChange={(e) => handleFilter('day_of_week', e.target.value)}
             >
@@ -291,7 +291,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                     <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.recurring')}</span>
                 </div>
                 <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
-                    <span className="text-2xl font-semibold text-amber-600">{stats.one_off}</span>
+                    <span className="text-2xl font-semibold text-yellow-600">{stats.one_off}</span>
                     <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.one_off')}</span>
                 </div>
             </div>

@@ -94,7 +94,7 @@ export default function Index({ contracts, filters }: any) {
                                         ${contract.status === 'active' ? 'bg-green-100 text-green-800' : 
                                           contract.status === 'disputed' ? 'bg-red-100 text-red-800' :
                                           contract.status === 'cancelled' ? 'bg-gray-100 text-gray-800' :
-                                          'bg-blue-100 text-blue-800'}`}>
+                                          'bg-slate-50 text-slate-900'}`}>
                                         {__('freelance.' + contract.status) || contract.status}
                                     </span>
                                 </td>

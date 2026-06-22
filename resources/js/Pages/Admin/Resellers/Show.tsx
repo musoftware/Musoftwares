@@ -28,7 +28,7 @@ const txTypeStyle: Record<string, { icon: any; color: string }> = {
     top_up:        { icon: TrendingUp, color: 'text-slate-900' },
     manual_credit: { icon: TrendingUp, color: 'text-slate-900' },
     charge:        { icon: TrendingDown, color: 'text-slate-500' },
-    manual_debit:  { icon: TrendingDown, color: 'text-orange-500' },
+    manual_debit:  { icon: TrendingDown, color: 'text-yellow-600' },
     suspension:    { icon: ShieldAlert, color: 'text-red-500' },
 };
 
@@ -103,7 +103,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                 />
 
                 {/* Balance Banner */}
-                <div className={`rounded-xl px-6 py-4 flex items-center justify-between border ${reseller.balance <= 0 ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'}`}>
+                <div className={`rounded-xl px-6 py-4 flex items-center justify-between border ${reseller.balance <= 0 ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">{__('general.pre_paid_balance')}</p>
                         <p className={`text-3xl font-bold font-mono ${reseller.balance <= 0 ? 'text-red-600' : 'text-slate-900'}`}>
@@ -177,7 +177,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                         {/* Anti-sharing info */}
                         <OperationalCard title={__('general.anti_sharing_protection')}>
                             <div className="flex items-start gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0">
                                     <Shield className="w-5 h-5 text-slate-900" />
                                 </div>
                                 <div className="text-sm text-text-muted space-y-1">
@@ -233,7 +233,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                                 <td className="px-4 py-3.5 text-end">
                                                     <div className="flex items-center justify-end gap-2">
                                                         {u.status === 'active' ? (
-                                                            <button onClick={() => suspendUser(u.user_id)} className="text-xs text-orange-600 hover:underline font-medium flex items-center gap-1">
+                                                            <button onClick={() => suspendUser(u.user_id)} className="text-xs text-yellow-600 hover:underline font-medium flex items-center gap-1">
                                                                 <UserX className="w-3.5 h-3.5" /> {__('general.suspend')}</button>
                                                         ) : (
                                                             <button onClick={() => activateUser(u.user_id)} className="text-xs text-slate-900 hover:underline font-medium flex items-center gap-1">

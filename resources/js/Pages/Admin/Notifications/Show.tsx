@@ -35,7 +35,7 @@ export default function Show({ campaign }: { campaign: any }) {
                             <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
                                 {campaign.title}
                                 {campaign.audience_type === 'personal' && (
-                                    <Badge variant="outline" className="ms-2 bg-indigo-50 text-slate-900 border-indigo-200">
+                                    <Badge variant="outline" className="ms-2 bg-slate-50 text-slate-900 border-slate-200">
                                         {__('general.personal')}</Badge>
                                 )}
                             </h1>

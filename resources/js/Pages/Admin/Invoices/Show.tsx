@@ -413,7 +413,7 @@ export default function Show({ invoice }: { invoice: any }) {
                     </CardHeader>
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-slate-900">
+                            <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-900">
                                 <User className="w-5 h-5" />
                             </div>
                             <div>
@@ -443,7 +443,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 </div>
                             )}
                             {invoice.project && (
-                                <div className="inline-flex items-center rounded bg-blue-50 px-2 py-1 text-xs font-semibold text-slate-900 mt-2">
+                                <div className="inline-flex items-center rounded bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-900 mt-2">
                                     <Folder className="w-3 h-3 me-1" /> {invoice.project.project_name}
                                 </div>
                             )}
@@ -481,7 +481,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             {invoice.discount > 0 && (
                                 <div className="flex justify-between items-center py-1">
                                     <span className="text-gray-500">{__('general.total_discount')}</span>
-                                    <span className="font-medium text-orange-600">-{formatCurrency(invoice.discount, invoice.currency)}</span>
+                                    <span className="font-medium text-yellow-600">-{formatCurrency(invoice.discount, invoice.currency)}</span>
                                 </div>
                             )}
                             {invoice.tax > 0 && (
@@ -501,7 +501,7 @@ export default function Show({ invoice }: { invoice: any }) {
                         {invoice.status !== 'paid' && (
                             <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
                                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.delivery_status')}</span>
-                                <Button onClick={() => { setJobStatusForm(invoice.job_status || 'pending'); setJobStatusModal(true); }} variant="outline" size="sm" className="h-7 text-xs border-blue-200 text-slate-900 bg-blue-50 hover:bg-blue-100">{__('general.update_status')}</Button>
+                                <Button onClick={() => { setJobStatusForm(invoice.job_status || 'pending'); setJobStatusModal(true); }} variant="outline" size="sm" className="h-7 text-xs border-slate-200 text-slate-900 bg-slate-50 hover:bg-slate-50">{__('general.update_status')}</Button>
                             </div>
                         )}
                     </CardContent>
@@ -521,7 +521,7 @@ export default function Show({ invoice }: { invoice: any }) {
                         <div className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">{__('general.total_billable_hours')}</div>
                         
                         {isUnpaid && (
-                            <Button onClick={handleAddTimerItem} variant="link" className="mt-4 text-slate-900 font-bold hover:text-blue-800">
+                            <Button onClick={handleAddTimerItem} variant="link" className="mt-4 text-slate-900 font-bold hover:text-slate-900">
                                 <Plus className="w-3 h-3 me-1" />{__('general.add_manual_entry')}
                             </Button>
                         )}
@@ -537,7 +537,7 @@ export default function Show({ invoice }: { invoice: any }) {
                         </CardHeader>
                         <CardContent className="pt-4">
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                                <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600">
                                     <Network className="w-5 h-5" />
                                 </div>
                                 <div>
@@ -586,9 +586,9 @@ export default function Show({ invoice }: { invoice: any }) {
                     <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
                         <span className="text-xs font-bold text-gray-500 uppercase tracking-wider me-2">Quick Build:</span>
                         <div className="flex gap-2 w-full sm:w-auto">
-                            <Button onClick={handleAddQtyItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-blue-300 hover:text-slate-900 hover:bg-blue-50">
+                            <Button onClick={handleAddQtyItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-slate-200 hover:text-slate-900 hover:bg-slate-50">
                                 <Layers className="w-4 h-4 me-2 text-slate-900" />{__('general.qty_item')}</Button>
-                            <Button onClick={handleAddSimpleItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-blue-300 hover:text-slate-900 hover:bg-blue-50">
+                            <Button onClick={handleAddSimpleItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-slate-200 hover:text-slate-900 hover:bg-slate-50">
                                 <Plus className="w-4 h-4 me-2 text-slate-900" />{__('general.simple_item')}</Button>
                             <Button onClick={() => setShowPayServiceModal(true)} variant="outline" size="sm" className="hidden sm:flex border-dashed hover:border-green-300 hover:text-green-600 hover:bg-green-50">
                                 <CreditCard className="w-4 h-4 me-2 text-green-500" />{__('general.pay_service')}</Button>
@@ -634,7 +634,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                 type="checkbox" 
                                                 checked={selectedItemsForMerge.includes(index)}
                                                 onChange={() => toggleItemForMerge(index)}
-                                                className="rounded border-gray-300 text-slate-900 focus:ring-blue-500"
+                                                className="rounded border-gray-300 text-slate-900 focus:ring-slate-900"
                                             />
                                         </td>
                                     )}
@@ -656,7 +656,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                             )
                                         ) : (
                                             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                                item.item_type === 'quantity' ? 'bg-blue-100 text-blue-800' :
+                                                item.item_type === 'quantity' ? 'bg-slate-50 text-slate-900' :
                                                 'bg-gray-100 text-gray-800'
                                             }`}>
                                                 <span className="capitalize">{item.item_type}</span>
@@ -763,7 +763,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             variant="ghost" 
                             size="sm" 
                             onClick={() => setShowPricingInsights(!showPricingInsights)}
-                            className="text-slate-900 bg-blue-50 hover:bg-blue-100"
+                            className="text-slate-900 bg-slate-50 hover:bg-slate-50"
                         >
                             <ChartLine className="w-4 h-4 me-2" />
                             {showPricingInsights ? 'Hide Pricing Insights' : 'Show Pricing Insights'}
@@ -774,7 +774,7 @@ export default function Show({ invoice }: { invoice: any }) {
                         <Card className="shadow-sm border-gray-200 h-full">
                             <CardContent className="p-5">
                                 <div className="flex items-center gap-2 font-bold text-gray-700 mb-2">
-                                    <AlertCircle className="w-4 h-4 text-orange-500" />{__('general.apply_discount')}</div>
+                                    <AlertCircle className="w-4 h-4 text-yellow-600" />{__('general.apply_discount')}</div>
                                 <p className="text-sm text-gray-500 mb-4">{__('general.enter_a_fixed_discount_amount_to_reduce_the_total_payable')}</p>
                                 
                                 <div className="flex items-end gap-3 flex-wrap">
@@ -784,7 +784,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                             <span className="bg-gray-100 border border-e-0 border-gray-300 rounded-s-md px-3 py-2 text-sm text-gray-500 h-10">{invoice.currency}</span>
                                             <Input 
                                                 type="number"
-                                                className="rounded-s-none h-10 shadow-none focus-visible:ring-blue-500"
+                                                className="rounded-s-none h-10 shadow-none focus-visible:ring-slate-900"
                                                 value={discount}
                                                 onChange={(e) => {
                                                     setDiscount(Number(e.target.value));
@@ -799,7 +799,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                         <div className="flex items-center">
                                             <Input 
                                                 type="number"
-                                                className="rounded-e-none h-10 shadow-none focus-visible:ring-blue-500"
+                                                className="rounded-e-none h-10 shadow-none focus-visible:ring-slate-900"
                                                 value={discountPercentage}
                                                 onChange={(e) => {
                                                     const pct = parseFloat(e.target.value) || 0;
@@ -896,7 +896,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                             <div>
                                                 <div className="flex justify-between items-center mb-1">
                                                     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                                        line.line_type === 'user_credit' ? 'bg-purple-100 text-purple-800' : 'bg-gray-200 text-gray-800'
+                                                        line.line_type === 'user_credit' ? 'bg-slate-50 text-slate-900' : 'bg-gray-200 text-gray-800'
                                                     }`}>
                                                         {line.line_type === 'user_credit' ? 'User Credit' : 'Direct Cost'}
                                                     </span>
@@ -1338,7 +1338,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 <input 
                                     type="checkbox" 
                                     id="notify_client" 
-                                    className="rounded border-gray-300 text-slate-900 focus:ring-blue-500"
+                                    className="rounded border-gray-300 text-slate-900 focus:ring-slate-900"
                                     checked={rescheduleForm.notify_client}
                                     onChange={(e) => setRescheduleForm(prev => ({ ...prev, notify_client: e.target.checked }))}
                                 />

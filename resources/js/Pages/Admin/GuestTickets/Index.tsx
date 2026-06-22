@@ -34,7 +34,7 @@ export default function Index({ tickets }: { tickets: any }) {
                                     <TableCell>{ticket.email}</TableCell>
                                     <TableCell>
                                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                                            ticket.status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700'
+                                            ticket.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-slate-100 text-slate-700'
                                         }`}>
                                             {ticket.status}
                                         </span>

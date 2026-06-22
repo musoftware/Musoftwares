@@ -165,7 +165,7 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                                     onClick={() => handleTagToggle(tag.id)}
                                     className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
                                         data.selectedTechTags.includes(tag.id)
-                                            ? 'bg-indigo-100 text-slate-900 border-indigo-200'
+                                            ? 'bg-slate-50 text-slate-900 border-slate-200'
                                             : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                                     }`}
                                 >

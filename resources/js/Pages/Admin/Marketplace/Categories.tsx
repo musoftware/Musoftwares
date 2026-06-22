@@ -43,7 +43,7 @@ export default function Categories({ categories }: any) {
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-900 focus:ring-slate-900"
                                 />
                             </div>
                             <div className="mb-4">
@@ -54,7 +54,7 @@ export default function Categories({ categories }: any) {
                                     onChange={(e) =>
                                         setDescription(e.target.value)
                                     }
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-900 focus:ring-slate-900"
                                 ></textarea>
                             </div>
                             <button

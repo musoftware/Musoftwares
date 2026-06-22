@@ -106,7 +106,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                     <CardContent className="p-6">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                             <div className="flex items-start gap-4">
-                                <div className="h-14 w-14 rounded-xl bg-indigo-50 text-slate-900 flex items-center justify-center font-bold text-xl shrink-0">
+                                <div className="h-14 w-14 rounded-xl bg-slate-50 text-slate-900 flex items-center justify-center font-bold text-xl shrink-0">
                                     {tenant.name.charAt(0).toUpperCase()}
                                 </div>
                                 <div className="space-y-1.5">
@@ -114,8 +114,8 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                         <h1 className="text-xl font-bold text-slate-900">{tenant.name}</h1>
                                         <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                                             tenant.status === 'active' 
-                                                ? 'bg-emerald-50 text-slate-900' 
-                                                : 'bg-rose-50 text-slate-900'
+                                                ? 'bg-green-50 text-slate-900' 
+                                                : 'bg-red-50 text-slate-900'
                                         }`}>
                                             {tenant.status}
                                         </span>
@@ -157,7 +157,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                         onClick={() => setActiveTab('clients')}
                         className={`pb-3 transition-colors border-b-2 -mb-px flex items-center gap-1.5 whitespace-nowrap ${
                             activeTab === 'clients' 
-                                ? 'border-indigo-600 text-slate-900 font-bold' 
+                                ? 'border-slate-900 text-slate-900 font-bold' 
                                 : 'border-transparent hover:text-slate-900'
                         }`}
                     >
@@ -167,7 +167,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                         onClick={() => setActiveTab('invoices')}
                         className={`pb-3 transition-colors border-b-2 -mb-px flex items-center gap-1.5 whitespace-nowrap ${
                             activeTab === 'invoices' 
-                                ? 'border-indigo-600 text-slate-900 font-bold' 
+                                ? 'border-slate-900 text-slate-900 font-bold' 
                                 : 'border-transparent hover:text-slate-900'
                         }`}
                     >
@@ -177,7 +177,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                         onClick={() => setActiveTab('team')}
                         className={`pb-3 transition-colors border-b-2 -mb-px flex items-center gap-1.5 whitespace-nowrap ${
                             activeTab === 'team' 
-                                ? 'border-indigo-600 text-slate-900 font-bold' 
+                                ? 'border-slate-900 text-slate-900 font-bold' 
                                 : 'border-transparent hover:text-slate-900'
                         }`}
                     >
@@ -187,7 +187,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                         onClick={() => setActiveTab('tasks')}
                         className={`pb-3 transition-colors border-b-2 -mb-px flex items-center gap-1.5 whitespace-nowrap ${
                             activeTab === 'tasks' 
-                                ? 'border-indigo-600 text-slate-900 font-bold' 
+                                ? 'border-slate-900 text-slate-900 font-bold' 
                                 : 'border-transparent hover:text-slate-900'
                         }`}
                     >
@@ -231,7 +231,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                                     {client.currency?.currency}
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
-                                                    <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded bg-indigo-50 text-slate-900 font-semibold font-mono text-xs">
+                                                    <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded bg-slate-50 text-slate-900 font-semibold font-mono text-xs">
                                                         {client.invoices_count} invoices
                                                     </span>
                                                 </td>
@@ -275,8 +275,8 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${
-                                                        invoice.status === 'paid' ? 'bg-emerald-50 text-slate-900' :
-                                                        invoice.status === 'sent' ? 'bg-blue-50 text-slate-900' : 'bg-slate-100 text-slate-600'
+                                                        invoice.status === 'paid' ? 'bg-green-50 text-slate-900' :
+                                                        invoice.status === 'sent' ? 'bg-slate-50 text-slate-900' : 'bg-slate-100 text-slate-600'
                                                     }`}>
                                                         {invoice.status}
                                                     </span>
@@ -322,8 +322,8 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                                 <td className="px-6 py-4">
                                                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider ${
                                                         member.role === 'manager' 
-                                                            ? 'bg-purple-50 text-slate-900' 
-                                                            : 'bg-blue-50 text-slate-900'
+                                                            ? 'bg-slate-50 text-slate-900' 
+                                                            : 'bg-slate-50 text-slate-900'
                                                     }`}>
                                                         {member.role}
                                                     </span>
@@ -331,8 +331,8 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                                 <td className="px-6 py-4">
                                                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider ${
                                                         member.status === 'active' 
-                                                            ? 'bg-emerald-50 text-slate-900' 
-                                                            : 'bg-rose-50 text-slate-900'
+                                                            ? 'bg-green-50 text-slate-900' 
+                                                            : 'bg-red-50 text-slate-900'
                                                     }`}>
                                                         {member.status === 'active' ? <Unlock className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
                                                         {member.status}
@@ -374,16 +374,16 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wider ${
-                                                        task.priority === 'high' ? 'bg-rose-50 text-slate-900' :
-                                                        task.priority === 'medium' ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-600'
+                                                        task.priority === 'high' ? 'bg-red-50 text-slate-900' :
+                                                        task.priority === 'medium' ? 'bg-yellow-50 text-yellow-700' : 'bg-slate-100 text-slate-600'
                                                     }`}>
                                                         {task.priority}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider ${
-                                                        task.status === 'completed' ? 'bg-emerald-50 text-slate-900' :
-                                                        task.status === 'in_progress' ? 'bg-blue-50 text-slate-900' : 'bg-slate-100 text-slate-500'
+                                                        task.status === 'completed' ? 'bg-green-50 text-slate-900' :
+                                                        task.status === 'in_progress' ? 'bg-slate-50 text-slate-900' : 'bg-slate-100 text-slate-500'
                                                     }`}>
                                                         {task.status}
                                                     </span>

@@ -46,15 +46,15 @@ interface Props {
 
 /* ─── Style maps ─────────────────────────────────────────────── */
 const STATUS_BADGE: Record<string, string> = {
-    open:          'bg-blue-100 text-blue-800 ring-1 ring-blue-200',
-    agent_replied: 'bg-amber-100 text-amber-800 ring-1 ring-amber-200',
-    user_replied:  'bg-violet-100 text-violet-800 ring-1 ring-violet-200',
-    closed:        'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200',
+    open:          'bg-slate-50 text-slate-900 ring-1 ring-slate-200',
+    agent_replied: 'bg-yellow-100 text-yellow-800 ring-1 ring-yellow-200',
+    user_replied:  'bg-slate-50 text-slate-900 ring-1 ring-slate-200',
+    closed:        'bg-green-100 text-green-800 ring-1 ring-green-200',
 };
 
 const PRIORITY_BADGE: Record<string, string> = {
     high:   'bg-red-100 text-red-700 ring-1 ring-red-200',
-    medium: 'bg-orange-100 text-orange-700 ring-1 ring-orange-200',
+    medium: 'bg-yellow-100 text-yellow-700 ring-1 ring-yellow-200',
     low:    'bg-slate-100 text-slate-600 ring-1 ring-slate-200',
 };
 
@@ -76,7 +76,7 @@ function StatCard({
             onClick={onClick}
             className={`group flex flex-col gap-2 rounded-2xl border p-4 text-start transition-all ${
                 active
-                    ? 'border-indigo-300 bg-indigo-50 shadow-md'
+                    ? 'border-slate-200 bg-slate-50 shadow-md'
                     : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
             }`}
         >
@@ -213,10 +213,10 @@ export default function Index({ tickets, filters, stats }: Props) {
                                 <Eye className="me-2 h-4 w-4" />{__('general.view_ticket')}</Link>
                         </DropdownMenuItem>
                         {t.ticket_status !== 'closed' ? (
-                            <DropdownMenuItem onClick={() => handleClose(t.id)} className="text-slate-900 focus:text-emerald-800">
+                            <DropdownMenuItem onClick={() => handleClose(t.id)} className="text-slate-900 focus:text-green-800">
                                 <CheckCircle className="me-2 h-4 w-4" />{__('general.close_ticket')}</DropdownMenuItem>
                         ) : (
-                            <DropdownMenuItem onClick={() => handleReopen(t.id)} className="text-amber-700 focus:text-amber-800">
+                            <DropdownMenuItem onClick={() => handleReopen(t.id)} className="text-yellow-700 focus:text-yellow-800">
                                 <RotateCcw className="me-2 h-4 w-4" /> {__('general.reopen')}</DropdownMenuItem>
                         )}
                     </DropdownMenuContent>
@@ -229,7 +229,7 @@ export default function Index({ tickets, filters, stats }: Props) {
     const advancedFilters = (
         <div className="flex items-center gap-2">
             <select
-                className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-xs text-slate-700 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
+                className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-xs text-slate-700 focus:border-slate-500 focus:ring-2 focus:ring-slate-50 outline-none transition-all"
                 value={filters.status || ''}
                 onChange={(e) => applyFilter({ status: e.target.value })}
             >
@@ -240,7 +240,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                 <option value="closed">{__('general.closed')}</option>
             </select>
             <select
-                className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-xs text-slate-700 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
+                className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-xs text-slate-700 focus:border-slate-500 focus:ring-2 focus:ring-slate-50 outline-none transition-all"
                 value={filters.priority || ''}
                 onChange={(e) => applyFilter({ priority: e.target.value })}
             >
@@ -289,7 +289,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                     <StatCard
                         label={__('general.waiting')}
                         value={stats.waiting}
-                        color="bg-violet-500"
+                        color="bg-slate-900"
                         icon={Clock}
                         active={filters.status === 'user_replied'}
                         onClick={() => handleStatusFilter('user_replied')}
@@ -297,7 +297,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                     <StatCard
                         label={__('general.replied')}
                         value={stats.agent_replied}
-                        color="bg-amber-500"
+                        color="bg-yellow-600"
                         icon={MessageSquare}
                         active={filters.status === 'agent_replied'}
                         onClick={() => handleStatusFilter('agent_replied')}

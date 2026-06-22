@@ -29,7 +29,7 @@ interface Props {
 }
 
 const statusColor: Record<string, string> = {
-    active:   'bg-slate-900/15 text-slate-900 border-emerald-500/30',
+    active:   'bg-slate-900/15 text-slate-900 border-green-500/30',
     inactive: 'bg-zinc-700/50 text-zinc-400 border-zinc-600',
     blocked:  'bg-red-500/15 text-red-400 border-red-500/30',
 };
@@ -68,7 +68,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                 <Users className="w-4 h-4" />{__('general.by_user')}</Button>
                         </Link>
                         <Link href={route('admin.serial-user-devices.assign')}>
-                            <Button size="sm" className="bg-violet-600 hover:bg-violet-500 text-white gap-2">
+                            <Button size="sm" className="bg-slate-900 hover:bg-slate-900 text-white gap-2">
                                 <Plus className="w-4 h-4" />{__('general.assign_device')}</Button>
                         </Link>
                     </div>
@@ -134,7 +134,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                     )}
                                     {(userDevices.data as any).map(a => (
                                         <tr key={a.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
-                                            <td className="px-4 py-3 font-mono text-xs text-violet-300">{a.device_id}</td>
+                                            <td className="px-4 py-3 font-mono text-xs text-slate-200">{a.device_id}</td>
                                             <td className="px-4 py-3">
                                                 {a.user ? (
                                                     <div>

@@ -106,7 +106,7 @@ export default function Costs() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between space-y-0 pb-2">
                             <p className="text-sm font-medium text-slate-500">{__('general.monthly_costs')}</p>
-                            <div className="p-2 bg-rose-50 rounded-xl">
+                            <div className="p-2 bg-red-50 rounded-xl">
                                 <ArrowDownRight className="h-4 w-4 text-slate-900" />
                             </div>
                         </div>
@@ -114,7 +114,7 @@ export default function Costs() {
                             {formatCurrency(stats.total_monthly_costs, stats.business_currency_code)}
                         </div>
                         <p className="text-xs text-slate-500 mt-2 font-medium">
-                            <span className="text-slate-900 font-semibold bg-rose-50 px-1.5 py-0.5 rounded me-1">{__('general.this_month')}</span>
+                            <span className="text-slate-900 font-semibold bg-red-50 px-1.5 py-0.5 rounded me-1">{__('general.this_month')}</span>
                             {__('general.total_costs')}</p>
                     </CardContent>
                 </Card>
@@ -180,7 +180,7 @@ export default function Costs() {
                                 <Input
                                     type="text"
                                     placeholder={__('general.search_reason')}
-                                    className="ps-9 h-9 border-slate-200 focus-visible:ring-rose-500 rounded-lg w-full text-sm"
+                                    className="ps-9 h-9 border-slate-200 focus-visible:ring-red-500 rounded-lg w-full text-sm"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -212,7 +212,7 @@ export default function Costs() {
                                     <TableCell>
                                         <div className="font-medium text-slate-900">{entry.title}</div>
                                         {entry.is_recurring && (
-                                            <span className="inline-flex items-center mt-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-slate-900">
+                                            <span className="inline-flex items-center mt-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-50 text-slate-900">
                                                 {__('general.recurring')}</span>
                                         )}
                                     </TableCell>

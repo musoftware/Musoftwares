@@ -171,7 +171,7 @@ export default function Show({ contract }: any) {
                             <span className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2 block">{__('freelance.client')}</span>
                             {contract.client ? (
                                 <div className="flex items-center space-x-3">
-                                    <div className="bg-blue-100 text-slate-900 h-10 w-10 flex items-center justify-center rounded-full font-bold">
+                                    <div className="bg-slate-50 text-slate-900 h-10 w-10 flex items-center justify-center rounded-full font-bold">
                                         {contract.client.name.charAt(0)}
                                     </div>
                                     <div>

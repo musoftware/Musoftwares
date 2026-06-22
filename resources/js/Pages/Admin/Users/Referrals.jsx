@@ -113,7 +113,7 @@ export default function Referrals({ client, referrals }) {
                                                                 <Link href={`/admin/users/${referral.id}`}>
                                                                     <User className="me-2 h-4 w-4" />{__('general.view_profile_1')}</Link>
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => handleUnlink(referral.id)} className="text-orange-600 focus:text-orange-600">
+                                                            <DropdownMenuItem onClick={() => handleUnlink(referral.id)} className="text-yellow-600 focus:text-yellow-600">
                                                                 <Unlink className="me-2 h-4 w-4" />{__('general.remove_referral')}</DropdownMenuItem>
                                                             <DropdownMenuItem onClick={() => handleDelete(referral.id)} className="text-red-600 focus:text-red-600">
                                                                 <Trash2 className="me-2 h-4 w-4" />{__('general.delete_user_account')}</DropdownMenuItem>

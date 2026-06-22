@@ -63,7 +63,7 @@ export default function AdminSidebarLayout({ title, header, user, children, acti
                                 <Link href={route().has('profile.edit') ? route('profile.edit') : '#'}>{__('general.profile')}</Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="cursor-pointer rounded-lg text-sm text-slate-900 focus:bg-rose-50 focus:text-slate-900" asChild>
+                            <DropdownMenuItem className="cursor-pointer rounded-lg text-sm text-slate-900 focus:bg-red-50 focus:text-slate-900" asChild>
                                 <Link href={route().has('logout') ? route('logout') : '#'} method="post" as="button" className="w-full text-start">{__('general.log_out')}</Link>
                             </DropdownMenuItem>
                         </DropdownMenuContent>

@@ -142,8 +142,8 @@ export default function Notes({ user, notes, stats }) {
 
     const getCategoryIcon = (cat) => {
         switch (cat) {
-            case 'password': return <Key size={14} className="text-amber-500" />;
-            case 'anydesk': return <Monitor size={14} className="text-blue-500" />;
+            case 'password': return <Key size={14} className="text-yellow-600" />;
+            case 'anydesk': return <Monitor size={14} className="text-slate-700" />;
             case 'archived': return <Archive size={14} className="text-gray-500" />;
             default: return <FileText size={14} className="text-slate-500" />;
         }
@@ -186,13 +186,13 @@ export default function Notes({ user, notes, stats }) {
             </div>
 
             {/* Security Banner */}
-            <div className={`p-4 rounded-xl border mb-6 flex items-start gap-4 ${isPasswordSet ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}`}>
-                {isPasswordSet ? <ShieldCheck className="text-green-600 shrink-0 mt-1" size={24} /> : <ShieldAlert className="text-amber-600 shrink-0 mt-1" size={24} />}
+            <div className={`p-4 rounded-xl border mb-6 flex items-start gap-4 ${isPasswordSet ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
+                {isPasswordSet ? <ShieldCheck className="text-green-600 shrink-0 mt-1" size={24} /> : <ShieldAlert className="text-yellow-600 shrink-0 mt-1" size={24} />}
                 <div className="flex-1">
-                    <h4 className={`font-bold mb-1 ${isPasswordSet ? 'text-green-900' : 'text-amber-900'}`}>
+                    <h4 className={`font-bold mb-1 ${isPasswordSet ? 'text-green-900' : 'text-yellow-900'}`}>
                         {isPasswordSet ? 'End-to-End Encryption Active' : 'Encryption Password Required'}
                     </h4>
-                    <p className={`text-sm mb-0 ${isPasswordSet ? 'text-green-700' : 'text-amber-700'}`}>{__('general.all_notes_are_encrypted_client_side_before_being_saved_the_server_cannot_read_your_data')}</p>
+                    <p className={`text-sm mb-0 ${isPasswordSet ? 'text-green-700' : 'text-yellow-700'}`}>{__('general.all_notes_are_encrypted_client_side_before_being_saved_the_server_cannot_read_your_data')}</p>
                 </div>
                 <div>
                     {!isPasswordSet ? (
@@ -202,10 +202,10 @@ export default function Notes({ user, notes, stats }) {
                                 placeholder={__('general.master_password')} 
                                 value={password} 
                                 onChange={e => setPassword(e.target.value)} 
-                                className="w-48 bg-white border-amber-300"
+                                className="w-48 bg-white border-yellow-300"
                                 required
                             />
-                            <Button type="submit" className="bg-amber-600 hover:bg-amber-700 text-white">{__('general.unlock')}</Button>
+                            <Button type="submit" className="bg-yellow-600 hover:bg-yellow-700 text-white">{__('general.unlock')}</Button>
                         </form>
                     ) : (
                         <Button variant="outline" onClick={handleClearPassword} className="border-green-300 text-green-700 hover:bg-green-100">{__('general.lock_clear_session')}</Button>

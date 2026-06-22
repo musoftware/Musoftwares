@@ -127,7 +127,7 @@ export default function Create({ services }) {
                                         key={service.id}
                                         onClick={() => handleServiceSelect(service.id)}
                                         className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 flex flex-col gap-3 ${
-                                            isSelected ? 'border-slate-900 bg-slate-100/50' : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                                            isSelected ? 'border-slate-900 bg-slate-100/50' : 'border-gray-200 hover:border-slate-200 hover:bg-gray-50'
                                         }`}
                                     >
                                         <div className="flex items-center gap-3">
@@ -135,7 +135,7 @@ export default function Create({ services }) {
                                                 <Icon className="h-5 w-5" />
                                             </div>
                                             <div>
-                                                <h3 className={`font-semibold text-sm ${isSelected ? 'text-blue-900' : 'text-gray-900'}`}>
+                                                <h3 className={`font-semibold text-sm ${isSelected ? 'text-slate-900' : 'text-gray-900'}`}>
                                                     {service.name}
                                                 </h3>
                                                 <span className="text-xs text-gray-500 uppercase tracking-wider font-medium">{service.type}</span>
@@ -158,8 +158,8 @@ export default function Create({ services }) {
                         <CardContent className="space-y-6">
                             
                             {hasActiveSubscription && (
-                                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-3">
-                                    <p className="text-sm text-amber-800 font-medium">
+                                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg space-y-3">
+                                    <p className="text-sm text-yellow-800 font-medium">
                                         {__('admin.user_has_active_subscription', { date: new Date(hasActiveSubscription.expires_at).toLocaleDateString() })}
                                     </p>
                                     <RadioGroup 
@@ -169,11 +169,11 @@ export default function Create({ services }) {
                                     >
                                         <div className="flex items-center space-x-2">
                                             <RadioGroupItem value="extend" id="r1" />
-                                            <Label htmlFor="r1" className="text-amber-900 cursor-pointer">{__('admin.extend_expiration_date')}</Label>
+                                            <Label htmlFor="r1" className="text-yellow-900 cursor-pointer">{__('admin.extend_expiration_date')}</Label>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <RadioGroupItem value="replace" id="r2" />
-                                            <Label htmlFor="r2" className="text-amber-900 cursor-pointer">{__('admin.replace_expiration_date')}</Label>
+                                            <Label htmlFor="r2" className="text-yellow-900 cursor-pointer">{__('admin.replace_expiration_date')}</Label>
                                         </div>
                                     </RadioGroup>
                                 </div>

@@ -31,7 +31,7 @@ interface Props {
 
 const statusStyles: Record<string, string> = {
     pending:   'bg-yellow-100 text-yellow-800',
-    reviewing: 'bg-blue-100 text-blue-800',
+    reviewing: 'bg-slate-50 text-slate-900',
     approved:  'bg-green-100 text-green-800',
     declined:  'bg-red-100 text-red-800',
 };
@@ -152,7 +152,7 @@ export default function Index({ requests, filters }: Props) {
 
     const advancedFilters = (
         <select
-            className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
             value={filters.status || ''}
             onChange={(e) => handleFilter(e.target.value)}
         >

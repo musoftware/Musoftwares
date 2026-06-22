@@ -66,17 +66,17 @@ interface Props {
 }
 
 const PRIORITY_CONFIG: Record<string, { label: string; cls: string }> = {
-    urgent: { label: 'Urgent', cls: 'bg-rose-100 text-slate-900 border border-rose-200' },
-    high:   { label: 'High',   cls: 'bg-amber-100 text-amber-700 border border-amber-200' },
-    normal: { label: 'Normal', cls: 'bg-blue-100 text-slate-900 border border-blue-200' },
+    urgent: { label: 'Urgent', cls: 'bg-red-100 text-slate-900 border border-red-200' },
+    high:   { label: 'High',   cls: 'bg-yellow-100 text-yellow-700 border border-yellow-200' },
+    normal: { label: 'Normal', cls: 'bg-slate-50 text-slate-900 border border-slate-200' },
     low:    { label: 'Low',    cls: 'bg-slate-100 text-slate-500 border border-slate-200' },
 };
 
 const STATUS_CONFIG: Record<string, string> = {
     open:        'bg-slate-100 text-slate-600',
-    in_progress: 'bg-blue-100 text-slate-900',
-    review:      'bg-indigo-100 text-slate-900',
-    completed:   'bg-emerald-100 text-slate-900',
+    in_progress: 'bg-slate-50 text-slate-900',
+    review:      'bg-slate-50 text-slate-900',
+    completed:   'bg-green-100 text-slate-900',
 };
 
 export default function AsList({ arrangedClients, clients, filters, stats, auth }: Props) {
@@ -130,10 +130,10 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                 {/* KPI Row */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {[
-                        { label: 'Active Todos',     value: stats.total_active_todos, color: 'text-slate-900',  bg: 'bg-indigo-50',  icon: ClipboardList },
-                        { label: 'Total Clients',    value: stats.total_clients,      color: 'text-violet-600', bg: 'bg-violet-50',  icon: User },
-                        { label: 'Active Clients',   value: totalClientsWithTasks,    color: 'text-slate-900', bg: 'bg-emerald-50', icon: User },
-                        { label: 'Task Boards',      value: totalTasks,               color: 'text-amber-600',  bg: 'bg-amber-50',   icon: Briefcase },
+                        { label: 'Active Todos',     value: stats.total_active_todos, color: 'text-slate-900',  bg: 'bg-slate-50',  icon: ClipboardList },
+                        { label: 'Total Clients',    value: stats.total_clients,      color: 'text-slate-900', bg: 'bg-slate-50',  icon: User },
+                        { label: 'Active Clients',   value: totalClientsWithTasks,    color: 'text-slate-900', bg: 'bg-green-50', icon: User },
+                        { label: 'Task Boards',      value: totalTasks,               color: 'text-yellow-600',  bg: 'bg-yellow-50',   icon: Briefcase },
                     ].map(({ label, value, color, bg, icon: Icon }) => (
                         <Card key={label} className="rounded-xl border border-slate-200 bg-white shadow-sm">
                             <CardContent className="p-5 flex items-center justify-between">
@@ -175,7 +175,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                     placeholder={__('general.search_todo_title_or_client_name')}
                                     value={search}
                                     onChange={e => setSearch(e.target.value)}
-                                    className="ps-9 h-9 shadow-none border-slate-200 text-xs focus-visible:ring-indigo-500"
+                                    className="ps-9 h-9 shadow-none border-slate-200 text-xs focus-visible:ring-slate-900"
                                 />
                             </div>
 
@@ -215,7 +215,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                 <div className="flex items-center gap-3 mb-4">
                                     <Avatar className="h-8 w-8 rounded-lg border border-slate-200">
                                         <AvatarImage src={clientGroup.client.avatar_url} alt={clientGroup.client.name} />
-                                        <AvatarFallback className="rounded-lg bg-indigo-100 text-slate-900 font-bold text-sm">
+                                        <AvatarFallback className="rounded-lg bg-slate-50 text-slate-900 font-bold text-sm">
                                             {clientGroup.client.name.charAt(0).toUpperCase()}
                                         </AvatarFallback>
                                     </Avatar>
@@ -267,7 +267,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                                                 title={isDone ? 'Completed' : 'Mark as complete'}
                                                             >
                                                                 {isDone
-                                                                    ? <CheckCircle2 className="h-4 w-4 text-slate-900 fill-emerald-50" />
+                                                                    ? <CheckCircle2 className="h-4 w-4 text-slate-900 fill-green-50" />
                                                                     : <Circle className="h-4 w-4" />
                                                                 }
                                                             </button>
@@ -285,12 +285,12 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                                                     </span>
 
                                                                     {todo.paused && (
-                                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-0.5">
+                                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-yellow-100 text-yellow-800 border border-yellow-200 flex items-center gap-0.5">
                                                                             <Pause className="h-2 w-2" /> {__('general.paused')}</span>
                                                                     )}
 
                                                                     {todo.is_paid && (
-                                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-green-100 text-green-800 border border-green-200">
                                                                             {__('general.paid')}</span>
                                                                     )}
 

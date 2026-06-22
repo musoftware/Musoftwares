@@ -26,11 +26,11 @@ export default function Show({ webhook }: Props) {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'processed':
-                return <Badge className="bg-emerald-100 text-emerald-800"><CheckCircle2 className="w-4 h-4 me-1" /> {__('general.processed')}</Badge>;
+                return <Badge className="bg-green-100 text-green-800"><CheckCircle2 className="w-4 h-4 me-1" /> {__('general.processed')}</Badge>;
             case 'failed':
-                return <Badge className="bg-rose-100 text-rose-800"><XCircle className="w-4 h-4 me-1" /> {__('general.failed')}</Badge>;
+                return <Badge className="bg-red-100 text-red-800"><XCircle className="w-4 h-4 me-1" /> {__('general.failed')}</Badge>;
             default:
-                return <Badge className="bg-amber-100 text-amber-800"><Clock className="w-4 h-4 me-1" /> {__('general.pending')}</Badge>;
+                return <Badge className="bg-yellow-100 text-yellow-800"><Clock className="w-4 h-4 me-1" /> {__('general.pending')}</Badge>;
         }
     };
 
@@ -52,13 +52,13 @@ export default function Show({ webhook }: Props) {
                 </div>
 
                 {webhook.error_message && (
-                    <div className="bg-rose-50 border-s-4 border-rose-500 p-4 rounded-e-md">
+                    <div className="bg-red-50 border-s-4 border-red-500 p-4 rounded-e-md">
                         <div className="flex">
                             <div className="flex-shrink-0">
                                 <XCircle className="h-5 w-5 text-slate-900" aria-hidden="true" />
                             </div>
                             <div className="ms-3">
-                                <h3 className="text-sm font-medium text-rose-800">{__('general.processing_failed')}</h3>
+                                <h3 className="text-sm font-medium text-red-800">{__('general.processing_failed')}</h3>
                                 <div className="mt-2 text-sm text-slate-900 font-mono bg-white/50 p-2 rounded">
                                     {webhook.error_message}
                                 </div>

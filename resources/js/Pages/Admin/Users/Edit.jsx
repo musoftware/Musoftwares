@@ -351,7 +351,7 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                 
                                 <div className="mt-2">
                                     {user.kyc_documents_count > 0 ? (
-                                        <div className="bg-slate-100 border border-blue-200 text-blue-800 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                        <div className="bg-slate-100 border border-slate-200 text-slate-900 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                             <div className="flex items-start">
                                                 <Info className="h-5 w-5 me-2 text-slate-900 shrink-0 mt-0.5" />
                                                 <div>
@@ -363,8 +363,8 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                             </a>
                                         </div>
                                     ) : (
-                                        <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 flex items-start">
-                                            <AlertTriangle className="h-5 w-5 me-2 text-amber-600 shrink-0 mt-0.5" />
+                                        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-4 flex items-start">
+                                            <AlertTriangle className="h-5 w-5 me-2 text-yellow-600 shrink-0 mt-0.5" />
                                             <div>
                                                 {__('general.this_user_has_not_uploaded_any_kyc_documents_yet')}
                                             </div>

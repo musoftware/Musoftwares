@@ -86,13 +86,13 @@ interface Props {
 const priorityColors: Record<string, string> = {
     high:   'bg-red-100 text-red-700',
     medium: 'bg-yellow-100 text-yellow-700',
-    low:    'bg-emerald-100 text-slate-900',
+    low:    'bg-green-100 text-slate-900',
 };
 
 const recurringColors: Record<string, string> = {
-    day:   'bg-blue-100 text-slate-900',
-    week:  'bg-indigo-100 text-slate-900',
-    month: 'bg-purple-100 text-slate-900',
+    day:   'bg-slate-50 text-slate-900',
+    week:  'bg-slate-50 text-slate-900',
+    month: 'bg-slate-50 text-slate-900',
     year:  'bg-slate-100 text-slate-700',
 };
 
@@ -243,7 +243,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
             render: (t: EmployeeTodo) =>
                 t.user ? (
                     <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <div className="h-7 w-7 rounded-full bg-slate-50 flex items-center justify-center">
                             <UserIcon className="h-3.5 w-3.5 text-slate-900" />
                         </div>
                         <div>

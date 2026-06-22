@@ -256,7 +256,7 @@ export default function Index({ skills, filters }: any) {
                                             </DropdownMenuItem>
                                             
                                             {skill.creator && (
-                                                <DropdownMenuItem onClick={() => handleBlockUser(skill.creator.id, skill.creator.name)} className="cursor-pointer text-orange-600">
+                                                <DropdownMenuItem onClick={() => handleBlockUser(skill.creator.id, skill.creator.name)} className="cursor-pointer text-yellow-600">
                                                     <Ban className="me-2 h-4 w-4" />
                                                     <span>{__('freelance.block_user_skills', undefined, 'Block User')}</span>
                                                 </DropdownMenuItem>

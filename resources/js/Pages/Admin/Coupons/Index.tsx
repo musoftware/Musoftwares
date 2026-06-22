@@ -368,7 +368,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                                 </td>
                                 <td className="p-4">
                                     <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${
-                                        c.type === 'fixed' ? 'bg-blue-100 text-slate-900' : 'bg-purple-100 text-slate-900'
+                                        c.type === 'fixed' ? 'bg-slate-50 text-slate-900' : 'bg-slate-50 text-slate-900'
                                     }`}>
                                         {c.type}
                                     </span>

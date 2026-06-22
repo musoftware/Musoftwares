@@ -64,10 +64,10 @@ export default function Index({ paymentLinks, currencies }: { paymentLinks: any,
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'paid':
-                return <StatusBadge status="paid" label={__('admin.paid')} className="bg-emerald-50 text-slate-900 border-emerald-100" />;
+                return <StatusBadge status="paid" label={__('admin.paid')} className="bg-green-50 text-slate-900 border-green-100" />;
             case 'pending':
             default:
-                return <StatusBadge status="pending" label={__('admin.pending')} className="bg-amber-50 text-amber-700 border-amber-100" />;
+                return <StatusBadge status="pending" label={__('admin.pending')} className="bg-yellow-50 text-yellow-700 border-yellow-100" />;
         }
     };
 

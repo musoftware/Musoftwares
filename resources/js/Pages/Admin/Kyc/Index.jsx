@@ -77,7 +77,7 @@ export default function AdminKycIndex({ auth, users }) {
                                         <TableCell className="ps-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 <Avatar className="h-9 w-9">
-                                                    <AvatarFallback className="bg-indigo-100 text-indigo-700 font-bold font-jetbrains">
+                                                    <AvatarFallback className="bg-slate-50 text-slate-900 font-bold font-jetbrains">
                                                         {user.name.substring(0, 2).toUpperCase()}
                                                     </AvatarFallback>
                                                 </Avatar>
@@ -89,9 +89,9 @@ export default function AdminKycIndex({ auth, users }) {
                                         </TableCell>
                                         <TableCell>
                                             {user.kyc_status === 'pending_review' ? (
-                                                <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100">{__('general.review_required')}</Badge>
+                                                <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">{__('general.review_required')}</Badge>
                                             ) : user.kyc_status === 'verified' ? (
-                                                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">{__('general.verified')}</Badge>
+                                                <Badge className="bg-green-100 text-green-700 hover:bg-green-100">{__('general.verified')}</Badge>
                                             ) : (
                                                 <Badge variant="outline">{__('general.unverified')}</Badge>
                                             )}
@@ -100,7 +100,7 @@ export default function AdminKycIndex({ auth, users }) {
                                             <div className="flex flex-wrap gap-2">
                                                 {user.documents.map(doc => (
                                                     <Badge key={doc.id} variant="outline" className="text-[10px] font-mono flex items-center gap-1 bg-white">
-                                                        <FileText className="w-3 h-3 text-indigo-500"/>
+                                                        <FileText className="w-3 h-3 text-slate-700"/>
                                                         {doc.type}
                                                     </Badge>
                                                 ))}
@@ -133,7 +133,7 @@ export default function AdminKycIndex({ auth, users }) {
                         <DialogContent className="max-w-3xl">
                             <DialogHeader>
                                 <DialogTitle className="flex items-center gap-2">
-                                    <User className="w-5 h-5 text-indigo-600" /> Review Application: {selectedUser.name}
+                                    <User className="w-5 h-5 text-slate-900" /> Review Application: {selectedUser.name}
                                 </DialogTitle>
                                 <DialogDescription>{__('general.review_the_documents_below_to_verify_this_user_s_identity')}</DialogDescription>
                             </DialogHeader>
@@ -143,7 +143,7 @@ export default function AdminKycIndex({ auth, users }) {
                                     <div key={doc.id} className="border border-slate-200 rounded-xl p-4 bg-slate-50 flex justify-between items-center">
                                         <div className="flex items-center gap-3 overflow-hidden">
                                             <div className="w-10 h-10 rounded bg-white border border-slate-200 flex items-center justify-center flex-shrink-0">
-                                                <FileText className="w-5 h-5 text-indigo-500" />
+                                                <FileText className="w-5 h-5 text-slate-700" />
                                             </div>
                                             <div className="truncate">
                                                 <h4 className="text-sm font-semibold uppercase tracking-wider">{doc.type.replace('_', ' ')}</h4>
@@ -166,7 +166,7 @@ export default function AdminKycIndex({ auth, users }) {
                                 <div className="flex gap-2">
                                     <Button variant="destructive" onClick={() => setIsRejectDialogOpen(true)}>
                                         <X className="w-4 h-4 me-1" /> {__('general.reject')}</Button>
-                                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleApprove(selectedUser.id)}>
+                                    <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => handleApprove(selectedUser.id)}>
                                         <Check className="w-4 h-4 me-1" />{__('general.approve_verification')}</Button>
                                 </div>
                             </DialogFooter>
@@ -178,7 +178,7 @@ export default function AdminKycIndex({ auth, users }) {
                 <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle className="text-rose-600">{__('general.reject_application')}</DialogTitle>
+                            <DialogTitle className="text-red-600">{__('general.reject_application')}</DialogTitle>
                             <DialogDescription>{__('general.please_provide_a_reason_for_rejecting_this_kyc_application_the_user_will_see_this_message')}</DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleReject} className="space-y-4">
@@ -189,7 +189,7 @@ export default function AdminKycIndex({ auth, users }) {
                                     onChange={e => setData('reason', e.target.value)}
                                     required
                                 />
-                                {errors.reason && <p className="text-rose-500 text-xs">{errors.reason}</p>}
+                                {errors.reason && <p className="text-red-600 text-xs">{errors.reason}</p>}
                             </div>
                             <DialogFooter>
                                 <Button type="button" variant="outline" onClick={() => setIsRejectDialogOpen(false)}>{__('general.cancel')}</Button>

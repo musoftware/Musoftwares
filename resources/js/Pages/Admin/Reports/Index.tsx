@@ -235,7 +235,7 @@ export default function ReportsIndex({
                                 </div>
                             </div>
                             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-slate-900">
+                                <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-900">
                                     <Server className="w-6 h-6" />
                                 </div>
                                 <div>
@@ -244,7 +244,7 @@ export default function ReportsIndex({
                                 </div>
                             </div>
                             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-600">
+                                <div className="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600">
                                     <HardDrive className="w-6 h-6" />
                                 </div>
                                 <div>
@@ -253,7 +253,7 @@ export default function ReportsIndex({
                                 </div>
                             </div>
                             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-slate-900">
+                                <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-900">
                                     <Activity className="w-6 h-6" />
                                 </div>
                                 <div>
@@ -269,7 +269,7 @@ export default function ReportsIndex({
                                     <h3 className="text-4xl font-bold text-green-600 mb-2">{maskValue(systemHealth?.whatsappUsers)}</h3>
                                     <p className="text-slate-700 font-medium">{__('general.active_whatsapp_users')}</p>
                                 </div>
-                                <div className="flex flex-col items-center justify-center p-8 bg-blue-50 rounded-xl border border-blue-100">
+                                <div className="flex flex-col items-center justify-center p-8 bg-slate-50 rounded-xl border border-slate-50">
                                     <h3 className="text-4xl font-bold text-slate-900 mb-2">{maskValue(formatCurrency(systemHealth?.totalWhatsappBalance, businessCurrency))}</h3>
                                     <p className="text-slate-700 font-medium">{__('general.total_whatsapp_balance')}</p>
                                 </div>
@@ -294,7 +294,7 @@ export default function ReportsIndex({
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                                 <div className="flex items-center gap-3 mb-6">
-                                    <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600"><Briefcase className="w-5 h-5"/></div>
+                                    <div className="w-10 h-10 rounded-lg bg-yellow-100 flex items-center justify-center text-yellow-600"><Briefcase className="w-5 h-5"/></div>
                                     <h3 className="font-bold text-slate-800">{__('general.project_completion')}</h3>
                                 </div>
                                 <div className="flex items-end gap-2">
@@ -305,7 +305,7 @@ export default function ReportsIndex({
                                 </div>
                                 <div className="mt-4 w-full bg-slate-100 rounded-full h-2">
                                     <div 
-                                        className="bg-orange-500 h-2 rounded-full" 
+                                        className="bg-yellow-600 h-2 rounded-full" 
                                         style={{ width: `${operationalStats?.totalProjects > 0 ? Math.round((operationalStats?.completedProjects / operationalStats?.totalProjects) * 100) : 0}%` }}
                                     ></div>
                                 </div>
@@ -313,7 +313,7 @@ export default function ReportsIndex({
 
                             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                                 <div className="flex items-center gap-3 mb-6">
-                                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-slate-900"><Activity className="w-5 h-5"/></div>
+                                    <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center text-slate-900"><Activity className="w-5 h-5"/></div>
                                     <h3 className="font-bold text-slate-800">{__('general.task_completion')}</h3>
                                 </div>
                                 <div className="flex items-end gap-2">
