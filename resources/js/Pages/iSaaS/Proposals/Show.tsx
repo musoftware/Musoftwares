@@ -44,7 +44,7 @@ export default function Show({ proposal, auth }: Props) {
         <AuthenticatedLayout>
             <Head title={proposal.project_name} />
 
-            <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
                 <div className="mb-6">
                     <Link href={route('isaas.proposals.index')} className="text-sm font-medium text-gray-500 hover:text-gray-900 flex items-center">
                         <ArrowLeft className="me-1 h-4 w-4" />{__('general.back_to_proposals')}</Link>

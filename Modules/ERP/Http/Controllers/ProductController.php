@@ -91,8 +91,7 @@ class ProductController extends Controller
                         ->orWhere('sku', 'like', "%{$search}%");
                 });
             })
-            ->limit(20)
-            ->get(['id', 'name', 'sku', 'barcode', 'uom', 'tax_rate', 'price', 'currency_id', 'stock_quantity']);
+            ->paginate(50, ['id', 'name', 'sku', 'barcode', 'uom', 'tax_rate', 'price', 'currency_id', 'stock_quantity']);
             
         return response()->json($products);
     }

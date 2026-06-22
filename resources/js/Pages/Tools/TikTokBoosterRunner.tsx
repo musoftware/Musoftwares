@@ -94,7 +94,7 @@ export default function TikTokBoosterRunner({ tool }: any) {
                 </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto p-8 max-w-5xl mx-auto w-full space-y-8">
+            <div className="flex-1 overflow-y-auto p-8 max-w-7xl mx-auto w-full space-y-8">
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
                     <h2 className="text-lg font-bold">{__('general.new_campaign')}</h2>
                     

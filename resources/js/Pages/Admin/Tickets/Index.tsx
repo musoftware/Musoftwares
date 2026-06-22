@@ -81,12 +81,12 @@ function StatCard({
             }`}
         >
             <div className="flex items-center justify-between">
-                <span className={`text-xs font-semibold uppercase tracking-wider ${active ? 'text-indigo-600' : 'text-slate-500'}`}>{label}</span>
+                <span className={`text-xs font-semibold uppercase tracking-wider ${active ? 'text-slate-900' : 'text-slate-500'}`}>{label}</span>
                 <div className={`rounded-lg p-1.5 ${color}`}>
                     <Icon className="h-3.5 w-3.5 text-white" />
                 </div>
             </div>
-            <span className={`text-3xl font-bold tabular-nums ${active ? 'text-indigo-700' : 'text-slate-900'}`}>{value}</span>
+            <span className={`text-3xl font-bold tabular-nums ${active ? 'text-slate-900' : 'text-slate-900'}`}>{value}</span>
         </button>
     );
 }
@@ -144,7 +144,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                 <div className="flex flex-col gap-0.5 min-w-0">
                     <Link
                         href={`/admin/tickets/${t.id}`}
-                        className="font-semibold text-slate-800 hover:text-indigo-600 transition-colors truncate max-w-xs flex items-center gap-1.5"
+                        className="font-semibold text-slate-800 hover:text-slate-900 transition-colors truncate max-w-xs flex items-center gap-1.5"
                     >
                         {t.needs_attention && (
                             <span className="flex-shrink-0 h-2 w-2 rounded-full bg-red-500" title={__('general.needs_attention')} />
@@ -213,7 +213,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                                 <Eye className="me-2 h-4 w-4" />{__('general.view_ticket')}</Link>
                         </DropdownMenuItem>
                         {t.ticket_status !== 'closed' ? (
-                            <DropdownMenuItem onClick={() => handleClose(t.id)} className="text-emerald-700 focus:text-emerald-800">
+                            <DropdownMenuItem onClick={() => handleClose(t.id)} className="text-slate-900 focus:text-emerald-800">
                                 <CheckCircle className="me-2 h-4 w-4" />{__('general.close_ticket')}</DropdownMenuItem>
                         ) : (
                             <DropdownMenuItem onClick={() => handleReopen(t.id)} className="text-amber-700 focus:text-amber-800">
@@ -281,7 +281,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                     <StatCard
                         label={__('general.open')}
                         value={stats.open}
-                        color="bg-blue-500"
+                        color="bg-slate-900"
                         icon={Inbox}
                         active={filters.status === 'open'}
                         onClick={() => handleStatusFilter('open')}
@@ -305,7 +305,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                     <StatCard
                         label={__('general.resolved')}
                         value={stats.closed}
-                        color="bg-emerald-500"
+                        color="bg-slate-900"
                         icon={CheckCheck}
                         active={filters.status === 'closed'}
                         onClick={() => handleStatusFilter('closed')}

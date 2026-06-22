@@ -551,7 +551,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                             </div>
                         </div>
                         </div>
-                        <div className="bg-gray-50 p-3 rounded-md border border-gray-100 flex items-center justify-between">
+                        <div className="bg-gray-50 p-3 rounded-md border border-gray-100 flex items-center justify-end gap-4">
                             <span className="text-sm font-medium text-gray-700">{__('admin.calculated_hourly_rate')}</span>
                             <span className="text-lg font-bold text-gray-900">{computedRate}</span>
                         </div>

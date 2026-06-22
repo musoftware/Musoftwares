@@ -36,7 +36,7 @@ export default function ReviewLeave({ leaveRequest }: any) {
         <ERPLayout title={__('erp.review_leave_request')} workspaceName={__('erp.manager')} menuItems={[]}>
             <Head title={__('erp.review_leave_request')} />
             
-            <div className="flex flex-col gap-8 p-8 max-w-4xl mx-auto">
+            <div className="flex flex-col gap-8 p-8 max-w-7xl mx-auto">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-4">
                         <Link href={route('erp.manager.approvals.index')}>

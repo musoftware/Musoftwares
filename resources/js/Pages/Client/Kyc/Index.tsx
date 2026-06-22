@@ -194,7 +194,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
         <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-foreground leading-tight">{__('general.identity_verification')}</h2>}>
             <Head title={__('general.kyc_verification')} />
 
-            <div className="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8">
+            <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8">
                 {/* STATUS BANNER */}
                 <div className={`p-6 rounded-2xl border shadow-sm ${
                     isVerified ? 'bg-emerald-50 border-emerald-200' :
@@ -341,7 +341,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                             <CheckCircle2 className="w-10 h-10 text-indigo-500" />
                         </div>
                         <h2 className="text-2xl font-bold text-slate-900 mb-2">{__('general.application_received')}</h2>
-                        <p className="text-slate-600 max-w-md mx-auto">
+                        <p className="text-slate-600 max-w-7xl mx-auto">
                             {__('general.thank_you_for_submitting_your_documents')}</p>
                     </div>
                 )}

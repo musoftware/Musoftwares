@@ -112,7 +112,7 @@ export function OutreachWorkspace(props: OutreachWorkspaceProps) {
                         <div className="bg-white border border-slate-200 rounded-2xl p-16 text-center shadow-sm">
                             <FileText className="w-8 h-8 text-slate-300 mx-auto mb-3" />
                             <h4 className="text-xs font-bold text-slate-900">{__('general.no_target_campaign_selected')}</h4>
-                            <p className="text-[11px] text-slate-400 mt-1 max-w-xs mx-auto">{__('general.select_an_active_search_campaign_from_the_left_sidebar_list_to_edit_its_cold_message_sequences')}</p>
+                            <p className="text-[11px] text-slate-400 mt-1 max-w-7xl mx-auto">{__('general.select_an_active_search_campaign_from_the_left_sidebar_list_to_edit_its_cold_message_sequences')}</p>
                         </div>
                     )}
                 </div>

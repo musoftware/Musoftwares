@@ -35,7 +35,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
         <ToolsPublicLayout title={__('general.my_tools')} activeNav="downloads">
             <Head title={__('general.my_tools_musoftware')} />
 
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
 
                 {/* Page header */}
                 <div>

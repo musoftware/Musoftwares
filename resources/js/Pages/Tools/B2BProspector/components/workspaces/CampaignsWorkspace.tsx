@@ -48,7 +48,7 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
                 <Card className="py-24 text-center border-dashed">
                     <Users className="w-10 h-10 text-slate-300 mx-auto mb-4" />
                     <h3 className="text-sm font-bold text-slate-900">{__('general.no_campaigns_launched_yet')}</h3>
-                    <p className="text-xs text-slate-500 mt-1.5 max-w-xs mx-auto">{__('general.create_your_first_lead_finder_campaign_to_start_sourcing_verified_emails_locally')}</p>
+                    <p className="text-xs text-slate-500 mt-1.5 max-w-7xl mx-auto">{__('general.create_your_first_lead_finder_campaign_to_start_sourcing_verified_emails_locally')}</p>
                     <Button onClick={() => props.setShowNewCampaignModal(true)} className="mt-6">{__('general.create_campaign')}</Button>
                 </Card>
             ) : (
@@ -102,7 +102,7 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
                                     </div>
                                 </div>
 
-                                <div className="border-t border-slate-100 pt-4 flex items-center justify-between gap-3">
+                                <div className="border-t border-slate-100 pt-4 flex items-center justify-end gap-4 gap-3">
                                     <Button 
                                         variant="ghost" size="sm"
                                         onClick={() => props.onViewLeads(camp.id)}

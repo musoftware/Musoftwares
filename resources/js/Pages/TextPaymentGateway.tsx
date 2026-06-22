@@ -45,7 +45,7 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
             <Head title={__('sms_gateway.payment_gateway')} />
 
             <div className="py-8 md:py-12 bg-slate-50/50 min-h-[calc(100vh-65px)]">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                     {/* Header Section */}
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                         <div>

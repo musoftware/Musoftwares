@@ -2544,7 +2544,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                                     setSelectedCalendarTask(task);
                                                                     setShowCalendarTaskModal(true);
                                                                 }}
-                                                                className="py-2.5 px-1 hover:bg-slate-50 transition cursor-pointer rounded-lg flex items-center justify-between text-start"
+                                                                className="py-2.5 px-1 hover:bg-slate-50 transition cursor-pointer rounded-lg flex items-center justify-end gap-4 text-start"
                                                             >
                                                                 <div className="max-w-[70%]">
                                                                     <span className="font-semibold text-xs text-slate-800 block truncate">{task.title}</span>
@@ -2930,7 +2930,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                             )}
                                         </div>
 
-                                        <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                                        <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-4 gap-3">
                                             <Link 
                                                 href={route('erp.tasks.show', selectedCalendarTask.id)} 
                                                 className={cn(buttonVariants({ size: 'sm', variant: 'outline' }), "flex-1 shadow-none text-xs font-semibold h-9 gap-1.5 border-slate-200")}

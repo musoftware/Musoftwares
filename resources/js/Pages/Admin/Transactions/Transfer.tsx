@@ -298,7 +298,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
         <AdminSidebarLayout title={__('general.swap_projects_budget')} header={__('general.swap_projects_budget')} user={auth?.user}>
             <Head title={`Swap Budget: ${user.name}`} />
 
-            <div className="w-full max-w-6xl mx-auto py-6 space-y-6">
+            <div className="w-full max-w-7xl mx-auto py-6 space-y-6">
                 <header className="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">{__('general.swap_projects_budget')}</h1>

@@ -42,7 +42,7 @@ export default function Billing({ subscriptions }: Props) {
 
     return (
         <ToolsPublicLayout title={__('general.billing')} activeNav="billing">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
                 {/* Page header */}
                 <div className="flex items-start justify-between">
                     <div>

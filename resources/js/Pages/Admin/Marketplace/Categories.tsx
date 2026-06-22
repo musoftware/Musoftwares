@@ -59,7 +59,7 @@ export default function Categories({ categories }: any) {
                             </div>
                             <button
                                 type="submit"
-                                className="rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
+                                className="rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-900"
                             >
                                 {__('general.save')}</button>
                         </form>

@@ -74,7 +74,7 @@ export default function Index({ proposals, filters }: any) {
                             <tr key={proposal.id} className="border-b hover:bg-gray-50">
                                 <td className="p-4">
                                     {proposal.job ? (
-                                        <Link href={route('admin.freelance.jobs.show', proposal.job.id)} className="font-medium text-blue-600 hover:underline">
+                                        <Link href={route('admin.freelance.jobs.show', proposal.job.id)} className="font-medium text-slate-900 hover:underline">
                                             {proposal.job.title}
                                         </Link>
                                     ) : (

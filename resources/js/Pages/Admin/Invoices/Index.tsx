@@ -194,7 +194,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     const getJobStatusBadge = (status) => {
         switch (status) {
             case 'done':
-                return <StatusBadge status="done" label={__('general.done')} className="bg-emerald-50 text-emerald-700 border-emerald-100" />;
+                return <StatusBadge status="done" label={__('general.done')} className="bg-emerald-50 text-slate-900 border-emerald-100" />;
             case 'processing':
                 return <StatusBadge status="processing" label={__('general.processing')} className="bg-amber-50 text-amber-700 border-amber-100" />;
             default:
@@ -357,7 +357,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                 <div className="flex items-center gap-3">
                                                     <Avatar className="h-10 w-10 border border-slate-200">
                                                         <AvatarImage src={invoice.user.avatar_url || ''} alt={invoice.user.name} />
-                                                        <AvatarFallback className="bg-blue-50 text-blue-500">
+                                                        <AvatarFallback className="bg-blue-50 text-slate-900">
                                                             <User className="h-5 w-5" />
                                                         </AvatarFallback>
                                                     </Avatar>
@@ -366,7 +366,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                         onClick={() => setSelectedClient(invoice.user)}
                                                         className="flex flex-col text-start group"
                                                     >
-                                                        <span className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-1">
+                                                        <span className="font-semibold text-slate-900 group-hover:text-slate-900 transition-colors flex items-center gap-1">
                                                             {invoice.user.name}
                                                             <ChevronDown className="h-3 w-3 text-muted-foreground hidden sm:inline-block" />
                                                         </span>
@@ -390,7 +390,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                         </TableCell>
                                         <TableCell className="text-end" data-label={__('general.total')}>
                                             <div className="flex flex-col items-end gap-1">
-                                                <span className="font-semibold text-emerald-600">
+                                                <span className="font-semibold text-slate-900">
                                                     {formatCurrency(invoice.amount, invoice.currency)}
                                                 </span>
                                                 {(invoice.business_currency && invoice.business_currency !== invoice.currency) && (
@@ -434,12 +434,12 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                     <DropdownMenuLabel>{__('general.invoice_actions')}</DropdownMenuLabel>
                                                     <DropdownMenuItem asChild>
                                                         <Link href={route('admin.invoices.show', invoice.id)} className="flex w-full items-center">
-                                                            <FileText className="me-2 h-4 w-4 text-blue-500" />{__('general.view_details')}</Link>
+                                                            <FileText className="me-2 h-4 w-4 text-slate-900" />{__('general.view_details')}</Link>
                                                     </DropdownMenuItem>
                                                     
                                                     <DropdownMenuItem asChild>
                                                         <Link href={`/admin/invoices/create?client_id=${invoice.user_id || invoice.user?.id}${(invoice.project_id || invoice.project?.id) ? `&project_id=${invoice.project_id || invoice.project?.id}` : ''}`} className="flex w-full items-center">
-                                                            <Plus className="me-2 h-4 w-4 text-emerald-500" />{__('general.new_invoice')}</Link>
+                                                            <Plus className="me-2 h-4 w-4 text-slate-900" />{__('general.new_invoice')}</Link>
                                                     </DropdownMenuItem>
                                                     
                                                     <DropdownMenuItem asChild>
@@ -464,18 +464,18 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                     <DropdownMenuLabel>{__('general.profile_tasks')}</DropdownMenuLabel>
                                                     <DropdownMenuItem asChild>
                                                         <a href={`/admin/users/${invoice.user_id || invoice.user?.id}`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
-                                                            <User className="me-2 h-4 w-4 text-blue-500" />{__('general.user_profile')}</a>
+                                                            <User className="me-2 h-4 w-4 text-slate-900" />{__('general.user_profile')}</a>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
                                                         <Link href={`/admin/users/${invoice.user_id || invoice.user?.id}/tasks/add`} className="flex w-full items-center">
-                                                            <ClipboardList className="me-2 h-4 w-4 text-emerald-500" />{__('general.add_tasks')}</Link>
+                                                            <ClipboardList className="me-2 h-4 w-4 text-slate-900" />{__('general.add_tasks')}</Link>
                                                     </DropdownMenuItem>
                                                 
                                                     <DropdownMenuSeparator />
                                                 
                                                     {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
                                                         <DropdownMenuItem onClick={() => handleMarkPaid(invoice.id)}>
-                                                            <CheckCircle className="me-2 h-4 w-4 text-emerald-600" />{__('general.mark_as_paid')}</DropdownMenuItem>
+                                                            <CheckCircle className="me-2 h-4 w-4 text-slate-900" />{__('general.mark_as_paid')}</DropdownMenuItem>
                                                     )}
                                                     {invoice.status !== 'cancelled' && (
                                                         <DropdownMenuItem onClick={() => handleCancel(invoice.id)} className="text-red-600 focus:text-red-600">

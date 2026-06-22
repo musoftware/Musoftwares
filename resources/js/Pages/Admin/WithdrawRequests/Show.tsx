@@ -132,7 +132,7 @@ export default function Show({ withdrawRequest }: Props) {
                             {__('general.user')}</h3>
                         <div className="flex items-center gap-3">
                             <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-                                <User className="h-4 w-4 text-indigo-600" />
+                                <User className="h-4 w-4 text-slate-900" />
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-slate-800">
@@ -146,7 +146,7 @@ export default function Show({ withdrawRequest }: Props) {
                         {withdrawRequest.user && (
                             <Link
                                 href={`/admin/users/${withdrawRequest.user.id}`}
-                                className="mt-3 block text-center text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+                                className="mt-3 block text-center text-xs text-slate-900 hover:text-indigo-800 font-medium transition-colors"
                             >
                                 View User Profile →
                             </Link>

@@ -61,7 +61,7 @@ interface Props {
 
 const statusStyles: Record<string, string> = {
     pending:  'bg-yellow-100 text-yellow-700 border-yellow-200',
-    active:   'bg-emerald-100 text-emerald-700 border-emerald-200',
+    active:   'bg-emerald-100 text-slate-900 border-emerald-200',
     declined: 'bg-red-100 text-red-700 border-red-200',
 };
 
@@ -137,7 +137,7 @@ export default function Show({ paymentMethod }: Props) {
                     <div className="flex items-start justify-between pb-4 border-b border-slate-100">
                         <div className="flex items-center gap-3">
                             <div className="h-10 w-10 rounded-lg bg-indigo-100 flex items-center justify-center">
-                                <CreditCard className="h-5 w-5 text-indigo-600" />
+                                <CreditCard className="h-5 w-5 text-slate-900" />
                             </div>
                             <div>
                                 <h2 className="text-lg font-semibold text-slate-800">
@@ -225,7 +225,7 @@ export default function Show({ paymentMethod }: Props) {
                             <>
                                 <div className="flex items-center gap-3">
                                     <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                                        <UserIcon className="h-4 w-4 text-indigo-600" />
+                                        <UserIcon className="h-4 w-4 text-slate-900" />
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-slate-800">{paymentMethod.user.name}</p>
@@ -234,7 +234,7 @@ export default function Show({ paymentMethod }: Props) {
                                 </div>
                                 <Link
                                     href={route('admin.users.show', paymentMethod.user.id)}
-                                    className="mt-3 block text-center text-xs text-indigo-600 hover:text-indigo-800 transition-colors"
+                                    className="mt-3 block text-center text-xs text-slate-900 hover:text-indigo-800 transition-colors"
                                 >
                                     View User Profile →
                                 </Link>
@@ -250,7 +250,7 @@ export default function Show({ paymentMethod }: Props) {
 
                         {paymentMethod.status !== 'active' && (
                             <Button
-                                className="w-full justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                                className="w-full justify-center gap-2 bg-slate-900 hover:bg-slate-900 text-white"
                                 onClick={() => handleUpdate('active')}
                             >
                                 <CheckCircle className="h-4 w-4" />{__('general.approve_method')}</Button>

@@ -66,17 +66,17 @@ interface Props {
 }
 
 const PRIORITY_CONFIG: Record<string, { label: string; cls: string }> = {
-    urgent: { label: 'Urgent', cls: 'bg-rose-100 text-rose-700 border border-rose-200' },
+    urgent: { label: 'Urgent', cls: 'bg-rose-100 text-slate-900 border border-rose-200' },
     high:   { label: 'High',   cls: 'bg-amber-100 text-amber-700 border border-amber-200' },
-    normal: { label: 'Normal', cls: 'bg-blue-100 text-blue-700 border border-blue-200' },
+    normal: { label: 'Normal', cls: 'bg-blue-100 text-slate-900 border border-blue-200' },
     low:    { label: 'Low',    cls: 'bg-slate-100 text-slate-500 border border-slate-200' },
 };
 
 const STATUS_CONFIG: Record<string, string> = {
     open:        'bg-slate-100 text-slate-600',
-    in_progress: 'bg-blue-100 text-blue-700',
-    review:      'bg-indigo-100 text-indigo-700',
-    completed:   'bg-emerald-100 text-emerald-700',
+    in_progress: 'bg-blue-100 text-slate-900',
+    review:      'bg-indigo-100 text-slate-900',
+    completed:   'bg-emerald-100 text-slate-900',
 };
 
 export default function AsList({ arrangedClients, clients, filters, stats, auth }: Props) {
@@ -122,7 +122,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                            <ListTodo className="h-6 w-6 text-indigo-600" />{__('general.active_tasks_platform_clients')}</h1>
+                            <ListTodo className="h-6 w-6 text-slate-900" />{__('general.active_tasks_platform_clients')}</h1>
                         <p className="text-sm text-slate-500 mt-1">{__('general.platform_wide_view_of_pending_checklist_items_grouped_by_client_task_board')}</p>
                     </div>
                 </div>
@@ -130,9 +130,9 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                 {/* KPI Row */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {[
-                        { label: 'Active Todos',     value: stats.total_active_todos, color: 'text-indigo-600',  bg: 'bg-indigo-50',  icon: ClipboardList },
+                        { label: 'Active Todos',     value: stats.total_active_todos, color: 'text-slate-900',  bg: 'bg-indigo-50',  icon: ClipboardList },
                         { label: 'Total Clients',    value: stats.total_clients,      color: 'text-violet-600', bg: 'bg-violet-50',  icon: User },
-                        { label: 'Active Clients',   value: totalClientsWithTasks,    color: 'text-emerald-600', bg: 'bg-emerald-50', icon: User },
+                        { label: 'Active Clients',   value: totalClientsWithTasks,    color: 'text-slate-900', bg: 'bg-emerald-50', icon: User },
                         { label: 'Task Boards',      value: totalTasks,               color: 'text-amber-600',  bg: 'bg-amber-50',   icon: Briefcase },
                     ].map(({ label, value, color, bg, icon: Icon }) => (
                         <Card key={label} className="rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -179,7 +179,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                 />
                             </div>
 
-                            <Button type="submit" size="sm" className="h-9 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-none border-0 text-xs">
+                            <Button type="submit" size="sm" className="h-9 bg-slate-900 hover:bg-slate-900 text-white font-semibold shadow-none border-0 text-xs">
                                 {__('general.apply')}</Button>
 
                             {(search || clientFilter) && (
@@ -215,7 +215,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                 <div className="flex items-center gap-3 mb-4">
                                     <Avatar className="h-8 w-8 rounded-lg border border-slate-200">
                                         <AvatarImage src={clientGroup.client.avatar_url} alt={clientGroup.client.name} />
-                                        <AvatarFallback className="rounded-lg bg-indigo-100 text-indigo-700 font-bold text-sm">
+                                        <AvatarFallback className="rounded-lg bg-indigo-100 text-slate-900 font-bold text-sm">
                                             {clientGroup.client.name.charAt(0).toUpperCase()}
                                         </AvatarFallback>
                                     </Avatar>
@@ -225,7 +225,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                     </div>
                                     <Link
                                         href={route('admin.users.show', clientGroup.client.id)}
-                                        className="ms-auto text-xs text-indigo-600 hover:underline flex items-center gap-0.5"
+                                        className="ms-auto text-xs text-slate-900 hover:underline flex items-center gap-0.5"
                                     >{__('general.view_client_profile')}<ChevronRight className="h-3.5 w-3.5" />
                                     </Link>
                                 </div>
@@ -244,7 +244,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                                 </div>
                                                 <Link
                                                     href={`/admin/tasks/client-tasks?client_id=${clientGroup.client.id}`}
-                                                    className="text-xs text-indigo-600 hover:underline flex items-center gap-0.5 whitespace-nowrap"
+                                                    className="text-xs text-slate-900 hover:underline flex items-center gap-0.5 whitespace-nowrap"
                                                 >{__('general.open_client_focus_board')}<ChevronRight className="h-3.5 w-3.5" />
                                                 </Link>
                                             </div>
@@ -263,11 +263,11 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                                             <button
                                                                 onClick={() => handleMarkComplete(todo.id)}
                                                                 disabled={isDone}
-                                                                className="mt-0.5 text-slate-300 hover:text-emerald-500 transition-colors flex-shrink-0 disabled:cursor-not-allowed"
+                                                                className="mt-0.5 text-slate-300 hover:text-slate-900 transition-colors flex-shrink-0 disabled:cursor-not-allowed"
                                                                 title={isDone ? 'Completed' : 'Mark as complete'}
                                                             >
                                                                 {isDone
-                                                                    ? <CheckCircle2 className="h-4 w-4 text-emerald-500 fill-emerald-50" />
+                                                                    ? <CheckCircle2 className="h-4 w-4 text-slate-900 fill-emerald-50" />
                                                                     : <Circle className="h-4 w-4" />
                                                                 }
                                                             </button>
@@ -310,7 +310,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                                                 {/* Meta line */}
                                                                 <div className="flex flex-wrap items-center gap-3 pt-0.5 text-[11px] text-slate-400 font-medium">
                                                                     {todo.cost && (
-                                                                        <span className="flex items-center gap-0.5 text-emerald-600 font-semibold">
+                                                                        <span className="flex items-center gap-0.5 text-slate-900 font-semibold">
                                                                             <DollarSign className="h-3 w-3" />
                                                                             {todo.cost} {todo.cost_currency}
                                                                         </span>

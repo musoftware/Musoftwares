@@ -88,7 +88,7 @@ export default function Show({ article }: ShowProps) {
                 <div className="absolute top-0 start-1/4 w-96 h-96 bg-indigo-200/30 rounded-full blur-3xl pointer-events-none z-0" />
                 <div className="absolute top-1/3 end-1/4 w-[400px] h-[400px] bg-purple-200/20 rounded-full blur-3xl pointer-events-none z-0" />
 
-                <div className="max-w-4xl mx-auto px-6 relative z-10">
+                <div className="max-w-7xl mx-auto px-6 relative z-10">
                     {/* Back Button */}
                     <div className="mb-8">
                         <Link href="/blog">

@@ -87,7 +87,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.total_workspaces')}</span>
                                 <h3 className="text-2xl font-bold text-slate-900">{stats.total_tenants}</h3>
                             </div>
-                            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
+                            <div className="p-3 bg-indigo-50 text-slate-900 rounded-lg">
                                 <Building2 className="h-6 w-6" />
                             </div>
                         </CardContent>
@@ -97,9 +97,9 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                         <CardContent className="p-5 flex items-center justify-between">
                             <div className="space-y-1">
                                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.active_status')}</span>
-                                <h3 className="text-2xl font-bold text-emerald-600">{stats.active_tenants}</h3>
+                                <h3 className="text-2xl font-bold text-slate-900">{stats.active_tenants}</h3>
                             </div>
-                            <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+                            <div className="p-3 bg-emerald-50 text-slate-900 rounded-lg">
                                 <TrendingUp className="h-6 w-6" />
                             </div>
                         </CardContent>
@@ -113,7 +113,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                     {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.total_revenue)}
                                 </h3>
                             </div>
-                            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
+                            <div className="p-3 bg-indigo-50 text-slate-900 rounded-lg">
                                 <DollarSign className="h-6 w-6" />
                             </div>
                         </CardContent>
@@ -125,7 +125,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.total_active_staff')}</span>
                                 <h3 className="text-2xl font-bold text-slate-900">{stats.total_team_members}</h3>
                             </div>
-                            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
+                            <div className="p-3 bg-indigo-50 text-slate-900 rounded-lg">
                                 <UserCheck className="h-6 w-6" />
                             </div>
                         </CardContent>
@@ -147,7 +147,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                     className="ps-9 h-10 shadow-none border-slate-200 focus-visible:ring-indigo-500"
                                 />
                             </div>
-                            <Button type="submit" size="sm" className="h-10 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-none border-0">
+                            <Button type="submit" size="sm" className="h-10 bg-slate-900 hover:bg-slate-900 text-white font-semibold shadow-none border-0">
                                 {__('general.search')}</Button>
                         </form>
                     </div>
@@ -182,7 +182,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                         <tr key={tenant.id} className="hover:bg-slate-50 transition text-[13px] text-slate-700">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2.5">
-                                                    <div className="h-8 w-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                                                    <div className="h-8 w-8 rounded-lg bg-indigo-50 text-slate-900 flex items-center justify-center font-bold text-xs">
                                                         {tenant.name.charAt(0).toUpperCase()}
                                                     </div>
                                                     <div>
@@ -203,7 +203,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                                                    tenant.team_count > 0 ? 'bg-indigo-50 text-indigo-700' : 'bg-slate-100 text-slate-500'
+                                                    tenant.team_count > 0 ? 'bg-indigo-50 text-slate-900' : 'bg-slate-100 text-slate-500'
                                                 }`}>
                                                     {tenant.team_count} staff
                                                 </span>
@@ -218,13 +218,13 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                                 <div className="flex items-center justify-end gap-2">
                                                     <Link 
                                                         href={route('admin.erp.show', tenant.id)}
-                                                        className={route('admin.erp.show', tenant.id) ? "inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 font-semibold text-xs transition-colors" : ""}
+                                                        className={route('admin.erp.show', tenant.id) ? "inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-slate-900 font-semibold text-xs transition-colors" : ""}
                                                     >
                                                         <Eye className="h-3 w-3" /> {__('general.drilldown')}</Link>
                                                     <Button 
                                                         size="sm"
                                                         onClick={() => handleImpersonate(tenant.user_id)}
-                                                        className="h-7 px-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-none border-0"
+                                                        className="h-7 px-2.5 bg-slate-900 hover:bg-slate-900 text-white font-semibold text-xs shadow-none border-0"
                                                     >
                                                         {__('general.impersonate')}</Button>
                                                 </div>
@@ -252,7 +252,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                             className={`px-3 py-1.5 rounded transition ${
                                                 link.active 
-                                                    ? 'bg-indigo-600 text-white font-bold' 
+                                                    ? 'bg-slate-900 text-white font-bold' 
                                                     : 'hover:bg-slate-100 text-slate-600'
                                             }`}
                                         />

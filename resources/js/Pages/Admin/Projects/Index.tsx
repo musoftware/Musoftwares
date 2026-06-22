@@ -91,12 +91,12 @@ export default function Index({ projects, currentTab, filters }) {
                 <>
                     <button 
                         onClick={() => openProjectSheet(project)}
-                        className="hover:text-blue-600 hover:underline text-start font-semibold cursor-pointer outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                        className="hover:text-slate-900 hover:underline text-start font-semibold cursor-pointer outline-none focus:ring-2 focus:ring-blue-500 rounded"
                     >
                         {project.project_name}
                     </button>
                     {project.invoices && project.invoices.length > 0 && (
-                        <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded w-fit" title="Unpaid Invoices / Milestones">
+                        <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-slate-900 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded w-fit" title="Unpaid Invoices / Milestones">
                             <AlertCircle className="w-3 h-3" /> {__('general.unpaid_dues')}
                         </div>
                     )}
@@ -111,7 +111,7 @@ export default function Index({ projects, currentTab, filters }) {
                     <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10 border border-slate-200">
                             <AvatarImage src={project.client.avatar_url || ''} alt={project.client.name} />
-                            <AvatarFallback className="bg-blue-50 text-blue-500">
+                            <AvatarFallback className="bg-blue-50 text-slate-900">
                                 <User className="h-5 w-5" />
                             </AvatarFallback>
                         </Avatar>
@@ -171,15 +171,15 @@ export default function Index({ projects, currentTab, filters }) {
 
     return (
         <AdminSidebarLayout title={__('general.projects')} header="Projects Manager">
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex items-center justify-end gap-4">
                 <div className="flex space-x-4">
                     <Link
                         href={route('admin.projects.index', { status: 'active' })}
-                        className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'active' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                        className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'active' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                     >{__('general.active_projects')}</Link>
                     <Link
                         href={route('admin.projects.index', { status: 'archived' })}
-                        className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'archived' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                        className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'archived' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                     >{__('general.archived_projects')}</Link>
                 </div>
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>

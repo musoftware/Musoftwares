@@ -33,7 +33,7 @@ export default function Tutorial({ tool }: Props) {
         <ToolsPublicLayout title={`${tool.title} — Quick Start Guide`} activeNav="explore">
             <Head title={`${tool.title} — Quick Start Guide`} />
 
-            <div className="max-w-3xl mx-auto py-10 px-4 sm:px-6 space-y-8">
+            <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 space-y-8">
                 {/* Back button */}
                 <div>
                     <Link

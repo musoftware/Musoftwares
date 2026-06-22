@@ -85,7 +85,7 @@ export default function Index({ servicesWithLandingPages, filters, auth, transla
                                                 <TableCell className="font-medium">
                                                     {service.title}
                                                     <br />
-                                                    <a href={`/l/${service.landing_page.slug}`} target="_blank" className="text-xs text-blue-500 hover:underline" rel="noreferrer">
+                                                    <a href={`/l/${service.landing_page.slug}`} target="_blank" className="text-xs text-slate-900 hover:underline" rel="noreferrer">
                                                         /l/{service.landing_page.slug}
                                                     </a>
                                                 </TableCell>

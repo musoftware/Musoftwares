@@ -156,7 +156,7 @@ export default function Index({ campaigns }: Props) {
                             </div>
                         </div>
                         
-                        <div className="bg-gray-50 border-t p-3 flex justify-between items-center">
+                        <div className="bg-gray-50 border-t p-3 flex justify-end gap-4 items-center">
                             <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => handleDelete(campaign.id)}>
                                 <Trash2 className="w-4 h-4" />
                             </Button>

@@ -495,7 +495,7 @@ export default function ArticleMakerRunner({ tool }: any) {
             </div>
 
             {/* ── Content ── */}
-            <div className="max-w-5xl mx-auto px-4 py-6">
+            <div className="max-w-7xl mx-auto px-4 py-6">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="grid w-full max-w-lg grid-cols-3 mb-6 bg-slate-100 p-1 rounded-xl">
                         <TabsTrigger value="discover" className="gap-2 text-sm font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg">
@@ -698,7 +698,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                             <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                 <Sparkles className="w-10 h-10 text-slate-300 mx-auto mb-4" />
                                 <h3 className="text-sm font-bold text-slate-700">{__('general.discover_thousands_of_keyword_ideas')}</h3>
-                                <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">{__('general.enter_a_niche_keyword_and_let_ai_article_writer_expand_it_into_hundreds_of_unique_long_tail_keywords_using_google_youtube_autocomplete')}</p>
+                                <p className="text-xs text-slate-400 mt-2 max-w-7xl mx-auto">{__('general.enter_a_niche_keyword_and_let_ai_article_writer_expand_it_into_hundreds_of_unique_long_tail_keywords_using_google_youtube_autocomplete')}</p>
                             </div>
                         )}
                     </TabsContent>
@@ -860,7 +860,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                             <div className="py-16 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                 <FileText className="w-10 h-10 text-slate-300 mx-auto mb-4" />
                                 <h3 className="text-sm font-bold text-slate-700">{__('general.no_keywords_to_publish')}</h3>
-                                <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">{__('general.go_to_the_discover_tab_first_to_generate_keywords_then_come_back_here_to_publish_them_to_wordpress')}</p>
+                                <p className="text-xs text-slate-400 mt-2 max-w-7xl mx-auto">{__('general.go_to_the_discover_tab_first_to_generate_keywords_then_come_back_here_to_publish_them_to_wordpress')}</p>
                             </div>
                         )}
                     </TabsContent>

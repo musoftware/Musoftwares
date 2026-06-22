@@ -86,7 +86,7 @@ export default function View({ income, transactions, upcomingSchedule, total_sta
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-sm text-gray-500">Cumulative Revenue:</span>
-                                <span className="text-sm font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 border border-emerald-100 rounded">
+                                <span className="text-sm font-bold text-slate-900 bg-emerald-50 px-2 py-0.5 border border-emerald-100 rounded">
                                     {total_stat.total_cost}
                                 </span>
                             </div>
@@ -154,7 +154,7 @@ export default function View({ income, transactions, upcomingSchedule, total_sta
                                                     <td className="px-4 py-3 text-sm text-gray-900">
                                                         {tx.reason}
                                                     </td>
-                                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-emerald-600 text-end">
+                                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-slate-900 text-end">
                                                         +{formatCurrency(tx.amount, tx.currency)}
                                                     </td>
                                                 </tr>
@@ -186,7 +186,7 @@ export default function View({ income, transactions, upcomingSchedule, total_sta
                                                 {run.recorded ? (
                                                     <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded">Recorded (Historical)</span>
                                                 ) : (
-                                                    <span className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-medium">{__('general.pending_execution')}</span>
+                                                    <span className="text-xs bg-emerald-50 text-slate-900 border border-emerald-200 px-2 py-0.5 rounded font-medium">{__('general.pending_execution')}</span>
                                                 )}
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap text-end">

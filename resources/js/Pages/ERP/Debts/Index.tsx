@@ -29,7 +29,7 @@ export default function DebtsIndex({ clients, filters, totalOwedToMe, totalIOwe,
         >
             <Head title={__('erp.debts_management')} />
             
-            <div className="max-w-6xl mx-auto space-y-6">
+            <div className="max-w-7xl mx-auto space-y-6">
                 <div>
                     <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">{__('erp.debts_and_loans')}</h2>
                     <p className="text-sm text-slate-500 mt-1">{__('erp.debts_description')}</p>

@@ -22,7 +22,7 @@ export function QueueWorkspace({
     };
 
     return (
-        <div className="space-y-5 max-w-3xl mx-auto">
+        <div className="space-y-5 max-w-7xl mx-auto">
             <div>
                 <h1 className="text-xl sm:text-2xl font-black text-white">{__('general.queue')}</h1>
                 <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('freelance.jobs_waiting_to_run_processed')}</p>

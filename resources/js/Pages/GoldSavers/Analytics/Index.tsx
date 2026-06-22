@@ -52,7 +52,7 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                                     <Lock className="w-10 h-10" />
                                 </div>
                                 <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">{__('general.advanced_analytics_locked')}</h2>
-                                <p className="text-slate-600 text-lg mb-8 max-w-2xl mx-auto">
+                                <p className="text-slate-600 text-lg mb-8 max-w-7xl mx-auto">
                                     {__('general.upgrade_to_see_analytics_desc')}
                                 </p>
                                 <Link href={route('subscriptions.manage')}>

@@ -227,7 +227,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                             </div>
                                         )}
                                     </div>
-                                    <div className="flex justify-between items-center pt-2">
+                                    <div className="flex justify-end gap-4 items-center pt-2">
                                         <Button type="button" variant="destructive" onClick={handleDeleteWallet}>
                                             <Trash className="w-4 h-4 me-2" />
                                             {__('erp.delete_wallet')}

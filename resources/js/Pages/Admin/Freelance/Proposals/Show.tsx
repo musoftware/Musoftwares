@@ -29,7 +29,7 @@ export default function Show({ proposal }: { proposal: any }) {
                     <div>
                         <h2 className="text-xl font-bold text-gray-900 mb-1">
                             {proposal.job ? (
-                                <Link href={route('admin.freelance.jobs.show', proposal.job.id)} className="text-blue-600 hover:underline">
+                                <Link href={route('admin.freelance.jobs.show', proposal.job.id)} className="text-slate-900 hover:underline">
                                     {__('freelance.job', undefined, 'Job:')} {proposal.job.title}
                                 </Link>
                             ) : (

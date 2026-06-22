@@ -81,7 +81,7 @@ export default function Index({ requests, filters }: Props) {
             render: (row: WithdrawRequest) => 
                 row.user ? (
                     <Link href={route('admin.users.show', row.user.id)} className="flex flex-col group cursor-pointer">
-                        <span className="font-medium text-slate-800 group-hover:text-blue-600 transition-colors">{row.user.name}</span>
+                        <span className="font-medium text-slate-800 group-hover:text-slate-900 transition-colors">{row.user.name}</span>
                         <span className="text-xs text-slate-500">{row.user.email}</span>
                     </Link>
                 ) : (

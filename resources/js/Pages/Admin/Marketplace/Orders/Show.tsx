@@ -79,7 +79,7 @@ export default function Show({ order }) {
                 <div className="col-span-1">
                     <div className="bg-slate-50 rounded-xl shadow-sm border border-slate-200 p-6 sticky top-24">
                         <h2 className="text-lg font-bold font-sora text-slate-800 flex items-center gap-2 mb-4">
-                            <ShieldAlert className="h-5 w-5 text-indigo-600" />{__('general.admin_actions')}</h2>
+                            <ShieldAlert className="h-5 w-5 text-slate-900" />{__('general.admin_actions')}</h2>
 
                         {(order.status === 'completed' || order.status === 'cancelled') ? (
                             <div className="bg-slate-100 text-slate-600 p-4 rounded-lg text-sm flex items-start gap-2">

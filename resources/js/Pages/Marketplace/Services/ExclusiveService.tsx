@@ -73,7 +73,7 @@ export default function ExclusiveService({ serviceSlug }: { serviceSlug: string 
                                     <Send className="w-8 h-8 text-emerald-600" />
                                 </div>
                                 <h2 className="text-2xl font-bold text-gray-900">تم استلام طلبك بنجاح</h2>
-                                <p className="text-gray-500 max-w-md mx-auto">
+                                <p className="text-gray-500 max-w-7xl mx-auto">
                                     شكراً لتواصلك معنا. سنقوم بمراجعة طلبك للخدمة الحصرية والتواصل معك قريباً عبر البريد الإلكتروني أو الهاتف الذي قدمته.
                                 </p>
                                 <div className="pt-4">

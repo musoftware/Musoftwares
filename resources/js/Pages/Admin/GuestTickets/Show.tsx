@@ -16,7 +16,7 @@ export default function Show({ ticket }: { ticket: any }) {
             }
         >
             <Head title={`Ticket #${ticket.id}`} />
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 max-w-3xl mx-auto space-y-6">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 max-w-7xl mx-auto space-y-6">
                 <div className="grid grid-cols-2 gap-4 border-b border-slate-100 pb-6">
                     <div>
                         <p className="text-sm text-slate-500">{__('general.name')}</p>

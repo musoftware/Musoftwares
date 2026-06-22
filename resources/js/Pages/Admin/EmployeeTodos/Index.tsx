@@ -86,13 +86,13 @@ interface Props {
 const priorityColors: Record<string, string> = {
     high:   'bg-red-100 text-red-700',
     medium: 'bg-yellow-100 text-yellow-700',
-    low:    'bg-emerald-100 text-emerald-700',
+    low:    'bg-emerald-100 text-slate-900',
 };
 
 const recurringColors: Record<string, string> = {
-    day:   'bg-blue-100 text-blue-700',
-    week:  'bg-indigo-100 text-indigo-700',
-    month: 'bg-purple-100 text-purple-700',
+    day:   'bg-blue-100 text-slate-900',
+    week:  'bg-indigo-100 text-slate-900',
+    month: 'bg-purple-100 text-slate-900',
     year:  'bg-slate-100 text-slate-700',
 };
 
@@ -244,7 +244,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                 t.user ? (
                     <div className="flex items-center gap-2">
                         <div className="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center">
-                            <UserIcon className="h-3.5 w-3.5 text-indigo-600" />
+                            <UserIcon className="h-3.5 w-3.5 text-slate-900" />
                         </div>
                         <div>
                             <p className="text-sm font-medium text-slate-700">{t.user.name}</p>
@@ -376,9 +376,9 @@ export default function Index({ todos, filters, stats, users }: Props) {
             <div className="mb-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 {[
                     { label: 'Total',   value: stats.total,   color: 'text-slate-800' },
-                    { label: 'Daily',   value: stats.daily,   color: 'text-blue-600' },
-                    { label: 'Weekly',  value: stats.weekly,  color: 'text-indigo-600' },
-                    { label: 'Monthly', value: stats.monthly, color: 'text-purple-600' },
+                    { label: 'Daily',   value: stats.daily,   color: 'text-slate-900' },
+                    { label: 'Weekly',  value: stats.weekly,  color: 'text-slate-900' },
+                    { label: 'Monthly', value: stats.monthly, color: 'text-slate-900' },
                     { label: 'Yearly',  value: stats.yearly,  color: 'text-slate-600' },
                 ].map((s) => (
                     <div

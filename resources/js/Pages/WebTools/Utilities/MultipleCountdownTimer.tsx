@@ -137,17 +137,17 @@ export default function MultipleCountdownTimer() {
 
     return (
         <WebToolsLayout title={__('general.multiple_countdown_timer')} activeNav="explore">
-            <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6">
+            <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6">
                 <div className="text-center mb-10">
                     <div className="inline-flex items-center justify-center p-3 bg-indigo-100 text-indigo-700 rounded-2xl mb-4">
                         <Timer className="w-8 h-8" />
                     </div>
                     <h1 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">{__('general.multiple_countdown_timer')}</h1>
-                    <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+                    <p className="mt-4 text-lg text-slate-600 max-w-7xl mx-auto">
                         {__('general.create_and_manage_multiple_timers_simult')}</p>
                 </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8 max-w-2xl mx-auto">
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8 max-w-7xl mx-auto">
                     <div className="flex gap-3">
                         <Input 
                             placeholder="Timer Label (e.g., 'Boil Eggs')" 
@@ -242,7 +242,7 @@ export default function MultipleCountdownTimer() {
                         {__('general.no_timers_added_yet_use_the_input_above')}</div>
                 )}
 
-                <div className="max-w-2xl mx-auto">
+                <div className="max-w-7xl mx-auto">
                     <Card className="bg-slate-50 border-slate-200">
                         <CardHeader className="pb-3">
                             <CardTitle className="text-base flex items-center gap-2 text-slate-700">

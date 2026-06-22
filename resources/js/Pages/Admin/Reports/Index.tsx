@@ -235,7 +235,7 @@ export default function ReportsIndex({
                                 </div>
                             </div>
                             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                                <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-slate-900">
                                     <Server className="w-6 h-6" />
                                 </div>
                                 <div>
@@ -253,7 +253,7 @@ export default function ReportsIndex({
                                 </div>
                             </div>
                             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
+                                <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-slate-900">
                                     <Activity className="w-6 h-6" />
                                 </div>
                                 <div>
@@ -270,7 +270,7 @@ export default function ReportsIndex({
                                     <p className="text-slate-700 font-medium">{__('general.active_whatsapp_users')}</p>
                                 </div>
                                 <div className="flex flex-col items-center justify-center p-8 bg-blue-50 rounded-xl border border-blue-100">
-                                    <h3 className="text-4xl font-bold text-blue-600 mb-2">{maskValue(formatCurrency(systemHealth?.totalWhatsappBalance, businessCurrency))}</h3>
+                                    <h3 className="text-4xl font-bold text-slate-900 mb-2">{maskValue(formatCurrency(systemHealth?.totalWhatsappBalance, businessCurrency))}</h3>
                                     <p className="text-slate-700 font-medium">{__('general.total_whatsapp_balance')}</p>
                                 </div>
                             </div>
@@ -313,7 +313,7 @@ export default function ReportsIndex({
 
                             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                                 <div className="flex items-center gap-3 mb-6">
-                                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600"><Activity className="w-5 h-5"/></div>
+                                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-slate-900"><Activity className="w-5 h-5"/></div>
                                     <h3 className="font-bold text-slate-800">{__('general.task_completion')}</h3>
                                 </div>
                                 <div className="flex items-end gap-2">
@@ -324,7 +324,7 @@ export default function ReportsIndex({
                                 </div>
                                 <div className="mt-4 w-full bg-slate-100 rounded-full h-2">
                                     <div 
-                                        className="bg-blue-500 h-2 rounded-full" 
+                                        className="bg-slate-900 h-2 rounded-full" 
                                         style={{ width: `${operationalStats?.totalTasks > 0 ? Math.round((operationalStats?.completedTasks / operationalStats?.totalTasks) * 100) : 0}%` }}
                                     ></div>
                                 </div>

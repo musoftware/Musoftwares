@@ -46,7 +46,7 @@ export default function Edit({ job }: any) {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2 md:col-span-2">
                                     <Label className="text-slate-700 font-semibold" htmlFor="title">
-                                        {__('freelance.job_title')} <span className="text-rose-500">*</span>
+                                        {__('freelance.job_title')} <span className="text-slate-900">*</span>
                                     </Label>
                                     <Input
                                         id="title"
@@ -55,7 +55,7 @@ export default function Edit({ job }: any) {
                                         className="h-10 transition-shadow focus-visible:ring-slate-800/20 focus-visible:border-slate-800"
                                         required
                                     />
-                                    {errors.title && <p className="text-[13px] text-rose-500 font-medium">{errors.title}</p>}
+                                    {errors.title && <p className="text-[13px] text-slate-900 font-medium">{errors.title}</p>}
                                 </div>
 
                                 <div className="space-y-2">
@@ -71,7 +71,7 @@ export default function Edit({ job }: any) {
                                         <option value="fixed">{__('freelance.fixed_price')}</option>
                                         <option value="hourly">{__('freelance.hourly_rate')}</option>
                                     </select>
-                                    {errors.type && <p className="text-[13px] text-rose-500 font-medium">{errors.type}</p>}
+                                    {errors.type && <p className="text-[13px] text-slate-900 font-medium">{errors.type}</p>}
                                 </div>
 
                                 <div className="space-y-2">
@@ -86,7 +86,7 @@ export default function Edit({ job }: any) {
                                         onChange={(e) => setData('budget', e.target.value)}
                                         className="h-10 transition-shadow focus-visible:ring-slate-800/20 focus-visible:border-slate-800"
                                     />
-                                    {errors.budget && <p className="text-[13px] text-rose-500 font-medium">{errors.budget}</p>}
+                                    {errors.budget && <p className="text-[13px] text-slate-900 font-medium">{errors.budget}</p>}
                                 </div>
 
                                 <div className="space-y-2 md:col-span-2">
@@ -99,12 +99,12 @@ export default function Edit({ job }: any) {
                                         onChange={(e) => setData('duration', e.target.value)}
                                         className="h-10 transition-shadow focus-visible:ring-slate-800/20 focus-visible:border-slate-800"
                                     />
-                                    {errors.duration && <p className="text-[13px] text-rose-500 font-medium">{errors.duration}</p>}
+                                    {errors.duration && <p className="text-[13px] text-slate-900 font-medium">{errors.duration}</p>}
                                 </div>
 
                                 <div className="space-y-2 md:col-span-2">
                                     <Label className="text-slate-700 font-semibold" htmlFor="description">
-                                        {__('freelance.description')} <span className="text-rose-500">*</span>
+                                        {__('freelance.description')} <span className="text-slate-900">*</span>
                                     </Label>
                                     <Textarea
                                         id="description"
@@ -113,7 +113,7 @@ export default function Edit({ job }: any) {
                                         className="resize-none min-h-[200px] transition-shadow focus-visible:ring-slate-800/20 focus-visible:border-slate-800"
                                         required
                                     />
-                                    {errors.description && <p className="text-[13px] text-rose-500 font-medium">{errors.description}</p>}
+                                    {errors.description && <p className="text-[13px] text-slate-900 font-medium">{errors.description}</p>}
                                 </div>
                             </div>
                         </CardContent>

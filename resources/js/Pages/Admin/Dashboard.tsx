@@ -81,7 +81,7 @@ export default function Dashboard({
                             {showValues ? 'Hide Values' : 'Show Values'}
                         </Button>
                         <div className="hidden md:flex items-center gap-2">
-                            <span className="bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-md border border-blue-100 flex items-center gap-1.5">
+                            <span className="bg-blue-50 text-slate-900 text-xs font-semibold px-3 py-1.5 rounded-md border border-blue-100 flex items-center gap-1.5">
                                 <DollarSign className="w-3.5 h-3.5" />
                                 {businessCurrency}
                             </span>
@@ -191,7 +191,7 @@ export default function Dashboard({
                                 </div>
                             </div>
                             <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex items-center gap-3">
-                                <Server className="w-8 h-8 text-blue-500" />
+                                <Server className="w-8 h-8 text-slate-900" />
                                 <div>
                                     <p className="text-xs text-slate-500 font-semibold uppercase">{__('general.server_load')}</p>
                                     <p className="text-lg font-bold text-slate-900">{systemHealth?.serverLoad}</p>
@@ -205,7 +205,7 @@ export default function Dashboard({
                                 </div>
                             </div>
                             <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex items-center gap-3">
-                                <Activity className="w-8 h-8 text-indigo-500" />
+                                <Activity className="w-8 h-8 text-slate-900" />
                                 <div>
                                     <p className="text-xs text-slate-500 font-semibold uppercase">{__('general.memory')}</p>
                                     <p className="text-lg font-bold text-slate-900">{systemHealth?.memoryUsage}</p>
@@ -221,7 +221,7 @@ export default function Dashboard({
                                 <p className="text-sm text-green-800 font-medium">{__('general.active_users')}</p>
                             </div>
                             <div className="flex flex-col items-center justify-center p-6 bg-blue-50 rounded-lg border border-blue-100">
-                                <h3 className="text-3xl font-bold text-blue-600 mb-1">{maskValue(formatCurrency(systemHealth?.totalWhatsappBalance, businessCurrency))}</h3>
+                                <h3 className="text-3xl font-bold text-slate-900 mb-1">{maskValue(formatCurrency(systemHealth?.totalWhatsappBalance, businessCurrency))}</h3>
                                 <p className="text-sm text-blue-800 font-medium">{__('general.total_balance')}</p>
                             </div>
                         </div>
@@ -282,7 +282,7 @@ export default function Dashboard({
 
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600"><Users className="w-5 h-5"/></div>
+                                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-slate-900"><Users className="w-5 h-5"/></div>
                                 <h3 className="font-bold text-slate-800">{__('general.user_analytics')}</h3>
                             </div>
                             <div className="space-y-4">
@@ -316,7 +316,7 @@ export default function Dashboard({
 
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600"><Ticket className="w-5 h-5"/></div>
+                                <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center text-slate-900"><Ticket className="w-5 h-5"/></div>
                                 <h3 className="font-bold text-slate-800">{__('general.support_ops')}</h3>
                             </div>
                             <div className="space-y-4">

@@ -128,7 +128,7 @@ export default function ObfuscatorRunner({ tool }: any) {
                 <span className="font-bold text-sm">{__('general.js_code_protector')}</span>
             </div>
 
-            <div className="max-w-3xl mx-auto px-4 py-8">
+            <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
                     <h2 className="text-lg font-bold mb-4">{__('general.configuration')}</h2>
                     

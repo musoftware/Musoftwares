@@ -118,7 +118,7 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
                             <Smartphone className="w-3.5 h-3.5 animate-pulse text-primary" />{__('general.remote_control_mode')}</Badge>
                     </div>
                     <CardTitle className="text-2xl md:text-3xl font-black tracking-tight">{__('general.link_to_windows_pc')}</CardTitle>
-                    <CardDescription className="text-xs md:text-sm max-w-sm mx-auto leading-relaxed">{__('general.android_devices_cannot_run_local_code_tools_directly_link_this_device_securely_to_the_musoftware_runtime_running_on_your_pc')}</CardDescription>
+                    <CardDescription className="text-xs md:text-sm max-w-7xl mx-auto leading-relaxed">{__('general.android_devices_cannot_run_local_code_tools_directly_link_this_device_securely_to_the_musoftware_runtime_running_on_your_pc')}</CardDescription>
                 </CardHeader>
 
                 <CardContent className="space-y-8 pt-6">

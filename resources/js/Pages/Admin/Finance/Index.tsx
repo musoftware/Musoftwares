@@ -356,7 +356,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-xl border shadow-sm flex items-center">
-                    <div className="bg-indigo-50 p-4 rounded-full me-4 text-indigo-700 border border-indigo-100">
+                    <div className="bg-indigo-50 p-4 rounded-full me-4 text-slate-900 border border-indigo-100">
                         <DollarSign className="w-6 h-6" />
                     </div>
                     <div>
@@ -1037,7 +1037,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                                     if (event.type === 'income') {
                                                         bgClass = 'bg-green-50 text-green-700 border-green-100';
                                                     } else if (event.type === 'salary') {
-                                                        bgClass = 'bg-blue-50 text-blue-700 border-blue-105';
+                                                        bgClass = 'bg-blue-50 text-slate-900 border-blue-105';
                                                     }
 
                                                     return (
@@ -1230,7 +1230,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200 inline-flex items-center text-xs font-bold">
                                                 {__('general.refund')}</span>
                                         ) : selectedDetailEntry.type === 'salary' ? (
-                                            <span className="text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 inline-flex items-center text-xs font-bold">
+                                            <span className="text-slate-900 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 inline-flex items-center text-xs font-bold">
                                                 {__('general.payroll')}</span>
                                         ) : (
                                             <span className="text-slate-700 bg-slate-50 px-2 py-0.5 rounded border border-slate-200 inline-flex items-center text-xs font-bold">

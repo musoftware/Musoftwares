@@ -40,7 +40,7 @@ export default function Subscribe({ tool, plan, walletBalance, walletCurrency = 
         return (
             <ToolsPublicLayout title={__('general.already_subscribed_1')} activeNav="downloads">
                 <Head title={__('general.already_subscribed_1')} />
-                <div className="max-w-md mx-auto py-20 px-4 text-center">
+                <div className="max-w-7xl mx-auto py-20 px-4 text-center">
                     <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto mb-5">
                         <CheckCircle2 className="h-8 w-8 text-emerald-500" />
                     </div>
@@ -58,7 +58,7 @@ export default function Subscribe({ tool, plan, walletBalance, walletCurrency = 
     return (
         <ToolsPublicLayout title={`Subscribe to ${tool.title}`} activeNav="explore">
             <Head title={`Subscribe to ${tool.title}`} />
-            <div className="max-w-lg mx-auto py-10 px-4 sm:px-6 space-y-6">
+            <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 space-y-6">
 
                 {/* Back */}
                 <button

@@ -61,7 +61,7 @@ export default function Form({ widget }: { widget?: any }) {
 
     return (
         <CrmLayout title={isEdit ? __('general.edit_form') : __('general.create_form')} activeMenu="widgets">
-            <div className="max-w-4xl mx-auto space-y-6 pb-12">
+            <div className="max-w-7xl mx-auto space-y-6 pb-12">
                 <div className="flex items-center gap-4">
                     <Link href={route('crm.widgets.index')} className={buttonVariants({ variant: 'ghost', size: 'icon', className: 'rounded-full' })}>
                         <ArrowLeft className="w-5 h-5" />

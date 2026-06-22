@@ -331,11 +331,11 @@ export default function Index({ users, search }: Props) {
                                         {/* User */}
                                         <td className="px-4 py-3">
                                             <Link href={route('admin.users.show', user.id)} className="flex items-center gap-3 group">
-                                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white text-xs font-bold flex-shrink-0 group-hover:bg-blue-600 transition-colors">
+                                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white text-xs font-bold flex-shrink-0 group-hover:bg-slate-900 transition-colors">
                                                     {user.name.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <div className="font-medium text-slate-900 group-hover:text-blue-600 transition-colors">{user.name}</div>
+                                                    <div className="font-medium text-slate-900 group-hover:text-slate-900 transition-colors">{user.name}</div>
                                                     <div className="text-[11px] text-slate-400">{user.email}</div>
                                                 </div>
                                             </Link>

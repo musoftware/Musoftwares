@@ -723,7 +723,7 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected,
 
                 {/* Pagination */}
                 {pages > 1 && (
-                    <div className="flex items-center justify-between p-4 border-t">
+                    <div className="flex items-center justify-end gap-4 p-4 border-t">
                         <p className="text-xs text-muted-foreground">
                             {isRtl ? `صفحة ${page} من ${pages}` : `Page ${page} of ${pages}`} · {total} {isRtl ? 'جهة اتصال' : 'contacts'}
                         </p>

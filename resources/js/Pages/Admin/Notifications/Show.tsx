@@ -22,7 +22,7 @@ export default function Show({ campaign }: { campaign: any }) {
         <AdminSidebarLayout>
             <Head title={campaign.title} />
 
-            <div className="max-w-5xl mx-auto py-8 space-y-8">
+            <div className="max-w-7xl mx-auto py-8 space-y-8">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -35,7 +35,7 @@ export default function Show({ campaign }: { campaign: any }) {
                             <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
                                 {campaign.title}
                                 {campaign.audience_type === 'personal' && (
-                                    <Badge variant="outline" className="ms-2 bg-indigo-50 text-indigo-700 border-indigo-200">
+                                    <Badge variant="outline" className="ms-2 bg-indigo-50 text-slate-900 border-indigo-200">
                                         {__('general.personal')}</Badge>
                                 )}
                             </h1>
@@ -59,7 +59,7 @@ export default function Show({ campaign }: { campaign: any }) {
                             <CardTitle className="text-sm font-medium text-slate-500">
                                 {__('freelance.views')}
                             </CardTitle>
-                            <Eye className="w-4 h-4 text-blue-500" />
+                            <Eye className="w-4 h-4 text-slate-900" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-3xl font-bold text-slate-900">
@@ -75,7 +75,7 @@ export default function Show({ campaign }: { campaign: any }) {
                             <CardTitle className="text-sm font-medium text-slate-500">
                                 {__('admin.clicks')}
                             </CardTitle>
-                            <MousePointerClick className="w-4 h-4 text-purple-500" />
+                            <MousePointerClick className="w-4 h-4 text-slate-900" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-3xl font-bold text-slate-900">
@@ -90,7 +90,7 @@ export default function Show({ campaign }: { campaign: any }) {
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium text-slate-500">
                                 {__('general.clickthrough_rate')}</CardTitle>
-                            <BarChart3 className="w-4 h-4 text-emerald-500" />
+                            <BarChart3 className="w-4 h-4 text-slate-900" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-3xl font-bold text-slate-900">
@@ -107,7 +107,7 @@ export default function Show({ campaign }: { campaign: any }) {
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
-                                    <Eye className="w-5 h-5 text-blue-500" />
+                                    <Eye className="w-5 h-5 text-slate-900" />
                                     {__('admin.who_viewed')}
                                 </CardTitle>
                             </CardHeader>
@@ -141,7 +141,7 @@ export default function Show({ campaign }: { campaign: any }) {
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
-                                    <MousePointerClick className="w-5 h-5 text-purple-500" />
+                                    <MousePointerClick className="w-5 h-5 text-slate-900" />
                                     {__('admin.who_clicked')}
                                 </CardTitle>
                             </CardHeader>
@@ -178,7 +178,7 @@ export default function Show({ campaign }: { campaign: any }) {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <Send className="w-5 h-5 text-indigo-500" />
+                            <Send className="w-5 h-5 text-slate-900" />
                             {__('general.payload_details')}</CardTitle>
                         <CardDescription>
                             {__('general.the_exact_content_that_was_delivered_to')}</CardDescription>
@@ -206,7 +206,7 @@ export default function Show({ campaign }: { campaign: any }) {
                             <div className="space-y-2">
                                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1">
                                     <LinkIcon className="w-3 h-3" /> {__('general.target_url')}</span>
-                                <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 text-blue-600 font-medium text-sm truncate">
+                                <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 text-slate-900 font-medium text-sm truncate">
                                     <a href={campaign.target_url} target="_blank" rel="noreferrer" className="hover:underline">
                                         {campaign.target_url}
                                     </a>

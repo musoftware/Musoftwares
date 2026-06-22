@@ -26,7 +26,7 @@ export default function Create() {
         <AuthenticatedLayout>
             <Head title={__('general.generate_ai_proposal')} />
 
-            <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
                 <div className="mb-6">
                     <Link href={route('isaas.proposals.index')} className="text-sm font-medium text-gray-500 hover:text-gray-900 flex items-center">
                         <ArrowLeft className="me-1 h-4 w-4" />{__('general.back_to_proposals')}</Link>
@@ -104,7 +104,7 @@ export default function Create() {
                             )}
                         </CardContent>
                         
-                        <CardFooter className="bg-gray-50 border-t px-6 py-4 flex justify-between items-center">
+                        <CardFooter className="bg-gray-50 border-t px-6 py-4 flex justify-end gap-4 items-center">
                             <span className="text-xs text-gray-500">{__('general.takes_about_15_seconds')}</span>
                             <Button type="submit" disabled={processing} size="lg" className="w-full sm:w-auto bg-black text-white hover:bg-gray-800">
                                 {processing ? (

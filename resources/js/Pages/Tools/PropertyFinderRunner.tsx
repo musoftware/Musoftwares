@@ -482,7 +482,7 @@ export default function PropertyFinderRunner({ tool }: any) {
             </div>
 
             {/* ── Content ── */}
-            <div className="max-w-5xl mx-auto px-4 py-6">
+            <div className="max-w-7xl mx-auto px-4 py-6">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="grid w-full max-w-md grid-cols-2 mb-6 bg-slate-100 p-1 rounded-xl">
                         <TabsTrigger
@@ -645,7 +645,7 @@ export default function PropertyFinderRunner({ tool }: any) {
                             <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                 <Building2 className="w-10 h-10 text-slate-300 mx-auto mb-4" />
                                 <h3 className="text-sm font-bold text-slate-700">{__('general.propertyfinder_bayut_sarouty')}</h3>
-                                <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">{__('general.search_for_properties_across_the_middle_east_north_africa_extract_real_listings_with_contact_details_prices_and_property_specs')}</p>
+                                <p className="text-xs text-slate-400 mt-2 max-w-7xl mx-auto">{__('general.search_for_properties_across_the_middle_east_north_africa_extract_real_listings_with_contact_details_prices_and_property_specs')}</p>
                             </div>
                         )}
                     </TabsContent>

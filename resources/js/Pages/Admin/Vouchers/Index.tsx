@@ -288,7 +288,7 @@ export default function Index({ vouchers }) {
             <Head title={__('general.admin_vouchers')} />
 
             {/* Header bar */}
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex items-center justify-end gap-4">
                 <div className="flex items-center gap-2 text-gray-500 text-sm">
                     <Ticket className="h-4 w-4" />
                     <span>{items.length} voucher{items.length !== 1 ? 's' : ''}</span>

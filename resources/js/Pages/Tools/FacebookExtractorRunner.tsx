@@ -170,7 +170,7 @@ export default function FacebookExtractorRunner({ tool }: any) {
                 </Badge>
             </div>
 
-            <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+            <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
                     <div>
                         <h1 className="text-xl font-bold tracking-tight text-slate-900">{__('general.facebook_data_extractor')}</h1>

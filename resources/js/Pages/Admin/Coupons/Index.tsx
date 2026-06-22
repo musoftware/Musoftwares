@@ -313,7 +313,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
             <Head title={__('general.admin_coupons')} />
 
             {/* Header bar */}
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex items-center justify-end gap-4">
                 <div className="flex items-center gap-2 text-gray-500 text-sm">
                     <Tag className="h-4 w-4" />
                     <span>{coupons?.total ?? items.length} coupon{(coupons?.total ?? items.length) !== 1 ? 's' : ''}</span>
@@ -368,7 +368,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                                 </td>
                                 <td className="p-4">
                                     <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${
-                                        c.type === 'fixed' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+                                        c.type === 'fixed' ? 'bg-blue-100 text-slate-900' : 'bg-purple-100 text-slate-900'
                                     }`}>
                                         {c.type}
                                     </span>

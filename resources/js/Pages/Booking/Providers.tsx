@@ -323,7 +323,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
         >
             <Head title={__('general.booking_providers_schedules')} />
 
-            <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
+            <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">{__('general.providers_schedules')}</h1>
@@ -462,7 +462,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                             )}
                                         </div>
 
-                                        <div className="flex items-center justify-between p-4 border rounded-lg bg-slate-50/50">
+                                        <div className="flex items-center justify-end gap-4 p-4 border rounded-lg bg-slate-50/50">
                                             <div className="space-y-0.5">
                                                 <Label>{__('general.active_roster_status')}</Label>
                                                 <p className="text-xs text-muted-foreground">{__('general.inactive_providers_cannot_be_selected_for_public_scheduling_slots')}</p>
@@ -489,7 +489,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                     <div className="border border-dashed border-slate-300 rounded-xl p-12 text-center bg-slate-50/50">
                                         <Users className="mx-auto h-12 w-12 text-slate-400 mb-4" />
                                         <h3 className="text-lg font-medium text-slate-900 mb-1">{__('general.roster_is_empty')}</h3>
-                                        <p className="text-sm text-slate-500 max-w-md mx-auto mb-6">{__('general.register_staff_members_doctors_or_practitioners_to_enable_multi_host_booking_flows')}</p>
+                                        <p className="text-sm text-slate-500 max-w-7xl mx-auto mb-6">{__('general.register_staff_members_doctors_or_practitioners_to_enable_multi_host_booking_flows')}</p>
                                         <Button onClick={handleAddProviderClick} className="bg-slate-900 hover:bg-slate-800 text-white">
                                             <Plus className="w-4 h-4 me-2" />{__('general.register_first_provider')}</Button>
                                     </div>

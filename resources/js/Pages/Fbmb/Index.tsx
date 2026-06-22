@@ -304,7 +304,7 @@ export default function ISaasIndex() {
             <Head title={__('general.isaas_database_lookup')} />
 
             <div className="py-8 md:py-12">
-                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                     {/* -- Hero Header -- */}
                     <div className="relative mb-6">
@@ -659,7 +659,7 @@ export default function ISaasIndex() {
                                                 </div>
 
                                                 <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 mb-6">
-                                                    <div className="flex items-center justify-between text-sm">
+                                                    <div className="flex items-center justify-end gap-4 text-sm">
                                                         <span className="text-slate-500 flex items-center gap-1.5">
                                                             <Wallet className="w-3.5 h-3.5" />{__('general.remaining_points')}</span>
                                                         <span className="font-mono font-semibold text-slate-800">{(result.remaining_balance || 0).toLocaleString()} Pts</span>

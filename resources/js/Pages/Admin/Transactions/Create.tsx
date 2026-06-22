@@ -189,7 +189,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                             <span className="hidden sm:inline">{__('general.refund')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="earned" className="flex items-center gap-2">
-                            <Coins className="h-4 w-4 text-purple-500" />
+                            <Coins className="h-4 w-4 text-slate-900" />
                             <span className="hidden sm:inline">{__('general.add_earn')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="used" className="flex items-center gap-2">

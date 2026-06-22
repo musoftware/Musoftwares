@@ -47,17 +47,17 @@ class Service extends Model
         return $this->belongsTo(User::class, 'seller_id');
     }
 
-    public function category()
+    public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(ServiceCategory::class, 'category_id');
     }
 
-    public function packages()
+    public function packages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ServicePackage::class, 'service_id');
     }
 
-    public function landingPage()
+    public function landingPage(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(ServiceLandingPage::class, 'service_id');
     }

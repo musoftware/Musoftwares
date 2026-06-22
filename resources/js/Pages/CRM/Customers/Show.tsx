@@ -28,7 +28,7 @@ export default function CustomerShow({ customer }: { customer: any }) {
     return (
         <CrmLayout title={customer.name} activeMenu="customers">
             <Head title={`${__('crm.customer')}: ${customer.name}`} />
-            <div className="p-6 max-w-5xl mx-auto">
+            <div className="p-6 max-w-7xl mx-auto">
                 <div className="mb-6 flex items-center gap-4">
                     <Link href={route('crm.customers.index')} className="text-slate-500 hover:text-slate-900">
                         <ArrowLeft className="h-5 w-5" />

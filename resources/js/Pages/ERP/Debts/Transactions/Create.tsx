@@ -96,7 +96,7 @@ export default function CreateDebtTransaction({ baseCurrency, clients = [] }: an
 
                                 {/* Client Selection or Creation */}
                                 <div className="space-y-4 md:col-span-2">
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex items-center justify-end gap-4">
                                         <Label>{__('erp.client')}</Label>
                                         <Button 
                                             type="button" 

@@ -124,7 +124,7 @@ export default function CreateService({ categories, seller }: Props) {
 
                             {/* Navigation */}
                             {step < 5 && (
-                                <div className="flex items-center justify-between pt-6 border-t border-slate-200">
+                                <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-200">
                                     <Button
                                         type="button"
                                         variant="outline"

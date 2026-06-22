@@ -58,7 +58,7 @@ export default function ShowTransaction({ transaction }: Props) {
         >
             <Head title={`Transaction ${transaction.reference_id}`} />
 
-            <div className="max-w-5xl mx-auto space-y-6">
+            <div className="max-w-7xl mx-auto space-y-6">
                 <ModulePageHeader
                     title={`Transaction ${transaction.reference_id}`}
                     description={__('general.detailed_view_of_the_ledger_transaction')}

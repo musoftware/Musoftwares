@@ -199,7 +199,7 @@ export default function JsObfuscator() {
                         <Code2 className="w-8 h-8" />
                     </div>
                     <h1 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">{__('general.javascript_obfuscator')}</h1>
-                    <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+                    <p className="mt-4 text-lg text-slate-600 max-w-7xl mx-auto">
                         {__('general.protect_your_javascript_code_with_advanc')}</p>
                 </div>
 

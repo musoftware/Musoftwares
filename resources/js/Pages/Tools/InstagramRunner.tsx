@@ -589,7 +589,7 @@ export default function InstagramRunner({ tool }: any) {
             </div>
 
             {/* ── Content ── */}
-            <div className="max-w-5xl mx-auto px-4 py-6">
+            <div className="max-w-7xl mx-auto px-4 py-6">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="grid w-full max-w-md grid-cols-2 mb-6 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
                         <TabsTrigger
@@ -676,7 +676,7 @@ export default function InstagramRunner({ tool }: any) {
                                                 <Users className="w-5 h-5 text-slate-400" />
                                             </div>
                                             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">{__('general.no_accounts_added')}</h4>
-                                            <p className="text-xs text-slate-500 mb-4 max-w-xs mx-auto">{__('general.add_an_instagram_account_to_start_extracting_data')}</p>
+                                            <p className="text-xs text-slate-500 mb-4 max-w-7xl mx-auto">{__('general.add_an_instagram_account_to_start_extracting_data')}</p>
                                             <Button onClick={handleAddAccount} disabled={addingAccount} className="h-9 px-4 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 text-xs font-bold">
                                                 {addingAccount ? <Loader2 className="w-3 h-3 animate-spin me-1.5" /> : <Plus className="w-3 h-3 me-1.5" />} Add Account
                                             </Button>
@@ -873,7 +873,7 @@ export default function InstagramRunner({ tool }: any) {
                                     </svg>
                                 </div>
                                 <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">{__('general.instagram_extraction_tool')}</h3>
-                                <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">{__('general.extract_followers_likers_commenters_and_hashtag_users_select_a_type_enter_a_target_and_start_extracting')}</p>
+                                <p className="text-xs text-slate-400 mt-2 max-w-7xl mx-auto">{__('general.extract_followers_likers_commenters_and_hashtag_users_select_a_type_enter_a_target_and_start_extracting')}</p>
                             </div>
                         )}
                     </TabsContent>

@@ -92,7 +92,7 @@ export default function Index({ users, business_currency }: { users: any, busine
                                                     {selectedUser?.services.map((service: any) => (
                                                         <div key={service.id} className="flex items-center justify-between p-3 border rounded-lg bg-gray-50">
                                                             <div className="flex items-center gap-3">
-                                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white border text-blue-600">
+                                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white border text-slate-900">
                                                                     <Package className="h-5 w-5" />
                                                                 </div>
                                                                 <div>

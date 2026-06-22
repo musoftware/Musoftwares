@@ -25,8 +25,8 @@ const statusMap: Record<string, string> = {
 };
 
 const txTypeStyle: Record<string, { icon: any; color: string }> = {
-    top_up:        { icon: TrendingUp, color: 'text-emerald-600' },
-    manual_credit: { icon: TrendingUp, color: 'text-emerald-600' },
+    top_up:        { icon: TrendingUp, color: 'text-slate-900' },
+    manual_credit: { icon: TrendingUp, color: 'text-slate-900' },
     charge:        { icon: TrendingDown, color: 'text-slate-500' },
     manual_debit:  { icon: TrendingDown, color: 'text-orange-500' },
     suspension:    { icon: ShieldAlert, color: 'text-red-500' },
@@ -106,7 +106,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                 <div className={`rounded-xl px-6 py-4 flex items-center justify-between border ${reseller.balance <= 0 ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'}`}>
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">{__('general.pre_paid_balance')}</p>
-                        <p className={`text-3xl font-bold font-mono ${reseller.balance <= 0 ? 'text-red-600' : 'text-emerald-700'}`}>
+                        <p className={`text-3xl font-bold font-mono ${reseller.balance <= 0 ? 'text-red-600' : 'text-slate-900'}`}>
                             {formatCurrency(reseller.balance, reseller.currency)}
                         </p>
                         {reseller.balance <= 0 && (
@@ -150,7 +150,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                     {iframeUrl}
                                 </div>
                                 <Button variant="outline" size="sm" onClick={copyUrl} className="shrink-0 gap-1.5">
-                                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                                    {copied ? <Check className="w-3.5 h-3.5 text-slate-900" /> : <Copy className="w-3.5 h-3.5" />}
                                     {copied ? 'Copied!' : 'Copy'}
                                 </Button>
                                 <a href={iframeUrl} target="_blank" rel="noopener noreferrer">
@@ -161,7 +161,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
 
                             <div className="mt-4 bg-slate-900 rounded-lg p-3">
                                 <p className="text-[10px] text-slate-400 font-mono mb-1">Embed code:</p>
-                                <code className="text-[11px] text-emerald-400 font-mono break-all">
+                                <code className="text-[11px] text-slate-900 font-mono break-all">
                                     {`<iframe src="${iframeUrl}" width="100%" height="800" frameborder="0"></iframe>`}
                                 </code>
                             </div>
@@ -178,7 +178,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                         <OperationalCard title={__('general.anti_sharing_protection')}>
                             <div className="flex items-start gap-3">
                                 <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                                    <Shield className="w-5 h-5 text-blue-500" />
+                                    <Shield className="w-5 h-5 text-slate-900" />
                                 </div>
                                 <div className="text-sm text-text-muted space-y-1">
                                     <p>{__('general.the_platform_automatically_detects_account_sharing_by_monitoring')}<strong className="text-text-primary">{__('general.concurrent_active_sessions')}</strong>.</p>
@@ -236,7 +236,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                                             <button onClick={() => suspendUser(u.user_id)} className="text-xs text-orange-600 hover:underline font-medium flex items-center gap-1">
                                                                 <UserX className="w-3.5 h-3.5" /> {__('general.suspend')}</button>
                                                         ) : (
-                                                            <button onClick={() => activateUser(u.user_id)} className="text-xs text-emerald-600 hover:underline font-medium flex items-center gap-1">
+                                                            <button onClick={() => activateUser(u.user_id)} className="text-xs text-slate-900 hover:underline font-medium flex items-center gap-1">
                                                                 <UserCheck className="w-3.5 h-3.5" /> {__('general.activate')}</button>
                                                         )}
                                                     </div>
@@ -341,7 +341,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                                     <td className="px-4 py-3 text-xs text-text-muted max-w-[200px] truncate">{t.description || '—'}</td>
                                                     <td className="px-4 py-3 text-xs text-text-muted">{t.user?.name || '—'}</td>
                                                     <td className="px-4 py-3 text-end font-mono text-xs">
-                                                        <span className={t.amount >= 0 ? 'text-emerald-600' : 'text-red-600'}>
+                                                        <span className={t.amount >= 0 ? 'text-slate-900' : 'text-red-600'}>
                                                             {t.amount >= 0 ? '+' : ''}{formatCurrency(t.amount, t.currency)}
                                                         </span>
                                                     </td>
@@ -364,7 +364,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                     <div className="max-w-md">
                         <OperationalCard title={__('general.adjust_reseller_balance')}>
                             <p className="text-xs text-text-muted mb-4">
-                                Current balance: <strong className={`font-mono ${reseller.balance <= 0 ? 'text-red-600' : 'text-emerald-600'}`}>{formatCurrency(reseller.balance, reseller.currency)}</strong>
+                                Current balance: <strong className={`font-mono ${reseller.balance <= 0 ? 'text-red-600' : 'text-slate-900'}`}>{formatCurrency(reseller.balance, reseller.currency)}</strong>
                             </p>
                             <form onSubmit={submitBalance} className="space-y-4">
                                 <div className="space-y-1.5">

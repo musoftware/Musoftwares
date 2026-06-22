@@ -49,7 +49,7 @@ export default function ActivityIndex({ activities, filters }: Props) {
             <Head title={__('general.activity_log')} />
 
             <div className="min-h-screen bg-slate-50/50">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
 
                     {/* Header */}
                     <div className="flex items-start justify-between mb-8">

@@ -174,7 +174,7 @@ export default function DuplicateFinderRunner({ tool }: any) {
                 <span className="font-bold text-sm">{__('general.duplicate_file_finder')}</span>
             </div>
 
-            <div className="max-w-4xl mx-auto px-4 py-8">
+            <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm mb-6">
                     <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
                         <HardDrive className="w-5 h-5 text-slate-400" />{__('general.target_directory')}</h2>

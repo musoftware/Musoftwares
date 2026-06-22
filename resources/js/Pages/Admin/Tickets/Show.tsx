@@ -84,10 +84,10 @@ const renderMarkdown = (text: string) => {
 
 /* ─── Maps ──────────────────────────────────────────────────── */
 const STATUS_STYLES: Record<string, { badge: string; dot: string; label: string }> = {
-    open:          { badge: 'bg-blue-100 text-blue-800 ring-blue-200',       dot: 'bg-blue-500',    label: 'Open' },
+    open:          { badge: 'bg-blue-100 text-blue-800 ring-blue-200',       dot: 'bg-slate-900',    label: 'Open' },
     agent_replied: { badge: 'bg-amber-100 text-amber-800 ring-amber-200',    dot: 'bg-amber-500',   label: 'Agent Replied' },
     user_replied:  { badge: 'bg-violet-100 text-violet-800 ring-violet-200', dot: 'bg-violet-500',  label: 'User Replied' },
-    closed:        { badge: 'bg-emerald-100 text-emerald-800 ring-emerald-200', dot: 'bg-emerald-500', label: 'Resolved' },
+    closed:        { badge: 'bg-emerald-100 text-emerald-800 ring-emerald-200', dot: 'bg-slate-900', label: 'Resolved' },
 };
 
 const PRIORITY_STYLES: Record<string, { badge: string; icon: string }> = {
@@ -97,8 +97,8 @@ const PRIORITY_STYLES: Record<string, { badge: string; icon: string }> = {
 };
 
 const AVATAR_COLORS = [
-    'bg-violet-500', 'bg-blue-500', 'bg-emerald-500',
-    'bg-rose-500',   'bg-amber-500', 'bg-cyan-500',
+    'bg-violet-500', 'bg-slate-900', 'bg-slate-900',
+    'bg-slate-900',   'bg-amber-500', 'bg-slate-900',
 ];
 
 /* ─── Avatar ────────────────────────────────────────────────── */
@@ -125,7 +125,7 @@ function AttachmentLink({ path }: { path: string }) {
             className="mt-2 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-sm"
         >
             {isImg
-                ? <ImageIcon className="h-3.5 w-3.5 text-blue-500 flex-shrink-0" />
+                ? <ImageIcon className="h-3.5 w-3.5 text-slate-900 flex-shrink-0" />
                 : <FileText className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />}
             <span className="max-w-[180px] truncate">{filename}</span>
             <ExternalLink className="h-3 w-3 text-slate-400 flex-shrink-0" />
@@ -252,7 +252,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
         <AdminSidebarLayout title={`Ticket #${ticket.id} — ${ticket.ticket_subject}`} header="Support Desk">
 
             {/* ── Top bar ── */}
-            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div className="mb-5 flex flex-wrap items-center justify-end gap-4 gap-3">
                 <Link
                     href="/admin/tickets"
                     className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors"
@@ -265,7 +265,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                     </span>
                     {!isClosed ? (
                         <Button size="sm" variant="outline" onClick={() => setCloseModalOpen(true)}
-                            className="border-emerald-200 text-emerald-700 hover:bg-emerald-50">
+                            className="border-emerald-200 text-slate-900 hover:bg-emerald-50">
                             <CheckCircle className="me-1.5 h-4 w-4" />{__('general.close_ticket')}</Button>
                     ) : (
                         <Button size="sm" variant="outline" onClick={handleReopen}
@@ -361,7 +361,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                             const bubbleBg = isInternal 
                                 ? 'bg-amber-50 border border-amber-200 text-amber-900 rounded-te-none' 
                                 : isAdminMsg
-                                    ? 'bg-indigo-600 text-white rounded-te-none'
+                                    ? 'bg-slate-900 text-white rounded-te-none'
                                     : 'bg-white border border-slate-200 text-slate-800 rounded-ts-none';
 
                             return (
@@ -373,7 +373,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                                 {msg.sender?.name ?? 'Unknown'}
                                             </span>
                                             {isAdminMsg && (
-                                                <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold text-indigo-600">{__('general.support_agent')}</span>
+                                                <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold text-slate-900">{__('general.support_agent')}</span>
                                             )}
                                             {isInternal && (
                                                 <span className="flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
@@ -484,7 +484,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                             className={`text-white min-w-[110px] ${
                                                 isInternal 
                                                     ? 'bg-amber-600 hover:bg-amber-700' 
-                                                    : 'bg-indigo-600 hover:bg-indigo-700'
+                                                    : 'bg-slate-900 hover:bg-slate-900'
                                             }`}
                                         >
                                             {submitting ? (
@@ -505,15 +505,15 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                         </div>
                     ) : (
                         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 flex items-center gap-3">
-                            <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0" />
+                            <CheckCircle className="h-5 w-5 text-slate-900 flex-shrink-0" />
                             <div>
                                 <p className="text-sm font-semibold text-emerald-800">{__('general.this_ticket_has_been_resolved')}</p>
                                 {ticket.closed_at && (
-                                    <p className="text-xs text-emerald-600 mt-0.5">Closed on {fullDate(ticket.closed_at)}</p>
+                                    <p className="text-xs text-slate-900 mt-0.5">Closed on {fullDate(ticket.closed_at)}</p>
                                 )}
                                 <button
                                     onClick={handleReopen}
-                                    className="mt-1 text-xs text-emerald-700 underline underline-offset-2 hover:text-emerald-900"
+                                    className="mt-1 text-xs text-slate-900 underline underline-offset-2 hover:text-emerald-900"
                                 >{__('general.reopen_ticket')}</button>
                             </div>
                         </div>
@@ -576,7 +576,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                 {ticket.user && (
                                     <Link
                                         href={`/admin/users/${ticket.user.id}`}
-                                        className="mt-2 inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+                                        className="mt-2 inline-flex items-center gap-1 text-xs text-slate-900 hover:text-indigo-800 font-medium transition-colors"
                                     >
                                         <User className="h-3.5 w-3.5" />{__('general.view_profile')}<ExternalLink className="h-3 w-3" />
                                     </Link>
@@ -614,7 +614,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                             {!isClosed ? (
                                 <button
                                     onClick={() => setCloseModalOpen(true)}
-                                    className="w-full flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors border border-emerald-200"
+                                    className="w-full flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 bg-emerald-50 hover:bg-emerald-100 transition-colors border border-emerald-200"
                                 >
                                     <CheckCircle className="h-4 w-4" />{__('general.mark_as_resolved')}</button>
                             ) : (
@@ -656,7 +656,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                         <Button variant="outline" onClick={() => setCloseModalOpen(false)}>{__('general.cancel')}</Button>
                         <Button 
                             onClick={handleCloseConfirm}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                            className="bg-slate-900 hover:bg-slate-900 text-white"
                         >{__('general.close_ticket')}</Button>
                     </DialogFooter>
                 </DialogContent>

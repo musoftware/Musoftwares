@@ -86,7 +86,7 @@ export default function Show({ job }: any) {
                                 <h3 className="text-lg font-medium text-gray-900 mb-2">{__('freelance.required_skills')}</h3>
                                 <div className="flex flex-wrap gap-2">
                                     {job.skills.map((skill: any) => (
-                                        <Badge key={skill.id} variant="outline" className="bg-blue-50 text-blue-700">
+                                        <Badge key={skill.id} variant="outline" className="bg-blue-50 text-slate-900">
                                             {skill.name}
                                         </Badge>
                                     ))}
@@ -171,7 +171,7 @@ export default function Show({ job }: any) {
                             <div className="space-y-3 text-sm">
                                 <div>
                                     <span className="text-gray-500 block">{__('freelance.name')}</span>
-                                    <Link href={route('admin.users.show', job.client.id)} className="font-semibold text-blue-600 hover:underline">
+                                    <Link href={route('admin.users.show', job.client.id)} className="font-semibold text-slate-900 hover:underline">
                                         {job.client.name}
                                     </Link>
                                 </div>
@@ -196,7 +196,7 @@ export default function Show({ job }: any) {
                                 href={route('admin.freelance.jobs.edit', job.id)} 
                                 className={buttonVariants({ variant: 'outline', className: 'w-full justify-start' })}
                             >
-                                <Edit className="h-4 w-4 me-2 text-blue-500" />
+                                <Edit className="h-4 w-4 me-2 text-slate-900" />
                                 {__('freelance.edit')}
                             </Link>
 
