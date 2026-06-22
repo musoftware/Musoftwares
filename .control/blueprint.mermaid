@@ -1,111 +1,73 @@
 flowchart TD
-    subgraph Foundation[1. Foundation & Infrastructure]
-        F1[Setup Laravel 12 & PHP 8.2]
-        F2[Install React 18, TypeScript, Vite]
-        F3[Configure Inertia.js Bridge]
-        F4[Setup Tailwind v4 & Shadcn UI]
-        F5[Install nwidart/laravel-modules]
-        F6[Configure Redis, Scout, Meilisearch]
-        F7[Setup Reverb for WebSockets]
-        
-        F1 --> F2 --> F3 --> F4 --> F5 --> F6 --> F7
-    end
+    phase1_init[Phase 1: Core Setup] --> be_setup[Backend: Laravel 12, PHP 8.2]
+    phase1_init --> fe_setup[Frontend: React 18, TS 5, Vite 7]
+    phase1_init --> db_setup[Data Layer: MySQL/PgSQL, Redis, Meilisearch]
 
-    subgraph Architecture[2. Core Architecture Rules]
-        A1[Enforce Thin Controllers]
-        A2[Setup Service Layer]
-        A3[Configure Zustand for State]
-        A4[Implement Soft Deletes]
-        A5[Setup Spatie Permissions]
-        
-        A1 --> A2 --> A3 --> A4 --> A5
-    end
+    be_setup --> be_packages[Install Backend Packages]
+    be_packages --> pkg_modules[nwidart/laravel-modules]
+    be_packages --> pkg_auth[Sanctum, Breeze, Socialite]
+    be_packages --> pkg_roles[Spatie Permissions/Model States]
+    be_packages --> pkg_ws[Laravel Reverb]
 
-    Foundation --> Architecture
+    fe_setup --> fe_packages[Install Frontend Packages]
+    fe_packages --> pkg_inertia[Inertia.js 2.0]
+    fe_packages --> pkg_styles[Tailwind CSS v4, Shadcn UI]
+    fe_packages --> pkg_state[Zustand 5.0.14]
+    fe_packages --> pkg_viz[Recharts, React Flow]
+    fe_packages --> pkg_anim[GSAP, Framer Motion]
 
-    subgraph AuthOnboarding[3. Identity, Auth & Onboarding]
-        AO1[Build Login, Register, Forgot Password]
-        AO2[Build Email Verification Flow]
-        AO3[Implement KYC Wizard]
-        AO4[Build Tenant & Workspace Setup]
-        AO5[Implement Role Assignment]
-        
-        AO1 --> AO2 --> AO3 --> AO4 --> AO5
-    end
+    pkg_modules --> phase2_auth[Phase 2: Auth & Onboarding]
+    pkg_auth --> phase2_auth
+    pkg_inertia --> phase2_auth
 
-    Architecture --> AuthOnboarding
+    phase2_auth --> route_login[Implement /login & /register]
+    route_login --> route_verify[Implement /verify-email & /two-factor-challenge]
+    route_verify --> route_onboard[Implement /onboarding/kyc & /onboarding/workspace]
 
-    subgraph CoreApp[4. Core Application & Settings]
-        C1[Build Bento-grid Dashboard]
-        C2[Develop Profile Settings]
-        C3[Develop Tenant Global Config]
-        C4[Develop Team Management & Roles]
-        
-        C1 --> C2 --> C3 --> C4
-    end
+    route_onboard --> phase3_core[Phase 3: Core Dashboard & Settings]
+    phase3_core --> route_dash[Implement /dashboard with Recharts & Reverb]
+    route_dash --> route_settings[Implement /settings Profile, Security, Workspace]
+    route_settings --> route_notif[Implement /notifications Hub]
 
-    AuthOnboarding --> CoreApp
+    route_notif --> phase4_modules[Phase 4: Domain Modules]
 
-    subgraph FinanceBilling[5. Financial & Billing Module]
-        FB1[Setup Subscriptions Overview]
-        FB2[Implement Wallet & Top-Up Dual Currency]
-        FB3[Build SaaS Plan Management]
-        FB4[Implement Invoices & PDF Generation]
-        
-        FB1 --> FB2 --> FB3 --> FB4
-    end
+    phase4_modules --> mod_billing[Billing Module]
+    mod_billing --> bill_wallet[Implement /billing/wallet Dual-Currency]
+    bill_wallet --> bill_subs[Implement /billing/subscriptions]
+    bill_subs --> bill_inv[Implement /billing/invoices & PDF Gen]
 
-    CoreApp --> FinanceBilling
+    phase4_modules --> mod_erp[ERP Module]
+    mod_erp --> erp_hr[Implement HR: Depts, Employees, Attendance, Payroll]
+    erp_hr --> erp_assets[Implement Assets & Cost Centers]
+    erp_assets --> erp_supply[Implement Supply Chain: POs, Inventory]
+    erp_supply --> erp_finance[Implement Finance: Ledgers, Reports]
 
-    subgraph ERP_CRM[6. ERP, CRM & Support]
-        EC1[Build CRM Leads & Kanban]
-        EC2[Build Client Directory & Portal]
-        EC3[Develop Marketing Campaigns UI]
-        EC4[Build Support Desk & Tickets]
-        
-        EC1 --> EC2 --> EC3 --> EC4
-    end
+    phase4_modules --> mod_crm[CRM Module]
+    mod_crm --> crm_leads[Implement /crm/leads Kanban with React Flow]
+    crm_leads --> crm_rest[Implement Campaigns, Tickets, Comms]
 
-    FinanceBilling --> ERP_CRM
+    phase4_modules --> mod_proj[Project Module]
+    mod_proj --> proj_board[Implement /projects board with Framer Motion]
+    proj_board --> proj_time[Implement Time Tracking]
 
-    subgraph ProjectsTasks[7. Project & Task Execution]
-        PT1[Build Project Portfolio & Creation]
-        PT2[Develop Project Dashboard]
-        PT3[Implement Task Kanban & Detail View]
-        PT4[Build Time Tracking & Timesheets]
-        
-        PT1 --> PT2 --> PT3 --> PT4
-    end
+    phase4_modules --> mod_market[Marketplace Module]
+    mod_market --> market_catalog[Implement Catalog & Product Pages]
+    market_catalog --> market_cart[Implement Cart & Wallet Checkout]
+    market_cart --> market_license[Implement License Generation]
 
-    ERP_CRM --> ProjectsTasks
+    phase4_modules --> mod_book[Booking Module]
+    mod_book --> book_cal[Implement Booking Calendar]
 
-    subgraph Marketplace[8. Marketplace & Licensing]
-        ML1[Build Software Store & Product Details]
-        ML2[Implement Checkout & Payment Gateway]
-        ML3[Develop License Management & IP Binding]
-        
-        ML1 --> ML2 --> ML3
-    end
+    bill_inv --> phase5_polish[Phase 5: Refinement & Edge Cases]
+    erp_finance --> phase5_polish
+    crm_rest --> phase5_polish
+    proj_time --> phase5_polish
+    market_license --> phase5_polish
+    book_cal --> phase5_polish
 
-    ProjectsTasks --> Marketplace
-
-    subgraph ExtraModules[9. Additional Modules]
-        EX1[Build Booking & Calendar]
-        EX2[Develop Freelance Job Board & Proposals]
-        EX3[Build Fbmb Dashboard]
-        
-        EX1 --> EX2 --> EX3
-    end
-
-    Marketplace --> ExtraModules
-
-    subgraph UIUX[10. UI/UX Polish & Delivery]
-        U1[Implement Branded Error Pages 403, 404, 500, 503]
-        U2[Add GSAP & Framer Motion Animations]
-        U3[Ensure Accessibility & ARIA]
-        U4[Configure Vite Manual Chunking]
-        
-        U1 --> U2 --> U3 --> U4
-    end
-
-    ExtraModules --> UIUX
+    phase5_polish --> opt_tenant[Apply Strict Global Tenant Isolation Scopes]
+    opt_tenant --> opt_sync[Sync ERP Transactions with Core Wallet]
+    opt_sync --> opt_softdel[Handle Soft Deletes in Historical Views]
+    opt_softdel --> opt_inertia[Optimize Inertia Payloads via Partial Reloads]
+    opt_inertia --> err_pages[Implement Custom Error Pages: 403, 404, 500, 503]
+    err_pages --> final_launch[System Ready]

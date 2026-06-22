@@ -307,7 +307,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                                                 handleDelete={handleDelete} 
                                             />
                                         </CardContent>
-                                        <CardFooter className="bg-slate-50 border-t flex justify-between p-6">
+                                        <CardFooter className="bg-slate-50 border-t flex justify-end gap-4 p-6">
                                             <Button 
                                                 variant="outline" 
                                                 onClick={() => setActiveStep(prev => Math.max(0, prev - 1))}

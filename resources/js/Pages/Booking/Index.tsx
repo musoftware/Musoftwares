@@ -103,7 +103,7 @@ export default function Index({ events }: { events: EventType[] }) {
                                         )}
                                     </div>
                                 </CardContent>
-                                <CardFooter className="pt-0 border-t mt-4 border-slate-100 flex justify-between items-center bg-slate-50/50 p-4 rounded-b-xl">
+                                <CardFooter className="pt-0 border-t mt-4 border-slate-100 flex justify-end gap-4 items-center bg-slate-50/50 p-4 rounded-b-xl">
                                     <Badge variant={event.is_active ? "default" : "secondary"} className="font-normal">
                                         {event.is_active ? 'Active' : 'Draft'}
                                     </Badge>

@@ -1,0 +1,24 @@
+```mermaid
+stateDiagram-v2
+    %% State Machine for a Generic Task or Order (based on spatie/laravel-model-states requirement)
+    
+    state "Pending" as Pending
+    state "In Progress" as InProgress
+    state "Completed" as Completed
+    state "Cancelled" as Cancelled
+    state "Failed" as Failed
+    
+    [*] --> Pending : Creation
+    
+    Pending --> InProgress : Start processing
+    Pending --> Cancelled : User/Admin cancels
+    
+    InProgress --> Completed : Successfully finished
+    InProgress --> Failed : Error during execution
+    InProgress --> Cancelled : User/Admin cancels
+    
+    Failed --> Pending : Retry
+    
+    Completed --> [*]
+    Cancelled --> [*]
+```

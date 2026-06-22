@@ -8,35 +8,35 @@ import { MoreHorizontal, Edit, Trash2, User } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
 export default function Index({ profiles, filters }: any) {
-    const [search, setSearch] = useState(filters.search || '');
+  const [search, setSearch] = useState(filters.search || '');
 
-    const handleSearch = (e: any) => {
-        e.preventDefault();
-        router.get(route('admin.freelance.profiles.index'), { search }, { preserveState: true });
-    };
+  const handleSearch = (e: any) => {
+    e.preventDefault();
+    router.get(route('admin.freelance.profiles.index'), { search }, { preserveState: true });
+  };
 
-    const handleDelete = (id: any) => {
-        if (confirm('Are you sure you want to delete this profile?')) {
-            router.delete(route('admin.freelance.profiles.destroy', id));
-        }
-    };
+  const handleDelete = (id: any) => {
+    if (confirm('Are you sure you want to delete this profile?')) {
+      router.delete(route('admin.freelance.profiles.destroy', id));
+    }
+  };
 
-    return (
-        <AdminSidebarLayout title={__('admin.freelance_profiles', undefined, 'Freelance Profiles')} header={__('admin.manage_freelance_profiles', undefined, 'Manage Freelance Profiles')}>
+  return (
+    <AdminSidebarLayout title={__('admin.freelance_profiles', undefined, 'Freelance Profiles')} header={__('admin.manage_freelance_profiles', undefined, 'Manage Freelance Profiles')}>
             <div className="mb-6 flex items-center justify-end gap-4">
                 <form onSubmit={handleSearch} className="flex space-x-2">
-                    <Input 
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        placeholder={__('admin.search_profiles', undefined, 'Search profiles...')}
-                        className="w-64"
-                    />
+                    <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={__('admin.search_profiles', undefined, 'Search profiles...')}
+            className="w-64" />
+          
                     <Button type="submit" variant="secondary">{__('freelance.search')}</Button>
-                    {search && (
-                        <Button type="button" variant="ghost" onClick={() => { setSearch(''); router.get(route('admin.freelance.profiles.index')); }}>
+                    {search &&
+          <Button type="button" variant="ghost" onClick={() => {setSearch('');router.get(route('admin.freelance.profiles.index'));}}>
                             {__('freelance.clear')}
                         </Button>
-                    )}
+          }
                 </form>
             </div>
 
@@ -54,8 +54,8 @@ export default function Index({ profiles, filters }: any) {
                         </tr>
                     </thead>
                     <tbody>
-                        {(profiles.data as any).map((profile: any) => (
-                            <tr key={profile.id} className="border-b hover:bg-gray-50">
+                        {(profiles.data as any).map((profile: any) =>
+            <tr key={profile.id} className="border-b hover:bg-gray-50">
                                 <td className="p-4 font-medium text-gray-900">{profile.id}</td>
                                 <td className="p-4 font-medium text-gray-900">{profile.user?.name || '-'}</td>
                                 <td className="p-4 text-gray-500">{profile.title || '-'}</td>
@@ -66,27 +66,27 @@ export default function Index({ profiles, filters }: any) {
                                 </td>
                                 <td className="p-4 text-gray-500">
                                     <div className="flex flex-wrap gap-1">
-                                        {profile.user?.skills?.length > 0 ? (
-                                            profile.user.skills.map((us: any) => (
-                                                <span key={us.id} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                        {profile.user?.skills?.length > 0 ?
+                  profile.user.skills.map((us: any) =>
+                  <span key={us.id} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                                                     {us.skill?.name || 'Unknown'}
                                                 </span>
-                                            ))
-                                        ) : (
-                                            <span>-</span>
-                                        )}
+                  ) :
+
+                  <span>-</span>
+                  }
                                     </div>
                                 </td>
                                 <td className="p-4">
-                                    {profile.user?.fcm_token || profile.user?.last_shortcut_sync_at ? (
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                    {profile.user?.fcm_token || profile.user?.last_shortcut_sync_at ?
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                                             {__('general.yes', undefined, 'Yes')}
-                                        </span>
-                                    ) : (
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                        </span> :
+
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
                                             {__('general.no', undefined, 'No')}
                                         </span>
-                                    )}
+                }
                                 </td>
                                 <td className="p-4 text-end">
                                     <DropdownMenu>
@@ -121,35 +121,35 @@ export default function Index({ profiles, filters }: any) {
                                     </DropdownMenu>
                                 </td>
                             </tr>
-                        ))}
-                        {(profiles.data as any).length === 0 && (
-                            <tr>
+            )}
+                        {(profiles.data as any).length === 0 &&
+            <tr>
                                 <td colSpan={6} className="p-4 text-center text-gray-500">
                                     {__('admin.no_profiles_found', undefined, 'No profiles found.')}
                                 </td>
                             </tr>
-                        )}
+            }
                     </tbody>
                 </table>
             </div>
 
-            {profiles.links && profiles.links.length > 3 && (
-                <div className="mt-4 flex justify-between items-center">
-                    <div className="text-sm text-gray-500">
+            {profiles.links && profiles.links.length > 3 &&
+      <div className="mt-4 flex justify-end gap-4 items-center">
+                    <div className="me-auto text-sm text-gray-500">
                         Showing {profiles.from || 0} to {profiles.to || 0} of {profiles.total} results
                     </div>
                     <div className="flex space-x-1">
-                        {profiles.links.map((link: any, idx: number) => (
-                            <Link 
-                                key={idx}
-                                href={link.url || '#'}
-                                className={`px-3 py-1 rounded text-sm transition ${link.active ? 'bg-slate-900 text-white shadow-sm' : !link.url ? 'cursor-not-allowed opacity-50 text-slate-300 pointer-events-none' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ))}
+                        {profiles.links.map((link: any, idx: number) =>
+          <Link
+            key={idx}
+            href={link.url || '#'}
+            className={`px-3 py-1 rounded text-sm transition ${link.active ? 'bg-slate-900 text-white shadow-sm' : !link.url ? 'cursor-not-allowed opacity-50 text-slate-300 pointer-events-none' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+            dangerouslySetInnerHTML={{ __html: link.label }} />
+
+          )}
                     </div>
                 </div>
-            )}
-        </AdminSidebarLayout>
-    );
+      }
+        </AdminSidebarLayout>);
+
 }

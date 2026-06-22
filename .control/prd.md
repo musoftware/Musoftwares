@@ -1,140 +1,111 @@
-# Musoftwares Product Requirements Document (PRD)
+# Musoftwares - Comprehensive Product Requirements Document (PRD)
 
-## 1. Executive Summary
-Musoftwares is a modular, multi-tenant Business Management Platform designed to serve as a comprehensive SaaS, ERP, CRM, and Marketplace. It consolidates core business operations, financial transactions, project management, and specialized domain workflows into a single deployable repository using a **Modular Monolith** architecture. 
+## 1. Introduction & Objectives
+Musoftwares is a modular, multi-tenant Business Management Platform functioning as a comprehensive SaaS, ERP, CRM, and Marketplace. The objective is to unify core business operations, financial transactions, project management, and specialized domain workflows into a single deployable repository using a Modular Monolith architecture.
 
-The frontend is a React 18 SPA integrated with Laravel 12 via Inertia.js, providing a seamless, fast, and modern user experience built on Shadcn UI and Tailwind CSS v4.
+## 2. Architecture & Tech Stack Summary
+- **Backend:** Laravel ^12.0, PHP ^8.2, `nwidart/laravel-modules` (Modular Monolith), Laravel Sanctum, Laravel Breeze, Laravel Socialite, Spatie Permissions/Model States, Laravel Reverb (WebSockets).
+- **Frontend:** React ^18.2.0, Inertia.js ^2.0 (SPA bridging), TypeScript ^5.0.2, Vite ^7.0.7, Tailwind CSS v4, Shadcn UI (`base-nova`), Zustand ^5.0.14, Recharts, React Flow, GSAP, Framer Motion.
+- **Data Layer:** Eloquent ORM (MySQL/PostgreSQL), Redis (Cache/Queue), Meilisearch (via Scout).
 
----
+## 3. Comprehensive Route & Page Checklist
 
-## 2. Architecture & Tech Stack (Context Recap)
-- **Backend:** Laravel ^12.0, PHP ^8.2, MySQL/PostgreSQL/SQLite, Redis, Laravel Scout (Meilisearch), Laravel Reverb (WebSockets).
-- **Frontend:** React ^18.2.0, TypeScript ^5.0.2, Inertia.js ^2.0, Vite ^7.0.7, Tailwind CSS v4, Shadcn UI (`base-nova`), Zustand for state, GSAP/Framer Motion for animations.
-- **Modularity:** `nwidart/laravel-modules` handles bounded contexts (Core, ERP, CRM, Billing, Booking, Marketplace, Fbmb, Freelance).
-- **Services:** Core business logic is strictly kept in the Service layer (`app/Services/` or `Modules/{ModuleName}/Services/`), keeping controllers thin.
+This section acts as a strict checklist for every expected route/page in the application, ensuring no gaps in user flow.
 
----
+### 3.1. Authentication & Onboarding (Core)
+| Route / Page | Description & UI/UX Requirements |
+|---|---|
+| `/login` | Email/password login, Socialite logins (Google, etc.). Clean card layout, centered. GSAP entrance animation. |
+| `/register` | Initial account creation. Form validation. |
+| `/forgot-password` | Request password reset link. |
+| `/reset-password/{token}` | Input new password. |
+| `/verify-email` | Prompting user to verify email before proceeding. |
+| `/two-factor-challenge` | 2FA code input for enhanced security. |
+| `/onboarding/kyc` | Multi-step form for identity validation. Progress bar, file dropzone for documents. |
+| `/onboarding/workspace` | Tenant setup, naming the workspace, inviting initial team members. |
 
-## 3. User Journeys & State Machines
-### Onboarding Journey
-`Guest` -> `Registered` -> `KYC_Pending` -> `KYC_Approved` (or `Rejected`) -> `Tenant_Setup` -> `Role_Assigned` -> `Active_User`
+### 3.2. Core Dashboard & Settings
+| Route / Page | Description & UI/UX Requirements |
+|---|---|
+| `/dashboard` | Main operational overview. Real-time metrics via Reverb. Summary charts (Recharts). |
+| `/settings/profile` | User profile management, avatar upload. |
+| `/settings/security` | Change password, enable 2FA, view active sessions. |
+| `/settings/workspace` | Tenant settings, Spatie role assignment, user invitations. |
+| `/notifications` | Centralized notification hub (FCM/DB). Real-time incoming alerts. |
 
-### Financial Workflow
-`Select Action` (Top-up/Sub/Invoice) -> `Dual-Currency Processing` -> `Process Transaction` -> `Success/Failure` -> `Update Wallet/Activate License`
+### 3.3. Billing & Financials (Billing Module)
+| Route / Page | Description & UI/UX Requirements |
+|---|---|
+| `/billing/wallet` | Wallet balance, transaction history. Dual-Currency UI showing base vs. converted currency. Top-up modal. |
+| `/billing/subscriptions` | SaaS subscription plans, current active plan, upgrade/downgrade flows. |
+| `/billing/invoices` | List of recurring and past invoices. View/Download PDF (`laravel-dompdf`). |
 
----
+### 3.4. ERP Module (Operations, HR, Supply Chain)
+| Route / Page | Description & UI/UX Requirements |
+|---|---|
+| `/erp/dashboard` | ERP-specific real-time operational efficiency metrics. |
+| `/erp/departments` | Manage organizational structure. Tree view or list. |
+| `/erp/employees` | Employee directory and profiles. |
+| `/erp/cost-centers` | Define and track cost centers. |
+| `/erp/assets` | Register physical/digital assets. Grid/List view. Assign to employees/departments. |
+| `/erp/assets/{id}/depreciation` | Depreciation schedules and maintenance logs. |
+| `/erp/suppliers` | Vendor management. Detail view with order history. |
+| `/erp/purchase-orders` | Create and track POs. State machine visualization (Pending -> Approved -> Fulfilled). |
+| `/erp/inventory` | Multi-warehouse inventory tracking. Real-time low-stock alerts. |
+| `/erp/hr/attendance` | Attendance logs, leave request approvals. Calendar view. |
+| `/erp/hr/payroll` | Payroll processing linked to time tracking. Generate payslips. |
+| `/erp/finance/ledgers` | Company ledgers. Reconcile with bank statements. Linked to Wallet. |
+| `/erp/finance/reports` | Generate P&L and Balance Sheet reports. Export to XLSX/PDF. |
 
-## 4. Explicit Route & Page Checklist (Strict UI/UX Requirements)
+### 3.5. Sales & CRM
+| Route / Page | Description & UI/UX Requirements |
+|---|---|
+| `/crm/dashboard` | Sales pipeline overview, conversion rates. |
+| `/crm/leads` | Lead tracking board (Kanban style via React Flow or Drag-and-Drop). |
+| `/crm/campaigns` | Marketing outreach campaigns. Performance metrics. |
+| `/crm/tickets` | Customer support ticketing system. Chat-like interface for responses. |
+| `/crm/communications` | Centralized messaging center for client interactions. |
 
-This section acts as a strict checklist for every expected route in the application. All pages must use Shadcn UI components with `base-nova` style and Tailwind v4.
+### 3.6. Project & Task Execution
+| Route / Page | Description & UI/UX Requirements |
+|---|---|
+| `/projects` | List/Grid of active project workspaces. |
+| `/projects/{id}/board` | Kanban task breakdown. Framer Motion for smooth drag-and-drop. |
+| `/projects/{id}/time` | Time tracking logs, timer widget. |
 
-### 4.1. Identity, Auth & Onboarding
-| Route | Purpose | Specific UI/UX Requirements |
-|-------|---------|-----------------------------|
-| `/login` | User authentication | Minimalist card. Email/Password inputs, Social Auth buttons, 'Forgot password' link. GSAP entrance animation. |
-| `/register` | User account creation | Name, Email, Password, Confirm Password, Terms checkbox. Password strength indicator. |
-| `/forgot-password` | Initiate password reset | Email input field, prominent submit button, link back to login. |
-| `/reset-password/{token}` | Complete password reset | New password and confirm password inputs. Validation feedback in real-time. |
-| `/verify-email` | Prompt for email verification | Illustration, "Check your inbox" message, "Resend verification email" action button. |
-| `/verify-email/{id}/{hash}` | Verification processing | Invisible processing route. Redirects to `/kyc` or dashboard with success toast. |
-| `/kyc` | Know Your Customer document upload | Multi-step wizard layout. React Dropzone for ID/document uploads. Visual progress tracker. Status indicator (Pending, Approved, Rejected). |
-| `/onboarding/tenant-setup` | Workspace creation | Form for Workspace Name, Subdomain, and Logo upload. Real-time slug validation. |
-| `/onboarding/role-assignment` | Initial user roles | Data table/list to invite team members and assign Spatie roles via dropdowns. |
+### 3.7. Marketplace & Licensing
+| Route / Page | Description & UI/UX Requirements |
+|---|---|
+| `/marketplace` | Product catalog. High-end visual cards, filtering. |
+| `/marketplace/products/{id}` | Product detail page. Rich text, image galleries. |
+| `/marketplace/cart` | Shopping cart drawer or page. |
+| `/marketplace/checkout` | Payment processing using Wallet credits or external gateway. |
+| `/marketplace/licenses` | Manage purchased software. Serial key generation and binding to hardware/users. |
 
-### 4.2. Core Application & User Settings
-| Route | Purpose | Specific UI/UX Requirements |
-|-------|---------|-----------------------------|
-| `/dashboard` | Main landing overview | Bento-grid layout. Overview stat cards (revenue, active projects, leads). Recharts for charts. Quick action floating action button (FAB). |
-| `/profile` | User personal settings | Avatar upload, personal info form, change password section, 2FA toggle (requires Auth confirmation). |
-| `/settings/workspace` | Tenant global config | Tabs for General, Billing Address, Preferences, and Danger Zone (Delete workspace). |
-| `/settings/members` | Team management | Data table of users. Roles/Permissions badges. Modal for "Invite Member" with role selection. |
+### 3.8. Booking Module
+| Route / Page | Description & UI/UX Requirements |
+|---|---|
+| `/booking` | Booking dashboard, upcoming appointments. |
+| `/booking/calendar` | Interactive calendar for scheduling resources or services. |
 
-### 4.3. Financial & Billing Module
-| Route | Purpose | Specific UI/UX Requirements |
-|-------|---------|-----------------------------|
-| `/billing` | Subscriptions & overview | Summary cards for Active Plan, Wallet Balance, and Next Billing Date. |
-| `/billing/wallet` | Wallet management | Large balance display. Transaction history table with sorting. "Top-Up" CTA. |
-| `/billing/wallet/top-up` | Add funds | Preset amount buttons + custom input. Dual-currency selector (Base vs Display currency). Payment method selection. |
-| `/billing/subscriptions` | SaaS Plan management | Pricing table/cards (Shadcn styling). Upgrade/Downgrade confirm modals. Current plan highlighted. |
-| `/billing/invoices` | Invoice history | Paginated table of invoices. Status badges (Paid, Pending, Overdue). Action menu (Download PDF). |
-| `/billing/invoices/{id}` | Detailed invoice view | A4-styled digital layout. Print/Download actions. Breakdown of line items. |
+### 3.9. Error Pages
+| Route / Page | Description & UI/UX Requirements |
+|---|---|
+| `403 Unauthorized` | High-quality branded error page. Clear action to return home. |
+| `404 Not Found` | Friendly "page not found" graphic. Search bar or links to common areas. |
+| `500 Server Error` | Apologetic messaging. Auto-retry countdown or support link. |
+| `503 Maintenance` | Scheduled maintenance page with estimated return time. |
 
-### 4.4. ERP & CRM (Sales, CRM, Ticketing)
-| Route | Purpose | Specific UI/UX Requirements |
-|-------|---------|-----------------------------|
-| `/crm/leads` | Lead management | Toggle between Data Table and Kanban board (drag & drop). Advanced filters (status, source). |
-| `/crm/leads/{id}` | Lead details | Split pane: Left (Contact info, status), Right (Activity timeline, notes input). |
-| `/crm/clients` | Client directory | Searchable grid/table of clients. Status indicators. |
-| `/crm/clients/{id}` | Client portal view | Tabs: Overview, Projects, Invoices, Tickets. |
-| `/crm/campaigns` | Marketing campaigns | List of campaigns with mini sparkline charts (Recharts) for open/click rates. |
-| `/crm/campaigns/create` | Campaign builder | Stepper UI. Audience selector (checkbox list), Rich Text/Monaco editor for email body. |
-| `/support/tickets` | Support desk | List of tickets. Priority badges (Red/Yellow/Green). Assigned agent avatars. |
-| `/support/tickets/create` | Open new ticket | Subject, Category dropdown, rich text description, React Dropzone for attachments. |
-| `/support/tickets/{id}` | Ticket thread | Chat-bubble style layout. Internal vs Public note toggles. Sticky reply box at bottom. |
+## 4. UI/UX Design Requirements & Guidelines
+- **Premium Aesthetics:** Use curated, harmonious color palettes (base-nova) and modern typography (e.g., Inter, Outfit). Avoid generic colors.
+- **Micro-Animations & Motion:** Use Framer Motion and GSAP for route transitions, hover effects, and drag-and-drop interactions to make the app feel alive and responsive.
+- **Component System:** Exclusively use Shadcn UI with Radix primitives. Avoid ad-hoc styling. Ensure all interactive elements have focus states and accessibility attributes.
+- **Data Heavy Screens:** Use DataTables with sticky headers, pagination, and inline filtering for lists (e.g., ERP Inventory, Employees).
+- **Responsive Design:** Ensure the SPA is fully functional on mobile devices using Tailwind's responsive utilities. Hide complex sidebar navigations behind a hamburger menu on small screens.
 
-### 4.5. Project & Task Execution
-| Route | Purpose | Specific UI/UX Requirements |
-|-------|---------|-----------------------------|
-| `/projects` | Project portfolio | Card grid showing project name, client, progress bar, and team avatars. |
-| `/projects/create` | New project | Form with date range picker, client autocomplete, budget input. |
-| `/projects/{id}` | Project dashboard | High-level metrics. Tabs for Tasks, Files, Timesheets, Settings. |
-| `/projects/{id}/tasks` | Task management | React Flow / custom Kanban board. Drag-and-drop columns. Filter by assignee. |
-| `/projects/{id}/tasks/{taskId}`| Task detail | (Can be a modal or page). Title, description editor, subtask checklist, comments. "Start Timer" button. |
-| `/projects/{id}/time-tracking` | Timesheets | Calendar or list view. Manual time entry form. Running timer widget. |
-
-### 4.6. Marketplace & Licensing
-| Route | Purpose | Specific UI/UX Requirements |
-|-------|---------|-----------------------------|
-| `/marketplace` | Software store | Grid of product cards (image, title, price, tags). Sidebar for category filters. |
-| `/marketplace/products/{id}` | Product details | Large hero image/carousel. Description tabs, pricing tiers. "Add to Cart" / "Buy Now" button. |
-| `/marketplace/checkout` | Purchase flow | Cart summary. Dual-currency display. Payment gateway integration UI. |
-| `/marketplace/checkout/success`| Confirmation | Celebration animation (Framer Motion). Order summary. "View License Keys" CTA. |
-| `/licenses` | Purchased software | Table of owned licenses. Status (Active, Expired). Expander to view keys. |
-| `/licenses/{id}` | License management | License details. List of Serial Keys. "Bind to IP/Domain" action. "Revoke" danger action. |
-
-### 4.7. Additional Modules (Booking, Freelance, Fbmb)
-| Route | Purpose | Specific UI/UX Requirements |
-|-------|---------|-----------------------------|
-| `/booking` | Appointment calendar | Full-page calendar view (Month/Week/Day). Click to add appointment. |
-| `/booking/create` | New appointment | Service selection, Date/Time picker (checking availability), Client info. |
-| `/freelance/jobs` | Job board | List of open contracts. Filter by skill/budget. |
-| `/freelance/jobs/{id}` | Job detail | Full description, budget, employer info. "Submit Proposal" CTA. |
-| `/freelance/proposals` | Proposal tracking | List of submitted proposals with status (Pending, Accepted, Rejected). |
-| `/fbmb/dashboard` | Fbmb Module home | Specific dashboard metrics related to the Fbmb context. |
-
-### 4.8. Error Pages (Must be branded and styled)
-| Route | Purpose | Specific UI/UX Requirements |
-|-------|---------|-----------------------------|
-| `/403` | Forbidden access | "Access Denied" illustration. Explanation text. "Return to Dashboard" button. |
-| `/404` | Page not found | Creative 404 graphic. Search bar to find content. "Go Home" button. |
-| `/500` | Server error | Apologetic text. "Try Again" button. "Contact Support" link. |
-| `/503` | Maintenance mode | "We'll be right back" messaging. Estimated downtime display. |
-
-### 4.9. Missing Menus & Role Isolations (Identified Gaps)
-Based on the defined user roles (`accountant`, `support_agent`, `seller`), the following menu items and isolations are logically required but currently missing from the frontend implementation:
-
-1. **Accountant Role Isolation (Admin Panel)**
-   - **User Story:** As an Accountant, I want to access the Admin Panel and see ONLY the "Invoices", "Finance & Business", and "Seller & Payout" menus, so that I am not distracted by or given unauthorized access to System Settings, User Management, or Marketplace configurations.
-   - **Acceptance Criteria:** Update `AppSidebar.tsx` to check if the user is an `accountant` (and not an admin) and filter the `items` array to only show the relevant financial groups.
-
-2. **Support Agent Role Isolation (Admin Panel)**
-   - **User Story:** As a Support Agent, I want to access the Admin Panel and see ONLY the "Operations -> Tickets" and "Operations -> Guest Tickets" menus, so that I can focus solely on resolving user issues without accessing other operational or financial data.
-   - **Acceptance Criteria:** Update `AppSidebar.tsx` to check if the user is a `support_agent` and filter the `items` array accordingly.
-
-3. **Seller Dashboard (Frontend/Marketplace)**
-   - **User Story:** As a Seller on the Marketplace, I need a dedicated "Seller Portal" accessible from the main navigation, where I can manage my product listings, view sales, and request payouts.
-   - **Acceptance Criteria:** Create routes like `/seller/dashboard`, `/seller/products`, and `/seller/payouts`. Add a "Seller Portal" link in the Services Mega Menu or User Dropdown in `AuthenticatedLayout.tsx` that is visible if the user has the `seller` role.
-
----
-
-## 5. Database & Service Logic Execution Rules
-1. **Thin Controllers:** Controllers only handle HTTP requests, `Inertia::render()`, and redirects.
-2. **Service Layer:** All business logic (e.g., Key generation, dual-currency processing, subscription state changes) must reside in `app/Services/` or module-specific `Services/`.
-3. **Data Integrity:** Soft deletes are mandatory on all core and modular tables.
-4. **Real-Time Data:** Use Laravel Reverb to broadcast events to the frontend (e.g., ticket replies, task column changes, notification alerts) triggering Zustand state updates.
-
-## 6. Non-Functional Requirements
-- **Performance:** Vite must utilize aggressive manual chunking to ensure rapid SPA load times.
-- **Security:** Strict authorization via `spatie/laravel-permission` must be applied at both the Route/Middleware level and within the UI components (hiding unauthorized elements).
-- **UX Motion:** GSAP and Framer Motion must be used purposefully (e.g., page transitions, modal entrances, success states) without overwhelming the user interface. Keep animations smooth and under 300ms.
-- **Accessibility:** Radix UI primitives inside Shadcn ensure ARIA compliance, keyboard navigation, and screen reader support.
+## 5. Missing Gaps & Edge Cases to Address
+- **ERP Integration:** Ensure ERP financial transactions perfectly sync with the Core wallet system without race conditions.
+- **Multi-Currency:** Dual-currency processing must be explicitly visible on all pricing and invoicing screens. Exchange rates must be cached but frequently updated.
+- **Tenant Data Isolation:** Global scopes must be strictly applied across all modules so tenant data never leaks.
+- **Soft Deletes Context:** Ensure related models (e.g., deleted employee) still render correctly in historical records (e.g., past payslips) without throwing 404s or null pointer exceptions.
+- **Inertia Payload Size:** With a modular monolith, Inertia responses must be heavily optimized using partial reloads and lazy evaluation to avoid sending massive, unnecessary JSON payloads.

@@ -58,6 +58,12 @@
         "vitest": "^4.1.6"
     },
     "dependencies": {
+        "@babel/core": "^8.0.1",
+        "@babel/generator": "^8.0.0",
+        "@babel/parser": "^8.0.0",
+        "@babel/preset-react": "^8.0.1",
+        "@babel/preset-typescript": "^8.0.1",
+        "@babel/traverse": "^8.0.0",
         "@base-ui/react": "^1.4.1",
         "@gsap/react": "^2.1.2",
         "@hello-pangea/dnd": "^18.0.1",

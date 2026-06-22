@@ -51,7 +51,7 @@ export default function Index({ auth, referral, commission_percentage }: any) {
                                 </Button>
                             </div>
 
-                            <div className="mt-4 p-4 bg-indigo-50 rounded-lg border border-indigo-100 flex items-center justify-between">
+                            <div className="mt-4 p-4 bg-indigo-50 rounded-lg border border-indigo-100 flex items-center justify-end gap-4">
                                 <div>
                                     <h4 className="font-semibold text-indigo-900">{__('general.your_commission_rate')}</h4>
                                     <p className="text-sm text-indigo-700">{__('general.you_earn_this_percentage_from_all_paymen')}</p>

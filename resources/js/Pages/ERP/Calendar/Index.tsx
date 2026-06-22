@@ -60,7 +60,7 @@ export default function CalendarIndex({ events }: Props) {
 
                 <Card className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                     {/* Calendar Header */}
-                    <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+                    <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-end gap-4">
                         <div className="flex items-center gap-2">
                             <Button variant="outline" size="sm" onClick={handlePrevMonth}>
                                 <ChevronLeft className="h-4 w-4" />

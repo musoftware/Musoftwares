@@ -10,38 +10,38 @@ import { __ } from '@/lib/i18n';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Index({ contracts, filters }: any) {
-    const [search, setSearch] = useState(filters.search || '');
-    const [status, setStatus] = useState(filters.status || 'all');
+  const [search, setSearch] = useState(filters.search || '');
+  const [status, setStatus] = useState(filters.status || 'all');
 
-    const handleSearch = (e: any) => {
-        e.preventDefault();
-        router.get(route('admin.freelance.contracts.index'), { search, status }, { preserveState: true });
-    };
+  const handleSearch = (e: any) => {
+    e.preventDefault();
+    router.get(route('admin.freelance.contracts.index'), { search, status }, { preserveState: true });
+  };
 
-    const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
 
-    const handleDelete = () => {
-        if (deleteConfirm) {
-            router.delete(route('admin.freelance.contracts.destroy', deleteConfirm));
-            setDeleteConfirm(null);
-        }
-    };
+  const handleDelete = () => {
+    if (deleteConfirm) {
+      router.delete(route('admin.freelance.contracts.destroy', deleteConfirm));
+      setDeleteConfirm(null);
+    }
+  };
 
-    return (
-        <AdminSidebarLayout title={__('freelance.admin_contracts', undefined, 'Freelance Contracts')} header={__('freelance.manage_contracts', undefined, 'Manage Contracts')}>
-            <div className="mb-6 flex items-center justify-between">
+  return (
+    <AdminSidebarLayout title={__('freelance.admin_contracts', undefined, 'Freelance Contracts')} header={__('freelance.manage_contracts', undefined, 'Manage Contracts')}>
+            <div className="mb-6 flex items-center justify-end gap-4">
                 <form onSubmit={handleSearch} className="flex space-x-2 w-full max-w-2xl">
-                    <Input 
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        placeholder={__('freelance.search_contracts_placeholder', undefined, 'Search by job title, client or freelancer...')}
-                        className="flex-1"
-                    />
+                    <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={__('freelance.search_contracts_placeholder', undefined, 'Search by job title, client or freelancer...')}
+            className="flex-1" />
+          
                     <select
-                        value={status}
-                        onChange={(e) => setStatus(e.target.value)}
-                        className="rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm"
-                    >
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm">
+            
                         <option value="all">{__('freelance.all_statuses')}</option>
                         <option value="active">{__('freelance.active', undefined, 'Active')}</option>
                         <option value="completed">{__('freelance.completed', undefined, 'Completed')}</option>
@@ -49,11 +49,11 @@ export default function Index({ contracts, filters }: any) {
                         <option value="disputed">{__('freelance.disputed', undefined, 'Disputed')}</option>
                     </select>
                     <Button type="submit" variant="secondary">{__('freelance.filter')}</Button>
-                    {(search || status !== 'all') && (
-                        <Button type="button" variant="ghost" onClick={() => { setSearch(''); setStatus('all'); router.get(route('admin.freelance.contracts.index')); }}>
+                    {(search || status !== 'all') &&
+          <Button type="button" variant="ghost" onClick={() => {setSearch('');setStatus('all');router.get(route('admin.freelance.contracts.index'));}}>
                             {__('freelance.clear')}
                         </Button>
-                    )}
+          }
                 </form>
             </div>
 
@@ -71,14 +71,14 @@ export default function Index({ contracts, filters }: any) {
                         </tr>
                     </thead>
                     <tbody>
-                        {(contracts.data as any).map((contract: any) => (
-                            <tr key={contract.id} className="border-b hover:bg-gray-50">
+                        {(contracts.data as any).map((contract: any) =>
+            <tr key={contract.id} className="border-b hover:bg-gray-50">
                                 <td className="p-4">
-                                    {contract.job ? (
-                                        <span className="font-medium text-gray-900">{contract.job.title}</span>
-                                    ) : (
-                                        <span className="text-gray-500 italic">{__('freelance.job_deleted', undefined, 'Job Deleted')}</span>
-                                    )}
+                                    {contract.job ?
+                <span className="font-medium text-gray-900">{contract.job.title}</span> :
+
+                <span className="text-gray-500 italic">{__('freelance.job_deleted', undefined, 'Job Deleted')}</span>
+                }
                                 </td>
                                 <td className="p-4 text-gray-700">
                                     <div>{contract.client?.name || __('freelance.unknown_client')}</div>
@@ -91,10 +91,10 @@ export default function Index({ contracts, filters }: any) {
                                 <td className="p-4 font-medium text-slate-900">{formatCurrency(contract.amount, contract.currency || contract.job?.currency)}</td>
                                 <td className="p-4 capitalize">
                                     <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 
-                                        ${contract.status === 'active' ? 'bg-green-100 text-green-800' : 
-                                          contract.status === 'disputed' ? 'bg-red-100 text-red-800' :
-                                          contract.status === 'cancelled' ? 'bg-gray-100 text-gray-800' :
-                                          'bg-slate-50 text-slate-900'}`}>
+                                        ${contract.status === 'active' ? 'bg-green-100 text-green-800' :
+                contract.status === 'disputed' ? 'bg-red-100 text-red-800' :
+                contract.status === 'cancelled' ? 'bg-gray-100 text-gray-800' :
+                'bg-slate-50 text-slate-900'}`}>
                                         {__('freelance.' + contract.status) || contract.status}
                                     </span>
                                 </td>
@@ -125,50 +125,50 @@ export default function Index({ contracts, filters }: any) {
                                     </DropdownMenu>
                                 </td>
                             </tr>
-                        ))}
-                        {(contracts.data as any).length === 0 && (
-                            <tr>
+            )}
+                        {(contracts.data as any).length === 0 &&
+            <tr>
                                 <td colSpan={7} className="p-4 text-center text-gray-500">
                                     {__('freelance.no_contracts_found', undefined, 'No contracts found.')}
                                 </td>
                             </tr>
-                        )}
+            }
                     </tbody>
                 </table>
             </div>
 
-            {contracts.links && contracts.links.length > 3 && (
-                <div className="mt-4 flex justify-between items-center">
-                    <div className="text-sm text-gray-500">
+            {contracts.links && contracts.links.length > 3 &&
+      <div className="mt-4 flex justify-end gap-4 items-center">
+                    <div className="me-auto text-sm text-gray-500">
                         {__('freelance.showing_results_of', {
-                            first: contracts.from || 0,
-                            last: contracts.to || 0,
-                            total: contracts.total
-                        })}
+            first: contracts.from || 0,
+            last: contracts.to || 0,
+            total: contracts.total
+          })}
                     </div>
                     <div className="flex space-x-1">
-                        {contracts.links.map((link: any, idx: number) => (
-                            <Link 
-                                key={idx}
-                                href={link.url || '#'}
-                                className={`px-3 py-1 rounded text-sm transition ${link.active ? 'bg-slate-900 text-white shadow-sm' : !link.url ? 'cursor-not-allowed opacity-50 text-slate-300 pointer-events-none' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ))}
+                        {contracts.links.map((link: any, idx: number) =>
+          <Link
+            key={idx}
+            href={link.url || '#'}
+            className={`px-3 py-1 rounded text-sm transition ${link.active ? 'bg-slate-900 text-white shadow-sm' : !link.url ? 'cursor-not-allowed opacity-50 text-slate-300 pointer-events-none' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+            dangerouslySetInnerHTML={{ __html: link.label }} />
+
+          )}
                     </div>
                 </div>
-            )}
+      }
 
-            <ConfirmModal 
-                isOpen={!!deleteConfirm} 
-                onCancel={() => setDeleteConfirm(null)}
-                onConfirm={handleDelete}
-                title={__('freelance.confirm_delete_contract', undefined, 'Delete Contract?')}
-                description={__('freelance.confirm_delete_contract_msg', undefined, 'Are you sure you want to delete this contract permanently?')}
-                confirmLabel={__('freelance.delete')}
-                cancelLabel={__('freelance.cancel')}
-                variant="danger"
-            />
-        </AdminSidebarLayout>
-    );
+            <ConfirmModal
+        isOpen={!!deleteConfirm}
+        onCancel={() => setDeleteConfirm(null)}
+        onConfirm={handleDelete}
+        title={__('freelance.confirm_delete_contract', undefined, 'Delete Contract?')}
+        description={__('freelance.confirm_delete_contract_msg', undefined, 'Are you sure you want to delete this contract permanently?')}
+        confirmLabel={__('freelance.delete')}
+        cancelLabel={__('freelance.cancel')}
+        variant="danger" />
+      
+        </AdminSidebarLayout>);
+
 }

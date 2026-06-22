@@ -1,21 +1,48 @@
-sequenceDiagram
-    participant User
-    participant ReactComponent as React Component (Frontend)
-    participant InertiaClient as Inertia.js Client
-    participant LaravelRoute as Laravel Routing / Middleware
-    participant Controller as Controller
-    participant Service as Business Service
-    participant Model as Eloquent Model / Database
+```mermaid
+graph LR
+    %% Data Flow Diagram
+    Client[Browser/Client]
     
-    User->>ReactComponent: Interacts with UI
-    ReactComponent->>InertiaClient: Dispatch Action (e.g., router.post)
-    InertiaClient->>LaravelRoute: HTTP Request
-    LaravelRoute->>LaravelRoute: Auth & Authorization (Sanctum / Spatie)
-    LaravelRoute->>Controller: Route to method
-    Controller->>Service: Call Business Logic
-    Service->>Model: Read/Write Data
-    Model-->>Service: Return Result
-    Service-->>Controller: Return Processed Data
-    Controller-->>InertiaClient: Inertia::render() / redirect()
-    InertiaClient-->>ReactComponent: Update Props / UI State
-    ReactComponent-->>User: Visual Update
+    subgraph Frontend
+        ReactUI[React Components]
+        LocalState[Zustand Local State]
+        Echo[Laravel Echo]
+    end
+
+    subgraph Bridge
+        InertiaBridge[Inertia.js Protocol]
+    end
+
+    subgraph Backend
+        Router[Laravel Router]
+        Middleware[Middleware: Auth, Tenant, Role]
+        Controller[Inertia Controller]
+        Service[app/Services Domain Logic]
+        Model[Eloquent Model]
+        Reverb[Laravel Reverb WebSocket Server]
+    end
+
+    subgraph Storage
+        Database[(RDBMS)]
+        Cache[(Redis Cache)]
+    end
+
+    Client -->|Interaction| ReactUI
+    ReactUI -->|Updates| LocalState
+    ReactUI -->|Page Request/Form Submit| InertiaBridge
+    InertiaBridge -->|HTTP| Router
+    Router --> Middleware
+    Middleware --> Controller
+    Controller --> Service
+    Service --> Cache
+    Service --> Model
+    Model --> Database
+    Database --> Model
+    Model --> Service
+    Service --> Controller
+    Service -.->|Broadcast Event| Reverb
+    Reverb -.->|WebSocket Push| Echo
+    Echo -.->|State Update| LocalState
+    Controller -->|Inertia Response Page/Props| InertiaBridge
+    InertiaBridge -->|Props Update| ReactUI
+```

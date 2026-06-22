@@ -144,7 +144,7 @@ export default function Index({ costs, currencies, categories, stats }) {
             )}
 
             {/* Title & Actions Bar */}
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-end gap-4 items-center mb-6">
                 <div>
                     <h2 className="text-xl font-bold text-slate-900">{__('general.active_recurring_costs')}</h2>
                     <p className="text-sm text-gray-500 mt-1">{__('general.manage_repeated_automated_business_expenses_and_schedules')}</p>

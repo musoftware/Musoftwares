@@ -9,59 +9,59 @@ import { FileSpreadsheet, Download, Activity, Users, DollarSign, Target } from '
 import { useForm } from '@inertiajs/react';
 import KPICard from '../Components/Widgets/KPICard';
 
-export default function ReportsIndex({ kpis }: { kpis: any }) {
-    const { data, setData, post, processing, errors } = useForm({
-        report_type: 'sales_performance',
-        start_date: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-        end_date: new Date().toISOString().split('T')[0],
-    });
+export default function ReportsIndex({ kpis }: {kpis: any;}) {
+  const { data, setData, post, processing, errors } = useForm({
+    report_type: 'sales_performance',
+    start_date: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
+    end_date: new Date().toISOString().split('T')[0]
+  });
 
-    const handleExport = (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = route('crm.reports.export');
-        
-        const csrfToken = document.head.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        if (csrfToken) {
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_token';
-            csrfInput.value = csrfToken;
-            form.appendChild(csrfInput);
-        }
+  const handleExport = (e: React.FormEvent) => {
+    e.preventDefault();
 
-        const typeInput = document.createElement('input');
-        typeInput.type = 'hidden';
-        typeInput.name = 'report_type';
-        typeInput.value = data.report_type;
-        form.appendChild(typeInput);
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = route('crm.reports.export');
 
-        const startInput = document.createElement('input');
-        startInput.type = 'hidden';
-        startInput.name = 'start_date';
-        startInput.value = data.start_date;
-        form.appendChild(startInput);
+    const csrfToken = document.head.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    if (csrfToken) {
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = '_token';
+      csrfInput.value = csrfToken;
+      form.appendChild(csrfInput);
+    }
 
-        const endInput = document.createElement('input');
-        endInput.type = 'hidden';
-        endInput.name = 'end_date';
-        endInput.value = data.end_date;
-        form.appendChild(endInput);
+    const typeInput = document.createElement('input');
+    typeInput.type = 'hidden';
+    typeInput.name = 'report_type';
+    typeInput.value = data.report_type;
+    form.appendChild(typeInput);
 
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
-    };
+    const startInput = document.createElement('input');
+    startInput.type = 'hidden';
+    startInput.name = 'start_date';
+    startInput.value = data.start_date;
+    form.appendChild(startInput);
 
-    return (
-        <CrmLayout title={__('reports.department_reports') ?? 'Department Reports'} activeMenu="reports">
+    const endInput = document.createElement('input');
+    endInput.type = 'hidden';
+    endInput.name = 'end_date';
+    endInput.value = data.end_date;
+    form.appendChild(endInput);
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+  };
+
+  return (
+    <CrmLayout title={__('reports.department_reports') ?? 'Department Reports'} activeMenu="reports">
             <div className="flex flex-col h-full gap-6 p-8 pt-6">
                 
                 {/* Header */}
-                <div className="flex justify-between items-center">
-                    <div>
+                <div className="flex justify-end gap-4 items-center">
+                    <div className="me-auto">
                         <h1 className="text-2xl font-bold tracking-tight text-foreground">{__('reports.department_reports') ?? 'Department Reports'}</h1>
                         <p className="text-sm text-muted-foreground mt-1">{__('reports.export_description') ?? 'Export activity, performance, and metrics for your department.'}</p>
                     </div>
@@ -69,30 +69,30 @@ export default function ReportsIndex({ kpis }: { kpis: any }) {
 
                 {/* KPI Bar */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <KPICard 
-                        title={__('reports.total_leads') ?? 'Total Leads'} 
-                        value={kpis?.total_leads ?? 0} 
-                        icon={Users} 
-                        colorClass="bg-blue-100 text-blue-600" 
-                    />
-                    <KPICard 
-                        title={__('reports.total_customers') ?? 'Total Customers'} 
-                        value={kpis?.total_customers ?? 0} 
-                        icon={Target} 
-                        colorClass="bg-purple-100 text-purple-600" 
-                    />
-                    <KPICard 
-                        title={__('reports.conversion_rate') ?? 'Conversion Rate'} 
-                        value={`${kpis?.conversion_rate ?? 0}%`} 
-                        icon={Activity} 
-                        colorClass="bg-emerald-100 text-emerald-600" 
-                    />
-                    <KPICard 
-                        title={__('reports.total_value') ?? 'Total Value'} 
-                        value={`$${kpis?.total_value ?? 0}`} 
-                        icon={DollarSign} 
-                        colorClass="bg-amber-100 text-amber-600" 
-                    />
+                    <KPICard
+            title={__('reports.total_leads') ?? 'Total Leads'}
+            value={kpis?.total_leads ?? 0}
+            icon={Users}
+            colorClass="bg-blue-100 text-blue-600" />
+          
+                    <KPICard
+            title={__('reports.total_customers') ?? 'Total Customers'}
+            value={kpis?.total_customers ?? 0}
+            icon={Target}
+            colorClass="bg-purple-100 text-purple-600" />
+          
+                    <KPICard
+            title={__('reports.conversion_rate') ?? 'Conversion Rate'}
+            value={`${kpis?.conversion_rate ?? 0}%`}
+            icon={Activity}
+            colorClass="bg-emerald-100 text-emerald-600" />
+          
+                    <KPICard
+            title={__('reports.total_value') ?? 'Total Value'}
+            value={`$${kpis?.total_value ?? 0}`}
+            icon={DollarSign}
+            colorClass="bg-amber-100 text-amber-600" />
+          
                 </div>
 
                 {/* Main Content Area */}
@@ -111,10 +111,10 @@ export default function ReportsIndex({ kpis }: { kpis: any }) {
                             <form onSubmit={handleExport} className="space-y-6 max-w-xl">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">{__('reports.report_type') ?? 'Report Type'}</label>
-                                    <Select 
-                                        value={data.report_type} 
-                                        onValueChange={(val) => setData('report_type', val || '')}
-                                    >
+                                    <Select
+                    value={data.report_type}
+                    onValueChange={(val) => setData('report_type', val || '')}>
+                    
                                         <SelectTrigger>
                                             <SelectValue placeholder={__('reports.select_report_type') ?? 'Select Report Type'} />
                                         </SelectTrigger>
@@ -130,20 +130,20 @@ export default function ReportsIndex({ kpis }: { kpis: any }) {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">{__('general.start_date') ?? 'Start Date'}</label>
-                                        <Input 
-                                            type="date" 
-                                            value={data.start_date}
-                                            onChange={e => setData('start_date', e.target.value)}
-                                        />
+                                        <Input
+                      type="date"
+                      value={data.start_date}
+                      onChange={(e) => setData('start_date', e.target.value)} />
+                    
                                         {errors.start_date && <p className="text-xs text-red-500">{errors.start_date}</p>}
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">{__('general.end_date') ?? 'End Date'}</label>
-                                        <Input 
-                                            type="date" 
-                                            value={data.end_date}
-                                            onChange={e => setData('end_date', e.target.value)}
-                                        />
+                                        <Input
+                      type="date"
+                      value={data.end_date}
+                      onChange={(e) => setData('end_date', e.target.value)} />
+                    
                                         {errors.end_date && <p className="text-xs text-red-500">{errors.end_date}</p>}
                                     </div>
                                 </div>
@@ -157,6 +157,6 @@ export default function ReportsIndex({ kpis }: { kpis: any }) {
                     </Card>
                 </div>
             </div>
-        </CrmLayout>
-    );
+        </CrmLayout>);
+
 }

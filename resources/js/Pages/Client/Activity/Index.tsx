@@ -93,7 +93,7 @@ export default function ActivityIndex({ activities, filters }: Props) {
 
                         {/* Pagination */}
                         {activities.last_page > 1 && (
-                            <div className="flex items-center justify-between pt-6 mt-6 border-t border-slate-100">
+                            <div className="flex items-center justify-end gap-4 pt-6 mt-6 border-t border-slate-100">
                                 <p className="text-sm text-slate-500">
                                     Page {activities.current_page} of {activities.last_page}
                                 </p>

@@ -21,7 +21,7 @@ export default function Index({ users, business_currency }: { users: any, busine
         <AdminSidebarLayout 
             title={__('admin.subscribers')} 
             header={
-                <div className="flex items-center justify-between w-full">
+                <div className="flex items-center justify-end gap-4 w-full">
                     <h1 className="text-lg font-semibold text-slate-800">{__('admin.subscribers')}</h1>
                     <Button onClick={() => window.location.href = route('admin.plans.create')}>
                         {__('admin.add_subscription')}

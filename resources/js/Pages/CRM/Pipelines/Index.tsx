@@ -9,7 +9,7 @@ export default function PipelinesIndex() {
         <CrmLayout title={__('crm.pipelines')} activeMenu="pipelines">
             <Head title={__('crm.pipelines')} />
             <div className="p-6 h-[calc(100vh-100px)] flex flex-col">
-                <div className="mb-6 flex justify-between items-center shrink-0">
+                <div className="mb-6 flex justify-end gap-4 items-center shrink-0">
                     <h1 className="text-2xl font-bold">{__('crm.pipelines')}</h1>
                 </div>
 

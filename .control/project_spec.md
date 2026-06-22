@@ -60,3 +60,7 @@ The `app/Services/` directory centralizes core business rules, keeping controlle
 3. **Project & Task Execution:** Creating projects, task breakdowns (Kanban), time tracking.
 4. **Sales & CRM:** Lead management, marketing campaigns, ticketing, client communications.
 5. **Marketplace & Licensing:** Purchasing software, serial key generation/binding, license management.
+
+
+### New Feature Request
+Audit full ERP module and complete full user story how to use it and then build missing gaps , missing features, etc

@@ -5,12 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue } from
+"@/Components/ui/select";
 import GoldSaversTabs from '../Components/GoldSaversTabs';
 import { formatNumber } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
@@ -18,104 +18,104 @@ import { Wallet, Target, Search, ArrowUpDown, Plus, Scale, LayoutGrid } from 'lu
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface GoldWallet {
-    id: number;
-    name: string;
-    goal_type: string;
-    target_grams: number;
-    target_amount: number;
-    balance_grams: number;
-    balance_amount: number;
-    currency: string;
-    transactions: any[];
+  id: number;
+  name: string;
+  goal_type: string;
+  target_grams: number;
+  target_amount: number;
+  balance_grams: number;
+  balance_amount: number;
+  currency: string;
+  transactions: any[];
 }
 
 interface WalletsProps {
-    wallets: GoldWallet[];
-    hasMultiWallets: boolean;
-    hasGoalTracking: boolean;
+  wallets: GoldWallet[];
+  hasMultiWallets: boolean;
+  hasGoalTracking: boolean;
 }
 
 export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking }: WalletsProps) {
-    const [isCreating, setIsCreating] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [goalFilter, setGoalFilter] = useState('All');
-    const [sortBy, setSortBy] = useState('recent');
-    const [newWallet, setNewWallet] = useState({
-        name: '',
-        goal_type: 'Investment',
-        target_grams: '',
+  const [isCreating, setIsCreating] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [goalFilter, setGoalFilter] = useState('All');
+  const [sortBy, setSortBy] = useState('recent');
+  const [newWallet, setNewWallet] = useState({
+    name: '',
+    goal_type: 'Investment',
+    target_grams: ''
+  });
+
+  const handleCreateWallet = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.post(route('isaas.gold-savers.wallets.store'), newWallet, {
+      onSuccess: () => {
+        setIsCreating(false);
+        setNewWallet({ name: '', goal_type: 'Investment', target_grams: '' });
+      }
     });
+  };
 
-    const handleCreateWallet = (e: React.FormEvent) => {
-        e.preventDefault();
-        router.post(route('isaas.gold-savers.wallets.store'), newWallet, {
-            onSuccess: () => {
-                setIsCreating(false);
-                setNewWallet({ name: '', goal_type: 'Investment', target_grams: '' });
-            }
-        });
-    };
+  const filteredWallets = useMemo(() => {
+    return wallets.filter((wallet) => {
+      const matchesSearch = wallet.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesGoal = goalFilter === 'All' || wallet.goal_type === goalFilter;
+      return matchesSearch && matchesGoal;
+    }).sort((a, b) => {
+      if (sortBy === 'balance_desc') return b.balance_grams - a.balance_grams;
+      if (sortBy === 'balance_asc') return a.balance_grams - b.balance_grams;
+      if (sortBy === 'target_progress') {
+        const progA = a.target_grams > 0 ? a.balance_grams / a.target_grams : 0;
+        const progB = b.target_grams > 0 ? b.balance_grams / b.target_grams : 0;
+        return progB - progA;
+      }
+      return b.id - a.id;
+    });
+  }, [wallets, searchQuery, goalFilter, sortBy]);
 
-    const filteredWallets = useMemo(() => {
-        return wallets.filter(wallet => {
-            const matchesSearch = wallet.name.toLowerCase().includes(searchQuery.toLowerCase());
-            const matchesGoal = goalFilter === 'All' || wallet.goal_type === goalFilter;
-            return matchesSearch && matchesGoal;
-        }).sort((a, b) => {
-            if (sortBy === 'balance_desc') return b.balance_grams - a.balance_grams;
-            if (sortBy === 'balance_asc') return a.balance_grams - b.balance_grams;
-            if (sortBy === 'target_progress') {
-                const progA = a.target_grams > 0 ? a.balance_grams / a.target_grams : 0;
-                const progB = b.target_grams > 0 ? b.balance_grams / b.target_grams : 0;
-                return progB - progA;
-            }
-            return b.id - a.id;
-        });
-    }, [wallets, searchQuery, goalFilter, sortBy]);
+  const totalGrams = useMemo(() => wallets.reduce((acc, w) => acc + Number(w.balance_grams || 0), 0), [wallets]);
+  const totalTarget = useMemo(() => wallets.reduce((acc, w) => acc + Number(w.target_grams || 0), 0), [wallets]);
+  const overallProgress = totalTarget > 0 ? totalGrams / totalTarget * 100 : 0;
 
-    const totalGrams = useMemo(() => wallets.reduce((acc, w) => acc + Number(w.balance_grams || 0), 0), [wallets]);
-    const totalTarget = useMemo(() => wallets.reduce((acc, w) => acc + Number(w.target_grams || 0), 0), [wallets]);
-    const overallProgress = totalTarget > 0 ? (totalGrams / totalTarget) * 100 : 0;
+  const goalTypes = useMemo(() => {
+    const types = new Set(wallets.map((w) => w.goal_type));
+    return ['All', ...Array.from(types)];
+  }, [wallets]);
 
-    const goalTypes = useMemo(() => {
-        const types = new Set(wallets.map(w => w.goal_type));
-        return ['All', ...Array.from(types)];
-    }, [wallets]);
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
 
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: { staggerChildren: 0.1 }
-        }
-    };
+  const itemVariants: any = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
+    exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } }
+  };
 
-    const itemVariants: any = {
-        hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
-        exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } }
-    };
-
-    return (
-        <AuthenticatedLayout
-            header={
-                <div className="flex flex-col">
+  return (
+    <AuthenticatedLayout
+      header={
+      <div className="flex flex-col">
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight mb-4">{__('erp.my_gold_wallets')}</h2>
                     <GoldSaversTabs />
                 </div>
-            }
-        >
+      }>
+      
             <Head title={__('erp.gold_wallets')} />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                     
                     {/* Header Stats */}
-                    {wallets.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    {wallets.length > 0 &&
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                             <Card>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">{__('general.total_gold_saved')}</CardTitle>
+                                <CardHeader className="flex flex-row items-center justify-end gap-4 space-y-0 pb-2">
+                                    <CardTitle className="me-auto text-sm font-medium">{__('general.total_gold_saved')}</CardTitle>
                                     <Scale className="w-4 h-4 text-muted-foreground" />
                                 </CardHeader>
                                 <CardContent>
@@ -123,48 +123,48 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                 </CardContent>
                             </Card>
                             
-                            {hasGoalTracking && (
-                                <Card>
-                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium">{__('general.overall_goals_progress')}</CardTitle>
+                            {hasGoalTracking &&
+            <Card>
+                                    <CardHeader className="flex flex-row items-center justify-end gap-4 space-y-0 pb-2">
+                                        <CardTitle className="me-auto text-sm font-medium">{__('general.overall_goals_progress')}</CardTitle>
                                         <Target className="w-4 h-4 text-muted-foreground" />
                                     </CardHeader>
                                     <CardContent>
                                         <div className="text-2xl font-bold">{overallProgress.toFixed(1)}%</div>
                                         <div className="w-full bg-slate-100 rounded-full h-2 mt-4">
-                                            <div 
-                                                style={{ width: `${Math.min(overallProgress, 100)}%` }}
-                                                className="bg-indigo-600 h-2 rounded-full" 
-                                            />
+                                            <div
+                    style={{ width: `${Math.min(overallProgress, 100)}%` }}
+                    className="bg-indigo-600 h-2 rounded-full" />
+                  
                                         </div>
                                     </CardContent>
                                 </Card>
-                            )}
+            }
 
                             <Card className="flex flex-col items-center justify-center p-6 border-dashed">
                                 <div className="text-center">
                                     <p className="text-muted-foreground mb-4">{__('erp.active_wallets')}: <span className="font-bold text-indigo-600">{wallets.length}</span></p>
-                                    {(!wallets.length || hasMultiWallets) && (
-                                        <Button onClick={() => setIsCreating(!isCreating)} variant="outline" className="gap-2">
+                                    {(!wallets.length || hasMultiWallets) &&
+                <Button onClick={() => setIsCreating(!isCreating)} variant="outline" className="gap-2">
                                             <Plus className="w-4 h-4" /> {isCreating ? __('general.cancel') : __('erp.create_new_wallet')}
                                         </Button>
-                                    )}
+                }
                                 </div>
                             </Card>
                         </div>
-                    )}
+          }
 
                     {/* Filters Bar */}
-                    {wallets.length > 0 && (
-                        <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                            <div className="relative w-full md:w-96">
+                    {wallets.length > 0 &&
+          <div className="flex flex-col md:flex-row gap-4 justify-end gap-4 items-center bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                            <div className="me-auto relative w-full md:w-96">
                                 <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                                <Input 
-                                    className="ps-9 bg-slate-50 border-slate-200 focus-visible:ring-indigo-500" 
-                                    placeholder={__('general.search_wallets')}
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
+                                <Input
+                className="ps-9 bg-slate-50 border-slate-200 focus-visible:ring-indigo-500"
+                placeholder={__('general.search_wallets')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)} />
+              
                             </div>
                             <div className="flex gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
                                 <div className="flex items-center gap-2">
@@ -174,9 +174,9 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                             <SelectValue placeholder={__('general.filter_by_goal')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {goalTypes.map(type => (
-                                                <SelectItem key={type} value={type}>{__(type)}</SelectItem>
-                                            ))}
+                                            {goalTypes.map((type) =>
+                    <SelectItem key={type} value={type}>{__(type)}</SelectItem>
+                    )}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -196,17 +196,17 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                 </div>
                             </div>
                         </div>
-                    )}
+          }
 
                     {/* Creation Form */}
                     <AnimatePresence>
-                        {isCreating && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                                animate={{ opacity: 1, height: 'auto', marginBottom: 24 }}
-                                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                                className="overflow-hidden"
-                            >
+                        {isCreating &&
+            <motion.div
+              initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+              animate={{ opacity: 1, height: 'auto', marginBottom: 24 }}
+              exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+              className="overflow-hidden">
+              
                                 <Card className="border-indigo-200 shadow-md bg-indigo-50/50">
                                     <CardHeader>
                                         <CardTitle className="text-lg text-indigo-900">{__('erp.create_new_wallet')}</CardTitle>
@@ -215,20 +215,20 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                         <form onSubmit={handleCreateWallet} className="flex flex-col md:flex-row gap-4 items-end">
                                             <div className="space-y-2 flex-1 w-full">
                                                 <label className="text-sm font-medium text-slate-700">{__('erp.wallet_name')}</label>
-                                                <Input 
-                                                    value={newWallet.name} 
-                                                    onChange={e => setNewWallet({...newWallet, name: e.target.value})} 
-                                                    placeholder={__('general.e_g_kids_college_fund')}
-                                                    className="bg-white"
-                                                    required 
-                                                />
+                                                <Input
+                        value={newWallet.name}
+                        onChange={(e) => setNewWallet({ ...newWallet, name: e.target.value })}
+                        placeholder={__('general.e_g_kids_college_fund')}
+                        className="bg-white"
+                        required />
+                      
                                             </div>
                                             <div className="space-y-2 flex-1 w-full">
                                                 <label className="text-sm font-medium text-slate-700">{__('general.goal_type')}</label>
-                                                <Select 
-                                                    value={newWallet.goal_type} 
-                                                    onValueChange={value => setNewWallet({...newWallet, goal_type: value as string})}
-                                                >
+                                                <Select
+                        value={newWallet.goal_type}
+                        onValueChange={(value) => setNewWallet({ ...newWallet, goal_type: value as string })}>
+                        
                                                     <SelectTrigger className="w-full bg-white">
                                                         <SelectValue placeholder={__('general.select_goal_type')} />
                                                     </SelectTrigger>
@@ -242,34 +242,34 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                                     </SelectContent>
                                                 </Select>
                                             </div>
-                                            {hasGoalTracking && (
-                                                <div className="space-y-2 flex-1 w-full">
+                                            {hasGoalTracking &&
+                    <div className="space-y-2 flex-1 w-full">
                                                     <label className="text-sm font-medium text-slate-700">{__('gold_saver.target_grams')} ({__('general.optional')})</label>
-                                                    <Input 
-                                                        type="number"
-                                                        step="0.01"
-                                                        value={newWallet.target_grams} 
-                                                        onChange={e => setNewWallet({...newWallet, target_grams: e.target.value})} 
-                                                        placeholder={__('general.e_g_50_00')}
-                                                        className="bg-white"
-                                                    />
+                                                    <Input
+                        type="number"
+                        step="0.01"
+                        value={newWallet.target_grams}
+                        onChange={(e) => setNewWallet({ ...newWallet, target_grams: e.target.value })}
+                        placeholder={__('general.e_g_50_00')}
+                        className="bg-white" />
+                      
                                                 </div>
-                                            )}
+                    }
                                             <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white w-full md:w-auto">{__('general.save_wallet')}</Button>
                                         </form>
                                     </CardContent>
                                 </Card>
                             </motion.div>
-                        )}
+            }
                     </AnimatePresence>
 
                     {/* Empty State if no wallets */}
-                    {!wallets.length && !isCreating && (
-                        <motion.div 
-                            initial={{ opacity: 0 }} 
-                            animate={{ opacity: 1 }} 
-                            className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-dashed border-slate-200"
-                        >
+                    {!wallets.length && !isCreating &&
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-dashed border-slate-200">
+            
                             <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
                                 <Wallet className="w-10 h-10 text-indigo-400" />
                             </div>
@@ -281,24 +281,24 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                 <Plus className="w-5 h-5" /> {__('general.create_your_first_wallet')}
                             </Button>
                         </motion.div>
-                    )}
+          }
 
                     {/* Wallets Grid */}
-                    <motion.div 
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="show"
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                    >
+                    <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
                         <AnimatePresence mode="popLayout">
-                            {filteredWallets.map(wallet => (
-                                <motion.div 
-                                    key={wallet.id} 
-                                    layout
-                                    variants={itemVariants}
-                                    onClick={() => router.get(route('isaas.gold-savers.wallets.show', wallet.id))} 
-                                    className="cursor-pointer group h-full"
-                                >
+                            {filteredWallets.map((wallet) =>
+              <motion.div
+                key={wallet.id}
+                layout
+                variants={itemVariants}
+                onClick={() => router.get(route('isaas.gold-savers.wallets.show', wallet.id))}
+                className="cursor-pointer group h-full">
+                
                                     <Card className="h-full hover:shadow-md transition-all duration-300">
                                         <CardHeader>
                                             <CardTitle className="flex items-center gap-2">
@@ -310,8 +310,8 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                             </div>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
-                                            <div className="flex justify-between items-end">
-                                                <div>
+                                            <div className="flex justify-end gap-4 items-end">
+                                                <div className="me-auto">
                                                     <div className="text-sm font-medium text-muted-foreground mb-1">{__('general.current_balance')}</div>
                                                     <div className="text-2xl font-bold">{wallet.balance_grams} <span className="text-sm text-muted-foreground font-normal">{__('general.g')}</span></div>
                                                     <div className="text-sm text-muted-foreground mt-1">{formatNumber(wallet.balance_amount)} {wallet.currency}</div>
@@ -319,40 +319,40 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                             </div>
 
                                             {/* Progress Bar */}
-                                            {hasGoalTracking && wallet.target_grams > 0 && (
-                                                <div className="mt-4 pt-4 border-t">
-                                                    <div className="flex justify-between text-sm mb-2">
-                                                        <span className="text-muted-foreground font-medium flex items-center gap-1"><Target className="w-4 h-4"/> {__('general.goal')}</span>
-                                                        <span className="font-semibold">{((wallet.balance_grams / wallet.target_grams) * 100).toFixed(1)}%</span>
+                                            {hasGoalTracking && wallet.target_grams > 0 &&
+                    <div className="mt-4 pt-4 border-t">
+                                                    <div className="flex justify-end gap-4 text-sm mb-2">
+                                                        <span className="me-auto text-muted-foreground font-medium flex items-center gap-1"><Target className="w-4 h-4" /> {__('general.goal')}</span>
+                                                        <span className="font-semibold">{(wallet.balance_grams / wallet.target_grams * 100).toFixed(1)}%</span>
                                                     </div>
                                                     <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                                                        <div 
-                                                            style={{ width: `${Math.min((wallet.balance_grams / wallet.target_grams) * 100, 100)}%` }}
-                                                            className="bg-indigo-600 h-full rounded-full" 
-                                                        />
+                                                        <div
+                          style={{ width: `${Math.min(wallet.balance_grams / wallet.target_grams * 100, 100)}%` }}
+                          className="bg-indigo-600 h-full rounded-full" />
+                        
                                                     </div>
                                                     <div className="text-xs text-end text-muted-foreground mt-1">{wallet.target_grams} {__('general.g')} {__('general.target')}</div>
                                                 </div>
-                                            )}
+                    }
                                         </CardContent>
                                     </Card>
                                 </motion.div>
-                            ))}
+              )}
                         </AnimatePresence>
                     </motion.div>
                     
-                    {wallets.length > 0 && filteredWallets.length === 0 && (
-                        <div className="text-center py-12 text-slate-500 bg-white rounded-xl border border-dashed border-slate-200">
+                    {wallets.length > 0 && filteredWallets.length === 0 &&
+          <div className="text-center py-12 text-slate-500 bg-white rounded-xl border border-dashed border-slate-200">
                             <Search className="w-8 h-8 mx-auto text-slate-300 mb-3" />
                             <p>{__('general.no_wallets_match_your_filters')}</p>
-                            <Button variant="link" onClick={() => { setSearchQuery(''); setGoalFilter('All'); }} className="mt-2">
+                            <Button variant="link" onClick={() => {setSearchQuery('');setGoalFilter('All');}} className="mt-2">
                                 {__('general.clear_filters')}
                             </Button>
                         </div>
-                    )}
+          }
 
                 </div>
             </div>
-        </AuthenticatedLayout>
-    );
+        </AuthenticatedLayout>);
+
 }
