@@ -14,7 +14,7 @@
     {
         "id": "HR1",
         "name": "Admin/Projects/Index.tsx",
-        "status": "running",
+        "status": "done",
         "dependencies": [
             "Phase1"
         ]
@@ -22,19 +22,19 @@
     {
         "id": "HR1_A",
         "name": "Convert projects table to Paginated DataTable",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "HR1_B",
         "name": "Convert clients select to Async Search Dropdown",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "HR2",
         "name": "ERP/Invoices/Create.jsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Phase1"
         ]
@@ -42,13 +42,13 @@
     {
         "id": "HR2_A",
         "name": "Convert clients select to Async Search Dropdown",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "HR2_B",
         "name": "Convert filteredProjects select to Async Search Dropdown",
-        "status": "pending",
+        "status": "running",
         "dependencies": []
     },
     {

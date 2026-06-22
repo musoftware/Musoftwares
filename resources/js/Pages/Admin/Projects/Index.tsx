@@ -20,7 +20,7 @@ import ProjectActionsSheet from './ProjectActionsSheet';
 import { formatMoney } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
-export default function Index({ projects, currentTab }) {
+export default function Index({ projects, currentTab, filters }) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [editingProject, setEditingProject] = useState<any>(null);
@@ -234,7 +234,9 @@ export default function Index({ projects, currentTab }) {
                     columns={columns}
                     data={projects.data}
                     pagination={projects}
-                    onPageChange={(page) => router.get(route('admin.projects.index', { status: currentTab, page }))}
+                    filters={filters}
+                    onSearch={(search) => router.get(route('admin.projects.index', { status: currentTab, search }), {}, { preserveState: true, replace: true })}
+                    onPageChange={(page) => router.get(route('admin.projects.index', { status: currentTab, page, search: filters?.search }), {}, { preserveState: true })}
                 />
             </div>
 

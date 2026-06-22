@@ -26,6 +26,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { ClientAutocomplete } from '@/Components/ClientAutocomplete';
 import { __ } from '@/lib/i18n';
 
 interface Task {
@@ -209,21 +210,12 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                             </div>
 
                             {/* Client Filter */}
-                            <div className="w-[180px]">
-                                <Select 
-                                    value={filterForm.data.client_id} 
-                                    onValueChange={(val) => handleFilterChange('client_id', val)}
-                                >
-                                    <SelectTrigger className="h-9 shadow-none text-xs">
-                                        <SelectValue placeholder={__('general.all_clients')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">{__('general.all_clients')}</SelectItem>
-                                        {clients.map((c) => (
-                                            <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                            <div className="w-[250px]">
+                                <ClientAutocomplete
+                                    value={filterForm.data.client_id === 'all' ? '' : filterForm.data.client_id}
+                                    onChange={(val) => handleFilterChange('client_id', val || 'all')}
+                                    placeholder={__('general.all_clients')}
+                                />
                             </div>
 
                             {/* Status Filter */}
@@ -445,24 +437,17 @@ export default function Index({ tasks, clients, projects = [], filters }: IndexP
                             {/* Client ID */}
                             <div className="space-y-1.5">
                                 <Label htmlFor="client_id" className="text-xs font-semibold text-foreground">{__('general.select_client')}</Label>
-                                <select
-                                    id="client_id"
+                                <ClientAutocomplete
                                     value={data.client_id}
-                                    onChange={(e) => {
+                                    onChange={(val) => {
                                         setData(prev => ({
                                             ...prev,
-                                            client_id: e.target.value,
+                                            client_id: val,
                                             project_id: ''
                                         }));
                                     }}
-                                    className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
-                                    required
-                                >
-                                    <option value="" disabled>{__('general.choose_a_client')}</option>
-                                    {clients.map((c) => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
-                                </select>
+                                    placeholder={__('general.choose_a_client')}
+                                />
                                 {errors.client_id && <p className="text-rose-500 text-[11px] font-medium">{errors.client_id}</p>}
                             </div>
 

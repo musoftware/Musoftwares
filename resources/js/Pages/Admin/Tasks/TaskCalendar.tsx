@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
+import { Badge } from '@/Components/ui/badge';
+import { ClientAutocomplete } from '@/Components/ClientAutocomplete';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -161,17 +163,13 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                         <p className="text-sm text-slate-500 mt-1">{__('general.detailed_overview_of_all_tasks_todos_and_busy_times_by_date_across_platform_clients')}</p>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <select
+                    <div className="flex items-center gap-3 w-[250px]">
+                        <ClientAutocomplete
                             value={clientFilter}
-                            onChange={e => handleClientChange(e.target.value)}
-                            className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        >
-                            <option value="">{__('general.all_clients')}</option>
-                            {clients.map(c => (
-                                <option key={c.id} value={c.id}>{c.name}</option>
-                            ))}
-                        </select>
+                            onChange={handleClientChange}
+                            searchEndpoint={route('admin.projects.search-clients')}
+                            placeholder={__('general.all_clients')}
+                        />
                     </div>
                 </div>
 
@@ -307,18 +305,12 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                     <form onSubmit={submitTask} className="space-y-4 py-4">
                         <div className="space-y-2">
                             <Label htmlFor="client_id">{__('general.client')} *</Label>
-                            <select
-                                id="client_id"
+                            <ClientAutocomplete
                                 value={data.client_id}
-                                onChange={e => setData('client_id', e.target.value)}
-                                className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                required
-                            >
-                                <option value="">{__('general.select_client')}</option>
-                                {clients.map(c => (
-                                    <option key={c.id} value={c.id}>{c.name}</option>
-                                ))}
-                            </select>
+                                onChange={val => setData('client_id', val)}
+                                searchEndpoint={route('admin.projects.search-clients')}
+                                placeholder={__('general.select_client')}
+                            />
                             {errors.client_id && <p className="text-xs text-red-500">{errors.client_id}</p>}
                         </div>
 

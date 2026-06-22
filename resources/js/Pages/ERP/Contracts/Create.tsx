@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { Input } from '@/Components/ui/input';
 import { ArrowLeft, FileSignature } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { ClientAutocomplete } from '@/Components/ClientAutocomplete';
 import { __ } from '@/lib/i18n';
 
 export default function CreateContract({ clients = [] }: { clients?: any[] }) {
@@ -69,18 +70,11 @@ export default function CreateContract({ clients = [] }: { clients?: any[] }) {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-700">{__('general.client')}<span className="text-red-500">*</span></label>
-                                    <Select value={form.client} onValueChange={(val) => setForm({...form, client: val || ''})}>
-                                        <SelectTrigger className="bg-white border-slate-200 text-slate-900">
-                                            <SelectValue placeholder={__('general.select_client')} />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-white border-slate-200 text-slate-900">
-                                            {clients.map(c => (
-                                                <SelectItem key={c.id} value={c.id.toString()}>
-                                                    {c.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <ClientAutocomplete
+                                        value={form.client}
+                                        onChange={(val) => setForm({...form, client: val || ''})}
+                                        placeholder={__('general.select_client')}
+                                    />
                                     {errors.client && <p className="text-xs text-red-500">{errors.client}</p>}
                                 </div>
                                 <div className="space-y-2">

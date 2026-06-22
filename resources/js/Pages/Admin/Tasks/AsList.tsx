@@ -20,6 +20,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
+import { ClientAutocomplete } from '@/Components/ClientAutocomplete';
 import axios from 'axios';
 import { __ } from '@/lib/i18n';
 
@@ -157,16 +158,14 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                             </div>
 
                             {/* Client filter */}
-                            <select
-                                value={clientFilter}
-                                onChange={e => handleClientChange(e.target.value)}
-                                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 shadow-none focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                            >
-                                <option value="">{__('general.all_clients')}</option>
-                                {clients.map(c => (
-                                    <option key={c.id} value={c.id}>{c.name}</option>
-                                ))}
-                            </select>
+                            <div className="w-[200px]">
+                                <ClientAutocomplete
+                                    value={clientFilter}
+                                    onChange={handleClientChange}
+                                    searchEndpoint={route('admin.projects.search-clients')}
+                                    placeholder={__('general.all_clients')}
+                                />
+                            </div>
 
                             {/* Search */}
                             <div className="relative flex-1 max-w-xs">

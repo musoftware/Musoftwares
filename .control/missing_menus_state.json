@@ -38,37 +38,37 @@
     {
         "id": "sup1",
         "name": "Update AppSidebar.tsx for Support Agent",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "sup2",
         "name": "Filter items array",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "sup3",
         "name": "Show only 'Operations -> Tickets', 'Operations -> Guest Tickets'",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "seller",
         "name": "3. Seller Dashboard Frontend/Marketplace",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "sel1",
         "name": "Create dedicated Seller Portal routes",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "sel2",
         "name": "/seller/dashboard",
-        "status": "pending",
+        "status": "running",
         "dependencies": [
             "sel1"
         ]

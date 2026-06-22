@@ -165,9 +165,16 @@ class Transaction extends Model
 
     public function balance()
     {
-        return Transaction::query()->where('user_id', $this->user_id)
-            ->where('id', '<=', $this->id)->sum('amount');
-        //        return FinanceHelper::instance()->format_money($this->amount, $this->currency);
+        return Transaction::query()
+            ->where('user_id', $this->user_id)
+            ->where(function ($query) {
+                $query->where('created_at', '<', $this->created_at)
+                      ->orWhere(function ($q) {
+                          $q->where('created_at', '=', $this->created_at)
+                            ->where('id', '<=', $this->id);
+                      });
+            })
+            ->sum('amount');
     }
 
     public function balance_str()

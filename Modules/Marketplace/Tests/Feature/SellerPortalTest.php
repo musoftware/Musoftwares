@@ -47,11 +47,13 @@ class SellerPortalTest extends TestCase
             'seller_id' => $this->seller->id,
             'category_id' => $category->id,
             'title' => 'Test Service',
+            'description' => 'Test Description',
             'status' => 'active',
         ]);
         $package = ServicePackage::create([
             'service_id' => $service->id,
             'name' => 'Basic',
+            'description' => 'Basic Description',
             'price' => 100,
             'delivery_days' => 1,
         ]);
@@ -62,6 +64,7 @@ class SellerPortalTest extends TestCase
             'package_id' => $package->id,
             'amount' => 100,
             'currency_id' => 1,
+            'commission_amount' => 10,
             'status' => ServiceOrderStatus::COMPLETED,
         ]);
 
@@ -69,6 +72,9 @@ class SellerPortalTest extends TestCase
             'order_id' => $order->id,
             'amount' => 100,
             'currency_id' => 1,
+            'business_amount' => 100,
+            'exchange_rate' => 1.0,
+            'exchange_rate_date' => now()->toDateString(),
             'status' => EscrowStatus::HELD,
         ]);
 
