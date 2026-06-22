@@ -303,4 +303,10 @@ return [
     'edit_direct_cost' => 'Edit Direct Cost',
     'edit_direct_cost_description' => 'Update the details of this direct cost',
     'reverse_transaction' => 'Reverse Transaction',
+    'cannot_delete_paid_payout' => 'Cannot delete a paid payout.',
+    'cannot_edit_paid_payout' => 'Cannot edit a paid payout.',
+    'payout_created' => 'Payout created successfully.',
+    'payout_deleted' => 'Payout deleted successfully.',
+    'payout_marked_paid' => 'Payout marked as paid.',
+    'payout_updated' => 'Payout updated successfully.',
 ];
