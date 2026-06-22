@@ -13,7 +13,7 @@ class FreelanceContractController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Contract::with(['job', 'client', 'freelancer']);
+        $query = Contract::with(['job.currency', 'client', 'freelancer', 'currency']);
 
         if ($request->has('search')) {
             $search = $request->get('search');
@@ -42,7 +42,7 @@ class FreelanceContractController extends Controller
 
     public function show(Contract $contract)
     {
-        $contract->load(['job', 'proposal', 'client', 'freelancer']);
+        $contract->load(['job.currency', 'proposal.currency', 'client', 'freelancer', 'currency']);
 
         return Inertia::render('Admin/Freelance/Contracts/Show', [
             'contract' => $contract

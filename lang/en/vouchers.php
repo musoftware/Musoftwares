@@ -16,7 +16,7 @@ return [
     'max' => 'Max',
     'per_user' => 'per user',
     'add_balance_and_pay' => 'Add Balance & Pay',
-    'uses' => 'uses',
+    'uses' => 'Uses',
     'limit' => 'Limit',
     'empty' => [
         'title' => 'No active vouchers',

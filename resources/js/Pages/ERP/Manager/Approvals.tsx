@@ -15,7 +15,7 @@ export default function Approvals({ leaveRequests, withdrawals }: any) {
     const leaveForm = useForm({ response: '' });
 
     return (
-        <ERPLayout>
+        <ERPLayout title={__('erp.manager_approvals')} workspaceName={__('erp.manager')} menuItems={[]}>
             <Head title={__('erp.manager_approvals')} />
             
             <div className="flex flex-col gap-8 p-8 max-w-7xl mx-auto">

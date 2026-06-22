@@ -54,6 +54,7 @@ class SchemaSyncCommand extends Command
                     $this->warn("Table '{$tableName}' is entirely missing. Creating it...");
                     
                     $colDefs = [];
+                    $primaryKeys = [];
                     foreach ($sourceColumns as $colName => $colDef) {
                         $def = "`{$colName}` {$colDef['type']}";
                         if ($colDef['nullable'] === 'NO') {
@@ -75,9 +76,13 @@ class SchemaSyncCommand extends Command
                             $def .= " {$colDef['extra']}";
                         }
                         if ($colDef['key'] === 'PRI') {
-                            $def .= " PRIMARY KEY";
+                            $primaryKeys[] = "`{$colName}`";
                         }
                         $colDefs[] = $def;
+                    }
+                    
+                    if (!empty($primaryKeys)) {
+                        $colDefs[] = "PRIMARY KEY (" . implode(', ', $primaryKeys) . ")";
                     }
                     
                     $createSql = "CREATE TABLE `{$tableName}` (\n  " . implode(",\n  ", $colDefs) . "\n)";

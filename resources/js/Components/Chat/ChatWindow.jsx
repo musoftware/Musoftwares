@@ -1,6 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Message from './Message';
 
 export default function ChatWindow({
@@ -37,7 +37,7 @@ export default function ChatWindow({
             .catch(console.error);
     };
 
-    const fetchMessages = async () => {
+    const fetchMessages = useCallback(async () => {
         if (!conversationId) return;
         try {
             const res = await axios.get(
@@ -57,7 +57,7 @@ export default function ChatWindow({
             console.error('Error fetching messages:', err);
             setFetchError("Failed to load messages. Please try again.");
         }
-    };
+    }, [conversationId]);
 
     // Real-time events connection
     useEffect(() => {
@@ -141,7 +141,7 @@ export default function ChatWindow({
             }, 5000); // Poll every 5 seconds
         }
         return () => clearInterval(pollInterval);
-    }, [isConnected, conversationId]);
+    }, [isConnected, conversationId, fetchMessages]);
 
     const handleFocus = () => {
         markAsRead();

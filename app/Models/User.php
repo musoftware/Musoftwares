@@ -65,7 +65,7 @@ class User extends Authenticatable
             return null;
         }
         $hash = md5(strtolower(trim($this->email)));
-        return "https://www.gravatar.com/avatar/{$hash}?s=200&d=404";
+        return "https://www.gravatar.com/avatar/{$hash}?s=200";
     }
 
     protected function casts(): array
@@ -176,7 +176,7 @@ class User extends Authenticatable
             ->where('unpaid', '>', 0)
             ->whereIn('status', ['unpaid', 'partially_paid'])
             ->get();
-            
+
         foreach ($unpaidInvoices as $invoice) {
             $schedule = $invoice->getSchedule();
             $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->currency_id);
@@ -191,7 +191,7 @@ class User extends Authenticatable
                     $monthsSinceStart = now()->diffInMonths($startDate);
                     $paymentsDue = min($splits, $monthsSinceStart + 1);
                     $totalDueByNow = ($invoiceTotal / $splits) * $paymentsDue;
-                    
+
                     if ($invoicePaid < $totalDueByNow) {
                         $deductionForInvoice = $totalDueByNow - $invoicePaid;
                         $locked += min($deductionForInvoice, $invoiceUnpaid);
@@ -560,12 +560,12 @@ class User extends Authenticatable
     public function routeNotificationForFcm($notification)
     {
         $tokens = $this->deviceTokens()->pluck('token')->toArray();
-        
+
         // Fallback to the old fcm_token column if no tokens found in the new table
         if (empty($tokens) && $this->fcm_token) {
             return $this->fcm_token;
         }
-        
+
         return $tokens;
     }
 

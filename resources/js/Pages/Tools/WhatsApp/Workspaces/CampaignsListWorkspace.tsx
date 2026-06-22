@@ -76,7 +76,7 @@ function CampaignCardActions({ campaign, onStart, onRetry, onPause, onResume, on
                 <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-xl h-8 w-8 bg-muted/50 hover:bg-muted text-muted-foreground transition-colors duration-150 outline-none select-none cursor-pointer focus:ring-0">
                     <MoreVertical className="w-3.5 h-3.5" />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align={__('end')} className="min-w-[140px]">
+                <DropdownMenuContent align="end" className="min-w-[140px]">
                     {(status === 'running' || status === 'processing' || status === 'paused') && (
                         <DropdownMenuItem onClick={() => onStop(campaign.id)} className="font-bold flex items-center gap-2 cursor-pointer text-start justify-start w-full">
                             <Square className="w-3.5 h-3.5 text-muted-foreground" />

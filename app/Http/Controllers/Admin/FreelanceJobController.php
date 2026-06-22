@@ -12,7 +12,7 @@ class FreelanceJobController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Job::with('client')->withCount('proposals');
+        $query = Job::with(['client', 'currency'])->withCount('proposals');
 
         if ($request->has('search')) {
             $search = $request->get('search');
@@ -37,7 +37,7 @@ class FreelanceJobController extends Controller
 
     public function show(Job $job)
     {
-        $job->load(['client', 'skills', 'proposals.freelancer', 'contracts.freelancer']);
+        $job->load(['client', 'skills', 'proposals.freelancer', 'proposals.currency', 'contracts.freelancer', 'contracts.currency', 'currency']);
 
         return Inertia::render('Admin/Freelance/Jobs/Show', [
             'job' => $job

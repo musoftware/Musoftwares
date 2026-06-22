@@ -391,6 +391,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'moderator'])->prefix('admi
     Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\Admin\AdminTicketController::class, 'reply'])->name('tickets.reply');
     Route::post('tickets/{ticket}/assign', [\App\Http\Controllers\Admin\AdminTicketController::class, 'assign'])->name('tickets.assign');
     Route::post('tickets/canned-responses', [\App\Http\Controllers\Admin\AdminTicketController::class, 'addCannedResponse'])->name('tickets.canned-responses.store');
+    Route::resource('guest-tickets', \App\Http\Controllers\Admin\GuestTicketController::class)->only(['index', 'show']);
 });
 
 // Admin Routes
@@ -402,9 +403,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // Website Services
     Route::resource('website-services', \App\Http\Controllers\Admin\WebsiteServiceController::class)->except(['show']);
-
-    // Guest Tickets
-    Route::resource('guest-tickets', \App\Http\Controllers\Admin\GuestTicketController::class)->only(['index', 'show']);
 
     // AI Estimator
     Route::get('/tools/ai-estimator', [\App\Http\Controllers\Admin\AiEstimatorController::class, 'index'])->name('tools.ai-estimator');
@@ -437,6 +435,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::delete('/employee-todos/{employeeTodo}', [\App\Http\Controllers\Admin\EmployeeTodoController::class, 'destroy'])->name('employee-todos.destroy');
 
     // ── Admin Projects ──────────────────────────────────────────────
+    Route::get('/projects/search-clients', [\App\Http\Controllers\Admin\ProjectController::class, 'searchClients'])->name('projects.search-clients');
     Route::resource('/projects', \App\Http\Controllers\Admin\ProjectController::class)->except(['create', 'edit', 'show']);
     Route::post('/projects/{project}/archive', [\App\Http\Controllers\Admin\ProjectController::class, 'archive'])->name('projects.archive');
     Route::post('/projects/{project}/restore', [\App\Http\Controllers\Admin\ProjectController::class, 'restore'])->name('projects.restore');
@@ -455,42 +454,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/plans/search-users', [\App\Http\Controllers\Admin\PlanController::class, 'searchUsers'])->name('plans.search-users');
     Route::resource('/plans', \App\Http\Controllers\Admin\PlanController::class)->except(['edit', 'show']);
 
-    // ── Admin Invoices (Platform Billing) ─────────────────────────
-    Route::get('/invoices', [\App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
-    Route::get('/invoices/unpaid', [\App\Http\Controllers\Admin\InvoiceController::class, 'unpaid'])->name('invoices.unpaid');
-    Route::get('/invoices/archive', [\App\Http\Controllers\Admin\InvoiceController::class, 'archive'])->name('invoices.archive');
-    Route::get('/invoices/create', [\App\Http\Controllers\Admin\InvoiceController::class, 'create'])->name('invoices.create');
-    Route::get('/invoices/timer-details/{item_id}', [\App\Http\Controllers\Admin\InvoiceController::class, 'timerDetails'])->name('invoices.timer-details');
-    Route::post('/invoices/timer-details/{item_id}/store', [\App\Http\Controllers\Admin\InvoiceController::class, 'storeTimerDetails'])->name('invoices.timer-details.store');
-    Route::delete('/invoices/timer-details/{item_id}/{timer_id}', [\App\Http\Controllers\Admin\InvoiceController::class, 'destroyTimerDetails'])->name('invoices.timer-details.destroy');
-    Route::post('/invoices/{invoice}/create-timer', [\App\Http\Controllers\Admin\InvoiceController::class, 'createTimerItem'])->name('invoices.create-timer');
-    Route::post('/invoices/bulk-action', [\App\Http\Controllers\Admin\InvoiceController::class, 'bulkAction'])->name('invoices.bulk-action');
-    Route::get('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
-    Route::get('/invoices/{invoice}/download-pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'downloadPdf'])->name('invoices.download-pdf');
-    Route::get('/invoices/{invoice}/print-pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'printPdf'])->name('invoices.print-pdf');
 
-    Route::put('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'update'])->name('invoices.update');
-    Route::post('/invoices/{invoice}/mark-paid', [\App\Http\Controllers\Admin\InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
-    Route::post('/invoices/{invoice}/cancel', [\App\Http\Controllers\Admin\InvoiceController::class, 'cancel'])->name('invoices.cancel');
-    Route::post('/invoices/{invoice}/change-status', [\App\Http\Controllers\Admin\InvoiceController::class, 'changeStatus'])->name('invoices.change-status');
-    Route::post('/invoices/{invoice}/change-job-status', [\App\Http\Controllers\Admin\InvoiceController::class, 'changeJobStatus'])->name('invoices.change-job-status');
-    Route::get('/invoices/{invoice}/notify', [\App\Http\Controllers\Admin\InvoiceController::class, 'notify'])->name('invoices.notify');
-    Route::post('/invoices/{invoice}/partial-pay', [\App\Http\Controllers\Admin\InvoiceController::class, 'partialPay'])->name('invoices.partial-pay');
-    Route::post('/invoices/{invoice}/pay-service/calculate', [\App\Http\Controllers\Admin\InvoiceController::class, 'calculatePayService'])->name('invoices.pay-service.calculate');
-    Route::post('/invoices/{invoice}/pay-service/store', [\App\Http\Controllers\Admin\InvoiceController::class, 'storePayService'])->name('invoices.pay-service.store');
-    Route::post('/invoices/{invoice}/share-link', [\App\Http\Controllers\Admin\InvoiceController::class, 'shareLink'])->name('invoices.share-link');
-    Route::post('/invoices/{invoice}/reschedule', [\App\Http\Controllers\Admin\InvoiceController::class, 'reschedule'])->name('invoices.reschedule');
-
-
-    // ── Platform Users Transactions ───────────────────────────────
-    Route::get('/transactions', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'index'])->name('transactions.index');
-    Route::get('/transactions/create', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'create'])->name('transactions.create');
-    Route::post('/transactions', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'store'])->name('transactions.store');
-    Route::delete('/transactions/{id}', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'destroy'])->name('transactions.destroy');
-    Route::get('/transactions/transfer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'transfer'])->name('transactions.transfer');
-    Route::post('/transactions/transfer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'start_transfer'])->name('transactions.start_transfer');
-    Route::post('/project/current_timer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'current_timer'])->name('project.current_timer');
-    Route::post('/transactions/recalc-balance/{user_id}', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'regenerate'])->name('transactions.recalc-balance');
     // ── Google Calendar Integrations ─────────────────────────────────
     Route::prefix('google-calendar')->name('google-calendar.')->group(function () {
         Route::get('/connect', [\App\Http\Controllers\Admin\GoogleCalendarIntegrationController::class, 'connect'])->name('connect');
@@ -498,84 +462,11 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::post('/disconnect', [\App\Http\Controllers\Admin\GoogleCalendarIntegrationController::class, 'disconnect'])->name('disconnect');
     });
 
-    // ── Third Party Integration Hooks ───────────────────────────────────────
-    Route::resource('payment-links', \App\Http\Controllers\Admin\PaymentLinkController::class)->except(['create', 'edit', 'show', 'update']);
-
-    // ── Admin Financial Operations ────────────────────────────────
-    Route::get('/finance', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'index'])->name('finance.index');
-    Route::get('/finance/export', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'export'])->name('finance.report.export');
-    Route::post('/finance', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'store'])->name('finance.store');
-    Route::put('/finance/{entry}', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'update'])->name('finance.update');
-    Route::delete('/finance/{entry}', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'destroy'])->name('finance.destroy');
-    Route::post('/finance/{entry}/mark-paid', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'markAsPaid'])->name('finance.mark-paid');
-
-    // Legacy Business Routes mapped to new BusinessController
-    Route::prefix('business')->group(function() {
-        Route::get('/income', [\App\Http\Controllers\Admin\BusinessController::class, 'income'])->name('income.index');
-        Route::get('/costs', [\App\Http\Controllers\Admin\BusinessController::class, 'costs'])->name('costs.index');
-        Route::get('/costs/create', [\App\Http\Controllers\Admin\BusinessController::class, 'create_cost'])->name('costs.create');
-        Route::post('/costs', [\App\Http\Controllers\Admin\BusinessController::class, 'store_cost'])->name('costs.store');
-        Route::get('/costs/edit/{id}', [\App\Http\Controllers\Admin\BusinessController::class, 'edit_cost'])->name('costs.edit');
-        Route::put('/costs/{id}', [\App\Http\Controllers\Admin\BusinessController::class, 'update_cost'])->name('costs.update');
-        Route::delete('/costs/{id}/delete', [\App\Http\Controllers\Admin\BusinessController::class, 'delete_cost'])->name('costs.delete');
-        
-        Route::delete('/income/{id}/delete', [\App\Http\Controllers\Admin\BusinessController::class, 'delete_income'])->name('income.delete');
-        Route::post('/income/{id}/reverse', [\App\Http\Controllers\Admin\BusinessController::class, 'reverse_income'])->name('income.reverse');
-        
-        Route::get('/reports', [\App\Http\Controllers\Admin\BusinessController::class, 'reports'])->name('reports.index');
-        Route::get('/balance-report', [\App\Http\Controllers\Admin\BusinessController::class, 'balance'])->name('reports.balance');
-    });
-
-    // Recurring Business Operations (Recovered from legacy project)
-    Route::prefix('business/recurring')->group(function () {
-        // Costs
-        Route::get('costs', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_costs'])->name('recurring_costs.index');
-        Route::get('costs/create', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'create_recurring_costs'])->name('recurring_costs.create');
-        Route::post('costs', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'store_recurring_costs'])->name('recurring_costs.store');
-        Route::get('costs/edit/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'edit_recurring_costs'])->name('recurring_costs.edit');
-        Route::put('costs/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'update_recurring_costs'])->name('recurring_costs.update');
-        Route::get('costs/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_costs_view'])->name('recurring_costs.view');
-        Route::delete('costs/{id}/delete', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_costs_delete'])->name('recurring_costs.delete');
-        Route::delete('costs/{id}/delete-with-transaction', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_costs_delete_with_transaction'])->name('recurring_costs.delete_with_transaction');
-        Route::post('costs/{id}/toggle-status', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'toggle_recurring_costs'])->name('recurring_costs.toggle');
-
-        // Income
-        Route::get('income', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_income'])->name('recurring_income.index');
-        Route::post('income', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'store_recurring_income'])->name('recurring_income.store');
-        Route::get('income/edit/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'edit_recurring_income'])->name('recurring_income.edit');
-        Route::put('income/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'update_recurring_income'])->name('recurring_income.update');
-        Route::get('income/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_income_view'])->name('recurring_income.view');
-        Route::delete('income/{id}/delete', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_income_delete'])->name('recurring_income.delete');
-        Route::delete('income/{id}/delete-with-transaction', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_income_delete_with_transaction'])->name('recurring_income.delete_with_transaction');
-        Route::post('income/{id}/toggle-status', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'toggle_recurring_income'])->name('recurring_income.toggle');
-
-        // Salaries
-        Route::get('salaries', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_salaries'])->name('recurring_salaries.index');
-        Route::post('salaries', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'store_recurring_salaries'])->name('recurring_salaries.store');
-        Route::get('salaries/edit/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'edit_recurring_salaries'])->name('recurring_salaries.edit');
-        Route::put('salaries/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'update_recurring_salaries'])->name('recurring_salaries.update');
-        Route::get('salaries/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_salaries_view'])->name('recurring_salaries.view');
-        Route::delete('salaries/{id}/delete', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_salaries_delete'])->name('recurring_salaries.delete');
-        Route::post('salaries/{id}/toggle-status', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'toggle_recurring_salaries'])->name('recurring_salaries.toggle');
-    });
-
-    // ── Admin Hours Calendar ──────────────────────────────────────
-    Route::get('/hours-calendar', [\App\Http\Controllers\Admin\HoursCalendarController::class, 'index'])->name('hours-calendar.index');
-    Route::post('/hours-calendar/data', [\App\Http\Controllers\Admin\HoursCalendarController::class, 'getData'])->name('hours-calendar.data');
-
     // ── Admin Busy Times ──────────────────────────────────────────────
     Route::get('/busy-times', [\App\Http\Controllers\Admin\AdminBusyTimesController::class, 'index'])->name('busy-times.index');
     Route::post('/busy-times/{busyTime}/toggle-active', [\App\Http\Controllers\Admin\AdminBusyTimesController::class, 'toggleActive'])->name('busy-times.toggle-active');
     Route::delete('/busy-times/{busyTime}', [\App\Http\Controllers\Admin\AdminBusyTimesController::class, 'destroy'])->name('busy-times.destroy');
 
-
-    Route::resource('vouchers', \App\Http\Controllers\Admin\AdminVoucherController::class);
-
-    Route::resource('coupons', \App\Http\Controllers\Admin\AdminCouponController::class);
-
-    Route::resource('payment-methods', \App\Http\Controllers\Admin\AdminPaymentMethodController::class)->only(['index', 'show', 'update']);
-
-    Route::resource('withdraw-requests', \App\Http\Controllers\Admin\AdminWithdrawRequestController::class)->only(['index', 'show', 'update']);
 
     // ── Admin Phase 4 (Settings & Localization) ───────────────────
     Route::get('settings', [\App\Http\Controllers\Admin\AdminSettingController::class, 'index'])->name('settings.index');
@@ -627,14 +518,12 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/users/create', [\App\Http\Controllers\Admin\UsersController::class, 'create'])->name('users.create');
     Route::post('/users', [\App\Http\Controllers\Admin\UsersController::class, 'store'])->name('users.store');
     Route::get('/users/problematic', [\App\Http\Controllers\Admin\UsersController::class, 'problematic'])->name('users.problematic');
-    Route::get('/users/co-work', [\App\Http\Controllers\Admin\UsersController::class, 'coWork'])->name('users.co-work');
     Route::get('/users/legacy-coworker/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'showLegacyCoWorker'])->name('users.legacy-coworker.show');
     Route::get('/users/legacy-coworker/{id}/edit', [\App\Http\Controllers\Admin\UsersController::class, 'editLegacyCoWorker'])->name('users.legacy-coworker.edit');
     Route::put('/users/legacy-coworker/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'updateLegacyCoWorker'])->name('users.legacy-coworker.update');
     Route::delete('/users/legacy-coworker/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'deleteLegacyCoWorker'])->name('users.legacy-coworker.destroy');
     Route::post('/users/legacy-coworker/{id}/create-user', [\App\Http\Controllers\Admin\UsersController::class, 'createUserFromCoWorker'])->name('users.legacy-coworker.create-user');
     Route::post('/users/legacy-coworker/{id}/reset-password', [\App\Http\Controllers\Admin\UsersController::class, 'resetPasswordAndSendCredentialsForCoWorker'])->name('users.legacy-coworker.reset-password');
-    Route::get('/users/earning-analyze', [\App\Http\Controllers\Admin\UsersController::class, 'earningAnalyze'])->name('users.earning-analyze');
 
     // Matches exact old links
     Route::get('/users/{id}/login-as', [\App\Http\Controllers\Admin\UsersController::class, 'loginAs'])->name('users.login-as');
@@ -1003,3 +892,120 @@ Route::middleware(['auth', 'verified'])->prefix('api')->name('api.')->group(func
     Route::get('/background-tasks/{backgroundTask}', [\App\Http\Controllers\BackgroundTaskController::class, 'show'])->name('background-tasks.show');
 });
 
+
+// ── Admin Accountant & Finance Routes ─────────────────────────────
+Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('admin')->name('admin.')->group(function () {
+    // ── Admin Invoices (Platform Billing) ─────────────────────────
+    Route::get('/invoices', [\App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/unpaid', [\App\Http\Controllers\Admin\InvoiceController::class, 'unpaid'])->name('invoices.unpaid');
+    Route::get('/invoices/archive', [\App\Http\Controllers\Admin\InvoiceController::class, 'archive'])->name('invoices.archive');
+    Route::get('/invoices/create', [\App\Http\Controllers\Admin\InvoiceController::class, 'create'])->name('invoices.create');
+    Route::get('/invoices/timer-details/{item_id}', [\App\Http\Controllers\Admin\InvoiceController::class, 'timerDetails'])->name('invoices.timer-details');
+    Route::post('/invoices/timer-details/{item_id}/store', [\App\Http\Controllers\Admin\InvoiceController::class, 'storeTimerDetails'])->name('invoices.timer-details.store');
+    Route::delete('/invoices/timer-details/{item_id}/{timer_id}', [\App\Http\Controllers\Admin\InvoiceController::class, 'destroyTimerDetails'])->name('invoices.timer-details.destroy');
+    Route::post('/invoices/{invoice}/create-timer', [\App\Http\Controllers\Admin\InvoiceController::class, 'createTimerItem'])->name('invoices.create-timer');
+    Route::post('/invoices/bulk-action', [\App\Http\Controllers\Admin\InvoiceController::class, 'bulkAction'])->name('invoices.bulk-action');
+    Route::get('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
+    Route::get('/invoices/{invoice}/download-pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'downloadPdf'])->name('invoices.download-pdf');
+    Route::get('/invoices/{invoice}/print-pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'printPdf'])->name('invoices.print-pdf');
+
+    Route::put('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'update'])->name('invoices.update');
+    Route::post('/invoices/{invoice}/mark-paid', [\App\Http\Controllers\Admin\InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
+    Route::post('/invoices/{invoice}/cancel', [\App\Http\Controllers\Admin\InvoiceController::class, 'cancel'])->name('invoices.cancel');
+    Route::post('/invoices/{invoice}/change-status', [\App\Http\Controllers\Admin\InvoiceController::class, 'changeStatus'])->name('invoices.change-status');
+    Route::post('/invoices/{invoice}/change-job-status', [\App\Http\Controllers\Admin\InvoiceController::class, 'changeJobStatus'])->name('invoices.change-job-status');
+    Route::get('/invoices/{invoice}/notify', [\App\Http\Controllers\Admin\InvoiceController::class, 'notify'])->name('invoices.notify');
+    Route::post('/invoices/{invoice}/partial-pay', [\App\Http\Controllers\Admin\InvoiceController::class, 'partialPay'])->name('invoices.partial-pay');
+    Route::post('/invoices/{invoice}/pay-service/calculate', [\App\Http\Controllers\Admin\InvoiceController::class, 'calculatePayService'])->name('invoices.pay-service.calculate');
+    Route::post('/invoices/{invoice}/pay-service/store', [\App\Http\Controllers\Admin\InvoiceController::class, 'storePayService'])->name('invoices.pay-service.store');
+    Route::post('/invoices/{invoice}/share-link', [\App\Http\Controllers\Admin\InvoiceController::class, 'shareLink'])->name('invoices.share-link');
+    Route::post('/invoices/{invoice}/reschedule', [\App\Http\Controllers\Admin\InvoiceController::class, 'reschedule'])->name('invoices.reschedule');
+
+    // ── Platform Users Transactions ───────────────────────────────
+    Route::get('/transactions', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/transactions/create', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'create'])->name('transactions.create');
+    Route::post('/transactions', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'store'])->name('transactions.store');
+    Route::delete('/transactions/{id}', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'destroy'])->name('transactions.destroy');
+    Route::get('/transactions/transfer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'transfer'])->name('transactions.transfer');
+    Route::post('/transactions/transfer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'start_transfer'])->name('transactions.start_transfer');
+    Route::post('/project/current_timer', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'current_timer'])->name('project.current_timer');
+    Route::post('/transactions/recalc-balance/{user_id}', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'regenerate'])->name('transactions.recalc-balance');
+
+    // ── Third Party Integration Hooks ───────────────────────────────────────
+    Route::resource('payment-links', \App\Http\Controllers\Admin\PaymentLinkController::class)->except(['create', 'edit', 'show', 'update']);
+
+    // ── Admin Financial Operations ────────────────────────────────
+    Route::get('/finance', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'index'])->name('finance.index');
+    Route::get('/finance/export', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'export'])->name('finance.report.export');
+    Route::post('/finance', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'store'])->name('finance.store');
+    Route::put('/finance/{entry}', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'update'])->name('finance.update');
+    Route::delete('/finance/{entry}', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'destroy'])->name('finance.destroy');
+    Route::post('/finance/{entry}/mark-paid', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'markAsPaid'])->name('finance.mark-paid');
+
+    // Legacy Business Routes mapped to new BusinessController
+    Route::prefix('business')->group(function() {
+        Route::get('/income', [\App\Http\Controllers\Admin\BusinessController::class, 'income'])->name('income.index');
+        Route::get('/costs', [\App\Http\Controllers\Admin\BusinessController::class, 'costs'])->name('costs.index');
+        Route::get('/costs/create', [\App\Http\Controllers\Admin\BusinessController::class, 'create_cost'])->name('costs.create');
+        Route::post('/costs', [\App\Http\Controllers\Admin\BusinessController::class, 'store_cost'])->name('costs.store');
+        Route::get('/costs/edit/{id}', [\App\Http\Controllers\Admin\BusinessController::class, 'edit_cost'])->name('costs.edit');
+        Route::put('/costs/{id}', [\App\Http\Controllers\Admin\BusinessController::class, 'update_cost'])->name('costs.update');
+        Route::delete('/costs/{id}/delete', [\App\Http\Controllers\Admin\BusinessController::class, 'delete_cost'])->name('costs.delete');
+        
+        Route::delete('/income/{id}/delete', [\App\Http\Controllers\Admin\BusinessController::class, 'delete_income'])->name('income.delete');
+        Route::post('/income/{id}/reverse', [\App\Http\Controllers\Admin\BusinessController::class, 'reverse_income'])->name('income.reverse');
+        
+        Route::get('/reports', [\App\Http\Controllers\Admin\BusinessController::class, 'reports'])->name('reports.index');
+        Route::get('/balance-report', [\App\Http\Controllers\Admin\BusinessController::class, 'balance'])->name('reports.balance');
+    });
+
+    // Recurring Business Operations (Recovered from legacy project)
+    Route::prefix('business/recurring')->group(function () {
+        // Costs
+        Route::get('costs', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_costs'])->name('recurring_costs.index');
+        Route::get('costs/create', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'create_recurring_costs'])->name('recurring_costs.create');
+        Route::post('costs', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'store_recurring_costs'])->name('recurring_costs.store');
+        Route::get('costs/edit/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'edit_recurring_costs'])->name('recurring_costs.edit');
+        Route::put('costs/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'update_recurring_costs'])->name('recurring_costs.update');
+        Route::get('costs/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_costs_view'])->name('recurring_costs.view');
+        Route::delete('costs/{id}/delete', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_costs_delete'])->name('recurring_costs.delete');
+        Route::delete('costs/{id}/delete-with-transaction', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_costs_delete_with_transaction'])->name('recurring_costs.delete_with_transaction');
+        Route::post('costs/{id}/toggle-status', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'toggle_recurring_costs'])->name('recurring_costs.toggle');
+
+        // Income
+        Route::get('income', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_income'])->name('recurring_income.index');
+        Route::post('income', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'store_recurring_income'])->name('recurring_income.store');
+        Route::get('income/edit/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'edit_recurring_income'])->name('recurring_income.edit');
+        Route::put('income/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'update_recurring_income'])->name('recurring_income.update');
+        Route::get('income/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_income_view'])->name('recurring_income.view');
+        Route::delete('income/{id}/delete', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_income_delete'])->name('recurring_income.delete');
+        Route::delete('income/{id}/delete-with-transaction', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_income_delete_with_transaction'])->name('recurring_income.delete_with_transaction');
+        Route::post('income/{id}/toggle-status', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'toggle_recurring_income'])->name('recurring_income.toggle');
+
+        // Salaries
+        Route::get('salaries', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_salaries'])->name('recurring_salaries.index');
+        Route::post('salaries', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'store_recurring_salaries'])->name('recurring_salaries.store');
+        Route::get('salaries/edit/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'edit_recurring_salaries'])->name('recurring_salaries.edit');
+        Route::put('salaries/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'update_recurring_salaries'])->name('recurring_salaries.update');
+        Route::get('salaries/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_salaries_view'])->name('recurring_salaries.view');
+        Route::delete('salaries/{id}/delete', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_salaries_delete'])->name('recurring_salaries.delete');
+        Route::post('salaries/{id}/toggle-status', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'toggle_recurring_salaries'])->name('recurring_salaries.toggle');
+    });
+
+    // ── Admin Hours Calendar ──────────────────────────────────────
+    Route::get('/hours-calendar', [\App\Http\Controllers\Admin\HoursCalendarController::class, 'index'])->name('hours-calendar.index');
+    Route::post('/hours-calendar/data', [\App\Http\Controllers\Admin\HoursCalendarController::class, 'getData'])->name('hours-calendar.data');
+
+    Route::resource('vouchers', \App\Http\Controllers\Admin\AdminVoucherController::class);
+
+    Route::resource('coupons', \App\Http\Controllers\Admin\AdminCouponController::class);
+
+    Route::resource('payment-methods', \App\Http\Controllers\Admin\AdminPaymentMethodController::class)->only(['index', 'show', 'update']);
+
+    Route::resource('withdraw-requests', \App\Http\Controllers\Admin\AdminWithdrawRequestController::class)->only(['index', 'show', 'update']);
+
+    Route::get('/users/co-work', [\App\Http\Controllers\Admin\UsersController::class, 'coWork'])->name('users.co-work');
+
+    Route::get('/users/earning-analyze', [\App\Http\Controllers\Admin\UsersController::class, 'earningAnalyze'])->name('users.earning-analyze');
+
+});

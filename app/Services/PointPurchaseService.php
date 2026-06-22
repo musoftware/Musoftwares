@@ -119,7 +119,7 @@ class PointPurchaseService extends BaseService
      */
     public function processWebhookPurchase(User $user, float $amountPaid, string $reason, int $points, $packageId = null): void
     {
-        $this->executeInTransaction(function () use ($user, $amountPaid, $reason, $points, $packageId) {
+        $this->executeInTransaction(function () use ($user, $amountPaid, $reason, $points) {
             $user->add_balance($amountPaid, $reason, 'received');
             
             // Deduct balance for points

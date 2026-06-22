@@ -11,7 +11,7 @@ class FreelanceProposalController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Proposal::with(['job', 'freelancer']);
+        $query = Proposal::with(['job.currency', 'freelancer', 'currency']);
 
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->get('search');
@@ -42,7 +42,7 @@ class FreelanceProposalController extends Controller
 
     public function show($id)
     {
-        $proposal = Proposal::with(['job', 'freelancer'])->findOrFail($id);
+        $proposal = Proposal::with(['job.currency', 'freelancer', 'currency'])->findOrFail($id);
 
         // Currency logic removed, relying on points or frontend formatting
 

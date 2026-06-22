@@ -39,13 +39,24 @@ class ProjectController extends Controller
             $query->where('user_id', $request->user_id);
         }
 
-        $projects = $query->latest()->get();
-        $clients = User::select('id', 'name', 'email')->orderBy('name')->get();
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('project_name', 'like', "%{$search}%")
+                  ->orWhereHas('client', function ($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $projects = $query->latest()->paginate(15)->withQueryString();
 
         return Inertia::render('Admin/Projects/Index', [
-            'projects' => ProjectResource::collection($projects)->resolve(),
-            'clients' => $clients,
+            'projects' => ProjectResource::collection($projects),
             'currentTab' => $status,
+            'filters' => [
+                'search' => $request->search,
+            ],
         ]);
     }
 
@@ -82,5 +93,22 @@ class ProjectController extends Controller
         $this->projectService->deleteProject($id);
 
         return redirect()->back()->with('success', __('general.project_deleted'));
+    }
+
+    public function searchClients(Request $request)
+    {
+        $query = $request->get('q', '');
+        
+        if (strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+        $clients = User::where('name', 'like', "%{$query}%")
+            ->orWhere('email', 'like', "%{$query}%")
+            ->select('id', 'name', 'email')
+            ->limit(10)
+            ->get();
+
+        return response()->json($clients);
     }
 }

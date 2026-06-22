@@ -1,12 +1,12 @@
 <?php
 
 return [
-  'cost_line_already_recorded' => 'cost_line_already_recorded',
-  'cost_line_record_failed' => 'cost_line_record_failed',
-  'cost_line_record_invalid_status' => 'cost_line_record_invalid_status',
-  'cost_line_record_not_found' => 'cost_line_record_not_found',
-  'cost_line_record_zero' => 'cost_line_record_zero',
-  'manage_discounts' => 'manage_discounts',
+  'cost_line_already_recorded' => 'Cost Line Already Recorded',
+  'cost_line_record_failed' => 'Cost Line Record Failed',
+  'cost_line_record_invalid_status' => 'Cost Line Record Invalid Status',
+  'cost_line_record_not_found' => 'Cost Line Record Not Found',
+  'cost_line_record_zero' => 'Cost Line Record Zero',
+  'manage_discounts' => 'Manage Discounts',
   'payment_method' => 'Payment Method',
   'an_error_occurred_during_payment' => 'An error occurred during payment processing.',
   'approve_release_payment' => 'Approve & Release Payment',
@@ -41,6 +41,6 @@ return [
   'have_your_developer_read_the' => 'Have your developer read the documentation to implement the checkout flow.',
   'set_up_your_webhook_endpoint' => 'Set up your webhook endpoint to receive real-time payment success notifications.',
   'pay_via_card_gateway' => 'الدفع عبر البطاقة/البوابة',
-    'equiv' => 'equiv',
+    'equiv' => 'Equiv',
     'amount_egp' => 'amount egp'
 ];

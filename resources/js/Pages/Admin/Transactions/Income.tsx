@@ -158,10 +158,10 @@ export default function Income({ transactions, filters, filteredUser }) {
                 </div>
                 <div className="flex gap-2">
                     <Button variant="default" asChild>
-                        <Link href="/admin/transactions/create?type=receive">{__('general.receive')}</Link>
+                        <Link href={`/admin/transactions/create?type=receive${filteredUser ? `&user_id=${filteredUser.id}` : ''}`}>{__('general.receive')}</Link>
                     </Button>
                     <Button variant="outline" asChild>
-                        <Link href="/admin/transactions/create?type=earn">{__('general.earn')}</Link>
+                        <Link href={`/admin/transactions/create?type=earn${filteredUser ? `&user_id=${filteredUser.id}` : ''}`}>{__('general.earn')}</Link>
                     </Button>
 
                     <DropdownMenu>
@@ -173,17 +173,17 @@ export default function Income({ transactions, filters, filteredUser }) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
-                                <Link href="/admin/transactions/create?type=used" className="w-full cursor-pointer">
+                                <Link href={`/admin/transactions/create?type=used${filteredUser ? `&user_id=${filteredUser.id}` : ''}`} className="w-full cursor-pointer">
                                     {__('general.used') || 'Used'}
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href="/admin/transactions/create?type=refund" className="w-full cursor-pointer">
+                                <Link href={`/admin/transactions/create?type=refund${filteredUser ? `&user_id=${filteredUser.id}` : ''}`} className="w-full cursor-pointer">
                                     {__('general.refund')}
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href="/admin/transactions/create?type=send" className="w-full cursor-pointer">
+                                <Link href={`/admin/transactions/create?type=send${filteredUser ? `&user_id=${filteredUser.id}` : ''}`} className="w-full cursor-pointer">
                                     {__('general.send')}
                                 </Link>
                             </DropdownMenuItem>

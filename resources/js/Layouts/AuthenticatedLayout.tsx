@@ -396,6 +396,30 @@ function AuthenticatedContent({
                                                 <p className={cn("text-xs truncate", isMarketplaceActive ? "text-violet-700/70" : "text-slate-500")}>{__('general.services_clients_amp_campaigns')}</p>
                                             </div>
                                         </DropdownMenuItem>
+
+                                        {user?.roles?.includes('seller') && (
+                                            <DropdownMenuItem 
+                                                className={cn(
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer mt-1",
+                                                    isRouteActive('seller.dashboard') ? "bg-blue-50/80 border-blue-100" : "hover:bg-slate-50 border-transparent"
+                                                )}
+                                                render={<Link href={safeRoute('seller.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                            >
+                                                <div className={cn(
+                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                    isRouteActive('seller.dashboard') ? "bg-blue-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-blue-50"
+                                                )}>
+                                                    <Building2 className={cn("w-4 h-4", isRouteActive('seller.dashboard') ? "text-blue-700" : "text-slate-500 group-hover/dropdown-menu-item:text-blue-600")} />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center justify-between">
+                                                        <p className={cn("text-sm font-medium", isRouteActive('seller.dashboard') ? "text-blue-900" : "text-slate-900")}>Seller Portal</p>
+                                                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700">Seller</span>
+                                                    </div>
+                                                    <p className={cn("text-xs truncate", isRouteActive('seller.dashboard') ? "text-blue-700/70" : "text-slate-500")}>Manage products and payouts</p>
+                                                </div>
+                                            </DropdownMenuItem>
+                                        )}
                                     </DropdownMenuContent>
                                 </DropdownMenu>
 
@@ -743,7 +767,7 @@ function AuthenticatedContent({
                                                     >
                                                         <Shield className="me-2 h-4 w-4 text-indigo-600" />{__('general.admin_dashboard')}</DropdownMenuItem>
                                                 )}
-                                                {user?.roles?.includes('moderator') && (
+                                                {(user?.roles?.includes('moderator') || user?.roles?.includes('support_agent')) && (
                                                     <DropdownMenuItem 
                                                         className="cursor-pointer rounded-lg text-sm bg-blue-50 text-blue-700 focus:bg-blue-100 focus:text-blue-800 mb-1"
                                                         render={<Link href={safeRoute('admin.tickets.index')} className="flex items-center w-full font-medium" />}

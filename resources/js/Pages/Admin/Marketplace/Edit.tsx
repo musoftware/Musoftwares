@@ -242,7 +242,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                         {__('general.english')}</Button>
                                     <Button 
                                         type="button" 
-                                        variant={__('outline')} 
+                                        variant={locale === 'ar' ? 'default' : 'outline'} 
                                         size="sm" 
                                         onClick={() => setLocale('ar')}
                                     >

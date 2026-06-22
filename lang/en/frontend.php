@@ -39,7 +39,7 @@ return array (
       'title' => 'Enterprise',
       'desc' => 'Custom solutions for large organizations.',
       'price' => 'Custom',
-      'interval' => '',
+      'interval' => 'Interval',
       'f1' => 'Dedicated infrastructure',
       'f2' => 'Custom integrations',
       'f3' => '24/7 phone support',

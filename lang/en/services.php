@@ -8,7 +8,7 @@ return [
         'prompt_placeholder' => 'ai.prompt_placeholder',
         'prompt_too_short' => 'ai.prompt_too_short'
     ],
-    'back_to_services' => 'back_to_services',
+    'back_to_services' => 'Back To Services',
     'create' => [
         'page_title' => 'create.page_title',
         'steps' => [
@@ -29,7 +29,7 @@ return [
             'required_fields' => 'create.wizard.required_fields'
         ]
     ],
-    'date_range' => 'date_range',
+    'date_range' => 'Date Range',
     'edit' => [
         'page_title' => 'edit.page_title',
         'ref_from_fee' => 'edit.ref_from_fee',
@@ -110,10 +110,10 @@ return [
         'sign_up_to_get_link' => 'referral_card.sign_up_to_get_link',
         'title' => 'referral_card.title'
     ],
-    'service_desc' => 'service_desc',
-    'service_extras_upsells' => 'service_extras_upsells',
-    'service_image' => 'service_image',
-    'service_title' => 'service_title',
+    'service_desc' => 'Service Desc',
+    'service_extras_upsells' => 'Service Extras Upsells',
+    'service_image' => 'Service Image',
+    'service_title' => 'Service Title',
     'tip' => [
         'create_help_text' => 'tip.create_help_text',
         'edit_help_text' => 'tip.edit_help_text',
