@@ -1,76 +1,76 @@
 import React, { useState } from 'react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { 
-    Building2, 
-    Users, 
-    FileText, 
-    UserCheck, 
-    DollarSign, 
-    Search, 
-    ArrowRight, 
-    UserMinus, 
-    Eye,
-    TrendingUp,
-    ShieldAlert
-} from 'lucide-react';
+import {
+  Building2,
+  Users,
+  FileText,
+  UserCheck,
+  DollarSign,
+  Search,
+  ArrowRight,
+  UserMinus,
+  Eye,
+  TrendingUp,
+  ShieldAlert } from
+'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Card, CardContent } from '@/Components/ui/card';
 import { __ } from '@/lib/i18n';
 
 interface Tenant {
-    id: number;
-    name: string;
-    owner_name: string;
-    owner_email: string;
-    status: string;
-    client_count: number;
-    invoice_count: number;
-    team_count: number;
-    revenue: number;
-    created_at: string;
-    user_id: number;
+  id: number;
+  name: string;
+  owner_name: string;
+  owner_email: string;
+  status: string;
+  client_count: number;
+  invoice_count: number;
+  team_count: number;
+  revenue: number;
+  created_at: string;
+  user_id: number;
 }
 
 interface IndexProps {
-    tenants: {
-        data: Tenant[];
-        links: any[];
-        current_page: number;
-        last_page: number;
-    };
-    filters: {
-        search?: string;
-    };
-    stats: {
-        total_tenants: number;
-        active_tenants: number;
-        total_revenue: number;
-        total_team_members: number;
-    };
-    auth: {
-        user: any;
-    };
+  tenants: {
+    data: Tenant[];
+    links: any[];
+    current_page: number;
+    last_page: number;
+  };
+  filters: {
+    search?: string;
+  };
+  stats: {
+    total_tenants: number;
+    active_tenants: number;
+    total_revenue: number;
+    total_team_members: number;
+  };
+  auth: {
+    user: any;
+  };
 }
 
 export default function Index({ tenants, filters, stats, auth }: IndexProps) {
-    const [search, setSearch] = useState(filters.search || '');
+  const [search, setSearch] = useState(filters.search || '');
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        router.get(route('admin.erp.index'), { search }, {
-            preserveState: true,
-            replace: true,
-        });
-    };
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.get(route('admin.erp.index'), { search }, {
+      preserveState: true,
+      replace: true
+    });
+  };
 
-    const handleImpersonate = (userId: number) => {
-        router.get(route('admin.erp.impersonate', userId));
-    };
+  const handleImpersonate = (userId: number) => {
+    router.get(route('admin.erp.impersonate', userId));
+  };
 
-    return (
-        <AdminSidebarLayout title={__('general.erp_overview')} header="ERP Overview">
+  return (
+    <AdminSidebarLayout title={__('general.erp_overview')} header="ERP Overview">
             <Head title={__('general.erp_admin_oversight')} />
 
             <div className="space-y-6">
@@ -82,8 +82,8 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                 {/* KPI Cards Grid */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <Card className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                        <CardContent className="p-5 flex items-center justify-between">
-                            <div className="space-y-1">
+                        <CardContent className="p-5 flex items-center justify-end gap-4">
+                            <div className="me-auto space-y-1">
                                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.total_workspaces')}</span>
                                 <h3 className="text-2xl font-bold text-slate-900">{stats.total_tenants}</h3>
                             </div>
@@ -94,8 +94,8 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                     </Card>
 
                     <Card className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                        <CardContent className="p-5 flex items-center justify-between">
-                            <div className="space-y-1">
+                        <CardContent className="p-5 flex items-center justify-end gap-4">
+                            <div className="me-auto space-y-1">
                                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.active_status')}</span>
                                 <h3 className="text-2xl font-bold text-slate-900">{stats.active_tenants}</h3>
                             </div>
@@ -106,8 +106,8 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                     </Card>
 
                     <Card className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                        <CardContent className="p-5 flex items-center justify-between">
-                            <div className="space-y-1">
+                        <CardContent className="p-5 flex items-center justify-end gap-4">
+                            <div className="me-auto space-y-1">
                                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.overall_platform_revenue')}</span>
                                 <h3 className="text-2xl font-bold text-slate-900">
                                     {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.total_revenue)}
@@ -120,8 +120,8 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                     </Card>
 
                     <Card className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                        <CardContent className="p-5 flex items-center justify-between">
-                            <div className="space-y-1">
+                        <CardContent className="p-5 flex items-center justify-end gap-4">
+                            <div className="me-auto space-y-1">
                                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.total_active_staff')}</span>
                                 <h3 className="text-2xl font-bold text-slate-900">{stats.total_team_members}</h3>
                             </div>
@@ -134,18 +134,18 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
 
                 {/* Filter and Table Card */}
                 <Card className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                    <div className="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <h3 className="font-semibold text-slate-800 text-sm">{__('general.workspace_registry')}</h3>
+                    <div className="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-end gap-4 gap-4">
+                        <h3 className="me-auto font-semibold text-slate-800 text-sm">{__('general.workspace_registry')}</h3>
                         <form onSubmit={handleSearch} className="flex items-center gap-2 max-w-sm w-full">
                             <div className="relative w-full">
                                 <Search className="absolute start-3 top-3 h-4 w-4 text-slate-400" />
-                                <Input 
-                                    type="text" 
-                                    placeholder={__('general.search_by_name_owner_or_email')} 
-                                    value={search}
-                                    onChange={e => setSearch(e.target.value)}
-                                    className="ps-9 h-10 shadow-none border-slate-200 focus-visible:ring-slate-900"
-                                />
+                                <Input
+                  type="text"
+                  placeholder={__('general.search_by_name_owner_or_email')}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="ps-9 h-10 shadow-none border-slate-200 focus-visible:ring-slate-900" />
+                
                             </div>
                             <Button type="submit" size="sm" className="h-10 bg-slate-900 hover:bg-slate-900 text-white font-semibold shadow-none border-0">
                                 {__('general.search')}</Button>
@@ -167,8 +167,8 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {(tenants.data as any).length === 0 ? (
-                                    <tr>
+                                {(tenants.data as any).length === 0 ?
+                <tr>
                                         <td colSpan={8} className="p-0">
                                             <div className="flex flex-col items-center justify-center p-12 text-center">
                                                 <ShieldAlert className="h-12 w-12 text-slate-300 mb-4" />
@@ -176,10 +176,10 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                                 <p className="text-xs text-slate-500 max-w-xs mt-1">{__('general.no_tenants_match_your_search_filter_or_no_tenants_exist')}</p>
                                             </div>
                                         </td>
-                                    </tr>
-                                ) : (
-                                    (tenants.data as any).map((tenant) => (
-                                        <tr key={tenant.id} className="hover:bg-slate-50 transition text-[13px] text-slate-700">
+                                    </tr> :
+
+                (tenants.data as any).map((tenant) =>
+                <tr key={tenant.id} className="hover:bg-slate-50 transition text-[13px] text-slate-700">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2.5">
                                                     <div className="h-8 w-8 rounded-lg bg-slate-50 text-slate-900 flex items-center justify-center font-bold text-xs">
@@ -203,8 +203,8 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                                                    tenant.team_count > 0 ? 'bg-slate-50 text-slate-900' : 'bg-slate-100 text-slate-500'
-                                                }`}>
+                    tenant.team_count > 0 ? 'bg-slate-50 text-slate-900' : 'bg-slate-100 text-slate-500'}`
+                    }>
                                                     {tenant.team_count} staff
                                                 </span>
                                             </td>
@@ -216,53 +216,53 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                             </td>
                                             <td className="px-6 py-4 text-end">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <Link 
-                                                        href={route('admin.erp.show', tenant.id)}
-                                                        className={route('admin.erp.show', tenant.id) ? "inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-50 hover:text-slate-900 font-semibold text-xs transition-colors" : ""}
-                                                    >
+                                                    <Link
+                        href={route('admin.erp.show', tenant.id)}
+                        className={route('admin.erp.show', tenant.id) ? "inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-50 hover:text-slate-900 font-semibold text-xs transition-colors" : ""}>
+                        
                                                         <Eye className="h-3 w-3" /> {__('general.drilldown')}</Link>
-                                                    <Button 
-                                                        size="sm"
-                                                        onClick={() => handleImpersonate(tenant.user_id)}
-                                                        className="h-7 px-2.5 bg-slate-900 hover:bg-slate-900 text-white font-semibold text-xs shadow-none border-0"
-                                                    >
+                                                    <Button
+                        size="sm"
+                        onClick={() => handleImpersonate(tenant.user_id)}
+                        className="h-7 px-2.5 bg-slate-900 hover:bg-slate-900 text-white font-semibold text-xs shadow-none border-0">
+                        
                                                         {__('general.impersonate')}</Button>
                                                 </div>
                                             </td>
                                         </tr>
-                                    ))
-                                )}
+                )
+                }
                             </tbody>
                         </table>
                     </div>
 
                     {/* Pagination Links */}
-                    {tenants.last_page > 1 && (
-                        <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
-                            <span>
+                    {tenants.last_page > 1 &&
+          <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-end gap-4 text-xs text-slate-500 font-medium">
+                            <span className="me-auto">
                                 Page {tenants.current_page} of {tenants.last_page}
                             </span>
                             <div className="flex items-center gap-1">
                                 {tenants.links.map((link, idx) => {
-                                    if (link.url === null) return null;
-                                    return (
-                                        <Link 
-                                            key={idx}
-                                            href={link.url}
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                            className={`px-3 py-1.5 rounded transition ${
-                                                link.active 
-                                                    ? 'bg-slate-900 text-white font-bold' 
-                                                    : 'hover:bg-slate-100 text-slate-600'
-                                            }`}
-                                        />
-                                    );
-                                })}
+                if (link.url === null) return null;
+                return (
+                  <Link
+                    key={idx}
+                    href={link.url}
+                    dangerouslySetInnerHTML={{ __html: link.label }}
+                    className={`px-3 py-1.5 rounded transition ${
+                    link.active ?
+                    'bg-slate-900 text-white font-bold' :
+                    'hover:bg-slate-100 text-slate-600'}`
+                    } />);
+
+
+              })}
                             </div>
                         </div>
-                    )}
+          }
                 </Card>
             </div>
-        </AdminSidebarLayout>
-    );
+        </AdminSidebarLayout>);
+
 }

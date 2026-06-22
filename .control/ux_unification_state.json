@@ -74,7 +74,7 @@
     {
         "id": "BP_7",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_6"
         ]
@@ -82,7 +82,7 @@
     {
         "id": "BP_8",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_7"
         ]
@@ -90,7 +90,7 @@
     {
         "id": "BP_9",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_8"
         ]
@@ -98,7 +98,7 @@
     {
         "id": "BP_10",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "running",
         "dependencies": [
             "BP_9"
         ]

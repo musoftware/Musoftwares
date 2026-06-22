@@ -10,38 +10,38 @@ import { __ } from '@/lib/i18n';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Index({ proposals, filters }: any) {
-    const [search, setSearch] = useState(filters.search || '');
-    const [status, setStatus] = useState(filters.status || 'all');
+  const [search, setSearch] = useState(filters.search || '');
+  const [status, setStatus] = useState(filters.status || 'all');
 
-    const handleSearch = (e: any) => {
-        e.preventDefault();
-        router.get(route('admin.freelance.proposals.index'), { search, status }, { preserveState: true });
-    };
+  const handleSearch = (e: any) => {
+    e.preventDefault();
+    router.get(route('admin.freelance.proposals.index'), { search, status }, { preserveState: true });
+  };
 
-    const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
 
-    const handleDelete = () => {
-        if (deleteConfirm) {
-            router.delete(route('admin.freelance.proposals.destroy', deleteConfirm));
-            setDeleteConfirm(null);
-        }
-    };
+  const handleDelete = () => {
+    if (deleteConfirm) {
+      router.delete(route('admin.freelance.proposals.destroy', deleteConfirm));
+      setDeleteConfirm(null);
+    }
+  };
 
-    return (
-        <AdminSidebarLayout title={__('freelance.admin_proposals', undefined, 'Freelance Proposals')} header={__('freelance.manage_proposals', undefined, 'Manage Proposals')}>
-            <div className="mb-6 flex items-center justify-between">
+  return (
+    <AdminSidebarLayout title={__('freelance.admin_proposals', undefined, 'Freelance Proposals')} header={__('freelance.manage_proposals', undefined, 'Manage Proposals')}>
+            <div className="mb-6 flex items-center justify-end gap-4">
                 <form onSubmit={handleSearch} className="flex space-x-2 w-full max-w-2xl">
-                    <Input 
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        placeholder={__('freelance.search_proposals_placeholder', undefined, 'Search by job title or freelancer name/email...')}
-                        className="flex-1"
-                    />
+                    <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={__('freelance.search_proposals_placeholder', undefined, 'Search by job title or freelancer name/email...')}
+            className="flex-1" />
+          
                     <select
-                        value={status}
-                        onChange={(e) => setStatus(e.target.value)}
-                        className="rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm"
-                    >
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm">
+            
                         <option value="all">{__('freelance.all_statuses')}</option>
                         <option value="pending">{__('freelance.pending', undefined, 'Pending')}</option>
                         <option value="accepted">{__('freelance.accepted', undefined, 'Accepted')}</option>
@@ -49,11 +49,11 @@ export default function Index({ proposals, filters }: any) {
                         <option value="withdrawn">{__('freelance.withdrawn', undefined, 'Withdrawn')}</option>
                     </select>
                     <Button type="submit" variant="secondary">{__('freelance.filter')}</Button>
-                    {(search || status !== 'all') && (
-                        <Button type="button" variant="ghost" onClick={() => { setSearch(''); setStatus('all'); router.get(route('admin.freelance.proposals.index')); }}>
+                    {(search || status !== 'all') &&
+          <Button type="button" variant="ghost" onClick={() => {setSearch('');setStatus('all');router.get(route('admin.freelance.proposals.index'));}}>
                             {__('freelance.clear')}
                         </Button>
-                    )}
+          }
                 </form>
             </div>
 
@@ -70,16 +70,16 @@ export default function Index({ proposals, filters }: any) {
                         </tr>
                     </thead>
                     <tbody>
-                        {(proposals.data as any).map((proposal: any) => (
-                            <tr key={proposal.id} className="border-b hover:bg-gray-50">
+                        {(proposals.data as any).map((proposal: any) =>
+            <tr key={proposal.id} className="border-b hover:bg-gray-50">
                                 <td className="p-4">
-                                    {proposal.job ? (
-                                        <Link href={route('admin.freelance.jobs.show', proposal.job.id)} className="font-medium text-slate-900 hover:underline">
+                                    {proposal.job ?
+                <Link href={route('admin.freelance.jobs.show', proposal.job.id)} className="font-medium text-slate-900 hover:underline">
                                             {proposal.job.title}
-                                        </Link>
-                                    ) : (
-                                        <span className="text-gray-500 italic">{__('freelance.job_deleted', undefined, 'Job Deleted')}</span>
-                                    )}
+                                        </Link> :
+
+                <span className="text-gray-500 italic">{__('freelance.job_deleted', undefined, 'Job Deleted')}</span>
+                }
                                 </td>
                                 <td className="p-4 text-gray-700">
                                     <div>{proposal.freelancer?.name || __('freelance.unknown_freelancer')}</div>
@@ -88,10 +88,10 @@ export default function Index({ proposals, filters }: any) {
                                 <td className="p-4 font-medium text-slate-900">{formatCurrency(proposal.bid_amount, proposal.currency)}</td>
                                 <td className="p-4 capitalize">
                                     <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 
-                                        ${proposal.status === 'accepted' ? 'bg-green-100 text-green-800' : 
-                                          proposal.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                          proposal.status === 'withdrawn' ? 'bg-gray-100 text-gray-800' :
-                                          'bg-yellow-100 text-yellow-800'}`}>
+                                        ${proposal.status === 'accepted' ? 'bg-green-100 text-green-800' :
+                proposal.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                proposal.status === 'withdrawn' ? 'bg-gray-100 text-gray-800' :
+                'bg-yellow-100 text-yellow-800'}`}>
                                         {__('freelance.' + proposal.status) || proposal.status}
                                     </span>
                                 </td>
@@ -122,50 +122,50 @@ export default function Index({ proposals, filters }: any) {
                                     </DropdownMenu>
                                 </td>
                             </tr>
-                        ))}
-                        {(proposals.data as any).length === 0 && (
-                            <tr>
+            )}
+                        {(proposals.data as any).length === 0 &&
+            <tr>
                                 <td colSpan={6} className="p-4 text-center text-gray-500">
                                     {__('freelance.no_proposals_found', undefined, 'No proposals found.')}
                                 </td>
                             </tr>
-                        )}
+            }
                     </tbody>
                 </table>
             </div>
 
-            {proposals.links && proposals.links.length > 3 && (
-                <div className="mt-4 flex justify-between items-center">
-                    <div className="text-sm text-gray-500">
+            {proposals.links && proposals.links.length > 3 &&
+      <div className="mt-4 flex justify-end gap-4 items-center">
+                    <div className="me-auto text-sm text-gray-500">
                         {__('freelance.showing_results_of', {
-                            first: proposals.from || 0,
-                            last: proposals.to || 0,
-                            total: proposals.total
-                        })}
+            first: proposals.from || 0,
+            last: proposals.to || 0,
+            total: proposals.total
+          })}
                     </div>
                     <div className="flex space-x-1">
-                        {proposals.links.map((link: any, idx: number) => (
-                            <Link 
-                                key={idx}
-                                href={link.url || '#'}
-                                className={`px-3 py-1 rounded text-sm transition ${link.active ? 'bg-slate-900 text-white shadow-sm' : !link.url ? 'cursor-not-allowed opacity-50 text-slate-300 pointer-events-none' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ))}
+                        {proposals.links.map((link: any, idx: number) =>
+          <Link
+            key={idx}
+            href={link.url || '#'}
+            className={`px-3 py-1 rounded text-sm transition ${link.active ? 'bg-slate-900 text-white shadow-sm' : !link.url ? 'cursor-not-allowed opacity-50 text-slate-300 pointer-events-none' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+            dangerouslySetInnerHTML={{ __html: link.label }} />
+
+          )}
                     </div>
                 </div>
-            )}
+      }
 
-            <ConfirmModal 
-                isOpen={!!deleteConfirm} 
-                onCancel={() => setDeleteConfirm(null)}
-                onConfirm={handleDelete}
-                title={__('freelance.confirm_delete_proposal')}
-                description={__('freelance.confirm_delete_proposal_msg')}
-                confirmLabel={__('freelance.delete')}
-                cancelLabel={__('freelance.cancel')}
-                variant="danger"
-            />
-        </AdminSidebarLayout>
-    );
+            <ConfirmModal
+        isOpen={!!deleteConfirm}
+        onCancel={() => setDeleteConfirm(null)}
+        onConfirm={handleDelete}
+        title={__('freelance.confirm_delete_proposal')}
+        description={__('freelance.confirm_delete_proposal_msg')}
+        confirmLabel={__('freelance.delete')}
+        cancelLabel={__('freelance.cancel')}
+        variant="danger" />
+      
+        </AdminSidebarLayout>);
+
 }

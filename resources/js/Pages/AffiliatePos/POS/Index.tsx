@@ -43,7 +43,7 @@ export default function PosIndex({ initialProducts, categories }: any) {
             {/* Main Product Area */}
             <div className="flex-1 flex flex-col h-full overflow-hidden">
                 {/* Header */}
-                <header className="bg-white border-b px-6 py-4 flex items-center justify-between shadow-sm">
+                <header className="bg-white border-b px-6 py-4 flex items-center justify-end gap-4 shadow-sm">
                     <div className="flex items-center gap-4">
                         <Button variant="ghost" size="icon" className="rounded-full">
                             <ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -128,7 +128,7 @@ export default function PosIndex({ initialProducts, categories }: any) {
                                     <h4 className="font-medium text-gray-800 leading-tight">{item.name}</h4>
                                     <div className="text-blue-600 font-semibold mt-1">EGP {item.price}</div>
                                 </div>
-                                <div className="flex flex-col items-end justify-between gap-3">
+                                <div className="flex flex-col items-end justify-end gap-4 gap-3">
                                     <Button 
                                         variant="ghost"
                                         size="icon"

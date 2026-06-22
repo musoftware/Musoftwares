@@ -170,7 +170,7 @@ export default function Index({ clients, filters, stats, tenant }: Props) {
             menuItems={menuItems}
             lockedAddons={lockedAddons}
         >
-            <div className="mb-6 flex justify-between items-center">
+            <div className="mb-6 flex justify-end gap-4 items-center">
                 <div>
                     <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">{__('general.clients_management')}</h2>
                     <p className="text-sm text-slate-500 mt-1">{__('general.manage_your_clients_and_wallet_balances')}</p>

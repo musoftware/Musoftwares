@@ -3,13 +3,13 @@ import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogFooter,
-} from '@/Components/ui/dialog';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter } from
+'@/Components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/Components/ui/dropdown-menu';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -17,129 +17,129 @@ import { MoreHorizontal, Edit, Trash2, CheckCircle, XCircle, Ban } from 'lucide-
 import { __ } from '@/lib/i18n';
 
 export default function Index({ skills, filters }: any) {
-    const [isCreateOpen, setIsCreateOpen] = useState(false);
-    const [isEditOpen, setIsEditOpen] = useState(false);
-    const [isBulkCreateOpen, setIsBulkCreateOpen] = useState(false);
-    const [editingSkill, setEditingSkill] = useState<any>(null);
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isBulkCreateOpen, setIsBulkCreateOpen] = useState(false);
+  const [editingSkill, setEditingSkill] = useState<any>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: ''
+  });
+  const [bulkSkills, setBulkSkills] = useState('');
+  const [search, setSearch] = useState(filters.search || '');
+
+  const handleSearch = (e: any) => {
+    e.preventDefault();
+    router.get(route('admin.freelance.skills.index'), { search }, { preserveState: true });
+  };
+
+  const handleCreateSubmit = (e: any) => {
+    e.preventDefault();
+    router.post(route('admin.freelance.skills.store'), formData, {
+      onSuccess: () => {
+        setIsCreateOpen(false);
+        resetForm();
+      }
     });
-    const [bulkSkills, setBulkSkills] = useState('');
-    const [search, setSearch] = useState(filters.search || '');
+  };
 
-    const handleSearch = (e: any) => {
-        e.preventDefault();
-        router.get(route('admin.freelance.skills.index'), { search }, { preserveState: true });
-    };
+  const handleBulkCreateSubmit = (e: any) => {
+    e.preventDefault();
+    router.post(route('admin.freelance.skills.bulkStore'), { skills: bulkSkills }, {
+      onSuccess: () => {
+        setIsBulkCreateOpen(false);
+        setBulkSkills('');
+      }
+    });
+  };
 
-    const handleCreateSubmit = (e: any) => {
-        e.preventDefault();
-        router.post(route('admin.freelance.skills.store'), formData, {
-            onSuccess: () => {
-                setIsCreateOpen(false);
-                resetForm();
-            },
-        });
-    };
+  const handleEditSubmit = (e: any) => {
+    e.preventDefault();
+    if (!editingSkill) return;
+    router.put(route('admin.freelance.skills.update', editingSkill.id), formData, {
+      onSuccess: () => {
+        setIsEditOpen(false);
+        setEditingSkill(null);
+        resetForm();
+      }
+    });
+  };
 
-    const handleBulkCreateSubmit = (e: any) => {
-        e.preventDefault();
-        router.post(route('admin.freelance.skills.bulkStore'), { skills: bulkSkills }, {
-            onSuccess: () => {
-                setIsBulkCreateOpen(false);
-                setBulkSkills('');
-            },
-        });
-    };
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      description: ''
+    });
+  };
 
-    const handleEditSubmit = (e: any) => {
-        e.preventDefault();
-        if (!editingSkill) return;
-        router.put(route('admin.freelance.skills.update', editingSkill.id), formData, {
-            onSuccess: () => {
-                setIsEditOpen(false);
-                setEditingSkill(null);
-                resetForm();
-            },
-        });
-    };
+  const openEditModal = (skill: any) => {
+    setEditingSkill(skill);
+    setFormData({
+      name: skill.name,
+      description: skill.description || ''
+    });
+    setIsEditOpen(true);
+  };
 
-    const resetForm = () => {
-        setFormData({
-            name: '',
-            description: '',
-        });
-    };
+  const handleDelete = (id: any) => {
+    if (confirm('Are you sure you want to delete this skill permanently?')) {
+      router.delete(route('admin.freelance.skills.destroy', id));
+    }
+  };
 
-    const openEditModal = (skill: any) => {
-        setEditingSkill(skill);
-        setFormData({
-            name: skill.name,
-            description: skill.description || '',
-        });
-        setIsEditOpen(true);
-    };
+  const handleApprove = (id: any) => {
+    router.post(route('admin.freelance.skills.approve', id), {}, { preserveScroll: true });
+  };
 
-    const handleDelete = (id: any) => {
-        if (confirm('Are you sure you want to delete this skill permanently?')) {
-            router.delete(route('admin.freelance.skills.destroy', id));
-        }
-    };
+  const handleReject = (id: any) => {
+    router.post(route('admin.freelance.skills.reject', id), {}, { preserveScroll: true });
+  };
 
-    const handleApprove = (id: any) => {
-        router.post(route('admin.freelance.skills.approve', id), {}, { preserveScroll: true });
-    };
+  const handleBlockUser = (userId: any, userName: string) => {
+    if (confirm(`Are you sure you want to block ${userName} from adding new skills?`)) {
+      router.post(route('admin.freelance.skills.block-user', userId), {}, { preserveScroll: true });
+    }
+  };
 
-    const handleReject = (id: any) => {
-        router.post(route('admin.freelance.skills.reject', id), {}, { preserveScroll: true });
-    };
-
-    const handleBlockUser = (userId: any, userName: string) => {
-        if (confirm(`Are you sure you want to block ${userName} from adding new skills?`)) {
-            router.post(route('admin.freelance.skills.block-user', userId), {}, { preserveScroll: true });
-        }
-    };
-
-    const renderFormFields = () => (
-        <div className="space-y-4 p-1">
+  const renderFormFields = () =>
+  <div className="space-y-4 p-1">
             <div>
                 <Label htmlFor="name">{__('freelance.skill_name', undefined, 'Skill Name')}</Label>
                 <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                />
+        id="name"
+        value={formData.name}
+        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        required />
+      
             </div>
 
             <div>
                 <Label htmlFor="description">{__('freelance.description_optional', undefined, 'Description (Optional)')}</Label>
                 <Input
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                />
+        id="description"
+        value={formData.description}
+        onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+      
             </div>
-        </div>
-    );
+        </div>;
 
-    return (
-        <AdminSidebarLayout title={__('freelance.admin_skills', undefined, 'Freelance Skills')} header={__('freelance.manage_skills', undefined, 'Manage Freelance Skills')}>
+
+  return (
+    <AdminSidebarLayout title={__('freelance.admin_skills', undefined, 'Freelance Skills')} header={__('freelance.manage_skills', undefined, 'Manage Freelance Skills')}>
             <div className="mb-6 flex items-center justify-end gap-4">
                 <form onSubmit={handleSearch} className="flex space-x-2">
-                    <Input 
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        placeholder={__('freelance.search_skills', undefined, 'Search skills...')}
-                        className="w-64"
-                    />
+                    <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={__('freelance.search_skills', undefined, 'Search skills...')}
+            className="w-64" />
+          
                     <Button type="submit" variant="secondary">{__('freelance.search')}</Button>
-                    {search && (
-                        <Button type="button" variant="ghost" onClick={() => { setSearch(''); router.get(route('admin.freelance.skills.index')); }}>
+                    {search &&
+          <Button type="button" variant="ghost" onClick={() => {setSearch('');router.get(route('admin.freelance.skills.index'));}}>
                             {__('freelance.clear')}
                         </Button>
-                    )}
+          }
                 </form>
 
                 <div className="flex gap-2">
@@ -156,13 +156,13 @@ export default function Index({ skills, filters }: any) {
                                     <div>
                                         <Label htmlFor="bulkSkills">{__('freelance.bulk_skills_placeholder', undefined, 'Enter skills, one per line')}</Label>
                                         <textarea
-                                            id="bulkSkills"
-                                            className="flex min-h-[150px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                            value={bulkSkills}
-                                            onChange={(e) => setBulkSkills(e.target.value)}
-                                            placeholder="PHP&#10;Laravel&#10;ReactJS"
-                                            required
-                                        />
+                      id="bulkSkills"
+                      className="flex min-h-[150px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      value={bulkSkills}
+                      onChange={(e) => setBulkSkills(e.target.value)}
+                      placeholder="PHP&#10;Laravel&#10;ReactJS"
+                      required />
+                    
                                     </div>
                                 </div>
                                 <DialogFooter className="mt-6">
@@ -210,17 +210,17 @@ export default function Index({ skills, filters }: any) {
                         </tr>
                     </thead>
                     <tbody>
-                        {(skills.data as any).map((skill: any) => (
-                            <tr key={skill.id} className="border-b hover:bg-gray-50">
+                        {(skills.data as any).map((skill: any) =>
+            <tr key={skill.id} className="border-b hover:bg-gray-50">
                                 <td className="p-4 font-medium text-gray-900">{skill.id}</td>
                                 <td className="p-4 font-medium text-gray-900">{skill.name}</td>
                                 <td className="p-4 text-gray-500">{skill.description || '-'}</td>
                                 <td className="p-4">
                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                                        skill.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                        skill.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                        'bg-red-100 text-red-800'
-                                    }`}>
+                skill.status === 'approved' ? 'bg-green-100 text-green-800' :
+                skill.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                'bg-red-100 text-red-800'}`
+                }>
                                         {skill.status.charAt(0).toUpperCase() + skill.status.slice(1)}
                                     </span>
                                 </td>
@@ -238,8 +238,8 @@ export default function Index({ skills, filters }: any) {
                                         <DropdownMenuContent align="end" className="w-56">
                                             <DropdownMenuLabel>{__('freelance.actions')}</DropdownMenuLabel>
                                             <DropdownMenuSeparator />
-                                            {skill.status === 'pending' && (
-                                                <>
+                                            {skill.status === 'pending' &&
+                    <>
                                                     <DropdownMenuItem onClick={() => handleApprove(skill.id)} className="cursor-pointer">
                                                         <CheckCircle className="me-2 h-4 w-4 text-green-600" />
                                                         <span>{__('freelance.approve_skill', undefined, 'Approve')}</span>
@@ -249,18 +249,18 @@ export default function Index({ skills, filters }: any) {
                                                         <span>{__('freelance.decline_skill', undefined, 'Decline')}</span>
                                                     </DropdownMenuItem>
                                                 </>
-                                            )}
+                    }
                                             <DropdownMenuItem onClick={() => openEditModal(skill)} className="cursor-pointer">
                                                 <Edit className="me-2 h-4 w-4 text-slate-900" />
                                                 <span>{__('freelance.edit')}</span>
                                             </DropdownMenuItem>
                                             
-                                            {skill.creator && (
-                                                <DropdownMenuItem onClick={() => handleBlockUser(skill.creator.id, skill.creator.name)} className="cursor-pointer text-yellow-600">
+                                            {skill.creator &&
+                    <DropdownMenuItem onClick={() => handleBlockUser(skill.creator.id, skill.creator.name)} className="cursor-pointer text-yellow-600">
                                                     <Ban className="me-2 h-4 w-4" />
                                                     <span>{__('freelance.block_user_skills', undefined, 'Block User')}</span>
                                                 </DropdownMenuItem>
-                                            )}
+                    }
 
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem onClick={() => handleDelete(skill.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
@@ -271,35 +271,35 @@ export default function Index({ skills, filters }: any) {
                                     </DropdownMenu>
                                 </td>
                             </tr>
-                        ))}
-                        {(skills.data as any).length === 0 && (
-                            <tr>
+            )}
+                        {(skills.data as any).length === 0 &&
+            <tr>
                                 <td colSpan={6} className="p-4 text-center text-gray-500">
                                     {__('freelance.no_skills_found', undefined, 'No skills found.')}
                                 </td>
                             </tr>
-                        )}
+            }
                     </tbody>
                 </table>
             </div>
 
-            {skills.links && skills.links.length > 3 && (
-                <div className="mt-4 flex justify-between items-center">
-                    <div className="text-sm text-gray-500">
+            {skills.links && skills.links.length > 3 &&
+      <div className="mt-4 flex justify-end gap-4 items-center">
+                    <div className="me-auto text-sm text-gray-500">
                         Showing {skills.from || 0} to {skills.to || 0} of {skills.total} results
                     </div>
                     <div className="flex space-x-1">
-                        {skills.links.map((link: any, idx: number) => (
-                            <Link 
-                                key={idx}
-                                href={link.url || '#'}
-                                className={`px-3 py-1 rounded text-sm transition ${link.active ? 'bg-slate-900 text-white shadow-sm' : !link.url ? 'cursor-not-allowed opacity-50 text-slate-300 pointer-events-none' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ))}
+                        {skills.links.map((link: any, idx: number) =>
+          <Link
+            key={idx}
+            href={link.url || '#'}
+            className={`px-3 py-1 rounded text-sm transition ${link.active ? 'bg-slate-900 text-white shadow-sm' : !link.url ? 'cursor-not-allowed opacity-50 text-slate-300 pointer-events-none' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+            dangerouslySetInnerHTML={{ __html: link.label }} />
+
+          )}
                     </div>
                 </div>
-            )}
+      }
 
             {/* Edit Modal */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
@@ -318,6 +318,6 @@ export default function Index({ skills, filters }: any) {
                     </form>
                 </DialogContent>
             </Dialog>
-        </AdminSidebarLayout>
-    );
+        </AdminSidebarLayout>);
+
 }

@@ -8,7 +8,7 @@ export default function CustomersIndex({ customers }: { customers: any }) {
         <CrmLayout title={__('general.customers')} activeMenu="customers">
             <Head title={__('crm.customers')} />
             <div className="p-6">
-                <div className="mb-6 flex justify-between items-center">
+                <div className="mb-6 flex justify-end gap-4 items-center">
                     <h1 className="text-2xl font-bold">{__('crm.customers')}</h1>
                 </div>
 

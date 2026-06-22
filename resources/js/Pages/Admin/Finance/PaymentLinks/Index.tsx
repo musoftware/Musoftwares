@@ -5,78 +5,78 @@ import { Button } from '@/Components/ui/button';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { MoreHorizontal, Plus, Link as LinkIcon, Copy, Trash } from 'lucide-react';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/Components/ui/dropdown-menu';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger } from
+'@/Components/ui/dropdown-menu';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { __ } from '@/lib/i18n';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from '@/Components/ui/dialog';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter } from
+'@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { CurrencySelect } from '@/Components/CurrencySelect';
 
-export default function Index({ paymentLinks, currencies }: { paymentLinks: any, currencies: any }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        title: '',
-        amount: '',
-        currency_id: '',
+export default function Index({ paymentLinks, currencies }: {paymentLinks: any;currencies: any;}) {
+  const { data, setData, post, processing, errors, reset } = useForm({
+    title: '',
+    amount: '',
+    currency_id: ''
+  });
+
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    post(route('admin.payment-links.store'), {
+      onSuccess: () => {
+        setIsCreateModalOpen(false);
+        reset();
+      }
     });
+  };
 
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const handleDelete = (id: number | string) => {
+    if (confirm(__('admin.confirm_delete_payment_link', { default: 'Are you sure you want to delete this payment link?' }))) {
+      router.delete(route('admin.payment-links.destroy', id));
+    }
+  };
 
-    const handleCreate = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(route('admin.payment-links.store'), {
-            onSuccess: () => {
-                setIsCreateModalOpen(false);
-                reset();
-            },
-        });
-    };
+  const copyToClipboard = (uuid: string) => {
+    const url = route('guest.payment-links.show', uuid);
+    navigator.clipboard.writeText(url);
+    alert(__('admin.copied_to_clipboard', { default: 'Copied to clipboard' }));
+  };
 
-    const handleDelete = (id: number | string) => {
-        if (confirm(__('admin.confirm_delete_payment_link', { default: 'Are you sure you want to delete this payment link?' }))) {
-            router.delete(route('admin.payment-links.destroy', id));
-        }
-    };
+  const paginationLinks = paymentLinks.meta?.links || paymentLinks.links;
 
-    const copyToClipboard = (uuid: string) => {
-        const url = route('guest.payment-links.show', uuid);
-        navigator.clipboard.writeText(url);
-        alert(__('admin.copied_to_clipboard', { default: 'Copied to clipboard' }));
-    };
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'paid':
+        return <StatusBadge status="paid" label={__('admin.paid')} className="bg-green-50 text-slate-900 border-green-100" />;
+      case 'pending':
+      default:
+        return <StatusBadge status="pending" label={__('admin.pending')} className="bg-yellow-50 text-yellow-700 border-yellow-100" />;
+    }
+  };
 
-    const paginationLinks = paymentLinks.meta?.links || paymentLinks.links;
-
-    const getStatusBadge = (status: string) => {
-        switch (status) {
-            case 'paid':
-                return <StatusBadge status="paid" label={__('admin.paid')} className="bg-green-50 text-slate-900 border-green-100" />;
-            case 'pending':
-            default:
-                return <StatusBadge status="pending" label={__('admin.pending')} className="bg-yellow-50 text-yellow-700 border-yellow-100" />;
-        }
-    };
-
-    return (
-        <AdminSidebarLayout title={__('admin.payment_links')} header={__('admin.payment_links')}>
+  return (
+    <AdminSidebarLayout title={__('admin.payment_links')} header={__('admin.payment_links')}>
             
             <Card className="mb-4 bg-white shadow-sm overflow-visible">
-                <CardContent className="p-4 flex justify-between items-center">
-                    <h2 className="text-lg font-semibold">{__('admin.payment_links')}</h2>
+                <CardContent className="p-4 flex justify-end gap-4 items-center">
+                    <h2 className="me-auto text-lg font-semibold">{__('admin.payment_links')}</h2>
                     <Button onClick={() => setIsCreateModalOpen(true)}>
                         <Plus className="me-2 h-4 w-4" />{__('admin.create_payment_link', { default: 'Create Link' })}
                     </Button>
@@ -99,8 +99,8 @@ export default function Index({ paymentLinks, currencies }: { paymentLinks: any,
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {(paymentLinks.data as any).map((link: any) => (
-                                    <TableRow key={link.id}>
+                                {(paymentLinks.data as any).map((link: any) =>
+                <TableRow key={link.id}>
                                         <TableCell data-label="ID" className="font-medium">
                                             #{link.id}
                                         </TableCell>
@@ -136,48 +136,48 @@ export default function Index({ paymentLinks, currencies }: { paymentLinks: any,
                                                             <LinkIcon className="me-2 h-4 w-4" />{__('admin.view_link', { default: 'View Link' })}
                                                         </a>
                                                     </DropdownMenuItem>
-                                                    {link.status === 'pending' && (
-                                                        <>
+                                                    {link.status === 'pending' &&
+                        <>
                                                             <DropdownMenuSeparator />
                                                             <DropdownMenuItem onClick={() => handleDelete(link.id)} className="text-red-600 focus:text-red-600">
                                                                 <Trash className="me-2 h-4 w-4" />{__('general.delete')}
                                                             </DropdownMenuItem>
                                                         </>
-                                                    )}
+                        }
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
-                                ))}
-                                {(paymentLinks.data as any).length === 0 && (
-                                    <TableRow>
+                )}
+                                {(paymentLinks.data as any).length === 0 &&
+                <TableRow>
                                         <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">{__('admin.no_payment_links_found', { default: 'No payment links found.' })}</TableCell>
                                     </TableRow>
-                                )}
+                }
                             </TableBody>
                         </Table>
                     </div>
                 </Card>
             </div>
 
-            {Array.isArray(paginationLinks) && paginationLinks.length > 3 && (
-                <div className="mt-4 flex justify-center md:justify-end">
+            {Array.isArray(paginationLinks) && paginationLinks.length > 3 &&
+      <div className="mt-4 flex justify-center md:justify-end">
                     <div className="inline-flex -space-x-px rounded-md shadow-sm">
-                        {paginationLinks.map((link, i) => (
-                            <Link
-                                key={i}
-                                href={link.url || '#'}
-                                className={`px-3 py-2 text-sm border ${
-                                    link.active 
-                                        ? 'z-10 bg-primary border-primary text-primary-foreground font-medium' 
-                                        : 'bg-background border-input text-muted-foreground hover:bg-muted'
-                                } ${i === 0 ? 'rounded-s-md' : ''} ${i === paginationLinks.length - 1 ? 'rounded-e-md' : ''}`}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ))}
+                        {paginationLinks.map((link, i) =>
+          <Link
+            key={i}
+            href={link.url || '#'}
+            className={`px-3 py-2 text-sm border ${
+            link.active ?
+            'z-10 bg-primary border-primary text-primary-foreground font-medium' :
+            'bg-background border-input text-muted-foreground hover:bg-muted'} ${
+            i === 0 ? 'rounded-s-md' : ''} ${i === paginationLinks.length - 1 ? 'rounded-e-md' : ''}`}
+            dangerouslySetInnerHTML={{ __html: link.label }} />
+
+          )}
                     </div>
                 </div>
-            )}
+      }
 
             <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
                 <DialogContent>
@@ -188,32 +188,32 @@ export default function Index({ paymentLinks, currencies }: { paymentLinks: any,
                         <div className="space-y-4 py-4">
                             <div>
                                 <Label>{__('general.title')}</Label>
-                                <Input 
-                                    value={data.title} 
-                                    onChange={(e) => setData('title', e.target.value)} 
-                                    required 
-                                    placeholder={__('admin.payment_link_title_placeholder', { default: 'e.g. Website Maintenance' })}
-                                />
+                                <Input
+                  value={data.title}
+                  onChange={(e) => setData('title', e.target.value)}
+                  required
+                  placeholder={__('admin.payment_link_title_placeholder', { default: 'e.g. Website Maintenance' })} />
+                
                                 {errors.title && <span className="text-red-500 text-sm">{errors.title}</span>}
                             </div>
                             <div>
                                 <Label>{__('general.amount')}</Label>
-                                <Input 
-                                    type="number" 
-                                    step="0.01" 
-                                    value={data.amount} 
-                                    onChange={(e) => setData('amount', e.target.value)} 
-                                    required 
-                                />
+                                <Input
+                  type="number"
+                  step="0.01"
+                  value={data.amount}
+                  onChange={(e) => setData('amount', e.target.value)}
+                  required />
+                
                                 {errors.amount && <span className="text-red-500 text-sm">{errors.amount}</span>}
                             </div>
-                            <CurrencySelect 
-                                label={__('general.currency')}
-                                currencies={currencies} 
-                                value={data.currency_id} 
-                                onChange={(val) => setData('currency_id', val)}
-                                error={errors.currency_id}
-                            />
+                            <CurrencySelect
+                label={__('general.currency')}
+                currencies={currencies}
+                value={data.currency_id}
+                onChange={(val) => setData('currency_id', val)}
+                error={errors.currency_id} />
+              
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>
@@ -227,7 +227,6 @@ export default function Index({ paymentLinks, currencies }: { paymentLinks: any,
                 </DialogContent>
             </Dialog>
 
-        </AdminSidebarLayout>
-    );
-}
+        </AdminSidebarLayout>);
 
+}

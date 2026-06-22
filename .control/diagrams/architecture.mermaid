@@ -1,24 +1,27 @@
+```mermaid
 graph TD
-    Client[Browser / Client SPA]
-    
-    subgraph Frontend[Frontend: React + Inertia.js]
-        ReactUI[React 18.2 UI Components<br>Tailwind CSS v4 + Shadcn]
-        State[Zustand / React Context]
-        InertiaClient[Inertia.js Client]
-        ReactUI --> State
-        ReactUI --> InertiaClient
+    %% Architecture Diagram
+    subgraph Frontend [Frontend SPA]
+        React[React 18]
+        Zustand[Zustand State]
+        Tailwind[Tailwind CSS v4 + Shadcn UI]
+        Echo[Laravel Echo & Pusher JS]
+        React --> Zustand
+        React --> Tailwind
+        React --> Echo
     end
 
-    subgraph Backend[Backend: Laravel Modular Monolith]
-        InertiaServer[Inertia.js Server Adapter]
+    subgraph Integration
+        Inertia[Inertia.js Server-Driven State]
+    end
+
+    subgraph Backend [Laravel Modular Monolith]
+        Laravel[Laravel 12 API & Controllers]
+        Services[app/Services - Business Logic]
+        Reverb[Laravel Reverb - WebSockets]
         
-        subgraph CoreApp[Core Application - app/]
-            Controllers[Thin Controllers]
-            Services[Business Services<br>app/Services/]
-            Models[Core Models]
-        end
-        
-        subgraph Modules[nwidart/laravel-modules]
+        subgraph Modules [nwidart/laravel-modules]
+            Core[Core Module]
             ERP[ERP Module]
             CRM[CRM Module]
             Billing[Billing Module]
@@ -27,26 +30,34 @@ graph TD
             Fbmb[Fbmb Module]
             Freelance[Freelance Module]
         end
-        
-        InertiaServer --> Controllers
-        Controllers --> Services
-        Controllers --> Modules
-        Services --> Models
-        Modules --> Models
-    end
-    
-    subgraph Infrastructure
-        DB[(Database<br>MySQL/PostgreSQL/SQLite)]
-        Redis[(Redis Cache/Queues)]
-        Scout[Meilisearch]
-        Reverb[Laravel Reverb WebSocket]
+
+        Laravel --> Services
+        Laravel --> Modules
+        Laravel --> Reverb
     end
 
-    Client -->|HTTP / Inertia Requests| Frontend
-    InertiaClient -->|JSON/Inertia Protocol| InertiaServer
-    Client <-->|WebSockets| Reverb
-    
-    Models --> DB
-    Services --> Redis
-    Models --> Scout
-    Reverb --> Backend
+    subgraph External & Key Services [Third Party / Packages]
+        S3[(AWS S3 / Flysystem)]
+        FCM[FCM Notification Channels]
+        Dompdf[barryvdh/laravel-dompdf]
+    end
+
+    subgraph Data Layer
+        Eloquent[Eloquent ORM]
+        DB[(MySQL/PostgreSQL/SQLite)]
+        Redis[(Redis Cache/Queue)]
+        Meili[(Meilisearch via Scout)]
+    end
+
+    Frontend <-->|JSON/XHR| Inertia
+    Inertia <--> Laravel
+    Echo <-->|WebSockets| Reverb
+    Services --> Eloquent
+    Modules --> Eloquent
+    Eloquent --> DB
+    Laravel --> Redis
+    Laravel --> Meili
+    Laravel --> S3
+    Laravel --> FCM
+    Laravel --> Dompdf
+```

@@ -1,17 +1,31 @@
-# Database Schema Design
+# Database Schema & Data Layer
 
-The application utilizes standard Laravel Migrations and Eloquent models with a heavily decoupled approach to support the modular monolith architecture.
+Musoftwares uses standard Laravel Migrations and Eloquent models for its database schema, designed with heavy decoupling.
 
-## Organization
-1. **Core Schema:** 
-   - Rooted in `app/Models/` and `database/migrations/`.
-   - Responsibilities: User Management, Financials/Wallets, Task Management, CRM/Support, Automations.
-2. **Modular Schema:** 
-   - Located in `Modules/{ModuleName}/Models/` and `Modules/{ModuleName}/Database/Migrations/`.
-   - Responsibilities: Strictly domain-specific tables isolated to their respective bounded contexts.
+## Schema Organization
 
-## Design Patterns
-- **Traits & Packages:** Extensive use of Laravel traits and Spatie packages (e.g., `spatie/laravel-permission`, `spatie/laravel-model-states`).
-- **Accessors/Mutators:** Used to handle data transformation consistently at the model level.
-- **Polymorphic Relationships:** Utilized heavily to allow flexible associations (e.g., attaching notes, files, or activities to multiple different entity types).
-- **Soft Deletes:** Enforced across all critical tables to prevent accidental data loss and maintain historical integrity.
+### 1. Core Schema
+Located in:
+- `app/Models`
+- `database/migrations`
+
+**Responsibilities:**
+- User Management
+- Financials/Wallets
+- Task Management
+- CRM/Support
+- Automations
+
+### 2. Modular Schema
+Located in:
+- `Modules/{ModuleName}/Models`
+- `Modules/{ModuleName}/Database/Migrations`
+
+**Responsibilities:**
+- Domain-specific tables and models (e.g., ERP, Booking, Marketplace tables).
+
+## Architectural Patterns
+- **Traits & Spatie Packages:** Heavy reliance on traits and Spatie packages (e.g., laravel-permission, laravel-model-states) to keep models clean.
+- **Accessors/Mutators:** Utilized for data formatting and virtual attributes.
+- **Polymorphic Relationships:** Used extensively for flexible, reusable relationships across domains.
+- **Soft Deletes:** Enforced across critical tables to prevent accidental data loss.

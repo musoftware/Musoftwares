@@ -3,77 +3,77 @@ import { Head, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from '@/Components/ui/dialog';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter } from
+'@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import {
-    CreditCard,
-    Plus,
-    Eye,
-    Trash2,
-    TrendingUp,
-    Users,
-    DollarSign,
-    CheckCircle,
-    XCircle,
-    Percent,
-} from 'lucide-react';
+  CreditCard,
+  Plus,
+  Eye,
+  Trash2,
+  TrendingUp,
+  Users,
+  DollarSign,
+  CheckCircle,
+  XCircle,
+  Percent } from
+'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface ClientStats {
-    total_payments: number;
-    successful_count: number;
-    total_volume: number;
-    total_commission: number;
+  total_payments: number;
+  successful_count: number;
+  total_volume: number;
+  total_commission: number;
 }
 
 interface GatewayClient {
-    id: number;
-    name: string;
-    client_id: string;
-    website: string | null;
-    status: 'active' | 'inactive';
-    commission_rate: number;
-    stats: ClientStats;
-    created_at: string;
+  id: number;
+  name: string;
+  client_id: string;
+  website: string | null;
+  status: 'active' | 'inactive';
+  commission_rate: number;
+  stats: ClientStats;
+  created_at: string;
 }
 
 interface Totals {
-    total_clients: number;
-    active_clients: number;
-    total_volume: number;
-    total_commission: number;
-    total_payments: number;
+  total_clients: number;
+  active_clients: number;
+  total_volume: number;
+  total_commission: number;
+  total_payments: number;
 }
 
 interface Props {
-    clients: { data: GatewayClient[]; links: any[] };
-    totals: Totals;
+  clients: {data: GatewayClient[];links: any[];};
+  totals: Totals;
 }
 
 // ─── Empty form ───────────────────────────────────────────────────────────────
 const emptyForm = {
-    name: '',
-    website: '',
-    status: 'active',
-    commission_rate: '40',
-    allowed_ips: '',
+  name: '',
+  website: '',
+  status: 'active',
+  commission_rate: '40',
+  allowed_ips: ''
 };
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
-function StatCard({ icon: Icon, label, value, sub }: { icon: any; label: string; value: string; sub?: string }) {
-    return (
-        <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-            <div className="flex items-start justify-between">
-                <div>
+function StatCard({ icon: Icon, label, value, sub }: {icon: any;label: string;value: string;sub?: string;}) {
+  return (
+    <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-end gap-4">
+                <div className="me-auto">
                     <p className="text-xs font-medium uppercase tracking-wider text-gray-400">{label}</p>
                     <p className="mt-1 text-2xl font-bold text-gray-900">{value}</p>
                     {sub && <p className="mt-0.5 text-xs text-gray-400">{sub}</p>}
@@ -82,66 +82,66 @@ function StatCard({ icon: Icon, label, value, sub }: { icon: any; label: string;
                     <Icon className="h-5 w-5 text-white" />
                 </div>
             </div>
-        </div>
-    );
+        </div>);
+
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function Index({ clients, totals }: Props) {
-    const [isCreateOpen, setIsCreateOpen] = useState(false);
-    const [formData, setFormData] = useState({ ...emptyForm });
-    const [processing, setProcessing] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [formData, setFormData] = useState({ ...emptyForm });
+  const [processing, setProcessing] = useState(false);
 
-    const set = (key: string, value: string) =>
-        setFormData(prev => ({ ...prev, [key]: value }));
+  const set = (key: string, value: string) =>
+  setFormData((prev) => ({ ...prev, [key]: value }));
 
-    const handleCreate = (e: React.FormEvent) => {
-        e.preventDefault();
-        setProcessing(true);
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    setProcessing(true);
 
-        const payload: any = {
-            name:            formData.name,
-            website:         formData.website || null,
-            status:          formData.status,
-            commission_rate: parseFloat(formData.commission_rate),
-        };
-
-        if (formData.allowed_ips.trim()) {
-            payload.allowed_ips = formData.allowed_ips
-                .split(',')
-                .map((ip: string) => ip.trim())
-                .filter(Boolean);
-        }
-
-        router.post(route('admin.musoftware-clients.store'), payload, {
-            onSuccess: () => { setIsCreateOpen(false); setFormData({ ...emptyForm }); },
-            onFinish:  () => setProcessing(false),
-        });
+    const payload: any = {
+      name: formData.name,
+      website: formData.website || null,
+      status: formData.status,
+      commission_rate: parseFloat(formData.commission_rate)
     };
 
-    const handleDelete = (client: GatewayClient) => {
-        if (!confirm(`Delete "${client.name}"? This cannot be undone.`)) return;
-        router.delete(route('admin.musoftware-clients.destroy', client.id));
-    };
+    if (formData.allowed_ips.trim()) {
+      payload.allowed_ips = formData.allowed_ips.
+      split(',').
+      map((ip: string) => ip.trim()).
+      filter(Boolean);
+    }
 
-    const items = clients?.data ?? [];
+    router.post(route('admin.musoftware-clients.store'), payload, {
+      onSuccess: () => {setIsCreateOpen(false);setFormData({ ...emptyForm });},
+      onFinish: () => setProcessing(false)
+    });
+  };
 
-    return (
-        <AdminSidebarLayout title={__('general.payment_gateway')} header="Payment Gateway Clients">
+  const handleDelete = (client: GatewayClient) => {
+    if (!confirm(`Delete "${client.name}"? This cannot be undone.`)) return;
+    router.delete(route('admin.musoftware-clients.destroy', client.id));
+  };
+
+  const items = clients?.data ?? [];
+
+  return (
+    <AdminSidebarLayout title={__('general.payment_gateway')} header="Payment Gateway Clients">
             <Head title={__('general.admin_payment_gateway')} />
 
             {/* ── Stats Row ─────────────────────────────────────────────── */}
             <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
-                <StatCard icon={Users}      label={__('general.total_clients')}   value={String(totals.total_clients)}  sub={`${totals.active_clients} active`} />
-                <StatCard icon={CheckCircle} label={__('general.payments_done')}  value={String(totals.total_payments)} />
-                <StatCard icon={DollarSign} label={__('general.total_volume')}    value={formatCurrency(totals.total_volume, 'EGP')} />
-                <StatCard icon={TrendingUp} label={__('general.our_commission')}  value={formatCurrency(totals.total_commission, 'EGP')} />
-                <StatCard icon={Percent}    label={__('general.default_rate')}    value="40%" sub="Per payment" />
+                <StatCard icon={Users} label={__('general.total_clients')} value={String(totals.total_clients)} sub={`${totals.active_clients} active`} />
+                <StatCard icon={CheckCircle} label={__('general.payments_done')} value={String(totals.total_payments)} />
+                <StatCard icon={DollarSign} label={__('general.total_volume')} value={formatCurrency(totals.total_volume, 'EGP')} />
+                <StatCard icon={TrendingUp} label={__('general.our_commission')} value={formatCurrency(totals.total_commission, 'EGP')} />
+                <StatCard icon={Percent} label={__('general.default_rate')} value="40%" sub="Per payment" />
             </div>
 
             {/* ── Header bar ────────────────────────────────────────────── */}
-            <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="mb-4 flex items-center justify-end gap-4">
+                <div className="me-auto flex items-center gap-2 text-sm text-gray-500">
                     <CreditCard className="h-4 w-4" />
                     <span>{items.length} client{items.length !== 1 ? 's' : ''}</span>
                 </div>
@@ -165,15 +165,15 @@ export default function Index({ clients, totals }: Props) {
                         </tr>
                     </thead>
                     <tbody>
-                        {items.map(client => (
-                            <tr key={client.id} className="border-b hover:bg-gray-50 transition-colors">
+                        {items.map((client) =>
+            <tr key={client.id} className="border-b hover:bg-gray-50 transition-colors">
                                 <td className="p-4">
                                     <div className="font-semibold text-gray-900">{client.name}</div>
-                                    {client.website && (
-                                        <div className="text-xs text-gray-400 truncate max-w-[160px]">
+                                    {client.website &&
+                <div className="text-xs text-gray-400 truncate max-w-[160px]">
                                             {client.website}
                                         </div>
-                                    )}
+                }
                                 </td>
                                 <td className="p-4">
                                     <code className="rounded bg-gray-100 px-2 py-0.5 text-xs font-mono text-gray-700">
@@ -198,62 +198,62 @@ export default function Index({ clients, totals }: Props) {
                                     {formatCurrency(client.stats.total_commission, 'EGP')}
                                 </td>
                                 <td className="p-4">
-                                    {client.status === 'active' ? (
-                                        <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
-                                            <CheckCircle className="h-3 w-3" /> {__('general.active')}</span>
-                                    ) : (
-                                        <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500">
+                                    {client.status === 'active' ?
+                <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
+                                            <CheckCircle className="h-3 w-3" /> {__('general.active')}</span> :
+
+                <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500">
                                             <XCircle className="h-3 w-3" /> {__('general.inactive')}</span>
-                                    )}
+                }
                                 </td>
                                 <td className="p-4 text-end space-x-2">
                                     <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => router.visit(route('admin.musoftware-clients.show', client.id))}
-                                    >
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.visit(route('admin.musoftware-clients.show', client.id))}>
+                  
                                         <Eye className="h-3.5 w-3.5 me-1" /> {__('general.view')}</Button>
                                     <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        onClick={() => handleDelete(client)}
-                                    >
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDelete(client)}>
+                  
                                         <Trash2 className="h-3.5 w-3.5" />
                                     </Button>
                                 </td>
                             </tr>
-                        ))}
-                        {items.length === 0 && (
-                            <tr>
+            )}
+                        {items.length === 0 &&
+            <tr>
                                 <td colSpan={8} className="p-12 text-center">
                                     <CreditCard className="mx-auto mb-3 h-10 w-10 text-gray-200" />
                                     <p className="font-medium text-gray-400">{__('general.no_clients_yet')}</p>
                                     <p className="mt-1 text-sm text-gray-300">{__('general.create_your_first_gateway_client_to_get_started')}</p>
                                 </td>
                             </tr>
-                        )}
+            }
                     </tbody>
                 </table>
             </div>
 
             {/* ── Pagination ────────────────────────────────────────────── */}
-            {clients?.links && (
-                <div className="mt-4 flex justify-center gap-1">
-                    {clients.links.map((link, i) => (
-                        <button
-                            key={i}
-                            disabled={!link.url}
-                            onClick={() => link.url && router.visit(link.url)}
-                            className={`px-3 py-1 rounded text-sm border ${
-                                link.active
-                                    ? 'bg-black text-white border-black'
-                                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50 disabled:opacity-40'
-                            }`}
-                            dangerouslySetInnerHTML={{ __html: link.label }}
-                        />
-                    ))}
+            {clients?.links &&
+      <div className="mt-4 flex justify-center gap-1">
+                    {clients.links.map((link, i) =>
+        <button
+          key={i}
+          disabled={!link.url}
+          onClick={() => link.url && router.visit(link.url)}
+          className={`px-3 py-1 rounded text-sm border ${
+          link.active ?
+          'bg-black text-white border-black' :
+          'bg-white text-gray-600 border-gray-300 hover:bg-gray-50 disabled:opacity-40'}`
+          }
+          dangerouslySetInnerHTML={{ __html: link.label }} />
+
+        )}
                 </div>
-            )}
+      }
 
             {/* ── Create Modal ──────────────────────────────────────────── */}
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -266,36 +266,36 @@ export default function Index({ clients, totals }: Props) {
                             <div>
                                 <Label htmlFor="name">Business / App Name *</Label>
                                 <Input
-                                    id="name"
-                                    value={formData.name}
-                                    onChange={e => set('name', e.target.value)}
-                                    placeholder={__('general.e_g_zara_egypt_store')}
-                                    required
-                                />
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => set('name', e.target.value)}
+                  placeholder={__('general.e_g_zara_egypt_store')}
+                  required />
+                
                             </div>
                             <div>
                                 <Label htmlFor="website">{__('general.website_url')}</Label>
                                 <Input
-                                    id="website"
-                                    type="url"
-                                    value={formData.website}
-                                    onChange={e => set('website', e.target.value)}
-                                    placeholder={__('general.https_example_com')}
-                                />
+                  id="website"
+                  type="url"
+                  value={formData.website}
+                  onChange={(e) => set('website', e.target.value)}
+                  placeholder={__('general.https_example_com')} />
+                
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <Label htmlFor="commission_rate">Commission Rate (%)</Label>
                                     <Input
-                                        id="commission_rate"
-                                        type="number"
-                                        min="1"
-                                        max="100"
-                                        step="0.5"
-                                        value={formData.commission_rate}
-                                        onChange={e => set('commission_rate', e.target.value)}
-                                        required
-                                    />
+                    id="commission_rate"
+                    type="number"
+                    min="1"
+                    max="100"
+                    step="0.5"
+                    value={formData.commission_rate}
+                    onChange={(e) => set('commission_rate', e.target.value)}
+                    required />
+                  
                                     <p className="mt-1 text-xs text-gray-400">
                                         Default: 40% → Musoftware earns {formData.commission_rate}% per payment
                                     </p>
@@ -303,11 +303,11 @@ export default function Index({ clients, totals }: Props) {
                                 <div>
                                     <Label htmlFor="status">{__('general.status')}</Label>
                                     <select
-                                        id="status"
-                                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black"
-                                        value={formData.status}
-                                        onChange={e => set('status', e.target.value)}
-                                    >
+                    id="status"
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black"
+                    value={formData.status}
+                    onChange={(e) => set('status', e.target.value)}>
+                    
                                         <option value="active">{__('general.active')}</option>
                                         <option value="inactive">{__('general.inactive')}</option>
                                     </select>
@@ -316,11 +316,11 @@ export default function Index({ clients, totals }: Props) {
                             <div>
                                 <Label htmlFor="allowed_ips">Allowed IPs (optional)</Label>
                                 <Input
-                                    id="allowed_ips"
-                                    value={formData.allowed_ips}
-                                    onChange={e => set('allowed_ips', e.target.value)}
-                                    placeholder="192.168.1.1, 10.0.0.1"
-                                />
+                  id="allowed_ips"
+                  value={formData.allowed_ips}
+                  onChange={(e) => set('allowed_ips', e.target.value)}
+                  placeholder="192.168.1.1, 10.0.0.1" />
+                
                                 <p className="mt-1 text-xs text-gray-400">{__('general.comma_separated_leave_empty_to_allow_all_ips')}</p>
                             </div>
                         </div>
@@ -334,6 +334,6 @@ export default function Index({ clients, totals }: Props) {
                     </form>
                 </DialogContent>
             </Dialog>
-        </AdminSidebarLayout>
-    );
+        </AdminSidebarLayout>);
+
 }

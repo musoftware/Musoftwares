@@ -178,7 +178,7 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
 
                             <div className={!hasHistoricalCharts ? "opacity-20 select-none pointer-events-none" : ""}>
                                 <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-sm col-span-1 md:col-span-3">
-                                    <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
+                                    <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mb-6 gap-4">
                                         <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
                                             {[24, 21, 18].map(k => (
                                                 <button

@@ -4,61 +4,61 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-    DialogTrigger,
-} from '@/Components/ui/dialog';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger } from
+'@/Components/ui/dialog';
 import { MoreHorizontal, Search, Plus, Trash2, Edit } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
 interface PointPackage {
-    id: number;
-    name: string;
-    points: number;
-    price: number;
-    is_active: boolean;
-    created_at: string;
+  id: number;
+  name: string;
+  points: number;
+  price: number;
+  is_active: boolean;
+  created_at: string;
 }
 
 interface Pagination {
-    data: PointPackage[];
-    links: { url: string | null; label: string; active: boolean }[];
-    from: number;
-    to: number;
-    total: number;
+  data: PointPackage[];
+  links: {url: string | null;label: string;active: boolean;}[];
+  from: number;
+  to: number;
+  total: number;
 }
 
 interface Props {
-    pointPackages: Pagination;
-    search: string;
+  pointPackages: Pagination;
+  search: string;
 }
 
 export default function Index({ pointPackages, search }: Props) {
-    const [searchInput, setSearchInput] = React.useState(search ?? '');
-    const [deleteId, setDeleteId] = React.useState<number | null>(null);
+  const [searchInput, setSearchInput] = React.useState(search ?? '');
+  const [deleteId, setDeleteId] = React.useState<number | null>(null);
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        router.get(route('admin.point-packages.index'), { search: searchInput }, { preserveState: true });
-    };
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.get(route('admin.point-packages.index'), { search: searchInput }, { preserveState: true });
+  };
 
-    const handleDelete = () => {
-        if (!deleteId) return;
-        router.delete(route('admin.point-packages.destroy', deleteId), {
-            onSuccess: () => setDeleteId(null),
-        });
-    };
+  const handleDelete = () => {
+    if (!deleteId) return;
+    router.delete(route('admin.point-packages.destroy', deleteId), {
+      onSuccess: () => setDeleteId(null)
+    });
+  };
 
-    return (
-        <AdminSidebarLayout title={__('admin.point_packages')} header={__('admin.point_packages')}>
+  return (
+    <AdminSidebarLayout title={__('admin.point_packages')} header={__('admin.point_packages')}>
             <Head title={__('admin.point_packages')} />
 
             <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <div>
+                <div className="flex items-center justify-end gap-4">
+                    <div className="me-auto">
                         <h1 className="text-2xl font-semibold text-slate-900">{__('admin.point_packages')}</h1>
                         <p className="text-sm text-slate-500 mt-1">{__('admin.manage_point_packages')}</p>
                     </div>
@@ -75,11 +75,11 @@ export default function Index({ pointPackages, search }: Props) {
                     <div className="relative w-full">
                         <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                         <Input
-                            placeholder={__('general.search')}
-                            value={searchInput}
-                            onChange={(e) => setSearchInput(e.target.value)}
-                            className="ps-9"
-                        />
+              placeholder={__('general.search')}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="ps-9" />
+            
                     </div>
                     <Button type="submit" variant="outline">
                         {__('general.search')}
@@ -100,18 +100,18 @@ export default function Index({ pointPackages, search }: Props) {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {(pointPackages.data as any).length > 0 ? (
-                                    (pointPackages.data as any).map((pkg) => (
-                                        <tr key={pkg.id} className="hover:bg-slate-50 transition-colors">
+                                {(pointPackages.data as any).length > 0 ?
+                (pointPackages.data as any).map((pkg) =>
+                <tr key={pkg.id} className="hover:bg-slate-50 transition-colors">
                                             <td className="px-4 py-3 font-medium text-slate-900">{pkg.name}</td>
                                             <td className="px-4 py-3 text-slate-600">{pkg.points.toLocaleString()}</td>
                                             <td className="px-4 py-3 text-slate-600">{Number(pkg.price).toFixed(2)}</td>
                                             <td className="px-4 py-3">
                                                 <span
-                                                    className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                                                        pkg.is_active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'
-                                                    }`}
-                                                >
+                      className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                      pkg.is_active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}`
+                      }>
+                      
                                                     {pkg.is_active ? __('admin.active') : __('general.inactive')}
                                                 </span>
                                             </td>
@@ -128,18 +128,18 @@ export default function Index({ pointPackages, search }: Props) {
                                                         </DialogHeader>
                                                         <div className="flex flex-col gap-2 py-2">
                                                             <Button
-                                                                variant="outline"
-                                                                className="justify-start"
-                                                                onClick={() => router.visit(route('admin.point-packages.edit', pkg.id))}
-                                                            >
+                            variant="outline"
+                            className="justify-start"
+                            onClick={() => router.visit(route('admin.point-packages.edit', pkg.id))}>
+                            
                                                                 <Edit className="me-2 h-4 w-4" />
                                                                 {__('general.edit')}
                                                             </Button>
                                                             <Button
-                                                                variant="destructive"
-                                                                className="justify-start"
-                                                                onClick={() => setDeleteId(pkg.id)}
-                                                            >
+                            variant="destructive"
+                            className="justify-start"
+                            onClick={() => setDeleteId(pkg.id)}>
+                            
                                                                 <Trash2 className="me-2 h-4 w-4" />
                                                                 {__('general.delete')}
                                                             </Button>
@@ -148,45 +148,45 @@ export default function Index({ pointPackages, search }: Props) {
                                                 </Dialog>
                                             </td>
                                         </tr>
-                                    ))
-                                ) : (
-                                    <tr>
+                ) :
+
+                <tr>
                                         <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
                                             {__('general.no_records_found')}
                                         </td>
                                     </tr>
-                                )}
+                }
                             </tbody>
                         </table>
                     </div>
 
                     {/* Pagination */}
-                    {pointPackages.total > 0 && pointPackages.links.length > 3 && (
-                        <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                            <div className="flex items-center gap-1">
+                    {pointPackages.total > 0 && pointPackages.links.length > 3 &&
+          <div className="flex items-center justify-end gap-4 border-t border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                            <div className="me-auto flex items-center gap-1">
                                 {pointPackages.links.map((link, idx) =>
-                                    link.url ? (
-                                        <button
-                                            key={idx}
-                                            onClick={() => router.visit(link.url!)}
-                                            className={`rounded-md px-3 py-1 text-sm transition-colors ${
-                                                link.active
-                                                    ? 'bg-slate-900 font-medium text-white shadow-sm'
-                                                    : 'text-slate-500 hover:bg-slate-100'
-                                            }`}
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
-                                    ) : (
-                                        <span
-                                            key={idx}
-                                            className="rounded-md px-3 py-1 text-sm text-slate-300 cursor-not-allowed"
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
-                                    )
-                                )}
+              link.url ?
+              <button
+                key={idx}
+                onClick={() => router.visit(link.url!)}
+                className={`rounded-md px-3 py-1 text-sm transition-colors ${
+                link.active ?
+                'bg-slate-900 font-medium text-white shadow-sm' :
+                'text-slate-500 hover:bg-slate-100'}`
+                }
+                dangerouslySetInnerHTML={{ __html: link.label }} /> :
+
+
+              <span
+                key={idx}
+                className="rounded-md px-3 py-1 text-sm text-slate-300 cursor-not-allowed"
+                dangerouslySetInnerHTML={{ __html: link.label }} />
+
+
+              )}
                             </div>
                         </div>
-                    )}
+          }
                 </div>
             </div>
 
@@ -206,6 +206,6 @@ export default function Index({ pointPackages, search }: Props) {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </AdminSidebarLayout>
-    );
+        </AdminSidebarLayout>);
+
 }
