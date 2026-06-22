@@ -11,7 +11,7 @@ export function FoldersWorkspace({
     callRPC
 }: {
     folders: SavedFolder[];
-    callRPC: (action: string, data?: any) => {__('general.promise')}<any>;
+    callRPC: (action: string, data?: any) => Promise<any>;
 }) {
     const handleOpenFolder = async (subdir?: string) => {
         try { await callRPC('open_folder', { subdir }); }
@@ -65,3 +65,4 @@ export function FoldersWorkspace({
         </div>
     );
 }
+

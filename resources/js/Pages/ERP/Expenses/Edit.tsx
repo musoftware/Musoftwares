@@ -48,7 +48,7 @@ export default function EditExpense({ expense }: EditExpenseProps) {
     return (
         <ERPLayout title={__('general.edit_expense')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
             <Head title={__('general.edit_expense')} />
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">
                     <Link href={route('erp.dashboard', { section: 'expenses' })} className="text-slate-400 hover:text-slate-900 transition-colors">
                         <ArrowLeft className="w-5 h-5" />
@@ -62,7 +62,7 @@ export default function EditExpense({ expense }: EditExpenseProps) {
                 <Card className="bg-white border border-slate-200 shadow-sm">
                     <CardHeader>
                         <CardTitle className="text-slate-900 flex items-center gap-2">
-                            <Edit2 className="w-5 h-5 text-indigo-600" />{__('general.expense_details')}</CardTitle>
+                            <Edit2 className="w-5 h-5 text-slate-900" />{__('general.expense_details')}</CardTitle>
                         <CardDescription className="text-slate-500">{__('general.update_the_details_of_the_expense_and_save_changes')}</CardDescription>
                     </CardHeader>
                     <CardContent>

@@ -58,45 +58,45 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                             
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.full_name')}</label>
-                                <input
+                                <Input
                                     type="text"
                                     value={data.person_name}
                                     onChange={e => setData('person_name', e.target.value)}
-                                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-slate-800 focus:border-slate-800"
                                 />
                                 {errors.person_name && <p className="text-red-500 text-xs mt-1">{errors.person_name}</p>}
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.email_address')}</label>
-                                <input
+                                <Input
                                     type="email"
                                     value={data.email}
                                     onChange={e => setData('email', e.target.value)}
-                                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-slate-800 focus:border-slate-800"
                                 />
                                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.mobile_number')}</label>
-                                <input
+                                <Input
                                     type="text"
                                     value={data.mobile}
                                     onChange={e => setData('mobile', e.target.value)}
-                                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-slate-800 focus:border-slate-800"
                                 />
                                 {errors.mobile && <p className="text-red-500 text-xs mt-1">{errors.mobile}</p>}
                             </div>
                             
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.whatsapp')}</label>
-                                <input
+                                <Input
                                     type="text"
                                     value={data.whatsapp}
                                     onChange={e => setData('whatsapp', e.target.value)}
                                     placeholder="+20 101 521 8548"
-                                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-slate-800 focus:border-slate-800"
                                 />
                                 {errors.whatsapp && <p className="text-red-500 text-xs mt-1">{errors.whatsapp}</p>}
                             </div>
@@ -108,22 +108,22 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                             
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.facebook_url')}</label>
-                                <input
+                                <Input
                                     type="url"
                                     value={data.facebook}
                                     onChange={e => setData('facebook', e.target.value)}
-                                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-slate-800 focus:border-slate-800"
                                 />
                                 {errors.facebook && <p className="text-red-500 text-xs mt-1">{errors.facebook}</p>}
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.linkedin_url')}</label>
-                                <input
+                                <Input
                                     type="url"
                                     value={data.linked_in}
                                     onChange={e => setData('linked_in', e.target.value)}
-                                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-slate-800 focus:border-slate-800"
                                 />
                                 {errors.linked_in && <p className="text-red-500 text-xs mt-1">{errors.linked_in}</p>}
                             </div>
@@ -131,21 +131,21 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.available_from')}</label>
-                                    <input
+                                    <Input
                                         type="time"
                                         value={data.time_from}
                                         onChange={e => setData('time_from', e.target.value)}
-                                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-slate-800 focus:border-slate-800"
                                     />
                                     {errors.time_from && <p className="text-red-500 text-xs mt-1">{errors.time_from}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">{__('general.available_to')}</label>
-                                    <input
+                                    <Input
                                         type="time"
                                         value={data.time_to}
                                         onChange={e => setData('time_to', e.target.value)}
-                                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-slate-800 focus:border-slate-800"
                                     />
                                     {errors.time_to && <p className="text-red-500 text-xs mt-1">{errors.time_to}</p>}
                                 </div>
@@ -158,18 +158,18 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                         <h2 className="text-lg font-semibold text-slate-800 mb-3">{__('general.programming_technologies')}</h2>
                         <div className="flex flex-wrap gap-2">
                             {techTags.map(tag => (
-                                <button
+                                <Button
                                     key={tag.id}
                                     type="button"
                                     onClick={() => handleTagToggle(tag.id)}
                                     className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
                                         data.selectedTechTags.includes(tag.id)
-                                            ? 'bg-indigo-100 text-indigo-700 border-indigo-200'
+                                            ? 'bg-indigo-100 text-slate-900 border-indigo-200'
                                             : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                                     }`}
                                 >
                                     {tag.name}
-                                </button>
+                                </Button>
                             ))}
                         </div>
                         {errors.selectedTechTags && <p className="text-red-500 text-xs mt-2">{errors.selectedTechTags}</p>}
@@ -178,7 +178,7 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
                     <div className="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-100">
                         <Link
                             href={`/admin/users/legacy-coworker/${worker.id}`}
-                            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-800"
                         >
                             {__('general.cancel')}</Link>
                         <Button type="submit" disabled={processing} className="flex items-center gap-2">

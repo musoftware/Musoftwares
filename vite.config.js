@@ -34,26 +34,7 @@ export default defineConfig({
                         // Let React and Inertia safely fall back to the default vendor chunk
                         return 'lib-core'; 
                     }
-                    if (id.includes('resources/js/Pages/')) {
-                        const parts = id.split('resources/js/Pages/')[1].split('/');
-                        
-                        // Group all tools into ONE chunk to avoid massive concurrent requests
-                        if (parts[0] === 'Tools') {
-                            return 'app-tools';
-                        }
-
-                        // Group major modules to prevent 503 rate limits on shared hosting
-                        const coreModules = ['Admin', 'Auth', 'Core', 'Dashboard.tsx', 'Error.tsx', 'Welcome.tsx', 'Profile', 'Settings', 'Activity', 'Notifications', 'Support'];
-                        const erpModules = ['ERP', 'CRM', 'Billing', 'Client', 'Financial', 'Messages', 'Vouchers'];
-                        const freelanceModules = ['Freelance', 'Marketplace', 'iSaaS', 'Public', 'Guest'];
-                        
-                        if (coreModules.includes(parts[0])) return 'app-pages-core';
-                        if (erpModules.includes(parts[0])) return 'app-pages-erp';
-                        if (freelanceModules.includes(parts[0])) return 'app-pages-freelance';
-                        
-                        // Everything else
-                        return 'app-pages-other';
-                    }
+                    // Let Vite handle Pages chunking automatically to avoid circular dependencies
                 }
             }
         }

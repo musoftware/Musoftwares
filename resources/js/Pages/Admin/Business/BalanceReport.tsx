@@ -31,8 +31,8 @@ import {
     TableRow,
 } from "@/Components/ui/table";
 import { formatCurrency } from '@/lib/utils';
-import {
 import { __ } from '@/lib/i18n';
+import {
     AreaChart,
     Area,
     XAxis,
@@ -257,3 +257,4 @@ export default function BalanceReport() {
         </AdminSidebarLayout>
     );
 }
+

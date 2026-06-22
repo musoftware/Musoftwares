@@ -30,7 +30,7 @@ export interface UseRuntimeStatusReturn {
     activeTasks: { taskId: string; pluginId: string; runtime: string }[];
     error:       string | null;
     lastEvent:   RuntimeEvent | null;
-    runPlugin:   (slug: string, params?: Record<string, unknown>) => {__('general.promise')}<string | null>;
+    runPlugin:   (slug: string, params?: Record<string, unknown>) => Promise<string | null>;
     stopTask:    (taskId: string) => void;
     send:        (type: string, payload?: Record<string, unknown>) => void;
     connected:   boolean;
@@ -181,3 +181,4 @@ export function useRuntimeStatus(): UseRuntimeStatusReturn {
         connected: status === 'online',
     };
 }
+

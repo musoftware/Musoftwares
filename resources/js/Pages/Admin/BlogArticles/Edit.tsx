@@ -42,7 +42,7 @@ export default function Edit({ article, services }) {
                 </Link>
             </div>
 
-            <div className="bg-white rounded-lg shadow border border-gray-200 p-6 max-w-4xl">
+            <div className="bg-white rounded-lg shadow border border-gray-200 p-6 w-full max-w-7xl">
                 <form onSubmit={submit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">

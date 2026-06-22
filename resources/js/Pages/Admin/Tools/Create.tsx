@@ -85,7 +85,7 @@ export default function AdminToolCreate({ categories }: Props) {
         >
             <Head title={__('general.create_tool_admin')} />
 
-            <div className="space-y-6 max-w-3xl">
+            <div className="space-y-6 w-full max-w-7xl">
                 <ModulePageHeader
                     title={__('general.create_new_tool')}
                     description={__('general.add_a_new_downloadable_desktop_tool_to_the_marketplace')}
@@ -187,7 +187,7 @@ export default function AdminToolCreate({ categories }: Props) {
                                 <Label className="text-xs font-semibold">Supported OS *</Label>
                                 <div className="flex gap-2 flex-wrap">
                                     {OS_OPTIONS.map(os => (
-                                        <button
+                                        <Button
                                             key={os}
                                             type="button"
                                             onClick={() => toggleOs(os)}
@@ -198,7 +198,7 @@ export default function AdminToolCreate({ categories }: Props) {
                                             }`}
                                         >
                                             {os}
-                                        </button>
+                                        </Button>
                                     ))}
                                 </div>
                             </div>
@@ -250,9 +250,9 @@ export default function AdminToolCreate({ categories }: Props) {
                                 {data.features.map((f, i) => (
                                     <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md text-xs font-medium">
                                         {f}
-                                        <button type="button" onClick={() => removeItem('features', i)} className="hover:text-red-500 transition-colors">
+                                        <Button type="button" onClick={() => removeItem('features', i)} className="hover:text-red-500 transition-colors">
                                             <X className="h-3 w-3" />
-                                        </button>
+                                        </Button>
                                     </span>
                                 ))}
                                 {data.features.length === 0 && (
@@ -286,9 +286,9 @@ export default function AdminToolCreate({ categories }: Props) {
                                 {data.requirements.map((r, i) => (
                                     <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-800 rounded-md text-xs font-medium">
                                         {r}
-                                        <button type="button" onClick={() => removeItem('requirements', i)} className="hover:text-red-500 transition-colors">
+                                        <Button type="button" onClick={() => removeItem('requirements', i)} className="hover:text-red-500 transition-colors">
                                             <X className="h-3 w-3" />
-                                        </button>
+                                        </Button>
                                     </span>
                                 ))}
                                 {data.requirements.length === 0 && (

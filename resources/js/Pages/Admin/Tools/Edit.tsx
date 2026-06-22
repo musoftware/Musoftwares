@@ -112,7 +112,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
         >
             <Head title={`Edit ${tool.title} — Admin`} />
 
-            <div className="space-y-6 max-w-3xl">
+            <div className="space-y-6 w-full max-w-7xl">
                 <ModulePageHeader
                     title={`Edit: ${tool.title}`}
                     description={`Manage tool configuration and release versions.`}
@@ -195,7 +195,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                 <Label className="text-xs font-semibold">{__('general.supported_os')}</Label>
                                 <div className="flex gap-2 flex-wrap">
                                     {OS_OPTIONS.map(os => (
-                                        <button
+                                        <Button
                                             key={os}
                                             type="button"
                                             onClick={() => toggleOs(os)}
@@ -206,7 +206,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                             }`}
                                         >
                                             {os}
-                                        </button>
+                                        </Button>
                                     ))}
                                 </div>
                             </div>
@@ -268,7 +268,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                 {data.features.map((f, i) => (
                                     <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md text-xs font-medium">
                                         {f}
-                                        <button type="button" onClick={() => removeItem('features', i)} className="hover:text-red-500 transition-colors"><X className="h-3 w-3" /></button>
+                                        <Button type="button" onClick={() => removeItem('features', i)} className="hover:text-red-500 transition-colors"><X className="h-3 w-3" /></Button>
                                     </span>
                                 ))}
                                 {data.features.length === 0 && <p className="text-xs text-text-muted italic">{__('general.no_features_added')}</p>}
@@ -294,7 +294,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                 {data.requirements.map((r, i) => (
                                     <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-800 rounded-md text-xs font-medium">
                                         {r}
-                                        <button type="button" onClick={() => removeItem('requirements', i)} className="hover:text-red-500 transition-colors"><X className="h-3 w-3" /></button>
+                                        <Button type="button" onClick={() => removeItem('requirements', i)} className="hover:text-red-500 transition-colors"><X className="h-3 w-3" /></Button>
                                     </span>
                                 ))}
                                 {data.requirements.length === 0 && <p className="text-xs text-text-muted italic">{__('general.no_requirements_added')}</p>}
@@ -329,7 +329,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
 
                             <div className="space-y-1.5">
                                 <Label htmlFor="file" className="text-xs font-semibold">Release File (.zip / .exe) *</Label>
-                                <input
+                                <Input
                                     id="file"
                                     type="file"
                                     accept=".zip,.exe"
@@ -378,7 +378,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                 type="submit"
                                 size="sm"
                                 disabled={versionForm.processing}
-                                className="gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white"
+                                className="gap-1.5 bg-slate-900 hover:bg-slate-900 text-white"
                             >
                                 <Upload className="h-3.5 w-3.5" />
                                 {versionForm.processing ? 'Uploading...' : 'Upload Version'}

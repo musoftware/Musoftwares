@@ -90,7 +90,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
         <AdminSidebarLayout title={__('general.new_transaction')} header="New Transaction" user={auth?.user}>
             <Head title={`Adjust Wallet: ${user.name}`} />
 
-            <div className="w-full max-w-6xl mx-auto py-6 space-y-6">
+            <div className="w-full w-full max-w-7xl mx-auto py-6 space-y-6">
                 <header className="mb-4">
                     <div className="flex items-center gap-2 mb-1">
                         <span className="text-xs font-semibold px-2 py-1 bg-primary/10 text-primary rounded-md uppercase tracking-wider">
@@ -128,7 +128,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                         </Card>
                         <Card>
                             <CardContent className="p-4 flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                                <div className="h-10 w-10 rounded-full bg-blue-100 text-slate-900 flex items-center justify-center shrink-0">
                                     <TrendingUp className="h-5 w-5" />
                                 </div>
                                 <div className="min-w-0">
@@ -181,7 +181,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                             <span className="hidden sm:inline">{__('general.charge')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="send" className="flex items-center gap-2">
-                            <ArrowUpRight className="h-4 w-4 text-blue-500" />
+                            <ArrowUpRight className="h-4 w-4 text-slate-800" />
                             <span className="hidden sm:inline">{__('general.send')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="refund" className="flex items-center gap-2">

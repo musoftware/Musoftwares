@@ -170,7 +170,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
     return (
         <ERPLayout title={isEdit ? 'Edit Invoice' : 'New Invoice'} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
-            <form onSubmit={handleSubmit} className="max-w-[900px] mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
+            <form onSubmit={handleSubmit} className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
 
                 {/* ── Page Header ─────────────────────────────────────────── */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-12">
@@ -213,7 +213,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                 <select
                                     className={cn(
                                         "flex h-11 w-full rounded-lg border bg-slate-50/50 px-3 py-2 text-sm transition-colors",
-                                        "focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:bg-white",
+                                        "focus:border-slate-800 focus:ring-1 focus:ring-slate-800 focus:bg-white",
                                         clientError ? "border-red-300 bg-red-50/30" : "border-slate-200"
                                     )}
                                     value={data.client_id}
@@ -238,7 +238,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                         Associated Project (Optional)
                                     </Label>
                                     <select
-                                        className="flex h-11 w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:bg-white transition-colors"
+                                        className="flex h-11 w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm focus:border-slate-800 focus:ring-1 focus:ring-slate-800 focus:bg-white transition-colors"
                                         value={data.project_id}
                                         onChange={(e) => setData('project_id', e.target.value)}
                                     >
@@ -328,7 +328,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                         <div className="flex-1 space-y-1">
                                             {has_inventory_addon && (
                                                 <select
-                                                    className="mb-1 h-8 w-full text-sm text-slate-600 shadow-none border-slate-200 bg-slate-50 px-2 rounded hover:border-slate-300 focus:border-indigo-500 transition-all"
+                                                    className="mb-1 h-8 w-full text-sm text-slate-600 shadow-none border-slate-200 bg-slate-50 px-2 rounded hover:border-slate-300 focus:border-slate-800 transition-all"
                                                     value={item.product_id || ''}
                                                     onChange={e => {
                                                         const productId = e.target.value;
@@ -361,7 +361,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                             <Input
                                                 className={cn(
                                                     "h-9 font-medium text-slate-900 shadow-none border-transparent bg-transparent px-2",
-                                                    "hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all placeholder:text-slate-300",
+                                                    "hover:border-slate-200 focus:border-slate-800 focus:bg-white transition-all placeholder:text-slate-300",
                                                     itemErrors[index] ? "border-red-300" : ""
                                                 )}
                                                 placeholder={__('general.service_or_product_name')}
@@ -372,7 +372,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                                 <FieldError message={itemErrors[index]} />
                                             )}
                                             <Input
-                                                className="h-8 text-sm text-slate-500 shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2 placeholder:text-slate-300"
+                                                className="h-8 text-sm text-slate-500 shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-slate-800 focus:bg-white transition-all px-2 placeholder:text-slate-300"
                                                 placeholder={__('general.optional_description')}
                                                 value={item.description || ''}
                                                 onChange={e => updateItem(index, 'description', e.target.value)}
@@ -380,7 +380,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                         </div>
                                         <div className="w-24 pt-0.5 relative">
                                             <Input
-                                                className="h-8 text-end shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2 pe-8"
+                                                className="h-8 text-end shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-slate-800 focus:bg-white transition-all px-2 pe-8"
                                                 type="number"
                                                 min="0.01"
                                                 step="0.01"
@@ -396,7 +396,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                         </div>
                                         <div className="w-32 pt-0.5">
                                             <Input
-                                                className="h-8 text-end shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2"
+                                                className="h-8 text-end shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-slate-800 focus:bg-white transition-all px-2"
                                                 type="number"
                                                 min="0"
                                                 step="0.01"
@@ -409,13 +409,13 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                             <CurrencyDisplay amount={item.unit_price * item.quantity} currency={data.amount_currency} />
                                         </div>
                                         <div className="w-10 pt-1.5 opacity-0 group-hover:opacity-100 transition-opacity flex justify-end">
-                                            <button
+                                            <Button
                                                 type="button"
                                                 onClick={() => removeItem(index)}
                                                 className="text-slate-400 hover:text-red-500 p-1 rounded hover:bg-red-50 transition-colors"
                                             >
                                                 <Trash2 className="w-4 h-4" />
-                                            </button>
+                                            </Button>
                                         </div>
                                     </div>
                                 ))}
@@ -427,7 +427,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => addItem('simple')}
-                                    className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 font-medium"
+                                    className="text-slate-900 hover:text-slate-900 hover:bg-indigo-50 font-medium"
                                 >
                                     <Plus className="me-1.5 h-4 w-4" />{__('general.add_line_item')}</Button>
                             </div>
@@ -443,7 +443,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                 <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.invoice_notes')}</Label>
                                 <textarea
                                     placeholder={__('general.payment_instructions_thank_you_message_or_additional_details')}
-                                    className="flex min-h-[120px] w-full rounded-xl border-slate-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors resize-none placeholder:text-slate-400"
+                                    className="flex min-h-[120px] w-full rounded-xl border-slate-200 bg-white px-4 py-3 text-sm focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition-colors resize-none placeholder:text-slate-400"
                                     value={data.notes}
                                     onChange={e => setData('notes', e.target.value)}
                                 />
@@ -451,7 +451,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
 
                             {/* Collapsible Internal Costs */}
                             <div className="border border-slate-100 rounded-xl overflow-hidden bg-white">
-                                <button
+                                <Button
                                     type="button"
                                     className="w-full px-4 py-3 flex items-center justify-between text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
                                     onClick={() => setShowCosts(!showCosts)}
@@ -463,7 +463,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                     {showCosts
                                         ? <ChevronUp className="h-4 w-4 text-slate-400" />
                                         : <ChevronDown className="h-4 w-4 text-slate-400" />}
-                                </button>
+                                </Button>
                                 {showCosts && (
                                     <div className="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
                                         <p className="text-xs text-slate-500">{__('general.track_internal_expenses_e_g_outsourcing_software_associated_with_this_invoice')}</p>
@@ -482,13 +482,13 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                                     value={cost.amount}
                                                     onChange={e => updateCost(index, 'amount', parseFloat(e.target.value))}
                                                 />
-                                                <button
+                                                <Button
                                                     type="button"
                                                     onClick={() => removeCost(index)}
                                                     className="text-slate-400 hover:text-red-500 transition-colors"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
-                                                </button>
+                                                </Button>
                                             </div>
                                         ))}
                                         <Button
@@ -537,7 +537,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                 <div className="pt-4 mt-2 border-t border-slate-200 flex justify-between items-end">
                                     <span className="font-semibold text-slate-900">{__('general.total_due')}</span>
                                     <div className="text-end">
-                                        <div className="text-3xl font-bold tracking-tight text-indigo-600">
+                                        <div className="text-3xl font-bold tracking-tight text-slate-900">
                                             <CurrencyDisplay amount={total} currency={data.amount_currency} />
                                         </div>
                                     </div>

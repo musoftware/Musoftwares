@@ -1,4 +1,6 @@
 import ERPLayout from '@/Layouts/ERPLayout';
+import { Input } from '@/Components/ui/input';
+import { Button } from '@/Components/ui/button';
 import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
@@ -62,12 +64,12 @@ export default function Edit({ product, currencies, categories, hasMultiCurrency
                                     <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                                         {t('erp.product_name', 'Product Name')}
                                     </label>
-                                    <input
+                                    <Input
                                         type="text"
                                         id="name"
                                         value={data.name}
                                         onChange={(e) => setData('name', e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-800 focus:ring-slate-800 sm:text-sm"
                                         required
                                     />
                                     <InputError message={errors.name} className="mt-2" />
@@ -77,12 +79,12 @@ export default function Edit({ product, currencies, categories, hasMultiCurrency
                                     <label htmlFor="sku" className="block text-sm font-medium text-gray-700">
                                         {t('erp.sku', 'SKU')}
                                     </label>
-                                    <input
+                                    <Input
                                         type="text"
                                         id="sku"
                                         value={data.sku}
                                         onChange={(e) => setData('sku', e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-800 focus:ring-slate-800 sm:text-sm"
                                     />
                                     <InputError message={errors.sku} className="mt-2" />
                                 </div>
@@ -109,7 +111,7 @@ export default function Edit({ product, currencies, categories, hasMultiCurrency
                                     id="category_id"
                                     value={data.category_id}
                                     onChange={(e) => setData('category_id', e.target.value)}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-800 focus:ring-slate-800 sm:text-sm"
                                 >
                                     <option value="">{t('erp.select_category', 'Select Category (Optional)')}</option>
                                     {categories.map((category) => (
@@ -125,12 +127,12 @@ export default function Edit({ product, currencies, categories, hasMultiCurrency
                                 <label htmlFor="barcode" className="block text-sm font-medium text-gray-700">
                                     {t('erp.barcode', 'Barcode / EAN')}
                                 </label>
-                                <input
+                                <Input
                                     type="text"
                                     id="barcode"
                                     value={data.barcode}
                                     onChange={(e) => setData('barcode', e.target.value)}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-800 focus:ring-slate-800 sm:text-sm"
                                 />
                                 <InputError message={errors.barcode} className="mt-2" />
                             </div>
@@ -139,13 +141,13 @@ export default function Edit({ product, currencies, categories, hasMultiCurrency
                                 <label htmlFor="uom" className="block text-sm font-medium text-gray-700">
                                     {t('erp.uom', 'Unit of Measure (Qty Type)')}
                                 </label>
-                                <input
+                                <Input
                                     type="text"
                                     id="uom"
                                     value={data.uom}
                                     onChange={(e) => setData('uom', e.target.value)}
                                     placeholder={__('general.piece_kg_box')}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-800 focus:ring-slate-800 sm:text-sm"
                                 />
                                 <InputError message={errors.uom} className="mt-2" />
                             </div>
@@ -154,13 +156,13 @@ export default function Edit({ product, currencies, categories, hasMultiCurrency
                                 <label htmlFor="tax_rate" className="block text-sm font-medium text-gray-700">
                                     {t('erp.tax_rate', 'Tax Rate (%)')}
                                 </label>
-                                <input
+                                <Input
                                     type="number"
                                     id="tax_rate"
                                     step="0.01"
                                     value={data.tax_rate}
                                     onChange={(e) => setData('tax_rate', e.target.value)}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-800 focus:ring-slate-800 sm:text-sm"
                                 />
                                 <InputError message={errors.tax_rate} className="mt-2" />
                             </div>
@@ -174,11 +176,11 @@ export default function Edit({ product, currencies, categories, hasMultiCurrency
                                         <img src={`/storage/${product.image_path}`} alt={product.name} className="h-16 w-16 object-cover rounded-md border" />
                                     </div>
                                 )}
-                                <input
+                                <Input
                                     type="file"
                                     id="image"
                                     onChange={(e) => setData('image', e.target.files ? e.target.files[0] : null)}
-                                    className="mt-1 block w-full text-sm text-gray-500 file:me-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                                    className="mt-1 block w-full text-sm text-gray-500 file:me-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-slate-900 hover:file:bg-indigo-100"
                                     accept="image/*"
                                 />
                                 <InputError message={errors.image} className="mt-2" />
@@ -188,13 +190,13 @@ export default function Edit({ product, currencies, categories, hasMultiCurrency
                                     <label htmlFor="price" className="block text-sm font-medium text-gray-700">
                                         {t('erp.price', 'Price')}
                                     </label>
-                                    <input
+                                    <Input
                                         type="number"
                                         id="price"
                                         step="0.01"
                                         value={data.price}
                                         onChange={(e) => setData('price', e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-800 focus:ring-slate-800 sm:text-sm"
                                         required
                                     />
                                     <InputError message={errors.price} className="mt-2" />
@@ -204,13 +206,13 @@ export default function Edit({ product, currencies, categories, hasMultiCurrency
                                     <label htmlFor="reorder_level" className="block text-sm font-medium text-gray-700">
                                         {t('erp.reorder_level', 'Reorder Level')}
                                     </label>
-                                    <input
+                                    <Input
                                         type="number"
                                         id="reorder_level"
                                         step="0.01"
                                         value={data.reorder_level}
                                         onChange={(e) => setData('reorder_level', e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-800 focus:ring-slate-800 sm:text-sm"
                                     />
                                     <InputError message={errors.reorder_level} className="mt-2" />
                                 </div>
@@ -224,20 +226,20 @@ export default function Edit({ product, currencies, categories, hasMultiCurrency
                                         rows={3}
                                         value={data.description}
                                         onChange={(e) => setData('description', e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-slate-800 focus:ring-slate-800 sm:text-sm"
                                     ></textarea>
                                     <InputError message={errors.description} className="mt-2" />
                                 </div>
                             </div>
 
                             <div className="mt-6 flex justify-end">
-                                <button
+                                <Button
                                     type="submit"
                                     disabled={processing}
-                                    className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                    className="inline-flex justify-center rounded-md border border-transparent bg-slate-900 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-800 focus:ring-offset-2"
                                 >
                                     {t('erp.save_changes', 'Save Changes')}
-                                </button>
+                                </Button>
                             </div>
                         </form>
                     </div>

@@ -2,8 +2,8 @@ import React, { PropsWithChildren } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Button } from '@/Components/ui/button';
-import { 
 import { __ } from '@/lib/i18n';
+import {
     Calculator, 
     Coins, 
     CreditCard, 
@@ -150,3 +150,4 @@ export default function WebToolsLayout({ children, title, activeNav = '' }: WebT
         </div>
     );
 }
+

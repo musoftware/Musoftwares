@@ -43,7 +43,7 @@ export default function Edit({ profile, availableSkills }: any) {
                 </Link>
             </div>
 
-            <div className="max-w-4xl mx-auto">
+            <div className="w-full max-w-7xl mx-auto">
                 <div className="bg-white rounded-lg shadow border border-slate-200">
                     <div className="p-6 border-b border-slate-200">
                         <h2 className="text-lg font-medium text-slate-900">

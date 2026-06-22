@@ -39,8 +39,8 @@ import {
     Cell,
     Legend
 } from 'recharts';
-import {
 import { __ } from '@/lib/i18n';
+import {
     Table,
     TableBody,
     TableCell,
@@ -405,3 +405,4 @@ export default function Income() {
         </AdminSidebarLayout>
     );
 }
+

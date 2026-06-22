@@ -60,7 +60,7 @@ export default function Edit({ event }: Props) {
         >
             <Head title={__('general.edit_event_type')} />
             
-            <div className="max-w-2xl mx-auto space-y-8">
+            <div className="w-full max-w-7xl mx-auto space-y-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">{__('general.edit_event_type')}</h1>

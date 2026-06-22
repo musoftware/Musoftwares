@@ -33,8 +33,8 @@ import {
     Tooltip as RechartsTooltip,
     ResponsiveContainer
 } from 'recharts';
-import {
 import { __ } from '@/lib/i18n';
+import {
     Table,
     TableBody,
     TableCell,
@@ -282,3 +282,4 @@ export default function Costs() {
         </AdminSidebarLayout>
     );
 }
+

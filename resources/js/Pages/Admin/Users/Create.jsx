@@ -85,7 +85,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
                         
                         {/* User Details */}
                         <div className="mb-10">
-                            <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.user_details')}</h5>
+                            <h5 className="text-lg font-bold text-slate-900 mb-6">{__('general.user_details')}</h5>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <Label htmlFor="name">{__('general.name')} <span className="text-red-500">*</span></Label>
@@ -114,7 +114,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
 
                         {/* Connection */}
                         <div className="mb-10">
-                            <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.connection')}</h5>
+                            <h5 className="text-lg font-bold text-slate-900 mb-6">{__('general.connection')}</h5>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="facebook">{__('general.facebook')}</Label>
@@ -139,7 +139,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
                                 </div>
                             </div>
                             <div className="flex items-start space-x-3 mt-4">
-                                <input type="checkbox" id="disable_unpaid_balance_whatsapp" name="disable_unpaid_balance_whatsapp" checked={data.disable_unpaid_balance_whatsapp} onChange={handleCheckboxChange} className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
+                                <input type="checkbox" id="disable_unpaid_balance_whatsapp" name="disable_unpaid_balance_whatsapp" checked={data.disable_unpaid_balance_whatsapp} onChange={handleCheckboxChange} className="mt-1 h-4 w-4 rounded border-gray-300 text-slate-900 focus:ring-slate-900" />
                                 <div>
                                     <Label htmlFor="disable_unpaid_balance_whatsapp" className="font-bold cursor-pointer text-gray-900">{__('general.disable_unpaid_balance_whatsapp_notifications')}</Label>
                                     <p className="text-sm text-gray-500">{__('general.if_checked_this_user_will_not_receive_whatsapp_notifications_for_unpaid_balances')}</p>
@@ -149,7 +149,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
 
                         {/* Info */}
                         <div className="mb-10">
-                            <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.info')}</h5>
+                            <h5 className="text-lg font-bold text-slate-900 mb-6">{__('general.info')}</h5>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <Label htmlFor="job">{__('general.job')}</Label>
@@ -260,7 +260,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
                                 </div>
                             </div>
                             <div className="flex items-center space-x-2 mt-4">
-                                <input type="checkbox" id="subscription_force" name="subscription_force" checked={data.subscription_force} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
+                                <input type="checkbox" id="subscription_force" name="subscription_force" checked={data.subscription_force} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900 focus:ring-slate-900" />
                                 <Label htmlFor="subscription_force" className="font-bold cursor-pointer text-gray-900">{__('general.force_subscription')}</Label>
                             </div>
                         </div>
@@ -268,18 +268,18 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
                             {/* Tax Settings */}
                             <div>
-                                <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.tax_settings')}</h5>
+                                <h5 className="text-lg font-bold text-slate-900 mb-6">{__('general.tax_settings')}</h5>
                                 <div className="space-y-4">
                                     <div className="flex items-center space-x-3">
-                                        <input type="checkbox" id="client_taxable" name="client_taxable" checked={data.client_taxable} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                                        <input type="checkbox" id="client_taxable" name="client_taxable" checked={data.client_taxable} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900" />
                                         <Label htmlFor="client_taxable" className="cursor-pointer font-medium">{__('general.client_taxable')}</Label>
                                     </div>
                                     <div className="flex items-center space-x-3">
-                                        <input type="checkbox" id="invoice_taxable" name="invoice_taxable" checked={data.invoice_taxable} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                                        <input type="checkbox" id="invoice_taxable" name="invoice_taxable" checked={data.invoice_taxable} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900" />
                                         <Label htmlFor="invoice_taxable" className="cursor-pointer font-medium">{__('general.invoice_taxable')}</Label>
                                     </div>
                                     <div className="flex items-center space-x-3">
-                                        <input type="checkbox" id="timer_taxable" name="timer_taxable" checked={data.timer_taxable} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                                        <input type="checkbox" id="timer_taxable" name="timer_taxable" checked={data.timer_taxable} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900" />
                                         <Label htmlFor="timer_taxable" className="cursor-pointer font-medium">{__('general.timer_taxable')}</Label>
                                     </div>
                                 </div>
@@ -287,18 +287,18 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
 
                             {/* General Settings */}
                             <div>
-                                <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.general_settings')}</h5>
+                                <h5 className="text-lg font-bold text-slate-900 mb-6">{__('general.general_settings')}</h5>
                                 <div className="space-y-4">
                                     <div className="flex items-center space-x-3">
-                                        <input type="checkbox" id="allow_referral_system" name="allow_referral_system" checked={data.allow_referral_system} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                                        <input type="checkbox" id="allow_referral_system" name="allow_referral_system" checked={data.allow_referral_system} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900" />
                                         <Label htmlFor="allow_referral_system" className="cursor-pointer font-medium">{__('general.allow_referral_system')}</Label>
                                     </div>
                                     <div className="flex items-center space-x-3">
-                                        <input type="checkbox" id="allow_view_times" name="allow_view_times" checked={data.allow_view_times} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                                        <input type="checkbox" id="allow_view_times" name="allow_view_times" checked={data.allow_view_times} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900" />
                                         <Label htmlFor="allow_view_times" className="cursor-pointer font-medium">{__('general.allow_view_work_times')}</Label>
                                     </div>
                                     <div className="flex items-center space-x-3">
-                                        <input type="checkbox" id="allow_postpaid" name="allow_postpaid" checked={data.allow_postpaid} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                                        <input type="checkbox" id="allow_postpaid" name="allow_postpaid" checked={data.allow_postpaid} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900" />
                                         <Label htmlFor="allow_postpaid" className="cursor-pointer font-medium">{__('general.allow_postpaid')}</Label>
                                     </div>
                                 </div>
@@ -307,11 +307,11 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
 
                         {/* KYC Verification */}
                         <div className="mb-10">
-                            <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.kyc_verification')}</h5>
+                            <h5 className="text-lg font-bold text-slate-900 mb-6">{__('general.kyc_verification')}</h5>
                             <div className="grid grid-cols-1 gap-6">
                                 <div>
                                     <div className="flex items-start space-x-3 mb-2">
-                                        <input type="checkbox" id="kyc_verified" name="kyc_verified" checked={data.kyc_verified} onChange={handleCheckboxChange} className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600" />
+                                        <input type="checkbox" id="kyc_verified" name="kyc_verified" checked={data.kyc_verified} onChange={handleCheckboxChange} className="mt-1 h-4 w-4 rounded border-gray-300 text-slate-900" />
                                         <div>
                                             <Label htmlFor="kyc_verified" className="font-bold cursor-pointer text-gray-900">{__('general.kyc_verified')}</Label>
                                             <p className="text-sm text-gray-500">{__('general.check_this_to_manually_verify_the_user_s_kyc_status')}</p>
@@ -327,7 +327,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
 
                         {/* Affiliate & Permissions */}
                         <div className="mb-10">
-                            <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.affiliate_commission_settings')}</h5>
+                            <h5 className="text-lg font-bold text-slate-900 mb-6">{__('general.affiliate_commission_settings')}</h5>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                                 <div className="space-y-2">
                                     <Label htmlFor="affiliate_commission_percentage">{__('general.commission_percentage_percent')}</Label>
@@ -335,7 +335,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
                                     <p className="text-xs text-gray-500">{__('general.enter_the_commission_percentage_e_g_1_00_for_1_percent')}</p>
                                 </div>
                                 <div className="flex items-start space-x-3 md:pt-8">
-                                    <input type="checkbox" id="add_commission_to_total" name="add_commission_to_total" checked={data.add_commission_to_total} onChange={handleCheckboxChange} className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600" />
+                                    <input type="checkbox" id="add_commission_to_total" name="add_commission_to_total" checked={data.add_commission_to_total} onChange={handleCheckboxChange} className="mt-1 h-4 w-4 rounded border-gray-300 text-slate-900" />
                                     <div>
                                         <Label htmlFor="add_commission_to_total" className="font-bold cursor-pointer text-gray-900">{__('general.add_commission_to_invoice_total')}</Label>
                                         <p className="text-sm text-gray-500">{__('general.if_checked_commission_will_be_added_to_invoice_total_instead_of_deducted')}</p>
@@ -343,7 +343,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
                                 </div>
                             </div>
 
-                            <h5 className="text-lg font-bold text-blue-600 mb-6">{__('general.referral_and_permissions')}</h5>
+                            <h5 className="text-lg font-bold text-slate-900 mb-6">{__('general.referral_and_permissions')}</h5>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <Label htmlFor="ref_user_id">{__('general.referral_user_id')}</Label>

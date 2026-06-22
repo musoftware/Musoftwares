@@ -26,7 +26,7 @@ export default function Edit({ auth, rule }) {
         <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-slate-800 leading-tight">{__('general.edit_automation_rule')}</h2>}>
             <Head title={__('general.edit_automation')} />
 
-            <div className="py-12 max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div className="py-12 w-full max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 <Card className="border-slate-200 shadow-sm">
                     <CardHeader className="bg-slate-50 border-b border-slate-100">
                         <CardTitle>Edit Rule: {rule.name}</CardTitle>
@@ -119,7 +119,7 @@ export default function Edit({ auth, rule }) {
                                 <Link href={route('settings.automations.index')}>
                                     <Button type="button" variant="outline">{__('general.cancel')}</Button>
                                 </Link>
-                                <Button type="submit" disabled={processing} className="bg-indigo-600 hover:bg-indigo-700">
+                                <Button type="submit" disabled={processing} className="bg-slate-900 hover:bg-slate-900">
                                     {__('general.update_rule')}</Button>
                             </div>
                         </form>

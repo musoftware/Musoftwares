@@ -14,7 +14,7 @@ export function HistoryWorkspace({
     setHistory
 }: {
     history: Process[];
-    callRPC: (action: string, data?: any) => {__('general.promise')}<any>;
+    callRPC: (action: string, data?: any) => Promise<any>;
     setHistory: (history: Process[]) => void;
 }) {
     const [selectedProcessId, setSelectedProcessId] = useState<string | null>(null);
@@ -130,3 +130,4 @@ export function HistoryWorkspace({
         </div>
     );
 }
+

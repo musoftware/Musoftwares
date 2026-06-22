@@ -68,7 +68,7 @@ export default function Create({ currencies, categories, stats }) {
                     <ArrowLeft className="w-4 h-4" />{__('general.back_to_recurring_costs')}</Link>
             </div>
 
-            <div className="bg-white p-6 rounded-xl border shadow-sm max-w-2xl">
+            <div className="bg-white p-6 rounded-xl border shadow-sm w-full max-w-7xl">
                 <h2 className="text-xl font-bold text-slate-900 mb-2">{__('general.add_recurring_cost')}</h2>
                 <p className="text-sm text-gray-500 mb-6">{__('general.add_a_new_overhead_expense_that_repeats_automatically')}</p>
 

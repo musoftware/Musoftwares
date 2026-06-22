@@ -11,7 +11,7 @@ export function Header({
     activeCount
 }: {
     activeWorkspace: WorkspaceType;
-    loadAll: () => {__('general.promise')}<void>;
+    loadAll: () => Promise<void>;
     activeCount: number;
 }) {
     const activeLabel = navItems.find(n => n.id === activeWorkspace)?.label || '';
@@ -53,3 +53,4 @@ export function Header({
         </>
     );
 }
+

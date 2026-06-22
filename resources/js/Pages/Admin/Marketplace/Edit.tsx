@@ -201,7 +201,7 @@ export default function Edit({ auth, service, categories }: Props) {
             <Head title={`Edit Service: ${service.title}`} />
 
             <div className="py-8 bg-slate-50 min-h-screen">
-                <div className="mx-auto max-w-4xl sm:px-6 lg:px-8 space-y-6">
+                <div className="mx-auto w-full max-w-7xl sm:px-6 lg:px-8 space-y-6">
                     
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
@@ -219,7 +219,7 @@ export default function Edit({ auth, service, categories }: Props) {
                         <Button 
                             onClick={handleSubmit} 
                             disabled={processing}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
+                            className="bg-slate-900 hover:bg-slate-900 text-white gap-2"
                         >
                             <Save className="w-4 h-4" />
                             {processing ? __('general.saving') : __('general.save_changes')}
@@ -325,13 +325,13 @@ export default function Edit({ auth, service, categories }: Props) {
                                 {data.packages.map((pkg, index) => (
                                     <div key={index} className="p-4 bg-slate-50 border border-slate-200 rounded-lg relative">
                                         {data.packages.length > 1 && (
-                                            <button 
+                                            <Button 
                                                 type="button" 
                                                 onClick={() => removePackage(index)}
                                                 className="absolute top-3 end-3 text-slate-400 hover:text-red-500 transition-colors bg-white p-1.5 rounded-md border border-slate-200 shadow-sm"
                                             >
                                                 <Trash2 className="w-4 h-4" />
-                                            </button>
+                                            </Button>
                                         )}
                                         
                                         <h3 className="font-semibold text-slate-700 mb-4 pe-10 text-sm uppercase tracking-wider">Package {index + 1}</h3>
@@ -437,13 +437,13 @@ export default function Edit({ auth, service, categories }: Props) {
                             <div className="space-y-4">
                                 {data.faq.map((f, index) => (
                                     <div key={index} className="p-4 bg-slate-50 border border-slate-200 rounded-lg relative">
-                                        <button 
+                                        <Button 
                                             type="button" 
                                             onClick={() => removeFaq(index)}
                                             className="absolute top-3 end-3 text-slate-400 hover:text-red-500 transition-colors bg-white p-1.5 rounded-md border border-slate-200 shadow-sm"
                                         >
                                             <Trash2 className="w-4 h-4" />
-                                        </button>
+                                        </Button>
                                         <div className="space-y-4 pe-10">
                                             <div className="space-y-2">
                                                 <Label>{__('general.question')}</Label>
@@ -476,24 +476,24 @@ export default function Edit({ auth, service, categories }: Props) {
                                 {data.kept_gallery.map((path, index) => (
                                     <div key={`kept-${index}`} className="relative aspect-video bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
                                         <img src={`/storage/${path}`} alt="Gallery" className="w-full h-full object-cover" />
-                                        <button type="button" onClick={() => removeKeptImage(path)} className="absolute top-1 end-1 bg-white p-1 rounded shadow text-red-500">
+                                        <Button type="button" onClick={() => removeKeptImage(path)} className="absolute top-1 end-1 bg-white p-1 rounded shadow text-red-500">
                                             <Trash2 className="w-4 h-4" />
-                                        </button>
+                                        </Button>
                                     </div>
                                 ))}
                                 {data.gallery.map((file, index) => (
                                     <div key={`new-${index}`} className="relative aspect-video bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
                                         <img src={URL.createObjectURL(file)} alt="New Gallery" className="w-full h-full object-cover opacity-70" />
-                                        <button type="button" onClick={() => removeNewImage(index)} className="absolute top-1 end-1 bg-white p-1 rounded shadow text-red-500">
+                                        <Button type="button" onClick={() => removeNewImage(index)} className="absolute top-1 end-1 bg-white p-1 rounded shadow text-red-500">
                                             <Trash2 className="w-4 h-4" />
-                                        </button>
+                                        </Button>
                                     </div>
                                 ))}
                                 {(data.kept_gallery.length + data.gallery.length) < 5 && (
                                     <label className="aspect-video bg-slate-50 rounded-lg border-2 border-dashed border-slate-200 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition-colors text-slate-500">
                                         <ImageIcon className="w-6 h-6 mb-2" />
                                         <span className="text-xs">{__('general.upload_image')}</span>
-                                        <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
+                                        <Input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
                                     </label>
                                 )}
                             </div>
