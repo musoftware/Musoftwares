@@ -1,0 +1,20 @@
+flowchart TD
+    root[Missing Menus & Role Isolations]
+    
+    root --> accountant[1. Accountant Role Isolation]
+    accountant --> acc1[Update AppSidebar.tsx for Accountant]
+    acc1 --> acc2[Filter items array]
+    acc2 --> acc3[Show only 'Invoices', 'Finance & Business', 'Seller & Payout']
+    
+    root --> support[2. Support Agent Role Isolation]
+    support --> sup1[Update AppSidebar.tsx for Support Agent]
+    sup1 --> sup2[Filter items array]
+    sup2 --> sup3[Show only 'Operations -> Tickets', 'Operations -> Guest Tickets']
+    
+    root --> seller[3. Seller Dashboard Frontend/Marketplace]
+    seller --> sel1[Create dedicated Seller Portal routes]
+    sel1 --> sel2[/seller/dashboard]
+    sel1 --> sel3[/seller/products]
+    sel1 --> sel4[/seller/payouts]
+    seller --> sel5[Update AuthenticatedLayout.tsx]
+    sel5 --> sel6[Add Seller Portal link for seller role in Services Mega Menu or User Dropdown]
