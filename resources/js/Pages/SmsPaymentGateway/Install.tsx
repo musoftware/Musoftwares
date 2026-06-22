@@ -7,6 +7,7 @@ import { CheckCircle, Copy, Download, ExternalLink, Smartphone, Settings } from 
 import { Input } from '@/Components/ui/input';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { __ } from '@/lib/i18n';
 
 interface InstallProps {
     androidAppUrl: string;
@@ -167,7 +168,7 @@ export default function Install({ androidAppUrl, macrodroidUrl, macrodroidToken 
                                                 </p>
                                                 <div className="bg-muted p-3 rounded-md text-xs font-mono space-y-1 mt-2">
                                                     <div><strong>URL:</strong> {macrodroidUrl}</div>
-                                                    <div><strong>Method:</strong> POST</div>
+                                                    <div><strong>Method:</strong> {__('general.post')}</div>
                                                     <div><strong>Content-Type:</strong> application/x-www-form-urlencoded</div>
                                                 </div>
                                                 <div className="bg-muted p-3 rounded-md text-xs mt-2 space-y-2">

@@ -80,8 +80,7 @@ export default function AiEstimator({ expected_monthly_income, work_days_per_mon
                             {__('admin.ai_estimator')}
                         </CardTitle>
                         <CardDescription>
-                            Describe a project or task and let the AI estimate the required hours based on your configured hourly rate.
-                        </CardDescription>
+                            {__('general.describe_a_project_or_task_and_let_the_a')}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -124,7 +123,7 @@ export default function AiEstimator({ expected_monthly_income, work_days_per_mon
                             <Label htmlFor="description">{__('admin.task_description')}</Label>
                             <Textarea
                                 id="description"
-                                placeholder="Describe the task or project requirements..."
+                                placeholder={__('general.describe_the_task_or_project_requirement')}
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 className="min-h-[150px]"

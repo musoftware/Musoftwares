@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Textarea } from '@/Components/ui/textarea';
 import { Label } from '@/Components/ui/label';
+import { __ } from '@/lib/i18n';
 
 export default function Edit({ service }: { service: any }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -32,7 +33,7 @@ export default function Edit({ service }: { service: any }) {
 
     return (
         <AdminSidebarLayout header="Edit Service">
-            <Head title="Edit Service" />
+            <Head title={__('general.edit_service')} />
             <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                 <form onSubmit={submit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -78,7 +79,7 @@ export default function Edit({ service }: { service: any }) {
                                 <img src={`/${service.image_path_en}`} alt={service.title_en} className="w-16 h-16 rounded object-cover mb-2" />
                             )}
                             <Input type="file" onChange={e => setData('image_en', e.target.files ? e.target.files[0] : null)} accept="image/*" />
-                            <p className="text-xs text-slate-500">Leave empty to keep the current image.</p>
+                            <p className="text-xs text-slate-500">{__('general.leave_empty_to_keep_the_current_image')}</p>
                             {errors.image_en && <p className="text-sm text-red-600">{errors.image_en}</p>}
                         </div>
                         <div className="space-y-2">
@@ -87,14 +88,14 @@ export default function Edit({ service }: { service: any }) {
                                 <img src={`/${service.image_path_ar}`} alt={service.title_ar} className="w-16 h-16 rounded object-cover mb-2" />
                             )}
                             <Input type="file" onChange={e => setData('image_ar', e.target.files ? e.target.files[0] : null)} accept="image/*" />
-                            <p className="text-xs text-slate-500">Leave empty to keep the current image.</p>
+                            <p className="text-xs text-slate-500">{__('general.leave_empty_to_keep_the_current_image')}</p>
                             {errors.image_ar && <p className="text-sm text-red-600">{errors.image_ar}</p>}
                         </div>
                     </div>
 
                     <div className="border-t border-slate-200 pt-6 mt-6">
                         <h3 className="text-lg font-semibold text-slate-900 mb-4">Advanced SEO Overrides (Optional)</h3>
-                        <p className="text-sm text-slate-500 mb-6">Leave these blank to have our AI automatically generate them based on the service description.</p>
+                        <p className="text-sm text-slate-500 mb-6">{__('general.leave_these_blank_to_have_our_ai_automat')}</p>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div className="space-y-2">
@@ -132,9 +133,9 @@ export default function Edit({ service }: { service: any }) {
 
                     <div className="flex justify-end gap-2">
                         <Link href={route('admin.website-services.index')}>
-                            <Button variant="outline" type="button">Cancel</Button>
+                            <Button variant="outline" type="button">{__('general.cancel')}</Button>
                         </Link>
-                        <Button type="submit" disabled={processing}>Update</Button>
+                        <Button type="submit" disabled={processing}>{__('general.update')}</Button>
                     </div>
                 </form>
             </div>

@@ -42,8 +42,7 @@ export default function Create({ client }: Props) {
                 <header className="mb-4">
                     <div className="flex items-center gap-2 mb-1">
                         <span className="text-xs font-semibold px-2 py-1 bg-primary/10 text-primary rounded-md uppercase tracking-wider">
-                            Finance
-                        </span>
+                            {__('general.finance')}</span>
                     </div>
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
@@ -54,8 +53,7 @@ export default function Create({ client }: Props) {
                         </div>
                         <div className="flex flex-wrap gap-2">
                             <Button variant="outline" onClick={() => window.history.back()}>
-                                <ArrowDownLeft className="h-4 w-4 me-2" style={{ transform: 'rotate(45deg)' }} /> Back
-                            </Button>
+                                <ArrowDownLeft className="h-4 w-4 me-2" style={{ transform: 'rotate(45deg)' }} /> {__('general.back')}</Button>
                         </div>
                     </div>
                 </header>
@@ -69,7 +67,7 @@ export default function Create({ client }: Props) {
                                     <Coins className="h-5 w-5" />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Current Points</p>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{__('general.current_points')}</p>
                                     <p className="font-bold text-xl truncate">
                                         {client.points_balance}
                                     </p>
@@ -83,14 +81,13 @@ export default function Create({ client }: Props) {
                         <Card>
                             <form onSubmit={handleSubmit}>
                                 <CardHeader>
-                                    <CardTitle>Adjust Points Balance</CardTitle>
+                                    <CardTitle>{__('general.adjust_points_balance')}</CardTitle>
                                     <CardDescription>
-                                        Add positive values to credit points, or negative values to deduct points.
-                                    </CardDescription>
+                                        {__('general.add_positive_values_to_credit_points_or')}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="amount">Number of Points</Label>
+                                        <Label htmlFor="amount">{__('general.number_of_points')}</Label>
                                         <Input
                                             id="amount"
                                             type="number"

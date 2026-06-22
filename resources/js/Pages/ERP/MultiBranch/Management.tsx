@@ -38,10 +38,10 @@ export default function BranchManagement({ branches }: Props) {
                     <thead className="bg-slate-50 border-b">
                         <tr>
                             <th className="px-6 py-3 font-medium text-slate-500">{__('general.branch_name')}</th>
-                            <th className="px-6 py-3 font-medium text-slate-500">Type</th>
-                            <th className="px-6 py-3 font-medium text-slate-500">Timezone</th>
-                            <th className="px-6 py-3 font-medium text-slate-500">Status</th>
-                            <th className="px-6 py-3 font-medium text-slate-500 text-end">Actions</th>
+                            <th className="px-6 py-3 font-medium text-slate-500">{__('general.type')}</th>
+                            <th className="px-6 py-3 font-medium text-slate-500">{__('general.timezone')}</th>
+                            <th className="px-6 py-3 font-medium text-slate-500">{__('general.status')}</th>
+                            <th className="px-6 py-3 font-medium text-slate-500 text-end">{__('general.actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">

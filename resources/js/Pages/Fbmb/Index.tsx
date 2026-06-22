@@ -331,7 +331,7 @@ export default function ISaasIndex() {
                         )}>
                             <div className="flex items-center gap-2 mb-1">
                                 <Wallet className={cn("w-4 h-4", hasBalance ? "text-emerald-500" : "text-amber-500")} />
-                                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Points</span>
+                                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">{__('general.points')}</span>
                             </div>
                             <p className={cn("text-2xl font-bold font-mono tracking-tight", hasBalance ? "text-emerald-700" : "text-amber-700")}>
                                 {Number(pointsBalance || 0).toLocaleString()} <span className="text-sm font-normal text-slate-400">Pts</span>
@@ -346,7 +346,7 @@ export default function ISaasIndex() {
                         <div className="relative overflow-hidden rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <Zap className="w-4 h-4 text-indigo-500" />
-                                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Volume Pricing</span>
+                                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">{__('general.volume_pricing')}</span>
                             </div>
                             <div className="space-y-1 relative z-10">
                                 {pricingTiers?.map((tier: PricingTier, i: number) => (
@@ -441,7 +441,7 @@ export default function ISaasIndex() {
                             {errorMessage && (
                                 <Alert variant="destructive" className="mb-6 animate-in fade-in slide-in-from-top-2 duration-300">
                                     <AlertCircle className="h-4 w-4" />
-                                    <AlertTitle>Error</AlertTitle>
+                                    <AlertTitle>{__('general.error')}</AlertTitle>
                                     <AlertDescription>{errorMessage}</AlertDescription>
                                 </Alert>
                             )}
@@ -491,7 +491,7 @@ export default function ISaasIndex() {
                                                                 {isDragging ? 'Drop your file here' : 'Click to upload or drag and drop'}
                                                             </p>
                                                             <p className="text-xs text-slate-500">
-                                                                Supports <span className="font-medium">.txt</span> and <span className="font-medium">.csv</span>{__('general.files_up_to_10_mb')}</p>
+                                                                {__('general.supports')}<span className="font-medium">.txt</span> and <span className="font-medium">.csv</span>{__('general.files_up_to_10_mb')}</p>
                                                         </>
                                                     ) : (
                                                         <div className="flex items-center gap-4 w-full" onClick={(e) => e.stopPropagation()}>
@@ -634,7 +634,7 @@ export default function ISaasIndex() {
                                                         <p className="text-2xl font-bold font-mono text-slate-800">{(result.total_ids || 0).toLocaleString()}</p>
                                                     </div>
                                                     <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center">
-                                                        <p className="text-xs text-emerald-600 font-medium uppercase tracking-wider mb-1">Matches</p>
+                                                        <p className="text-xs text-emerald-600 font-medium uppercase tracking-wider mb-1">{__('general.matches')}</p>
                                                         <p className="text-2xl font-bold font-mono text-emerald-700">{(result.found_count || 0).toLocaleString()}</p>
                                                     </div>
                                                     <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-center">

@@ -230,7 +230,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                     <Tabs defaultValue="new" className="w-full">
                         <TabsList className="w-full grid grid-cols-2 mb-6 p-1 bg-slate-100 rounded-xl">
                             <TabsTrigger value="new" className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">{__('general.new_campaign')}</TabsTrigger>
-                            <TabsTrigger value="history" className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">Database</TabsTrigger>
+                            <TabsTrigger value="history" className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">{__('general.database')}</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="new" className="space-y-6">
@@ -253,7 +253,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                 >
                                     <option value="duckduckgo">DuckDuckGo (Recommended)</option>
                                     <option value="google">Google (May require fallback)</option>
-                                    <option value="bing">Bing</option>
+                                    <option value="bing">{__('general.bing')}</option>
                                 </select>
                             </div>
 
@@ -442,10 +442,10 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                 <table className="w-full text-start border-collapse min-w-[1200px]">
                                     <thead>
                                         <tr className="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-wider font-black text-slate-500 sticky top-0 z-10">
-                                            <th className="px-4 py-3 whitespace-nowrap">Domain</th>
+                                            <th className="px-4 py-3 whitespace-nowrap">{__('general.domain')}</th>
                                             <th className="px-4 py-3 whitespace-nowrap">{__('general.page_title')}</th>
                                             <th className="px-4 py-3 w-64">{__('general.h1_snippet')}</th>
-                                            <th className="px-4 py-3 whitespace-nowrap text-end">Metrics</th>
+                                            <th className="px-4 py-3 whitespace-nowrap text-end">{__('general.metrics')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
@@ -477,7 +477,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                                         </p>
                                                         <p className="text-[10px] text-slate-500 line-clamp-2">{r.snippet || metrics.meta_description || '-'}</p>
                                                     </td>
-                                                    <td className="px-4 py-3 align-top text-right">
+                                                    <td className="px-4 py-3 align-top text-end">
                                                         <div className="flex flex-col items-end gap-1.5">
                                                             <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 text-[9px] font-bold px-1.5 py-0 h-5 border border-indigo-100 shadow-sm">
                                                                 {metrics.word_count || 0} Words

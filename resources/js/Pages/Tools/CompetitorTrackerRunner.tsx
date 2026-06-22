@@ -12,9 +12,7 @@ export default function CompetitorTrackerRunner({ tool }: any) {
                 </div>
                 <h1 className="text-2xl font-bold">{__('general.competitor_analytics')}</h1>
                 <p className="text-sm text-slate-400">
-                    This tool allows you to track competitor metrics and changes directly from your local machine.
-                    The intelligence engine is now powered by the Musoftware Runtime.
-                </p>
+                    {__('general.this_tool_allows_you_to_track_competitor')}</p>
                 <div className="pt-8 border-t border-slate-800">
                     <p className="text-xs text-slate-500 uppercase tracking-widest font-black mb-4">{__('general.coming_soon')}</p>
                     <Button variant="outline" className="bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800">{__('general.view_documentation')}</Button>

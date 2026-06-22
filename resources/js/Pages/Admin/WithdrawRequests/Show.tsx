@@ -82,8 +82,7 @@ export default function Show({ withdrawRequest }: Props) {
                         <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
                             <div>
                                 <dt className="text-slate-500 flex items-center gap-1.5 mb-1">
-                                    <Wallet className="h-3.5 w-3.5" /> Amount
-                                </dt>
+                                    <Wallet className="h-3.5 w-3.5" /> {__('general.amount')}</dt>
                                 <dd className="text-2xl font-bold text-slate-900">
                                     {formatCurrency(withdrawRequest.amount, base_currency)}
                                 </dd>
@@ -115,7 +114,7 @@ export default function Show({ withdrawRequest }: Props) {
 
                             {withdrawRequest.notes && (
                                 <div className="col-span-2">
-                                    <dt className="text-slate-500 mb-1">Notes</dt>
+                                    <dt className="text-slate-500 mb-1">{__('general.notes')}</dt>
                                     <dd className="text-slate-700 whitespace-pre-wrap bg-slate-50 rounded-lg p-3 border border-slate-200">
                                         {withdrawRequest.notes}
                                     </dd>
@@ -130,8 +129,7 @@ export default function Show({ withdrawRequest }: Props) {
                     {/* User card */}
                     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
                         <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
-                            User
-                        </h3>
+                            {__('general.user')}</h3>
                         <div className="flex items-center gap-3">
                             <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
                                 <User className="h-4 w-4 text-indigo-600" />
@@ -159,24 +157,21 @@ export default function Show({ withdrawRequest }: Props) {
                     {!['approved', 'declined'].includes(withdrawRequest.status) && (
                         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
                             <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
-                                Actions
-                            </h3>
+                                {__('general.actions')}</h3>
                             <div className="space-y-2">
                                 <Button
                                     className="w-full justify-start gap-2 bg-green-600 hover:bg-green-700 text-white"
                                     disabled={loading || withdrawRequest.status === 'approved'}
                                     onClick={() => updateStatus('approved')}
                                 >
-                                    <CheckCircle className="h-4 w-4" /> Approve
-                                </Button>
+                                    <CheckCircle className="h-4 w-4" /> {__('general.approve')}</Button>
                                 <Button
                                     variant="outline"
                                     className="w-full justify-start gap-2 border-red-200 text-red-600 hover:bg-red-50"
                                     disabled={loading || withdrawRequest.status === 'declined'}
                                     onClick={() => updateStatus('declined')}
                                 >
-                                    <XCircle className="h-4 w-4" /> Decline
-                                </Button>
+                                    <XCircle className="h-4 w-4" /> {__('general.decline')}</Button>
                                 {withdrawRequest.status === 'pending' && (
                                     <Button
                                         variant="outline"
@@ -193,8 +188,7 @@ export default function Show({ withdrawRequest }: Props) {
                     {['approved', 'declined'].includes(withdrawRequest.status) && (
                         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
                             <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
-                                Actions
-                            </h3>
+                                {__('general.actions')}</h3>
                             <Button
                                 variant="outline"
                                 className="w-full justify-start gap-2"

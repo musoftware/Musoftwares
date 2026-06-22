@@ -103,7 +103,7 @@ export default function FreelanceLayout({ children, clean = false }) {
                         <div className="flex items-center gap-8">
                             <Link href="/freelance/dashboard" className="flex items-center gap-2">
                                 <ApplicationLogo className="h-8 w-auto text-emerald-600" />
-                                <span className="font-bold text-lg tracking-tight text-slate-900 hidden sm:block">ArabiJobs</span>
+                                <span className="font-bold text-lg tracking-tight text-slate-900 hidden sm:block">{__('general.arabijobs')}</span>
                             </Link>
 
                             <nav className="hidden md:flex items-center gap-2">

@@ -44,7 +44,7 @@ function NewCampaignModal({
 }: {
     onClose: () => void;
     onCreated: (c: any) => void;
-    callRPC: (a: string, d?: any) => Promise<any>;
+    callRPC: (a: string, d?: any) => {__('general.promise')}<any>;
 }) {
     const [name, setName]           = useState('');
     const [keyword, setKeyword]     = useState('');
@@ -105,7 +105,7 @@ function NewCampaignModal({
 
                     {/* Keyword */}
                     <div className="space-y-1.5">
-                        <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Keyword <span className="text-rose-500">*</span></Label>
+                        <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">{__('general.keyword')}<span className="text-rose-500">*</span></Label>
                         <div className="relative">
                             <Search className="w-4 h-4 text-slate-400 absolute start-3.5 top-1/2 -translate-y-1/2" />
                             <Input
@@ -120,7 +120,7 @@ function NewCampaignModal({
 
                     {/* Location */}
                     <div className="space-y-1.5">
-                        <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Location <span className="text-rose-500">*</span></Label>
+                        <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">{__('general.location')}<span className="text-rose-500">*</span></Label>
                         <div className="relative">
                             <MapPin className="w-4 h-4 text-slate-400 absolute start-3.5 top-1/2 -translate-y-1/2" />
                             <Input
@@ -179,8 +179,7 @@ function NewCampaignModal({
                             onClick={onClose}
                             className="flex-1"
                         >
-                            Cancel
-                        </Button>
+                            {__('general.cancel')}</Button>
                         <Button
                             type="submit"
                             disabled={saving || !keyword.trim() || !location.trim()}
@@ -197,7 +196,7 @@ function NewCampaignModal({
 }
 
 // ── Settings Panel ────────────────────────────────────────────────────────────
-function SettingsPanel({ callRPC }: { callRPC: (a: string, d?: any) => Promise<any> }) {
+function SettingsPanel({ callRPC }: { callRPC: (a: string, d?: any) => {__('general.promise')}<any> }) {
     const [settings, setSettings]   = useState<any>(null);
     const [proxiesText, setProxies] = useState('');
     const [saving, setSaving]       = useState(false);
@@ -234,7 +233,7 @@ function SettingsPanel({ callRPC }: { callRPC: (a: string, d?: any) => Promise<a
     return (
         <form onSubmit={handleSave} className="space-y-8 max-w-2xl">
             <div>
-                <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-700 bg-clip-text text-transparent">Settings</h1>
+                <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-700 bg-clip-text text-transparent">{__('general.settings')}</h1>
                 <p className="text-xs text-slate-500 mt-1">{__('general.configure_extraction_behaviour_speed_and_proxy_rotation')}</p>
             </div>
 
@@ -548,7 +547,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                 {/* Runtime indicator */}
                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-800">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-bold uppercase tracking-wider">Live</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider">{__('general.live')}</span>
                 </div>
             </header>
 
@@ -612,7 +611,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                             {/* Header */}
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-700 bg-clip-text text-transparent">Campaigns</h1>
+                                    <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-700 bg-clip-text text-transparent">{__('general.campaigns')}</h1>
                                     <p className="text-xs text-slate-500 mt-1">{__('general.each_campaign_targets_a_keyword_location_and_extracts_matching_businesses')}</p>
                                 </div>
                                 <Button
@@ -718,8 +717,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                                                     onClick={() => handleStop(camp.id)}
                                                                     className="h-8 bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-100 text-[11px]"
                                                                 >
-                                                                    <Square className="w-3 h-3 fill-rose-600 me-1" /> Pause
-                                                                </Button>
+                                                                    <Square className="w-3 h-3 fill-rose-600 me-1" /> {__('general.pause')}</Button>
                                                             ) : (
                                                                 <Button
                                                                     size="sm"
@@ -748,7 +746,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                             {/* Header */}
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div>
-                                    <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-700 bg-clip-text text-transparent">Results</h1>
+                                    <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-700 bg-clip-text text-transparent">{__('general.results')}</h1>
                                     <p className="text-xs text-slate-500 mt-1">{totalResults.toLocaleString()} businesses extracted across all campaigns.</p>
                                 </div>
                                 <Button
@@ -804,16 +802,14 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                         onClick={() => { setFilterHasEmail(v => !v); setResultsOffset(0); }}
                                         className={`h-8 px-2.5 text-[11px] gap-1 ${filterHasEmail ? 'bg-emerald-950 hover:bg-emerald-900 border-emerald-950 text-white' : ''}`}
                                     >
-                                        <Mail className="w-3 h-3" /> Email
-                                    </Button>
+                                        <Mail className="w-3 h-3" /> {__('general.email')}</Button>
                                     <Button
                                         type="button"
                                         variant={filterHasPhone ? 'default' : 'outline'}
                                         onClick={() => { setFilterHasPhone(v => !v); setResultsOffset(0); }}
                                         className={`h-8 px-2.5 text-[11px] gap-1 ${filterHasPhone ? 'bg-sky-950 hover:bg-sky-900 border-sky-950 text-white' : ''}`}
                                     >
-                                        <Phone className="w-3 h-3" /> Phone
-                                    </Button>
+                                        <Phone className="w-3 h-3" /> {__('general.phone')}</Button>
                                 </div>
                             </div>
 
@@ -899,13 +895,13 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                                     size="sm"
                                                     disabled={resultsOffset === 0}
                                                     onClick={() => setResultsOffset(v => Math.max(0, v - resultsLimit))}
-                                                >Previous</Button>
+                                                >{__('general.previous')}</Button>
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
                                                     disabled={resultsOffset + resultsLimit >= totalResults}
                                                     onClick={() => setResultsOffset(v => v + resultsLimit)}
-                                                >Next</Button>
+                                                >{__('general.next')}</Button>
                                             </div>
                                         </div>
                                     )}

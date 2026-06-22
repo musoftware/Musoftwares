@@ -107,7 +107,7 @@ export default function Index({ vouchers }) {
 
             {/* Description */}
             <div>
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{__('general.description')}</Label>
                 <textarea
                     id="description"
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black"
@@ -129,7 +129,7 @@ export default function Index({ vouchers }) {
                     required
                 >
                     <option value="fixed">{__('general.fixed_amount')}</option>
-                    <option value="percentage">Percentage</option>
+                    <option value="percentage">{__('general.percentage')}</option>
                 </select>
             </div>
 
@@ -216,7 +216,7 @@ export default function Index({ vouchers }) {
                         min="1"
                         value={formData.max_uses_per_user}
                         onChange={(e) => set('max_uses_per_user', e.target.value)}
-                        placeholder="Unlimited"
+                        placeholder={__('general.unlimited')}
                     />
                 </div>
                 <div>
@@ -227,7 +227,7 @@ export default function Index({ vouchers }) {
                         min="1"
                         value={formData.max_total_uses}
                         onChange={(e) => set('max_total_uses', e.target.value)}
-                        placeholder="Unlimited"
+                        placeholder={__('general.unlimited')}
                     />
                 </div>
             </div>
@@ -284,7 +284,7 @@ export default function Index({ vouchers }) {
     const items = vouchers?.data ?? vouchers ?? [];
 
     return (
-        <AdminSidebarLayout title="Vouchers" header="Vouchers Manager">
+        <AdminSidebarLayout title={__('general.vouchers')} header="Vouchers Manager">
             <Head title={__('general.admin_vouchers')} />
 
             {/* Header bar */}
@@ -304,8 +304,7 @@ export default function Index({ vouchers }) {
                             {renderFormFields()}
                             <DialogFooter className="mt-6">
                                 <Button type="button" variant="outline" onClick={() => { setIsCreateOpen(false); resetForm(); }}>
-                                    Cancel
-                                </Button>
+                                    {__('general.cancel')}</Button>
                                 <Button type="submit">{__('general.save_voucher')}</Button>
                             </DialogFooter>
                         </form>
@@ -318,13 +317,13 @@ export default function Index({ vouchers }) {
                 <table className="w-full text-start text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
-                            <th className="p-4 font-medium text-gray-600">Name</th>
-                            <th className="p-4 font-medium text-gray-600">Type</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.name')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.type')}</th>
                             <th className="p-4 font-medium text-gray-600">{__('general.spend_reward')}</th>
-                            <th className="p-4 font-medium text-gray-600">Uses</th>
-                            <th className="p-4 font-medium text-gray-600">Expires</th>
-                            <th className="p-4 font-medium text-gray-600">Status</th>
-                            <th className="p-4 font-medium text-gray-600 text-end">Actions</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.uses')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.expires')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.status')}</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">{__('general.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -363,26 +362,22 @@ export default function Index({ vouchers }) {
                                 <td className="p-4 text-sm text-gray-500">
                                     {v.expires_at
                                         ? new Date(v.expires_at).toLocaleDateString()
-                                        : <span className="text-gray-400">Never</span>}
+                                        : <span className="text-gray-400">{__('general.never')}</span>}
                                 </td>
                                 <td className="p-4">
                                     {v.is_active ? (
                                         <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-800">
-                                            <CheckCircle className="h-3 w-3" /> Active
-                                        </span>
+                                            <CheckCircle className="h-3 w-3" /> {__('general.active')}</span>
                                     ) : (
                                         <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold bg-red-100 text-red-800">
-                                            <XCircle className="h-3 w-3" /> Inactive
-                                        </span>
+                                            <XCircle className="h-3 w-3" /> {__('general.inactive')}</span>
                                     )}
                                 </td>
                                 <td className="p-4 space-x-2 text-end">
                                     <Button variant="outline" size="sm" onClick={() => openEditModal(v)}>
-                                        <Pencil className="h-3.5 w-3.5 me-1" /> Edit
-                                    </Button>
+                                        <Pencil className="h-3.5 w-3.5 me-1" /> {__('general.edit')}</Button>
                                     <Button variant="destructive" size="sm" onClick={() => handleDelete(v.id)}>
-                                        <Trash2 className="h-3.5 w-3.5 me-1" /> Delete
-                                    </Button>
+                                        <Trash2 className="h-3.5 w-3.5 me-1" /> {__('general.delete')}</Button>
                                 </td>
                             </tr>
                         ))}
@@ -425,8 +420,7 @@ export default function Index({ vouchers }) {
                         {renderFormFields()}
                         <DialogFooter className="mt-6">
                             <Button type="button" variant="outline" onClick={() => { setIsEditOpen(false); resetForm(); }}>
-                                Cancel
-                            </Button>
+                                {__('general.cancel')}</Button>
                             <Button type="submit">{__('general.save_changes')}</Button>
                         </DialogFooter>
                     </form>

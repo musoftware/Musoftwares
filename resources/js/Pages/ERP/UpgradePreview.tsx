@@ -83,7 +83,7 @@ export default function UpgradePreview() {
                             <div className="rounded-lg border border-border bg-muted/30 p-4 select-none filter blur-[1.5px] opacity-70 pointer-events-none font-mono text-[10px] space-y-3">
                                 <div className="flex justify-between border-b border-border pb-2">
                                     <span className="font-semibold text-foreground">Estimate #EST-021</span>
-                                    <span className="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-medium">Draft</span>
+                                    <span className="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-medium">{__('general.draft')}</span>
                                 </div>
                                 <div className="space-y-1.5 text-muted-foreground">
                                     <div className="flex justify-between"><span>{__('general.core_refactoring')}</span><span>{formatMoney(1200, 'USD')}</span></div>
@@ -134,7 +134,7 @@ export default function UpgradePreview() {
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-muted/10">
-                                        <TableHead className="ps-6 w-[40%]">Feature</TableHead>
+                                        <TableHead className="ps-6 w-[40%]">{__('general.feature')}</TableHead>
                                         <TableHead className="text-center w-[30%]">{__('general.standard_client_account')}</TableHead>
                                         <TableHead className="text-center w-[30%] bg-primary/5 text-primary font-semibold">{__('general.premium_erp_workspace')}</TableHead>
                                     </TableRow>

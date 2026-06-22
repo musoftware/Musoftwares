@@ -18,8 +18,7 @@ function StatusBadge({ day, score, status }: { day: number; score: number; statu
     if (day >= 14 && score >= 70) {
         return (
             <Badge variant="outline" className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
-                Ready
-            </Badge>
+                {__('general.ready')}</Badge>
         );
     }
     if (day > 0 || status === 'running') {
@@ -29,8 +28,7 @@ function StatusBadge({ day, score, status }: { day: number; score: number; statu
     }
     return (
         <Badge variant="outline" className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-500/10 text-slate-400 border-slate-700">
-            Idle
-        </Badge>
+            {__('general.idle')}</Badge>
     );
 }
 
@@ -79,7 +77,7 @@ function NumberCard({ number, onRemove }: { number: any; onRemove: () => void })
             <div className="grid grid-cols-3 gap-3">
                 <div className="text-center">
                     <p className="text-sm font-black text-white">{number.trust_score ?? '70'}%</p>
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-500">Reputation</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-500">{__('general.reputation')}</p>
                 </div>
                 <div className="text-center">
                     <p className="text-sm font-black text-white">{number.msgs_today ?? '0'}</p>
@@ -101,8 +99,7 @@ function NumberCard({ number, onRemove }: { number: any; onRemove: () => void })
             <div className="flex gap-2 mt-4">
                 {number.status === 'running' ? (
                     <Button variant="outline" className="flex-1 h-9 bg-yellow-500/10 border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/15 hover:text-yellow-400">
-                        <Square className="w-3 h-3 me-1.5" /> Pause
-                    </Button>
+                        <Square className="w-3 h-3 me-1.5" /> {__('general.pause')}</Button>
                 ) : (
                     <Button variant="outline" className="flex-1 h-9 bg-green-500/10 border-green-500/20 text-green-400 hover:bg-green-500/15 hover:text-green-400">
                         <Play className="w-3 h-3 me-1.5" />{__('general.resume_warmup')}</Button>
@@ -139,7 +136,7 @@ function AddNumberModal({ onClose, onAdd }: { onClose: () => void; onAdd: (n: an
                     </div>
                 </div>
                 <div className="flex gap-3 pt-2 border-t border-slate-800">
-                    <Button variant="outline" onClick={onClose} className="flex-1 h-10 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-400">Cancel</Button>
+                    <Button variant="outline" onClick={onClose} className="flex-1 h-10 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-400">{__('general.cancel')}</Button>
                     <Button onClick={() => { if (!phone.trim()) return; onAdd({ phone: phone.trim(), label: label.trim(), status: 'idle', warmup_day: 0, trust_grade: 'C', trust_score: 40, ban_risk: 5, msgs_today: 0 }); onClose(); }}
                         disabled={!phone.trim()}
                         className="flex-1 h-10 bg-green-500 text-white hover:bg-green-600">{__('general.connect_number')}</Button>

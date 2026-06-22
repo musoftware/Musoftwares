@@ -148,8 +148,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                 />
                             </div>
                             <Button type="submit" size="sm" className="h-10 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-none border-0">
-                                Search
-                            </Button>
+                                {__('general.search')}</Button>
                         </form>
                     </div>
 
@@ -159,12 +158,12 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                     <th className="px-6 py-3.5">{__('general.workspace_name')}</th>
                                     <th className="px-6 py-3.5">{__('general.owner_contact')}</th>
-                                    <th className="px-6 py-3.5 text-center">Clients</th>
-                                    <th className="px-6 py-3.5 text-center">Invoices</th>
+                                    <th className="px-6 py-3.5 text-center">{__('general.clients')}</th>
+                                    <th className="px-6 py-3.5 text-center">{__('general.invoices')}</th>
                                     <th className="px-6 py-3.5 text-center">{__('general.team_size')}</th>
-                                    <th className="px-6 py-3.5 text-end">Revenue</th>
+                                    <th className="px-6 py-3.5 text-end">{__('general.revenue')}</th>
                                     <th className="px-6 py-3.5">{__('general.created_at')}</th>
-                                    <th className="px-6 py-3.5 text-end">Actions</th>
+                                    <th className="px-6 py-3.5 text-end">{__('general.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -221,15 +220,13 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                                         href={route('admin.erp.show', tenant.id)}
                                                         className={route('admin.erp.show', tenant.id) ? "inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 font-semibold text-xs transition-colors" : ""}
                                                     >
-                                                        <Eye className="h-3 w-3" /> Drilldown
-                                                    </Link>
+                                                        <Eye className="h-3 w-3" /> {__('general.drilldown')}</Link>
                                                     <Button 
                                                         size="sm"
                                                         onClick={() => handleImpersonate(tenant.user_id)}
                                                         className="h-7 px-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-none border-0"
                                                     >
-                                                        Impersonate
-                                                    </Button>
+                                                        {__('general.impersonate')}</Button>
                                                 </div>
                                             </td>
                                         </tr>

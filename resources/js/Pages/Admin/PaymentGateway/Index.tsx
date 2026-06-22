@@ -154,14 +154,14 @@ export default function Index({ clients, totals }: Props) {
                 <table className="w-full text-start text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
-                            <th className="p-4 font-medium text-gray-600">Client</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.client')}</th>
                             <th className="p-4 font-medium text-gray-600">{__('general.client_id')}</th>
-                            <th className="p-4 font-medium text-gray-600">Commission</th>
-                            <th className="p-4 font-medium text-gray-600">Payments</th>
-                            <th className="p-4 font-medium text-gray-600">Volume</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.commission')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.payments')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.volume')}</th>
                             <th className="p-4 font-medium text-gray-600">{__('general.our_earnings')}</th>
-                            <th className="p-4 font-medium text-gray-600">Status</th>
-                            <th className="p-4 font-medium text-gray-600 text-end">Actions</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.status')}</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">{__('general.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -200,12 +200,10 @@ export default function Index({ clients, totals }: Props) {
                                 <td className="p-4">
                                     {client.status === 'active' ? (
                                         <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
-                                            <CheckCircle className="h-3 w-3" /> Active
-                                        </span>
+                                            <CheckCircle className="h-3 w-3" /> {__('general.active')}</span>
                                     ) : (
                                         <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500">
-                                            <XCircle className="h-3 w-3" /> Inactive
-                                        </span>
+                                            <XCircle className="h-3 w-3" /> {__('general.inactive')}</span>
                                     )}
                                 </td>
                                 <td className="p-4 text-end space-x-2">
@@ -214,8 +212,7 @@ export default function Index({ clients, totals }: Props) {
                                         size="sm"
                                         onClick={() => router.visit(route('admin.musoftware-clients.show', client.id))}
                                     >
-                                        <Eye className="h-3.5 w-3.5 me-1" /> View
-                                    </Button>
+                                        <Eye className="h-3.5 w-3.5 me-1" /> {__('general.view')}</Button>
                                     <Button
                                         variant="destructive"
                                         size="sm"
@@ -304,15 +301,15 @@ export default function Index({ clients, totals }: Props) {
                                     </p>
                                 </div>
                                 <div>
-                                    <Label htmlFor="status">Status</Label>
+                                    <Label htmlFor="status">{__('general.status')}</Label>
                                     <select
                                         id="status"
                                         className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black"
                                         value={formData.status}
                                         onChange={e => set('status', e.target.value)}
                                     >
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
+                                        <option value="active">{__('general.active')}</option>
+                                        <option value="inactive">{__('general.inactive')}</option>
                                     </select>
                                 </div>
                             </div>
@@ -329,8 +326,7 @@ export default function Index({ clients, totals }: Props) {
                         </div>
                         <DialogFooter className="mt-6">
                             <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
-                                Cancel
-                            </Button>
+                                {__('general.cancel')}</Button>
                             <Button type="submit" disabled={processing}>
                                 {processing ? 'Creating…' : 'Create Client'}
                             </Button>

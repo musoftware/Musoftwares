@@ -6,6 +6,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { ShieldAlert, Activity, Trash2, ShieldCheck } from 'lucide-react';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { __ } from '@/lib/i18n';
 
 export default function Security({ blockedIps, rateLimits }: any) {
     const [form, setForm] = useState({
@@ -51,8 +52,8 @@ export default function Security({ blockedIps, rateLimits }: any) {
     };
 
     return (
-        <AdminSidebarLayout title="Security & Rate Limits" header="Security Settings">
-            <Head title="Security Settings" />
+        <AdminSidebarLayout title={__('general.security_rate_limits')} header="Security Settings">
+            <Head title={__('general.security_settings')} />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="space-y-6">
@@ -60,7 +61,7 @@ export default function Security({ blockedIps, rateLimits }: any) {
                         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50">
                             <div className="flex items-center gap-2">
                                 <Activity className="h-4 w-4 text-gray-500" />
-                                <h2 className="text-sm font-semibold text-gray-800 uppercase tracking-wide">Add Rate Limit</h2>
+                                <h2 className="text-sm font-semibold text-gray-800 uppercase tracking-wide">{__('general.add_rate_limit')}</h2>
                             </div>
                         </div>
                         <div className="p-5">
@@ -80,7 +81,7 @@ export default function Security({ blockedIps, rateLimits }: any) {
                                         type="number"
                                         value={form.tenant_id}
                                         onChange={e => setForm({ ...form, tenant_id: e.target.value })}
-                                        placeholder="Leave blank for all"
+                                        placeholder={__('general.leave_blank_for_all')}
                                     />
                                 </div>
                                 <div>
@@ -88,12 +89,12 @@ export default function Security({ blockedIps, rateLimits }: any) {
                                     <Input
                                         value={form.ip_address}
                                         onChange={e => setForm({ ...form, ip_address: e.target.value })}
-                                        placeholder="Leave blank for all"
+                                        placeholder={__('general.leave_blank_for_all')}
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <Label>Max Requests</Label>
+                                        <Label>{__('general.max_requests')}</Label>
                                         <Input
                                             type="number"
                                             value={form.max_requests}
@@ -111,7 +112,7 @@ export default function Security({ blockedIps, rateLimits }: any) {
                                         />
                                     </div>
                                 </div>
-                                <Button type="submit" className="w-full">Create Rate Limit</Button>
+                                <Button type="submit" className="w-full">{__('general.create_rate_limit')}</Button>
                             </form>
                         </div>
                     </div>
@@ -119,11 +120,11 @@ export default function Security({ blockedIps, rateLimits }: any) {
                     <div className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
                         <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-100 bg-gray-50">
                             <Activity className="h-4 w-4 text-gray-500" />
-                            <h2 className="text-sm font-semibold text-gray-800 uppercase tracking-wide">Active Rate Limits</h2>
+                            <h2 className="text-sm font-semibold text-gray-800 uppercase tracking-wide">{__('general.active_rate_limits')}</h2>
                         </div>
                         <div className="divide-y divide-gray-100">
                             {rateLimits.length === 0 ? (
-                                <div className="p-5 text-sm text-gray-500 text-center">No custom rate limits configured.</div>
+                                <div className="p-5 text-sm text-gray-500 text-center">{__('general.no_custom_rate_limits_configured')}</div>
                             ) : (
                                 rateLimits.map((limit: any) => (
                                     <div key={limit.id} className="p-4 flex items-center justify-between">
@@ -154,13 +155,13 @@ export default function Security({ blockedIps, rateLimits }: any) {
                     <div className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
                         <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-100 bg-gray-50">
                             <ShieldAlert className="h-4 w-4 text-red-500" />
-                            <h2 className="text-sm font-semibold text-gray-800 uppercase tracking-wide">Blocked IPs</h2>
+                            <h2 className="text-sm font-semibold text-gray-800 uppercase tracking-wide">{__('general.blocked_ips')}</h2>
                         </div>
                         <div className="divide-y divide-gray-100">
                             {blockedIps.length === 0 ? (
                                 <div className="p-5 flex flex-col items-center justify-center text-center">
                                     <ShieldCheck className="h-8 w-8 text-green-500 mb-2" />
-                                    <p className="text-sm text-gray-500">No IPs are currently blocked. Ecosystem is safe.</p>
+                                    <p className="text-sm text-gray-500">{__('general.no_ips_are_currently_blocked_ecosystem_i')}</p>
                                 </div>
                             ) : (
                                 blockedIps.map((ip: any) => (
@@ -178,8 +179,7 @@ export default function Security({ blockedIps, rateLimits }: any) {
                                             className="text-green-600 border-green-200 hover:bg-green-50"
                                             onClick={() => setDeleteModal({ open: true, type: 'ip', id: ip.id })}
                                         >
-                                            Unblock
-                                        </Button>
+                                            {__('general.unblock')}</Button>
                                     </div>
                                 ))
                             )}

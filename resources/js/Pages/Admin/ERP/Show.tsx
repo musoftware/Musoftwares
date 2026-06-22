@@ -204,8 +204,8 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                 <thead>
                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         <th className="px-6 py-3.5">{__('general.client_name')}</th>
-                                        <th className="px-6 py-3.5">Email</th>
-                                        <th className="px-6 py-3.5">Phone</th>
+                                        <th className="px-6 py-3.5">{__('general.email')}</th>
+                                        <th className="px-6 py-3.5">{__('general.phone')}</th>
                                         <th className="px-6 py-3.5 text-center">{__('general.wallet_currency')}</th>
                                         <th className="px-6 py-3.5 text-center">{__('general.invoices_count')}</th>
                                     </tr>
@@ -250,9 +250,9 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                 <thead>
                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         <th className="px-6 py-3.5">{__('general.invoice_number')}</th>
-                                        <th className="px-6 py-3.5">Client</th>
-                                        <th className="px-6 py-3.5 text-end">Amount</th>
-                                        <th className="px-6 py-3.5">Status</th>
+                                        <th className="px-6 py-3.5">{__('general.client')}</th>
+                                        <th className="px-6 py-3.5 text-end">{__('general.amount')}</th>
+                                        <th className="px-6 py-3.5">{__('general.status')}</th>
                                         <th className="px-6 py-3.5">{__('general.issued_at')}</th>
                                     </tr>
                                 </thead>
@@ -298,10 +298,10 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                             <table className="w-full text-start text-sm border-collapse">
                                 <thead>
                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        <th className="px-6 py-3.5">Name</th>
-                                        <th className="px-6 py-3.5">Email</th>
-                                        <th className="px-6 py-3.5">Role</th>
-                                        <th className="px-6 py-3.5">Status</th>
+                                        <th className="px-6 py-3.5">{__('general.name')}</th>
+                                        <th className="px-6 py-3.5">{__('general.email')}</th>
+                                        <th className="px-6 py-3.5">{__('general.role')}</th>
+                                        <th className="px-6 py-3.5">{__('general.status')}</th>
                                         <th className="px-6 py-3.5">{__('general.last_login')}</th>
                                     </tr>
                                 </thead>
@@ -356,8 +356,8 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                 <thead>
                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         <th className="px-6 py-3.5">{__('general.task_title')}</th>
-                                        <th className="px-6 py-3.5">Priority</th>
-                                        <th className="px-6 py-3.5">Status</th>
+                                        <th className="px-6 py-3.5">{__('general.priority')}</th>
+                                        <th className="px-6 py-3.5">{__('general.status')}</th>
                                         <th className="px-6 py-3.5">{__('general.due_date')}</th>
                                     </tr>
                                 </thead>

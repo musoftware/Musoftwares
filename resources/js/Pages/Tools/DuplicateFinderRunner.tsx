@@ -260,7 +260,7 @@ export default function DuplicateFinderRunner({ tool }: any) {
                                                     className="mt-0.5 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
                                                 />
                                                 <span className="text-slate-600 dark:text-slate-400 break-all flex-1">
-                                                    <span className="font-bold text-emerald-600 dark:text-emerald-500 me-2 text-[10px] uppercase">Original</span>
+                                                    <span className="font-bold text-emerald-600 dark:text-emerald-500 me-2 text-[10px] uppercase">{__('general.original')}</span>
                                                     {group.original}
                                                 </span>
                                             </div>
@@ -274,7 +274,7 @@ export default function DuplicateFinderRunner({ tool }: any) {
                                                         className="mt-0.5 rounded border-red-300 text-red-500 focus:ring-red-500"
                                                     />
                                                     <span className="text-slate-700 dark:text-slate-300 break-all flex-1">
-                                                        <span className="font-bold text-red-500 me-2 text-[10px] uppercase">Duplicate</span>
+                                                        <span className="font-bold text-red-500 me-2 text-[10px] uppercase">{__('general.duplicate')}</span>
                                                         {dup}
                                                     </span>
                                                 </div>

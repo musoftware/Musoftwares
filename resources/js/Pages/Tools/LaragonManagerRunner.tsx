@@ -134,8 +134,7 @@ export default function LaragonManagerRunner({ tool }: any) {
                         disabled={loading}
                         className="h-8 gap-1.5 px-3"
                     >
-                        <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
-                    </Button>
+                        <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> {__('general.refresh')}</Button>
                 </div>
             </div>
 
@@ -174,8 +173,7 @@ export default function LaragonManagerRunner({ tool }: any) {
                                     className="flex-1 text-xs h-8 bg-slate-900 text-white hover:bg-slate-800"
                                     onClick={() => openInVSCode(p.path)}
                                 >
-                                    <Code className="w-3.5 h-3.5 me-1.5" /> VSCode
-                                </Button>
+                                    <Code className="w-3.5 h-3.5 me-1.5" /> {__('general.vscode')}</Button>
                                 <Button
                                     variant="outline"
                                     size="sm"

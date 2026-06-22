@@ -34,8 +34,8 @@ export default function AffiliateOrdersIndex({ orders, filters }: any) {
                         <SelectContent>
                             <SelectItem value="all">{__('general.all_orders')}</SelectItem>
                             <SelectItem value="new">New</SelectItem>
-                            <SelectItem value="delivered">Delivered</SelectItem>
-                            <SelectItem value="returned">Returned</SelectItem>
+                            <SelectItem value="delivered">{__('general.delivered')}</SelectItem>
+                            <SelectItem value="returned">{__('general.returned')}</SelectItem>
                         </SelectContent>
                     </Select>
                 </CardHeader>
@@ -44,10 +44,10 @@ export default function AffiliateOrdersIndex({ orders, filters }: any) {
                         <TableHeader>
                             <TableRow className="bg-gray-50/80">
                                 <TableHead className="font-semibold text-gray-600">{__('general.order_id')}</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Customer</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.customer')}</TableHead>
                                 <TableHead className="font-semibold text-gray-600 text-end">Commission (EGP)</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Status</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Date</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.status')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.date')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>

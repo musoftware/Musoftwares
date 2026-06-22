@@ -214,7 +214,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/users/${client.id}/files`} className="w-full cursor-pointer flex items-center">
                                             <FileText className="me-2 h-4 w-4" />
-                                            <span>Files</span>
+                                            <span>{__('general.files')}</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
@@ -226,7 +226,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/users/${client.id}/reports`} className="w-full cursor-pointer flex items-center">
                                             <FileText className="me-2 h-4 w-4" />
-                                            <span>Reports</span>
+                                            <span>{__('general.reports')}</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
@@ -244,7 +244,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
 
                             {/* Column 3: Billing & Finance */}
                             <div className="space-y-1">
-                                <DropdownMenuLabel className="text-slate-500 uppercase tracking-wider text-xs mb-2">Finance</DropdownMenuLabel>
+                                <DropdownMenuLabel className="text-slate-500 uppercase tracking-wider text-xs mb-2">{__('general.finance')}</DropdownMenuLabel>
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/invoices/create?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
@@ -255,7 +255,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                     <DropdownMenuItem asChild>
                                         <Link href={`/admin/invoices?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
                                             <FileText className="me-2 h-4 w-4" />
-                                            <span>Invoices</span>
+                                            <span>{__('general.invoices')}</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => setIsFinanceModalOpen(true)}>
@@ -342,7 +342,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                 type="text" 
                                 value={deleteConfirmationText}
                                 onChange={(e) => setDeleteConfirmationText(e.target.value)}
-                                placeholder="DELETE"
+                                placeholder={__('general.delete')}
                             />
                         </div>
                         <DialogFooter>
@@ -388,7 +388,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setIsActivateMembershipOpen(false)}>Cancel</Button>
+                            <Button type="button" variant="outline" onClick={() => setIsActivateMembershipOpen(false)}>{__('general.cancel')}</Button>
                             <Button type="submit">{__('general.activate_plan')}</Button>
                         </DialogFooter>
                     </form>
@@ -453,7 +453,7 @@ ${newPassword}`}
                         </div>
                     ) : (
                         <DialogFooter>
-                            <Button variant="outline" onClick={() => setIsResetPassOpen(false)}>Cancel</Button>
+                            <Button variant="outline" onClick={() => setIsResetPassOpen(false)}>{__('general.cancel')}</Button>
                             <Button variant="destructive" onClick={handleResetPassword}>{__('general.reset_password')}</Button>
                         </DialogFooter>
                     )}
@@ -471,17 +471,17 @@ ${newPassword}`}
                         </DialogHeader>
                         <div className="py-4 space-y-4">
                             <div>
-                                <Label>Status</Label>
+                                <Label>{__('general.status')}</Label>
                                 <select 
                                     className="border-gray-300 rounded-md w-full mt-1"
                                     value={editMembershipForm.status}
                                     onChange={e => setEditMembershipForm({...editMembershipForm, status: e.target.value})}
                                     required
                                 >
-                                    <option value="active">Active</option>
-                                    <option value="expired">Expired</option>
-                                    <option value="cancelled">Cancelled</option>
-                                    <option value="pending">Pending</option>
+                                    <option value="active">{__('general.active')}</option>
+                                    <option value="expired">{__('general.expired')}</option>
+                                    <option value="cancelled">{__('general.cancelled')}</option>
+                                    <option value="pending">{__('general.pending')}</option>
                                 </select>
                             </div>
                             <div>
@@ -496,7 +496,7 @@ ${newPassword}`}
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setIsEditMembershipOpen(false)}>Cancel</Button>
+                            <Button type="button" variant="outline" onClick={() => setIsEditMembershipOpen(false)}>{__('general.cancel')}</Button>
                             <Button type="submit">{__('general.save_changes')}</Button>
                         </DialogFooter>
                     </form>
@@ -513,14 +513,12 @@ ${newPassword}`}
                         <Link href={`/admin/transactions?user=${client.id}`} className="w-full">
                             <Button className="w-full justify-start h-12" variant="outline" onClick={() => setIsFinanceModalOpen(false)}>
                                 <TrendingUp className="me-2 h-5 w-5 text-green-600" />
-                                Income Transactions
-                            </Button>
+                                {__('general.income_transactions')}</Button>
                         </Link>
                         <Link href={`/admin/finance?client_id=${client.id}`} className="w-full">
                             <Button className="w-full justify-start h-12" variant="outline" onClick={() => setIsFinanceModalOpen(false)}>
                                 <TrendingDown className="me-2 h-5 w-5 text-red-600" />
-                                Cost Transactions
-                            </Button>
+                                {__('general.cost_transactions')}</Button>
                         </Link>
                     </div>
                 </DialogContent>
@@ -545,8 +543,7 @@ ${newPassword}`}
                             <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold uppercase tracking-wide border border-green-200">{__('general.kyc_verified')}</span>
                         ) : (
                             <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold uppercase tracking-wide border border-amber-200">
-                                Unverified
-                            </span>
+                                {__('general.unverified')}</span>
                         )}
                         <span className="px-3 py-1 bg-slate-50 text-slate-500 rounded-full text-xs uppercase tracking-wide border border-slate-200">
                             Last Active: {client.last_activity_at ? new Date(client.last_activity_at).toLocaleDateString() : "Never"}
@@ -559,22 +556,22 @@ ${newPassword}`}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white p-4 rounded-[12px] shadow-sm border border-slate-200 text-center">
                     <div className="text-3xl font-bold font-jetbrains text-slate-900 mb-1">{stats.invoices_total || 0}</div>
-                    <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Invoices</div>
+                    <div className="text-xs font-bold uppercase tracking-wider text-slate-500">{__('general.invoices')}</div>
                     <div className="text-xs text-green-600 font-medium mt-1">{stats.invoices_paid || 0} Paid</div>
                 </div>
                 <div className="bg-white p-4 rounded-[12px] shadow-sm border border-slate-200 text-center">
                     <div className="text-3xl font-bold font-jetbrains text-slate-900 mb-1">{stats.tickets_total || 0}</div>
-                    <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Tickets</div>
+                    <div className="text-xs font-bold uppercase tracking-wider text-slate-500">{__('general.tickets')}</div>
                     <div className="text-xs text-amber-600 font-medium mt-1">{stats.tickets_open || 0} Open</div>
                 </div>
                 <div className="bg-white p-4 rounded-[12px] shadow-sm border border-slate-200 text-center">
                     <div className="text-3xl font-bold font-jetbrains text-slate-900 mb-1">{stats.orders_total || 0}</div>
-                    <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Orders</div>
-                    <div className="text-xs text-slate-400 font-medium mt-1">Total</div>
+                    <div className="text-xs font-bold uppercase tracking-wider text-slate-500">{__('general.orders')}</div>
+                    <div className="text-xs text-slate-400 font-medium mt-1">{__('general.total')}</div>
                 </div>
                 <div className="bg-white p-4 rounded-[12px] shadow-sm border border-slate-200 text-center">
                     <div className="text-3xl font-bold font-jetbrains text-slate-900 mb-1">{stats.services_total || 0}</div>
-                    <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Services</div>
+                    <div className="text-xs font-bold uppercase tracking-wider text-slate-500">{__('general.services')}</div>
                     <div className="text-xs text-green-600 font-medium mt-1">{stats.services_approved || 0} Approved</div>
                 </div>
             </div>
@@ -587,32 +584,32 @@ ${newPassword}`}
                             <Briefcase size={18} className="text-slate-400" />{__('general.personal_information')}</h2>
                         <div className="space-y-4 text-sm">
                             <div className="grid grid-cols-2 gap-2">
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Currency</span><span className="font-medium text-slate-900 break-words">{client.currency || <span className="text-slate-400 italic">Default</span>}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.currency')}</span><span className="font-medium text-slate-900 break-words">{client.currency || <span className="text-slate-400 italic">{__('general.default')}</span>}</span></div>
                                 <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Hour Rate (USD)</span><span className="font-medium text-slate-900 break-words">{client.hour_rate || "0.00"}</span></div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Phone</span><span className="font-medium text-slate-900 break-words">{client.phone || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">WhatsApp</span><span className="font-medium text-slate-900 break-words">{client.whatsapp_number || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.phone')}</span><span className="font-medium text-slate-900 break-words">{client.phone || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.whatsapp')}</span><span className="font-medium text-slate-900 break-words">{client.whatsapp_number || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Skype</span><span className="font-medium text-slate-900 break-words">{client.skype || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Facebook</span><span className="font-medium text-slate-900 break-words">{client.facebook || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.skype')}</span><span className="font-medium text-slate-900 break-words">{client.skype || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.facebook')}</span><span className="font-medium text-slate-900 break-words">{client.facebook || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                 <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Job</span><span className="font-medium text-slate-900 break-words">{client.job || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
-                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Joined</span><span className="font-medium text-slate-900">{client.created_at ? new Date(client.created_at).toLocaleDateString() : "N/A"}</span></div>
+                                <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.joined')}</span><span className="font-medium text-slate-900">{client.created_at ? new Date(client.created_at).toLocaleDateString() : "N/A"}</span></div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                 <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.start_date')}</span><span className="font-medium text-slate-900">{client.date_start ? new Date(client.date_start).toLocaleDateString() : <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
                                 <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.end_date')}</span><span className="font-medium text-slate-900">{client.date_end ? new Date(client.date_end).toLocaleDateString() : <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span></div>
                             </div>
                             <div>
-                                <span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Address</span>
+                                <span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.address')}</span>
                                 <span className="font-medium text-slate-900 break-words">{client.address || <span className="text-slate-400 italic">{__('general.not_provided')}</span>}</span>
                             </div>
                             <div className="pt-4 border-t border-slate-100">
                                 <div className="grid grid-cols-2 gap-2">
-                                    <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">Taxable</span><span className="font-medium text-slate-900">{client.client_taxable ? "Yes" : "No"}</span></div>
+                                    <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.taxable')}</span><span className="font-medium text-slate-900">{client.client_taxable ? "Yes" : "No"}</span></div>
                                     <div><span className="text-slate-500 block text-xs uppercase tracking-wider font-bold mb-1">{__('general.invoice_taxable')}</span><span className="font-medium text-slate-900">{client.invoice_taxable ? "Yes" : "No"}</span></div>
                                 </div>
                             </div>
@@ -689,7 +686,7 @@ ${newPassword}`}
                                 />
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                                <span className="text-slate-500 text-sm">Remaining</span>
+                                <span className="text-slate-500 text-sm">{__('general.remaining')}</span>
                                 <span className={`font-bold font-jetbrains ${((client.user_balance || 0) - (stats.invoices_unpaid_sum || 0)) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                     {formatCurrency((client.user_balance || 0) - (stats.invoices_unpaid_sum || 0), client.currency)}
                                 </span>
@@ -766,7 +763,7 @@ ${newPassword}`}
                                             </svg>
                                             <div className="absolute inset-0 flex flex-col items-center justify-center">
                                                 <span className="text-2xl font-bold text-slate-900 font-jetbrains">{daysRemaining}</span>
-                                                <span className="text-xs text-slate-500 uppercase font-bold">Days</span>
+                                                <span className="text-xs text-slate-500 uppercase font-bold">{__('general.days')}</span>
                                             </div>
                                         </div>
                                         <div className="text-slate-900 font-bold mb-1">{client.subscription_plan || "Custom Plan"}</div>
@@ -778,7 +775,7 @@ ${newPassword}`}
                                     <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
                                         <Trash2 size={24} />
                                     </div>
-                                    <h5 className="text-red-600 font-bold text-lg mb-1">Expired</h5>
+                                    <h5 className="text-red-600 font-bold text-lg mb-1">{__('general.expired')}</h5>
                                     <p className="text-sm text-slate-500">{__('general.subscription_has_ended')}</p>
                                 </div>
                             )}
@@ -801,10 +798,10 @@ ${newPassword}`}
                                 <table className="w-full text-start text-sm">
                                     <thead className="bg-slate-50 border-b border-slate-200">
                                         <tr>
-                                            <th className="p-3 font-bold text-slate-600">Module</th>
-                                            <th className="p-3 font-bold text-slate-600">Status</th>
+                                            <th className="p-3 font-bold text-slate-600">{__('general.module')}</th>
+                                            <th className="p-3 font-bold text-slate-600">{__('general.status')}</th>
                                             <th className="p-3 font-bold text-slate-600">{__('general.expires_at')}</th>
-                                            <th className="p-3 text-end font-bold text-slate-600">Actions</th>
+                                            <th className="p-3 text-end font-bold text-slate-600">{__('general.actions')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -827,11 +824,9 @@ ${newPassword}`}
                                                 </td>
                                                 <td className="p-3 text-end space-x-2">
                                                     <Button variant="ghost" size="sm" onClick={() => openEditMembership(sub)}>
-                                                        Edit
-                                                    </Button>
+                                                        {__('general.edit')}</Button>
                                                     <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-800 hover:bg-red-50" onClick={() => deleteMembership(sub.id)}>
-                                                        Delete
-                                                    </Button>
+                                                        {__('general.delete')}</Button>
                                                 </td>
                                             </tr>
                                         ))}

@@ -77,7 +77,7 @@ export default function CheckoutSessions({ sessions }: Props) {
                                         <tr key={session.id} className="hover:bg-slate-50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600">
                                                 {session.session_id}
-                                                {session.is_test && <Badge variant="outline" className="ms-2 bg-amber-50 text-amber-600 border-amber-200">Test</Badge>}
+                                                {session.is_test && <Badge variant="outline" className="ms-2 bg-amber-50 text-amber-600 border-amber-200">{__('general.test')}</Badge>}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">
                                                 {formatMoney(session.amount, session.currency?.currency)}

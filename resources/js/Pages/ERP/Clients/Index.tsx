@@ -153,11 +153,11 @@ export default function Index({ clients, filters, stats, tenant }: Props) {
                 onChange={(e) => handleFilter('status', e.target.value)}
             >
                 <option value="">{__('general.all_statuses')}</option>
-                <option value="active">Active</option>
-                <option value="lead">Lead</option>
-                <option value="paying">Paying</option>
-                <option value="retained">Retained</option>
-                <option value="churned">Churned</option>
+                <option value="active">{__('general.active')}</option>
+                <option value="lead">{__('general.lead')}</option>
+                <option value="paying">{__('general.paying')}</option>
+                <option value="retained">{__('general.retained')}</option>
+                <option value="churned">{__('general.churned')}</option>
             </select>
         </div>
     );

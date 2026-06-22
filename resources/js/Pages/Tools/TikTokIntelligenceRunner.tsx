@@ -54,7 +54,7 @@ function CreatorCard({ creator, idx }: { creator: any; idx: number }) {
                 </div>
             </div>
             <div className="shrink-0 text-end">
-                <p className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1">Engagement</p>
+                <p className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1">{__('general.engagement')}</p>
                 <p className="text-sm font-black text-emerald-400">{creator.engagement_rate ?? '—'}%</p>
             </div>
         </div>
@@ -161,8 +161,8 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                     <span className="font-bold text-sm">{__('general.tiktok_analytics')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Tab active={tab === 'discover'} onClick={() => setTab('discover')}><Search className="w-3 h-3 inline me-1" />Discover</Tab>
-                    <Tab active={tab === 'monitor'} onClick={() => setTab('monitor')}><Eye className="w-3 h-3 inline me-1" />Monitor</Tab>
+                    <Tab active={tab === 'discover'} onClick={() => setTab('discover')}><Search className="w-3 h-3 inline me-1" />{__('general.discover')}</Tab>
+                    <Tab active={tab === 'monitor'} onClick={() => setTab('monitor')}><Eye className="w-3 h-3 inline me-1" />{__('general.monitor')}</Tab>
                     <Tab active={tab === 'vault'} onClick={() => setTab('vault')}><Bookmark className="w-3 h-3 inline me-1" />{__('general.ugc_vault')}</Tab>
                 </div>
                 <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-pink-500/10 border-pink-500/30 text-pink-400' : status === 'done' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-slate-800 border-slate-700 text-slate-500'}`}>
@@ -191,7 +191,7 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Niche</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.niche')}</label>
                                     <select value={niche} onChange={e => setNiche(e.target.value)}
                                         className="w-full h-11 px-3 text-sm bg-slate-800 border border-slate-700 focus:border-pink-500 rounded-md outline-none text-white">
                                         {NICHES.map(n => <option key={n} value={n}>{n.charAt(0).toUpperCase() + n.slice(1)}</option>)}
@@ -201,8 +201,7 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                                     <div className="flex gap-2 w-full">
                                         {status === 'running' ? (
                                             <Button variant="outline" onClick={() => setStatus('done')} className="flex-1 gap-2 h-11 bg-rose-500/10 border-rose-500/20 text-rose-400 hover:bg-rose-500/20 hover:text-rose-400">
-                                                <Square className="w-4 h-4" /> Stop
-                                            </Button>
+                                                <Square className="w-4 h-4" /> {__('general.stop')}</Button>
                                         ) : (
                                             <Button onClick={handleDiscover} disabled={!keyword.trim()} className="flex-1 gap-2 h-11 bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg shadow-pink-500/20 hover:opacity-90">
                                                 <Zap className="w-4 h-4" />{__('general.discover_creators')}</Button>

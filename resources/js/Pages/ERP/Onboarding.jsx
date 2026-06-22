@@ -8,6 +8,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { CurrencySelect } from '@/Components/CurrencySelect';
+import { __ } from '@/lib/i18n';
 
 export default function Onboarding({ currencies = [] }) {
     const [step, setStep] = useState(1);
@@ -98,7 +99,7 @@ export default function Onboarding({ currencies = [] }) {
                                         {errors.baseCurrency && <p className="text-xs text-destructive">{errors.baseCurrency}</p>}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="timezone">Timezone</Label>
+                                        <Label htmlFor="timezone">{__('general.timezone')}</Label>
                                         <select
                                             id="timezone"
                                             value={data.timezone}
@@ -140,7 +141,7 @@ export default function Onboarding({ currencies = [] }) {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="clientEmail">Email</Label>
+                                        <Label htmlFor="clientEmail">{__('general.email')}</Label>
                                         <Input
                                             id="clientEmail"
                                             type="email"
@@ -150,7 +151,7 @@ export default function Onboarding({ currencies = [] }) {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="clientCurrency">Currency</Label>
+                                        <Label htmlFor="clientCurrency">{__('general.currency')}</Label>
                                         <CurrencySelect
                                             id="clientCurrency"
                                             currencies={currencies}
@@ -173,14 +174,12 @@ export default function Onboarding({ currencies = [] }) {
                                         }}
                                         className="w-1/3"
                                     >
-                                        Skip
-                                    </Button>
+                                        {__('general.skip')}</Button>
                                     <Button
                                         onClick={() => data.clientName ? setStep(3) : alert('Please enter client name or click Skip')}
                                         className="w-2/3 shadow-none"
                                     >
-                                        Continue
-                                    </Button>
+                                        {__('general.continue')}</Button>
                                 </div>
                             </div>
                         )}
@@ -226,14 +225,12 @@ export default function Onboarding({ currencies = [] }) {
                                         }}
                                         className="w-1/3"
                                     >
-                                        Skip
-                                    </Button>
+                                        {__('general.skip')}</Button>
                                     <Button
                                         onClick={() => data.invoiceDesc && data.invoiceAmount ? setStep(4) : alert('Fill in the fields or click Skip')}
                                         className="w-2/3 shadow-none"
                                     >
-                                        Continue
-                                    </Button>
+                                        {__('general.continue')}</Button>
                                 </div>
                             </div>
                         )}
@@ -246,7 +243,7 @@ export default function Onboarding({ currencies = [] }) {
                                     <p className="text-muted-foreground">{__('general.review_your_configuration_summary_before_entering_your_workspace')}</p>
                                 </div>
                                 <div className="bg-muted p-5 rounded-xl text-start inline-block w-full max-w-sm mx-auto border border-border">
-                                    <h4 className="font-semibold text-foreground mb-3 text-sm">Summary</h4>
+                                    <h4 className="font-semibold text-foreground mb-3 text-sm">{__('general.summary')}</h4>
                                     <ul className="space-y-2 text-sm text-muted-foreground font-medium">
                                         <li className="flex items-center gap-2">
                                             <div className="w-1.5 h-1.5 rounded-full bg-primary" />

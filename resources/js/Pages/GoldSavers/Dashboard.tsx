@@ -246,7 +246,7 @@ export default function Dashboard({ wallets, latestPrice, portfolio, hasLivePric
                                             )}
                                         </div>
                                         <div className="p-6 rounded-xl bg-indigo-50 border border-indigo-100 shadow-sm relative overflow-hidden">
-                                            <div className="absolute top-0 end-0 w-3 h-3 bg-indigo-500 rounded-bl-xl opacity-20"></div>
+                                            <div className="absolute top-0 end-0 w-3 h-3 bg-indigo-500 rounded-bs-xl opacity-20"></div>
                                             <div className="text-indigo-600 text-sm font-medium mb-2">21k {__('gold_saver.purity')}</div>
                                             <div className="font-bold text-3xl text-indigo-700">{latestPrice?.price_gram_21k ?? '3,550'}</div>
                                             <div className="text-xs text-indigo-400 mt-2">{latestPrice?.currency} / {__('general.g')}</div>

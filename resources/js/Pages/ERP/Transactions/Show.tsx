@@ -103,8 +103,7 @@ export default function ShowTransaction({ transaction }: Props) {
                                     <div>
                                         <span className="text-sm font-medium text-slate-500 flex items-center mb-1">
                                             <User className="w-4 h-4 me-2" />
-                                            Client
-                                        </span>
+                                            {__('general.client')}</span>
                                         {transaction.client_id ? (
                                             <Link href={route('erp.clients.show', transaction.client_id)} className="text-base font-medium text-indigo-600 hover:underline">
                                                 {transaction.client_name}
@@ -127,7 +126,7 @@ export default function ShowTransaction({ transaction }: Props) {
                     <div className="space-y-6">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-base">Metadata</CardTitle>
+                                <CardTitle className="text-base">{__('general.metadata')}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div>
@@ -138,7 +137,7 @@ export default function ShowTransaction({ transaction }: Props) {
                                 </div>
                                 
                                 <div className="border-t border-slate-100 pt-4">
-                                    <span className="text-xs text-slate-500 block uppercase tracking-wider font-medium mb-1">Authorizer</span>
+                                    <span className="text-xs text-slate-500 block uppercase tracking-wider font-medium mb-1">{__('general.authorizer')}</span>
                                     <div className="flex items-center gap-2">
                                         <div className="h-6 w-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-medium text-slate-600">
                                             {transaction.authorizer.substring(0, 2).toUpperCase()}

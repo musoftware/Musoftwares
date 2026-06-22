@@ -9,6 +9,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { Send } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function PayoutMethods({ payoutMethods }) {
     const [isCreating, setIsCreating] = useState(false);
@@ -107,8 +108,7 @@ export default function PayoutMethods({ payoutMethods }) {
                                 <CardContent className="p-6">
                                     {pm.is_default && (
                                         <Badge variant="secondary" className="absolute top-4 end-4 bg-primary/10 text-primary border-primary/20 gap-1 font-semibold">
-                                            <CheckCircle2 className="w-3.5 h-3.5" /> Default
-                                        </Badge>
+                                            <CheckCircle2 className="w-3.5 h-3.5" /> {__('general.default')}</Badge>
                                     )}
 
                                     <div>
@@ -325,8 +325,7 @@ export default function PayoutMethods({ payoutMethods }) {
 
                             <div className="flex items-center justify-end gap-3 pt-4 border-t">
                                 <Button variant="outline" type="button" onClick={() => { setIsCreating(false); setEditingMethod(null); reset(); }}>
-                                    Cancel
-                                </Button>
+                                    {__('general.cancel')}</Button>
                                 <Button type="submit" disabled={processing} className="shadow-none">
                                     {editingMethod ? 'Save Changes' : 'Save Payout Method'}
                                 </Button>

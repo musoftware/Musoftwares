@@ -150,7 +150,7 @@
                     </div>
                     <input type="text" id="ref-input" required 
                            placeholder="{{ __('sms_gateway.reference_placeholder') }}"
-                           class="w-full py-[14px] px-[16px] border-[1.5px] border-[#E4E8F5] rounded-[13px] text-[14px] bg-white {{ app()->getLocale() == 'ar' ? 'text-right' : 'text-left' }} font-medium text-[#1A1A2E] outline-none transition-all focus:border-primary focus:shadow-[0_0_0_3px_rgba(75,67,214,0.1)] placeholder:text-[#A8A8BC] placeholder:text-[13.5px] placeholder:font-medium" dir="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}">
+                           class="w-full py-[14px] px-[16px] border-[1.5px] border-[#E4E8F5] rounded-[13px] text-[14px] bg-white {{ app()->getLocale() == 'ar' ? 'text-end' : 'text-start' }} font-medium text-[#1A1A2E] outline-none transition-all focus:border-primary focus:shadow-[0_0_0_3px_rgba(75,67,214,0.1)] placeholder:text-[#A8A8BC] placeholder:text-[13.5px] placeholder:font-medium" dir="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}">
                 </div>
 
                 <!-- ERROR MSG -->
@@ -159,7 +159,7 @@
                 <!-- SUBMIT -->
                 <button type="submit" id="submit-btn" class="w-full py-[14px] bg-[#111220] hover:opacity-90 active:scale-95 text-white border-none rounded-[14px] text-[16px] font-extrabold tracking-[0.3px] cursor-pointer transition-all flex justify-center items-center shadow-md">
                     <span id="btn-text">{{ __('sms_gateway.confirm_payment') }}</span>
-                    <div id="btn-spinner" class="spinner hidden mr-3 {{ app()->getLocale() == 'ar' ? 'mr-3' : 'ml-3' }}"></div>
+                    <div id="btn-spinner" class="spinner hidden me-3 {{ app()->getLocale() == 'ar' ? 'me-3' : 'ms-3' }}"></div>
                 </button>
             </form>
         </div>

@@ -6,6 +6,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Badge } from '@/Components/ui/badge';
+import { __ } from '@/lib/i18n';
 
 export default function GroupsWorkspace({ t, locale, callRPC, selectedAccount, sessions, daemonConnected }: any) {
     const isRtl = locale === 'ar';
@@ -310,12 +311,10 @@ export default function GroupsWorkspace({ t, locale, callRPC, selectedAccount, s
                                         </Button>
                                         <Button variant="outline" size="sm" className="rounded-xl h-9 text-xs gap-1.5" onClick={() => downloadMembers('txt')}>
                                             <Download className="w-3.5 h-3.5" />
-                                            TXT
-                                        </Button>
+                                            {__('general.txt')}</Button>
                                         <Button variant="outline" size="sm" className="rounded-xl h-9 text-xs gap-1.5" onClick={() => downloadMembers('csv')}>
                                             <Download className="w-3.5 h-3.5" />
-                                            CSV
-                                        </Button>
+                                            {__('general.csv')}</Button>
                                         <Button 
                                             size="sm" 
                                             className="rounded-xl h-9 text-xs gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold" 

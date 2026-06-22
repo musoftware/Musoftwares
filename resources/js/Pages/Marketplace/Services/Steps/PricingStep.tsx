@@ -78,7 +78,7 @@ export default function PricingStep({ data, setData, errors }: any) {
                             </div>
 
                             <div className="space-y-1.5 flex-1">
-                                <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Description</Label>
+                                <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider">{__('general.description')}</Label>
                                 <textarea
                                     value={pkg.description}
                                     onChange={e => setPackageField(idx, 'description', e.target.value)}
@@ -100,25 +100,25 @@ export default function PricingStep({ data, setData, errors }: any) {
                                             onChange={e => setPackageField(idx, 'delivery_days', Number(e.target.value))}
                                             className="h-10 text-sm font-medium pe-12"
                                         />
-                                        <span className="absolute end-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Days</span>
+                                        <span className="absolute end-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">{__('general.days')}</span>
                                     </div>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Revisions</Label>
+                                    <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider">{__('general.revisions')}</Label>
                                     <select
                                         value={pkg.revisions}
                                         onChange={e => setPackageField(idx, 'revisions', Number(e.target.value))}
                                         className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
                                     >
-                                        <option value="0">None</option>
+                                        <option value="0">{__('general.none')}</option>
                                         {[1,2,3,4,5,6,7,8,9].map(n => <option key={n} value={n}>{n}</option>)}
-                                        <option value="-1">Unlimited</option>
+                                        <option value="-1">{__('general.unlimited')}</option>
                                     </select>
                                 </div>
                             </div>
 
                             <div className="pt-4 border-t border-slate-100">
-                                <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3 block">Price</Label>
+                                <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3 block">{__('general.price')}</Label>
                                 <div className="relative flex items-center shadow-sm rounded-xl overflow-hidden border focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
                                     <select
                                         value={pkg.currency_id}

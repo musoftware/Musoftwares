@@ -228,7 +228,7 @@ export function DataTable({
             {pagination && pagination.total > 0 && (
                 <div className="flex items-center justify-between gap-4 border-t border-slate-200 bg-white px-4 py-3 text-[13px] text-slate-600">
                     <div className="flex items-center gap-2">
-                        <span className="text-slate-400 text-xs">Show</span>
+                        <span className="text-slate-400 text-xs">{__('general.show')}</span>
                         <select
                             className="h-7 rounded-md border border-slate-200 bg-white ps-2 pe-6 text-[12px] focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             value={pagination.per_page}

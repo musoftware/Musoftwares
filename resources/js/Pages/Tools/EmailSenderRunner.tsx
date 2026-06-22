@@ -356,7 +356,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                 {activeTab === 'dashboard' && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div>
-                            <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+                            <h1 className="text-2xl font-bold tracking-tight">{__('general.dashboard')}</h1>
                             <p className="text-sm text-slate-500 mt-1">{__('general.overview_of_your_email_sending_performance')}</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -383,7 +383,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                             </div>
                             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h3 className="font-medium text-slate-500">Unsubscribes</h3>
+                                    <h3 className="font-medium text-slate-500">{__('general.unsubscribes')}</h3>
                                     <XCircle className="w-5 h-5 text-rose-500" />
                                 </div>
                                 <p className="text-3xl font-bold text-slate-900">{globalStats.unsubscribes}</p>
@@ -401,8 +401,8 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                     <thead className="text-xs text-slate-500 bg-slate-50 border-b border-slate-100 uppercase">
                                         <tr>
                                             <th className="px-6 py-3 font-medium">{__('general.campaign_name')}</th>
-                                            <th className="px-6 py-3 font-medium">Status</th>
-                                            <th className="px-6 py-3 font-medium">Progress</th>
+                                            <th className="px-6 py-3 font-medium">{__('general.status')}</th>
+                                            <th className="px-6 py-3 font-medium">{__('general.progress')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
@@ -431,7 +431,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-2xl font-bold tracking-tight">Campaigns</h1>
+                                <h1 className="text-2xl font-bold tracking-tight">{__('general.campaigns')}</h1>
                                 <p className="text-sm text-slate-500 mt-1">{__('general.manage_and_track_your_email_broadcasts')}</p>
                             </div>
                             <Dialog open={isCampaignModalOpen} onOpenChange={setIsCampaignModalOpen}>
@@ -458,7 +458,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Template</Label>
+                                            <Label>{__('general.template')}</Label>
                                             <Select value={campaignForm.template_id} onValueChange={v => setCampaignForm({...campaignForm, template_id: v || ''})}>
                                                 <SelectTrigger><SelectValue placeholder={__('general.select_email_design')} /></SelectTrigger>
                                                 <SelectContent>
@@ -516,12 +516,12 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                     <thead className="text-xs text-slate-500 bg-slate-50 border-b border-slate-100 uppercase">
                                         <tr>
                                             <th className="px-6 py-3 font-medium">{__('general.campaign_name')}</th>
-                                            <th className="px-6 py-3 font-medium">Status</th>
-                                            <th className="px-6 py-3 font-medium">Progress</th>
-                                            <th className="px-6 py-3 font-medium">Opens</th>
-                                            <th className="px-6 py-3 font-medium">Clicks</th>
-                                            <th className="px-6 py-3 font-medium">Unsubs</th>
-                                            <th className="px-6 py-3 font-medium text-end">Actions</th>
+                                            <th className="px-6 py-3 font-medium">{__('general.status')}</th>
+                                            <th className="px-6 py-3 font-medium">{__('general.progress')}</th>
+                                            <th className="px-6 py-3 font-medium">{__('general.opens')}</th>
+                                            <th className="px-6 py-3 font-medium">{__('general.clicks')}</th>
+                                            <th className="px-6 py-3 font-medium">{__('general.unsubs')}</th>
+                                            <th className="px-6 py-3 font-medium text-end">{__('general.actions')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
@@ -605,8 +605,8 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                             <Input value={listForm.name} onChange={e => setListForm({...listForm, name: e.target.value})} placeholder={__('general.e_g_vip_customers')} />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Description</Label>
-                                            <Input value={listForm.description} onChange={e => setListForm({...listForm, description: e.target.value})} placeholder="Optional" />
+                                            <Label>{__('general.description')}</Label>
+                                            <Input value={listForm.description} onChange={e => setListForm({...listForm, description: e.target.value})} placeholder={__('general.optional')} />
                                         </div>
                                         <div className="space-y-2">
                                             <Label>Raw Contacts (CSV)</Label>
@@ -637,7 +637,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                     <div key={l.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-sm transition-all group relative">
                                         <h3 className="font-semibold text-slate-900 pe-8">{l.name}</h3>
                                         <p className="text-2xl font-bold text-slate-800 mt-3">{l.contact_count}</p>
-                                        <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mt-1 mb-4">Subscribers</p>
+                                        <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mt-1 mb-4">{__('general.subscribers')}</p>
                                         <Button variant="outline" size="sm" onClick={() => handleViewContacts(l.id)} className="w-full text-xs">{__('general.view_contacts')}</Button>
                                         <Button 
                                             variant="ghost" 
@@ -665,10 +665,10 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                     <table className="w-full text-sm text-start">
                                         <thead className="text-xs text-slate-500 bg-slate-50 border-b border-slate-100 uppercase sticky top-0">
                                             <tr>
-                                                <th className="px-4 py-2 font-medium">Name</th>
-                                                <th className="px-4 py-2 font-medium">Email</th>
-                                                <th className="px-4 py-2 font-medium">Status</th>
-                                                <th className="px-4 py-2 font-medium text-end">Actions</th>
+                                                <th className="px-4 py-2 font-medium">{__('general.name')}</th>
+                                                <th className="px-4 py-2 font-medium">{__('general.email')}</th>
+                                                <th className="px-4 py-2 font-medium">{__('general.status')}</th>
+                                                <th className="px-4 py-2 font-medium text-end">{__('general.actions')}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
@@ -681,9 +681,9 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                                     <td className="px-4 py-3 text-slate-600">{c.email}</td>
                                                     <td className="px-4 py-3">
                                                         {c.unsubscribed === 1 ? (
-                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">Unsubscribed</span>
+                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">{__('general.unsubscribed')}</span>
                                                         ) : (
-                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Active</span>
+                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">{__('general.active')}</span>
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-3 text-end">
@@ -706,7 +706,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-2xl font-bold tracking-tight">Templates</h1>
+                                <h1 className="text-2xl font-bold tracking-tight">{__('general.templates')}</h1>
                                 <p className="text-sm text-slate-500 mt-1">{__('general.design_and_manage_your_email_templates')}</p>
                             </div>
                             <Dialog open={isTemplateModalOpen} onOpenChange={setIsTemplateModalOpen}>
@@ -765,8 +765,8 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                         <h3 className="font-semibold text-slate-900 pe-8">{t.name}</h3>
                                         <p className="text-sm text-slate-500 mt-1 truncate mb-4">{t.subject}</p>
                                         <div className="flex gap-2">
-                                            <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => { setPreviewHtml(t.html_content); setIsPreviewOpen(true); }}>Preview</Button>
-                                            <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => handleEditTemplate(t)}>Edit</Button>
+                                            <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => { setPreviewHtml(t.html_content); setIsPreviewOpen(true); }}>{__('general.preview')}</Button>
+                                            <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => handleEditTemplate(t)}>{__('general.edit')}</Button>
                                         </div>
                                         <Button 
                                             variant="ghost" 
@@ -829,11 +829,11 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label>Username</Label>
+                                                <Label>{__('general.username')}</Label>
                                                 <Input value={accountForm.username} onChange={e => setAccountForm({...accountForm, username: e.target.value})} />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Password</Label>
+                                                <Label>{__('general.password')}</Label>
                                                 <Input type="password" value={accountForm.password} onChange={e => setAccountForm({...accountForm, password: e.target.value})} />
                                             </div>
                                         </div>
@@ -848,13 +848,13 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                             </div>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Encryption</Label>
+                                            <Label>{__('general.encryption')}</Label>
                                             <Select value={accountForm.encryption} onValueChange={v => setAccountForm({...accountForm, encryption: v || ''})}>
                                                 <SelectTrigger><SelectValue /></SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="ssl">{__('general.ssl_tls')}</SelectItem>
-                                                    <SelectItem value="starttls">STARTTLS</SelectItem>
-                                                    <SelectItem value="none">None</SelectItem>
+                                                    <SelectItem value="starttls">{__('general.starttls')}</SelectItem>
+                                                    <SelectItem value="none">{__('general.none')}</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -883,7 +883,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                             <p className="text-sm text-slate-500 mt-1">{a.username}</p>
                                             <div className="mt-3 flex items-center gap-1.5 mb-4">
                                                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                                                <span className="text-xs font-medium text-slate-600">Connected</span>
+                                                <span className="text-xs font-medium text-slate-600">{__('general.connected')}</span>
                                             </div>
                                             <Button variant="outline" size="sm" className="text-xs" onClick={() => handleEditAccount(a)}>{__('general.edit_account')}</Button>
                                         </div>
@@ -902,7 +902,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+                                <h1 className="text-2xl font-bold tracking-tight">{__('general.settings')}</h1>
                                 <p className="text-sm text-slate-500 mt-1">{__('general.configure_your_email_sender_integration')}</p>
                             </div>
                         </div>
@@ -948,9 +948,9 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                             <table className="w-full text-sm text-start">
                                 <thead className="text-xs text-slate-500 bg-slate-50 border-b border-slate-100 uppercase sticky top-0">
                                     <tr>
-                                        <th className="px-4 py-2 font-medium">Time</th>
-                                        <th className="px-4 py-2 font-medium">Event</th>
-                                        <th className="px-4 py-2 font-medium">Details</th>
+                                        <th className="px-4 py-2 font-medium">{__('general.time')}</th>
+                                        <th className="px-4 py-2 font-medium">{__('general.event')}</th>
+                                        <th className="px-4 py-2 font-medium">{__('general.details')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">

@@ -50,7 +50,7 @@ export default function ResellersIndex({ resellers, meta }: any) {
     }
 
     return (
-        <WorkspaceLayout title="Resellers" workspaceName="Musoftware Admin" tenantId="SYS-ADMIN" menuItems={menuItems}>
+        <WorkspaceLayout title={__('general.resellers')} workspaceName="Musoftware Admin" tenantId="SYS-ADMIN" menuItems={menuItems}>
             <Head title={__('general.tool_resellers')} />
             <div className="space-y-6">
                 <ModulePageHeader
@@ -115,12 +115,12 @@ export default function ResellersIndex({ resellers, meta }: any) {
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b border-border/60">
-                                        <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Reseller</th>
-                                        <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Balance</th>
+                                        <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.reseller')}</th>
+                                        <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.balance')}</th>
                                         <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.sub_users')}</th>
                                         <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.sharing_flags')}</th>
-                                        <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Status</th>
-                                        <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
+                                        <th className="text-start px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.status')}</th>
+                                        <th className="text-end px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.actions')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border/40">
@@ -135,7 +135,7 @@ export default function ResellersIndex({ resellers, meta }: any) {
                                                     {formatCurrency(r.balance, r.currency)}
                                                 </span>
                                                 {r.balance <= 0 && (
-                                                    <span className="ms-2 text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded">EMPTY</span>
+                                                    <span className="ms-2 text-[10px] font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded">{__('general.empty')}</span>
                                                 )}
                                             </td>
                                             <td className="px-4 py-3.5">
@@ -152,8 +152,7 @@ export default function ResellersIndex({ resellers, meta }: any) {
                                                     </span>
                                                 ) : (
                                                     <span className="inline-flex items-center gap-1 text-xs text-emerald-600">
-                                                        <CheckCircle className="w-3.5 h-3.5" /> Clean
-                                                    </span>
+                                                        <CheckCircle className="w-3.5 h-3.5" /> {__('general.clean')}</span>
                                                 )}
                                             </td>
                                             <td className="px-4 py-3.5">
@@ -165,8 +164,7 @@ export default function ResellersIndex({ resellers, meta }: any) {
                                                         href={`/admin/resellers/${r.id}`}
                                                         className="text-xs font-semibold text-primary hover:underline"
                                                     >
-                                                        Manage
-                                                    </Link>
+                                                        {__('general.manage')}</Link>
                                                 </div>
                                             </td>
                                         </tr>

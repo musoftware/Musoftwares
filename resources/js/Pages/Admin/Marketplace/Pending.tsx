@@ -132,7 +132,7 @@ export default function Pending({ auth, services, filters }: any) {
                                                 <span className="text-sm text-slate-500">
                                                     Seller:{' '}
                                                     <span className="font-medium text-slate-900">
-                                                        {service.seller?.name || <span className="italic text-slate-400">Unknown</span>}
+                                                        {service.seller?.name || <span className="italic text-slate-400">{__('general.unknown')}</span>}
                                                     </span>
                                                 </span>
                                             </div>
@@ -153,8 +153,7 @@ export default function Pending({ auth, services, filters }: any) {
                                             className="w-full bg-green-600 hover:bg-green-700 text-white font-bold gap-2 shadow-sm"
                                         >
                                             <Check className="h-4 w-4" />
-                                            Approve
-                                        </Button>
+                                            {__('general.approve')}</Button>
                                         
                                         <Button
                                             variant="outline"
@@ -162,8 +161,7 @@ export default function Pending({ auth, services, filters }: any) {
                                             className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 font-bold gap-2 bg-white"
                                         >
                                             <X className="h-4 w-4" />
-                                            Reject
-                                        </Button>
+                                            {__('general.reject')}</Button>
 
                                         <Button
                                             variant="outline"
@@ -171,8 +169,7 @@ export default function Pending({ auth, services, filters }: any) {
                                             className="w-full font-bold gap-2 bg-white"
                                         >
                                             <Pencil className="h-4 w-4" />
-                                            Edit
-                                        </Button>
+                                            {__('general.edit')}</Button>
 
                                         <a
                                             href={route('marketplace.services.show', service.id)}
@@ -252,8 +249,7 @@ export default function Pending({ auth, services, filters }: any) {
 
                     <div className="mt-6 flex justify-end gap-3">
                         <Button type="button" variant="outline" onClick={() => setRejectingServiceId(null)}>
-                            Cancel
-                        </Button>
+                            {__('general.cancel')}</Button>
                         <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white">{__('general.confirm_rejection')}</Button>
                     </div>
                 </form>

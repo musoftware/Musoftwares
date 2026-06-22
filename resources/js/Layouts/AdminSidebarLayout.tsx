@@ -60,7 +60,7 @@ export default function AdminSidebarLayout({ title, header, user, children, acti
                                 <Link href={route().has('dashboard') ? route('dashboard') : '#'}>{__('general.dashboard')}</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer rounded-lg text-sm mb-1" asChild>
-                                <Link href={route().has('profile.edit') ? route('profile.edit') : '#'}>Profile</Link>
+                                <Link href={route().has('profile.edit') ? route('profile.edit') : '#'}>{__('general.profile')}</Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem className="cursor-pointer rounded-lg text-sm text-rose-600 focus:bg-rose-50 focus:text-rose-700" asChild>

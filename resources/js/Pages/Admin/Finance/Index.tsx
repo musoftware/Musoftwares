@@ -315,9 +315,9 @@ export default function Index({ entries, categories, users, currentTab, stats, a
 
     const getStatusBadge = (status: string) => {
         switch (status) {
-            case 'completed': return <span className="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><CheckCircle2 className="w-3 h-3 me-1"/> Completed</span>;
-            case 'pending': return <span className="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><Clock className="w-3 h-3 me-1"/> Pending</span>;
-            case 'overdue': return <span className="bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><AlertCircle className="w-3 h-3 me-1"/> Overdue</span>;
+            case 'completed': return <span className="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><CheckCircle2 className="w-3 h-3 me-1"/> {__('general.completed')}</span>;
+            case 'pending': return <span className="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><Clock className="w-3 h-3 me-1"/> {__('general.pending')}</span>;
+            case 'overdue': return <span className="bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><AlertCircle className="w-3 h-3 me-1"/> {__('general.overdue')}</span>;
             default: return null;
         }
     };
@@ -379,11 +379,11 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                 <button
                     onClick={() => handleTabChange('projects')}
                     className={`py-3 px-6 font-medium text-sm border-b-2 transition-colors ${currentTab === 'projects' ? 'border-black text-black font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200'}`}
-                >Project Profitability</button>
+                >{__('general.project_profitability')}</button>
                 <button
                     onClick={() => handleTabChange('budgets')}
                     className={`py-3 px-6 font-medium text-sm border-b-2 transition-colors ${currentTab === 'budgets' ? 'border-black text-black font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200'}`}
-                >Budgets</button>
+                >{__('general.budgets')}</button>
                 <button
                     onClick={() => handleTabChange('salaries')}
                     className={`py-3 px-6 font-medium text-sm border-b-2 transition-colors ${currentTab === 'salaries' ? 'border-black text-black font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200'}`}
@@ -451,7 +451,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 {/* Donut Chart */}
                                 <div className="h-[120px] w-full flex items-center justify-center relative">
                                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Total</span>
+                                        <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{__('general.total')}</span>
                                         <span className="text-sm font-extrabold text-slate-900 font-mono">
                                             {formatCurrency(categoryAllocationData.reduce((sum: number, item: any) => sum + item.value, 0), stats.business_currency_code)}
                                         </span>
@@ -590,9 +590,9 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 onChange={e => setSelectedStatusFilter(e.target.value)}
                             >
                                 <option value="">{__('general.all_statuses')}</option>
-                                <option value="completed">Completed</option>
-                                <option value="pending">Pending</option>
-                                <option value="overdue">Overdue</option>
+                                <option value="completed">{__('general.completed')}</option>
+                                <option value="pending">{__('general.pending')}</option>
+                                <option value="overdue">{__('general.overdue')}</option>
                             </select>
 
                             <select
@@ -604,12 +604,11 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 {users.map((u: any) => <option key={u.id} value={u.id}>{u.name}</option>)}
                             </select>
 
-                            <Button onClick={applyFilters} variant="secondary" size="sm" className="h-9">Filter</Button>
+                            <Button onClick={applyFilters} variant="secondary" size="sm" className="h-9">{__('general.filter')}</Button>
                             
                             {(filters.search || filters.category || filters.status || filters.user_id || searchTerm || selectedCategoryFilter || selectedStatusFilter || selectedUserFilter) && (
                                 <Button onClick={clearFilters} variant="ghost" size="sm" className="h-9 text-gray-500 hover:text-black">
-                                    <X className="w-4 h-4 me-1" /> Clear
-                                </Button>
+                                    <X className="w-4 h-4 me-1" /> {__('general.clear')}</Button>
                             )}
                         </div>
                     ) : (
@@ -621,8 +620,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
 
                     <a href={route('admin.finance.report.export', { type: currentTab === 'income' || currentTab === 'expenses' ? 'ledger' : 'pnl' })} target="_blank" rel="noreferrer">
                         <Button variant="outline" className="h-9 me-2 text-slate-700">
-                            <Download className="w-4 h-4 me-2" /> Export CSV
-                        </Button>
+                            <Download className="w-4 h-4 me-2" /> {__('general.export_csv')}</Button>
                     </a>
                     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                         <DialogTrigger asChild>
@@ -661,12 +659,12 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="create-amount">Amount</Label>
+                                            <Label htmlFor="create-amount">{__('general.amount')}</Label>
                                             <Input id="create-amount" type="number" step="0.01" min="0.01" required value={newEntry.amount} onChange={e => setNewEntry({...newEntry, amount: e.target.value})} />
                                             {errors.amount && <span className="text-red-600 text-xs block">{errors.amount}</span>}
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="create-currency">Currency</Label>
+                                            <Label htmlFor="create-currency">{__('general.currency')}</Label>
                                             <select id="create-currency" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newEntry.currency_id} onChange={e => setNewEntry({...newEntry, currency_id: e.target.value})}>
                                                 {currenciesList.map(c => <option key={c.id} value={c.id}>{c.currency} ({c.symbol})</option>)}
                                             </select>
@@ -713,11 +711,11 @@ export default function Index({ entries, categories, users, currentTab, stats, a
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="create-status">Status</Label>
+                                            <Label htmlFor="create-status">{__('general.status')}</Label>
                                             <select id="create-status" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newEntry.status} onChange={e => setNewEntry({...newEntry, status: e.target.value})}>
                                                 <option value="completed">{__('general.completed_paid')}</option>
-                                                <option value="pending">Pending</option>
-                                                <option value="overdue">Overdue</option>
+                                                <option value="pending">{__('general.pending')}</option>
+                                                <option value="overdue">{__('general.overdue')}</option>
                                             </select>
                                         </div>
                                         <div className="space-y-2">
@@ -746,12 +744,12 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             </div>
                                             {newEntry.is_recurring && (
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="create-interval">Interval</Label>
+                                                    <Label htmlFor="create-interval">{__('general.interval')}</Label>
                                                     <select id="create-interval" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newEntry.recurrence_interval} onChange={e => setNewEntry({...newEntry, recurrence_interval: e.target.value})}>
-                                                        <option value="day">Daily</option>
-                                                        <option value="week">Weekly</option>
-                                                        <option value="month">Monthly</option>
-                                                        <option value="year">Annually</option>
+                                                        <option value="day">{__('general.daily')}</option>
+                                                        <option value="week">{__('general.weekly')}</option>
+                                                        <option value="month">{__('general.monthly')}</option>
+                                                        <option value="year">{__('general.annually')}</option>
                                                     </select>
                                                 </div>
                                             )}
@@ -776,12 +774,12 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Project Name</th>
-                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Client</th>
-                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Revenue</th>
-                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Costs</th>
-                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Margin</th>
-                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Profit</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.project_name')}</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.client')}</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.revenue')}</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.costs')}</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.margin')}</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.profit')}</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -798,7 +796,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 {(entries.data as any).length === 0 && (
                                     <tr>
                                         <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                                            <h3 className="text-lg font-medium text-gray-900">No projects found</h3>
+                                            <h3 className="text-lg font-medium text-gray-900">{__('general.no_projects_found')}</h3>
                                         </td>
                                     </tr>
                                 )}
@@ -808,11 +806,11 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Category</th>
-                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Budget Amount</th>
-                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Spent</th>
-                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Remaining</th>
-                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Status</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.category')}</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.budget_amount')}</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.spent')}</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.remaining')}</th>
+                                    <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.status')}</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -835,7 +833,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 {(entries.data as any).length === 0 && (
                                     <tr>
                                         <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                                            <h3 className="text-lg font-medium text-gray-900">No budgets found</h3>
+                                            <h3 className="text-lg font-medium text-gray-900">{__('general.no_budgets_found')}</h3>
                                         </td>
                                     </tr>
                                 )}
@@ -852,8 +850,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     Amount {renderSortIcon('amount')}
                                 </th>
                                 <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
-                                    Category
-                                </th>
+                                    {__('general.category')}</th>
                                 <th onClick={() => handleSort('created_at')} className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">
                                     Date {renderSortIcon('created_at')}
                                 </th>
@@ -863,7 +860,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 <th onClick={() => handleSort('status')} className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">
                                     Status {renderSortIcon('status')}
                                 </th>
-                                <th className="px-6 py-3 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Actions</th>
+                                <th className="px-6 py-3 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -874,8 +871,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                         {entry.user && <div className="text-xs text-gray-500 mt-1">User: {entry.user.name}</div>}
                                         {entry.is_recurring && (
                                             <span className="inline-flex items-center gap-1 bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-semibold px-2 py-0.5 rounded-full mt-1.5">
-                                                <RefreshCw className="w-2.5 h-2.5" /> Recurring
-                                            </span>
+                                                <RefreshCw className="w-2.5 h-2.5" /> {__('general.recurring')}</span>
                                         )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap cursor-pointer" onClick={() => openDetails(entry)}>
@@ -913,8 +909,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                         </Button>
                                         {entry.status === 'pending' && (
                                             <Button variant="outline" size="sm" className="me-2 border-green-200 text-green-700 hover:bg-green-50" onClick={() => handleMarkPaid(entry.id)}>
-                                                <CheckCircle2 className="w-4 h-4 me-1" /> Paid
-                                            </Button>
+                                                <CheckCircle2 className="w-4 h-4 me-1" /> {__('general.paid')}</Button>
                                         )}
                                         <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black hover:bg-slate-50 me-1" onClick={() => openEdit(entry)}>
                                             <Edit className="w-4 h-4" />
@@ -981,8 +976,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     <ChevronLeft className="h-4 w-4" />
                                 </Button>
                                 <Button variant="outline" size="sm" onClick={handleGoToToday}>
-                                    Today
-                                </Button>
+                                    {__('general.today')}</Button>
                                 <Button variant="outline" size="sm" onClick={handleNextMonth}>
                                     <ChevronRight className="h-4 w-4" />
                                 </Button>
@@ -1111,12 +1105,12 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="edit-amount">Amount</Label>
+                                    <Label htmlFor="edit-amount">{__('general.amount')}</Label>
                                     <Input id="edit-amount" type="number" step="0.01" min="0.01" required value={editingEntry.amount} onChange={e => setEditingEntry({...editingEntry, amount: e.target.value})} />
                                     {errors.amount && <span className="text-red-650 text-xs block">{errors.amount}</span>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="edit-currency">Currency</Label>
+                                    <Label htmlFor="edit-currency">{__('general.currency')}</Label>
                                     <select id="edit-currency" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={editingEntry.currency_id} onChange={e => setEditingEntry({...editingEntry, currency_id: e.target.value})}>
                                         {currenciesList.map(c => <option key={c.id} value={c.id}>{c.currency} ({c.symbol})</option>)}
                                     </select>
@@ -1163,11 +1157,11 @@ export default function Index({ entries, categories, users, currentTab, stats, a
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="edit-status">Status</Label>
+                                    <Label htmlFor="edit-status">{__('general.status')}</Label>
                                     <select id="edit-status" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={editingEntry.status} onChange={e => setEditingEntry({...editingEntry, status: e.target.value})}>
                                         <option value="completed">{__('general.completed_paid')}</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="overdue">Overdue</option>
+                                        <option value="pending">{__('general.pending')}</option>
+                                        <option value="overdue">{__('general.overdue')}</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
@@ -1210,8 +1204,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                             {/* Financial Amount Box */}
                             <div className="bg-slate-50 border rounded-xl p-5 text-center">
                                 <div className="text-xs text-gray-500 uppercase tracking-wider mb-1 font-semibold">
-                                    Amount
-                                </div>
+                                    {__('general.amount')}</div>
                                 <div className="text-3xl font-black text-slate-900 flex justify-center items-baseline gap-1">
                                     {formatCurrency(selectedDetailEntry.amount, selectedDetailEntry.currency)}
                                 </div>
@@ -1228,28 +1221,25 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                             {/* Core Details Grid */}
                             <div className="grid grid-cols-2 gap-4 border rounded-xl p-4">
                                 <div className="space-y-1">
-                                    <div className="text-xs text-gray-400 font-medium">Type</div>
+                                    <div className="text-xs text-gray-400 font-medium">{__('general.type')}</div>
                                     <div className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                                         {selectedDetailEntry.type === 'received' ? (
                                             <span className="text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200 inline-flex items-center text-xs font-bold">
                                                 <TrendingUp className="w-3 h-3 me-1" />{__('general.deposit_income')}</span>
                                         ) : selectedDetailEntry.type === 'refunded' ? (
                                             <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200 inline-flex items-center text-xs font-bold">
-                                                Refund
-                                            </span>
+                                                {__('general.refund')}</span>
                                         ) : selectedDetailEntry.type === 'salary' ? (
                                             <span className="text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 inline-flex items-center text-xs font-bold">
-                                                Payroll
-                                            </span>
+                                                {__('general.payroll')}</span>
                                         ) : (
                                             <span className="text-slate-700 bg-slate-50 px-2 py-0.5 rounded border border-slate-200 inline-flex items-center text-xs font-bold">
-                                                <TrendingDown className="w-3 h-3 me-1" /> Expense
-                                            </span>
+                                                <TrendingDown className="w-3 h-3 me-1" /> {__('general.expense')}</span>
                                         )}
                                     </div>
                                 </div>
                                 <div className="space-y-1">
-                                    <div className="text-xs text-gray-400 font-medium">Category</div>
+                                    <div className="text-xs text-gray-400 font-medium">{__('general.category')}</div>
                                     <div className="text-sm font-semibold text-slate-800">
                                         {selectedDetailEntry.category?.name || 'Uncategorized'}
                                     </div>
@@ -1270,7 +1260,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 </div>
                                 {selectedDetailEntry.is_recurring && (
                                     <div className="col-span-2 space-y-1 pt-2 border-t border-slate-100">
-                                        <div className="text-xs text-gray-400 font-medium">Recurrence</div>
+                                        <div className="text-xs text-gray-400 font-medium">{__('general.recurrence')}</div>
                                         <div className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                                             <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
                                             <span>{__('general.this_is_a_recurring_transaction')}</span>
@@ -1291,7 +1281,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             href={route('admin.users.show', selectedDetailEntry.user.id)}
                                             className="text-xs text-slate-500 hover:text-black flex items-center hover:underline font-semibold"
                                         >
-                                            Profile <ExternalLink className="w-3 h-3 ms-1" />
+                                            {__('general.profile')}<ExternalLink className="w-3 h-3 ms-1" />
                                         </Link>
                                     </div>
                                     <div>
@@ -1308,14 +1298,12 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             href={route('admin.users.notes.index', selectedDetailEntry.user.id)}
                                             className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-black transition-colors"
                                         >
-                                            <FileText className="w-3.5 h-3.5" /> Notes
-                                        </Link>
+                                            <FileText className="w-3.5 h-3.5" /> {__('general.notes')}</Link>
                                         <Link
                                             href={route('admin.users.files.index', selectedDetailEntry.user.id)}
                                             className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-black transition-colors"
                                         >
-                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> Files
-                                        </Link>
+                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> {__('general.files')}</Link>
                                         <Link
                                             href={route('admin.users.reports', selectedDetailEntry.user.id)}
                                             className="col-span-2 inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-black transition-colors"
@@ -1375,8 +1363,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             handleDelete(selectedDetailEntry.id);
                                         }}
                                     >
-                                        <Trash2 className="w-4 h-4 me-2" /> Delete
-                                    </Button>
+                                        <Trash2 className="w-4 h-4 me-2" /> {__('general.delete')}</Button>
                                 </div>
                             </div>
                         </div>

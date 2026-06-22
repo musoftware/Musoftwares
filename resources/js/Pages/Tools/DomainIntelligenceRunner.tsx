@@ -270,7 +270,7 @@ export default function DomainIntelligenceRunner({ tool }: any) {
                                                 </div>
                                                 <div className="p-5 space-y-4 flex-1">
                                                     <div>
-                                                        <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-1">Registrar</p>
+                                                        <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-1">{__('general.registrar')}</p>
                                                         <p className="text-sm font-medium text-slate-900">{res.whois?.registrar || 'Unknown'}</p>
                                                     </div>
                                                     <div className="grid grid-cols-2 gap-4">
@@ -310,7 +310,7 @@ export default function DomainIntelligenceRunner({ tool }: any) {
                                                             {res.dns?.aaaa?.length > 0 ? res.dns.aaaa.map((ip: string, i: number) => (
                                                                 <span key={`aaaa-${i}`} className="text-xs font-mono bg-slate-100 text-slate-800 px-2 py-1 rounded">AAAA: {ip}</span>
                                                             )) : null}
-                                                            {(!res.dns?.a?.length && !res.dns?.aaaa?.length) && <span className="text-xs text-slate-500">None</span>}
+                                                            {(!res.dns?.a?.length && !res.dns?.aaaa?.length) && <span className="text-xs text-slate-500">{__('general.none')}</span>}
                                                         </div>
                                                     </div>
                                                     <div>
@@ -321,7 +321,7 @@ export default function DomainIntelligenceRunner({ tool }: any) {
                                                                     <span className="text-slate-400 me-2">Priority {mx.priority}</span>
                                                                     {mx.exchange}
                                                                 </div>
-                                                            )) : <span className="text-xs text-slate-500">None</span>}
+                                                            )) : <span className="text-xs text-slate-500">{__('general.none')}</span>}
                                                         </div>
                                                     </div>
                                                     <div>
@@ -331,7 +331,7 @@ export default function DomainIntelligenceRunner({ tool }: any) {
                                                                 <div key={i} className="text-[10px] font-mono bg-slate-100 text-slate-800 px-2 py-1.5 rounded break-all">
                                                                     {Array.isArray(txt) ? txt.join('') : txt}
                                                                 </div>
-                                                            )) : <span className="text-xs text-slate-500">None</span>}
+                                                            )) : <span className="text-xs text-slate-500">{__('general.none')}</span>}
                                                         </div>
                                                     </div>
                                                     <div>
@@ -339,7 +339,7 @@ export default function DomainIntelligenceRunner({ tool }: any) {
                                                         <div className="flex flex-wrap gap-2">
                                                             {res.dns?.cname?.length > 0 ? res.dns.cname.map((cname: string, i: number) => (
                                                                 <span key={i} className="text-xs font-mono bg-slate-100 text-slate-800 px-2 py-1 rounded">{cname}</span>
-                                                            )) : <span className="text-xs text-slate-500">None</span>}
+                                                            )) : <span className="text-xs text-slate-500">{__('general.none')}</span>}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -355,7 +355,7 @@ export default function DomainIntelligenceRunner({ tool }: any) {
                                                     <div className="flex flex-wrap gap-2">
                                                         {res.subdomains?.length > 0 ? res.subdomains.map((sub: string, i: number) => (
                                                             <span key={i} className="text-[11px] font-mono bg-slate-100 text-slate-800 px-2 py-1 rounded border border-slate-200">{sub}</span>
-                                                        )) : <span className="text-xs text-slate-500">None</span>}
+                                                        )) : <span className="text-xs text-slate-500">{__('general.none')}</span>}
                                                     </div>
                                                 </div>
                                             </div>

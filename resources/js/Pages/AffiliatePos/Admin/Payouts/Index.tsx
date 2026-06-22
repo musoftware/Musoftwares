@@ -40,12 +40,12 @@ export default function PayoutsIndex({ payouts, filters }: any) {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
-                                <TableHead className="font-semibold text-gray-600">User</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Method</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.user')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.method')}</TableHead>
                                 <TableHead className="font-semibold text-gray-600">{__('general.account_info')}</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-end">Amount</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Status</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-end">Actions</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">{__('general.amount')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.status')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">{__('general.actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -75,18 +75,15 @@ export default function PayoutsIndex({ payouts, filters }: any) {
                                         <TableCell>
                                             {payout.status === 'pending' && (
                                                 <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-none flex w-fit items-center gap-1">
-                                                    <Clock className="w-3 h-3" /> Pending
-                                                </Badge>
+                                                    <Clock className="w-3 h-3" /> {__('general.pending')}</Badge>
                                             )}
                                             {payout.status === 'approved' && (
                                                 <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-none flex w-fit items-center gap-1">
-                                                    <CheckCircle2 className="w-3 h-3" /> Approved
-                                                </Badge>
+                                                    <CheckCircle2 className="w-3 h-3" /> {__('general.approved')}</Badge>
                                             )}
                                             {payout.status === 'declined' && (
                                                 <Badge className="bg-red-100 text-red-800 hover:bg-red-100 border-none flex w-fit items-center gap-1">
-                                                    <XCircle className="w-3 h-3" /> Declined
-                                                </Badge>
+                                                    <XCircle className="w-3 h-3" /> {__('general.declined')}</Badge>
                                             )}
                                         </TableCell>
                                         <TableCell className="text-end">
@@ -99,19 +96,17 @@ export default function PayoutsIndex({ payouts, filters }: any) {
                                                         onClick={() => handleProcess(payout.id, 'declined')}
                                                         disabled={processing}
                                                     >
-                                                        Decline
-                                                    </Button>
+                                                        {__('general.decline')}</Button>
                                                     <Button 
                                                         size="sm" 
                                                         className="bg-green-600 hover:bg-green-700 text-white shadow-sm"
                                                         onClick={() => handleProcess(payout.id, 'approved')}
                                                         disabled={processing}
                                                     >
-                                                        Approve
-                                                    </Button>
+                                                        {__('general.approve')}</Button>
                                                 </div>
                                             ) : (
-                                                <span className="text-sm text-gray-400">Processed</span>
+                                                <span className="text-sm text-gray-400">{__('general.processed')}</span>
                                             )}
                                         </TableCell>
                                     </TableRow>

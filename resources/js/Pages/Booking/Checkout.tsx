@@ -89,7 +89,7 @@ export default function Checkout({ booking, walletBalance }: any) {
                                                 <div className="flex items-center gap-2">
                                                     <p className="font-medium text-slate-900">{__('general.pay_with_wallet_balance')}</p>
                                                     {!hasEnoughBalance && (
-                                                        <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">Insufficient</span>
+                                                        <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">{__('general.insufficient')}</span>
                                                     )}
                                                 </div>
                                                 <p className="text-sm text-slate-500">Available: {walletBalance.toFixed(2)} {booking.currency}</p>
@@ -142,21 +142,21 @@ export default function Checkout({ booking, walletBalance }: any) {
                                 
                                 <div className="space-y-3 pt-4 border-t border-slate-100">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-slate-500">Date</span>
+                                        <span className="text-slate-500">{__('general.date')}</span>
                                         <span className="font-medium text-slate-900">{format(new Date(booking.starts_at), 'MMM d, yyyy')}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-slate-500">Time</span>
+                                        <span className="text-slate-500">{__('general.time')}</span>
                                         <span className="font-medium text-slate-900">{format(new Date(booking.starts_at), 'h:mm a')}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-slate-500">Guest</span>
+                                        <span className="text-slate-500">{__('general.guest')}</span>
                                         <span className="font-medium text-slate-900">{booking.guest_name}</span>
                                     </div>
                                 </div>
                                 
                                 <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
-                                    <span className="font-medium text-slate-900">Total</span>
+                                    <span className="font-medium text-slate-900">{__('general.total')}</span>
                                     <span className="text-xl font-semibold text-slate-900">{booking.price} {booking.currency}</span>
                                 </div>
                             </CardContent>

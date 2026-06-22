@@ -475,8 +475,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                     </CardContent>
                                     <CardFooter className="border-t border-slate-100 px-6 py-4 flex justify-end gap-3 bg-slate-50/50 rounded-b-xl">
                                         <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
-                                            Cancel
-                                        </Button>
+                                            {__('general.cancel')}</Button>
                                         <Button type="submit" disabled={profileForm.processing} className="bg-slate-900 text-white hover:bg-slate-800">
                                             {isEditing ? 'Save Changes' : 'Register Provider'}
                                         </Button>
@@ -574,8 +573,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                         className="flex-1 bg-slate-900 hover:bg-slate-800 text-white"
                                                     >
                                                         <Calendar className="w-3.5 h-3.5 me-1.5" />
-                                                        Schedules
-                                                        <ArrowRight className="w-3 h-3 ms-1.5" />
+                                                        {__('general.schedules')}<ArrowRight className="w-3 h-3 ms-1.5" />
                                                     </Button>
                                                 </CardFooter>
                                             </Card>
@@ -706,7 +704,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                             {newOverride.is_enabled && (
                                                 <div className="grid grid-cols-2 gap-3">
                                                     <div className="space-y-1">
-                                                        <Label className="text-xs text-slate-500">From</Label>
+                                                        <Label className="text-xs text-slate-500">{__('general.from')}</Label>
                                                         <Input
                                                             type="time"
                                                             value={newOverride.start_time}

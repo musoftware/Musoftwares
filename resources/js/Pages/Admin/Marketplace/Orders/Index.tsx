@@ -10,10 +10,10 @@ export default function Index({ orders }) {
 
     const getStatusBadge = (status) => {
         switch (status) {
-            case 'completed': return <Badge variant="default" className="bg-green-100 text-green-800">Completed</Badge>;
+            case 'completed': return <Badge variant="default" className="bg-green-100 text-green-800">{__('general.completed')}</Badge>;
             case 'in_progress': return <Badge variant="secondary" className="bg-blue-100 text-blue-800">{__('general.in_progress')}</Badge>;
-            case 'disputed': return <Badge variant="destructive" className="bg-red-100 text-red-800">Disputed</Badge>;
-            case 'cancelled': return <Badge variant="outline" className="text-gray-500 border-gray-300">Cancelled</Badge>;
+            case 'disputed': return <Badge variant="destructive" className="bg-red-100 text-red-800">{__('general.disputed')}</Badge>;
+            case 'cancelled': return <Badge variant="outline" className="text-gray-500 border-gray-300">{__('general.cancelled')}</Badge>;
             default: return <Badge variant="outline" className="text-gray-600">{status}</Badge>;
         }
     };
@@ -25,12 +25,12 @@ export default function Index({ orders }) {
                     <thead className="border-b bg-gray-50">
                         <tr>
                             <th className="p-4 font-medium text-gray-600">ID</th>
-                            <th className="p-4 font-medium text-gray-600">Service</th>
-                            <th className="p-4 font-medium text-gray-600">Buyer</th>
-                            <th className="p-4 font-medium text-gray-600">Seller</th>
-                            <th className="p-4 font-medium text-gray-600 text-end">Amount</th>
-                            <th className="p-4 font-medium text-gray-600 text-center">Status</th>
-                            <th className="p-4 font-medium text-gray-600 text-end">Actions</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.service')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.buyer')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.seller')}</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">{__('general.amount')}</th>
+                            <th className="p-4 font-medium text-gray-600 text-center">{__('general.status')}</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">{__('general.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -53,8 +53,7 @@ export default function Index({ orders }) {
                                         href={`/admin/marketplace/orders/${order.id}`}
                                         className="text-indigo-600 hover:text-indigo-900 hover:underline font-medium text-sm"
                                     >
-                                        Manage
-                                    </Link>
+                                        {__('general.manage')}</Link>
                                 </td>
                             </tr>
                         ))}

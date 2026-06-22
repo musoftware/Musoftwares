@@ -29,7 +29,7 @@ export default function Guest({ children }: PropsWithChildren) {
                         <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center shadow-xs transition-transform duration-200 group-hover:scale-105">
                             <ApplicationLogo className="w-4 h-4 fill-current" />
                         </div>
-                        <span className="font-semibold text-base tracking-tight text-zinc-900 dark:text-zinc-100">Musoftware</span>
+                        <span className="font-semibold text-base tracking-tight text-zinc-900 dark:text-zinc-100">{__('general.musoftware')}</span>
                     </Link>
                 </div>
 
@@ -61,7 +61,7 @@ export default function Guest({ children }: PropsWithChildren) {
                         <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center shadow-xs transition-transform group-hover:scale-105">
                             <ApplicationLogo className="w-4 h-4 fill-current" />
                         </div>
-                        <span className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Musoftware</span>
+                        <span className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">{__('general.musoftware')}</span>
                     </Link>
                 </div>
 

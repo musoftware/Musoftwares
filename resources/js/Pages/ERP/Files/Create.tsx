@@ -82,11 +82,11 @@ export default function CreateFile() {
                                         <SelectValue placeholder={__('general.select_category')} />
                                     </SelectTrigger>
                                     <SelectContent className="bg-white border-slate-200 text-slate-900">
-                                        <SelectItem value="Document">Document</SelectItem>
+                                        <SelectItem value="Document">{__('general.document')}</SelectItem>
                                         <SelectItem value="Design Asset">{__('general.design_asset')}</SelectItem>
                                         <SelectItem value="Invoice PDF">{__('general.invoice_pdf')}</SelectItem>
-                                        <SelectItem value="Brief">Brief</SelectItem>
-                                        <SelectItem value="Contract">Contract</SelectItem>
+                                        <SelectItem value="Brief">{__('general.brief')}</SelectItem>
+                                        <SelectItem value="Contract">{__('general.contract')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 {errors.type && <p className="text-xs text-red-500">{errors.type}</p>}

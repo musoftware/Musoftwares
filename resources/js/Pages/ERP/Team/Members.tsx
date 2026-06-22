@@ -199,13 +199,13 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                         <table className="w-full text-start text-sm border-collapse">
                             <thead>
                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    <th className="px-6 py-3.5">Name</th>
-                                    <th className="px-6 py-3.5">Email</th>
-                                    <th className="px-6 py-3.5">Role</th>
-                                    <th className="px-6 py-3.5">Status</th>
-                                    <th className="px-6 py-3.5">Joined</th>
+                                    <th className="px-6 py-3.5">{__('general.name')}</th>
+                                    <th className="px-6 py-3.5">{__('general.email')}</th>
+                                    <th className="px-6 py-3.5">{__('general.role')}</th>
+                                    <th className="px-6 py-3.5">{__('general.status')}</th>
+                                    <th className="px-6 py-3.5">{__('general.joined')}</th>
                                     <th className="px-6 py-3.5">{__('general.last_login')}</th>
-                                    <th className="px-6 py-3.5 text-end">Actions</th>
+                                    <th className="px-6 py-3.5 text-end">{__('general.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -361,8 +361,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                     className="shadow-none" 
                                     onClick={() => setShowInviteModal(false)}
                                 >
-                                    Cancel
-                                </Button>
+                                    {__('general.cancel')}</Button>
                                 <Button 
                                     type="submit" 
                                     size="sm" 
@@ -450,8 +449,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                     className="shadow-none" 
                                     onClick={() => { setShowEditModal(false); setSelectedMember(null); }}
                                 >
-                                    Cancel
-                                </Button>
+                                    {__('general.cancel')}</Button>
                                 <Button 
                                     type="submit" 
                                     size="sm" 

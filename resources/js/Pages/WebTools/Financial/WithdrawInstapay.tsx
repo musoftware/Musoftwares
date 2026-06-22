@@ -8,6 +8,7 @@ import { Button } from '@/Components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Wallet, Smartphone, ShieldCheck, Mail, User, Phone, ArrowRight, DollarSign, Calculator, Settings, Send } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/Components/ui/alert';
+import { __ } from '@/lib/i18n';
 
 interface Currency {
     id: number;
@@ -61,15 +62,14 @@ export default function WithdrawInstapay({
     };
 
     return (
-        <WebToolsLayout title="InstaPay & Vodafone Cash" activeNav="explore">
+        <WebToolsLayout title={__('general.instapay_vodafone_cash')} activeNav="explore">
             <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6">
                 <div className="mb-8 text-center">
                     <div className="inline-flex items-center justify-center p-3 bg-purple-100 rounded-2xl text-purple-600 mb-4">
                         <Send className="w-8 h-8" />
                     </div>
                     <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
-                        InstaPay & Vodafone Cash
-                    </h1>
+                        {__('general.instapay_vodafone_cash')}</h1>
                     <p className="text-lg text-slate-600 max-w-2xl mx-auto">
                         {isGuest 
                             ? "Enter your details to create an account and receive login credentials on WhatsApp. Then log in to complete payment."
@@ -85,25 +85,23 @@ export default function WithdrawInstapay({
                                 <div className="bg-purple-50/50 p-6 border-b border-slate-100 flex items-start gap-4">
                                     <ShieldCheck className="w-6 h-6 text-purple-500 mt-1 flex-shrink-0" />
                                     <div>
-                                        <h3 className="font-bold text-slate-900">Pay with InstaPay</h3>
+                                        <h3 className="font-bold text-slate-900">{__('general.pay_with_instapay')}</h3>
                                         <p className="text-sm text-slate-600 mt-1">
-                                            Account will be created and login credentials sent directly to your WhatsApp. No password to choose here.
-                                        </p>
+                                            {__('general.account_will_be_created_and_login_creden')}</p>
                                     </div>
                                 </div>
                                 
                                 <CardContent className="p-6">
                                     {withdrawInstapayCurrencies.length === 0 ? (
                                         <Alert variant="destructive">
-                                            <AlertTitle>Error</AlertTitle>
-                                            <AlertDescription>Payment signup is temporarily unavailable. Please contact support.</AlertDescription>
+                                            <AlertTitle>{__('general.error')}</AlertTitle>
+                                            <AlertDescription>{__('general.payment_signup_is_temporarily_unavailabl')}</AlertDescription>
                                         </Alert>
                                     ) : (
                                         <form onSubmit={handleSignup} className="space-y-6">
                                             <div className="space-y-2">
                                                 <Label className="text-slate-700 font-bold flex items-center gap-2 text-base">
-                                                    <Wallet className="w-4 h-4 text-slate-500" /> Amount to Pay
-                                                </Label>
+                                                    <Wallet className="w-4 h-4 text-slate-500" /> {__('general.amount_to_pay')}</Label>
                                                 <div className="flex relative">
                                                     <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
                                                         <span className="text-slate-500 font-bold">$</span>
@@ -123,7 +121,7 @@ export default function WithdrawInstapay({
                                                         onValueChange={val => signupForm.setData('currency_id', val || '')}
                                                     >
                                                         <SelectTrigger className={`w-[120px] h-14 rounded-s-none border-s-0 bg-slate-50 font-bold ${signupForm.errors.currency_id ? 'border-red-500' : ''}`}>
-                                                            <SelectValue placeholder="Currency" />
+                                                            <SelectValue placeholder={__('general.currency')} />
                                                         </SelectTrigger>
                                                         <SelectContent>
                                                             {withdrawInstapayCurrencies.map(cur => (
@@ -138,7 +136,7 @@ export default function WithdrawInstapay({
 
                                             <div className="space-y-4 pt-4 border-t border-slate-100">
                                                 <div className="space-y-2">
-                                                    <Label className="text-slate-700 font-bold">Full Name</Label>
+                                                    <Label className="text-slate-700 font-bold">{__('general.full_name')}</Label>
                                                     <div className="relative">
                                                         <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                                             <User className="w-5 h-5 text-slate-400" />
@@ -149,14 +147,14 @@ export default function WithdrawInstapay({
                                                             value={signupForm.data.name}
                                                             onChange={e => signupForm.setData('name', e.target.value)}
                                                             className={`ps-10 h-12 bg-slate-50 ${signupForm.errors.name ? 'border-red-500' : ''}`}
-                                                            placeholder="Your full name"
+                                                            placeholder={__('general.your_full_name')}
                                                         />
                                                     </div>
                                                     {signupForm.errors.name && <p className="text-sm text-red-500">{signupForm.errors.name}</p>}
                                                 </div>
 
                                                 <div className="space-y-2">
-                                                    <Label className="text-slate-700 font-bold">Email Address</Label>
+                                                    <Label className="text-slate-700 font-bold">{__('general.email_address')}</Label>
                                                     <div className="relative">
                                                         <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                                             <Mail className="w-5 h-5 text-slate-400" />
@@ -174,7 +172,7 @@ export default function WithdrawInstapay({
                                                 </div>
 
                                                 <div className="space-y-2">
-                                                    <Label className="text-slate-700 font-bold">WhatsApp Number</Label>
+                                                    <Label className="text-slate-700 font-bold">{__('general.whatsapp_number')}</Label>
                                                     <div className="relative">
                                                         <div className="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
                                                             <Phone className="w-5 h-5 text-slate-400" />
@@ -188,7 +186,7 @@ export default function WithdrawInstapay({
                                                             placeholder="+1234567890"
                                                         />
                                                     </div>
-                                                    <p className="text-xs text-slate-500">We will send your login credentials here.</p>
+                                                    <p className="text-xs text-slate-500">{__('general.we_will_send_your_login_credentials_here')}</p>
                                                     {signupForm.errors.mobile && <p className="text-sm text-red-500">{signupForm.errors.mobile}</p>}
                                                 </div>
                                             </div>
@@ -204,23 +202,20 @@ export default function WithdrawInstapay({
                         <div className="md:col-span-1 space-y-6">
                             <Card className="border-none shadow-sm bg-slate-50">
                                 <CardContent className="p-6">
-                                    <h3 className="font-bold text-slate-900 mb-4">How it works</h3>
+                                    <h3 className="font-bold text-slate-900 mb-4">{__('general.how_it_works')}</h3>
                                     <ol className="space-y-4 text-sm text-slate-600 relative border-s border-slate-200 ms-3 ps-4">
                                         <li className="relative">
                                             <div className="absolute -start-[21px] top-1 w-3 h-3 rounded-full bg-purple-500 border-2 border-white"></div>
                                             <strong className="text-slate-900 block mb-1">1. Fill Details</strong>
-                                            Enter your amount and contact info.
-                                        </li>
+                                            {__('general.enter_your_amount_and_contact_info')}</li>
                                         <li className="relative">
                                             <div className="absolute -start-[21px] top-1 w-3 h-3 rounded-full bg-purple-500 border-2 border-white"></div>
                                             <strong className="text-slate-900 block mb-1">2. Get Credentials</strong>
-                                            Receive an instant WhatsApp message with your password.
-                                        </li>
+                                            {__('general.receive_an_instant_whatsapp_message_with')}</li>
                                         <li className="relative">
                                             <div className="absolute -start-[21px] top-1 w-3 h-3 rounded-full bg-purple-500 border-2 border-white"></div>
                                             <strong className="text-slate-900 block mb-1">3. Pay Securely</strong>
-                                            You'll be redirected to log in and complete your payment via Instapay.
-                                        </li>
+                                            {__('general.youll_be_redirected_to_log_in_and_comple')}</li>
                                     </ol>
                                 </CardContent>
                             </Card>
@@ -232,24 +227,23 @@ export default function WithdrawInstapay({
                             <CardHeader className="bg-slate-50 border-b border-slate-100 pb-4">
                                 <CardTitle className="text-lg flex items-center gap-2">
                                     <Calculator className="w-5 h-5 text-slate-500" />
-                                    Fee Calculator
-                                </CardTitle>
-                                <CardDescription>Estimate your transfer and receiving amounts.</CardDescription>
+                                    {__('general.fee_calculator')}</CardTitle>
+                                <CardDescription>{__('general.estimate_your_transfer_and_receiving_amo')}</CardDescription>
                             </CardHeader>
                             <CardContent className="pt-6">
                                 <form onSubmit={handleCalc} className="space-y-6">
                                     <div className="space-y-2">
-                                        <Label className="text-slate-700 font-bold">Calculation Type</Label>
+                                        <Label className="text-slate-700 font-bold">{__('general.calculation_type')}</Label>
                                         <Select 
                                             value={calcForm.data.calculation_type} 
                                             onValueChange={val => calcForm.setData('calculation_type', val || '')}
                                         >
                                             <SelectTrigger className="h-12">
-                                                <SelectValue placeholder="Select type" />
+                                                <SelectValue placeholder={__('general.select_type')} />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="visa_master">Credit Card to InstaPay</SelectItem>
-                                                <SelectItem value="vodafone_cash">Vodafone Cash to InstaPay</SelectItem>
+                                                <SelectItem value="visa_master">{__('general.credit_card_to_instapay')}</SelectItem>
+                                                <SelectItem value="vodafone_cash">{__('general.vodafone_cash_to_instapay')}</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>
@@ -282,7 +276,7 @@ export default function WithdrawInstapay({
                             <div className="space-y-6">
                                 <Card className="bg-slate-900 text-white border-none shadow-lg">
                                     <CardContent className="p-8">
-                                        <p className="text-slate-400 font-medium mb-1">You will receive</p>
+                                        <p className="text-slate-400 font-medium mb-1">{__('general.you_will_receive')}</p>
                                         <h2 className="text-4xl font-bold text-emerald-400">${formatMoney(result)} <span className="text-xl text-emerald-600">EGP</span></h2>
                                         
                                         <div className="mt-6 pt-6 border-t border-slate-800 grid grid-cols-2 gap-4">
@@ -301,8 +295,8 @@ export default function WithdrawInstapay({
                                 <Card className="border-slate-200 shadow-sm border-s-4 border-s-blue-500">
                                     <CardContent className="p-6 flex items-center justify-between">
                                         <div>
-                                            <h4 className="font-bold text-slate-900">Total Fees Deducted</h4>
-                                            <p className="text-sm text-slate-500">Includes processing, gateway, and service fees</p>
+                                            <h4 className="font-bold text-slate-900">{__('general.total_fees_deducted')}</h4>
+                                            <p className="text-sm text-slate-500">{__('general.includes_processing_gateway_and_service')}</p>
                                         </div>
                                         <div className="text-end">
                                             <p className="text-2xl font-bold text-slate-900">{formatMoney((input || 0) - result)} <span className="text-sm text-slate-500">EGP</span></p>
@@ -313,8 +307,8 @@ export default function WithdrawInstapay({
                         ) : (
                             <Card className="border-dashed border-2 border-slate-200 bg-slate-50/50 flex flex-col items-center justify-center p-12 text-center text-slate-500">
                                 <Calculator className="w-16 h-16 text-slate-300 mb-4" />
-                                <h3 className="text-xl font-medium text-slate-700">Ready to calculate</h3>
-                                <p className="mt-2 text-sm">Enter an amount and select a type to see the fee breakdown and final receiving amount.</p>
+                                <h3 className="text-xl font-medium text-slate-700">{__('general.ready_to_calculate')}</h3>
+                                <p className="mt-2 text-sm">{__('general.enter_an_amount_and_select_a_type_to_see')}</p>
                             </Card>
                         )}
                     </div>

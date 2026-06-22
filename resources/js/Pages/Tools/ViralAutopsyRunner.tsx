@@ -296,7 +296,7 @@ export default function ViralAutopsyRunner({ tool }: any) {
                         {/* Engagement metrics */}
                         <Section icon={TrendingUp} title={__('general.engagement_metrics')} color="text-emerald-600">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                                <StatChip label="Plays" value={Number(eng.plays).toLocaleString()} highlight />
+                                <StatChip label={__('general.plays')} value={Number(eng.plays).toLocaleString()} highlight />
                                 <StatChip label={__('general.like_rate')} value={eng.like_rate} highlight={parseFloat(eng.like_rate) > 5} />
                                 <StatChip label={__('general.comment_rate')} value={eng.comment_rate} />
                                 <StatChip label={__('general.share_rate')} value={eng.share_rate} />
@@ -318,7 +318,7 @@ export default function ViralAutopsyRunner({ tool }: any) {
                             <div className="grid grid-cols-2 gap-3 mb-4">
                                 <StatChip label={__('general.hook_type')} value={cap.hook_type_label} />
                                 <StatChip label={__('general.caption_score')} value={`${cap.score}/30`} highlight={cap.score >= 20} />
-                                <StatChip label="Hashtags" value={`${cap.hashtag_count} tags`} />
+                                <StatChip label={__('general.hashtags')} value={`${cap.hashtag_count} tags`} />
                                 <StatChip label={__('general.word_count')} value={`${cap.word_count} words`} highlight={cap.word_count <= 30} />
                             </div>
                             {cap.triggers?.length > 0 && (
@@ -334,8 +334,8 @@ export default function ViralAutopsyRunner({ tool }: any) {
                         {/* Sound strategy */}
                         <Section icon={Music} title={__('general.sound_strategy')} color="text-pink-600">
                             <div className="grid grid-cols-2 gap-3 mb-3">
-                                <StatChip label="Sound" value={snd.title} />
-                                <StatChip label="Type" value={snd.is_original ? 'Original Audio' : 'Trending Sound'} highlight={!snd.is_original} />
+                                <StatChip label={__('general.sound')} value={snd.title} />
+                                <StatChip label={__('general.type')} value={snd.is_original ? 'Original Audio' : 'Trending Sound'} highlight={!snd.is_original} />
                             </div>
                             {snd.analysis?.map((s: string, i: number) => (
                                 <div key={i} className="flex items-start gap-2 bg-pink-50 border border-pink-100 rounded-xl px-3 py-2 mb-2">
@@ -349,8 +349,8 @@ export default function ViralAutopsyRunner({ tool }: any) {
                         {/* Content structure */}
                         <Section icon={Layout} title={__('general.content_structure')} color="text-blue-600">
                             <div className="grid grid-cols-2 gap-3 mb-3">
-                                <StatChip label="Duration" value={`${str.duration_seconds}s`} highlight={str.duration_seconds <= 30} />
-                                <StatChip label="Format" value={str.duration_label?.replace('_', ' ')} />
+                                <StatChip label={__('general.duration')} value={`${str.duration_seconds}s`} highlight={str.duration_seconds <= 30} />
+                                <StatChip label={__('general.format')} value={str.duration_label?.replace('_', ' ')} />
                             </div>
                             {str.analysis?.map((s: string, i: number) => (
                                 <div key={i} className="flex items-start gap-2 bg-blue-50 border border-blue-100 rounded-xl px-3 py-2 mb-2">

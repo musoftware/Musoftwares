@@ -91,9 +91,9 @@ export default function Index({ sequences }: { sequences: any }) {
                             <div className="flex justify-between items-start mb-4">
                                 <h3 className="font-semibold text-lg text-gray-900">{seq.name}</h3>
                                 {seq.is_active ? (
-                                    <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Active</span>
+                                    <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">{__('general.active')}</span>
                                 ) : (
-                                    <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">Draft</span>
+                                    <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">{__('general.draft')}</span>
                                 )}
                             </div>
                             
@@ -104,7 +104,7 @@ export default function Index({ sequences }: { sequences: any }) {
                                 </div>
                                 <div className="flex items-center text-sm text-gray-500">
                                     <Users className="w-4 h-4 me-2 text-blue-400" />
-                                    <span>Enrolled: <span className="font-medium text-gray-700">{seq.states_count}</span> Leads</span>
+                                    <span>Enrolled: <span className="font-medium text-gray-700">{seq.states_count}</span> {__('general.leads')}</span>
                                 </div>
                                 <div className="flex items-center text-sm text-gray-500">
                                     <div className="w-4 h-4 me-2 rounded-full border-2 border-indigo-400 flex items-center justify-center">
@@ -121,8 +121,7 @@ export default function Index({ sequences }: { sequences: any }) {
                             </Button>
                             <Link href={route('crm.sequences.show', seq.id)}>
                                 <Button size="sm" variant="outline">
-                                    <Edit className="w-4 h-4 me-2" /> Builder
-                                </Button>
+                                    <Edit className="w-4 h-4 me-2" /> {__('general.builder')}</Button>
                             </Link>
                         </div>
                     </div>

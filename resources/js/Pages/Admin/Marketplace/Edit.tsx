@@ -239,8 +239,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                         size="sm" 
                                         onClick={() => setLocale('en')}
                                     >
-                                        English
-                                    </Button>
+                                        {__('general.english')}</Button>
                                     <Button 
                                         type="button" 
                                         variant={__('outline')} 
@@ -566,8 +565,8 @@ export default function Edit({ auth, service, categories }: Props) {
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="fee">From Fee</SelectItem>
-                                                    <SelectItem value="seller">From Seller</SelectItem>
+                                                    <SelectItem value="fee">{__('general.from_fee')}</SelectItem>
+                                                    <SelectItem value="seller">{__('general.from_seller')}</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <div className="relative flex-1">

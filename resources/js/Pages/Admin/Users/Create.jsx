@@ -90,7 +90,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
                                 <div className="space-y-2">
                                     <Label htmlFor="name">{__('general.name')} <span className="text-red-500">*</span></Label>
                                     <Input id="name" value={data.name} onChange={e => setData('name', e.target.value)} placeholder={__('general.name')} required />
-                                    <p className="text-xs text-gray-500">Name must include a last name.</p>
+                                    <p className="text-xs text-gray-500">{__('general.name_must_include_a_last_name')}</p>
                                     {errors.name && <p className="text-sm text-red-600">{errors.name}</p>}
                                 </div>
                                 <div className="space-y-2">

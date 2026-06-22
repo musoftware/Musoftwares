@@ -3,6 +3,7 @@ import { router } from '@inertiajs/react';
 import { Users, Zap } from 'lucide-react';
 import { Badge } from '@/Components/ui/badge';
 import { PlatformBadges } from './PlatformBadge';
+import { __ } from '@/lib/i18n';
 
 const CATEGORY_ICON_MAP: Record<string, string> = {
     scraper:    '🌐',
@@ -65,8 +66,7 @@ export function ToolCard({ tool, isSubscribed = false }: ToolCardProps) {
                     <h3 className="font-semibold text-slate-900 text-sm leading-tight truncate">{tool.title}</h3>
                     {tool.is_featured && (
                         <Badge className="bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-50 text-[10px] px-1.5 py-0 font-medium h-4">
-                            Featured
-                        </Badge>
+                            {__('general.featured')}</Badge>
                     )}
                     {isSubscribed && (
                         <Badge className="bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-50 text-[10px] px-1.5 py-0 font-medium h-4">

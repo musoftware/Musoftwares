@@ -43,8 +43,7 @@ export default function AssignTask({ client }: Props) {
                     </div>
                     <div>
                         <Button variant="outline" onClick={() => window.history.back()}>
-                            <ArrowDownLeft className="h-4 w-4 me-2" style={{ transform: 'rotate(45deg)' }} /> Back
-                        </Button>
+                            <ArrowDownLeft className="h-4 w-4 me-2" style={{ transform: 'rotate(45deg)' }} /> {__('general.back')}</Button>
                     </div>
                 </header>
 
@@ -53,20 +52,19 @@ export default function AssignTask({ client }: Props) {
                         <CardHeader>
                             <CardTitle className="flex items-center">
                                 <Briefcase className="h-5 w-5 me-2 text-primary" />
-                                Task Details
-                            </CardTitle>
+                                {__('general.task_details')}</CardTitle>
                             <CardDescription>
                                 {__('general.this_will_create_a_new_task_named')} {client.name}'s Task {__('general.and_link_it_to_their_erp_account')}.
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="title">Task Title <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="title">{__('general.task_title')}<span className="text-red-500">*</span></Label>
                                 <Input
                                     id="title"
                                     value={data.title}
                                     onChange={e => setData('title', e.target.value)}
-                                    placeholder="Enter task title"
+                                    placeholder={__('general.enter_task_title')}
                                 />
                                 {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
                             </div>
@@ -77,7 +75,7 @@ export default function AssignTask({ client }: Props) {
                                     id="description"
                                     value={data.description}
                                     onChange={e => setData('description', e.target.value)}
-                                    placeholder="Enter task description or notes"
+                                    placeholder={__('general.enter_task_description_or_notes')}
                                     rows={4}
                                 />
                                 {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}

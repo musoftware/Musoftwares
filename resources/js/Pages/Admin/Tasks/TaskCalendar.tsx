@@ -183,8 +183,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                 <ChevronLeft className="h-4 w-4" />
                             </Button>
                             <Button variant="outline" size="sm" onClick={handleGoToToday}>
-                                Today
-                            </Button>
+                                {__('general.today')}</Button>
                             <Button variant="outline" size="sm" onClick={handleNextMonth}>
                                 <ChevronRight className="h-4 w-4" />
                             </Button>
@@ -381,8 +380,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                     onClick={() => setData('checklist_items', [...data.checklist_items, { title: '' }])}
                                     className="h-7 px-2 text-xs"
                                 >
-                                    <Plus className="h-3 w-3 me-1" /> Add Item
-                                </Button>
+                                    <Plus className="h-3 w-3 me-1" /> {__('general.add_item')}</Button>
                             </div>
                             
                             <div className="space-y-2">
@@ -395,7 +393,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                                 newItems[index].title = e.target.value;
                                                 setData('checklist_items', newItems);
                                             }}
-                                            placeholder="Checklist item description..."
+                                            placeholder={__('general.checklist_item_description')}
                                             className="h-8 text-sm"
                                             required
                                         />
@@ -414,7 +412,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                     </div>
                                 ))}
                                 {data.checklist_items.length === 0 && (
-                                    <p className="text-xs text-slate-400 italic">No checklist items added.</p>
+                                    <p className="text-xs text-slate-400 italic">{__('general.no_checklist_items_added')}</p>
                                 )}
                             </div>
                         </div>

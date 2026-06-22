@@ -22,19 +22,19 @@ export default function PublishStep({ data, setStep, processing }: any) {
                 <div className="p-6 space-y-4">
                     <div className="flex items-center justify-between py-2 border-b border-dashed border-slate-200">
                         <span className="text-sm font-medium text-slate-600">{__('general.title_category')}</span>
-                        <button type="button" onClick={() => setStep(1)} className="text-xs font-bold text-indigo-600 hover:underline">Edit</button>
+                        <button type="button" onClick={() => setStep(1)} className="text-xs font-bold text-indigo-600 hover:underline">{__('general.edit')}</button>
                     </div>
                     <div className="flex items-center justify-between py-2 border-b border-dashed border-slate-200">
                         <span className="text-sm font-medium text-slate-600">Pricing Packages ({data.packages.length})</span>
-                        <button type="button" onClick={() => setStep(2)} className="text-xs font-bold text-indigo-600 hover:underline">Edit</button>
+                        <button type="button" onClick={() => setStep(2)} className="text-xs font-bold text-indigo-600 hover:underline">{__('general.edit')}</button>
                     </div>
                     <div className="flex items-center justify-between py-2 border-b border-dashed border-slate-200">
                         <span className="text-sm font-medium text-slate-600">Description, FAQ ({data.faq.length}), Requirements ({data.requirements.length})</span>
-                        <button type="button" onClick={() => setStep(3)} className="text-xs font-bold text-indigo-600 hover:underline">Edit</button>
+                        <button type="button" onClick={() => setStep(3)} className="text-xs font-bold text-indigo-600 hover:underline">{__('general.edit')}</button>
                     </div>
                     <div className="flex items-center justify-between py-2">
                         <span className="text-sm font-medium text-slate-600">Gallery ({data.gallery.length} Images)</span>
-                        <button type="button" onClick={() => setStep(4)} className="text-xs font-bold text-indigo-600 hover:underline">Edit</button>
+                        <button type="button" onClick={() => setStep(4)} className="text-xs font-bold text-indigo-600 hover:underline">{__('general.edit')}</button>
                     </div>
                 </div>
             </div>

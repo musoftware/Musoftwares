@@ -30,8 +30,8 @@ export default function Documentation() {
 
                     <Tabs defaultValue="simple" className="w-full">
                         <TabsList className="mb-4">
-                            <TabsTrigger value="simple"><Code className="w-4 h-4 me-2"/> Simple</TabsTrigger>
-                            <TabsTrigger value="advanced"><Terminal className="w-4 h-4 me-2"/> Advanced</TabsTrigger>
+                            <TabsTrigger value="simple"><Code className="w-4 h-4 me-2"/> {__('general.simple')}</TabsTrigger>
+                            <TabsTrigger value="advanced"><Terminal className="w-4 h-4 me-2"/> {__('general.advanced')}</TabsTrigger>
                         </TabsList>
 
                         {/* SIMPLE */}
@@ -182,7 +182,7 @@ res.json({ id: session.id });`}</code>
                                     </CardHeader>
                                     <CardContent>
                                         <p className="text-slate-600 mb-4">{__('general.to_securely_confirm_that_a_webhook_was_actually_sent_by_our_gateway_you_must_verify_its_cryptographic_signature_using_your_webhook_secret')}<br/><br/>
-                                            <strong>Never</strong>{__('general.fulfill_an_order_without_verifying_the_webhook_signature')}</p>
+                                            <strong>{__('general.never')}</strong>{__('general.fulfill_an_order_without_verifying_the_webhook_signature')}</p>
                                         
                                         <Tabs defaultValue="php" className="w-full">
                                             <TabsList className="h-8">
@@ -293,15 +293,15 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
                         </CardHeader>
                         <CardContent className="space-y-6 text-sm text-amber-900/80 dark:text-amber-200/80">
                             <div>
-                                <h4 className="font-bold mb-1 text-amber-900 dark:text-amber-400">English</h4>
+                                <h4 className="font-bold mb-1 text-amber-900 dark:text-amber-400">{__('general.english')}</h4>
                                 <p>
-                                    <strong>{__('general.never_rely_on_the_frontend')}<code>onSuccess</code>{__('general.callback_to_fulfill_orders')}</strong><br/>{__('general.client_side_code_can_be_easily_manipulated_or_bypassed_by_users_hijacking_the')}<code>onSuccess</code>{__('general.event_is_strictly_for_ui_purposes_such_as_redirecting_the_user_to_a_thank_you_page_to_securely_verify_that_a_payment_was_successful_you_must_use')}<strong>Webhooks</strong>{__('general.or_server_side_api_verification_exactly_as_implemented_by_major_gateways_like_stripe')}</p>
+                                    <strong>{__('general.never_rely_on_the_frontend')}<code>onSuccess</code>{__('general.callback_to_fulfill_orders')}</strong><br/>{__('general.client_side_code_can_be_easily_manipulated_or_bypassed_by_users_hijacking_the')}<code>onSuccess</code>{__('general.event_is_strictly_for_ui_purposes_such_as_redirecting_the_user_to_a_thank_you_page_to_securely_verify_that_a_payment_was_successful_you_must_use')}<strong>{__('general.webhooks')}</strong>{__('general.or_server_side_api_verification_exactly_as_implemented_by_major_gateways_like_stripe')}</p>
                             </div>
                             <div  className="text-end font-sans">
                                 <h4 className="font-bold mb-1 text-amber-900 dark:text-amber-400">عربي</h4>
                                 <p>
                                     <strong>لا تعتمد أبداً على دالة <code>onSuccess</code> في واجهة المستخدم لتأكيد الطلبات.</strong><br/>
-                                    يمكن للمستخدمين التلاعب بسهولة بالكود من جهة المتصفح وتخطي عملية الدفع. حدث <code>onSuccess</code> مصمم فقط لتحسين تجربة المستخدم (مثل توجيهه لصفحة شكر). لكي تتأكد بأمان تام من نجاح الدفع، يجب عليك استخدام <strong>Webhooks</strong> أو التحقق من جانب السيرفر (Server-Side Verification)، تماماً كما تفعل بوابات الدفع العالمية مثل Stripe.
+                                    يمكن للمستخدمين التلاعب بسهولة بالكود من جهة المتصفح وتخطي عملية الدفع. حدث <code>onSuccess</code> مصمم فقط لتحسين تجربة المستخدم (مثل توجيهه لصفحة شكر). لكي تتأكد بأمان تام من نجاح الدفع، يجب عليك استخدام <strong>{__('general.webhooks')}</strong> أو التحقق من جانب السيرفر (Server-Side Verification)، تماماً كما تفعل بوابات الدفع العالمية مثل Stripe.
                                 </p>
                             </div>
                         </CardContent>

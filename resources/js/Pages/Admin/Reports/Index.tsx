@@ -56,7 +56,7 @@ export default function ReportsIndex({
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">Analytics</span>
+                            <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">{__('general.analytics')}</span>
                         </div>
                         <h1 className="text-2xl font-bold text-slate-900">{__('general.system_reports')}</h1>
                         <p className="text-sm text-slate-500 mt-1">{__('general.comprehensive_details_about_the_managed_system_and_financials')}</p>
@@ -199,7 +199,7 @@ export default function ReportsIndex({
                                     <thead className="text-slate-500 border-b border-slate-200">
                                         <tr>
                                             <th className="pb-3 font-medium">{__('general.tenant_name')}</th>
-                                            <th className="pb-3 text-end font-medium">Revenue</th>
+                                            <th className="pb-3 text-end font-medium">{__('general.revenue')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
@@ -230,7 +230,7 @@ export default function ReportsIndex({
                                     <Database className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <p className="text-xs text-slate-500 font-semibold uppercase">Database</p>
+                                    <p className="text-xs text-slate-500 font-semibold uppercase">{__('general.database')}</p>
                                     <p className="text-lg font-bold text-slate-900">{systemHealth?.database}</p>
                                 </div>
                             </div>
@@ -257,7 +257,7 @@ export default function ReportsIndex({
                                     <Activity className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <p className="text-xs text-slate-500 font-semibold uppercase">Memory</p>
+                                    <p className="text-xs text-slate-500 font-semibold uppercase">{__('general.memory')}</p>
                                     <p className="text-lg font-bold text-slate-900">{systemHealth?.memoryUsage}</p>
                                 </div>
                             </div>

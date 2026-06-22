@@ -270,8 +270,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                     ) : (
                         <Button size="sm" variant="outline" onClick={handleReopen}
                             className="border-amber-200 text-amber-700 hover:bg-amber-50">
-                            <RotateCcw className="me-1.5 h-4 w-4" /> Reopen
-                        </Button>
+                            <RotateCcw className="me-1.5 h-4 w-4" /> {__('general.reopen')}</Button>
                     )}
                 </div>
             </div>
@@ -360,10 +359,10 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                             // Style differences for Internal Notes
                             const isInternal = msg.is_internal;
                             const bubbleBg = isInternal 
-                                ? 'bg-amber-50 border border-amber-200 text-amber-900 rounded-tr-none' 
+                                ? 'bg-amber-50 border border-amber-200 text-amber-900 rounded-te-none' 
                                 : isAdminMsg
-                                    ? 'bg-indigo-600 text-white rounded-tr-none'
-                                    : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none';
+                                    ? 'bg-indigo-600 text-white rounded-te-none'
+                                    : 'bg-white border border-slate-200 text-slate-800 rounded-ts-none';
 
                             return (
                                 <div key={msg.id} className={`flex gap-3 ${isAdminMsg ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -531,7 +530,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                         </div>
                         <dl className="divide-y divide-slate-100">
                             <div className="flex items-center justify-between px-5 py-3">
-                                <dt className="flex items-center gap-2 text-xs text-slate-500"><Tag className="h-3.5 w-3.5" /> Status</dt>
+                                <dt className="flex items-center gap-2 text-xs text-slate-500"><Tag className="h-3.5 w-3.5" /> {__('general.status')}</dt>
                                 <dd>
                                     <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${statusMeta.badge}`}>
                                         <span className={`h-1.5 w-1.5 rounded-full ${statusMeta.dot}`} />
@@ -540,7 +539,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                 </dd>
                             </div>
                             <div className="flex items-center justify-between px-5 py-3">
-                                <dt className="flex items-center gap-2 text-xs text-slate-500"><AlertTriangle className="h-3.5 w-3.5" /> Priority</dt>
+                                <dt className="flex items-center gap-2 text-xs text-slate-500"><AlertTriangle className="h-3.5 w-3.5" /> {__('general.priority')}</dt>
                                 <dd>
                                     <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${priorityMeta.badge}`}>
                                         {priorityMeta.icon} {ticket.priority_text}
@@ -548,16 +547,16 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                                 </dd>
                             </div>
                             <div className="flex items-center justify-between px-5 py-3">
-                                <dt className="flex items-center gap-2 text-xs text-slate-500"><MessageSquare className="h-3.5 w-3.5" /> Replies</dt>
+                                <dt className="flex items-center gap-2 text-xs text-slate-500"><MessageSquare className="h-3.5 w-3.5" /> {__('general.replies')}</dt>
                                 <dd className="text-sm font-semibold text-slate-700">{messages.length}</dd>
                             </div>
                             <div className="flex items-center justify-between px-5 py-3">
-                                <dt className="flex items-center gap-2 text-xs text-slate-500"><Calendar className="h-3.5 w-3.5" /> Opened</dt>
+                                <dt className="flex items-center gap-2 text-xs text-slate-500"><Calendar className="h-3.5 w-3.5" /> {__('general.opened')}</dt>
                                 <dd className="text-xs text-slate-700" title={fullDate(ticket.created_at)}>{relativeTime(ticket.created_at)}</dd>
                             </div>
                             {ticket.closed_at && (
                                 <div className="flex items-center justify-between px-5 py-3">
-                                    <dt className="flex items-center gap-2 text-xs text-slate-500"><CheckCircle className="h-3.5 w-3.5" /> Closed</dt>
+                                    <dt className="flex items-center gap-2 text-xs text-slate-500"><CheckCircle className="h-3.5 w-3.5" /> {__('general.closed')}</dt>
                                     <dd className="text-xs text-slate-700" title={fullDate(ticket.closed_at)}>{relativeTime(ticket.closed_at)}</dd>
                                 </div>
                             )}
@@ -567,7 +566,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                     {/* Client info */}
                     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                         <div className="border-b border-slate-100 px-5 py-3">
-                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Client</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">{__('general.client')}</h3>
                         </div>
                         <div className="px-5 py-4 flex items-start gap-3">
                             <Avatar name={ticket.display_name} size="lg" />
@@ -589,7 +588,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                     {/* Assignment */}
                     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                         <div className="border-b border-slate-100 px-5 py-3">
-                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Assignment</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">{__('general.assignment')}</h3>
                         </div>
                         <div className="px-5 py-4">
                             <select 
@@ -654,7 +653,7 @@ export default function Show({ ticket, supportAgents, cannedResponses }: Props) 
                         />
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setCloseModalOpen(false)}>Cancel</Button>
+                        <Button variant="outline" onClick={() => setCloseModalOpen(false)}>{__('general.cancel')}</Button>
                         <Button 
                             onClick={handleCloseConfirm}
                             className="bg-emerald-600 hover:bg-emerald-700 text-white"

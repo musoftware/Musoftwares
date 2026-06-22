@@ -128,7 +128,7 @@ export default function Pay({
                                     <h1 className="text-2xl font-bold font-mono tracking-tight">{invoice.invoice_number}</h1>
                                 </div>
                                 <div className="text-end sm:text-end space-y-1.5">
-                                    <span className="text-xs text-slate-400 block uppercase tracking-wider font-semibold">Status</span>
+                                    <span className="text-xs text-slate-400 block uppercase tracking-wider font-semibold">{__('general.status')}</span>
                                     <StatusBadge status={invoice.status} />
                                 </div>
                             </div>
@@ -152,10 +152,10 @@ export default function Pay({
                                     <table className="min-w-full divide-y divide-slate-100">
                                         <thead>
                                             <tr className="text-start text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                                                <th className="pb-3 pe-4">Description</th>
+                                                <th className="pb-3 pe-4">{__('general.description')}</th>
                                                 <th className="pb-3 px-4 text-center">Qty</th>
                                                 <th className="pb-3 px-4 text-end">{__('general.unit_price')}</th>
-                                                <th className="pb-3 ps-4 text-end">Total</th>
+                                                <th className="pb-3 ps-4 text-end">{__('general.total')}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100 text-[13px] text-slate-700">
@@ -178,7 +178,7 @@ export default function Pay({
                                 {/* Financial Summary */}
                                 <div className="border-t border-slate-100 pt-6 flex flex-col items-end space-y-2.5">
                                     <div className="flex justify-between w-64 text-sm text-slate-500">
-                                        <span>Subtotal</span>
+                                        <span>{__('general.subtotal')}</span>
                                         <span className="font-mono font-medium">
                                             <CurrencyDisplay amount={invoice.amount} currency={invoice.currency} />
                                         </span>

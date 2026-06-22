@@ -64,7 +64,7 @@ export default function AffiliateModeratorsCreate() {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Password</label>
+                            <label className="text-sm font-medium text-gray-700">{__('general.password')}</label>
                             <Input 
                                 type="password" 
                                 value={data.password} 
@@ -79,8 +79,7 @@ export default function AffiliateModeratorsCreate() {
 
                 <div className="flex justify-end gap-3">
                     <Button type="button" variant="outline" onClick={() => window.history.back()} disabled={processing}>
-                        Cancel
-                    </Button>
+                        {__('general.cancel')}</Button>
                     <Button type="submit" className="bg-blue-600 hover:bg-blue-700 shadow-md" disabled={processing}>
                         <UserPlus className="w-4 h-4 me-2" />{__('general.create_account')}</Button>
                 </div>

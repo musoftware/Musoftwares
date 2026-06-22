@@ -161,7 +161,7 @@ export default function Show({ paymentMethod }: Props) {
                                 <DetailRow icon={Building2} label={__('general.bank_name')}       value={paymentMethod.bank_name} />
                                 <DetailRow icon={Hash}      label={__('general.account_number')}  value={paymentMethod.bank_number} />
                                 <DetailRow icon={UserIcon}  label={__('general.account_holder')}  value={paymentMethod.bank} />
-                                <DetailRow icon={GitBranch} label="Branch"          value={paymentMethod.bank_branch} />
+                                <DetailRow icon={GitBranch} label={__('general.branch')}          value={paymentMethod.bank_branch} />
                                 <DetailRow icon={Mail}      label={__('general.payee_email')}     value={paymentMethod.payee_email} />
                                 <DetailRow icon={Hash}      label={__('general.id_number')}       value={paymentMethod.id_number} />
                             </>
@@ -186,7 +186,7 @@ export default function Show({ paymentMethod }: Props) {
                             <>
                                 <DetailRow icon={Wallet}   label={__('general.wallet_provider')} value={paymentMethod.ewallet_provider} />
                                 <DetailRow icon={Mail}     label={__('general.payee_email')}     value={paymentMethod.payee_email} />
-                                <DetailRow icon={Phone}    label="Mobile"          value={paymentMethod.mobile} />
+                                <DetailRow icon={Phone}    label={__('general.mobile')}          value={paymentMethod.mobile} />
                                 <DetailRow icon={Hash}     label={__('general.id_number')}       value={paymentMethod.id_number} />
                             </>
                         )}
@@ -194,7 +194,7 @@ export default function Show({ paymentMethod }: Props) {
                         {/* Fallback: raw details string */}
                         {!isBank && !isMobile && !isPaypal && !isInstapay && paymentMethod.details && (
                             <div className="rounded-lg bg-slate-50 border border-slate-100 p-4">
-                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Details</p>
+                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">{__('general.details')}</p>
                                 <pre className="text-sm text-slate-700 whitespace-pre-wrap font-sans leading-relaxed">
                                     {paymentMethod.details}
                                 </pre>
@@ -246,7 +246,7 @@ export default function Show({ paymentMethod }: Props) {
 
                     {/* Actions card */}
                     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-2">
-                        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Actions</h3>
+                        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">{__('general.actions')}</h3>
 
                         {paymentMethod.status !== 'active' && (
                             <Button

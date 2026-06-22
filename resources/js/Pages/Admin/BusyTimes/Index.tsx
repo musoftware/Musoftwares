@@ -140,7 +140,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                     }`}
                 >
                     {row.is_recurring ? (
-                        <><RefreshCw className="h-3 w-3" /> Recurring</>
+                        <><RefreshCw className="h-3 w-3" /> {__('general.recurring')}</>
                     ) : (
                         <><CalendarDays className="h-3 w-3" />{__('general.one_off')}</>
                     )}
@@ -220,20 +220,19 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-44">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuLabel>{__('general.actions')}</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => handleToggleActive(row)}>
                             {row.is_active ? (
-                                <><ToggleLeft className="me-2 h-4 w-4" /> Deactivate</>
+                                <><ToggleLeft className="me-2 h-4 w-4" /> {__('general.deactivate')}</>
                             ) : (
-                                <><ToggleRight className="me-2 h-4 w-4" /> Activate</>
+                                <><ToggleRight className="me-2 h-4 w-4" /> {__('general.activate')}</>
                             )}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={() => handleDelete(row)}
                             className="text-red-600 focus:text-red-700"
                         >
-                            <Trash2 className="me-2 h-4 w-4" /> Delete
-                        </DropdownMenuItem>
+                            <Trash2 className="me-2 h-4 w-4" /> {__('general.delete')}</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             ),
@@ -248,7 +247,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                 onChange={(e) => handleFilter('is_recurring', e.target.value)}
             >
                 <option value="">{__('general.all_types')}</option>
-                <option value="1">Recurring</option>
+                <option value="1">{__('general.recurring')}</option>
                 <option value="0">{__('general.one_off')}</option>
             </select>
             <select
@@ -257,8 +256,8 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                 onChange={(e) => handleFilter('is_active', e.target.value)}
             >
                 <option value="">{__('general.all_statuses')}</option>
-                <option value="1">Active</option>
-                <option value="0">Inactive</option>
+                <option value="1">{__('general.active')}</option>
+                <option value="0">{__('general.inactive')}</option>
             </select>
             <select
                 className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
@@ -281,15 +280,15 @@ export default function Index({ busyTimes, filters, stats }: Props) {
             <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
                     <span className="text-2xl font-semibold text-slate-800">{stats.total}</span>
-                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Total</span>
+                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.total')}</span>
                 </div>
                 <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
                     <span className="text-2xl font-semibold text-green-600">{stats.active}</span>
-                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Active</span>
+                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.active')}</span>
                 </div>
                 <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
                     <span className="text-2xl font-semibold text-indigo-600">{stats.recurring}</span>
-                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Recurring</span>
+                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.recurring')}</span>
                 </div>
                 <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
                     <span className="text-2xl font-semibold text-amber-600">{stats.one_off}</span>

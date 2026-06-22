@@ -68,7 +68,7 @@ export default function CreateContract({ clients = [] }: { clients?: any[] }) {
                                     {errors.title && <p className="text-xs text-red-500">{errors.title}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Client <span className="text-red-500">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.client')}<span className="text-red-500">*</span></label>
                                     <Select value={form.client} onValueChange={(val) => setForm({...form, client: val || ''})}>
                                         <SelectTrigger className="bg-white border-slate-200 text-slate-900">
                                             <SelectValue placeholder={__('general.select_client')} />
@@ -101,8 +101,7 @@ export default function CreateContract({ clients = [] }: { clients?: any[] }) {
                             <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
                                 <Link href={route('erp.dashboard', { section: 'documents' })}>
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-900 hover:bg-slate-100">
-                                        Cancel
-                                    </Button>
+                                        {__('general.cancel')}</Button>
                                 </Link>
                                 <Button type="submit" disabled={isSubmitting}>
                                     {isSubmitting ? 'Drafting...' : 'Draft Contract'}

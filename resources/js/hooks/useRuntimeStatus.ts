@@ -17,6 +17,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { runtimeSDK } from '@/lib/runtime-sdk';
 import type { RuntimePlugin, RuntimeEvent, RuntimeStatus } from '@/lib/runtime-sdk';
+import { __ } from '@/lib/i18n';
 
 export type { RuntimePlugin, RuntimeEvent };
 
@@ -29,7 +30,7 @@ export interface UseRuntimeStatusReturn {
     activeTasks: { taskId: string; pluginId: string; runtime: string }[];
     error:       string | null;
     lastEvent:   RuntimeEvent | null;
-    runPlugin:   (slug: string, params?: Record<string, unknown>) => Promise<string | null>;
+    runPlugin:   (slug: string, params?: Record<string, unknown>) => {__('general.promise')}<string | null>;
     stopTask:    (taskId: string) => void;
     send:        (type: string, payload?: Record<string, unknown>) => void;
     connected:   boolean;

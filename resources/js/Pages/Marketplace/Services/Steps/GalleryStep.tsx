@@ -50,8 +50,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
                             </div>
                             {idx === 0 && (
                                 <div className="absolute top-2 start-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">
-                                    PRIMARY
-                                </div>
+                                    {__('general.primary')}</div>
                             )}
                         </div>
                     ))}
@@ -67,7 +66,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
                             <input {...getInputProps()} />
                             <UploadCloud className={`w-8 h-8 mb-3 ${isDragActive ? 'text-indigo-500' : 'text-slate-400'}`} />
                             <p className="text-sm font-bold text-slate-700">{__('general.drag_drop_photos_or')}</p>
-                            <p className="text-sm font-bold text-indigo-600 mb-1">Browse</p>
+                            <p className="text-sm font-bold text-indigo-600 mb-1">{__('general.browse')}</p>
                             <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">{__('general.max_5mb')}</p>
                         </div>
                     )}

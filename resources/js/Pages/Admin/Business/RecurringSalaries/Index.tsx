@@ -167,12 +167,12 @@ export default function Index({ salaries, currencies, users }) {
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="amount">Amount</Label>
+                                        <Label htmlFor="amount">{__('general.amount')}</Label>
                                         <Input id="amount" type="number" step="any" required value={newSalary.amount} onChange={e => setNewSalary({...newSalary, amount: e.target.value})} placeholder="0.00" />
                                         {errors.amount && <span className="text-red-600 text-xs block">{errors.amount}</span>}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="currency">Currency</Label>
+                                        <Label htmlFor="currency">{__('general.currency')}</Label>
                                         <select id="currency" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newSalary.currency} onChange={e => setNewSalary({...newSalary, currency: e.target.value})}>
                                             {currenciesList.map(c => <option key={c.id} value={c.id}>{c.currency} ({c.symbol})</option>)}
                                         </select>
@@ -194,12 +194,12 @@ export default function Index({ salaries, currencies, users }) {
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="frequency">Frequency</Label>
+                                        <Label htmlFor="frequency">{__('general.frequency')}</Label>
                                         <select id="frequency" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newSalary.recurring} onChange={e => setNewSalary({...newSalary, recurring: e.target.value})}>
-                                            <option value="day">Daily</option>
-                                            <option value="week">Weekly</option>
-                                            <option value="month">Monthly</option>
-                                            <option value="year">Annually</option>
+                                            <option value="day">{__('general.daily')}</option>
+                                            <option value="week">{__('general.weekly')}</option>
+                                            <option value="month">{__('general.monthly')}</option>
+                                            <option value="year">{__('general.annually')}</option>
                                         </select>
                                     </div>
                                     <div className="space-y-2">
@@ -286,15 +286,12 @@ export default function Index({ salaries, currencies, users }) {
                             <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.title_schedule')}</th>
                             <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.start_date')}</th>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
-                                Amount
-                            </th>
+                                {__('general.amount')}</th>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
-                                Active
-                            </th>
+                                {__('general.active')}</th>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
-                                Note
-                            </th>
-                            <th className="px-6 py-3 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Actions</th>
+                                {__('general.note')}</th>
+                            <th className="px-6 py-3 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -328,7 +325,7 @@ export default function Index({ salaries, currencies, users }) {
                                     <Switch 
                                         checked={salary.is_active} 
                                         onCheckedChange={() => handleToggleActive(salary.id)} 
-                                        aria-label="Toggle active status"
+                                        aria-label={__('general.toggle_active_status')}
                                     />
                                     <div className="text-[10px] text-gray-500 mt-1">{salary.is_active ? __('general.active') : __('general.inactive')}</div>
                                 </td>
@@ -344,7 +341,7 @@ export default function Index({ salaries, currencies, users }) {
                                         </Button>
                                     </Link>
                                     <Link href={route('admin.recurring_salaries.edit', salary.id)}>
-                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black me-1" title="Edit">
+                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black me-1" title={__('general.edit')}>
                                             <Edit className="w-4 h-4" />
                                         </Button>
                                     </Link>

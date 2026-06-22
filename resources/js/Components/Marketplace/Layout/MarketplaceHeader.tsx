@@ -69,8 +69,7 @@ export default function MarketplaceHeader() {
                             {__('general.explore')}
                         </Link>
                         <button className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
-                            <Globe className="h-4 w-4" /> English
-                        </button>
+                            <Globe className="h-4 w-4" /> {__('general.english')}</button>
                         <button className="hover:text-indigo-600 transition-colors">US$ USD</button>
                         {!user && (
                             <Link href="/marketplace/services/create" className="hover:text-indigo-600 transition-colors">

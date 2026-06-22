@@ -37,8 +37,7 @@ export default function Categories({ categories }: any) {
                         <form onSubmit={handleCreate}>
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700">
-                                    Name
-                                </label>
+                                    {__('general.name')}</label>
                                 <input
                                     required
                                     type="text"
@@ -49,8 +48,7 @@ export default function Categories({ categories }: any) {
                             </div>
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700">
-                                    Description
-                                </label>
+                                    {__('general.description')}</label>
                                 <textarea
                                     value={description}
                                     onChange={(e) =>
@@ -63,8 +61,7 @@ export default function Categories({ categories }: any) {
                                 type="submit"
                                 className="rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
                             >
-                                Save
-                            </button>
+                                {__('general.save')}</button>
                         </form>
                     </div>
 
@@ -74,14 +71,11 @@ export default function Categories({ categories }: any) {
                             <thead>
                                 <tr>
                                     <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                        Name
-                                    </th>
+                                        {__('general.name')}</th>
                                     <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                        Slug
-                                    </th>
+                                        {__('general.slug')}</th>
                                     <th className="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase">
-                                        Actions
-                                    </th>
+                                        {__('general.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
@@ -100,8 +94,7 @@ export default function Categories({ categories }: any) {
                                                 }
                                                 className="text-red-600 hover:text-red-900"
                                             >
-                                                Delete
-                                            </button>
+                                                {__('general.delete')}</button>
                                         </td>
                                     </tr>
                                 ))}

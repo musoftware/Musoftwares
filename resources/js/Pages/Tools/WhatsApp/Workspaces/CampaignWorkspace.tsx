@@ -738,8 +738,7 @@ export default function CampaignWorkspace({
                                     <div className="bg-teal-700 text-white px-4 py-3 flex items-center justify-between border-b border-teal-800">
                                         <div className="flex items-center gap-3">
                                             <div className="size-9 rounded-full bg-teal-600 border border-teal-500 flex items-center justify-center font-black text-xs shadow-sm">
-                                                WA
-                                            </div>
+                                                {__('general.wa')}</div>
                                             <div>
                                                 <p className="text-xs font-black">{selectedTemplate.name}</p>
                                                 <p className="text-[10px] text-teal-100">{isRtl ? 'معاينة الرسالة' : 'Live Preview'}</p>

@@ -202,11 +202,11 @@ export default function Index({ tickets, filters, stats }: Props) {
             render: (t: Ticket) => (
                 <DropdownMenu>
                     <DropdownMenuTrigger render={<Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100" />}>
-                        <span className="sr-only">Actions</span>
+                        <span className="sr-only">{__('general.actions')}</span>
                         <MoreHorizontal className="h-4 w-4 text-slate-400" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-44">
-                        <DropdownMenuLabel className="text-xs text-slate-500">Actions</DropdownMenuLabel>
+                        <DropdownMenuLabel className="text-xs text-slate-500">{__('general.actions')}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <Link href={`/admin/tickets/${t.id}`} className="flex items-center">
@@ -217,8 +217,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                                 <CheckCircle className="me-2 h-4 w-4" />{__('general.close_ticket')}</DropdownMenuItem>
                         ) : (
                             <DropdownMenuItem onClick={() => handleReopen(t.id)} className="text-amber-700 focus:text-amber-800">
-                                <RotateCcw className="me-2 h-4 w-4" /> Reopen
-                            </DropdownMenuItem>
+                                <RotateCcw className="me-2 h-4 w-4" /> {__('general.reopen')}</DropdownMenuItem>
                         )}
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -235,10 +234,10 @@ export default function Index({ tickets, filters, stats }: Props) {
                 onChange={(e) => applyFilter({ status: e.target.value })}
             >
                 <option value="">{__('general.all_statuses')}</option>
-                <option value="open">Open</option>
+                <option value="open">{__('general.open')}</option>
                 <option value="user_replied">{__('general.user_replied')}</option>
                 <option value="agent_replied">{__('general.agent_replied')}</option>
-                <option value="closed">Closed</option>
+                <option value="closed">{__('general.closed')}</option>
             </select>
             <select
                 className="h-9 rounded-xl border border-slate-200 bg-white px-3 text-xs text-slate-700 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
@@ -272,7 +271,7 @@ export default function Index({ tickets, filters, stats }: Props) {
             {stats && (
                 <div className="mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                     <StatCard
-                        label="Total"
+                        label={__('general.total')}
                         value={stats.total}
                         color="bg-slate-500"
                         icon={BarChart2}
@@ -280,7 +279,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                         onClick={() => applyFilter({ status: '' })}
                     />
                     <StatCard
-                        label="Open"
+                        label={__('general.open')}
                         value={stats.open}
                         color="bg-blue-500"
                         icon={Inbox}
@@ -288,7 +287,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                         onClick={() => handleStatusFilter('open')}
                     />
                     <StatCard
-                        label="Waiting"
+                        label={__('general.waiting')}
                         value={stats.waiting}
                         color="bg-violet-500"
                         icon={Clock}
@@ -296,7 +295,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                         onClick={() => handleStatusFilter('user_replied')}
                     />
                     <StatCard
-                        label="Replied"
+                        label={__('general.replied')}
                         value={stats.agent_replied}
                         color="bg-amber-500"
                         icon={MessageSquare}
@@ -304,7 +303,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                         onClick={() => handleStatusFilter('agent_replied')}
                     />
                     <StatCard
-                        label="Resolved"
+                        label={__('general.resolved')}
                         value={stats.closed}
                         color="bg-emerald-500"
                         icon={CheckCheck}

@@ -68,8 +68,7 @@ export default function Edit({ event }: Props) {
                     </div>
                     <div className="mt-4 sm:mt-0">
                         <Link href={route('booking.events.index')} className="text-sm font-medium text-slate-500 hover:text-slate-900">
-                            Back
-                        </Link>
+                            {__('general.back')}</Link>
                     </div>
                 </div>
 
@@ -107,7 +106,7 @@ export default function Edit({ event }: Props) {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="description">Description</Label>
+                                <Label htmlFor="description">{__('general.description')}</Label>
                                 <Textarea 
                                     id="description" 
                                     value={data.description}
@@ -176,7 +175,7 @@ export default function Edit({ event }: Props) {
                             {data.requires_payment && (
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="price">Price</Label>
+                                        <Label htmlFor="price">{__('general.price')}</Label>
                                         <Input 
                                             id="price" 
                                             type="number"
@@ -189,7 +188,7 @@ export default function Edit({ event }: Props) {
                                         {errors.price && <p className="text-sm text-red-500">{errors.price}</p>}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="currency">Currency</Label>
+                                        <Label htmlFor="currency">{__('general.currency')}</Label>
                                         <Input 
                                             id="currency" 
                                             value={data.currency}
@@ -210,8 +209,7 @@ export default function Edit({ event }: Props) {
                             href={route('booking.events.index')} 
                             className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-100 transition-colors"
                         >
-                            Cancel
-                        </Link>
+                            {__('general.cancel')}</Link>
                         <LoadingButton loading={processing} type="submit">{__('general.save_changes')}</LoadingButton>
                     </div>
                 </form>

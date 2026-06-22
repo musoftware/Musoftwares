@@ -80,12 +80,12 @@ export default function Create({ currencies, categories, stats }) {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="amount">Amount</Label>
+                            <Label htmlFor="amount">{__('general.amount')}</Label>
                             <Input id="amount" type="number" step="any" required value={newCost.amount} onChange={e => setNewCost({...newCost, amount: e.target.value})} placeholder="0.00" />
                             {errors.amount && <span className="text-red-600 text-xs block">{errors.amount}</span>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="currency">Currency</Label>
+                            <Label htmlFor="currency">{__('general.currency')}</Label>
                             <select id="currency" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newCost.currency} onChange={e => setNewCost({...newCost, currency: e.target.value})}>
                                 {currenciesList.map(c => <option key={c.id} value={c.id}>{c.currency} ({c.symbol})</option>)}
                             </select>
@@ -99,9 +99,9 @@ export default function Create({ currencies, categories, stats }) {
                                 setCreateReasonOption(e.target.value);
                                 setNewCost({...newCost, reason_choice: e.target.value});
                             }}>
-                                <option value="internet">Internet</option>
-                                <option value="electricity">Electricity</option>
-                                <option value="salary">Salary</option>
+                                <option value="internet">{__('general.internet')}</option>
+                                <option value="electricity">{__('general.electricity')}</option>
+                                <option value="salary">{__('general.salary')}</option>
                                 {categoriesList.filter(c => !['internet', 'electricity', 'salary'].includes(c.toLowerCase())).map((c, i) => (
                                     <option key={i} value={c}>{c}</option>
                                 ))}
@@ -122,12 +122,12 @@ export default function Create({ currencies, categories, stats }) {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="frequency">Frequency</Label>
+                            <Label htmlFor="frequency">{__('general.frequency')}</Label>
                             <select id="frequency" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newCost.recurring} onChange={e => setNewCost({...newCost, recurring: e.target.value})}>
-                                <option value="day">Daily</option>
-                                <option value="week">Weekly</option>
-                                <option value="month">Monthly</option>
-                                <option value="year">Annually</option>
+                                <option value="day">{__('general.daily')}</option>
+                                <option value="week">{__('general.weekly')}</option>
+                                <option value="month">{__('general.monthly')}</option>
+                                <option value="year">{__('general.annually')}</option>
                             </select>
                         </div>
                         <div className="space-y-2">

@@ -82,7 +82,7 @@ export default function BranchDashboard({ activeBranchId, branches, metrics }: P
                         <div className="space-y-4">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-slate-500">{__('general.system_status')}</span>
-                                <span className="text-emerald-600 font-medium">Online</span>
+                                <span className="text-emerald-600 font-medium">{__('general.online')}</span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-slate-500">{__('general.low_stock_items')}</span>

@@ -122,7 +122,7 @@ function AdjustDialog({ user, onClose }: { user: UserRow; onClose: () => void })
 
                     {/* Reason */}
                     <div className="space-y-1">
-                        <Label htmlFor="adj-reason">Reason</Label>
+                        <Label htmlFor="adj-reason">{__('general.reason')}</Label>
                         <Input
                             id="adj-reason"
                             placeholder={__('general.e_g_bonus_for_referral_campaign')}
@@ -135,8 +135,7 @@ function AdjustDialog({ user, onClose }: { user: UserRow; onClose: () => void })
 
                     <DialogFooter>
                         <Button type="button" variant="outline" onClick={onClose}>
-                            Cancel
-                        </Button>
+                            {__('general.cancel')}</Button>
                         <Button
                             type="submit"
                             disabled={processing || !data.amount || !data.reason}
@@ -199,11 +198,9 @@ function HistoryDialog({ user, onClose }: { user: UserRow; onClose: () => void }
                                 <tr>
                                     <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{__('general.action_label')}</th>
                                     <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 text-center">
-                                        Points
-                                    </th>
+                                        {__('general.points')}</th>
                                     <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 text-end">
-                                        Date
-                                    </th>
+                                        {__('general.date')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -309,8 +306,7 @@ export default function Index({ users, search }: Props) {
                         )}
                     </div>
                     <Button type="submit" variant="default" size="sm">
-                        Search
-                    </Button>
+                        {__('general.search')}</Button>
                 </form>
 
                 {/* Table */}
@@ -319,12 +315,10 @@ export default function Index({ users, search }: Props) {
                         <thead className="border-b border-slate-200 bg-slate-50">
                             <tr>
                                 <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                                    User
-                                </th>
+                                    {__('general.user')}</th>
                                 <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{__('general.points_balance')}</th>
                                 <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 text-end">
-                                    Actions
-                                </th>
+                                    {__('general.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -372,16 +366,14 @@ export default function Index({ users, search }: Props) {
                                                     onClick={() => setAdjustTarget(user)}
                                                 >
                                                     <Coins className="me-1.5 h-3.5 w-3.5" />
-                                                    Adjust
-                                                </Button>
+                                                    {__('general.adjust')}</Button>
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"
                                                     onClick={() => setHistoryTarget(user)}
                                                 >
                                                     <History className="me-1.5 h-3.5 w-3.5" />
-                                                    History
-                                                </Button>
+                                                    {__('general.history')}</Button>
                                             </div>
                                         </td>
                                     </tr>

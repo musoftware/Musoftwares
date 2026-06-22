@@ -288,7 +288,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                             <User className="w-4 h-4 text-blue-600" />
                         </div>
                         <div className="overflow-hidden">
-                            <small className="text-gray-400 block uppercase font-bold text-[10px] tracking-wider">Client</small>
+                            <small className="text-gray-400 block uppercase font-bold text-[10px] tracking-wider">{__('general.client')}</small>
                             <Link href={route('admin.users.show', item.client_id || 0)} target="_blank" className="font-bold text-gray-900 text-sm truncate block hover:text-blue-600 transition-colors">
                                 {item.client_name}
                             </Link>
@@ -301,7 +301,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                 <Folder className="w-4 h-4 text-amber-600" />
                             </div>
                             <div>
-                                <small className="text-gray-400 block uppercase font-bold text-[10px] tracking-wider">Project</small>
+                                <small className="text-gray-400 block uppercase font-bold text-[10px] tracking-wider">{__('general.project')}</small>
                                 <span className="font-bold text-gray-900 text-sm">{item.project_name}</span>
                             </div>
                         </div>
@@ -312,7 +312,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                             <Calendar className="w-4 h-4 text-green-600" />
                         </div>
                         <div>
-                            <small className="text-gray-400 block uppercase font-bold text-[10px] tracking-wider">Date</small>
+                            <small className="text-gray-400 block uppercase font-bold text-[10px] tracking-wider">{__('general.date')}</small>
                             <span className="font-bold text-gray-900 text-sm">{item.date || parseDateTime(new Date().toISOString()).date}</span>
                         </div>
                     </div>
@@ -379,7 +379,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                     type="text" 
                                     value={reason} 
                                     onChange={e => setReason(e.target.value)} 
-                                    placeholder="What did you work on?" 
+                                    placeholder={__('general.what_did_you_work_on')} 
                                     onKeyDown={e => { if(e.key === 'Enter') handleStart() }}
                                     className="shadow-sm"
                                     disabled={item.invoice_status !== 'unpaid'}
@@ -389,16 +389,15 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                             <div className="md:col-span-2">
                                 <div className="flex items-end gap-3 flex-wrap bg-gray-50/50 p-3 rounded-xl border border-gray-100">
                                     <div className="w-24">
-                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Hours</label>
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">{__('general.hours')}</label>
                                         <Input type="number" min="0" placeholder="0" value={manualHours} onChange={e => setManualHours(e.target.value)} disabled={item.invoice_status !== 'unpaid'} />
                                     </div>
                                     <div className="w-24">
-                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Minutes</label>
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">{__('general.minutes')}</label>
                                         <Input type="number" min="0" max="59" placeholder="0" value={manualMinutes} onChange={e => setManualMinutes(e.target.value)} disabled={item.invoice_status !== 'unpaid'} />
                                     </div>
                                     <Button type="button" variant="secondary" onClick={handleAddManual} disabled={item.invoice_status !== 'unpaid'}>
-                                        <Plus className="w-4 h-4 me-2" /> Add Duration
-                                    </Button>
+                                        <Plus className="w-4 h-4 me-2" /> {__('general.add_duration')}</Button>
                                 </div>
                             </div>
                         </div>
@@ -408,9 +407,9 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                             <table className="w-full text-sm">
                                 <thead className="bg-gray-50 border-b border-gray-200">
                                     <tr>
-                                        <th className="px-4 py-2 text-start font-semibold text-gray-600 w-1/4">Start</th>
+                                        <th className="px-4 py-2 text-start font-semibold text-gray-600 w-1/4">{__('general.start')}</th>
                                         <th className="px-4 py-2 text-start font-semibold text-gray-600 w-1/4">End</th>
-                                        <th className="px-4 py-2 text-start font-semibold text-gray-600 w-1/4">Duration</th>
+                                        <th className="px-4 py-2 text-start font-semibold text-gray-600 w-1/4">{__('general.duration')}</th>
                                         <th className="px-4 py-2 text-start font-semibold text-gray-600">{invoice_currency?.currency || 'Amount'}</th>
                                         <th className="px-4 py-2 w-12"></th>
                                     </tr>
@@ -463,16 +462,14 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                     disabled={isRunning || item.invoice_status !== 'unpaid'} 
                                     className="bg-blue-600 hover:bg-blue-700 shadow-sm"
                                 >
-                                    <Play className="w-4 h-4 me-2" /> Start
-                                </Button>
+                                    <Play className="w-4 h-4 me-2" /> {__('general.start')}</Button>
                                 <Button 
                                     onClick={handleStop} 
                                     disabled={!isRunning} 
                                     variant="outline" 
                                     className="border-gray-300 text-gray-700 hover:bg-gray-50"
                                 >
-                                    <Pause className="w-4 h-4 me-2" /> Pause
-                                </Button>
+                                    <Pause className="w-4 h-4 me-2" /> {__('general.pause')}</Button>
 
                                 <div className="flex items-center gap-2 ms-2 ps-2 border-s border-gray-200">
                                     <Button
@@ -509,15 +506,15 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                         {/* Summary Bar */}
                         <div className="bg-gray-50 rounded-xl p-4 flex flex-wrap gap-4 sm:gap-8 border border-gray-100">
                             <div className="flex-1 min-w-[120px]">
-                                <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Start Date</span>
+                                <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{__('general.start_date')}</span>
                                 <div className="font-mono text-sm text-gray-800">{firstStartDate}</div>
                             </div>
                             <div className="flex-1 min-w-[120px]">
-                                <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">End Date</span>
+                                <span className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{__('general.end_date')}</span>
                                 <div className="font-mono text-sm text-gray-800">{lastEndDate}</div>
                             </div>
                             <div className="flex-1 min-w-[120px]">
-                                <span className="block text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1">Total Time</span>
+                                <span className="block text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1">{__('general.total_time')}</span>
                                 <div className="font-mono text-lg font-bold text-blue-700">{formatDurationMS(currentTotalSeconds)}</div>
                             </div>
                             <div className="flex-1 min-w-[120px]">

@@ -321,7 +321,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                                 <Input placeholder={__('general.short_description')} value={item.description} onChange={e => updateItem(index, 'description', e.target.value)} />
                                             </div>
                                             <div className="w-24">
-                                                <Input type="number" placeholder="Hours" value={item.hours} onChange={e => updateItem(index, 'hours', parseFloat(e.target.value))} />
+                                                <Input type="number" placeholder={__('general.hours')} value={item.hours} onChange={e => updateItem(index, 'hours', parseFloat(e.target.value))} />
                                             </div>
                                             <div className="w-32 space-y-2">
                                                 <Input type="number" placeholder={__('general.rate_fixed')} value={item.hourly_rate_egp} onChange={e => updateItem(index, 'hourly_rate_egp', parseFloat(e.target.value))} />
@@ -329,13 +329,13 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                                     <SelectTrigger><SelectValue/></SelectTrigger>
                                                     <SelectContent>
                                                         <SelectItem value="One-time">{__('general.one_time')}</SelectItem>
-                                                        <SelectItem value="Monthly">Monthly</SelectItem>
-                                                        <SelectItem value="Yearly">Yearly</SelectItem>
+                                                        <SelectItem value="Monthly">{__('general.monthly')}</SelectItem>
+                                                        <SelectItem value="Yearly">{__('general.yearly')}</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </div>
                                             <div className="w-32">
-                                                <Input type="number" placeholder="Subtotal" value={item.subtotal_egp} onChange={e => updateItem(index, 'subtotal_egp', parseFloat(e.target.value))} />
+                                                <Input type="number" placeholder={__('general.subtotal')} value={item.subtotal_egp} onChange={e => updateItem(index, 'subtotal_egp', parseFloat(e.target.value))} />
                                             </div>
                                             <Button type="button" variant="ghost" size="icon" className="text-red-500" onClick={() => removeItem(index)}>
                                                 <Trash2 className="w-4 h-4" />
@@ -403,15 +403,15 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div>
-                                <Label>Status</Label>
+                                <Label>{__('general.status')}</Label>
                                 <Select value={data.status} onValueChange={v => setData('status', v)}>
                                     <SelectTrigger className="mt-1"><SelectValue/></SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="draft">Draft</SelectItem>
+                                        <SelectItem value="draft">{__('general.draft')}</SelectItem>
                                         <SelectItem value="sent">{__('general.sent_to_client')}</SelectItem>
-                                        <SelectItem value="signed">Signed</SelectItem>
-                                        <SelectItem value="active">Active</SelectItem>
-                                        <SelectItem value="completed">Completed</SelectItem>
+                                        <SelectItem value="signed">{__('general.signed')}</SelectItem>
+                                        <SelectItem value="active">{__('general.active')}</SelectItem>
+                                        <SelectItem value="completed">{__('general.completed')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -498,7 +498,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                     <Input type="date" value={data.valid_until} onChange={e => setData('valid_until', e.target.value)} className="mt-1" />
                                 </div>
                                 <div>
-                                    <Label>Duration</Label>
+                                    <Label>{__('general.duration')}</Label>
                                     <Input placeholder={__('general.e_g_15_days')} value={data.duration} onChange={e => setData('duration', e.target.value)} className="mt-1" />
                                 </div>
                             </div>
@@ -543,8 +543,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
 
             <div className="flex justify-end gap-3 sticky bottom-4 bg-white/80 backdrop-blur-md p-4 rounded-lg border shadow-sm z-10">
                 <Button type="button" variant="outline" onClick={() => router.get(route('isaas.contracts.index'))}>
-                    Cancel
-                </Button>
+                    {__('general.cancel')}</Button>
                 <Button type="submit" disabled={processing}>
                     {processing ? 'Saving...' : 'Save Contract'}
                 </Button>

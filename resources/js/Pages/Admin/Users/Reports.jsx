@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { formatMoney } from '@/lib/utils';
 import { format } from 'date-fns';
+import { __ } from '@/lib/i18n';
 
 function secondsToTime(seconds) {
     if (!seconds) return '00:00:00';
@@ -76,9 +77,9 @@ export default function Reports({ client, dates = [], unpaid = 0 }) {
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-gray-50">
-                                        <TableHead>Date</TableHead>
-                                        <TableHead>Time</TableHead>
-                                        <TableHead className="text-end">Cost</TableHead>
+                                        <TableHead>{__('general.date')}</TableHead>
+                                        <TableHead>{__('general.time')}</TableHead>
+                                        <TableHead className="text-end">{__('general.cost')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>

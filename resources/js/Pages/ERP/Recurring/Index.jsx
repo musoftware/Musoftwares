@@ -24,6 +24,7 @@ import {
     DropdownMenuTrigger
 } from '@/Components/ui/dropdown-menu.tsx';
 import { format, formatDistanceToNow, isAfter, isBefore, addDays } from 'date-fns';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ income, expense, stats }) {
     const [activeTab, setActiveTab] = useState('income');
@@ -90,7 +91,7 @@ export default function Index({ income, expense, stats }) {
 
                     {/* Tab Bar */}
                     <div className="mb-6 border-b border-gray-200">
-                        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                        <nav className="-mb-px flex space-x-8" aria-label={__('general.tabs')}>
                             <button
                                 onClick={() => setActiveTab('income')}
                                 className={`
@@ -101,8 +102,7 @@ export default function Index({ income, expense, stats }) {
                                 `}
                             >
                                 <TrendingUp className="w-4 h-4 me-2" />
-                                Income
-                            </button>
+                                {__('general.income')}</button>
                             <button
                                 onClick={() => setActiveTab('expense')}
                                 className={`
@@ -113,8 +113,7 @@ export default function Index({ income, expense, stats }) {
                                 `}
                             >
                                 <TrendingDown className="w-4 h-4 me-2" />
-                                Expenses
-                            </button>
+                                {__('general.expenses')}</button>
                         </nav>
                     </div>
 
@@ -172,13 +171,13 @@ export default function Index({ income, expense, stats }) {
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Frequency</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.title')}</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.frequency')}</th>
                                     <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.next_run')}</th>
-                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.amount')}</th>
+                                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.status')}</th>
                                     <th scope="col" className="relative px-6 py-3">
-                                        <span className="sr-only">Actions</span>
+                                        <span className="sr-only">{__('general.actions')}</span>
                                     </th>
                                 </tr>
                             </thead>
@@ -222,27 +221,24 @@ export default function Index({ income, expense, stats }) {
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuItem asChild>
                                                             <Link href={route('erp.recurring.edit', entry.id)} className="flex items-center w-full">
-                                                                <Edit2 className="w-4 h-4 me-2" /> Edit
-                                                            </Link>
+                                                                <Edit2 className="w-4 h-4 me-2" /> {__('general.edit')}</Link>
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => handlePauseResume(entry)} className="flex items-center w-full cursor-pointer">
                                                             {entry.status === 'active' ? (
-                                                                <><Pause className="w-4 h-4 me-2" /> Pause</>
+                                                                <><Pause className="w-4 h-4 me-2" /> {__('general.pause')}</>
                                                             ) : (
-                                                                <><Play className="w-4 h-4 me-2" /> Resume</>
+                                                                <><Play className="w-4 h-4 me-2" /> {__('general.resume')}</>
                                                             )}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem asChild>
                                                             <Link href={route('erp.recurring.logs', entry.id)} className="flex items-center w-full">
-                                                                <History className="w-4 h-4 me-2" /> Logs
-                                                            </Link>
+                                                                <History className="w-4 h-4 me-2" /> {__('general.logs')}</Link>
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             className="flex items-center w-full text-red-600 focus:text-red-600 cursor-pointer"
                                                             onClick={() => handleDelete(entry.id)}
                                                         >
-                                                            <Trash2 className="w-4 h-4 me-2" /> Delete
-                                                        </DropdownMenuItem>
+                                                            <Trash2 className="w-4 h-4 me-2" /> {__('general.delete')}</DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </td>

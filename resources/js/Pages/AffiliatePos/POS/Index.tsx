@@ -166,15 +166,15 @@ export default function PosIndex({ initialProducts, categories }: any) {
                 <div className="p-6 bg-white border-t shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                     <div className="space-y-3 mb-6">
                         <div className="flex justify-between text-gray-500">
-                            <span>Subtotal</span>
+                            <span>{__('general.subtotal')}</span>
                             <span>EGP {total}</span>
                         </div>
                         <div className="flex justify-between text-gray-500">
                             <span>Tax (0%)</span>
-                            <span>EGP 0</span>
+                            <span>{__('general.egp_0')}</span>
                         </div>
                         <div className="flex justify-between text-xl font-bold text-gray-900 pt-3 border-t">
-                            <span>Total</span>
+                            <span>{__('general.total')}</span>
                             <span>EGP {total}</span>
                         </div>
                     </div>

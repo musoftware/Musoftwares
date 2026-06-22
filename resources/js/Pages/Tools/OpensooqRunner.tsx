@@ -49,32 +49,31 @@ function LeadCard({ lead, idx }: { lead: any; idx: number }) {
             </div>
             <div className="flex-1 grid grid-cols-2 md:grid-cols-6 gap-3 min-w-0 items-center">
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Name</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.name')}</p>
                     <p className="text-xs font-semibold text-slate-800 truncate">{lead.name || '—'}</p>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Phone</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.phone')}</p>
                     <p className="text-xs font-mono text-slate-600 truncate">{lead.phone || '—'}</p>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">WhatsApp</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.whatsapp')}</p>
                     <p className="text-xs font-mono text-emerald-600 truncate">{lead.whatsapp || '—'}</p>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Email</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.email')}</p>
                     <p className="text-xs font-mono text-slate-600 truncate">{lead.email || '—'}</p>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Details</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.details')}</p>
                     <p className="text-xs text-slate-600 truncate" title={lead.listing_title || ''}>{lead.listing_title || '—'}</p>
                     <p className="text-[10px] text-slate-400 truncate" title={lead.region || ''}>{lead.region || '—'}</p>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Link</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.link')}</p>
                     {lead.url ? (
                         <a href={lead.url} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline truncate block flex items-center gap-1">
-                            <ExternalLink className="w-3 h-3 shrink-0" /> View
-                        </a>
+                            <ExternalLink className="w-3 h-3 shrink-0" /> {__('general.view')}</a>
                     ) : (
                         <p className="text-xs text-slate-500">—</p>
                     )}
@@ -521,7 +520,7 @@ export default function OpensooqRunner({ tool }: any) {
 
                                 {/* Country */}
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Country</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.country')}</label>
                                     <div className="relative">
                                         <MapPin className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <select
@@ -561,8 +560,7 @@ export default function OpensooqRunner({ tool }: any) {
                                         onClick={handleStop}
                                         className="h-11 gap-2 px-6 bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100 hover:text-rose-800 text-sm font-bold"
                                     >
-                                        <Square className="w-4 h-4" /> Stop
-                                    </Button>
+                                        <Square className="w-4 h-4" /> {__('general.stop')}</Button>
                                 ) : (
                                     <Button
                                         onClick={handleStart}
@@ -582,8 +580,7 @@ export default function OpensooqRunner({ tool }: any) {
                                         }}
                                         className="h-11 px-4 border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-600 text-sm font-medium"
                                     >
-                                        Clear
-                                    </Button>
+                                        {__('general.clear')}</Button>
                                 )}
                             </div>
 
@@ -615,11 +612,11 @@ export default function OpensooqRunner({ tool }: any) {
                         {/* Stats */}
                         {leads.length > 0 && (
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 animate-in fade-in duration-300">
-                                <StatCard label="Total" value={leads.length} icon={Users} color="bg-orange-50 border-orange-200" />
+                                <StatCard label={__('general.total')} value={leads.length} icon={Users} color="bg-orange-50 border-orange-200" />
                                 <StatCard label={__('general.with_phone')} value={leads.filter((l: any) => l.phone).length} icon={Phone} />
-                                <StatCard label="WhatsApp" value={leads.filter((l: any) => l.whatsapp).length} icon={MessageCircle} color="bg-emerald-50 border-emerald-200" />
+                                <StatCard label={__('general.whatsapp')} value={leads.filter((l: any) => l.whatsapp).length} icon={MessageCircle} color="bg-emerald-50 border-emerald-200" />
                                 <StatCard label={__('general.with_email')} value={leads.filter((l: any) => l.email).length} icon={Mail} />
-                                <StatCard label="Country" value={COUNTRIES.find(c => c.code === country)?.name} icon={MapPin} />
+                                <StatCard label={__('general.country')} value={COUNTRIES.find(c => c.code === country)?.name} icon={MapPin} />
                             </div>
                         )}
 
@@ -678,9 +675,9 @@ export default function OpensooqRunner({ tool }: any) {
                                     {/* Stats */}
                                     {campaignLeads.length > 0 && (
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
-                                            <StatCard label="Total" value={campaignLeads.length} icon={Users} color="bg-orange-50 border-orange-200" />
+                                            <StatCard label={__('general.total')} value={campaignLeads.length} icon={Users} color="bg-orange-50 border-orange-200" />
                                             <StatCard label={__('general.with_phone')} value={campaignLeads.filter(l => l.phone).length} icon={Phone} />
-                                            <StatCard label="WhatsApp" value={campaignLeads.filter(l => l.whatsapp).length} icon={MessageCircle} color="bg-emerald-50 border-emerald-200" />
+                                            <StatCard label={__('general.whatsapp')} value={campaignLeads.filter(l => l.whatsapp).length} icon={MessageCircle} color="bg-emerald-50 border-emerald-200" />
                                             <StatCard label={__('general.with_email')} value={campaignLeads.filter(l => l.email).length} icon={Mail} />
                                         </div>
                                     )}
@@ -717,8 +714,7 @@ export default function OpensooqRunner({ tool }: any) {
                                         disabled={loadingCampaigns}
                                         className="h-8 gap-1.5 text-xs font-bold"
                                     >
-                                        <RefreshCw className={`w-3.5 h-3.5 ${loadingCampaigns ? 'animate-spin' : ''}`} /> Refresh
-                                    </Button>
+                                        <RefreshCw className={`w-3.5 h-3.5 ${loadingCampaigns ? 'animate-spin' : ''}`} /> {__('general.refresh')}</Button>
                                 </div>
 
                                 {loadingCampaigns && campaigns.length === 0 ? (

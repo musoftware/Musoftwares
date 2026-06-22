@@ -156,7 +156,7 @@ export default function HoursCalendar({ years, auth }: any) {
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">Productivity</span>
+                            <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">{__('general.productivity')}</span>
                         </div>
                         <h1 className="text-2xl font-bold text-slate-900">{__('general.work_hours_calendar')}</h1>
                         <p className="text-sm text-slate-500 mt-1">{__('general.track_your_productivity_throughout_the_year')}</p>
@@ -253,13 +253,13 @@ export default function HoursCalendar({ years, auth }: any) {
                     </div>
 
                     <div className="flex items-center gap-2 mt-6 text-xs text-slate-500 justify-end w-full">
-                        <span>Less</span>
+                        <span>{__('general.less')}</span>
                         <div className="w-[12px] h-[12px] md:w-[14px] md:h-[14px] rounded-[2px] border bg-slate-100 border-slate-200"></div>
                         <div className="w-[12px] h-[12px] md:w-[14px] md:h-[14px] rounded-[2px] border bg-green-200 border-green-300"></div>
                         <div className="w-[12px] h-[12px] md:w-[14px] md:h-[14px] rounded-[2px] border bg-green-400 border-green-500"></div>
                         <div className="w-[12px] h-[12px] md:w-[14px] md:h-[14px] rounded-[2px] border bg-green-600 border-green-700"></div>
                         <div className="w-[12px] h-[12px] md:w-[14px] md:h-[14px] rounded-[2px] border bg-green-800 border-green-900"></div>
-                        <span>More</span>
+                        <span>{__('general.more')}</span>
                     </div>
 
                     {/* Tooltip */}

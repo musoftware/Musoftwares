@@ -78,8 +78,7 @@ export default function VendorProductsEdit({ product }: any) {
 
                 <div className="flex justify-end gap-3">
                     <Button type="button" variant="outline" onClick={() => window.history.back()} disabled={processing}>
-                        Cancel
-                    </Button>
+                        {__('general.cancel')}</Button>
                     <Button type="submit" className="bg-blue-600 hover:bg-blue-700 shadow-md" disabled={processing}>
                         <Save className="w-4 h-4 me-2" />{__('general.update_product')}</Button>
                 </div>

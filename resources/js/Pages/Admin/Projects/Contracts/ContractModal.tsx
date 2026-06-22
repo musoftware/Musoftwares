@@ -182,27 +182,23 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                         className={`px-4 py-2 font-medium text-sm ${activeTab === 'details' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'text-slate-500'}`}
                         onClick={() => setActiveTab('details')}
                     >
-                        General Details
-                    </button>
+                        {__('general.general_details')}</button>
                     <button 
                         className={`px-4 py-2 font-medium text-sm ${activeTab === 'scope' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'text-slate-500'}`}
                         onClick={() => setActiveTab('scope')}
                     >
-                        Scope & Features
-                    </button>
+                        {__('general.scope_features')}</button>
                     <button 
                         className={`px-4 py-2 font-medium text-sm ${activeTab === 'pricing' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'text-slate-500'}`}
                         onClick={() => setActiveTab('pricing')}
                     >
-                        Pricing & Milestones
-                    </button>
+                        {__('general.pricing_milestones')}</button>
                     {contract && (
                         <button 
                             className={`px-4 py-2 font-medium text-sm ${activeTab === 'ai' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'text-slate-500'} ms-auto flex items-center gap-1`}
                             onClick={() => setActiveTab('ai')}
                         >
-                            <Sparkles className="w-3 h-3" /> AI Assistant
-                        </button>
+                            <Sparkles className="w-3 h-3" /> {__('general.ai_assistant')}</button>
                     )}
                 </div>
 
@@ -212,7 +208,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                             <Sparkles className="w-5 h-5" /> Generate with AI (Recommended)
                         </div>
                         <Textarea 
-                            placeholder="Describe the project requirements, features, timeline, and pricing... The AI will structure the contract for you." 
+                            placeholder={__('general.describe_the_project_requirements_featur')} 
                             value={aiPrompt}
                             onChange={(e) => setAiPrompt(e.target.value)}
                             className="bg-white border-indigo-200"
@@ -223,7 +219,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                             disabled={isGenerating} 
                             className="self-end bg-indigo-600 hover:bg-indigo-700 text-white"
                         >
-                            {isGenerating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" /> Generating...</> : 'Generate Contract'}
+                            {isGenerating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" /> {__('general.generating')}</> : 'Generate Contract'}
                         </Button>
                     </div>
                 )}
@@ -237,25 +233,25 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                     value={formData.description} 
                                     onChange={e => setFormData({...formData, description: e.target.value})}
                                     rows={4}
-                                    placeholder="Executive summary of the project..."
+                                    placeholder={__('general.executive_summary_of_the_project')}
                                 />
                             </div>
                             <div>
-                                <Label>Currency</Label>
+                                <Label>{__('general.currency')}</Label>
                                 <select 
                                     className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                     value={formData.currency_id}
                                     onChange={e => setFormData({...formData, currency_id: e.target.value})}
                                     required
                                 >
-                                    <option value="">Select Currency</option>
+                                    <option value="">{__('general.select_currency')}</option>
                                     {currencies.map(c => (
                                         <option key={c.id} value={c.id}>{c.currency} ({c.symbol})</option>
                                     ))}
                                 </select>
                             </div>
                             <div>
-                                <Label>Total Amount</Label>
+                                <Label>{__('general.total_amount')}</Label>
                                 <Input 
                                     type="number" 
                                     step="0.01" 
@@ -272,7 +268,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                 />
                             </div>
                             <div>
-                                <Label>Valid Until</Label>
+                                <Label>{__('general.valid_until')}</Label>
                                 <Input 
                                     type="date" 
                                     value={formData.valid_until} 
@@ -281,16 +277,16 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                             </div>
                             {contract && (
                                 <div>
-                                    <Label>Contract Status</Label>
+                                    <Label>{__('general.contract_status')}</Label>
                                     <select 
                                         className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
                                         value={formData.status}
                                         onChange={e => setFormData({...formData, status: e.target.value})}
                                     >
-                                        <option value="draft">Draft</option>
-                                        <option value="sent">Sent</option>
-                                        <option value="active">Active</option>
-                                        <option value="completed">Completed</option>
+                                        <option value="draft">{__('general.draft')}</option>
+                                        <option value="sent">{__('general.sent')}</option>
+                                        <option value="active">{__('general.active')}</option>
+                                        <option value="completed">{__('general.completed')}</option>
                                     </select>
                                 </div>
                             )}
@@ -303,8 +299,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                 <div className="flex justify-between items-center mb-2">
                                     <Label className="text-base font-semibold">Key Features / Scope of Work</Label>
                                     <Button type="button" variant="outline" size="sm" onClick={addFeature}>
-                                        <Plus className="w-4 h-4 me-1" /> Add Feature
-                                    </Button>
+                                        <Plus className="w-4 h-4 me-1" /> {__('general.add_feature')}</Button>
                                 </div>
                                 <div className="space-y-2">
                                     {formData.key_features.map((feature, idx) => (
@@ -328,12 +323,12 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                             </div>
                             
                             <div className="pt-4 border-t">
-                                <Label className="text-base font-semibold block mb-2">General Terms & Conditions</Label>
+                                <Label className="text-base font-semibold block mb-2">{__('general.general_terms_conditions')}</Label>
                                 <Textarea 
                                     value={formData.terms} 
                                     onChange={e => setFormData({...formData, terms: e.target.value})}
                                     rows={6}
-                                    placeholder="Legal terms, responsibilities, etc..."
+                                    placeholder={__('general.legal_terms_responsibilities_etc')}
                                 />
                             </div>
                         </div>
@@ -345,29 +340,28 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                 <div className="flex justify-between items-center mb-2">
                                     <Label className="text-base font-semibold">Pricing Items (Quotation)</Label>
                                     <Button type="button" variant="outline" size="sm" onClick={addPricing}>
-                                        <Plus className="w-4 h-4 me-1" /> Add Item
-                                    </Button>
+                                        <Plus className="w-4 h-4 me-1" /> {__('general.add_item')}</Button>
                                 </div>
                                 <div className="space-y-3">
                                     {formData.pricing_items.map((item, idx) => (
                                         <div key={idx} className="flex items-start gap-2 bg-slate-50 p-3 rounded border">
                                             <div className="grid grid-cols-1 md:grid-cols-4 gap-2 flex-1">
                                                 <div className="md:col-span-4">
-                                                    <Input placeholder="Item Title" value={item.item} onChange={e => updatePricing(idx, 'item', e.target.value)} />
+                                                    <Input placeholder={__('general.item_title')} value={item.item} onChange={e => updatePricing(idx, 'item', e.target.value)} />
                                                 </div>
                                                 <div className="md:col-span-4">
-                                                    <Input placeholder="Description" value={item.description} onChange={e => updatePricing(idx, 'description', e.target.value)} />
+                                                    <Input placeholder={__('general.description')} value={item.description} onChange={e => updatePricing(idx, 'description', e.target.value)} />
                                                 </div>
                                                 <div>
                                                     <Label className="text-xs">Hours/Qty</Label>
-                                                    <Input type="number" placeholder="Hours" value={item.hours} onChange={e => updatePricing(idx, 'hours', e.target.value)} />
+                                                    <Input type="number" placeholder={__('general.hours')} value={item.hours} onChange={e => updatePricing(idx, 'hours', e.target.value)} />
                                                 </div>
                                                 <div>
-                                                    <Label className="text-xs">Rate</Label>
-                                                    <Input type="number" placeholder="Rate" value={item.hourly_rate} onChange={e => updatePricing(idx, 'hourly_rate', e.target.value)} />
+                                                    <Label className="text-xs">{__('general.rate')}</Label>
+                                                    <Input type="number" placeholder={__('general.rate')} value={item.hourly_rate} onChange={e => updatePricing(idx, 'hourly_rate', e.target.value)} />
                                                 </div>
                                                 <div className="md:col-span-2">
-                                                    <Label className="text-xs">Line Total</Label>
+                                                    <Label className="text-xs">{__('general.line_total')}</Label>
                                                     <Input type="number" disabled value={item.total} className="bg-slate-100" />
                                                 </div>
                                             </div>
@@ -378,8 +372,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                     ))}
                                     {formData.pricing_items.length === 0 && (
                                         <div className="text-center p-4 border border-dashed rounded text-slate-500 text-sm">
-                                            No pricing items added.
-                                        </div>
+                                            {__('general.no_pricing_items_added')}</div>
                                     )}
                                 </div>
                             </div>
@@ -397,11 +390,9 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                             {contract && (
                                 <div className="pt-4 border-t flex items-center justify-between">
                                     <div className="text-sm text-slate-600">
-                                        You can generate invoices dynamically from the contract milestones.
-                                    </div>
+                                        {__('general.you_can_generate_invoices_dynamically_fr')}</div>
                                     <Button type="button" variant="outline" onClick={handleGenerateInvoice}>
-                                        <Send className="w-4 h-4 me-2" /> Generate Invoice
-                                    </Button>
+                                        <Send className="w-4 h-4 me-2" /> {__('general.generate_invoice')}</Button>
                                 </div>
                             )}
                         </div>
@@ -410,13 +401,12 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                     {activeTab === 'ai' && contract && (
                         <div className="bg-indigo-50 p-4 rounded-lg mb-6 border border-indigo-100 flex flex-col gap-3">
                             <div className="flex items-center gap-2 text-indigo-800 font-semibold">
-                                <Sparkles className="w-5 h-5" /> Refine with AI
-                            </div>
+                                <Sparkles className="w-5 h-5" /> {__('general.refine_with_ai')}</div>
                             <p className="text-sm text-indigo-700 mb-2">
                                 Describe the changes you want to make to this contract (e.g., "Add a milestone for testing", "Change the duration to 6 months and adjust pricing accordingly"). The AI will create a new version.
                             </p>
                             <Textarea 
-                                placeholder="Instructions for AI..." 
+                                placeholder={__('general.instructions_for_ai')} 
                                 value={aiPrompt}
                                 onChange={(e) => setAiPrompt(e.target.value)}
                                 className="bg-white border-indigo-200"
@@ -427,7 +417,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                 disabled={isGenerating} 
                                 className="self-end bg-indigo-600 hover:bg-indigo-700 text-white"
                             >
-                                {isGenerating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" /> Processing...</> : 'Refine Contract'}
+                                {isGenerating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" /> {__('general.processing')}</> : 'Refine Contract'}
                             </Button>
                         </div>
                     )}
@@ -435,7 +425,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                 </form>
 
                 <DialogFooter className="mt-6 border-t pt-4">
-                    <Button variant="outline" onClick={onClose} type="button">Cancel</Button>
+                    <Button variant="outline" onClick={onClose} type="button">{__('general.cancel')}</Button>
                     <Button type="submit" form="contract-form" disabled={isLoading || isGenerating}>
                         {isLoading ? <Loader2 className="w-4 h-4 animate-spin me-2" /> : null}
                         {contract ? 'Update Contract (Creates new version)' : 'Create Contract'}

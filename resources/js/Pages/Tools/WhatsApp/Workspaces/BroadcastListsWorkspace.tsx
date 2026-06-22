@@ -257,8 +257,7 @@ export default function BroadcastListsWorkspace({ t, locale, callRPC, daemonConn
                             {copiedId ? (isRtl ? 'تم!' : 'Copied!') : (isRtl ? 'نسخ' : 'Copy')}
                         </Button>
                         <Button variant="outline" size="sm" className="rounded-xl gap-1.5 text-xs font-bold" onClick={handleDownloadCSV} disabled={members.length === 0}>
-                            <Download className="w-3 h-3" /> CSV
-                        </Button>
+                            <Download className="w-3 h-3" /> {__('general.csv')}</Button>
                         <Button variant="outline" size="sm" className="rounded-xl gap-1.5 text-xs font-bold" onClick={() => { setShowImportContacts(true); fetchFolders(); }}>
                             <FolderOpen className="w-3 h-3" />
                             {isRtl ? 'استيراد من مجلد' : 'Import from Folder'}
@@ -478,6 +477,7 @@ export default function BroadcastListsWorkspace({ t, locale, callRPC, daemonConn
                             <p className="text-sm font-bold">{isRtl ? 'لا أعضاء بعد' : 'No members yet'}</p>
                             <p className="text-xs text-muted-foreground mt-1">
                                 {isRtl ? 'أضف أعضاء يدوياً أو استورد من مجلدات الكونتاكت' : 'Add members manually or import from contact folders'}
+import { __ } from '@/lib/i18n';
                             </p>
                         </div>
                     )}

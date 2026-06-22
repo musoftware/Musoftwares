@@ -58,7 +58,7 @@ export default function Create({ services }) {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="slug">Slug</Label>
+                            <Label htmlFor="slug">{__('general.slug')}</Label>
                             <Input
                                 id="slug"
                                 value={data.slug}
@@ -83,7 +83,7 @@ export default function Create({ services }) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="excerpt">Excerpt</Label>
+                        <Label htmlFor="excerpt">{__('general.excerpt')}</Label>
                         <Textarea
                             id="excerpt"
                             value={data.excerpt}
@@ -102,8 +102,8 @@ export default function Create({ services }) {
                                     <SelectValue placeholder={__('general.select_language')} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="en">English</SelectItem>
-                                    <SelectItem value="ar">Arabic</SelectItem>
+                                    <SelectItem value="en">{__('general.english')}</SelectItem>
+                                    <SelectItem value="ar">{__('general.arabic')}</SelectItem>
                                 </SelectContent>
                             </Select>
                             {errors.language && <p className="text-sm text-red-600">{errors.language}</p>}

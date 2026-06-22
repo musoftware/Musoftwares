@@ -18,8 +18,7 @@ export default function Index({
             header={
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl leading-tight font-semibold text-gray-800">
-                        Notifications
-                    </h2>
+                        {__('general.notifications')}</h2>
                     <button
                         onClick={markAllRead}
                         disabled={processing}
@@ -28,7 +27,7 @@ export default function Index({
                 </div>
             }
         >
-            <Head title="Notifications" />
+            <Head title={__('general.notifications')} />
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">

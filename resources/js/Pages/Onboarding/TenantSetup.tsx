@@ -101,8 +101,8 @@ export default function TenantSetup({ user, errors }: Props) {
                                     {s}
                                 </div>
                                 <span className={`hidden sm:inline-block text-xs font-medium ${s === 1 ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}>
-                                    {s === 1 && __('general.tenant_setup', 'Workspace Setup')}
-                                    {s === 2 && __('general.role_assignment', 'Role Assignment')}
+                                    {s === 1 && (__('general.tenant_setup') ?? 'Workspace Setup')}
+                                    {s === 2 && (__('general.role_assignment') ?? 'Role Assignment')}
                                 </span>
                                 {s < 2 && <ChevronRight className="w-3.5 h-3.5 text-muted-foreground mx-1" />}
                             </div>
@@ -116,14 +116,14 @@ export default function TenantSetup({ user, errors }: Props) {
                             <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mb-4 text-foreground">
                                 <Building className="w-5 h-5" />
                             </div>
-                            <CardTitle className="text-xl sm:text-2xl">{__('general.create_your_workspace', 'Create your workspace')}</CardTitle>
-                            <CardDescription className="mt-1.5 leading-relaxed">{__('general.setup_workspace_details', 'Configure the core identity for your team environment.')}</CardDescription>
+                            <CardTitle className="text-xl sm:text-2xl">{(__('general.create_your_workspace') ?? 'Create your workspace')}</CardTitle>
+                            <CardDescription className="mt-1.5 leading-relaxed">{(__('general.setup_workspace_details') ?? 'Configure the core identity for your team environment.')}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6 px-8 py-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{__('general.workspace_name', 'Workspace Name')}<span className="text-destructive">*</span></label>
+                                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{(__('general.workspace_name') ?? 'Workspace Name')}<span className="text-destructive">*</span></label>
                                 <Input
-                                    placeholder="Acme Corp"
+                                    placeholder={__('general.acme_corp')}
                                     value={formData.name}
                                     onChange={handleNameChange}
                                     className="h-10 text-sm font-medium"
@@ -134,7 +134,7 @@ export default function TenantSetup({ user, errors }: Props) {
                             <div className="space-y-2">
                                 <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center space-x-1.5">
                                     <LinkIcon className="w-3.5 h-3.5 text-blue-500" />
-                                    <span>{__('general.subdomain', 'Subdomain')}</span>
+                                    <span>{(__('general.subdomain') ?? 'Subdomain')}</span>
                                     <span className="text-destructive">*</span>
                                 </label>
                                 <div className="flex items-center space-x-2">
@@ -150,7 +150,7 @@ export default function TenantSetup({ user, errors }: Props) {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{__('general.logo', 'Logo')} <span className="text-muted-foreground/70 font-normal lowercase">(optional)</span></label>
+                                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{(__('general.logo') ?? 'Logo')} <span className="text-muted-foreground/70 font-normal lowercase">(optional)</span></label>
                                 
                                 <div className="flex items-center gap-4">
                                     {previewUrl ? (
@@ -177,7 +177,7 @@ export default function TenantSetup({ user, errors }: Props) {
                                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                             />
                                             <Button type="button" variant="outline" className="w-full" disabled={saving}>
-                                                <Upload className="w-4 h-4 me-2" /> {__('general.upload_logo', 'Upload Logo')}
+                                                <Upload className="w-4 h-4 me-2" /> {(__('general.upload_logo') ?? 'Upload Logo')}
                                             </Button>
                                         </div>
                                         <p className="text-xs text-muted-foreground mt-2">Recommended: 256x256px transparent PNG.</p>
@@ -188,7 +188,7 @@ export default function TenantSetup({ user, errors }: Props) {
                         </CardContent>
                         <CardFooter className="border-t px-8 py-4 flex justify-end bg-muted/30">
                             <Button onClick={handleComplete} size="lg" className="h-11 px-6 rounded-xl font-medium shadow-sm" disabled={saving || !formData.name || !formData.subdomain}>
-                                {saving ? <><Loader2 className="w-4 h-4 me-2 animate-spin" />{__('general.saving', 'Saving...')}</> : <>{__('general.continue', 'Continue')}<ArrowRight className="w-4 h-4 ms-2" /></>}
+                                {saving ? <><Loader2 className="w-4 h-4 me-2 animate-spin" />{(__('general.saving') ?? 'Saving...')}</> : <>{(__('general.continue') ?? 'Continue')}<ArrowRight className="w-4 h-4 ms-2" /></>}
                             </Button>
                         </CardFooter>
                     </motion.div>

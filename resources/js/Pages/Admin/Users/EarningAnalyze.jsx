@@ -22,6 +22,7 @@ import {
 } from '@/Components/ui/tooltip';
 import { formatMoney } from '@/lib/utils';
 import { format } from 'date-fns';
+import { __ } from '@/lib/i18n';
 
 // ─────────────────────────────────────────────────────────────
 // Business currency formatter — prepends symbol from backend
@@ -163,21 +164,18 @@ function StatusBadge({ status }) {
     if (status === 'cleared') {
         return (
             <Badge className="bg-green-50 text-green-700 border-green-200 text-xs font-medium gap-1">
-                <CheckCircle2 className="h-2.5 w-2.5" /> Cleared
-            </Badge>
+                <CheckCircle2 className="h-2.5 w-2.5" /> {__('general.cleared')}</Badge>
         );
     }
     if (status === 'overdue') {
         return (
             <Badge className="bg-red-50 text-red-700 border-red-200 text-xs font-medium gap-1">
-                <AlertTriangle className="h-2.5 w-2.5" /> Overdue
-            </Badge>
+                <AlertTriangle className="h-2.5 w-2.5" /> {__('general.overdue')}</Badge>
         );
     }
     return (
         <Badge className="bg-amber-50 text-amber-700 border-amber-200 text-xs font-medium gap-1">
-            <Clock className="h-2.5 w-2.5" /> Pending
-        </Badge>
+            <Clock className="h-2.5 w-2.5" /> {__('general.pending')}</Badge>
     );
 }
 
@@ -251,7 +249,7 @@ export default function EarningAnalyze({
 
             {/* ── Section 1: KPIs ───────────────────────────────────────── */}
             <div className="mb-8">
-                <SectionLabel icon={DollarSign} label="Summary" />
+                <SectionLabel icon={DollarSign} label={__('general.summary')} />
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     <MetricCard
                         icon={DollarSign}
@@ -269,7 +267,7 @@ export default function EarningAnalyze({
                     />
                     <MetricCard
                         icon={CheckCircle2}
-                        label="Cleared"
+                        label={__('general.cleared')}
                         value={fmt(stats?.cleared_earnings)}
                         sub="Already paid to user wallets"
                         success
@@ -484,9 +482,9 @@ export default function EarningAnalyze({
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-slate-50">
-                                        <TableHead className="text-xs">Currency</TableHead>
-                                        <TableHead className="text-end text-xs">Total</TableHead>
-                                        <TableHead className="text-end text-xs">Count</TableHead>
+                                        <TableHead className="text-xs">{__('general.currency')}</TableHead>
+                                        <TableHead className="text-end text-xs">{__('general.total')}</TableHead>
+                                        <TableHead className="text-end text-xs">{__('general.count')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -527,13 +525,13 @@ export default function EarningAnalyze({
                             <TableHeader>
                                 <TableRow className="bg-slate-50">
                                     <TableHead className="w-10 text-xs">#</TableHead>
-                                    <TableHead className="text-xs">User</TableHead>
+                                    <TableHead className="text-xs">{__('general.user')}</TableHead>
                                     <TableHead
                                         className="cursor-pointer select-none hover:text-slate-900 text-xs"
                                         onClick={() => toggleSort('referral_count')}
                                     >
                                         <span className="flex items-center gap-1">
-                                            Referrals <SortIcon k="referral_count" />
+                                            {__('general.referrals')}<SortIcon k="referral_count" />
                                         </span>
                                     </TableHead>
                                     <TableHead
@@ -541,7 +539,7 @@ export default function EarningAnalyze({
                                         onClick={() => toggleSort('total_earned')}
                                     >
                                         <span className="flex items-center justify-end gap-1">
-                                            Earned <SortIcon k="total_earned" />
+                                            {__('general.earned')}<SortIcon k="total_earned" />
                                         </span>
                                     </TableHead>
                                     <TableHead className="w-12 text-end text-xs"></TableHead>
@@ -625,12 +623,12 @@ export default function EarningAnalyze({
                             <TableHeader>
                                 <TableRow className="bg-slate-50">
                                     <TableHead className="w-10 text-xs">ID</TableHead>
-                                    <TableHead className="text-xs">Earner</TableHead>
+                                    <TableHead className="text-xs">{__('general.earner')}</TableHead>
                                     <TableHead className="text-xs">{__('general.referred_user')}</TableHead>
-                                    <TableHead className="text-end text-xs">Amount</TableHead>
-                                    <TableHead className="text-xs">Status</TableHead>
+                                    <TableHead className="text-end text-xs">{__('general.amount')}</TableHead>
+                                    <TableHead className="text-xs">{__('general.status')}</TableHead>
                                     <TableHead className="text-xs">{__('general.clear_date')}</TableHead>
-                                    <TableHead className="text-xs">Created</TableHead>
+                                    <TableHead className="text-xs">{__('general.created')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>

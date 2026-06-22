@@ -27,19 +27,19 @@ function LeadCard({ lead, idx }: { lead: any; idx: number }) {
             </div>
             <div className="flex-1 grid grid-cols-2 md:grid-cols-5 gap-3 min-w-0">
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Name</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.name')}</p>
                     <p className="text-xs font-semibold text-slate-800 truncate">{lead.name || '—'}</p>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Phone</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.phone')}</p>
                     <p className="text-xs font-mono text-slate-600 truncate">{lead.phone || '—'}</p>
                 </div>
                 <div className="min-w-0 md:col-span-2">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Listing</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.listing')}</p>
                     <p className="text-xs text-slate-600 truncate">{lead.listing_title || '—'}</p>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Price</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.price')}</p>
                     <p className="text-xs font-semibold text-emerald-600 truncate">{lead.price || '—'}</p>
                 </div>
             </div>
@@ -219,8 +219,7 @@ export default function HarajRunner({ tool }: any) {
                         {status === 'running' ? (
                             <Button variant="outline" onClick={() => { setStatus('done'); setProgressMsg(`Stopped — ${leads.length} leads captured.`); }}
                                 className="h-11 gap-2 px-6 bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100 hover:text-rose-800 text-sm font-bold">
-                                <Square className="w-4 h-4" /> Stop
-                            </Button>
+                                <Square className="w-4 h-4" /> {__('general.stop')}</Button>
                         ) : (
                             <Button onClick={handleStart} disabled={!keyword.trim()}
                                 className="h-11 gap-2 px-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md text-sm font-bold hover:opacity-90">
@@ -229,8 +228,7 @@ export default function HarajRunner({ tool }: any) {
                         {leads.length > 0 && status !== 'running' && (
                             <Button variant="outline" onClick={() => { setLeads([]); setStatus('idle'); setProgress(0); }}
                                 className="h-11 px-4 border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-600 text-sm font-medium">
-                                Clear
-                            </Button>
+                                {__('general.clear')}</Button>
                         )}
                     </div>
 

@@ -123,7 +123,7 @@ export default function ClientPageLayout({
 
                 {/* Admin UX Tabs */}
                 <div className="border-b border-slate-200 mb-6">
-                    <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                    <nav className="-mb-px flex space-x-8" aria-label={__('general.tabs')}>
                         {tabs.map((tab) => {
                             const isActive = activeTab === tab.id;
                             return (

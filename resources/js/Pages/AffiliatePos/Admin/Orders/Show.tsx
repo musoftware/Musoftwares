@@ -51,10 +51,10 @@ export default function OrderShow({ order }: any) {
                             <SelectValue placeholder={__('general.update_status_1')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="preparing">Preparing</SelectItem>
-                            <SelectItem value="shipping">Shipping</SelectItem>
-                            <SelectItem value="delivered">Delivered</SelectItem>
-                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                            <SelectItem value="preparing">{__('general.preparing')}</SelectItem>
+                            <SelectItem value="shipping">{__('general.shipping')}</SelectItem>
+                            <SelectItem value="delivered">{__('general.delivered')}</SelectItem>
+                            <SelectItem value="cancelled">{__('general.cancelled')}</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -68,9 +68,9 @@ export default function OrderShow({ order }: any) {
                         <div className="absolute top-5 start-16 end-16 h-0.5 bg-blue-600 z-0 transition-all duration-500" style={{ width: order.status === 'new' ? '0%' : order.status === 'preparing' ? '33%' : order.status === 'shipping' ? '66%' : '100%' }}></div>
                         
                         <div className="relative z-10"><TimelineStep title={__('general.new_order')} active={true} /></div>
-                        <div className="relative z-10"><TimelineStep title="Preparing" active={['preparing', 'shipping', 'delivered'].includes(order.status)} /></div>
-                        <div className="relative z-10"><TimelineStep title="Shipping" active={['shipping', 'delivered'].includes(order.status)} /></div>
-                        <div className="relative z-10"><TimelineStep title="Delivered" active={order.status === 'delivered'} isLast={true} /></div>
+                        <div className="relative z-10"><TimelineStep title={__('general.preparing')} active={['preparing', 'shipping', 'delivered'].includes(order.status)} /></div>
+                        <div className="relative z-10"><TimelineStep title={__('general.shipping')} active={['shipping', 'delivered'].includes(order.status)} /></div>
+                        <div className="relative z-10"><TimelineStep title={__('general.delivered')} active={order.status === 'delivered'} isLast={true} /></div>
                     </div>
                 </CardContent>
             </Card>
@@ -84,11 +84,11 @@ export default function OrderShow({ order }: any) {
                     </CardHeader>
                     <CardContent className="p-5 space-y-4">
                         <div>
-                            <div className="text-sm text-gray-500">Name</div>
+                            <div className="text-sm text-gray-500">{__('general.name')}</div>
                             <div className="font-medium text-gray-900">{order.customer_name}</div>
                         </div>
                         <div>
-                            <div className="text-sm text-gray-500">Phone</div>
+                            <div className="text-sm text-gray-500">{__('general.phone')}</div>
                             <div className="font-mono text-gray-900">{order.customer_phone}</div>
                         </div>
                         <div>
@@ -112,11 +112,11 @@ export default function OrderShow({ order }: any) {
                         <Table>
                             <TableHeader>
                                 <TableRow className="bg-gray-50/80">
-                                    <TableHead className="font-semibold text-gray-600">Product</TableHead>
+                                    <TableHead className="font-semibold text-gray-600">{__('general.product')}</TableHead>
                                     <TableHead className="font-semibold text-gray-600 text-center">Qty</TableHead>
-                                    <TableHead className="font-semibold text-gray-600 text-end">Price</TableHead>
-                                    <TableHead className="font-semibold text-gray-600 text-end">Commission</TableHead>
-                                    <TableHead className="font-semibold text-gray-600 text-end">Total</TableHead>
+                                    <TableHead className="font-semibold text-gray-600 text-end">{__('general.price')}</TableHead>
+                                    <TableHead className="font-semibold text-gray-600 text-end">{__('general.commission')}</TableHead>
+                                    <TableHead className="font-semibold text-gray-600 text-end">{__('general.total')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -140,7 +140,7 @@ export default function OrderShow({ order }: any) {
                                     </TableRow>
                                 ))}
                                 <TableRow className="bg-gray-50/50">
-                                    <TableCell colSpan={4} className="text-end font-medium text-gray-500">Subtotal</TableCell>
+                                    <TableCell colSpan={4} className="text-end font-medium text-gray-500">{__('general.subtotal')}</TableCell>
                                     <TableCell className="text-end font-bold text-gray-900">{order.subtotal.toLocaleString()} EGP</TableCell>
                                 </TableRow>
                                 <TableRow className="bg-gray-50/50">

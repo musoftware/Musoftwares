@@ -74,10 +74,10 @@ export default function OrdersIndex({ orders, filters }: any) {
                             <SelectContent>
                                 <SelectItem value="all">{__('general.all_orders')}</SelectItem>
                                 <SelectItem value="new">New</SelectItem>
-                                <SelectItem value="preparing">Preparing</SelectItem>
-                                <SelectItem value="shipping">Shipping</SelectItem>
-                                <SelectItem value="delivered">Delivered</SelectItem>
-                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                                <SelectItem value="preparing">{__('general.preparing')}</SelectItem>
+                                <SelectItem value="shipping">{__('general.shipping')}</SelectItem>
+                                <SelectItem value="delivered">{__('general.delivered')}</SelectItem>
+                                <SelectItem value="cancelled">{__('general.cancelled')}</SelectItem>
                             </SelectContent>
                         </Select>
                         <Button variant="outline" onClick={handleSearch} className="ms-auto">{__('general.apply_filters')}</Button>
@@ -89,11 +89,11 @@ export default function OrdersIndex({ orders, filters }: any) {
                             <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
                                 <TableHead className="font-semibold text-gray-600">{__('general.order_id')}</TableHead>
                                 <TableHead className="font-semibold text-gray-600">{__('general.customer_details')}</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Location</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.location')}</TableHead>
                                 <TableHead className="font-semibold text-gray-600 text-end">Total (EGP)</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Status</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Date</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-end">Actions</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.status')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.date')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">{__('general.actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -140,14 +140,14 @@ export default function OrdersIndex({ orders, filters }: any) {
                                                         <SelectValue placeholder={__('general.update')} />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="preparing">Preparing</SelectItem>
-                                                        <SelectItem value="shipping">Shipping</SelectItem>
-                                                        <SelectItem value="delivered">Delivered</SelectItem>
-                                                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                                                        <SelectItem value="preparing">{__('general.preparing')}</SelectItem>
+                                                        <SelectItem value="shipping">{__('general.shipping')}</SelectItem>
+                                                        <SelectItem value="delivered">{__('general.delivered')}</SelectItem>
+                                                        <SelectItem value="cancelled">{__('general.cancelled')}</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                                 <Link href={route('affiliate_pos.admin.orders.show', { order: order.id })}>
-                                                    <Button size="sm" variant="secondary" className="h-8">View</Button>
+                                                    <Button size="sm" variant="secondary" className="h-8">{__('general.view')}</Button>
                                                 </Link>
                                             </div>
                                         </TableCell>

@@ -10,6 +10,7 @@ import { Textarea } from '@/Components/ui/textarea';
 import SimpleCrypto from '@/lib/SimpleCrypto';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import { __ } from '@/lib/i18n';
 
 export default function Notes({ user, notes, stats }) {
     const [title, setTitle] = useState('');
@@ -178,11 +179,9 @@ export default function Notes({ user, notes, stats }) {
                 </div>
                 <div className="flex space-x-2">
                     <Link href={`/admin/users/${user.id}/files`} className="bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-lg text-sm font-semibold transition">
-                        Files
-                    </Link>
+                        {__('general.files')}</Link>
                     <Link href={`/admin/users/${user.id}`} className="bg-slate-900 text-white hover:bg-slate-800 px-4 py-2 rounded-lg text-sm font-semibold transition">
-                        Profile
-                    </Link>
+                        {__('general.profile')}</Link>
                 </div>
             </div>
 
@@ -206,7 +205,7 @@ export default function Notes({ user, notes, stats }) {
                                 className="w-48 bg-white border-amber-300"
                                 required
                             />
-                            <Button type="submit" className="bg-amber-600 hover:bg-amber-700 text-white">Unlock</Button>
+                            <Button type="submit" className="bg-amber-600 hover:bg-amber-700 text-white">{__('general.unlock')}</Button>
                         </form>
                     ) : (
                         <Button variant="outline" onClick={handleClearPassword} className="border-green-300 text-green-700 hover:bg-green-100">{__('general.lock_clear_session')}</Button>
@@ -233,10 +232,10 @@ export default function Notes({ user, notes, stats }) {
                                 onChange={e => setFilterCategory(e.target.value)}
                             >
                                 <option value="all">{__('general.all_categories')}</option>
-                                <option value="password">Passwords</option>
-                                <option value="anydesk">AnyDesk</option>
+                                <option value="password">{__('general.passwords')}</option>
+                                <option value="anydesk">{__('general.anydesk')}</option>
                                 <option value="notes">{__('general.general_notes')}</option>
-                                <option value="archived">Archived</option>
+                                <option value="archived">{__('general.archived')}</option>
                             </select>
                         </div>
                         <div className="text-sm font-medium text-slate-500">
@@ -250,7 +249,7 @@ export default function Notes({ user, notes, stats }) {
                                 <div className="flex justify-between items-start mb-3 gap-4">
                                     <div className="flex flex-col flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                            {note.is_pinned && <span className="bg-slate-800 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Pinned</span>}
+                                            {note.is_pinned && <span className="bg-slate-800 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">{__('general.pinned')}</span>}
                                             <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium capitalize flex items-center gap-1 border border-slate-200 shrink-0">
                                                 {getCategoryIcon(note.category)}
                                                 {note.category}
@@ -268,7 +267,7 @@ export default function Notes({ user, notes, stats }) {
                                         <button onClick={() => handleArchive(note.id, note.category)} className="p-1.5 rounded-md border border-slate-200 text-slate-400 hover:text-slate-700 transition" title={note.category === 'archived' ? 'Unarchive' : 'Archive'}>
                                             {note.category === 'archived' ? <Upload size={14} /> : <Archive size={14} />}
                                         </button>
-                                        <button onClick={() => handleDelete(note.id)} className="p-1.5 rounded-md border border-red-100 bg-red-50 text-red-500 hover:bg-red-100 transition" title="Delete">
+                                        <button onClick={() => handleDelete(note.id)} className="p-1.5 rounded-md border border-red-100 bg-red-50 text-red-500 hover:bg-red-100 transition" title={__('general.delete')}>
                                             <Trash2 size={14} />
                                         </button>
                                     </div>
@@ -289,8 +288,7 @@ export default function Notes({ user, notes, stats }) {
                                     {isPasswordSet && !note.decryptedContent.startsWith('🔒') && (
                                         <Button variant="outline" size="sm" className="ms-4 shrink-0 shadow-sm border-slate-200" onClick={() => handleViewNote(note)}>
                                             <FileText size={14} className="me-2 text-slate-400" />
-                                            View Note
-                                        </Button>
+                                            {__('general.view_note')}</Button>
                                     )}
                                 </div>
                             </div>
@@ -324,7 +322,7 @@ export default function Notes({ user, notes, stats }) {
 
                         <form onSubmit={handleAddNote} className="space-y-4">
                             <div>
-                                <Label htmlFor="category" className="text-slate-700 font-bold mb-1.5 block">Category</Label>
+                                <Label htmlFor="category" className="text-slate-700 font-bold mb-1.5 block">{__('general.category')}</Label>
                                 <select 
                                     id="category"
                                     className="w-full border-slate-300 rounded-lg text-sm focus:border-slate-900 focus:ring-slate-900 bg-slate-50"
@@ -332,14 +330,14 @@ export default function Notes({ user, notes, stats }) {
                                     onChange={e => setCategory(e.target.value)} 
                                     disabled={loading || !isPasswordSet}
                                 >
-                                    <option value="password">Password</option>
-                                    <option value="notes">Notes</option>
-                                    <option value="anydesk">Anydesk</option>
+                                    <option value="password">{__('general.password')}</option>
+                                    <option value="notes">{__('general.notes')}</option>
+                                    <option value="anydesk">{__('general.anydesk')}</option>
                                 </select>
                             </div>
 
                             <div>
-                                <Label htmlFor="title" className="text-slate-700 font-bold mb-1.5 block">Title</Label>
+                                <Label htmlFor="title" className="text-slate-700 font-bold mb-1.5 block">{__('general.title')}</Label>
                                 <Input
                                     id="title"
                                     type="text"
@@ -356,8 +354,7 @@ export default function Notes({ user, notes, stats }) {
                                 <Label htmlFor="content" className="text-slate-700 font-bold mb-1.5 flex justify-between">
                                     <span>{__('general.secure_content')}</span>
                                     <span className="text-[10px] font-bold uppercase tracking-wider text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-200 flex items-center gap-1">
-                                        <Key size={10} /> Encrypted
-                                    </span>
+                                        <Key size={10} /> {__('general.encrypted')}</span>
                                 </Label>
                                 <textarea
                                     id="content"
@@ -409,7 +406,7 @@ export default function Notes({ user, notes, stats }) {
                                 className={`h-8 px-3 shadow-sm transition-all ${copied ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-50 hover:text-green-700' : 'bg-white hover:bg-slate-50 text-slate-600'}`}
                                 onClick={handleCopy}
                             >
-                                {copied ? <><Check size={14} className="me-1.5" /> Copied</> : <><Copy size={14} className="me-1.5" /> Copy Text</>}
+                                {copied ? <><Check size={14} className="me-1.5" /> {__('general.copied')}</> : <><Copy size={14} className="me-1.5" /> {__('general.copy_text')}</>}
                             </Button>
                         </div>
                         <Textarea 
@@ -421,8 +418,7 @@ export default function Notes({ user, notes, stats }) {
                     
                     <div className="flex justify-end p-4 border-t border-slate-100 bg-slate-50">
                         <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>
-                            Close
-                        </Button>
+                            {__('general.close')}</Button>
                     </div>
                 </DialogContent>
             </Dialog>

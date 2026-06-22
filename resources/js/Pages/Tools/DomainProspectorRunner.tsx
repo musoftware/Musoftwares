@@ -212,8 +212,8 @@ export default function DomainProspectorRunner({ tool }: any) {
                                     <table className="w-full text-start border-collapse min-w-[800px]">
                                         <thead>
                                             <tr className="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-wider font-black text-slate-500 sticky top-0 z-10">
-                                                <th className="px-4 py-3 whitespace-nowrap">Domain</th>
-                                                <th className="px-4 py-3 whitespace-nowrap">Status</th>
+                                                <th className="px-4 py-3 whitespace-nowrap">{__('general.domain')}</th>
+                                                <th className="px-4 py-3 whitespace-nowrap">{__('general.status')}</th>
                                                 <th className="px-4 py-3 whitespace-nowrap">{__('general.for_sale')}</th>
                                                 <th className="px-4 py-3 w-64">{__('general.contact_emails')}</th>
                                                 <th className="px-4 py-3 whitespace-nowrap">{__('general.page_title')}</th>
@@ -227,9 +227,9 @@ export default function DomainProspectorRunner({ tool }: any) {
                                                     </td>
                                                     <td className="px-4 py-3 align-middle">
                                                         {r.isRegistered ? (
-                                                            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 gap-1 text-[10px]"><CheckCircle className="w-3 h-3" /> Registered</Badge>
+                                                            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 gap-1 text-[10px]"><CheckCircle className="w-3 h-3" /> {__('general.registered')}</Badge>
                                                         ) : (
-                                                            <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 gap-1 text-[10px]"><ShoppingCart className="w-3 h-3" /> Available</Badge>
+                                                            <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 gap-1 text-[10px]"><ShoppingCart className="w-3 h-3" /> {__('general.available')}</Badge>
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-3 align-middle">

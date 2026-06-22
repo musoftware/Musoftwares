@@ -13,6 +13,7 @@ import { Input } from '@/Components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { AppPage } from '@/Components/ui/AppPage';
 import { PageHeader } from '@/Components/ui/PageHeader';
+import { __ } from '@/lib/i18n';
 
 export default function PointsIndex({ auth, tiers = [], quickPackages = [], transactions, egpToPreferredRate = 0.10, currency = 'USD' }) {
     const { wallet, flash, is_lance_domain } = usePage().props;
@@ -191,7 +192,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                             {pkg.savings > 0 && (
                                                 <div className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md mb-2">
                                                     <CheckCircle2 className="w-3 h-3" />
-                                                    Save <FinancialAmount amount={pkg.savings} currency={globalCurrency} />
+                                                    {__('general.save')}<FinancialAmount amount={pkg.savings} currency={globalCurrency} />
                                                 </div>
                                             )}
                                         </CardContent>
@@ -202,9 +203,9 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                                 onClick={() => handleQuickBuy(pkg)}
                                             >
                                                 {canAfford ? (
-                                                    <span className="flex items-center gap-2">Pay <FinancialAmount amount={pkg.total_cost} currency={globalCurrency} />{__('general.via_wallet')}<Wallet className="w-4 h-4" /></span>
+                                                    <span className="flex items-center gap-2">{__('general.pay')}<FinancialAmount amount={pkg.total_cost} currency={globalCurrency} />{__('general.via_wallet')}<Wallet className="w-4 h-4" /></span>
                                                 ) : (
-                                                    <span className="flex items-center gap-2">Pay <FinancialAmount amount={pkg.total_cost} currency={globalCurrency} />{__('general.via_kashier')}<CreditCard className="w-4 h-4" /></span>
+                                                    <span className="flex items-center gap-2">{__('general.pay')}<FinancialAmount amount={pkg.total_cost} currency={globalCurrency} />{__('general.via_kashier')}<CreditCard className="w-4 h-4" /></span>
                                                 )}
                                             </Button>
                                         </CardFooter>
@@ -267,7 +268,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                                 </div>
                                             </div>
                                             <div className="text-end">
-                                                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Wallet</p>
+                                                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{__('general.wallet')}</p>
                                                 <div className={`text-sm font-semibold ${wallet_balance >= customPricing.totalCost ? 'text-emerald-600' : 'text-foreground'}`}>
                                                     <FinancialAmount amount={wallet_balance} currency={globalCurrency} />
                                                 </div>
@@ -294,9 +295,9 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                     onClick={handleCustomPurchase}
                                 >
                                     {customPricing && wallet_balance >= customPricing.totalCost ? (
-                                        <span className="flex items-center gap-2">Pay <FinancialAmount amount={customPricing.totalCost} currency={globalCurrency} />{__('general.via_wallet')}<Wallet className="w-4 h-4" /></span>
+                                        <span className="flex items-center gap-2">{__('general.pay')}<FinancialAmount amount={customPricing.totalCost} currency={globalCurrency} />{__('general.via_wallet')}<Wallet className="w-4 h-4" /></span>
                                     ) : (
-                                        <span className="flex items-center gap-2">Pay <FinancialAmount amount={customPricing?.totalCost || 0} currency={globalCurrency} />{__('general.via_kashier')}<CreditCard className="w-4 h-4" /></span>
+                                        <span className="flex items-center gap-2">{__('general.pay')}<FinancialAmount amount={customPricing?.totalCost || 0} currency={globalCurrency} />{__('general.via_kashier')}<CreditCard className="w-4 h-4" /></span>
                                     )}
                                 </Button>
                             </CardFooter>
@@ -307,16 +308,16 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                 <div>
                     <div className="flex items-center gap-2 mb-4">
                         <History className="w-5 h-5 text-muted-foreground" />
-                        <h3 className="text-lg font-semibold">History</h3>
+                        <h3 className="text-lg font-semibold">{__('general.history')}</h3>
                     </div>
 
                     <Card>
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Date</TableHead>
-                                    <TableHead>Description</TableHead>
-                                    <TableHead className="text-end">Points</TableHead>
+                                    <TableHead>{__('general.date')}</TableHead>
+                                    <TableHead>{__('general.description')}</TableHead>
+                                    <TableHead className="text-end">{__('general.points')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>

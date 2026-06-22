@@ -82,7 +82,7 @@ export default function Index({ projects, clients, currentTab }) {
     };
 
     return (
-        <AdminSidebarLayout title="Projects" header="Projects Manager">
+        <AdminSidebarLayout title={__('general.projects')} header="Projects Manager">
             <div className="mb-6 flex items-center justify-between">
                 <div className="flex space-x-4">
                     <Link
@@ -104,7 +104,7 @@ export default function Index({ projects, clients, currentTab }) {
                         </DialogHeader>
                         <form onSubmit={handleCreateSubmit} className="space-y-4">
                             <div>
-                                <Label htmlFor="client_id">Client</Label>
+                                <Label htmlFor="client_id">{__('general.client')}</Label>
                                 <select
                                     id="user_id"
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
@@ -141,9 +141,8 @@ export default function Index({ projects, clients, currentTab }) {
                             </div>
                             <DialogFooter>
                                 <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit">Save</Button>
+                                    {__('general.cancel')}</Button>
+                                <Button type="submit">{__('general.save')}</Button>
                             </DialogFooter>
                         </form>
                     </DialogContent>
@@ -154,11 +153,11 @@ export default function Index({ projects, clients, currentTab }) {
                 <table className="w-full text-start text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
-                            <th className="p-4 font-medium text-gray-600">Name</th>
-                            <th className="p-4 font-medium text-gray-600">Client</th>
-                            <th className="p-4 font-medium text-gray-600">Budget</th>
-                            <th className="p-4 font-medium text-gray-600">Status</th>
-                            <th className="p-4 font-medium text-gray-600 text-end">Actions</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.name')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.client')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.budget')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.status')}</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">{__('general.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -173,8 +172,7 @@ export default function Index({ projects, clients, currentTab }) {
                                     </button>
                                     {project.invoices && project.invoices.length > 0 && (
                                         <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded w-fit" title="Unpaid Invoices / Milestones">
-                                            <AlertCircle className="w-3 h-3" /> Unpaid Dues
-                                        </div>
+                                            <AlertCircle className="w-3 h-3" /> {__('general.unpaid_dues')}</div>
                                     )}
                                 </td>
                                 <td className="p-4">
@@ -207,20 +205,16 @@ export default function Index({ projects, clients, currentTab }) {
                                 </td>
                                 <td className="p-4 space-x-2 text-end">
                                     <Button variant="outline" size="sm" onClick={() => openEditModal(project)}>
-                                        Edit
-                                    </Button>
+                                        {__('general.edit')}</Button>
                                     {project.archived === 0 ? (
                                         <Button variant="outline" size="sm" onClick={() => handleArchive(project.id)}>
-                                            Archive
-                                        </Button>
+                                            {__('general.archive')}</Button>
                                     ) : (
                                         <Button variant="outline" size="sm" onClick={() => handleRestore(project.id)}>
-                                            Restore
-                                        </Button>
+                                            {__('general.restore')}</Button>
                                     )}
                                     <Button variant="destructive" size="sm" onClick={() => handleDelete(project.id)}>
-                                        Delete
-                                    </Button>
+                                        {__('general.delete')}</Button>
                                 </td>
                             </tr>
                         ))}
@@ -261,8 +255,7 @@ export default function Index({ projects, clients, currentTab }) {
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
-                                Cancel
-                            </Button>
+                                {__('general.cancel')}</Button>
                             <Button type="submit">{__('general.save_changes')}</Button>
                         </DialogFooter>
                     </form>

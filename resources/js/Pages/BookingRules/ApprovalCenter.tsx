@@ -26,8 +26,8 @@ export default function ApprovalCenter({ pendingApprovals }) {
                                 <TableHead>{__('general.date_time')}</TableHead>
                                 <TableHead>{__('general.rule_triggered')}</TableHead>
                                 <TableHead>{__('general.booking_ref')}</TableHead>
-                                <TableHead>Reason</TableHead>
-                                <TableHead className="text-end">Actions</TableHead>
+                                <TableHead>{__('general.reason')}</TableHead>
+                                <TableHead className="text-end">{__('general.actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -42,11 +42,9 @@ export default function ApprovalCenter({ pendingApprovals }) {
                                     </TableCell>
                                     <TableCell className="text-end space-x-2">
                                         <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">
-                                            <XCircle className="h-4 w-4 me-1" /> Reject
-                                        </Button>
+                                            <XCircle className="h-4 w-4 me-1" /> {__('general.reject')}</Button>
                                         <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
-                                            <CheckCircle2 className="h-4 w-4 me-1" /> Approve
-                                        </Button>
+                                            <CheckCircle2 className="h-4 w-4 me-1" /> {__('general.approve')}</Button>
                                     </TableCell>
                                 </TableRow>
                             ))}

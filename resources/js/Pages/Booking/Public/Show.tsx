@@ -245,8 +245,7 @@ export default function Show({ host, eventType }: any) {
                             {selectedTime && (
                                 <div className="pt-2 animate-in slide-in-from-bottom-2 fade-in">
                                     <Button onClick={handleContinue} className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl py-5 text-sm font-semibold shadow-sm flex items-center justify-center gap-1.5">
-                                        Continue
-                                        <ChevronRight className="w-4 h-4" />
+                                        {__('general.continue')}<ChevronRight className="w-4 h-4" />
                                     </Button>
                                 </div>
                             )}
@@ -284,7 +283,7 @@ export default function Show({ host, eventType }: any) {
 
                 {data.booking_provider_id && (
                     <div className="border-t sm:border-t-0 sm:border-s border-slate-200 sm:ps-4 pt-3 sm:pt-0">
-                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Provider</h4>
+                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{__('general.provider')}</h4>
                         <span className="text-sm font-semibold text-slate-800 block">
                             {selectedProvider?.name || availableSlots.find(s => s.time === selectedTime)?.provider?.name || 'Assigned Specialist'}
                         </span>
@@ -413,7 +412,7 @@ export default function Show({ host, eventType }: any) {
                         
                         {eventType.description && (
                             <div className="mt-8 pt-6 border-t border-slate-200/50">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Description</span>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">{__('general.description')}</span>
                                 <p className="text-slate-500 text-xs leading-relaxed">
                                     {eventType.description}
                                 </p>

@@ -112,7 +112,7 @@ export default function ContractView({ contract }: Props) {
                 </div>
 
                 <div className="mt-8 text-center text-sm text-gray-500">
-                    <p>{__('general.powered_by')}<span className="font-semibold text-gray-900">Musoftware</span>{__('general.freelance_isaas')}</p>
+                    <p>{__('general.powered_by')}<span className="font-semibold text-gray-900">{__('general.musoftware')}</span>{__('general.freelance_isaas')}</p>
                 </div>
             </div>
         </div>

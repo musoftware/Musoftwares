@@ -306,8 +306,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                     </div>
                     <div>
                         <Button variant="outline" onClick={() => window.history.back()}>
-                            <ArrowDownLeft className="h-4 w-4 me-2" style={{ transform: 'rotate(45deg)' }} /> Back
-                        </Button>
+                            <ArrowDownLeft className="h-4 w-4 me-2" style={{ transform: 'rotate(45deg)' }} /> {__('general.back')}</Button>
                     </div>
                 </header>
 
@@ -315,14 +314,14 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                     {/* Entry Form */}
                     <Card className="lg:col-span-1">
                         <CardHeader>
-                            <CardTitle>Transfer Details</CardTitle>
+                            <CardTitle>{__('general.transfer_details')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
-                                <Label>Currency</Label>
+                                <Label>{__('general.currency')}</Label>
                                 <Select value={String(currencyId)} onValueChange={(v) => setCurrencyId(Number(v))}>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select Currency" />
+                                        <SelectValue placeholder={__('general.select_currency')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {currencies.map(c => (
@@ -334,14 +333,14 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
 
                             <div className="space-y-2">
                                 <div className="flex justify-between items-center">
-                                    <Label>Source Project</Label>
+                                    <Label>{__('general.source_project')}</Label>
                                     <span className={`text-xs font-semibold ${sourceBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                         Avail: {formatCurrency(sourceBalance, activeCurrency.currency)}
                                     </span>
                                 </div>
                                 <Select value={String(sourceProject)} onValueChange={(v) => setSourceProject(Number(v))}>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select Source Project" />
+                                        <SelectValue placeholder={__('general.select_source_project')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {activeProjects.map(p => (
@@ -353,14 +352,14 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
 
                             <div className="space-y-2">
                                 <div className="flex justify-between items-center">
-                                    <Label>Target Project</Label>
+                                    <Label>{__('general.target_project')}</Label>
                                     <span className={`text-xs font-semibold ${targetBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                         Cur: {formatCurrency(targetBalance, activeCurrency.currency)}
                                     </span>
                                 </div>
                                 <Select value={String(targetProject)} onValueChange={(v) => setTargetProject(Number(v))}>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select Target Project" />
+                                        <SelectValue placeholder={__('general.select_target_project')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {activeProjects.map(p => (
@@ -371,7 +370,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Amount</Label>
+                                <Label>{__('general.amount')}</Label>
                                 <div className="flex items-center gap-2">
                                     <Input 
                                         type="number" 
@@ -394,7 +393,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                             {showExchange && (
                                 <div className="p-3 bg-muted rounded-md space-y-3">
                                     <div className="space-y-2">
-                                        <Label className="text-xs">From Currency</Label>
+                                        <Label className="text-xs">{__('general.from_currency')}</Label>
                                         <Select value={String(fromCurrency)} onValueChange={(v) => {
                                             setFromCurrency(Number(v));
                                             handleExchangeCalc(Number(fromAmount), Number(v));
@@ -425,7 +424,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                                         <Label className="text-xs">Yield ({activeCurrency.symbol})</Label>
                                         <div className="flex gap-2">
                                             <Input disabled value={toAmount} className="h-8" />
-                                            <Button size="sm" onClick={applyExchange}>Apply</Button>
+                                            <Button size="sm" onClick={applyExchange}>{__('general.apply')}</Button>
                                         </div>
                                     </div>
                                 </div>
@@ -433,12 +432,10 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
 
                             <div className="pt-4 flex flex-col gap-2">
                                 <Button className="w-full" onClick={handleAdd}>
-                                    Add Transfer
-                                </Button>
+                                    {__('general.add_transfer')}</Button>
                                 <Button variant="outline" className="w-full text-yellow-600 border-yellow-200 bg-yellow-50 hover:bg-yellow-100" onClick={handleGeniusFix}>
                                     <Lightbulb className="h-4 w-4 me-2" />
-                                    Genius Fix
-                                </Button>
+                                    {__('general.genius_fix')}</Button>
                             </div>
                         </CardContent>
                     </Card>
@@ -447,31 +444,30 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                     <Card className="lg:col-span-2">
                         <CardHeader>
                             <div className="flex items-center justify-between">
-                                <CardTitle>Prepared Transfers</CardTitle>
+                                <CardTitle>{__('general.prepared_transfers')}</CardTitle>
                                 {data.data.length > 0 && (
                                     <Button onClick={handleSubmit} disabled={processing} variant="default" className="bg-green-600 hover:bg-green-700">
                                         <Save className="h-4 w-4 me-2" />
-                                        Save All Transfers
-                                    </Button>
+                                        {__('general.save_all_transfers')}</Button>
                                 )}
                             </div>
-                            <CardDescription>Review items before saving.</CardDescription>
+                            <CardDescription>{__('general.review_items_before_saving')}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {data.data.length === 0 ? (
                                 <div className="text-center py-12 text-muted-foreground border border-dashed rounded-lg">
                                     <ArrowRightLeft className="h-8 w-8 mx-auto mb-3 opacity-20" />
-                                    <p>No transfers added yet.</p>
+                                    <p>{__('general.no_transfers_added_yet')}</p>
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-sm text-start">
                                         <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
                                             <tr>
-                                                <th className="px-4 py-3 rounded-tl-lg">Source</th>
-                                                <th className="px-4 py-3">Target</th>
-                                                <th className="px-4 py-3">Amount</th>
-                                                <th className="px-4 py-3 rounded-tr-lg w-[50px]"></th>
+                                                <th className="px-4 py-3 rounded-ts-lg">{__('general.source')}</th>
+                                                <th className="px-4 py-3">{__('general.target')}</th>
+                                                <th className="px-4 py-3">{__('general.amount')}</th>
+                                                <th className="px-4 py-3 rounded-te-lg w-[50px]"></th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y">

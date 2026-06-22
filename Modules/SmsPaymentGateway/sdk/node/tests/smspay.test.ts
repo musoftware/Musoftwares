@@ -4,6 +4,7 @@
 
 import * as http from 'http';
 import { SmsPay, AuthenticationError, InvalidRequestError, ApiError } from '../src';
+import { __ } from '@/lib/i18n';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -330,7 +331,7 @@ describe('CheckoutSessions', () => {
 
             server = http.createServer((_req, res) => {
                 res.writeHead(502, { 'Content-Type': 'text/html' });
-                res.end('<html>Bad Gateway</html>');
+                res.end('<html>{__('general.bad_gateway')}</html>');
             });
 
             await new Promise<void>((resolve) => {

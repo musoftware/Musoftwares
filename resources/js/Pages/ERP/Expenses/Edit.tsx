@@ -69,7 +69,7 @@ export default function EditExpense({ expense }: EditExpenseProps) {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2 md:col-span-2">
-                                    <label className="text-sm font-medium text-slate-700">Title <span className="text-red-500">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.title')}<span className="text-red-500">*</span></label>
                                     <Input 
                                         required 
                                         value={form.title} 
@@ -80,7 +80,7 @@ export default function EditExpense({ expense }: EditExpenseProps) {
                                     {errors.title && <p className="text-xs text-red-500">{errors.title}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Amount <span className="text-red-500">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.amount')}<span className="text-red-500">*</span></label>
                                     <Input 
                                         required
                                         type="number"
@@ -94,7 +94,7 @@ export default function EditExpense({ expense }: EditExpenseProps) {
                                     {errors.amount && <p className="text-xs text-red-500">{errors.amount}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Date <span className="text-red-500">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.date')}<span className="text-red-500">*</span></label>
                                     <Input 
                                         required
                                         type="date"
@@ -105,7 +105,7 @@ export default function EditExpense({ expense }: EditExpenseProps) {
                                     {errors.date && <p className="text-xs text-red-500">{errors.date}</p>}
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
-                                    <label className="text-sm font-medium text-slate-700">Category</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.category')}</label>
                                     <Input 
                                         value={form.category} 
                                         onChange={e => setForm({...form, category: e.target.value})} 
@@ -115,7 +115,7 @@ export default function EditExpense({ expense }: EditExpenseProps) {
                                     {errors.category && <p className="text-xs text-red-500">{errors.category}</p>}
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
-                                    <label className="text-sm font-medium text-slate-700">Description</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.description')}</label>
                                     <Textarea 
                                         value={form.description} 
                                         onChange={e => setForm({...form, description: e.target.value})} 
@@ -129,8 +129,7 @@ export default function EditExpense({ expense }: EditExpenseProps) {
                             <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
                                 <Link href={route('erp.dashboard', { section: 'expenses' })}>
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-900 hover:bg-slate-100">
-                                        Cancel
-                                    </Button>
+                                        {__('general.cancel')}</Button>
                                 </Link>
                                 <Button type="submit" disabled={isSubmitting}>
                                     {isSubmitting ? 'Saving...' : 'Save Changes'}

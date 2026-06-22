@@ -53,8 +53,8 @@ export default function Index({ auth, referral, commission_percentage }: any) {
 
                             <div className="mt-4 p-4 bg-indigo-50 rounded-lg border border-indigo-100 flex items-center justify-between">
                                 <div>
-                                    <h4 className="font-semibold text-indigo-900">Your Commission Rate</h4>
-                                    <p className="text-sm text-indigo-700">You earn this percentage from all payments made by your referrals.</p>
+                                    <h4 className="font-semibold text-indigo-900">{__('general.your_commission_rate')}</h4>
+                                    <p className="text-sm text-indigo-700">{__('general.you_earn_this_percentage_from_all_paymen')}</p>
                                 </div>
                                 <Badge className="bg-indigo-600 text-white text-lg py-1 px-3">
                                     {formattedCommission}
@@ -70,16 +70,13 @@ export default function Index({ auth, referral, commission_percentage }: any) {
                                 {__('messages.embed_modules')}
                             </CardTitle>
                             <CardDescription>
-                                You can embed modules or tools directly into your own website using an iframe. 
-                                Secure it with an embed key to track your clients and usage.
-                            </CardDescription>
+                                {__('general.you_can_embed_modules_or_tools_directly')}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="bg-gray-50 p-6 rounded-lg text-center border border-dashed border-gray-300">
-                                <p className="text-gray-600 mb-4">You have not generated any embed keys yet.</p>
+                                <p className="text-gray-600 mb-4">{__('general.you_have_not_generated_any_embed_keys_ye')}</p>
                                 <Button>
-                                    Generate Embed Key
-                                </Button>
+                                    {__('general.generate_embed_key')}</Button>
                             </div>
                         </CardContent>
                     </Card>

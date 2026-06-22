@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { __ } from '@/lib/i18n';
 
 interface Course {
     slug: string;
@@ -21,7 +22,7 @@ export default function CourseIndex({ courses }: CourseIndexProps) {
         <AuthenticatedLayout
             header={<h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">{__('general.written_courses')}</h2>}
         >
-            <Head title="Courses" />
+            <Head title={__('general.courses')} />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">

@@ -74,8 +74,7 @@ function KeywordRow({ kw, idx }: { kw: any; idx: number }) {
             </div>
             {kw.published_id > 0 && (
                 <Badge variant="outline" className="text-[9px] font-bold bg-emerald-50 border-emerald-200 text-emerald-700 shrink-0">
-                    Published
-                </Badge>
+                    {__('general.published')}</Badge>
             )}
             <Button
                 variant="ghost" size="icon"
@@ -504,8 +503,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                             {discoverStatus === 'running' && <span className="ms-1 w-2 h-2 rounded-full bg-violet-500 animate-pulse" />}
                         </TabsTrigger>
                         <TabsTrigger value="wordpress" className="gap-2 text-sm font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg">
-                            <Send className="w-4 h-4" /> WordPress
-                        </TabsTrigger>
+                            <Send className="w-4 h-4" /> {__('general.wordpress')}</TabsTrigger>
                         <TabsTrigger value="campaigns" className="gap-2 text-sm font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg">
                             <History className="w-4 h-4" /> Campaigns
                             {campaigns.length > 0 && (
@@ -546,7 +544,7 @@ export default function ArticleMakerRunner({ tool }: any) {
 
                                 {/* Source */}
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Source</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.source')}</label>
                                     <div className="relative">
                                         <Globe className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <select
@@ -604,8 +602,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                                         onClick={handleStopDiscover}
                                         className="h-11 gap-2 px-6 bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100 hover:text-rose-800 text-sm font-bold"
                                     >
-                                        <Square className="w-4 h-4" /> Stop
-                                    </Button>
+                                        <Square className="w-4 h-4" /> {__('general.stop')}</Button>
                                 ) : (
                                     <Button
                                         onClick={handleStartDiscover}
@@ -646,8 +643,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                                         }}
                                         className="h-11 px-4 border-slate-200 text-slate-500 hover:bg-slate-50 text-sm font-medium"
                                     >
-                                        Clear
-                                    </Button>
+                                        {__('general.clear')}</Button>
                                 )}
                             </div>
 
@@ -689,8 +685,8 @@ export default function ArticleMakerRunner({ tool }: any) {
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-in fade-in duration-300">
                                 <StatCard label={__('general.total_keywords')} value={keywords.length} icon={Lightbulb} color="bg-violet-50 border-violet-200" />
                                 <StatCard label={__('general.with_subtitles')} value={keywords.filter(k => k.subtitle).length} icon={BookOpen} color="bg-amber-50 border-amber-200" />
-                                <StatCard label="Published" value={keywords.filter(k => k.published_id > 0).length} icon={Send} color="bg-emerald-50 border-emerald-200" />
-                                <StatCard label="Source" value={SOURCES.find(s => s.value === source)?.label || source} icon={Globe} />
+                                <StatCard label={__('general.published')} value={keywords.filter(k => k.published_id > 0).length} icon={Send} color="bg-emerald-50 border-emerald-200" />
+                                <StatCard label={__('general.source')} value={SOURCES.find(s => s.value === source)?.label || source} icon={Globe} />
                             </div>
                         )}
 
@@ -735,7 +731,7 @@ export default function ArticleMakerRunner({ tool }: any) {
 
                                 {/* Username */}
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Username</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.username')}</label>
                                     <div className="relative">
                                         <Type className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
@@ -750,7 +746,7 @@ export default function ArticleMakerRunner({ tool }: any) {
 
                                 {/* Password */}
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Password</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.password')}</label>
                                     <div className="relative">
                                         <Key className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
@@ -908,10 +904,10 @@ export default function ArticleMakerRunner({ tool }: any) {
 
                                     {campaignKeywords.length > 0 && (
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
-                                            <StatCard label="Total" value={campaignKeywords.length} icon={Lightbulb} color="bg-violet-50 border-violet-200" />
+                                            <StatCard label={__('general.total')} value={campaignKeywords.length} icon={Lightbulb} color="bg-violet-50 border-violet-200" />
                                             <StatCard label={__('general.with_subtitles')} value={campaignKeywords.filter(k => k.subtitle).length} icon={BookOpen} color="bg-amber-50 border-amber-200" />
-                                            <StatCard label="Published" value={campaignKeywords.filter(k => k.published_id > 0).length} icon={Send} color="bg-emerald-50 border-emerald-200" />
-                                            <StatCard label="Source" value={selectedCampaign.source} icon={Globe} />
+                                            <StatCard label={__('general.published')} value={campaignKeywords.filter(k => k.published_id > 0).length} icon={Send} color="bg-emerald-50 border-emerald-200" />
+                                            <StatCard label={__('general.source')} value={selectedCampaign.source} icon={Globe} />
                                         </div>
                                     )}
                                 </div>
@@ -945,8 +941,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                                         disabled={loadingCampaigns}
                                         className="h-8 gap-1.5 text-xs font-bold"
                                     >
-                                        <RefreshCw className={`w-3.5 h-3.5 ${loadingCampaigns ? 'animate-spin' : ''}`} /> Refresh
-                                    </Button>
+                                        <RefreshCw className={`w-3.5 h-3.5 ${loadingCampaigns ? 'animate-spin' : ''}`} /> {__('general.refresh')}</Button>
                                 </div>
 
                                 {loadingCampaigns && campaigns.length === 0 ? (

@@ -34,6 +34,7 @@ import {
     ResponsiveContainer
 } from 'recharts';
 import {
+import { __ } from '@/lib/i18n';
     Table,
     TableBody,
     TableCell,
@@ -97,14 +98,14 @@ export default function Costs() {
 
     return (
         <AdminSidebarLayout 
-            title="Business Costs" 
+            title={__('general.business_costs')} 
             header="Business Costs"
         >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                 <Card className="border-none shadow-sm shadow-slate-200/50">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between space-y-0 pb-2">
-                            <p className="text-sm font-medium text-slate-500">Monthly Costs</p>
+                            <p className="text-sm font-medium text-slate-500">{__('general.monthly_costs')}</p>
                             <div className="p-2 bg-rose-50 rounded-xl">
                                 <ArrowDownRight className="h-4 w-4 text-rose-600" />
                             </div>
@@ -113,9 +114,8 @@ export default function Costs() {
                             {formatCurrency(stats.total_monthly_costs, stats.business_currency_code)}
                         </div>
                         <p className="text-xs text-slate-500 mt-2 font-medium">
-                            <span className="text-rose-600 font-semibold bg-rose-50 px-1.5 py-0.5 rounded me-1">This Month</span>
-                            Total Costs
-                        </p>
+                            <span className="text-rose-600 font-semibold bg-rose-50 px-1.5 py-0.5 rounded me-1">{__('general.this_month')}</span>
+                            {__('general.total_costs')}</p>
                     </CardContent>
                 </Card>
             </div>
@@ -124,8 +124,7 @@ export default function Costs() {
                 <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
                         <CalendarIcon className="w-5 h-5 text-rose-500" />
-                        Cost Trends
-                    </CardTitle>
+                        {__('general.cost_trends')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="h-[250px] mt-4">
@@ -171,8 +170,8 @@ export default function Costs() {
             <Card className="border-none shadow-sm shadow-slate-200/50">
                 <CardHeader className="pb-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <CardTitle className="text-lg font-semibold text-slate-900">Cost Entries</CardTitle>
-                        <CardDescription>Recent expense transactions</CardDescription>
+                        <CardTitle className="text-lg font-semibold text-slate-900">{__('general.cost_entries')}</CardTitle>
+                        <CardDescription>{__('general.recent_expense_transactions')}</CardDescription>
                     </div>
                     <div className="flex flex-col sm:flex-row items-center w-full sm:w-auto gap-3">
                         <form onSubmit={handleSearch} className="flex items-center w-full sm:w-auto gap-2">
@@ -180,13 +179,13 @@ export default function Costs() {
                                 <Search className="absolute start-2.5 top-2.5 h-4 w-4 text-slate-400" />
                                 <Input
                                     type="text"
-                                    placeholder="Search reason..."
+                                    placeholder={__('general.search_reason')}
                                     className="ps-9 h-9 border-slate-200 focus-visible:ring-rose-500 rounded-lg w-full text-sm"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
-                            <Button type="submit" size="sm" variant="secondary">Search</Button>
+                            <Button type="submit" size="sm" variant="secondary">{__('general.search')}</Button>
                         </form>
                         <Button size="sm" onClick={() => router.visit(route('admin.costs.create'))} className="bg-rose-600 hover:bg-rose-700 text-white w-full sm:w-auto">
                             {__('admin.add_cost') || "Add Cost"}
@@ -197,10 +196,10 @@ export default function Costs() {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                                <TableHead className="w-[120px] font-semibold">Date</TableHead>
-                                <TableHead className="font-semibold">Reason</TableHead>
+                                <TableHead className="w-[120px] font-semibold">{__('general.date')}</TableHead>
+                                <TableHead className="font-semibold">{__('general.reason')}</TableHead>
                                 <TableHead className="font-semibold">Project/Client</TableHead>
-                                <TableHead className="text-end font-semibold">Amount</TableHead>
+                                <TableHead className="text-end font-semibold">{__('general.amount')}</TableHead>
                                 <TableHead className="w-[80px]"></TableHead>
                             </TableRow>
                         </TableHeader>
@@ -214,8 +213,7 @@ export default function Costs() {
                                         <div className="font-medium text-slate-900">{entry.title}</div>
                                         {entry.is_recurring && (
                                             <span className="inline-flex items-center mt-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700">
-                                                Recurring
-                                            </span>
+                                                {__('general.recurring')}</span>
                                         )}
                                     </TableCell>
                                     <TableCell>
@@ -241,7 +239,7 @@ export default function Costs() {
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                                    <span className="sr-only">Open menu</span>
+                                                    <span className="sr-only">{__('general.open_menu')}</span>
                                                     <MoreHorizontal className="h-4 w-4 text-slate-500" />
                                                 </Button>
                                             </DropdownMenuTrigger>
@@ -263,8 +261,7 @@ export default function Costs() {
                             {entries?.data?.length === 0 && (
                                 <TableRow>
                                     <TableCell colSpan={5} className="h-32 text-center text-slate-500">
-                                        No cost records found for this period.
-                                    </TableCell>
+                                        {__('general.no_cost_records_found_for_this_period')}</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
@@ -274,7 +271,7 @@ export default function Costs() {
 
             <ConfirmModal
                 isOpen={deleteId !== null}
-                title="Delete Cost Transaction"
+                title={__('general.delete_cost_transaction')}
                 description="Are you sure you want to delete this cost? This will recalculate the associated user's ledger. This action cannot be undone."
                 confirmLabel="Delete Cost"
                 variant="danger"

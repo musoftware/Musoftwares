@@ -83,11 +83,11 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
     const getPriorityBadge = (priority: string) => {
         switch (priority) {
             case 'urgent':
-                return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-rose-50 border border-rose-200 text-rose-700">Urgent</span>;
+                return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-rose-50 border border-rose-200 text-rose-700">{__('general.urgent')}</span>;
             case 'high':
-                return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-amber-50 border border-amber-200 text-amber-700">High</span>;
+                return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-amber-50 border border-amber-200 text-amber-700">{__('general.high')}</span>;
             case 'normal':
-                return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-blue-50 border border-blue-200 text-blue-700">Normal</span>;
+                return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-blue-50 border border-blue-200 text-blue-700">{__('general.normal')}</span>;
             default:
                 return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-slate-50 border border-slate-200 text-slate-500">Low</span>;
         }
@@ -195,18 +195,15 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
                                                 <DropdownMenuContent align="start" className="w-56 text-xs">
                                                     <DropdownMenuItem asChild>
                                                         <Link href={route('erp.clients.show', clientGroup.client.id)} className="flex items-center gap-2 cursor-pointer">
-                                                            <User className="h-4 w-4 text-primary" /> Profile
-                                                        </Link>
+                                                            <User className="h-4 w-4 text-primary" /> {__('general.profile')}</Link>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
                                                         <Link href={route('erp.tasks.index', { client_id: clientGroup.client.id })} className="flex items-center gap-2 cursor-pointer">
-                                                            <ListTodo className="h-4 w-4 text-info" /> Tasks
-                                                        </Link>
+                                                            <ListTodo className="h-4 w-4 text-info" /> {__('general.tasks')}</Link>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
                                                         <Link href={route('erp.invoices.index', { client_id: clientGroup.client.id })} className="flex items-center gap-2 cursor-pointer">
-                                                            <FileText className="h-4 w-4 text-secondary" /> Invoices
-                                                        </Link>
+                                                            <FileText className="h-4 w-4 text-secondary" /> {__('general.invoices')}</Link>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
                                                         <Link href={route('erp.clients.wallet.index', clientGroup.client.id)} className="flex items-center gap-2 cursor-pointer">
@@ -240,8 +237,7 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
                                                             </Button>
                                                             <Button asChild size="sm" variant="default" className="h-7 text-[10px] px-2.5 bg-purple-600 hover:bg-purple-700">
                                                                 <Link href={route('erp.tasks.show', task.id)}>
-                                                                    <Share2 className="h-3 w-3 me-1" /> Share
-                                                                </Link>
+                                                                    <Share2 className="h-3 w-3 me-1" /> {__('general.share')}</Link>
                                                             </Button>
                                                             <Button asChild size="sm" variant="default" className="h-7 text-[10px] px-2.5 bg-green-600 hover:bg-green-700">
                                                                 <Link href={route('erp.tasks.show', task.id)}>
@@ -249,8 +245,7 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
                                                             </Button>
                                                             <Button asChild size="sm" variant="default" className="h-7 text-[10px] px-2.5 bg-slate-500 hover:bg-slate-600">
                                                                 <Link href={route('erp.tasks.show', task.id)}>
-                                                                    <Archive className="h-3 w-3 me-1" /> Archive
-                                                                </Link>
+                                                                    <Archive className="h-3 w-3 me-1" /> {__('general.archive')}</Link>
                                                             </Button>
                                                         </div>
                                                     </div>
@@ -295,12 +290,11 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
                                                                                 
                                                                                 {todo.paused && (
                                                                                     <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-0.5">
-                                                                                        <Pause className="h-2 w-2" /> Paused
-                                                                                    </span>
+                                                                                        <Pause className="h-2 w-2" /> {__('general.paused')}</span>
                                                                                 )}
                                                                                 
                                                                                 {todo.is_paid && (
-                                                                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-emerald-100 text-emerald-800 border border-emerald-200">Paid</span>
+                                                                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-emerald-100 text-emerald-800 border border-emerald-200">{__('general.paid')}</span>
                                                                                 )}
                                                                             </div>
 

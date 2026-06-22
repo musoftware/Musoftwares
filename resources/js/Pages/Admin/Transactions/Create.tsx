@@ -94,8 +94,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                 <header className="mb-4">
                     <div className="flex items-center gap-2 mb-1">
                         <span className="text-xs font-semibold px-2 py-1 bg-primary/10 text-primary rounded-md uppercase tracking-wider">
-                            Finance
-                        </span>
+                            {__('general.finance')}</span>
                     </div>
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
@@ -106,8 +105,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                         </div>
                         <div className="flex flex-wrap gap-2">
                             <Button variant="outline" onClick={() => window.history.back()}>
-                                <ArrowDownLeft className="h-4 w-4 me-2" style={{ transform: 'rotate(45deg)' }} /> Back
-                            </Button>
+                                <ArrowDownLeft className="h-4 w-4 me-2" style={{ transform: 'rotate(45deg)' }} /> {__('general.back')}</Button>
                         </div>
                     </div>
                 </header>
@@ -160,7 +158,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                                     <ArrowUpRight className="h-5 w-5" />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Withdrawn</p>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{__('general.withdrawn')}</p>
                                     <p className="font-bold text-sm truncate">
                                         <CurrencyDisplay amount={user.withdrawn_commission || 0} currency={user.currency_obj || businessCurrency} />
                                     </p>
@@ -176,19 +174,19 @@ export default function Create({ user, selectedProject, type, currencies, busine
                     <TabsList className="grid w-full grid-cols-6 mb-6">
                         <TabsTrigger value="timer-received" className="flex items-center gap-2">
                             <ArrowDownLeft className="h-4 w-4 text-green-500" />
-                            <span className="hidden sm:inline">Receive</span>
+                            <span className="hidden sm:inline">{__('general.receive')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="timer-due" className="flex items-center gap-2">
                             <Receipt className="h-4 w-4 text-orange-500" />
-                            <span className="hidden sm:inline">Charge</span>
+                            <span className="hidden sm:inline">{__('general.charge')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="send" className="flex items-center gap-2">
                             <ArrowUpRight className="h-4 w-4 text-blue-500" />
-                            <span className="hidden sm:inline">Send</span>
+                            <span className="hidden sm:inline">{__('general.send')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="refund" className="flex items-center gap-2">
                             <Undo2 className="h-4 w-4 text-red-500" />
-                            <span className="hidden sm:inline">Refund</span>
+                            <span className="hidden sm:inline">{__('general.refund')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="earned" className="flex items-center gap-2">
                             <Coins className="h-4 w-4 text-purple-500" />
@@ -222,13 +220,11 @@ export default function Create({ user, selectedProject, type, currencies, busine
                         </Button>
                         <Button variant="secondary" asChild className="rounded-full">
                             <a href={route('admin.finance.index', { user_id: user.id })} target="_blank" rel="noopener noreferrer">
-                                <Coins className="h-4 w-4 me-2" /> Transactions
-                            </a>
+                                <Coins className="h-4 w-4 me-2" /> {__('general.transactions')}</a>
                         </Button>
                         <Button variant="secondary" asChild className="rounded-full">
                             <a href={route('admin.invoices.index', { client_id: user.id })} target="_blank" rel="noopener noreferrer">
-                                <Receipt className="h-4 w-4 me-2" /> Invoices
-                            </a>
+                                <Receipt className="h-4 w-4 me-2" /> {__('general.invoices')}</a>
                         </Button>
                     </div>
                     {(hourRate !== undefined || recommendedHourRate !== undefined) && (

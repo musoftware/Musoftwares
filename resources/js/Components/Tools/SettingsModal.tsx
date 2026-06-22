@@ -121,23 +121,23 @@ export function SettingsModal({
                             {showPrayerTimes && (
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 pt-4 border-t border-white/10">
                                     <div>
-                                        <label className="text-xs text-slate-400 mb-1 block">City</label>
+                                        <label className="text-xs text-slate-400 mb-1 block">{__('general.city')}</label>
                                         <input 
                                             type="text"
                                             value={prayerCity}
                                             onChange={(e) => onPrayerSettingsChange(e.target.value, prayerCountry, prayerMethod)}
                                             className="w-full bg-[#1c1c1c] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
-                                            placeholder="Cairo"
+                                            placeholder={__('general.cairo')}
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs text-slate-400 mb-1 block">Country</label>
+                                        <label className="text-xs text-slate-400 mb-1 block">{__('general.country')}</label>
                                         <input 
                                             type="text"
                                             value={prayerCountry}
                                             onChange={(e) => onPrayerSettingsChange(prayerCity, e.target.value, prayerMethod)}
                                             className="w-full bg-[#1c1c1c] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
-                                            placeholder="Egypt"
+                                            placeholder={__('general.egypt')}
                                         />
                                     </div>
                                     <div>
@@ -153,14 +153,14 @@ export function SettingsModal({
                                             <option value="4">{__('general.umm_al_qura_university_makkah')}</option>
                                             <option value="5">{__('general.egyptian_general_authority_of_survey')}</option>
                                             <option value="8">{__('general.gulf_region')}</option>
-                                            <option value="9">Kuwait</option>
-                                            <option value="10">Qatar</option>
+                                            <option value="9">{__('general.kuwait')}</option>
+                                            <option value="10">{__('general.qatar')}</option>
                                             <option value="11">{__('general.majlis_ugama_islam_singapura')}</option>
                                             <option value="12">{__('general.union_organization_islamic_de_france')}</option>
                                             <option value="13">{__('general.diyanet_i_leri_ba_kanl_turkey')}</option>
                                             <option value="14">{__('general.spiritual_administration_of_muslims_of_russia')}</option>
                                             <option value="15">{__('general.moonsighting_committee_worldwide')}</option>
-                                            <option value="16">Dubai</option>
+                                            <option value="16">{__('general.dubai')}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -171,15 +171,14 @@ export function SettingsModal({
                     {/* Wallpaper Settings */}
                     <div>
                         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                            <ImageIcon className="w-5 h-5 text-purple-400" /> Wallpaper
-                        </h3>
+                            <ImageIcon className="w-5 h-5 text-purple-400" /> {__('general.wallpaper')}</h3>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             <div 
                                 onClick={() => onWallpaperChange('')}
                                 className={`relative h-24 rounded-xl overflow-hidden cursor-pointer group border-2 transition-all flex flex-col items-center justify-center bg-[#1c1c1c] ${!wallpaperUrl ? 'border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'border-white/10 hover:border-white/20'}`}
                             >
                                 <X className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors mb-1" />
-                                <span className="text-xs font-medium text-slate-400 group-hover:text-white transition-colors">None</span>
+                                <span className="text-xs font-medium text-slate-400 group-hover:text-white transition-colors">{__('general.none')}</span>
                             </div>
                             {displayWallpapers.map((url, idx) => (
                                 <div 

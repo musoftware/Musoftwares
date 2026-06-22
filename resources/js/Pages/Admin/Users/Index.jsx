@@ -189,7 +189,7 @@ export default function Index({ clients, filters, stats }) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
                         <DropdownMenuGroup>
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuLabel>{__('general.actions')}</DropdownMenuLabel>
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/users/${client.id}`}>
                                     <Eye className="me-2 h-4 w-4" />{__('general.view_profile_1')}</Link>
@@ -216,18 +216,15 @@ export default function Index({ clients, filters, stats }) {
                         <DropdownMenuGroup>
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/users/${client.id}/referrals`}>
-                                    <Users className="me-2 h-4 w-4" /> Referrals
-                                </Link>
+                                    <Users className="me-2 h-4 w-4" /> {__('general.referrals')}</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/users/${client.id}/files`}>
-                                    <FolderOpen className="me-2 h-4 w-4" /> Files
-                                </Link>
+                                    <FolderOpen className="me-2 h-4 w-4" /> {__('general.files')}</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <Link href={`/admin/users/${client.id}/reports`}>
-                                    <FileText className="me-2 h-4 w-4" /> Reports
-                                </Link>
+                                    <FileText className="me-2 h-4 w-4" /> {__('general.reports')}</Link>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                     </DropdownMenuContent>
@@ -244,9 +241,9 @@ export default function Index({ clients, filters, stats }) {
                 onChange={(e) => handleFilter('role', e.target.value)}
             >
                 <option value="">{__('general.all_roles')}</option>
-                <option value="client">Clients</option>
-                <option value="admin">Admins</option>
-                <option value="employee">Employees</option>
+                <option value="client">{__('general.clients')}</option>
+                <option value="admin">{__('general.admins')}</option>
+                <option value="employee">{__('general.employees')}</option>
             </select>
             <select 
                 className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
@@ -254,8 +251,8 @@ export default function Index({ clients, filters, stats }) {
                 onChange={(e) => handleFilter('status', e.target.value)}
             >
                 <option value="">{__('general.all_statuses')}</option>
-                <option value="active">Active</option>
-                <option value="blocked">Blocked</option>
+                <option value="active">{__('general.active')}</option>
+                <option value="blocked">{__('general.blocked')}</option>
             </select>
             <select 
                 className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
@@ -263,14 +260,14 @@ export default function Index({ clients, filters, stats }) {
                 onChange={(e) => handleFilter('kyc', e.target.value)}
             >
                 <option value="">{__('general.all_kyc')}</option>
-                <option value="verified">Verified</option>
-                <option value="unverified">Unverified</option>
+                <option value="verified">{__('general.verified')}</option>
+                <option value="unverified">{__('general.unverified')}</option>
             </select>
         </div>
     );
 
     return (
-        <AdminSidebarLayout title="Clients" header="Platform Users">
+        <AdminSidebarLayout title={__('general.clients')} header="Platform Users">
             {stats && (
                 <div className="mb-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
@@ -279,11 +276,11 @@ export default function Index({ clients, filters, stats }) {
                     </div>
                     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
                         <span className="text-2xl font-semibold text-green-600">{stats.active}</span>
-                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Active</span>
+                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.active')}</span>
                     </div>
                     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
                         <span className="text-2xl font-semibold text-red-600">{stats.blocked}</span>
-                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Blocked</span>
+                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.blocked')}</span>
                     </div>
                     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
                         <span className="text-2xl font-semibold text-indigo-600">{stats.kyc_verified}</span>
@@ -393,8 +390,7 @@ export default function Index({ clients, filters, stats }) {
                             <DialogHeader>
                                 <DialogTitle>{__("general.reset_password")}</DialogTitle>
                                 <DialogDescription>
-                                    Are you sure you want to reset this user's password? They will immediately lose access with their current password.
-                                </DialogDescription>
+                                    {__('general.are_you_sure_you_want_to_reset_this_user')}</DialogDescription>
                             </DialogHeader>
                             <DialogFooter className="mt-4">
                                 <Button variant="ghost" onClick={() => setResetPasswordState(prev => ({ ...prev, isOpen: false }))}>
@@ -416,8 +412,7 @@ export default function Index({ clients, filters, stats }) {
                                         });
                                     }}
                                 >
-                                    Yes, Reset Password
-                                </Button>
+                                    {__('general.yes_reset_password')}</Button>
                             </DialogFooter>
                         </>
                     )}
@@ -425,7 +420,7 @@ export default function Index({ clients, filters, stats }) {
                     {resetPasswordState.status === 'loading' && (
                         <div className="py-12 flex flex-col items-center justify-center space-y-4">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-                            <p className="text-slate-500 text-sm">Resetting password...</p>
+                            <p className="text-slate-500 text-sm">{__('general.resetting_password')}</p>
                         </div>
                     )}
 
@@ -465,8 +460,7 @@ ${resetPasswordState.newPassword}`}
                             </div>
                             <DialogFooter>
                                 <Button className="w-full sm:w-auto" onClick={() => setResetPasswordState({ isOpen: false, clientId: null, client: null, status: 'confirm', newPassword: '' })}>
-                                    Done
-                                </Button>
+                                    {__('general.done')}</Button>
                             </DialogFooter>
                         </>
                     )}

@@ -43,11 +43,11 @@ export default function VendorProductsIndex({ products }: any) {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-gray-50/80">
-                                <TableHead className="font-semibold text-gray-600">Product</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.product')}</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Price (EGP)</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Commission</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Status</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-end">Actions</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.commission')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.status')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">{__('general.actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -72,8 +72,7 @@ export default function VendorProductsIndex({ products }: any) {
                                         <TableCell className="text-end">
                                             <Link href={route('affiliate_pos.vendor.products.edit', { product: product.id })}>
                                                 <Button variant="ghost" size="sm">
-                                                    <Edit2 className="w-4 h-4 me-2" /> Edit
-                                                </Button>
+                                                    <Edit2 className="w-4 h-4 me-2" /> {__('general.edit')}</Button>
                                             </Link>
                                         </TableCell>
                                     </TableRow>

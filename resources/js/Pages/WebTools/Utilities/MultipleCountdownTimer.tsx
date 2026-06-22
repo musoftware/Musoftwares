@@ -6,6 +6,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Plus, Play, Pause, RotateCcw, X, Timer, Info } from 'lucide-react';
 import { useToast } from '@/Components/ui/use-toast';
+import { __ } from '@/lib/i18n';
 
 interface TimerData {
     id: string;
@@ -131,16 +132,15 @@ export default function MultipleCountdownTimer() {
     };
 
     return (
-        <WebToolsLayout title="Multiple Countdown Timer" activeNav="explore">
+        <WebToolsLayout title={__('general.multiple_countdown_timer')} activeNav="explore">
             <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6">
                 <div className="text-center mb-10">
                     <div className="inline-flex items-center justify-center p-3 bg-indigo-100 text-indigo-700 rounded-2xl mb-4">
                         <Timer className="w-8 h-8" />
                     </div>
-                    <h1 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">Multiple Countdown Timer</h1>
+                    <h1 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">{__('general.multiple_countdown_timer')}</h1>
                     <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
-                        Create and manage multiple timers simultaneously for cooking, work, exercise, and more.
-                    </p>
+                        {__('general.create_and_manage_multiple_timers_simult')}</p>
                 </div>
 
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8 max-w-2xl mx-auto">
@@ -154,8 +154,7 @@ export default function MultipleCountdownTimer() {
                         />
                         <Button onClick={handleAddClick} className="gap-2">
                             <Plus className="w-4 h-4" />
-                            Add Timer
-                        </Button>
+                            {__('general.add_timer')}</Button>
                     </div>
                 </div>
 
@@ -236,8 +235,7 @@ export default function MultipleCountdownTimer() {
 
                 {timers.length === 0 && (
                     <div className="text-center py-12 text-slate-500">
-                        No timers added yet. Use the input above to add one!
-                    </div>
+                        {__('general.no_timers_added_yet_use_the_input_above')}</div>
                 )}
 
                 <div className="max-w-2xl mx-auto">
@@ -245,15 +243,14 @@ export default function MultipleCountdownTimer() {
                         <CardHeader className="pb-3">
                             <CardTitle className="text-base flex items-center gap-2 text-slate-700">
                                 <Info className="w-4 h-4" />
-                                How to use
-                            </CardTitle>
+                                {__('general.how_to_use')}</CardTitle>
                         </CardHeader>
                         <CardContent className="text-sm text-slate-600">
                             <ul className="list-disc ps-5 space-y-2">
                                 <li><strong>Add a Timer:</strong> Enter a label (optional) and click "Add Timer".</li>
-                                <li><strong>Set Time:</strong> Enter hours, minutes, and seconds for each timer.</li>
-                                <li><strong>Controls:</strong> Start, pause, or reset each timer individually.</li>
-                                <li><strong>Alarm:</strong> An audio alarm will sound when a timer reaches zero.</li>
+                                <li><strong>Set Time:</strong> {__('general.enter_hours_minutes_and_seconds_for_each')}</li>
+                                <li><strong>Controls:</strong> {__('general.start_pause_or_reset_each_timer_individu')}</li>
+                                <li><strong>Alarm:</strong> {__('general.an_audio_alarm_will_sound_when_a_timer_r')}</li>
                             </ul>
                         </CardContent>
                     </Card>

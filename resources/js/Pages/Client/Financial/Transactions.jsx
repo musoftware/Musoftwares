@@ -6,17 +6,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 
 export default function Transactions({ transactions, wallet }) {
     return (
         <AuthenticatedLayout header="Financial Transactions">
-            <Head title="Transactions" />
+            <Head title={__('general.transactions')} />
 
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-8">
                 
                 {/* Header */}
                 <div className="space-y-2">
-                    <h1 className="text-2xl font-semibold tracking-tight">Transactions</h1>
+                    <h1 className="text-2xl font-semibold tracking-tight">{__('general.transactions')}</h1>
                     <p className="text-sm text-muted-foreground">{__('general.view_your_wallet_transaction_history_and_ledgers')}</p>
                 </div>
 
@@ -77,12 +78,12 @@ export default function Transactions({ transactions, wallet }) {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="ps-6">Type</TableHead>
-                                    <TableHead>Description</TableHead>
-                                    <TableHead>Amount</TableHead>
+                                    <TableHead className="ps-6">{__('general.type')}</TableHead>
+                                    <TableHead>{__('general.description')}</TableHead>
+                                    <TableHead>{__('general.amount')}</TableHead>
                                     <TableHead>{__('general.balance_before')}</TableHead>
                                     <TableHead>{__('general.balance_after')}</TableHead>
-                                    <TableHead className="pe-6 text-end">Date</TableHead>
+                                    <TableHead className="pe-6 text-end">{__('general.date')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>

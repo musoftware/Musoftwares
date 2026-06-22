@@ -3,6 +3,7 @@ import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export default function IndexAdmin({ auth, withdrawals }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -54,21 +55,16 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                     <thead className="bg-gray-50">
                                         <tr>
                                             <th className="px-6 py-3 text-start text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                Date
-                                            </th>
+                                                {__('general.date')}</th>
                                             <th className="px-6 py-3 text-start text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                Client
-                                            </th>
+                                                {__('general.client')}</th>
                                             <th className="px-6 py-3 text-start text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                Amount
-                                            </th>
+                                                {__('general.amount')}</th>
                                             <th className="px-6 py-3 text-start text-xs font-medium tracking-wider text-gray-500 uppercase">{__('general.bank_info')}</th>
                                             <th className="px-6 py-3 text-start text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                Status
-                                            </th>
+                                                {__('general.status')}</th>
                                             <th className="px-6 py-3 text-start text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                Actions
-                                            </th>
+                                                {__('general.actions')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 bg-white">
@@ -120,8 +116,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                                                 }
                                                                 className="me-3 text-indigo-600 hover:text-indigo-900"
                                                             >
-                                                                Approve
-                                                            </button>
+                                                                {__('general.approve')}</button>
                                                             <button
                                                                 onClick={() =>
                                                                     setActionModal(
@@ -134,8 +129,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                                                 }
                                                                 className="text-red-600 hover:text-red-900"
                                                             >
-                                                                Reject
-                                                            </button>
+                                                                {__('general.reject')}</button>
                                                         </>
                                                     )}
                                                     {withdrawal.status ===
@@ -216,8 +210,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                             disabled={processing}
                                             className="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 sm:ms-3 sm:w-auto sm:text-sm"
                                         >
-                                            Reject
-                                        </button>
+                                            {__('general.reject')}</button>
                                         <button
                                             type="button"
                                             onClick={() =>
@@ -229,8 +222,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                             }
                                             className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 sm:mt-0 sm:ms-3 sm:w-auto sm:text-sm"
                                         >
-                                            Cancel
-                                        </button>
+                                            {__('general.cancel')}</button>
                                     </div>
                                 </form>
                             ) : (
@@ -297,8 +289,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                             }
                                             className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 sm:mt-0 sm:ms-3 sm:w-auto sm:text-sm"
                                         >
-                                            Cancel
-                                        </button>
+                                            {__('general.cancel')}</button>
                                     </div>
                                 </form>
                             )}

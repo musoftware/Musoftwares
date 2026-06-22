@@ -76,18 +76,18 @@ export default function Show({ campaign }) {
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900 flex items-center">
                         {campaign.name}
-                        {campaign.status === 'draft' && <span className="ms-3 inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">Draft</span>}
-                        {campaign.status === 'scheduled' && <span className="ms-3 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Scheduled</span>}
+                        {campaign.status === 'draft' && <span className="ms-3 inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">{__('general.draft')}</span>}
+                        {campaign.status === 'scheduled' && <span className="ms-3 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">{__('general.scheduled')}</span>}
                         {campaign.status === 'sending' && <span className="ms-3 inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">{__('general.sending')}</span>}
-                        {campaign.status === 'paused' && <span className="ms-3 inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800">Paused</span>}
-                        {campaign.status === 'completed' && <span className="ms-3 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Completed</span>}
+                        {campaign.status === 'paused' && <span className="ms-3 inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800">{__('general.paused')}</span>}
+                        {campaign.status === 'completed' && <span className="ms-3 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">{__('general.completed')}</span>}
                     </h2>
                     <p className="text-gray-500 mt-1">Target: {campaign.target_audience.replace('_', ' ')} • Type: <span className="capitalize">{campaign.type}</span></p>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-2">
                     <Link href={route('crm.campaigns.index')}>
-                        <Button variant="outline">Back</Button>
+                        <Button variant="outline">{__('general.back')}</Button>
                     </Link>
                     
                     {campaign.status === 'draft' && (
@@ -112,13 +112,13 @@ export default function Show({ campaign }) {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Tone</Label>
+                                            <Label>{__('general.tone')}</Label>
                                             <select 
                                                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                                                 value={aiForm.tone}
                                                 onChange={e => setAiForm({...aiForm, tone: e.target.value})}
                                             >
-                                                <option value="professional">Professional</option>
+                                                <option value="professional">{__('general.professional')}</option>
                                                 <option value="urgent">{__('general.urgent_flash_sale')}</option>
                                                 <option value="friendly">{__('general.friendly_casual')}</option>
                                             </select>
@@ -202,11 +202,11 @@ export default function Show({ campaign }) {
                             <div className="text-2xl font-bold text-gray-900">{campaign.recipients_count || 0}</div>
                         </div>
                         <div className="bg-white p-4 rounded-lg border shadow-sm text-center">
-                            <div className="text-sm text-gray-500">Delivered</div>
+                            <div className="text-sm text-gray-500">{__('general.delivered')}</div>
                             <div className="text-2xl font-bold text-green-600">--</div>
                         </div>
                         <div className="bg-white p-4 rounded-lg border shadow-sm text-center">
-                            <div className="text-sm text-gray-500">Failed</div>
+                            <div className="text-sm text-gray-500">{__('general.failed')}</div>
                             <div className="text-2xl font-bold text-red-600">--</div>
                         </div>
                         <div className="bg-white p-4 rounded-lg border shadow-sm text-center">

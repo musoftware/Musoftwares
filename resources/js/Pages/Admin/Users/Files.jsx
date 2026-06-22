@@ -14,6 +14,7 @@ import {
 import { ConfirmModal, PromptModal } from '@/Components/ui/ConfirmModal';
 import { useToast } from '@/Components/ui/use-toast';
 import { cn } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export default function Files({ user, files = [], folders = [], breadcrumbs = [], current_folder = '' }) {
     const { toast } = useToast();
@@ -157,12 +158,10 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                     <div className="flex items-center gap-2">
                         <Button variant="outline" onClick={() => setIsNewFolderOpen(true)} disabled={isLoading}>
                             <Plus className="h-4 w-4 me-2" />
-                            New Folder
-                        </Button>
+                            {__('general.new_folder')}</Button>
                         <Button onClick={handleUploadClick} disabled={isLoading}>
                             <Upload className="h-4 w-4 me-2" />
-                            Upload
-                        </Button>
+                            {__('general.upload')}</Button>
                         <input 
                             type="file" 
                             ref={fileInputRef} 
@@ -197,7 +196,7 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                         {folders.length === 0 && files.length === 0 ? (
                             <div className="p-12 text-center text-slate-500">
                                 <FolderOpen className="h-12 w-12 mx-auto text-slate-300 mb-3" />
-                                <p>This folder is empty.</p>
+                                <p>{__('general.this_folder_is_empty')}</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1 p-4">
@@ -217,15 +216,12 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDownload(folder.path); }}>
-                                                        <Download className="h-4 w-4 me-2" /> Download Zip
-                                                    </DropdownMenuItem>
+                                                        <Download className="h-4 w-4 me-2" /> {__('general.download_zip')}</DropdownMenuItem>
                                                     <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setRenameItem({ ...folder, type: 'folder' }); }}>
-                                                        <Edit className="h-4 w-4 me-2" /> Rename
-                                                    </DropdownMenuItem>
+                                                        <Edit className="h-4 w-4 me-2" /> {__('general.rename')}</DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem className="text-red-600" onClick={(e) => { e.stopPropagation(); setDeleteItem({ ...folder, type: 'folder' }); }}>
-                                                        <Trash2 className="h-4 w-4 me-2" /> Delete
-                                                    </DropdownMenuItem>
+                                                        <Trash2 className="h-4 w-4 me-2" /> {__('general.delete')}</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>
@@ -252,20 +248,16 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem onClick={() => handleDownload(file.path)}>
-                                                        <Download className="h-4 w-4 me-2" /> Download
-                                                    </DropdownMenuItem>
+                                                        <Download className="h-4 w-4 me-2" /> {__('general.download')}</DropdownMenuItem>
                                                     {isTextFile(file.ext) && (
                                                         <DropdownMenuItem onClick={() => handleEdit(file.path)}>
-                                                            <FileText className="h-4 w-4 me-2" /> Edit in Editor
-                                                        </DropdownMenuItem>
+                                                            <FileText className="h-4 w-4 me-2" /> {__('general.edit_in_editor')}</DropdownMenuItem>
                                                     )}
                                                     <DropdownMenuItem onClick={() => setRenameItem({ ...file, type: 'file' })}>
-                                                        <Edit className="h-4 w-4 me-2" /> Rename
-                                                    </DropdownMenuItem>
+                                                        <Edit className="h-4 w-4 me-2" /> {__('general.rename')}</DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem className="text-red-600" onClick={() => setDeleteItem({ ...file, type: 'file' })}>
-                                                        <Trash2 className="h-4 w-4 me-2" /> Delete
-                                                    </DropdownMenuItem>
+                                                        <Trash2 className="h-4 w-4 me-2" /> {__('general.delete')}</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>
@@ -289,8 +281,8 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
             {/* New Folder Modal */}
             <PromptModal
                 isOpen={isNewFolderOpen}
-                title="Create New Folder"
-                label="Folder Name"
+                title={__('general.create_new_folder')}
+                label={__('general.folder_name')}
                 placeholder="e.g. Documents"
                 onConfirm={handleNewFolder}
                 onCancel={() => setIsNewFolderOpen(false)}
@@ -301,7 +293,7 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
             <PromptModal
                 isOpen={!!renameItem}
                 title={`Rename ${renameItem?.type === 'folder' ? 'Folder' : 'File'}`}
-                label="New Name"
+                label={__('general.new_name')}
                 placeholder={renameItem?.name || ''}
                 onConfirm={handleRename}
                 onCancel={() => setRenameItem(null)}

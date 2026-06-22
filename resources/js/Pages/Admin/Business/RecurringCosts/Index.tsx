@@ -164,18 +164,14 @@ export default function Index({ costs, currencies, categories, stats }) {
                             <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.title_schedule')}</th>
                             <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.start_date')}</th>
                             <th className="px-6 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
-                                Category
-                            </th>
+                                {__('general.category')}</th>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
-                                Amount
-                            </th>
+                                {__('general.amount')}</th>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
-                                Active
-                            </th>
+                                {__('general.active')}</th>
                             <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
-                                Transactions
-                            </th>
-                            <th className="px-6 py-3 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">Actions</th>
+                                {__('general.transactions')}</th>
+                            <th className="px-6 py-3 text-end text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -201,7 +197,7 @@ export default function Index({ costs, currencies, categories, stats }) {
                                     <Switch 
                                         checked={cost.is_active} 
                                         onCheckedChange={() => handleToggleActive(cost.id)} 
-                                        aria-label="Toggle active status"
+                                        aria-label={__('general.toggle_active_status')}
                                     />
                                     <div className="text-[10px] text-gray-500 mt-1">{cost.is_active ? __('general.active') : __('general.inactive')}</div>
                                 </td>
@@ -215,7 +211,7 @@ export default function Index({ costs, currencies, categories, stats }) {
                                         </Button>
                                     </Link>
                                     <Link href={route('admin.recurring_costs.edit', cost.id)}>
-                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black me-1" title="Edit">
+                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black me-1" title={__('general.edit')}>
                                             <Edit className="w-4 h-4" />
                                         </Button>
                                     </Link>

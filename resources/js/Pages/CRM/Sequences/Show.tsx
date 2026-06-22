@@ -84,13 +84,13 @@ export default function Show({ sequence }) {
                                             <Input type="number" min="1" max="5" value={aiForm.num_steps} onChange={e => setAiForm({...aiForm, num_steps: parseInt(e.target.value)})} />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Tone</Label>
+                                            <Label>{__('general.tone')}</Label>
                                             <select 
                                                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                                                 value={aiForm.tone}
                                                 onChange={e => setAiForm({...aiForm, tone: e.target.value})}
                                             >
-                                                <option value="professional">Professional</option>
+                                                <option value="professional">{__('general.professional')}</option>
                                                 <option value="friendly">{__('general.friendly_welcoming')}</option>
                                                 <option value="urgent">{__('general.urgent_sales')}</option>
                                             </select>
@@ -120,7 +120,7 @@ export default function Show({ sequence }) {
                                         </div>
                                     ))}
                                     <div className="flex justify-end space-x-3 mt-4">
-                                        <Button variant="outline" onClick={() => setGeneratedSteps(null)}>Discard</Button>
+                                        <Button variant="outline" onClick={() => setGeneratedSteps(null)}>{__('general.discard')}</Button>
                                         <Button onClick={handleApplyAI}>{__('general.apply_steps_to_sequence')}</Button>
                                     </div>
                                 </div>

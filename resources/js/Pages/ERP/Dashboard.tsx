@@ -1003,7 +1003,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                 
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div>
-                                        <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Overview</h2>
+                                        <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">{__('general.overview')}</h2>
                                         <p className="text-sm text-slate-500 mt-1">{__('general.here_s_what_s_happening_in_your_workspace_today')}</p>
                                     </div>
                                     {!isReadOnlyMember && (
@@ -1080,7 +1080,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         icon={Users}
                                     />
                                     <MetricCard 
-                                        label="Subscriptions"
+                                        label={__('general.subscriptions')}
                                         value={stats.recurringCount}
                                         icon={Layers}
                                     />
@@ -1233,7 +1233,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'clients' && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title="Clients" 
+                                    title={__('general.clients')} 
                                     description={__('general.manage_your_clients_contacts_and_their_billing_profiles')}
                                     actions={!isReadOnlyMember && (
                                         <Link href={route("erp.clients.create")}><Button size="sm" className="shadow-none">
@@ -1262,13 +1262,13 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         <table className="w-full text-start text-sm border-collapse">
                                             <thead>
                                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                                    <th className="px-6 py-3.5">Client</th>
-                                                    <th className="px-6 py-3.5">Contact</th>
-                                                    <th className="px-6 py-3.5 text-end">Balance</th>
-                                                    <th className="px-6 py-3.5 text-end">Unpaid</th>
-                                                    <th className="px-6 py-3.5 text-end">Paid</th>
-                                                    <th className="px-6 py-3.5">Created</th>
-                                                    {!isReadOnlyMember && <th className="px-6 py-3.5 text-end">Actions</th>}
+                                                    <th className="px-6 py-3.5">{__('general.client')}</th>
+                                                    <th className="px-6 py-3.5">{__('general.contact')}</th>
+                                                    <th className="px-6 py-3.5 text-end">{__('general.balance')}</th>
+                                                    <th className="px-6 py-3.5 text-end">{__('general.unpaid')}</th>
+                                                    <th className="px-6 py-3.5 text-end">{__('general.paid')}</th>
+                                                    <th className="px-6 py-3.5">{__('general.created')}</th>
+                                                    {!isReadOnlyMember && <th className="px-6 py-3.5 text-end">{__('general.actions')}</th>}
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
@@ -1347,7 +1347,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'branches' && hasMultiBranch && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title="Branches" 
+                                    title={__('general.branches')} 
                                     description={__('general.manage_your_business_branches_locations_and_timezone_settings')}
                                     actions={!isReadOnlyMember && (
                                         <Button size="sm" className="shadow-none" onClick={() => setShowAddBranchModal(true)}>
@@ -1377,13 +1377,13 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
 
                                                     <div className="grid grid-cols-2 gap-3 bg-slate-50/50 p-3 rounded-lg border border-slate-100">
                                                         <div>
-                                                            <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Timezone</span>
+                                                            <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">{__('general.timezone')}</span>
                                                             <span className="block text-[13px] font-semibold text-slate-700 mt-0.5">
                                                                 {branch.timezone}
                                                             </span>
                                                         </div>
                                                         <div>
-                                                            <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Created</span>
+                                                            <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">{__('general.created')}</span>
                                                             <span className="block text-[13px] font-semibold text-slate-700 mt-0.5 flex items-center gap-1.5">
                                                                 <CalendarIcon className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                                                                 {branch.created_at}
@@ -1431,13 +1431,13 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                     className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                                 >
                                                     <option value="retail">{__('general.retail_store')}</option>
-                                                    <option value="office">Office</option>
-                                                    <option value="warehouse">Warehouse</option>
+                                                    <option value="office">{__('general.office')}</option>
+                                                    <option value="warehouse">{__('general.warehouse')}</option>
                                                     <option value="virtual">{__('general.virtual_online')}</option>
                                                 </select>
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-slate-700">Timezone</label>
+                                                <label className="text-sm font-medium text-slate-700">{__('general.timezone')}</label>
                                                 <Input
                                                     value={branchForm.timezone}
                                                     onChange={(e) => setBranchForm({ ...branchForm, timezone: e.target.value })}
@@ -1446,8 +1446,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                             </div>
                                             <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
                                                 <Button type="button" variant="outline" onClick={() => setShowAddBranchModal(false)}>
-                                                    Cancel
-                                                </Button>
+                                                    {__('general.cancel')}</Button>
                                                 <Button type="submit">{__('general.create_branch')}</Button>
                                             </div>
                                         </form>
@@ -1460,7 +1459,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'projects' && activeAddons.includes('erp-projects') && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title="Projects" 
+                                    title={__('general.projects')} 
                                     description={__('general.manage_active_projects_track_progress_and_monitor_deadlines')}
                                     actions={!isReadOnlyMember && (
                                         <Link href={route("erp.projects.create")}><Button size="sm" className="shadow-none">
@@ -1492,13 +1491,13 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
 
                                                 <div className="grid grid-cols-2 gap-3 bg-slate-50/50 p-3 rounded-lg border border-slate-100">
                                                     <div>
-                                                        <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Budget</span>
+                                                        <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">{__('general.budget')}</span>
                                                         <span className="block text-[13px] font-semibold text-slate-700 mt-0.5">
                                                             <CurrencyDisplay amount={proj.budget} currency={proj.currency || currency} />
                                                         </span>
                                                     </div>
                                                     <div>
-                                                        <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Deadline</span>
+                                                        <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">{__('general.deadline')}</span>
                                                         <span className="block text-[13px] font-semibold text-slate-700 mt-0.5 flex items-center gap-1.5">
                                                             <CalendarIcon className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                                                             {formatDate(proj.deadline)}
@@ -1508,7 +1507,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
 
                                                 <div className="space-y-1.5">
                                                     <div className="flex justify-between text-xs font-semibold text-slate-500">
-                                                        <span>Progress</span>
+                                                        <span>{__('general.progress')}</span>
                                                         <span>{proj.progress}%</span>
                                                     </div>
                                                     <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
@@ -1522,8 +1521,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                             href={route('erp.projects.edit', proj.id)}
                                                             className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
                                                         >
-                                                            <Edit2 className="h-3.5 w-3.5" /> Edit
-                                                        </Link>
+                                                            <Edit2 className="h-3.5 w-3.5" /> {__('general.edit')}</Link>
                                                         <button 
                                                             onClick={() => setDeleteProjectConfirm({ open: true, project: proj })}
                                                             className="flex items-center justify-center py-2 px-3 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-colors shadow-sm shrink-0"
@@ -1546,7 +1544,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div className="flex-grow">
                                         <ModulePageHeader 
-                                            title="Tasks" 
+                                            title={__('general.tasks')} 
                                             description={__('general.manage_and_organize_your_team_s_tasks_and_priorities')}
                                         />
                                     </div>
@@ -1756,7 +1754,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'documents' && activeAddons.includes('erp-document-storage') && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title="Files" 
+                                    title={__('general.files')} 
                                     description={__('general.secure_cloud_repository_for_your_documents_and_files')}
                                     actions={!isReadOnlyMember && (
                                         <Link href={route("erp.files.create")}><Button size="sm" className="shadow-none">
@@ -1785,11 +1783,11 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         <table className="w-full text-start text-sm border-collapse">
                                             <thead>
                                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                                    <th className="px-6 py-3.5">Filename</th>
+                                                    <th className="px-6 py-3.5">{__('general.filename')}</th>
                                                     <th className="px-6 py-3.5">{__('general.storage_provider')}</th>
-                                                    <th className="px-6 py-3.5">Tags</th>
+                                                    <th className="px-6 py-3.5">{__('general.tags')}</th>
                                                     <th className="px-6 py-3.5">{__('general.file_size')}</th>
-                                                    <th className="px-6 py-3.5 text-end">Access</th>
+                                                    <th className="px-6 py-3.5 text-end">{__('general.access')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
@@ -1841,7 +1839,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'contracts' && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title="Contracts" 
+                                    title={__('general.contracts')} 
                                     description={__('general.draft_and_track_client_service_agreements_and_contracts')}
                                     actions={
                                         <Link href={route("erp.contracts.create")}><Button size="sm" className="shadow-none">
@@ -1856,8 +1854,8 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                                     <th className="px-6 py-3.5">{__('general.agreement_sheet')}</th>
                                                     <th className="px-6 py-3.5">{__('general.client_tenant')}</th>
-                                                    <th className="px-6 py-3.5 text-end">Value</th>
-                                                    <th className="px-6 py-3.5 text-center">Status</th>
+                                                    <th className="px-6 py-3.5 text-end">{__('general.value')}</th>
+                                                    <th className="px-6 py-3.5 text-center">{__('general.status')}</th>
                                                     <th className="px-6 py-3.5 text-end">{__('general.date_created')}</th>
                                                 </tr>
                                             </thead>
@@ -1894,7 +1892,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'transactions' && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title="Transactions" 
+                                    title={__('general.transactions')} 
                                     description={__('general.view_all_wallet_activity_payments_and_balance_adjustments')}
 
                                 />
@@ -1952,14 +1950,14 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         <table className="w-full text-start text-sm border-collapse">
                                             <thead>
                                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                                    <th className="px-5 py-3.5">Reference</th>
-                                                    <th className="px-5 py-3.5">Client</th>
-                                                    <th className="px-5 py-3.5">Type</th>
-                                                    <th className="px-5 py-3.5 text-center">Direction</th>
-                                                    <th className="px-5 py-3.5 text-end">Amount</th>
-                                                    <th className="px-5 py-3.5 text-end">Balance</th>
+                                                    <th className="px-5 py-3.5">{__('general.reference')}</th>
+                                                    <th className="px-5 py-3.5">{__('general.client')}</th>
+                                                    <th className="px-5 py-3.5">{__('general.type')}</th>
+                                                    <th className="px-5 py-3.5 text-center">{__('general.direction')}</th>
+                                                    <th className="px-5 py-3.5 text-end">{__('general.amount')}</th>
+                                                    <th className="px-5 py-3.5 text-end">{__('general.balance')}</th>
                                                     <th className="px-5 py-3.5">{__('general.authorized_by')}</th>
-                                                    <th className="px-5 py-3.5 text-end">Timestamp</th>
+                                                    <th className="px-5 py-3.5 text-end">{__('general.timestamp')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
@@ -1993,12 +1991,10 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                             <td className="px-5 py-4 text-center">
                                                                 {txn.direction === 'CREDIT' ? (
                                                                     <Badge className="bg-emerald-50 text-emerald-700 border-none rounded font-bold text-[10px]">
-                                                                        <ArrowDown className="h-3 w-3 me-0.5" /> CREDIT
-                                                                    </Badge>
+                                                                        <ArrowDown className="h-3 w-3 me-0.5" /> {__('general.credit')}</Badge>
                                                                 ) : (
                                                                     <Badge className="bg-rose-50 text-rose-700 border-none rounded font-bold text-[10px]">
-                                                                        <ArrowUp className="h-3 w-3 me-0.5" /> DEBIT
-                                                                    </Badge>
+                                                                        <ArrowUp className="h-3 w-3 me-0.5" /> {__('general.debit')}</Badge>
                                                                 )}
                                                             </td>
                                                             <td className="px-5 py-4 text-end">
@@ -2036,7 +2032,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'expenses' && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title="Expenses" 
+                                    title={__('general.expenses')} 
                                     description={__('general.log_and_manage_your_business_expenses_and_operating_costs')}
                                     actions={!isReadOnlyMember && (
                                         <Link href={route("erp.expenses.create")}><Button size="sm" className="shadow-none">
@@ -2049,11 +2045,11 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         <table className="w-full text-start text-sm border-collapse">
                                             <thead>
                                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                                    <th className="px-6 py-3.5">Expense</th>
-                                                    <th className="px-6 py-3.5">Category</th>
-                                                    <th className="px-6 py-3.5 text-end">Amount</th>
-                                                    <th className="px-6 py-3.5">Date</th>
-                                                    {!isReadOnlyMember && <th className="px-6 py-3.5 text-end">Actions</th>}
+                                                    <th className="px-6 py-3.5">{__('general.expense')}</th>
+                                                    <th className="px-6 py-3.5">{__('general.category')}</th>
+                                                    <th className="px-6 py-3.5 text-end">{__('general.amount')}</th>
+                                                    <th className="px-6 py-3.5">{__('general.date')}</th>
+                                                    {!isReadOnlyMember && <th className="px-6 py-3.5 text-end">{__('general.actions')}</th>}
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
@@ -2070,25 +2066,25 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                 ) : (
                                                     expenses.map((exp) => (
                                                         <tr key={exp.id} className="hover:bg-slate-50 transition text-[13px] text-slate-700">
-                                                            <td className="px-6 py-4" data-label="Expense">
+                                                            <td className="px-6 py-4" data-label={__('general.expense')}>
                                                                 <span className="font-semibold text-slate-900 block">{exp.title}</span>
                                                                 {exp.description && exp.description !== '-' && (
                                                                     <span className="text-slate-400 text-xs mt-0.5 block">{exp.description}</span>
                                                                 )}
                                                             </td>
-                                                            <td className="px-6 py-4" data-label="Category">
+                                                            <td className="px-6 py-4" data-label={__('general.category')}>
                                                                 <Badge variant="outline" className="text-[10px] font-medium text-slate-500 bg-white shadow-none rounded-md">
                                                                     {exp.category}
                                                                 </Badge>
                                                             </td>
-                                                            <td className="px-6 py-4 text-end font-semibold text-slate-900 font-mono" data-label="Amount">
+                                                            <td className="px-6 py-4 text-end font-semibold text-slate-900 font-mono" data-label={__('general.amount')}>
                                                                 <CurrencyDisplay amount={exp.amount} currency={currency} />
                                                             </td>
-                                                            <td className="px-6 py-4 text-slate-500 text-xs font-mono" data-label="Date">
+                                                            <td className="px-6 py-4 text-slate-500 text-xs font-mono" data-label={__('general.date')}>
                                                                 {formatDate(exp.date)}
                                                             </td>
                                                             {!isReadOnlyMember && (
-                                                                <td className="px-6 py-4 text-end" data-label="Actions">
+                                                                <td className="px-6 py-4 text-end" data-label={__('general.actions')}>
                                                                     <div className="flex items-center justify-end gap-2">
                                                                         <Link href={route('erp.expenses.edit', exp.id)} className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), "h-8 w-8 text-slate-400 hover:text-indigo-600")}>
                                                                             <Edit2 className="h-4 w-4" />
@@ -2113,7 +2109,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'team' && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title="Team" 
+                                    title={__('general.team')} 
                                     description={__('general.manage_your_team_members_and_their_workspace_access')}
                                 />
 
@@ -2163,15 +2159,15 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                     </div>
                                                     <div className="flex justify-between">
                                                         <span>{__('general.central_ledger')}</span>
-                                                        <Badge variant="outline" className="text-[10px] font-bold">Owner</Badge>
+                                                        <Badge variant="outline" className="text-[10px] font-bold">{__('general.owner')}</Badge>
                                                     </div>
                                                     <div className="flex justify-between">
                                                         <span>{__('general.invoice_generation')}</span>
-                                                        <Badge variant="outline" className="text-[10px] font-bold">Accountant</Badge>
+                                                        <Badge variant="outline" className="text-[10px] font-bold">{__('general.accountant')}</Badge>
                                                     </div>
                                                     <div className="flex justify-between">
                                                         <span>{__('general.task_assignments')}</span>
-                                                        <Badge variant="outline" className="text-[10px] font-bold">Staff</Badge>
+                                                        <Badge variant="outline" className="text-[10px] font-bold">{__('general.staff')}</Badge>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2185,7 +2181,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'notes' && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title="Notes" 
+                                    title={__('general.notes')} 
                                     description={__('general.workspace_scratchpad_for_logging_internal_memos_and_pinned_notes')}
                                     actions={
                                         <Button size="sm" onClick={handleCreateNote} className="shadow-none">
@@ -2242,9 +2238,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                             value={noteEditor.category}
                                                             onChange={(e) => setNoteEditor(prev => ({ ...prev, category: e.target.value }))}
                                                         >
-                                                            <option value="Internal">Internal</option>
-                                                            <option value="Client">Client</option>
-                                                            <option value="Project">Project</option>
+                                                            <option value="Internal">{__('general.internal')}</option>
+                                                            <option value="Client">{__('general.client')}</option>
+                                                            <option value="Project">{__('general.project')}</option>
                                                         </select>
                                                         <Input 
                                                             className="border-none font-semibold text-[15px] h-9 focus-visible:ring-0 px-0 shadow-none"
@@ -2372,7 +2368,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                             return (
                                 <div className="space-y-6">
                                     <ModulePageHeader 
-                                        title="Calendar" 
+                                        title={__('general.calendar')} 
                                         description={__('general.view_task_due_dates_client_deliverables_and_scheduling_timelines')}
                                     />
 
@@ -2392,8 +2388,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                             onClick={handleGoToToday}
                                                             className="shadow-none text-xs font-semibold px-2.5 h-8 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                                                         >
-                                                            Today
-                                                        </Button>
+                                                            {__('general.today')}</Button>
                                                         <div className="flex items-center border border-slate-200 rounded-lg bg-white p-0.5 overflow-hidden">
                                                             <Button 
                                                                 size="icon" 
@@ -2568,8 +2563,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                                     }}
                                                                     className="h-6 text-[10px] font-semibold border-slate-200 shadow-none hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200"
                                                                 >
-                                                                    Schedule
-                                                                </Button>
+                                                                    {__('general.schedule')}</Button>
                                                             </div>
                                                         ))
                                                     )}
@@ -2626,26 +2620,26 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                         </div>
                                                         <div className="grid grid-cols-2 gap-2">
                                                             <div>
-                                                                <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Priority</label>
+                                                                <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">{__('general.priority')}</label>
                                                                 <select
                                                                     value={calendarTaskForm.priority}
                                                                     onChange={e => setCalendarTaskForm(prev => ({ ...prev, priority: e.target.value }))}
                                                                     className="w-full text-xs h-8.5 rounded-md border border-slate-200 bg-white px-2.5 shadow-none focus:outline-none"
                                                                 >
                                                                     <option value="low">Low</option>
-                                                                    <option value="normal">Normal</option>
-                                                                    <option value="high">High</option>
-                                                                    <option value="urgent">Urgent</option>
+                                                                    <option value="normal">{__('general.normal')}</option>
+                                                                    <option value="high">{__('general.high')}</option>
+                                                                    <option value="urgent">{__('general.urgent')}</option>
                                                                 </select>
                                                             </div>
                                                             <div>
-                                                                <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Status</label>
+                                                                <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">{__('general.status')}</label>
                                                                 <select
                                                                     value={calendarTaskForm.status}
                                                                     onChange={e => setCalendarTaskForm(prev => ({ ...prev, status: e.target.value }))}
                                                                     className="w-full text-xs h-8.5 rounded-md border border-slate-200 bg-white px-2.5 shadow-none focus:outline-none"
                                                                 >
-                                                                    <option value="open">Todo</option>
+                                                                    <option value="open">{__('general.todo')}</option>
                                                                     <option value="in_progress">{__('general.in_progress')}</option>
                                                                     <option value="review">{__('general.in_review')}</option>
                                                                 </select>
@@ -2665,7 +2659,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'support' && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title="Support" 
+                                    title={__('general.support')} 
                                     description={__('general.track_client_helpdesk_tickets_and_resolve_inquiries')}
                                     actions={
                                         <Link href={route("erp.tickets.create")}><Button size="sm" className="shadow-none">
@@ -2681,10 +2675,10 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                     <th className="px-6 py-3.5">{__('general.ticket_id')}</th>
                                                     <th className="px-6 py-3.5">{__('general.ticket_subject')}</th>
                                                     <th className="px-6 py-3.5">{__('general.client_tenant')}</th>
-                                                    <th className="px-6 py-3.5">Priority</th>
-                                                    <th className="px-6 py-3.5">Status</th>
+                                                    <th className="px-6 py-3.5">{__('general.priority')}</th>
+                                                    <th className="px-6 py-3.5">{__('general.status')}</th>
                                                     <th className="px-6 py-3.5">{__('general.date_created')}</th>
-                                                    <th className="px-6 py-3.5 text-end">Actions</th>
+                                                    <th className="px-6 py-3.5 text-end">{__('general.actions')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100 font-sans text-[13px] text-slate-700">
@@ -2719,8 +2713,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                                         className="h-7 px-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 text-xs shadow-none border-none"
                                                                         onClick={() => handleResolveTicket(t.id)}
                                                                     >
-                                                                        Resolve
-                                                                    </Button>
+                                                                        {__('general.resolve')}</Button>
                                                                 )}
                                                                 {t.status.toLowerCase() !== 'closed' && (
                                                                     <Button 
@@ -2729,8 +2722,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                                         className="h-7 px-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50 text-xs shadow-none border-none"
                                                                         onClick={() => handleCloseTicket(t.id)}
                                                                     >
-                                                                        Close
-                                                                    </Button>
+                                                                        {__('general.close')}</Button>
                                                                 )}
                                                                 <Button 
                                                                     size="xs" 
@@ -2755,7 +2747,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'activity' && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title="Activity" 
+                                    title={__('general.activity')} 
                                     description={__('general.log_of_actions_taken_within_the_workspace')}
                                 />
 
@@ -2769,7 +2761,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'settings' && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title="Settings" 
+                                    title={__('general.settings')} 
                                     description={__('general.manage_your_workspace_preferences_billing_parameters_and_brand_identity')}
                                 />
 
@@ -2830,7 +2822,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                     <div>
                                                         <div className="flex items-center gap-2">
                                                             <span className="font-semibold text-slate-900 text-sm">{provider.name}</span>
-                                                            {provider.isDefault && <Badge variant="secondary" className="text-[9px] uppercase tracking-wider bg-indigo-50 text-indigo-700">Default</Badge>}
+                                                            {provider.isDefault && <Badge variant="secondary" className="text-[9px] uppercase tracking-wider bg-indigo-50 text-indigo-700">{__('general.default')}</Badge>}
                                                         </div>
                                                         <span className="text-xs text-slate-500 flex items-center gap-1.5 mt-1">
                                                             <HardDrive className="h-3 w-3" /> {provider.bucket} ({provider.driver})
@@ -2894,7 +2886,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         <div className="space-y-3.5 text-xs text-slate-700">
                                             {selectedCalendarTask.client && (
                                                 <div className="flex justify-between items-center py-1.5 border-b border-slate-50">
-                                                    <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">Client</span>
+                                                    <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">{__('general.client')}</span>
                                                     <span className="font-bold text-slate-800 flex items-center gap-1">
                                                         <Users className="h-3.5 w-3.5 text-indigo-500" />
                                                         {selectedCalendarTask.client.name}
@@ -2902,7 +2894,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                 </div>
                                             )}
                                             <div className="flex justify-between items-center py-1.5 border-b border-slate-50">
-                                                <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">Priority</span>
+                                                <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">{__('general.priority')}</span>
                                                 <Badge variant="outline" className={cn(
                                                     "text-[10px] font-bold uppercase",
                                                     selectedCalendarTask.priority.toLowerCase() === 'urgent' ? 'bg-rose-50 text-rose-700 border-rose-200' :
@@ -2920,7 +2912,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                 </span>
                                             </div>
                                             <div className="flex justify-between items-center py-1.5 border-b border-slate-50">
-                                                <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">Assignee</span>
+                                                <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">{__('general.assignee')}</span>
                                                 <span className="font-semibold text-slate-800 flex items-center gap-1.5">
                                                     <div className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[9px]">
                                                         {selectedCalendarTask.assignee ? selectedCalendarTask.assignee.substring(0, 2).toUpperCase() : 'UA'}
@@ -2930,7 +2922,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                             </div>
                                             {selectedCalendarTask.task_description && (
                                                 <div className="space-y-1.5 pt-2">
-                                                    <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px] block font-sans">Description</span>
+                                                    <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px] block font-sans">{__('general.description')}</span>
                                                     <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed font-sans text-[12px]">
                                                         {selectedCalendarTask.task_description}
                                                     </p>
@@ -2949,8 +2941,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                 size="sm"
                                                 className="flex-1 shadow-none text-xs font-semibold h-9 bg-indigo-650 text-white hover:bg-indigo-700"
                                             >
-                                                Close
-                                            </Button>
+                                                {__('general.close')}</Button>
                                         </div>
                                     </div>
                                 )}
@@ -2997,35 +2988,35 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
 
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="space-y-1">
-                                            <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Priority</label>
+                                            <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">{__('general.priority')}</label>
                                             <select
                                                 value={calendarTaskForm.priority}
                                                 onChange={e => setCalendarTaskForm(prev => ({ ...prev, priority: e.target.value }))}
                                                 className="w-full text-xs h-9.5 rounded-md border border-slate-200 bg-white px-2.5 shadow-none focus:outline-none"
                                             >
                                                 <option value="low">Low</option>
-                                                <option value="normal">Normal</option>
-                                                <option value="high">High</option>
-                                                <option value="urgent">Urgent</option>
+                                                <option value="normal">{__('general.normal')}</option>
+                                                <option value="high">{__('general.high')}</option>
+                                                <option value="urgent">{__('general.urgent')}</option>
                                             </select>
                                         </div>
                                         <div className="space-y-1">
-                                            <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Status</label>
+                                            <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">{__('general.status')}</label>
                                             <select
                                                 value={calendarTaskForm.status}
                                                 onChange={e => setCalendarTaskForm(prev => ({ ...prev, status: e.target.value }))}
                                                 className="w-full text-xs h-9.5 rounded-md border border-slate-200 bg-white px-2.5 shadow-none focus:outline-none"
                                             >
-                                                <option value="open">Todo</option>
+                                                <option value="open">{__('general.todo')}</option>
                                                 <option value="in_progress">{__('general.in_progress')}</option>
                                                 <option value="review">{__('general.in_review')}</option>
-                                                <option value="completed">Done</option>
+                                                <option value="completed">{__('general.done')}</option>
                                             </select>
                                         </div>
                                     </div>
 
                                     <div className="space-y-1">
-                                        <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Description</label>
+                                        <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">{__('general.description')}</label>
                                         <Textarea 
                                             placeholder={__('general.enter_additional_task_details_and_guidelines')}
                                             value={calendarTaskForm.task_description}
@@ -3041,8 +3032,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                             onClick={() => setShowCalendarAddModal(false)}
                                             className="h-9 shadow-none text-xs font-semibold"
                                         >
-                                            Cancel
-                                        </Button>
+                                            {__('general.cancel')}</Button>
                                         <Button 
                                             type="submit"
                                             className="h-9 shadow-none text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700"

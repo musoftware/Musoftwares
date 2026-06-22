@@ -37,6 +37,7 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import { useToast } from '@/Components/ui/use-toast';
 import { CurrencySelect } from '@/Components/CurrencySelect';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ auth, paymentMethods, currencies = [] }) {
     const { toast } = useToast();
@@ -130,7 +131,7 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                             {errors.account_number && <p className="text-xs text-rose-500">{errors.account_number}</p>}
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label htmlFor="iban">IBAN</Label>
+                                            <Label htmlFor="iban">{__('general.iban')}</Label>
                                             <Input id="iban" className="shadow-none border-slate-200" value={data.iban} onChange={e => setData('iban', e.target.value)} required />
                                             {errors.iban && <p className="text-xs text-rose-500">{errors.iban}</p>}
                                         </div>
@@ -150,7 +151,7 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                                 value={data.bank_country}
                                                 onChange={e => setData('bank_country', e.target.value)}
                                             >
-                                                <option value="EG">Egypt</option>
+                                                <option value="EG">{__('general.egypt')}</option>
                                                 <option value="US">{__('general.united_states')}</option>
                                                 <option value="GB">{__('general.united_kingdom')}</option>
                                                 <option value="AE">UAE</option>
@@ -158,7 +159,7 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                             </select>
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label htmlFor="currency">Currency</Label>
+                                            <Label htmlFor="currency">{__('general.currency')}</Label>
                                             <CurrencySelect
                                                 id="currency"
                                                 currencies={currencies}
@@ -201,8 +202,7 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                             <div key={pm.id} className={`relative bg-white rounded-2xl border ${pm.is_default ? 'border-indigo-200 shadow-sm ring-1 ring-indigo-50' : 'border-slate-100 shadow-sm'} p-6 transition-all`}>
                                 {pm.is_default && (
                                     <div className="absolute -top-3 -end-3 bg-indigo-100 text-indigo-700 text-[10px] font-bold px-3 py-1 rounded-full flex items-center border border-indigo-200">
-                                        <Check className="w-3 h-3 me-1" /> DEFAULT
-                                    </div>
+                                        <Check className="w-3 h-3 me-1" /> {__('general.default')}</div>
                                 )}
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                                     
@@ -219,7 +219,7 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                     </div>
 
                                     <div className="flex-1 md:max-w-xs space-y-1">
-                                        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">IBAN</p>
+                                        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">{__('general.iban')}</p>
                                         <p className="font-mono text-sm tracking-tighter bg-slate-50 p-2 rounded-lg border border-slate-100 text-slate-700">
                                             {maskIBAN(pm.iban)}
                                         </p>
@@ -227,11 +227,11 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
 
                                     <div className="flex items-center gap-6">
                                         <div className="text-end">
-                                            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Status</p>
+                                            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">{__('general.status')}</p>
                                             <StatusBadge status={pm.status} />
                                         </div>
                                         <div className="text-end">
-                                            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Currency</p>
+                                            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">{__('general.currency')}</p>
                                             <div className="flex items-center text-sm font-medium text-slate-700">
                                                 <Globe className="w-3.5 h-3.5 me-1.5 text-slate-400" /> {pm.bank_country} • {pm.bank_currency}
                                             </div>
@@ -249,8 +249,7 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                                         <Check className="w-4 h-4 me-2 text-indigo-600" />{__('general.set_default')}</DropdownMenuItem>
                                                 )}
                                                 <DropdownMenuItem className="text-rose-600 focus:bg-rose-50 cursor-pointer" onClick={() => deletePM(pm)}>
-                                                    <Trash2 className="w-4 h-4 me-2 text-rose-600" /> Delete
-                                                </DropdownMenuItem>
+                                                    <Trash2 className="w-4 h-4 me-2 text-rose-600" /> {__('general.delete')}</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>

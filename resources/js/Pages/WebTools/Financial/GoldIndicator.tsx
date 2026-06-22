@@ -6,6 +6,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsToolti
 import { LineChart as LineChartIcon, Activity, TrendingUp, DollarSign, ArrowUpRight, ArrowDownRight, Gem } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
+import { __ } from '@/lib/i18n';
 
 // Mock data to simulate the GoldChart.php logic
 const generateMockData = () => {
@@ -41,25 +42,22 @@ export default function GoldIndicator() {
     const [timeframe, setTimeframe] = useState('1m');
 
     return (
-        <WebToolsLayout title="Gold Indicator" activeNav="explore">
+        <WebToolsLayout title={__('general.gold_indicator')} activeNav="explore">
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6">
                 <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <span className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-sm font-medium mb-3">
-                            Market Analysis
-                        </span>
+                            {__('general.market_analysis')}</span>
                         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
                             <Gem className="w-8 h-8 text-amber-500" />
-                            Gold Indicator
-                        </h1>
+                            {__('general.gold_indicator')}</h1>
                         <p className="mt-2 text-lg text-slate-600">
-                            Analyze gold market trends, local vs world prices, and implied USD rates.
-                        </p>
+                            {__('general.analyze_gold_market_trends_local_vs_worl')}</p>
                     </div>
                     <div className="flex gap-2 items-center bg-white p-2 rounded-xl shadow-sm border border-slate-200">
                         <Select value={timeframe} onValueChange={(val) => setTimeframe(val || "")}>
                             <SelectTrigger className="w-[150px] border-none shadow-none focus:ring-0">
-                                <SelectValue placeholder="Timeframe" />
+                                <SelectValue placeholder={__('general.timeframe')} />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="1w">1 Week</SelectItem>
@@ -77,7 +75,7 @@ export default function GoldIndicator() {
                         <CardContent className="p-6">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <p className="text-sm font-medium text-slate-500">Local 21K Price</p>
+                                    <p className="text-sm font-medium text-slate-500">{__('general.local_21k_price')}</p>
                                     <h3 className="text-3xl font-bold text-slate-900 mt-1">{mockData[mockData.length-1].local21k.toLocaleString()} <span className="text-lg font-medium text-slate-500">EGP</span></h3>
                                 </div>
                                 <div className="p-2 bg-emerald-100 rounded-lg">
@@ -95,7 +93,7 @@ export default function GoldIndicator() {
                         <CardContent className="p-6">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <p className="text-sm font-medium text-slate-500">World 21K Price</p>
+                                    <p className="text-sm font-medium text-slate-500">{__('general.world_21k_price')}</p>
                                     <h3 className="text-3xl font-bold text-slate-900 mt-1">{mockData[mockData.length-1].world21k.toLocaleString()} <span className="text-lg font-medium text-slate-500">EGP</span></h3>
                                 </div>
                                 <div className="p-2 bg-red-100 rounded-lg">
@@ -113,7 +111,7 @@ export default function GoldIndicator() {
                         <CardContent className="p-6">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <p className="text-sm font-medium text-slate-500">Implied USD Rate</p>
+                                    <p className="text-sm font-medium text-slate-500">{__('general.implied_usd_rate')}</p>
                                     <h3 className="text-3xl font-bold text-slate-900 mt-1">{mockData[mockData.length-1].usdPrice.toFixed(2)} <span className="text-lg font-medium text-slate-500">EGP</span></h3>
                                 </div>
                                 <div className="p-2 bg-indigo-100 rounded-lg">
@@ -131,7 +129,7 @@ export default function GoldIndicator() {
                         <CardContent className="p-6">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <p className="text-sm font-medium text-slate-500">Market Spread</p>
+                                    <p className="text-sm font-medium text-slate-500">{__('general.market_spread')}</p>
                                     <h3 className="text-3xl font-bold text-slate-900 mt-1">{mockData[mockData.length-1].spread.toLocaleString()} <span className="text-lg font-medium text-slate-500">EGP</span></h3>
                                 </div>
                                 <div className="p-2 bg-amber-100 rounded-lg">
@@ -139,8 +137,8 @@ export default function GoldIndicator() {
                                 </div>
                             </div>
                             <div className="mt-4 flex items-center text-sm">
-                                <span className="text-amber-600 font-medium">High Premium</span>
-                                <span className="text-slate-500 ms-2">Wait for dip</span>
+                                <span className="text-amber-600 font-medium">{__('general.high_premium')}</span>
+                                <span className="text-slate-500 ms-2">{__('general.wait_for_dip')}</span>
                             </div>
                         </CardContent>
                     </Card>
@@ -156,7 +154,7 @@ export default function GoldIndicator() {
                                         <LineChartIcon className="w-5 h-5 text-indigo-500" />
                                         Local vs World Price (21K)
                                     </CardTitle>
-                                    <CardDescription>Compare local market price against international spot price</CardDescription>
+                                    <CardDescription>{__('general.compare_local_market_price_against_inter')}</CardDescription>
                                 </div>
                             </div>
                         </CardHeader>
@@ -194,9 +192,8 @@ export default function GoldIndicator() {
                         <CardHeader className="pb-2 border-b border-slate-100">
                             <CardTitle className="text-lg flex items-center gap-2">
                                 <Activity className="w-5 h-5 text-amber-500" />
-                                Implied USD Rate
-                            </CardTitle>
-                            <CardDescription>Gold-implied exchange rate</CardDescription>
+                                {__('general.implied_usd_rate')}</CardTitle>
+                            <CardDescription>{__('general.goldimplied_exchange_rate')}</CardDescription>
                         </CardHeader>
                         <CardContent className="pt-6">
                             <div className="h-[350px] w-full">
@@ -221,14 +218,12 @@ export default function GoldIndicator() {
                     <CardContent className="p-6">
                         <h4 className="font-semibold text-slate-900 mb-2 flex items-center gap-2">
                             <TrendingUp className="w-5 h-5 text-indigo-500" />
-                            Market Insights
-                        </h4>
+                            {__('general.market_insights')}</h4>
                         <p className="text-sm text-slate-600 mb-4">
-                            The current spread between local and world prices is elevated. Historically, this suggests a higher premium in the local market, likely driven by local demand and currency fluctuations.
-                        </p>
+                            {__('general.the_current_spread_between_local_and_wor')}</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-slate-200">
                             <div>
-                                <span className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">YTD Performance</span>
+                                <span className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{__('general.ytd_performance')}</span>
                                 <span className="text-lg font-bold text-emerald-600">+14.2%</span>
                             </div>
                             <div>
@@ -236,11 +231,11 @@ export default function GoldIndicator() {
                                 <span className="text-lg font-bold text-slate-800">185 EGP</span>
                             </div>
                             <div>
-                                <span className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Sentiment</span>
-                                <span className="text-lg font-bold text-amber-600">Premium Peak</span>
+                                <span className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{__('general.sentiment')}</span>
+                                <span className="text-lg font-bold text-amber-600">{__('general.premium_peak')}</span>
                             </div>
                             <div>
-                                <span className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Currency Impact</span>
+                                <span className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{__('general.currency_impact')}</span>
                                 <span className="text-lg font-bold text-red-500">-2.1%</span>
                             </div>
                         </div>

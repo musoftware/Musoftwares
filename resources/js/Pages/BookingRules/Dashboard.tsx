@@ -60,11 +60,11 @@ export default function RulesDashboard({ rules, stats }) {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Priority</TableHead>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Trigger</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="text-end">Actions</TableHead>
+                                <TableHead>{__('general.priority')}</TableHead>
+                                <TableHead>{__('general.name')}</TableHead>
+                                <TableHead>{__('general.trigger')}</TableHead>
+                                <TableHead>{__('general.status')}</TableHead>
+                                <TableHead className="text-end">{__('general.actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -80,7 +80,7 @@ export default function RulesDashboard({ rules, stats }) {
                                     </TableCell>
                                     <TableCell className="text-end">
                                         <Link href={`/booking-rules/${rule.id}/edit`}>
-                                            <Button variant="ghost" size="sm">Edit</Button>
+                                            <Button variant="ghost" size="sm">{__('general.edit')}</Button>
                                         </Link>
                                     </TableCell>
                                 </TableRow>

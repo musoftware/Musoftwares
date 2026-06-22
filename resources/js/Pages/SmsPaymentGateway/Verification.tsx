@@ -50,9 +50,7 @@ export default function Verification({ token }: VerificationProps) {
                                 <Alert className="bg-amber-50 text-amber-800 border-amber-200">
                                     <AlertCircle className="h-4 w-4 text-amber-600" />
                                     <AlertDescription>
-                                        No active Personal Access Token found. You must generate an API Token from your profile settings before 
-                                        you can programmatically interact with the Payment Gateway.
-                                    </AlertDescription>
+                                        {__('general.no_active_personal_access_token_found_yo')}</AlertDescription>
                                 </Alert>
                             )}
 

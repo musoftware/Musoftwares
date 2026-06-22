@@ -45,8 +45,7 @@ export default function Show({ service }: any) {
                         href={route('marketplace.services.index')}
                         className="transition-colors hover:text-indigo-600"
                     >
-                        Marketplace
-                    </Link>
+                        {__('general.marketplace')}</Link>
                     <span className="mx-2">/</span>
                     <Link
                         href={route('marketplace.services.index', {

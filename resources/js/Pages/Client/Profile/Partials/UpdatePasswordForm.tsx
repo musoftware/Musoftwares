@@ -55,9 +55,7 @@ export default function UpdatePasswordForm({
                 <h2 className="text-lg font-medium text-gray-900">{__('general.update_password')}</h2>
 
                 <p className="mt-1 text-sm text-gray-600">
-                    Ensure your account is using a long, random password to stay
-                    secure.
-                </p>
+                    {__('general.ensure_your_account_is_using_a_long_rand')}</p>
             </header>
 
             <form onSubmit={updatePassword} className="mt-6 space-y-6">
@@ -125,7 +123,7 @@ export default function UpdatePasswordForm({
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                    <PrimaryButton disabled={processing}>{__('general.save')}</PrimaryButton>
 
                     <Transition
                         show={recentlySuccessful}

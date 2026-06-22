@@ -317,19 +317,19 @@ export default function Show({ invoice }: { invoice: any }) {
 
     const getStatusBadge = (status: string) => {
         switch (status) {
-            case 'paid': return <span className="inline-flex items-center rounded-full bg-green-500 px-3 py-1 text-sm font-medium text-white">Paid</span>;
+            case 'paid': return <span className="inline-flex items-center rounded-full bg-green-500 px-3 py-1 text-sm font-medium text-white">{__('general.paid')}</span>;
             case 'partially_paid': return <span className="inline-flex items-center rounded-full bg-yellow-400 px-3 py-1 text-sm font-medium text-black">{__('general.partially_paid')}</span>;
-            case 'cancelled': return <span className="inline-flex items-center rounded-full bg-gray-500 px-3 py-1 text-sm font-medium text-white">Cancelled</span>;
+            case 'cancelled': return <span className="inline-flex items-center rounded-full bg-gray-500 px-3 py-1 text-sm font-medium text-white">{__('general.cancelled')}</span>;
             case 'unpaid':
-            default: return <span className="inline-flex items-center rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white">Unpaid</span>;
+            default: return <span className="inline-flex items-center rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white">{__('general.unpaid')}</span>;
         }
     };
 
     const getJobStatusBadge = (status: string) => {
         switch (status) {
-            case 'done': return <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">Done</span>;
-            case 'processing': return <span className="inline-flex items-center rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-800">Processing</span>;
-            default: return <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800">Pending</span>;
+            case 'done': return <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">{__('general.done')}</span>;
+            case 'processing': return <span className="inline-flex items-center rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-800">{__('general.processing')}</span>;
+            default: return <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800">{__('general.pending')}</span>;
         }
     };
 
@@ -474,7 +474,7 @@ export default function Show({ invoice }: { invoice: any }) {
                         <div className="space-y-2 text-sm">
                             {(invoice.tax > 0 || invoice.discount > 0) && (
                                 <div className="flex justify-between items-center py-1">
-                                    <span className="text-gray-500">Subtotal</span>
+                                    <span className="text-gray-500">{__('general.subtotal')}</span>
                                     <span className="font-medium">{formatCurrency(invoice.sub_total, invoice.currency)}</span>
                                 </div>
                             )}
@@ -533,8 +533,7 @@ export default function Show({ invoice }: { invoice: any }) {
                     <Card className="shadow-sm border-gray-200">
                         <CardHeader className="pb-3 border-b border-gray-100 bg-gray-50/50">
                             <CardTitle className="text-base flex items-center text-gray-700">
-                                <Network className="w-4 h-4 me-2 text-gray-400" /> Affiliate
-                            </CardTitle>
+                                <Network className="w-4 h-4 me-2 text-gray-400" /> {__('general.affiliate')}</CardTitle>
                         </CardHeader>
                         <CardContent className="pt-4">
                             <div className="flex items-center gap-3 mb-4">
@@ -616,13 +615,13 @@ export default function Show({ invoice }: { invoice: any }) {
                     <table className="w-full text-sm text-start">
                         <thead className="bg-gray-50/50 text-gray-500 border-b">
                             <tr>
-                                {isEditing && <th className="px-4 py-3 font-medium w-12 text-center">Merge</th>}
+                                {isEditing && <th className="px-4 py-3 font-medium w-12 text-center">{__('general.merge')}</th>}
                                 <th className="px-4 py-3 font-medium w-12 text-center">#</th>
-                                <th className="px-4 py-3 font-medium w-24">Type</th>
-                                <th className="px-4 py-3 font-medium">Description</th>
-                                <th className="px-4 py-3 font-medium text-end w-32">Price</th>
-                                <th className="px-4 py-3 font-medium text-center w-24">Quantity</th>
-                                <th className="px-4 py-3 font-medium text-end w-32">Total</th>
+                                <th className="px-4 py-3 font-medium w-24">{__('general.type')}</th>
+                                <th className="px-4 py-3 font-medium">{__('general.description')}</th>
+                                <th className="px-4 py-3 font-medium text-end w-32">{__('general.price')}</th>
+                                <th className="px-4 py-3 font-medium text-center w-24">{__('general.quantity')}</th>
+                                <th className="px-4 py-3 font-medium text-end w-32">{__('general.total')}</th>
                                 {isEditing && <th className="px-4 py-3 font-medium text-center w-16"></th>}
                             </tr>
                         </thead>
@@ -739,8 +738,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                     </Button>
                                                 )}
                                                 <Button type="button" onClick={handleCancel} variant="outline" size="sm" disabled={isSaving}>
-                                                    <X className="w-4 h-4 me-1" /> Cancel
-                                                </Button>
+                                                    <X className="w-4 h-4 me-1" /> {__('general.cancel')}</Button>
                                                 <Button type="button" onClick={handleSave} size="sm" disabled={isSaving} className="bg-blue-600 hover:bg-blue-700">
                                                     <Check className="w-4 h-4 me-1" />{__('general.save_changes')}</Button>
                                             </div>
@@ -781,7 +779,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 
                                 <div className="flex items-end gap-3 flex-wrap">
                                     <div className="flex-1 space-y-1 min-w-[150px]">
-                                        <Label className="text-xs text-gray-500 uppercase">Amount</Label>
+                                        <Label className="text-xs text-gray-500 uppercase">{__('general.amount')}</Label>
                                         <div className="flex items-center">
                                             <span className="bg-gray-100 border border-e-0 border-gray-300 rounded-s-md px-3 py-2 text-sm text-gray-500 h-10">{invoice.currency}</span>
                                             <Input 
@@ -797,7 +795,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                         </div>
                                     </div>
                                     <div className="flex-1 space-y-1 min-w-[120px]">
-                                        <Label className="text-xs text-gray-500 uppercase">Percent</Label>
+                                        <Label className="text-xs text-gray-500 uppercase">{__('general.percent')}</Label>
                                         <div className="flex items-center">
                                             <Input 
                                                 type="number"
@@ -817,8 +815,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                     </div>
                                     {isUnpaid && (
                                         <Button type="button" onClick={handleSave} disabled={isSaving} className="h-10 bg-gray-900 text-white hover:bg-gray-800 w-full sm:w-auto">
-                                            Update
-                                        </Button>
+                                            {__('general.update')}</Button>
                                     )}
                                 </div>
                                 <div className="text-xs text-gray-400 mt-2">
@@ -912,7 +909,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                             <div className="flex flex-col gap-3">
                                                 <div className="flex flex-col sm:flex-row gap-3">
                                                     <div className="w-full sm:w-1/4">
-                                                        <Label className="text-xs text-gray-500">Type</Label>
+                                                        <Label className="text-xs text-gray-500">{__('general.type')}</Label>
                                                         <select 
                                                             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                                                             value={line.line_type}
@@ -927,7 +924,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                         </select>
                                                     </div>
                                                     <div className="w-full sm:w-1/4">
-                                                        <Label className="text-xs text-gray-500">Amount</Label>
+                                                        <Label className="text-xs text-gray-500">{__('general.amount')}</Label>
                                                         <Input 
                                                             type="number" 
                                                             className="h-9" 
@@ -940,7 +937,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                         />
                                                     </div>
                                                     <div className="w-full sm:w-2/4">
-                                                        <Label className="text-xs text-gray-500">Description</Label>
+                                                        <Label className="text-xs text-gray-500">{__('general.description')}</Label>
                                                         <div className="flex items-center gap-2">
                                                             <Input 
                                                                 type="text" 
@@ -1084,8 +1081,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                     setTransferModal(true);
                                 }}
                             >
-                                Transfer
-                            </Button>
+                                {__('general.transfer')}</Button>
                         )}
 
                         {invoice.status !== 'cancelled' && !invoice.is_published && (
@@ -1379,7 +1375,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 { value: 'processing', label: 'Processing' },
                                 { value: 'done', label: 'Done' }
                             ]}
-                            placeholder="Select job status"
+                            placeholder={__('general.select_job_status')}
                         />
                     </div>
                     <DialogFooter>
@@ -1397,8 +1393,8 @@ export default function Show({ invoice }: { invoice: any }) {
             <Dialog open={transferModal} onOpenChange={setTransferModal}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Transfer to Project</DialogTitle>
-                        <DialogDescription>Select the project to transfer this invoice to.</DialogDescription>
+                        <DialogTitle>{__('general.transfer_to_project')}</DialogTitle>
+                        <DialogDescription>{__('general.select_the_project_to_transfer_this_invo')}</DialogDescription>
                     </DialogHeader>
                     <div className="py-4">
                         <PremiumCombobox
@@ -1408,7 +1404,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 value: p.id,
                                 label: p.project_name
                             })) || []}
-                            placeholder="Select project"
+                            placeholder={__('general.select_project')}
                         />
                     </div>
                     <DialogFooter>
@@ -1422,7 +1418,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 onSuccess: () => setTransferModal(false),
                                 preserveScroll: true
                             });
-                        }} className="bg-blue-600 hover:bg-blue-700 text-white">Transfer</Button>
+                        }} className="bg-blue-600 hover:bg-blue-700 text-white">{__('general.transfer')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

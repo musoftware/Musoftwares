@@ -11,6 +11,7 @@ import { Button } from '@/Components/ui/button';
 import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
 import { Separator } from '@/Components/ui/separator';
 import {
+import { __ } from '@/lib/i18n';
     Wallet,
     FileText,
     FilePlus,
@@ -62,7 +63,7 @@ export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }
                         </div>
                         
                         <div className="space-y-3">
-                            <p className="text-sm font-medium text-slate-600">Invoices</p>
+                            <p className="text-sm font-medium text-slate-600">{__('general.invoices')}</p>
                             <div className="grid grid-cols-2 gap-3">
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
                                     <Link href={`/admin/invoices?project_id=${project.id}`}>
@@ -83,31 +84,31 @@ export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
                                     <Link href={`/admin/transactions/create?user=${project.user_id}&project=${project.id}&type=send-money`}>
                                         <Banknote className="h-4 w-4 text-sky-500" /> 
-                                        <span className="font-normal text-slate-700">Send</span>
+                                        <span className="font-normal text-slate-700">{__('general.send')}</span>
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
                                     <Link href={`/admin/transactions/create?user=${project.user_id}&project=${project.id}&type=receive`}>
                                         <Coins className="h-4 w-4 text-sky-500" /> 
-                                        <span className="font-normal text-slate-700">Receive</span>
+                                        <span className="font-normal text-slate-700">{__('general.receive')}</span>
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
                                     <Link href={`/admin/transactions/create?user=${project.user_id}&project=${project.id}&type=earned`}>
                                         <Trophy className="h-4 w-4 text-amber-500" /> 
-                                        <span className="font-normal text-slate-700">Earned</span>
+                                        <span className="font-normal text-slate-700">{__('general.earned')}</span>
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
                                     <Link href={`/admin/transactions/create?user=${project.user_id}&project=${project.id}&type=charge`}>
                                         <Receipt className="h-4 w-4 text-slate-500" /> 
-                                        <span className="font-normal text-slate-700">Charge</span>
+                                        <span className="font-normal text-slate-700">{__('general.charge')}</span>
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
                                     <Link href={`/admin/transactions/create?user=${project.user_id}&project=${project.id}&type=refund`}>
                                         <RotateCcw className="h-4 w-4 text-slate-500" /> 
-                                        <span className="font-normal text-slate-700">Refund</span>
+                                        <span className="font-normal text-slate-700">{__('general.refund')}</span>
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
@@ -119,7 +120,7 @@ export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
                                     <Link href={`/admin/transactions?user=${project.user_id}&project=${project.id}`}>
                                         <Wallet className="h-4 w-4 text-blue-500" /> 
-                                        <span className="font-normal text-slate-700">Transactions</span>
+                                        <span className="font-normal text-slate-700">{__('general.transactions')}</span>
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
@@ -137,15 +138,14 @@ export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }
                         <div className="flex items-center gap-2">
                             <LayoutDashboard className="h-4 w-4 text-sky-500" />
                             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                                Workflow
-                            </h3>
+                                {__('general.workflow')}</h3>
                             <Separator className="flex-1" />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
                                 <Link href={`/admin/users/${project.user_id}/projects`}>
                                     <LayoutDashboard className="h-4 w-4 text-blue-500" /> 
-                                    <span className="font-normal text-slate-700">Projects</span>
+                                    <span className="font-normal text-slate-700">{__('general.projects')}</span>
                                 </Link>
                             </Button>
                             <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
@@ -157,7 +157,7 @@ export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }
                             <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
                                 <Link href={`/admin/users/${project.user_id}/notes`}>
                                     <ClipboardEdit className="h-4 w-4 text-amber-500" /> 
-                                    <span className="font-normal text-slate-700">Notes</span>
+                                    <span className="font-normal text-slate-700">{__('general.notes')}</span>
                                 </Link>
                             </Button>
                             <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
@@ -169,7 +169,7 @@ export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }
                             <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
                                 <Link href={`/admin/projects/${project.id}/contracts`}>
                                     <FileText className="h-4 w-4 text-indigo-500" /> 
-                                    <span className="font-normal text-slate-700">Contracts & Proposals</span>
+                                    <span className="font-normal text-slate-700">{__('general.contracts_proposals')}</span>
                                 </Link>
                             </Button>
                         </div>
@@ -180,8 +180,7 @@ export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }
                         <div className="flex items-center gap-2">
                             <User className="h-4 w-4 text-rose-500" />
                             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                                Management
-                            </h3>
+                                {__('general.management')}</h3>
                             <Separator className="flex-1" />
                         </div>
                         <div className="grid grid-cols-2 gap-3">

@@ -138,7 +138,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                     />
                 </div>
                 <div>
-                    <Label htmlFor="name">Name <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="name">{__('general.name')}<span className="text-red-500">*</span></Label>
                     <Input
                         id="name"
                         value={formData.name}
@@ -151,7 +151,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
 
             {/* Description */}
             <div>
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{__('general.description')}</Label>
                 <textarea
                     id="description"
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black"
@@ -173,7 +173,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                     required
                 >
                     <option value="fixed">{__('general.fixed_amount')}</option>
-                    <option value="percentage">Percentage</option>
+                    <option value="percentage">{__('general.percentage')}</option>
                 </select>
             </div>
 
@@ -208,7 +208,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                     </div>
                 )}
                 <div>
-                    <Label htmlFor="currency">Currency <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="currency">{__('general.currency')}<span className="text-red-500">*</span></Label>
                     <CurrencySelect 
                         currencies={currencies}
                         value={formData.currency}
@@ -241,7 +241,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                         min="1"
                         value={formData.max_uses_per_user}
                         onChange={(e) => set('max_uses_per_user', e.target.value)}
-                        placeholder="Unlimited"
+                        placeholder={__('general.unlimited')}
                     />
                 </div>
                 <div>
@@ -252,7 +252,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                         min="1"
                         value={formData.max_total_uses}
                         onChange={(e) => set('max_total_uses', e.target.value)}
-                        placeholder="Unlimited"
+                        placeholder={__('general.unlimited')}
                     />
                 </div>
             </div>
@@ -309,7 +309,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
     const items = coupons?.data ?? [];
 
     return (
-        <AdminSidebarLayout title="Coupons" header="Coupons Manager">
+        <AdminSidebarLayout title={__('general.coupons')} header="Coupons Manager">
             <Head title={__('general.admin_coupons')} />
 
             {/* Header bar */}
@@ -329,8 +329,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                             {renderFormFields()}
                             <DialogFooter className="mt-6">
                                 <Button type="button" variant="outline" onClick={() => { setIsCreateOpen(false); resetForm(); }}>
-                                    Cancel
-                                </Button>
+                                    {__('general.cancel')}</Button>
                                 <Button type="submit">{__('general.save_coupon')}</Button>
                             </DialogFooter>
                         </form>
@@ -343,14 +342,14 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 <table className="w-full text-start text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
-                            <th className="p-4 font-medium text-gray-600">Code</th>
-                            <th className="p-4 font-medium text-gray-600">Name</th>
-                            <th className="p-4 font-medium text-gray-600">Type</th>
-                            <th className="p-4 font-medium text-gray-600">Discount</th>
-                            <th className="p-4 font-medium text-gray-600">Uses</th>
-                            <th className="p-4 font-medium text-gray-600">Expires</th>
-                            <th className="p-4 font-medium text-gray-600">Status</th>
-                            <th className="p-4 font-medium text-gray-600 text-end">Actions</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.code')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.name')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.type')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.discount')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.uses')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.expires')}</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.status')}</th>
+                            <th className="p-4 font-medium text-gray-600 text-end">{__('general.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -402,18 +401,16 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                                             </div>
                                         </div>
                                     ) : (
-                                        <span className="text-gray-400">Never</span>
+                                        <span className="text-gray-400">{__('general.never')}</span>
                                     )}
                                 </td>
                                 <td className="p-4">
                                     {c.is_active ? (
                                         <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-800">
-                                            <CheckCircle className="h-3 w-3" /> Active
-                                        </span>
+                                            <CheckCircle className="h-3 w-3" /> {__('general.active')}</span>
                                     ) : (
                                         <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold bg-red-100 text-red-800">
-                                            <XCircle className="h-3 w-3" /> Inactive
-                                        </span>
+                                            <XCircle className="h-3 w-3" /> {__('general.inactive')}</span>
                                     )}
                                 </td>
                                 <td className="p-4 space-x-2 text-end">
@@ -422,14 +419,11 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                                         size="sm"
                                         onClick={() => router.visit(route('admin.coupons.show', c.id))}
                                     >
-                                        <Eye className="h-3.5 w-3.5 me-1" /> View
-                                    </Button>
+                                        <Eye className="h-3.5 w-3.5 me-1" /> {__('general.view')}</Button>
                                     <Button variant="outline" size="sm" onClick={() => openEditModal(c)}>
-                                        <Pencil className="h-3.5 w-3.5 me-1" /> Edit
-                                    </Button>
+                                        <Pencil className="h-3.5 w-3.5 me-1" /> {__('general.edit')}</Button>
                                     <Button variant="destructive" size="sm" onClick={() => handleDelete(c.id)}>
-                                        <Trash2 className="h-3.5 w-3.5 me-1" /> Delete
-                                    </Button>
+                                        <Trash2 className="h-3.5 w-3.5 me-1" /> {__('general.delete')}</Button>
                                 </td>
                             </tr>
                         ))}
@@ -472,8 +466,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                         {renderFormFields()}
                         <DialogFooter className="mt-6">
                             <Button type="button" variant="outline" onClick={() => { setIsEditOpen(false); resetForm(); }}>
-                                Cancel
-                            </Button>
+                                {__('general.cancel')}</Button>
                             <Button type="submit">{__('general.save_changes')}</Button>
                         </DialogFooter>
                     </form>

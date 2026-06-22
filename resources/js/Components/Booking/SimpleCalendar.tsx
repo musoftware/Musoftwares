@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
 import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 
 export function SimpleCalendar({ bookings, onDateClick, onBookingClick }: any) {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -27,8 +28,7 @@ export function SimpleCalendar({ bookings, onDateClick, onBookingClick }: any) {
                         <ChevronLeft className="w-4 h-4" />
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>
-                        Today
-                    </Button>
+                        {__('general.today')}</Button>
                     <Button variant="outline" size="sm" onClick={() => setCurrentDate(addMonths(currentDate, 1))}>
                         <ChevronRight className="w-4 h-4" />
                     </Button>

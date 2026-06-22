@@ -139,11 +139,10 @@ export default function Index({ requests, filters }: Props) {
                         <MoreHorizontal className="h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuLabel>{__('general.actions')}</DropdownMenuLabel>
                         <DropdownMenuItem asChild>
                             <Link href={`/admin/withdraw-requests/${row.id}`}>
-                                <Eye className="me-2 h-4 w-4" /> View
-                            </Link>
+                                <Eye className="me-2 h-4 w-4" /> {__('general.view')}</Link>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -158,10 +157,10 @@ export default function Index({ requests, filters }: Props) {
             onChange={(e) => handleFilter(e.target.value)}
         >
             <option value="">{__('general.all_statuses')}</option>
-            <option value="pending">Pending</option>
-            <option value="reviewing">Reviewing</option>
-            <option value="approved">Approved</option>
-            <option value="declined">Declined</option>
+            <option value="pending">{__('general.pending')}</option>
+            <option value="reviewing">{__('general.reviewing')}</option>
+            <option value="approved">{__('general.approved')}</option>
+            <option value="declined">{__('general.declined')}</option>
         </select>
     );
 

@@ -53,7 +53,7 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
 
     return (
         <ERPLayout 
-            title="Backup" 
+            title={__('general.backup')} 
             menuItems={menuItems} 
             lockedAddons={lockedAddons}
             workspaceName={workspaceName}

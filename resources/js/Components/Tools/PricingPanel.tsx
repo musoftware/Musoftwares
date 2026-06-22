@@ -101,8 +101,7 @@ export function PricingPanel({ plans, toolSlug, isAuthed }: PricingPanelProps) {
                                     {isPopular && (
                                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-400 text-amber-900">
                                             <Zap className="h-3 w-3" />
-                                            Popular
-                                        </span>
+                                            {__('general.popular')}</span>
                                     )}
                                 </div>
 

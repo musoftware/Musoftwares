@@ -56,11 +56,7 @@ export default function DeleteUserForm({
                 <h2 className="text-lg font-medium text-gray-900">{__('general.delete_account')}</h2>
 
                 <p className="mt-1 text-sm text-gray-600">
-                    Once your account is deleted, all of its resources and data
-                    will be permanently deleted. Before deleting your account,
-                    please download any data or information that you wish to
-                    retain.
-                </p>
+                    {__('general.once_your_account_is_deleted_all_of_its')}</p>
             </header>
 
             <DangerButton onClick={confirmUserDeletion}>{__('general.delete_account')}</DangerButton>
@@ -70,11 +66,7 @@ export default function DeleteUserForm({
                     <h2 className="text-lg font-medium text-gray-900">{__('general.are_you_sure_you_want_to_delete_your_account')}</h2>
 
                     <p className="mt-1 text-sm text-gray-600">
-                        Once your account is deleted, all of its resources and
-                        data will be permanently deleted. Please enter your
-                        password to confirm you would like to permanently delete
-                        your account.
-                    </p>
+                        {__('general.once_your_account_is_deleted_all_of_its')}</p>
 
                     <div className="mt-6">
                         <InputLabel
@@ -94,7 +86,7 @@ export default function DeleteUserForm({
                             }
                             className="mt-1 block w-3/4"
                             isFocused
-                            placeholder="Password"
+                            placeholder={__('general.password')}
                         />
 
                         <InputError
@@ -105,8 +97,7 @@ export default function DeleteUserForm({
 
                     <div className="mt-6 flex justify-end">
                         <SecondaryButton onClick={closeModal}>
-                            Cancel
-                        </SecondaryButton>
+                            {__('general.cancel')}</SecondaryButton>
 
                         <DangerButton className="ms-3" disabled={processing}>{__('general.delete_account')}</DangerButton>
                     </div>

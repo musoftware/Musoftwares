@@ -143,8 +143,7 @@ export default function ProductTourModal({ user, isOpen, onClose, currentStep, o
                         onClick={handleSkip}
                         className="absolute top-5 end-5 text-xs font-medium text-slate-400 hover:text-slate-700 transition-colors z-10"
                     >
-                        Skip
-                    </button>
+                        {__('general.skip')}</button>
 
                     {/* Content */}
                     <div className="px-10 pt-14 pb-8 text-center flex flex-col items-center">
@@ -226,7 +225,7 @@ export default function ProductTourModal({ user, isOpen, onClose, currentStep, o
                             style={{ background: isLast ? '#10b981' : stepData.accent }}
                         >
                             {isLast ? 'Get Started' : (
-                                <>Continue <ChevronRight className="w-4 h-4" /></>
+                                <>{__('general.continue')}<ChevronRight className="w-4 h-4" /></>
                             )}
                         </button>
                     </div>

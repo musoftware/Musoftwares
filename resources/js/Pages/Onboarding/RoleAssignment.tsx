@@ -95,8 +95,8 @@ export default function RoleAssignment({ tenant, teamMembers, roles, errors }: P
                                     {s < 2 ? <Check className="w-3.5 h-3.5" /> : s}
                                 </div>
                                 <span className={`hidden sm:inline-block text-xs font-medium ${s === 2 ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}>
-                                    {s === 1 && __('general.tenant_setup', 'Workspace Setup')}
-                                    {s === 2 && __('general.role_assignment', 'Role Assignment')}
+                                    {s === 1 && (__('general.tenant_setup') ?? 'Workspace Setup')}
+                                    {s === 2 && (__('general.role_assignment') ?? 'Role Assignment')}
                                 </span>
                                 {s < 2 && <ChevronRight className="w-3.5 h-3.5 text-muted-foreground mx-1" />}
                             </div>
@@ -112,8 +112,8 @@ export default function RoleAssignment({ tenant, teamMembers, roles, errors }: P
                                     <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mb-4 text-foreground">
                                         <Users className="w-5 h-5" />
                                     </div>
-                                    <CardTitle className="text-xl sm:text-2xl">{__('general.invite_team_members', 'Invite Team Members')}</CardTitle>
-                                    <CardDescription className="mt-1.5 leading-relaxed">{__('general.invite_team_desc', 'Assign roles to your team members for the workspace:')} <strong className="text-foreground">{tenant.name}</strong></CardDescription>
+                                    <CardTitle className="text-xl sm:text-2xl">{(__('general.invite_team_members') ?? 'Invite Team Members')}</CardTitle>
+                                    <CardDescription className="mt-1.5 leading-relaxed">{(__('general.invite_team_desc') ?? 'Assign roles to your team members for the workspace:')} <strong className="text-foreground">{tenant.name}</strong></CardDescription>
                                 </div>
                                 {tenant.logo && (
                                     <div className="w-16 h-16 rounded-xl border overflow-hidden shadow-sm hidden sm:block">
@@ -126,13 +126,13 @@ export default function RoleAssignment({ tenant, teamMembers, roles, errors }: P
                         <CardContent className="space-y-6 px-8 py-6">
                             {/* Invite Form */}
                             <div className="bg-muted/30 p-5 rounded-xl border shadow-sm">
-                                <h3 className="text-sm font-semibold mb-4 flex items-center"><Plus className="w-4 h-4 me-2"/> {__('general.add_new_member', 'Add New Member')}</h3>
+                                <h3 className="text-sm font-semibold mb-4 flex items-center"><Plus className="w-4 h-4 me-2"/> {(__('general.add_new_member') ?? 'Add New Member')}</h3>
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                                     <div className="md:col-span-4 space-y-2">
-                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{__('general.name', 'Name')}</label>
+                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{(__('general.name') ?? 'Name')}</label>
                                         <Input
-                                            placeholder="Jane Doe"
+                                            placeholder={__('general.jane_doe')}
                                             value={formData.name}
                                             onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                                             className="h-9 text-sm"
@@ -140,7 +140,7 @@ export default function RoleAssignment({ tenant, teamMembers, roles, errors }: P
                                         {errors.name && <span className="text-xs text-destructive">{errors.name}</span>}
                                     </div>
                                     <div className="md:col-span-4 space-y-2">
-                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center"><Mail className="w-3 h-3 me-1"/>{__('general.email', 'Email')}</label>
+                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center"><Mail className="w-3 h-3 me-1"/>{(__('general.email') ?? 'Email')}</label>
                                         <Input
                                             placeholder="jane@example.com"
                                             type="email"
@@ -151,12 +151,12 @@ export default function RoleAssignment({ tenant, teamMembers, roles, errors }: P
                                         {errors.email && <span className="text-xs text-destructive">{errors.email}</span>}
                                     </div>
                                     <div className="md:col-span-4 space-y-2">
-                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center"><Shield className="w-3 h-3 me-1"/>{__('general.role', 'Role')}</label>
+                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center"><Shield className="w-3 h-3 me-1"/>{(__('general.role') ?? 'Role')}</label>
                                         <PremiumCombobox
                                             value={formData.role}
                                             onChange={(val) => setFormData(prev => ({ ...prev, role: String(val) }))}
                                             options={roles}
-                                            placeholder="Select role"
+                                            placeholder={__('general.select_role')}
                                             searchPlaceholder="Search role"
                                         />
                                         {errors.role && <span className="text-xs text-destructive">{errors.role}</span>}
@@ -164,18 +164,18 @@ export default function RoleAssignment({ tenant, teamMembers, roles, errors }: P
                                 </div>
                                 <div className="mt-4 flex justify-end">
                                     <Button onClick={handleInvite} size="sm" variant="secondary" disabled={inviting || !formData.name || !formData.email || !formData.role}>
-                                        {inviting ? <><Loader2 className="w-3.5 h-3.5 me-2 animate-spin" />{__('general.inviting', 'Inviting...')}</> : <>{__('general.send_invite', 'Send Invite')}</>}
+                                        {inviting ? <><Loader2 className="w-3.5 h-3.5 me-2 animate-spin" />{(__('general.inviting') ?? 'Inviting...')}</> : <>{(__('general.send_invite') ?? 'Send Invite')}</>}
                                     </Button>
                                 </div>
                             </div>
 
                             {/* Team Members List */}
                             <div className="space-y-3">
-                                <h3 className="text-sm font-semibold">{__('general.team_members', 'Team Members')} ({teamMembers.length})</h3>
+                                <h3 className="text-sm font-semibold">{(__('general.team_members') ?? 'Team Members')} ({teamMembers.length})</h3>
                                 {teamMembers.length === 0 ? (
                                     <div className="text-center py-8 border border-dashed rounded-xl bg-muted/10 text-muted-foreground">
                                         <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                                        <p className="text-sm">{__('general.no_members_yet', 'No team members added yet. You can invite them above or skip for now.')}</p>
+                                        <p className="text-sm">{(__('general.no_members_yet') ?? 'No team members added yet. You can invite them above or skip for now.')}</p>
                                     </div>
                                 ) : (
                                     <div className="border rounded-xl divide-y overflow-hidden">
@@ -207,7 +207,7 @@ export default function RoleAssignment({ tenant, teamMembers, roles, errors }: P
                                 <ArrowLeft className="w-4 h-4 me-1.5" /> {__('general.back')}
                             </Link>
                             <Button onClick={handleFinish} size="lg" className="h-11 px-8 rounded-xl font-medium shadow-md" disabled={saving}>
-                                {saving ? <><Loader2 className="w-4 h-4 me-2 animate-spin" />{__('general.finishing', 'Finishing setup...')}</> : <>{__('general.finish_setup', 'Finish Setup')} <Check className="w-4 h-4 ms-2" /></>}
+                                {saving ? <><Loader2 className="w-4 h-4 me-2 animate-spin" />{(__('general.finishing') ?? 'Finishing setup...')}</> : <>{(__('general.finish_setup') ?? 'Finish Setup')} <Check className="w-4 h-4 ms-2" /></>}
                             </Button>
                         </CardFooter>
                     </motion.div>

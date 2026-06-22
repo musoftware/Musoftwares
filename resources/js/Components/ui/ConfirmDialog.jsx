@@ -6,6 +6,7 @@ import {
 } from '@/Components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { AlertCircle, AlertTriangle, HelpCircle, Loader2 } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export function ConfirmDialog({
     open,
@@ -82,8 +83,7 @@ export function ConfirmDialog({
                             onClick={onClose}
                             className="bg-surface text-text-primary border-border hover:bg-surface-raised flex-1 rounded-lg border px-4 py-2 text-[14px] font-medium transition-colors disabled:opacity-50"
                         >
-                            Cancel
-                        </button>
+                            {__('general.cancel')}</button>
                         <button
                             type="button"
                             disabled={loading}

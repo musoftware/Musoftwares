@@ -7,6 +7,7 @@ import { ArrowRight, Code2, Cpu, LineChart, MessageSquare } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import { __ } from '@/lib/i18n';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -57,20 +58,16 @@ export default function Company() {
                     <div className="max-w-4xl">
                         <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-8 bg-white">
                             <span className="flex h-1.5 w-1.5 rounded-full bg-[#111111]"></span>
-                            The Company
-                        </div>
+                            {__('general.the_company')}</div>
                         <h1 className="gsap-fade-up text-5xl lg:text-7xl font-extrabold text-[#111111] tracking-tight leading-[1.05] mb-6">
-                            Boutique Engineering. Direct Communication.
-                        </h1>
+                            {__('general.boutique_engineering_direct_communicatio')}</h1>
                         <p className="gsap-fade-up text-xl text-[#666666] font-normal leading-relaxed max-w-2xl mb-10">
-                            We are not a massive agency where you get lost in the shuffle. Led by Eng. Mahmoud, we provide dedicated technical expertise tailored specifically to ambitious businesses.
-                        </p>
+                            {__('general.we_are_not_a_massive_agency_where_you_ge')}</p>
                         <Button 
                             onClick={() => openWhatsApp("Hello Mahmoud, I'm interested in working with you.")}
                             className="gsap-fade-up bg-[#111111] text-white hover:bg-[#333333] rounded-xl px-8 py-6 text-sm font-bold uppercase tracking-wide transition-all"
                         >
-                            Talk to the Lead Engineer
-                        </Button>
+                            {__('general.talk_to_the_lead_engineer')}</Button>
                     </div>
                 </section>
 
@@ -80,10 +77,9 @@ export default function Company() {
                         
                         {/* Left Column */}
                         <div className="lg:col-span-5 pt-12 lg:pt-0">
-                            <h2 className="gsap-fade-up text-3xl font-extrabold text-[#111111] mb-8">Why work with us?</h2>
+                            <h2 className="gsap-fade-up text-3xl font-extrabold text-[#111111] mb-8">{__('general.why_work_with_us')}</h2>
                             <p className="gsap-fade-up text-lg text-[#666666] leading-relaxed mb-6">
-                                Most software agencies focus on churning out projects quickly using pre-made templates. We do things differently.
-                            </p>
+                                {__('general.most_software_agencies_focus_on_churning')}</p>
                             <p className="gsap-fade-up text-lg text-[#666666] leading-relaxed mb-8">
                                 We believe in deep, structural engineering. We write clean code, build scalable architectures, and ensure that what we build today won't break tomorrow. When you hire us, you're not just getting code—you're getting technical partnership.
                             </p>
@@ -98,7 +94,7 @@ export default function Company() {
 
                         {/* Right Column: Values */}
                         <div className="lg:col-span-7 border-t lg:border-t-0 lg:border-s border-[#e5e5e5] pt-12 lg:pt-0 lg:ps-16">
-                            <h2 className="gsap-fade-up text-xs font-bold text-[#888888] tracking-widest uppercase mb-12">Our Core Values</h2>
+                            <h2 className="gsap-fade-up text-xs font-bold text-[#888888] tracking-widest uppercase mb-12">{__('general.our_core_values')}</h2>
                             
                             <div className="space-y-12">
                                 <div className="gsap-fade-up flex gap-6">
@@ -106,8 +102,8 @@ export default function Company() {
                                         <Code2 className="w-5 h-5 text-[#111111]" />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold text-[#111111] mb-2">Technical Excellence</h3>
-                                        <p className="text-[#666666] leading-relaxed">No shortcuts. We use modern, enterprise-grade technology stacks to ensure your software is fast, secure, and easily maintainable.</p>
+                                        <h3 className="text-xl font-bold text-[#111111] mb-2">{__('general.technical_excellence')}</h3>
+                                        <p className="text-[#666666] leading-relaxed">{__('general.no_shortcuts_we_use_modern_enterprisegra')}</p>
                                     </div>
                                 </div>
                                 <div className="gsap-fade-up flex gap-6">
@@ -115,8 +111,8 @@ export default function Company() {
                                         <MessageSquare className="w-5 h-5 text-[#111111]" />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold text-[#111111] mb-2">Direct Communication</h3>
-                                        <p className="text-[#666666] leading-relaxed">You speak directly with the people building your software. No account managers playing telephone with your requirements.</p>
+                                        <h3 className="text-xl font-bold text-[#111111] mb-2">{__('general.direct_communication')}</h3>
+                                        <p className="text-[#666666] leading-relaxed">{__('general.you_speak_directly_with_the_people_build')}</p>
                                     </div>
                                 </div>
                                 <div className="gsap-fade-up flex gap-6">
@@ -124,8 +120,8 @@ export default function Company() {
                                         <LineChart className="w-5 h-5 text-[#111111]" />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold text-[#111111] mb-2">Business-Driven Solutions</h3>
-                                        <p className="text-[#666666] leading-relaxed">We don't build features just for the sake of it. Everything we engineer is designed to solve a specific operational problem or generate ROI.</p>
+                                        <h3 className="text-xl font-bold text-[#111111] mb-2">{__('general.businessdriven_solutions')}</h3>
+                                        <p className="text-[#666666] leading-relaxed">{__('general.we_dont_build_features_just_for_the_sake')}</p>
                                     </div>
                                 </div>
                             </div>
@@ -138,41 +134,37 @@ export default function Company() {
                 <section className="py-24 lg:py-32 px-6 lg:px-8 bg-[#fafafa] reveal-section">
                     <div className="max-w-7xl mx-auto">
                         <div className="max-w-3xl mb-16">
-                            <h2 className="gsap-fade-up text-xs font-bold text-[#888888] tracking-widest uppercase mb-4">How we work</h2>
-                            <h3 className="gsap-fade-up text-4xl lg:text-5xl font-extrabold text-[#111111] tracking-tight">A proven delivery process.</h3>
+                            <h2 className="gsap-fade-up text-xs font-bold text-[#888888] tracking-widest uppercase mb-4">{__('general.how_we_work')}</h2>
+                            <h3 className="gsap-fade-up text-4xl lg:text-5xl font-extrabold text-[#111111] tracking-tight">{__('general.a_proven_delivery_process')}</h3>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <div className="gsap-fade-up relative p-8 bg-white border border-[#e5e5e5] rounded-2xl transition-colors hover:border-[#111111]">
                                 <span className="text-5xl font-bold text-[#f0f0f0] absolute top-6 end-6 font-mono select-none">1</span>
-                                <h4 className="text-xl font-bold text-[#111111] mb-4 mt-8 relative z-10">Discovery</h4>
+                                <h4 className="text-xl font-bold text-[#111111] mb-4 mt-8 relative z-10">{__('general.discovery')}</h4>
                                 <p className="text-[#666666] text-sm leading-relaxed relative z-10">
-                                    We start with a deep dive into your business logic, identifying the bottlenecks and defining the technical requirements.
-                                </p>
+                                    {__('general.we_start_with_a_deep_dive_into_your_busi')}</p>
                             </div>
                             
                             <div className="gsap-fade-up relative p-8 bg-white border border-[#e5e5e5] rounded-2xl transition-colors hover:border-[#111111]">
                                 <span className="text-5xl font-bold text-[#f0f0f0] absolute top-6 end-6 font-mono select-none">2</span>
-                                <h4 className="text-xl font-bold text-[#111111] mb-4 mt-8 relative z-10">Architecture</h4>
+                                <h4 className="text-xl font-bold text-[#111111] mb-4 mt-8 relative z-10">{__('general.architecture')}</h4>
                                 <p className="text-[#666666] text-sm leading-relaxed relative z-10">
-                                    We design the database schema, system flow, and user interface, ensuring everything is scalable from day one.
-                                </p>
+                                    {__('general.we_design_the_database_schema_system_flo')}</p>
                             </div>
                             
                             <div className="gsap-fade-up relative p-8 bg-white border border-[#e5e5e5] rounded-2xl transition-colors hover:border-[#111111]">
                                 <span className="text-5xl font-bold text-[#f0f0f0] absolute top-6 end-6 font-mono select-none">3</span>
-                                <h4 className="text-xl font-bold text-[#111111] mb-4 mt-8 relative z-10">Engineering</h4>
+                                <h4 className="text-xl font-bold text-[#111111] mb-4 mt-8 relative z-10">{__('general.engineering')}</h4>
                                 <p className="text-[#666666] text-sm leading-relaxed relative z-10">
-                                    We write clean, documented code using modern frameworks. You get regular updates and transparency throughout the build.
-                                </p>
+                                    {__('general.we_write_clean_documented_code_using_mod')}</p>
                             </div>
                             
                             <div className="gsap-fade-up relative p-8 bg-white border border-[#e5e5e5] rounded-2xl transition-colors hover:border-[#111111]">
                                 <span className="text-5xl font-bold text-[#f0f0f0] absolute top-6 end-6 font-mono select-none">4</span>
-                                <h4 className="text-xl font-bold text-[#111111] mb-4 mt-8 relative z-10">Deployment</h4>
+                                <h4 className="text-xl font-bold text-[#111111] mb-4 mt-8 relative z-10">{__('general.deployment')}</h4>
                                 <p className="text-[#666666] text-sm leading-relaxed relative z-10">
-                                    We securely deploy your application to production servers, configure the domains, and hand over the keys.
-                                </p>
+                                    {__('general.we_securely_deploy_your_application_to_p')}</p>
                             </div>
                         </div>
                     </div>
@@ -182,16 +174,14 @@ export default function Company() {
                 <section className="py-32 bg-[#111111] text-white text-center reveal-section px-6">
                     <div className="max-w-3xl mx-auto">
                         <h2 className="gsap-fade-up text-4xl md:text-5xl font-extrabold mb-6">
-                            Let's build something great.
-                        </h2>
+                            {__('general.lets_build_something_great')}</h2>
                         <p className="gsap-fade-up text-xl text-[#a3a3a3] mb-12 leading-relaxed">
-                            Reach out today to discuss your vision. We're ready to architect your next big move.
-                        </p>
+                            {__('general.reach_out_today_to_discuss_your_vision_w')}</p>
                         <Button 
                             onClick={() => openWhatsApp("Hello Mahmoud, I'd like to start a project with Musoftware.")}
                             className="gsap-fade-up bg-white text-[#111111] hover:bg-[#e5e5e5] rounded-xl px-10 py-7 text-sm font-bold tracking-wide uppercase transition-all flex items-center justify-center gap-3 mx-auto"
                         >
-                            Contact Us on WhatsApp <ArrowRight className="w-4 h-4" />
+                            {__('general.contact_us_on_whatsapp')}<ArrowRight className="w-4 h-4" />
                         </Button>
                     </div>
                 </section>

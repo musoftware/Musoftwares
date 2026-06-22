@@ -193,7 +193,7 @@ export default function FacebookExtractorRunner({ tool }: any) {
                                 onClick={() => setType('followers')}
                             >
                                 <UserPlus className="w-4 h-4 shrink-0" />
-                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">Followers</span>
+                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">{__('general.followers')}</span>
                             </Button>
                             <Button 
                                 variant={type === 'following' ? 'default' : 'outline'} 
@@ -201,7 +201,7 @@ export default function FacebookExtractorRunner({ tool }: any) {
                                 onClick={() => setType('following')}
                             >
                                 <UserCheck className="w-4 h-4 shrink-0" />
-                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">Following</span>
+                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">{__('general.following')}</span>
                             </Button>
                             <Button 
                                 variant={type === 'comments' ? 'default' : 'outline'} 

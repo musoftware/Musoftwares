@@ -121,7 +121,7 @@
                 </div>
                 <input type="text" id="transaction_id" name="transaction_id" required 
                        placeholder="أدخل رقم العملية الذي ظهر لك بعد التحويل"
-                       class="w-full py-[14px] px-[16px] border-[1.5px] border-[#E4E8F5] rounded-[13px] text-[14px] bg-white text-right font-medium text-[#1A1A2E] outline-none transition-all focus:border-primary focus:shadow-[0_0_0_3px_rgba(75,67,214,0.1)] placeholder:text-[#A8A8BC] placeholder:text-[13.5px] placeholder:font-medium" dir="rtl">
+                       class="w-full py-[14px] px-[16px] border-[1.5px] border-[#E4E8F5] rounded-[13px] text-[14px] bg-white text-end font-medium text-[#1A1A2E] outline-none transition-all focus:border-primary focus:shadow-[0_0_0_3px_rgba(75,67,214,0.1)] placeholder:text-[#A8A8BC] placeholder:text-[13.5px] placeholder:font-medium" dir="rtl">
             </div>
 
             <!-- ERROR MSG -->
@@ -129,7 +129,7 @@
 
             <button type="submit" id="submit-btn" class="w-full py-[14px] bg-[#111220] hover:opacity-90 active:scale-95 text-white border-none rounded-[14px] text-[16px] font-extrabold tracking-[0.3px] cursor-pointer transition-all mt-1 flex justify-center items-center shadow-md">
                 <span id="btn-text">تأكيد الدفع</span>
-                <div id="btn-spinner" class="spinner hidden mr-3"></div>
+                <div id="btn-spinner" class="spinner hidden me-3"></div>
             </button>
         </form>
     </div>

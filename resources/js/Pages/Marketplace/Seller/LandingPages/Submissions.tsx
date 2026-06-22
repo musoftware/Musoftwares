@@ -15,10 +15,10 @@ export default function Submissions({ service, landingPage, submissions }: any) 
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Date</TableHead>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Data</TableHead>
+                                    <TableHead>{__('general.date')}</TableHead>
+                                    <TableHead>{__('general.name')}</TableHead>
+                                    <TableHead>{__('general.email')}</TableHead>
+                                    <TableHead>{__('general.data')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>

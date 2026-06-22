@@ -493,9 +493,9 @@ export default function IPTVDownloaderRunner() {
                     {/* Connection Info GroupBox */}
                     <div className="m-2 p-3 border border-slate-300 rounded-md">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs font-bold text-slate-700">Connection Info</span>
+                            <span className="text-xs font-bold text-slate-700">{__('general.connection_info')}</span>
                             <div className="flex gap-2">
-                                <Button variant="ghost" className={`h-6 px-2 py-0 text-[10px] ${connectionType === 'xtream' ? 'bg-slate-100 font-bold' : ''}`} onClick={() => setConnectionType('xtream')}>Xtream</Button>
+                                <Button variant="ghost" className={`h-6 px-2 py-0 text-[10px] ${connectionType === 'xtream' ? 'bg-slate-100 font-bold' : ''}`} onClick={() => setConnectionType('xtream')}>{__('general.xtream')}</Button>
                                 <Button variant="ghost" className={`h-6 px-2 py-0 text-[10px] ${connectionType === 'm3u' ? 'bg-slate-100 font-bold' : ''}`} onClick={() => setConnectionType('m3u')}>M3U</Button>
                             </div>
                         </div>
@@ -503,15 +503,15 @@ export default function IPTVDownloaderRunner() {
                         {connectionType === 'xtream' ? (
                             <div className="space-y-2.5">
                                 <div className="flex items-center gap-2">
-                                    <Label className="w-16 text-end text-xs">Server</Label>
+                                    <Label className="w-16 text-end text-xs">{__('general.server')}</Label>
                                     <Input value={xtreamHost} onChange={e => setXtreamHost(e.target.value)} className="h-7 text-xs flex-1 rounded-sm" />
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Label className="w-16 text-end text-xs">Username</Label>
+                                    <Label className="w-16 text-end text-xs">{__('general.username')}</Label>
                                     <Input value={xtreamUser} onChange={e => setXtreamUser(e.target.value)} className="h-7 text-xs flex-1 rounded-sm" />
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Label className="w-16 text-end text-xs">Password</Label>
+                                    <Label className="w-16 text-end text-xs">{__('general.password')}</Label>
                                     <Input type="password" value={xtreamPass} onChange={e => setXtreamPass(e.target.value)} className="h-7 text-xs flex-1 rounded-sm" />
                                 </div>
                             </div>
@@ -527,7 +527,7 @@ export default function IPTVDownloaderRunner() {
                         <div className="mt-3 flex items-center justify-between">
                             <div className="flex items-center space-x-1.5 ms-2">
                                 <Checkbox id="chkSaveData" checked={saveData} onCheckedChange={(c) => setSaveData(c as boolean)} />
-                                <Label htmlFor="chkSaveData" className="text-xs cursor-pointer text-slate-600">Save Data</Label>
+                                <Label htmlFor="chkSaveData" className="text-xs cursor-pointer text-slate-600">{__('general.save_data')}</Label>
                             </div>
                             <Button 
                                 onClick={handleConnect} 
@@ -543,20 +543,20 @@ export default function IPTVDownloaderRunner() {
 
                     {/* Categories GroupBox */}
                     <div className="m-2 mt-0 p-3 border border-slate-300 rounded-md flex-1 flex flex-col min-h-0">
-                        <span className="text-xs font-bold text-slate-700 mb-2 block">Categories</span>
+                        <span className="text-xs font-bold text-slate-700 mb-2 block">{__('general.categories')}</span>
                         
                         <div className="flex items-center gap-3 mb-3 pb-2 border-b border-slate-200">
                             <div className="flex items-center space-x-1.5">
                                 <Checkbox id="chkLive" checked={showLive} onCheckedChange={(c) => setShowLive(c as boolean)} />
-                                <Label htmlFor="chkLive" className="text-xs cursor-pointer">Live</Label>
+                                <Label htmlFor="chkLive" className="text-xs cursor-pointer">{__('general.live')}</Label>
                             </div>
                             <div className="flex items-center space-x-1.5">
                                 <Checkbox id="chkMovies" checked={showMovies} onCheckedChange={(c) => setShowMovies(c as boolean)} />
-                                <Label htmlFor="chkMovies" className="text-xs cursor-pointer">Movies</Label>
+                                <Label htmlFor="chkMovies" className="text-xs cursor-pointer">{__('general.movies')}</Label>
                             </div>
                             <div className="flex items-center space-x-1.5">
                                 <Checkbox id="chkSeries" checked={showSeries} onCheckedChange={(c) => setShowSeries(c as boolean)} />
-                                <Label htmlFor="chkSeries" className="text-xs cursor-pointer">Series</Label>
+                                <Label htmlFor="chkSeries" className="text-xs cursor-pointer">{__('general.series')}</Label>
                             </div>
                         </div>
 
@@ -567,8 +567,7 @@ export default function IPTVDownloaderRunner() {
                                         className={`px-3 py-1.5 text-xs cursor-pointer hover:bg-slate-50 ${selectedGroup === '' ? 'bg-[#007ACC] text-white font-bold' : ''}`}
                                         onClick={() => setSelectedGroup('')}
                                     >
-                                        All Categories
-                                    </div>
+                                        {__('general.all_categories')}</div>
                                     {groups.map((g, i) => (
                                         <div 
                                             key={i}
@@ -588,7 +587,7 @@ export default function IPTVDownloaderRunner() {
                 {/* Right Panel */}
                 <div className="flex-1 flex flex-col p-2 bg-[#F0F0F0]">
                     <div className="border border-slate-300 rounded-md flex-1 flex flex-col min-h-0 p-3 bg-white">
-                        <span className="text-xs font-bold text-slate-700 mb-2 block">Content</span>
+                        <span className="text-xs font-bold text-slate-700 mb-2 block">{__('general.content')}</span>
 
                         {/* Search Box */}
                         <div className="flex items-center gap-2 mb-3">
@@ -599,8 +598,7 @@ export default function IPTVDownloaderRunner() {
                                 className="h-7 text-xs flex-1 rounded-sm" 
                             />
                             <Button onClick={handleSearch} className="h-7 text-xs px-6 rounded-sm bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300">
-                                Search
-                            </Button>
+                                {__('general.search')}</Button>
                         </div>
 
                         {/* Action Panel */}
@@ -611,15 +609,14 @@ export default function IPTVDownloaderRunner() {
                                     checked={selectedChannels.size === channels.length && channels.length > 0} 
                                     onCheckedChange={(c) => handleSelectAllChannels(c as boolean)} 
                                 />
-                                <Label htmlFor="chkSelectAllContent" className="text-xs font-semibold cursor-pointer">Select All</Label>
+                                <Label htmlFor="chkSelectAllContent" className="text-xs font-semibold cursor-pointer">{__('general.select_all')}</Label>
                             </div>
                             <Button 
                                 onClick={handleAddToQueue}
                                 disabled={selectedChannels.size === 0}
                                 className="h-7 bg-[#E67E22] hover:bg-[#D35400] text-white px-6 rounded-sm text-xs font-bold shadow-sm"
                             >
-                                Add to queue
-                            </Button>
+                                {__('general.add_to_queue')}</Button>
                         </div>
 
                         {/* Content List */}
@@ -627,7 +624,7 @@ export default function IPTVDownloaderRunner() {
                             {/* Header row */}
                             <div className="flex border-b border-slate-200 bg-slate-50 px-2 py-1.5">
                                 <div className="w-8"></div>
-                                <div className="flex-1 text-xs font-bold text-slate-600">Name</div>
+                                <div className="flex-1 text-xs font-bold text-slate-600">{__('general.name')}</div>
                             </div>
                             {/* Body */}
                             <ScrollArea className="flex-1">
@@ -649,7 +646,7 @@ export default function IPTVDownloaderRunner() {
                                     </div>
                                 ))}
                                 {channels.length === 0 && !isConnecting && activePlaylistId && (
-                                    <div className="text-center py-10 text-slate-400 text-xs italic">No items found in this category.</div>
+                                    <div className="text-center py-10 text-slate-400 text-xs italic">{__('general.no_items_found_in_this_category')}</div>
                                 )}
                             </ScrollArea>
                         </div>
@@ -664,11 +661,9 @@ export default function IPTVDownloaderRunner() {
                 <Tabs defaultValue="downloader" className="w-full flex-1 flex flex-col">
                     <TabsList className="h-8 justify-start bg-transparent rounded-none px-0 gap-1 border-b border-slate-300 w-full mb-2">
                         <TabsTrigger value="downloader" className="data-[state=active]:bg-white data-[state=active]:border-t data-[state=active]:border-x data-[state=active]:border-slate-300 border border-transparent border-b-0 rounded-t-sm text-xs px-6 h-full data-[state=active]:shadow-none relative z-10 data-[state=active]:-mb-px">
-                            Downloader
-                        </TabsTrigger>
+                            {__('general.downloader')}</TabsTrigger>
                         <TabsTrigger value="log" className="data-[state=active]:bg-white data-[state=active]:border-t data-[state=active]:border-x data-[state=active]:border-slate-300 border border-transparent border-b-0 rounded-t-sm text-xs px-6 h-full data-[state=active]:shadow-none relative z-10 data-[state=active]:-mb-px">
-                            Log
-                        </TabsTrigger>
+                            {__('general.log')}</TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="downloader" className="flex-1 m-0 flex flex-col min-h-0 data-[state=active]:flex bg-white border border-slate-300 p-2">
@@ -676,7 +671,7 @@ export default function IPTVDownloaderRunner() {
                             {/* Header */}
                             <div className="flex border-b border-slate-200 bg-slate-50 px-2 py-1.5">
                                 <div className="w-8"></div>
-                                <div className="w-1/2 text-xs font-bold text-slate-600 border-e border-slate-200 px-2">Name</div>
+                                <div className="w-1/2 text-xs font-bold text-slate-600 border-e border-slate-200 px-2">{__('general.name')}</div>
                                 <div className="flex-1 text-xs font-bold text-slate-600 px-2">Progress / Status</div>
                             </div>
                             {/* Body */}
@@ -709,8 +704,7 @@ export default function IPTVDownloaderRunner() {
                                 disabled={selectedQueueItems.size === 0}
                                 className="bg-[#007ACC] hover:bg-[#005A9E] text-white font-bold h-7 px-6 rounded-sm text-xs shadow-sm absolute start-0"
                             >
-                                Start Download
-                            </Button>
+                                {__('general.start_download')}</Button>
                             
                             <div className="flex items-center space-x-2 absolute start-[150px]">
                                 <Checkbox 
@@ -718,7 +712,7 @@ export default function IPTVDownloaderRunner() {
                                     checked={selectedQueueItems.size === downloadQueue.length && downloadQueue.length > 0} 
                                     onCheckedChange={(c) => handleSelectAllQueue(c as boolean)} 
                                 />
-                                <Label htmlFor="chkSelectAllQueue" className="text-xs cursor-pointer">Select All</Label>
+                                <Label htmlFor="chkSelectAllQueue" className="text-xs cursor-pointer">{__('general.select_all')}</Label>
                             </div>
                         </div>
                     </TabsContent>

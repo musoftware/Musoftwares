@@ -37,9 +37,9 @@ export default function VendorOrdersIndex({ orders, filters }: any) {
                             <SelectContent>
                                 <SelectItem value="all">{__('general.all_orders')}</SelectItem>
                                 <SelectItem value="new">New</SelectItem>
-                                <SelectItem value="preparing">Preparing</SelectItem>
-                                <SelectItem value="shipping">Shipping</SelectItem>
-                                <SelectItem value="delivered">Delivered</SelectItem>
+                                <SelectItem value="preparing">{__('general.preparing')}</SelectItem>
+                                <SelectItem value="shipping">{__('general.shipping')}</SelectItem>
+                                <SelectItem value="delivered">{__('general.delivered')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -49,12 +49,12 @@ export default function VendorOrdersIndex({ orders, filters }: any) {
                         <TableHeader>
                             <TableRow className="bg-gray-50/80">
                                 <TableHead className="font-semibold text-gray-600">{__('general.order_id')}</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Customer</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Location</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-end">Items</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Status</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Date</TableHead>
-                                <TableHead className="font-semibold text-gray-600 text-end">Action</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.customer')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.location')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">{__('general.items')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.status')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.date')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-end">{__('general.action')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -80,8 +80,7 @@ export default function VendorOrdersIndex({ orders, filters }: any) {
                                         <TableCell className="text-end">
                                             <Link href={route('affiliate_pos.vendor.orders.show', order.id)}>
                                                 <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800 hover:bg-blue-50">
-                                                    <Eye className="w-4 h-4 me-1" /> View
-                                                </Button>
+                                                    <Eye className="w-4 h-4 me-1" /> {__('general.view')}</Button>
                                             </Link>
                                         </TableCell>
                                     </TableRow>

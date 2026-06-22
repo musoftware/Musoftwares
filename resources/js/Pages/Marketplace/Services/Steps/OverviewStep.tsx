@@ -54,7 +54,7 @@ export default function OverviewStep({ data, setData, errors, categories }: any)
 
             <div className="space-y-3">
                 <Label className="text-sm font-semibold text-slate-700">
-                    Category <span className="text-red-500">*</span>
+                    {__('general.category')}<span className="text-red-500">*</span>
                 </Label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {categories.map((cat: any) => (

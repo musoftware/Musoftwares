@@ -133,9 +133,9 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
                                                     <tr className="border-b bg-muted/50 text-start">
                                                         <th className="font-medium p-4">ID</th>
                                                         <th className="font-medium p-4">{__('general.page_id')}</th>
-                                                        <th className="font-medium p-4">Type</th>
-                                                        <th className="font-medium p-4">File</th>
-                                                        <th className="font-medium p-4">Status</th>
+                                                        <th className="font-medium p-4">{__('general.type')}</th>
+                                                        <th className="font-medium p-4">{__('general.file')}</th>
+                                                        <th className="font-medium p-4">{__('general.status')}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>

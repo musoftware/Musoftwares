@@ -38,7 +38,7 @@ export default function DescriptionStep({ data, setData, errors }: any) {
         <div className="space-y-10">
             <div className="space-y-4">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 mb-1">Description</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-1">{__('general.description')}</h2>
                     <p className="text-sm text-slate-500">{__('general.briefly_describe_your_service')}</p>
                 </div>
 
@@ -118,7 +118,7 @@ export default function DescriptionStep({ data, setData, errors }: any) {
                                 <Trash2 className="w-4 h-4" />
                             </button>
                             <div className="pe-8">
-                                <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Question</Label>
+                                <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">{__('general.question')}</Label>
                                 <Input 
                                     value={item.question} 
                                     onChange={e => updateFaq(i, 'question', e.target.value)} 
@@ -127,7 +127,7 @@ export default function DescriptionStep({ data, setData, errors }: any) {
                                 />
                             </div>
                             <div>
-                                <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Answer</Label>
+                                <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">{__('general.answer')}</Label>
                                 <textarea
                                     value={item.answer}
                                     onChange={e => updateFaq(i, 'answer', e.target.value)}
