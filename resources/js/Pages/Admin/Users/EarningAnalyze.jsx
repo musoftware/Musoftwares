@@ -96,7 +96,7 @@ function MetricCard({ label, value, sub, icon: Icon, tooltip, accent = false, da
     const valueClass = danger
         ? 'text-red-600'
         : warning
-            ? 'text-amber-600'
+            ? 'text-yellow-600'
             : success
                 ? 'text-green-600'
                 : 'text-slate-900';
@@ -174,7 +174,7 @@ function StatusBadge({ status }) {
         );
     }
     return (
-        <Badge className="bg-amber-50 text-amber-700 border-amber-200 text-xs font-medium gap-1">
+        <Badge className="bg-yellow-50 text-yellow-700 border-yellow-200 text-xs font-medium gap-1">
             <Clock className="h-2.5 w-2.5" /> {__('general.pending')}</Badge>
     );
 }
@@ -549,7 +549,7 @@ export default function EarningAnalyze({
                                 {sortedEarners.map((earner, idx) => (
                                     <TableRow key={earner.user_id} className="hover:bg-slate-50/60">
                                         <TableCell>
-                                            <span className={`text-xs font-bold ${idx < 3 ? 'text-amber-500' : 'text-slate-400'}`}>
+                                            <span className={`text-xs font-bold ${idx < 3 ? 'text-yellow-600' : 'text-slate-400'}`}>
                                                 {idx + 1}
                                             </span>
                                         </TableCell>

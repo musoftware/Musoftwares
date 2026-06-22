@@ -68,7 +68,7 @@ export default function Index({ profiles, filters }: any) {
                                     <div className="flex flex-wrap gap-1">
                                         {profile.user?.skills?.length > 0 ? (
                                             profile.user.skills.map((us: any) => (
-                                                <span key={us.id} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">
+                                                <span key={us.id} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                                                     {us.skill?.name || 'Unknown'}
                                                 </span>
                                             ))

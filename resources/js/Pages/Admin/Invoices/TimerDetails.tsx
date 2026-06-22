@@ -261,7 +261,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
 
             <div className="max-w-7xl mx-auto pb-12">
                 <div className="mb-5">
-                    <span className="text-xs font-bold tracking-widest text-slate-900 uppercase bg-indigo-50 px-2 py-1 rounded mb-2 inline-block">
+                    <span className="text-xs font-bold tracking-widest text-slate-900 uppercase bg-slate-50 px-2 py-1 rounded mb-2 inline-block">
                         {__('billing.billing')}
                     </span>
                     <div className="flex items-baseline flex-wrap gap-3">
@@ -284,7 +284,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                 {/* Info Cards (Modern Compact Row) */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                     <div className="p-2 border rounded-xl bg-white flex items-center gap-3 shadow-sm">
-                        <div className="rounded-full bg-blue-50 p-2 flex items-center justify-center w-10 h-10">
+                        <div className="rounded-full bg-slate-50 p-2 flex items-center justify-center w-10 h-10">
                             <User className="w-4 h-4 text-slate-900" />
                         </div>
                         <div className="overflow-hidden">
@@ -297,8 +297,8 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
 
                     {item.project_name && (
                         <div className="p-2 border rounded-xl bg-white flex items-center gap-3 shadow-sm">
-                            <div className="rounded-full bg-amber-50 p-2 flex items-center justify-center w-10 h-10">
-                                <Folder className="w-4 h-4 text-amber-600" />
+                            <div className="rounded-full bg-yellow-50 p-2 flex items-center justify-center w-10 h-10">
+                                <Folder className="w-4 h-4 text-yellow-600" />
                             </div>
                             <div>
                                 <small className="text-gray-400 block uppercase font-bold text-[10px] tracking-wider">{__('general.project')}</small>
@@ -335,7 +335,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                                 name="rateType" 
                                                 checked={rate === system_base_rate}
                                                 onChange={() => setRate(system_base_rate)}
-                                                className="w-3.5 h-3.5 text-slate-900 focus:ring-blue-500 border-gray-300"
+                                                className="w-3.5 h-3.5 text-slate-900 focus:ring-slate-900 border-gray-300"
                                                 disabled={item.invoice_status !== 'unpaid'}
                                             />
                                             {__('admin.base_system_rate')} ({system_base_rate})
@@ -346,7 +346,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                                 name="rateType" 
                                                 checked={rate === client_rate}
                                                 onChange={() => setRate(client_rate)}
-                                                className="w-3.5 h-3.5 text-slate-900 focus:ring-blue-500 border-gray-300"
+                                                className="w-3.5 h-3.5 text-slate-900 focus:ring-slate-900 border-gray-300"
                                                 disabled={item.invoice_status !== 'unpaid' || client_rate <= 0}
                                             />
                                             {__('admin.client_rate')} ({client_rate > 0 ? client_rate : __('general.not_set')})
@@ -421,7 +421,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                             <td className="px-4 py-2.5 font-mono text-xs text-gray-600">{parseDateTime(timer.end_date).full}</td>
                                             <td className="px-4 py-2.5 font-mono text-xs font-medium">
                                                 {formatDurationMS(timer.duration_seconds)}
-                                                {timer.isNew && <span className="ms-2 text-[9px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">New</span>}
+                                                {timer.isNew && <span className="ms-2 text-[9px] font-bold bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">New</span>}
                                             </td>
                                             <td className="px-4 py-2.5 font-bold text-gray-900">{formatCurrency(timer.amount, invoice_currency)}</td>
                                             <td className="px-4 py-2.5 text-center">
@@ -477,12 +477,12 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                         onClick={toggleBridge}
                                         className={`transition-colors ${
                                             bridgeStatus === 'connected' ? 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100' : 
-                                            (bridgeStatus === 'connecting' ? 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100' : 'bg-gray-50 text-gray-600')
+                                            (bridgeStatus === 'connecting' ? 'bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100' : 'bg-gray-50 text-gray-600')
                                         }`}
                                     >
                                         <div className={`w-2 h-2 rounded-full me-2 ${
                                             bridgeStatus === 'connected' ? 'bg-green-500' : 
-                                            (bridgeStatus === 'connecting' ? 'bg-amber-500 animate-pulse' : 'bg-gray-400')
+                                            (bridgeStatus === 'connecting' ? 'bg-yellow-600 animate-pulse' : 'bg-gray-400')
                                         }`}></div>
                                         {bridgeStatus === 'connected' ? 'Bridge On' : (bridgeStatus === 'connecting' ? 'Connecting…' : 'Bridge Off')}
                                     </Button>

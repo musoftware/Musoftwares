@@ -182,7 +182,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
             case 'paid':
                 return <StatusBadge status="paid" />;
             case 'partially_paid':
-                return <StatusBadge status="partially_paid" label={__('general.partially_paid')} className="bg-amber-50 text-amber-700 border-amber-100" />;
+                return <StatusBadge status="partially_paid" label={__('general.partially_paid')} className="bg-yellow-50 text-yellow-700 border-yellow-100" />;
             case 'cancelled':
                 return <StatusBadge status="cancelled" />;
             case 'unpaid':
@@ -194,9 +194,9 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     const getJobStatusBadge = (status) => {
         switch (status) {
             case 'done':
-                return <StatusBadge status="done" label={__('general.done')} className="bg-emerald-50 text-slate-900 border-emerald-100" />;
+                return <StatusBadge status="done" label={__('general.done')} className="bg-green-50 text-slate-900 border-green-100" />;
             case 'processing':
-                return <StatusBadge status="processing" label={__('general.processing')} className="bg-amber-50 text-amber-700 border-amber-100" />;
+                return <StatusBadge status="processing" label={__('general.processing')} className="bg-yellow-50 text-yellow-700 border-yellow-100" />;
             default:
                 return <StatusBadge status="pending" label={__('general.pending')} className="bg-slate-50 text-slate-700 border-slate-100" />;
         }
@@ -357,7 +357,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                 <div className="flex items-center gap-3">
                                                     <Avatar className="h-10 w-10 border border-slate-200">
                                                         <AvatarImage src={invoice.user.avatar_url || ''} alt={invoice.user.name} />
-                                                        <AvatarFallback className="bg-blue-50 text-slate-900">
+                                                        <AvatarFallback className="bg-slate-50 text-slate-900">
                                                             <User className="h-5 w-5" />
                                                         </AvatarFallback>
                                                     </Avatar>
@@ -452,11 +452,11 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                     <DropdownMenuLabel>{__('general.client_reports')}</DropdownMenuLabel>
                                                     <DropdownMenuItem asChild>
                                                         <a href={`/admin/users/${invoice.user_id || invoice.user?.id}/balance-sheet`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
-                                                            <Receipt className="me-2 h-4 w-4 text-sky-500" />{__('general.due_balance_sheet')}</a>
+                                                            <Receipt className="me-2 h-4 w-4 text-slate-700" />{__('general.due_balance_sheet')}</a>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
                                                         <a href={`/admin/users/${invoice.user_id || invoice.user?.id}/reports`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
-                                                            <Clock className="me-2 h-4 w-4 text-amber-500" />{__('general.timer_balance_sheet')}</a>
+                                                            <Clock className="me-2 h-4 w-4 text-yellow-600" />{__('general.timer_balance_sheet')}</a>
                                                     </DropdownMenuItem>
                                                 
                                                     <DropdownMenuSeparator />

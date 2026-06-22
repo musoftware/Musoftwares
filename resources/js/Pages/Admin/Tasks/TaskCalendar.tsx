@@ -213,7 +213,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                     onDoubleClick={() => handleDayDoubleClick(day)}
                                     className={`min-h-[140px] border-e border-b border-slate-100 p-2 flex flex-col transition-colors cursor-pointer ${
                                         !isCurrentMonth ? 'bg-slate-50/50 opacity-60' : ''
-                                    } ${isCurrentDay ? 'bg-indigo-50/30' : 'hover:bg-slate-50/30'}`}
+                                    } ${isCurrentDay ? 'bg-slate-50/30' : 'hover:bg-slate-50/30'}`}
                                 >
                                     <div className="flex justify-between items-start mb-2">
                                         <span
@@ -230,7 +230,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                     <div className="flex-1 space-y-1.5 overflow-y-auto max-h-[160px] pe-1 styled-scrollbar">
                                         {/* Busy Times */}
                                         {dayEvents.busy_times.map((bt) => (
-                                            <div key={bt.id} className="text-[10px] px-1.5 py-1 rounded bg-rose-50 text-slate-900 border border-rose-100 flex flex-col gap-0.5 shadow-sm">
+                                            <div key={bt.id} className="text-[10px] px-1.5 py-1 rounded bg-red-50 text-slate-900 border border-red-100 flex flex-col gap-0.5 shadow-sm">
                                                 <div className="font-semibold flex items-center gap-1">
                                                     <AlertCircle className="h-3 w-3" />
                                                     <span className="truncate">{bt.title}</span>
@@ -246,7 +246,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
 
                                         {/* Tasks */}
                                         {dayEvents.tasks.map((task) => (
-                                            <div key={`task-${task.id}`} className="text-[10px] px-1.5 py-1 rounded bg-indigo-50 text-slate-900 border border-indigo-100 flex flex-col gap-0.5 shadow-sm">
+                                            <div key={`task-${task.id}`} className="text-[10px] px-1.5 py-1 rounded bg-slate-50 text-slate-900 border border-slate-50 flex flex-col gap-0.5 shadow-sm">
                                                 <div className="font-semibold flex items-start gap-1">
                                                     <ListTodo className="h-3 w-3 mt-0.5 shrink-0" />
                                                     <span className={`truncate ${task.completed ? 'line-through opacity-70' : ''}`}>{task.title}</span>
@@ -262,7 +262,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
 
                                         {/* Todos */}
                                         {dayEvents.todos.map((todo) => (
-                                            <div key={`todo-${todo.id}`} className="text-[10px] px-1.5 py-1 rounded bg-emerald-50 text-slate-900 border border-emerald-100 flex flex-col gap-0.5 shadow-sm">
+                                            <div key={`todo-${todo.id}`} className="text-[10px] px-1.5 py-1 rounded bg-green-50 text-slate-900 border border-green-100 flex flex-col gap-0.5 shadow-sm">
                                                 <div className="font-semibold flex items-start gap-1">
                                                     {todo.completed ? (
                                                         <CheckCircle2 className="h-3 w-3 mt-0.5 shrink-0" />

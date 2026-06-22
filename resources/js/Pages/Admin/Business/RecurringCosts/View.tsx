@@ -33,7 +33,7 @@ export default function View({ cost, transactions, upcomingSchedule, total_stat 
                         <Button variant="outline" size="sm" className="flex items-center gap-1.5">
                             <Edit className="w-4 h-4" /> {__('general.edit')}</Button>
                     </Link>
-                    <Button variant="outline" size="sm" className="text-orange-600 hover:text-orange-900 flex items-center gap-1.5" onClick={handleDelete}>
+                    <Button variant="outline" size="sm" className="text-yellow-600 hover:text-yellow-900 flex items-center gap-1.5" onClick={handleDelete}>
                         <Trash2 className="w-4 h-4" />{__('general.delete_schedule')}</Button>
                     <Button variant="destructive" size="sm" className="flex items-center gap-1.5" onClick={handleDeleteWithTransactions}>
                         <Trash2 className="w-4 h-4" />{__('general.delete_all')}</Button>
@@ -184,9 +184,9 @@ export default function View({ cost, transactions, upcomingSchedule, total_stat 
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap text-sm">
                                                 {run.recorded ? (
-                                                    <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded">Recorded (Historical)</span>
+                                                    <span className="text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-2 py-0.5 rounded">Recorded (Historical)</span>
                                                 ) : (
-                                                    <span className="text-xs bg-emerald-50 text-slate-900 border border-emerald-200 px-2 py-0.5 rounded font-medium">{__('general.pending_execution')}</span>
+                                                    <span className="text-xs bg-green-50 text-slate-900 border border-green-200 px-2 py-0.5 rounded font-medium">{__('general.pending_execution')}</span>
                                                 )}
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap text-end">

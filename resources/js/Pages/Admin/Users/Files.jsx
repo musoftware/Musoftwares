@@ -120,8 +120,8 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
 
     // --- Helpers ---
     const getFileIcon = (ext) => {
-        if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(ext)) return <ImageIcon className="h-8 w-8 text-blue-500" />;
-        if (['zip', 'rar', 'tar', 'gz'].includes(ext)) return <FileArchive className="h-8 w-8 text-amber-500" />;
+        if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(ext)) return <ImageIcon className="h-8 w-8 text-slate-700" />;
+        if (['zip', 'rar', 'tar', 'gz'].includes(ext)) return <FileArchive className="h-8 w-8 text-yellow-600" />;
         if (['txt', 'md', 'doc', 'docx', 'pdf'].includes(ext)) return <FileText className="h-8 w-8 text-slate-500" />;
         return <File className="h-8 w-8 text-slate-400" />;
     };
@@ -179,8 +179,8 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                                     <button 
                                         onClick={() => navigateTo(crumb.path)}
                                         className={cn(
-                                            "hover:text-blue-600 transition-colors",
-                                            idx === breadcrumbs.length - 1 ? "text-blue-600 font-semibold cursor-default" : ""
+                                            "hover:text-slate-900 transition-colors",
+                                            idx === breadcrumbs.length - 1 ? "text-slate-900 font-semibold cursor-default" : ""
                                         )}
                                         disabled={idx === breadcrumbs.length - 1 || isLoading}
                                     >
@@ -225,7 +225,7 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>
-                                        <FolderOpen className="h-12 w-12 text-blue-400 mb-2" />
+                                        <FolderOpen className="h-12 w-12 text-slate-500 mb-2" />
                                         <span className="text-sm font-medium text-slate-700 truncate w-full" title={folder.name}>
                                             {folder.name}
                                         </span>

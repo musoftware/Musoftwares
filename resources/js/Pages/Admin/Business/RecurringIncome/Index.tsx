@@ -343,7 +343,7 @@ export default function Index({ incomes, currencies, categories, stats }) {
                                     <span className="bg-slate-100 border text-slate-800 text-xs px-2 py-0.5 rounded font-medium">{income.reason}</span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                                    <span className="text-sm font-bold text-emerald-650 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded">
+                                    <span className="text-sm font-bold text-green-650 bg-green-50 border border-green-200 px-2 py-1 rounded">
                                         {formatCurrency(income.amount, income.currency)}
                                     </span>
                                 </td>
@@ -369,7 +369,7 @@ export default function Index({ incomes, currencies, categories, stats }) {
                                             <Edit className="w-4 h-4" />
                                         </Button>
                                     </Link>
-                                    <Button variant="ghost" size="sm" className="text-orange-600 hover:text-orange-900 me-1" onClick={() => handleDelete(income.id)} title={__('general.delete_schedule_only')}>
+                                    <Button variant="ghost" size="sm" className="text-yellow-600 hover:text-yellow-900 me-1" onClick={() => handleDelete(income.id)} title={__('general.delete_schedule_only')}>
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
                                     <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900" onClick={() => handleDeleteWithTransactions(income.id)} title={__('general.delete_everything')}>

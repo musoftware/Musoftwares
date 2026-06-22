@@ -86,7 +86,7 @@ export default function Show({ job }: any) {
                                 <h3 className="text-lg font-medium text-gray-900 mb-2">{__('freelance.required_skills')}</h3>
                                 <div className="flex flex-wrap gap-2">
                                     {job.skills.map((skill: any) => (
-                                        <Badge key={skill.id} variant="outline" className="bg-blue-50 text-slate-900">
+                                        <Badge key={skill.id} variant="outline" className="bg-slate-50 text-slate-900">
                                             {skill.name}
                                         </Badge>
                                     ))}
@@ -222,7 +222,7 @@ export default function Show({ job }: any) {
 
                             {(job.status === 'published' || job.status === 'open' || job.status === 'suspended') && (
                                 <Button 
-                                    className="w-full bg-orange-100 text-orange-800 hover:bg-orange-200 justify-start" 
+                                    className="w-full bg-yellow-100 text-yellow-800 hover:bg-yellow-200 justify-start" 
                                     variant="secondary"
                                     onClick={() => setRefundConfirm(true)}
                                 >

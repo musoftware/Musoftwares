@@ -316,7 +316,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'completed': return <span className="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><CheckCircle2 className="w-3 h-3 me-1"/> {__('general.completed')}</span>;
-            case 'pending': return <span className="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><Clock className="w-3 h-3 me-1"/> {__('general.pending')}</span>;
+            case 'pending': return <span className="bg-yellow-50 text-yellow-700 border border-yellow-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><Clock className="w-3 h-3 me-1"/> {__('general.pending')}</span>;
             case 'overdue': return <span className="bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><AlertCircle className="w-3 h-3 me-1"/> {__('general.overdue')}</span>;
             default: return null;
         }
@@ -356,12 +356,12 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-xl border shadow-sm flex items-center">
-                    <div className="bg-indigo-50 p-4 rounded-full me-4 text-slate-900 border border-indigo-100">
+                    <div className="bg-slate-50 p-4 rounded-full me-4 text-slate-900 border border-slate-50">
                         <DollarSign className="w-6 h-6" />
                     </div>
                     <div>
                         <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">{__('general.net_profit')}</p>
-                        <h3 className="text-2xl font-bold text-indigo-900">{formatCurrency(stats.total_monthly_net_profit, stats.business_currency_code)}</h3>
+                        <h3 className="text-2xl font-bold text-slate-900">{formatCurrency(stats.total_monthly_net_profit, stats.business_currency_code)}</h3>
                     </div>
                 </div>
             </div>
@@ -518,7 +518,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             
                                             let bgColor = 'bg-slate-200';
                                             if (item.status.toLowerCase() === 'completed') bgColor = 'bg-green-600';
-                                            if (item.status.toLowerCase() === 'pending') bgColor = 'bg-amber-500';
+                                            if (item.status.toLowerCase() === 'pending') bgColor = 'bg-yellow-600';
                                             if (item.status.toLowerCase() === 'overdue') bgColor = 'bg-red-600';
                                             
                                             return (
@@ -538,7 +538,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             let dotColor = 'bg-slate-300';
                                             let textColor = 'text-slate-650';
                                             if (item.status.toLowerCase() === 'completed') { dotColor = 'bg-green-600'; textColor = 'text-green-700'; }
-                                            if (item.status.toLowerCase() === 'pending') { dotColor = 'bg-amber-500'; textColor = 'text-amber-700'; }
+                                            if (item.status.toLowerCase() === 'pending') { dotColor = 'bg-yellow-600'; textColor = 'text-yellow-700'; }
                                             if (item.status.toLowerCase() === 'overdue') { dotColor = 'bg-red-600'; textColor = 'text-red-700'; }
                                             
                                             return (
@@ -1014,7 +1014,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             key={idx}
                                             className={`min-h-[140px] p-2 flex flex-col transition-colors relative ${
                                                 !isCurrentMonth ? 'bg-slate-50/30 opacity-55' : ''
-                                            } ${isCurrentDay ? 'bg-indigo-50/20' : 'hover:bg-slate-50/50'}`}
+                                            } ${isCurrentDay ? 'bg-slate-50/20' : 'hover:bg-slate-50/50'}`}
                                         >
                                             <div className="flex justify-between items-start mb-2">
                                                 <button
@@ -1037,7 +1037,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                                     if (event.type === 'income') {
                                                         bgClass = 'bg-green-50 text-green-700 border-green-100';
                                                     } else if (event.type === 'salary') {
-                                                        bgClass = 'bg-blue-50 text-slate-900 border-blue-105';
+                                                        bgClass = 'bg-slate-50 text-slate-900 border-slate-50';
                                                     }
 
                                                     return (
@@ -1230,7 +1230,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200 inline-flex items-center text-xs font-bold">
                                                 {__('general.refund')}</span>
                                         ) : selectedDetailEntry.type === 'salary' ? (
-                                            <span className="text-slate-900 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 inline-flex items-center text-xs font-bold">
+                                            <span className="text-slate-900 bg-slate-50 px-2 py-0.5 rounded border border-slate-200 inline-flex items-center text-xs font-bold">
                                                 {__('general.payroll')}</span>
                                         ) : (
                                             <span className="text-slate-700 bg-slate-50 px-2 py-0.5 rounded border border-slate-200 inline-flex items-center text-xs font-bold">

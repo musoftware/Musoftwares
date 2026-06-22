@@ -140,15 +140,15 @@ export default function AiEstimator({ expected_monthly_income, work_days_per_mon
 
                 {estimatedHours !== null && (
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                        <Card className="bg-blue-50 border-blue-100">
+                        <Card className="bg-slate-50 border-slate-50">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-blue-800 flex items-center gap-2">
+                                <CardTitle className="text-sm font-medium text-slate-900 flex items-center gap-2">
                                     <Clock className="h-4 w-4" />
                                     {__('admin.estimated_hours')}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-bold text-blue-900">{estimatedHours}h</div>
+                                <div className="text-3xl font-bold text-slate-900">{estimatedHours}h</div>
                             </CardContent>
                         </Card>
 

@@ -130,14 +130,14 @@ export default function AdminToolsIndex({ tools, categories }: Props) {
                                                             <div className="flex items-center gap-1.5">
                                                                 <p className="font-semibold text-text-primary text-sm leading-tight">{tool.title}</p>
                                                                 {tool.max_subscription_months === 1 && (
-                                                                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-50 border border-amber-200 text-amber-700 rounded text-[10px] font-semibold" title={__('general.monthly_subscriptions_only')}>
+                                                                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded text-[10px] font-semibold" title={__('general.monthly_subscriptions_only')}>
                                                                         <Clock className="h-2.5 w-2.5" />{__('general.monthly_only')}</span>
                                                                 )}
                                                             </div>
                                                             <p className="text-xs text-text-muted mt-0.5">{tool.slug}</p>
                                                         </div>
                                                         {tool.is_featured && (
-                                                            <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400 flex-shrink-0" />
+                                                            <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400 flex-shrink-0" />
                                                         )}
                                                     </div>
                                                 </td>

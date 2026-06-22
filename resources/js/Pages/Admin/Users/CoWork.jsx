@@ -14,14 +14,14 @@ const TAG_LIMIT = 4;
 
 function SkillBadge({ name }) {
     return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-slate-50 text-slate-900 border border-slate-50">
             <Tag className="w-3 h-3" />
             {name}
         </span>
     );
 }
 
-function TagList({ tags, colorClass = 'bg-emerald-50 text-emerald-700 border-emerald-100' }) {
+function TagList({ tags, colorClass = 'bg-green-50 text-green-700 border-green-100' }) {
     const [expanded, setExpanded] = useState(false);
     const visible = expanded ? tags : tags.slice(0, TAG_LIMIT);
     const hidden  = tags.length - TAG_LIMIT;
@@ -54,7 +54,7 @@ function FreelancerCard({ user }) {
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col gap-3">
             <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-500 to-slate-700 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
                         {user.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
                     </div>
                     <div>
@@ -66,7 +66,7 @@ function FreelancerCard({ user }) {
                 </div>
                 <Link
                     href={`/admin/users/${user.id}`}
-                    className="text-indigo-600 hover:text-indigo-800 transition-colors flex-shrink-0"
+                    className="text-slate-900 hover:text-slate-900 transition-colors flex-shrink-0"
                     title={__('general.view_profile')}
                 >
                     <ChevronRight className="w-5 h-5" />
@@ -75,7 +75,7 @@ function FreelancerCard({ user }) {
 
             <div className="flex flex-wrap gap-1.5">
                 {user.skills?.length > 0
-                    ? <TagList tags={user.skills} colorClass="bg-indigo-50 text-indigo-700 border-indigo-100" />
+                    ? <TagList tags={user.skills} colorClass="bg-slate-50 text-slate-900 border-slate-50" />
                     : <span className="text-xs text-slate-400 italic">{__('general.no_skills_listed')}</span>
                 }
             </div>
@@ -92,7 +92,7 @@ function LegacyCard({ worker }) {
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col gap-3">
             <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-slate-700 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
                         {worker.person_name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '??'}
                     </div>
                     <div>
@@ -106,7 +106,7 @@ function LegacyCard({ worker }) {
                 </div>
                 <Link
                     href={`/admin/users/legacy-coworker/${worker.id}`}
-                    className="text-emerald-600 hover:text-emerald-800 transition-colors flex-shrink-0"
+                    className="text-green-600 hover:text-green-800 transition-colors flex-shrink-0"
                     title={__('general.view_details_1')}
                 >
                     <ChevronRight className="w-5 h-5" />
@@ -138,13 +138,13 @@ function LegacyCard({ worker }) {
                 )}
                 {worker.facebook && (
                     <a href={worker.facebook} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-blue-600 hover:underline col-span-2 truncate"
+                        className="flex items-center gap-1 text-slate-900 hover:underline col-span-2 truncate"
                         onClick={e => e.stopPropagation()}>
                         <ExternalLink className="w-3 h-3" /> {__('general.facebook')}</a>
                 )}
                 {worker.linked_in && (
                     <a href={worker.linked_in} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-sky-700 hover:underline col-span-2 truncate"
+                        className="flex items-center gap-1 text-slate-900 hover:underline col-span-2 truncate"
                         onClick={e => e.stopPropagation()}>
                         <ExternalLink className="w-3 h-3" /> {__('general.linkedin')}</a>
                 )}
@@ -157,7 +157,7 @@ function LegacyCard({ worker }) {
             </div>
 
             {worker.tech_tags?.length > 0 && (
-                <TagList tags={worker.tech_tags} colorClass="bg-emerald-50 text-emerald-700 border-emerald-100" />
+                <TagList tags={worker.tech_tags} colorClass="bg-green-50 text-green-700 border-green-100" />
             )}
         </div>
     );
@@ -190,11 +190,11 @@ export default function CoWork({ freelancers = [], legacyCoWorkers = [] }) {
             {/* Stats row */}
             <div className="mb-6 grid grid-cols-2 gap-4">
                 <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center">
-                    <span className="text-2xl font-semibold text-indigo-600">{freelancers.length}</span>
+                    <span className="text-2xl font-semibold text-slate-900">{freelancers.length}</span>
                     <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Freelancers (System)</span>
                 </div>
                 <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center">
-                    <span className="text-2xl font-semibold text-emerald-600">{legacyCoWorkers.length}</span>
+                    <span className="text-2xl font-semibold text-green-600">{legacyCoWorkers.length}</span>
                     <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.legacy_co_workers')}</span>
                 </div>
             </div>
@@ -213,14 +213,14 @@ export default function CoWork({ freelancers = [], legacyCoWorkers = [] }) {
                                     onClick={() => { setActiveTab(tab.id); setSearch(''); }}
                                     className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-all rounded-t-md ${
                                         isActive
-                                            ? 'border-indigo-600 text-indigo-700 bg-indigo-50/60'
+                                            ? 'border-slate-900 text-slate-900 bg-slate-50/60'
                                             : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                                     }`}
                                 >
                                     <Icon className="w-4 h-4" />
                                     {tab.label}
                                     <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
-                                        isActive ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-500'
+                                        isActive ? 'bg-slate-50 text-slate-900' : 'bg-slate-100 text-slate-500'
                                     }`}>
                                         {tab.id === 'freelancers' ? freelancers.length : legacyCoWorkers.length}
                                     </span>
@@ -238,7 +238,7 @@ export default function CoWork({ freelancers = [], legacyCoWorkers = [] }) {
                             placeholder={activeTab === 'freelancers' ? 'Search by name, email, skill…' : 'Search by name, email, tag…'}
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            className="h-9 ps-9 pe-3 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent w-64"
+                            className="h-9 ps-9 pe-3 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent w-64"
                         />
                     </div>
                 </div>

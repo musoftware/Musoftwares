@@ -215,7 +215,7 @@ export default function Index({ costs, currencies, categories, stats }) {
                                             <Edit className="w-4 h-4" />
                                         </Button>
                                     </Link>
-                                    <Button variant="ghost" size="sm" className="text-orange-600 hover:text-orange-900 me-1" onClick={() => handleDelete(cost.id)} title={__('general.delete_schedule_only')}>
+                                    <Button variant="ghost" size="sm" className="text-yellow-600 hover:text-yellow-900 me-1" onClick={() => handleDelete(cost.id)} title={__('general.delete_schedule_only')}>
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
                                     <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900" onClick={() => handleDeleteWithTransactions(cost.id)} title={__('general.delete_everything')}>

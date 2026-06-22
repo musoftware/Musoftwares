@@ -111,7 +111,7 @@ export default function UserLoansTab({ client, loans }) {
                                             {loan.status === 'paid' ? (
                                                 <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold uppercase">{__('admin.paid') || 'مسدد'}</span>
                                             ) : (
-                                                <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-bold uppercase">{__('admin.active') || 'نشط'}</span>
+                                                <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-bold uppercase">{__('admin.active') || 'نشط'}</span>
                                             )}
                                         </td>
                                         <td className="px-4 py-3 text-end">

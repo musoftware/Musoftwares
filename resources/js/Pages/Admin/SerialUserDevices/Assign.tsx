@@ -65,7 +65,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                                     <SelectContent className="bg-zinc-900 border-zinc-700 max-h-60">
                                         {availableDevices.map(d => (
                                             <SelectItem key={d.device_id} value={d.device_id}>
-                                                <span className="font-mono text-xs text-violet-300">{d.device_id}</span>
+                                                <span className="font-mono text-xs text-slate-200">{d.device_id}</span>
                                                 <span className="text-zinc-400 ms-2">· {d.machine_name}</span>
                                             </SelectItem>
                                         ))}
@@ -131,7 +131,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                             </div>
 
                             <div className="flex gap-3 pt-2">
-                                <Button type="submit" className="bg-violet-600 hover:bg-violet-500 text-white">{__('general.assign_device')}</Button>
+                                <Button type="submit" className="bg-slate-900 hover:bg-slate-900 text-white">{__('general.assign_device')}</Button>
                                 <Link href={route('admin.serial-user-devices.index')}>
                                     <Button type="button" variant="ghost" className="text-zinc-400 hover:text-white">{__('general.cancel')}</Button>
                                 </Link>

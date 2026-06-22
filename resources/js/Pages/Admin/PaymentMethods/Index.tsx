@@ -66,7 +66,7 @@ interface Props {
 
 const statusStyles: Record<string, string> = {
     pending:  'bg-yellow-100 text-yellow-700',
-    active:   'bg-emerald-100 text-slate-900',
+    active:   'bg-green-100 text-slate-900',
     declined: 'bg-red-100 text-red-700',
 };
 
@@ -78,11 +78,11 @@ const statusLabel: Record<string, string> = {
 
 // Map payment types to icon colors for visual variety
 const typeColors: Record<string, string> = {
-    bank:          'bg-blue-100 text-slate-900',
-    paypal:        'bg-indigo-100 text-slate-900',
-    mobile_wallet: 'bg-purple-100 text-slate-900',
-    wallet:        'bg-purple-100 text-slate-900',
-    instapay:      'bg-rose-100 text-slate-900',
+    bank:          'bg-slate-50 text-slate-900',
+    paypal:        'bg-slate-50 text-slate-900',
+    mobile_wallet: 'bg-slate-50 text-slate-900',
+    wallet:        'bg-slate-50 text-slate-900',
+    instapay:      'bg-red-100 text-slate-900',
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -133,7 +133,7 @@ export default function Index({ methods, filters, stats }: Props) {
             render: (m: PaymentMethod) =>
                 m.user ? (
                     <Link href={route('admin.users.show', m.user.id)} className="flex items-center gap-2 group cursor-pointer">
-                        <div className="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 group-hover:bg-slate-900 transition-colors">
+                        <div className="h-7 w-7 rounded-full bg-slate-50 flex items-center justify-center flex-shrink-0 group-hover:bg-slate-900 transition-colors">
                             <UserIcon className="h-3.5 w-3.5 text-slate-900 group-hover:text-white transition-colors" />
                         </div>
                         <div>
@@ -290,7 +290,7 @@ export default function Index({ methods, filters, stats }: Props) {
                     </div>
                     <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">{__('general.pending')}</span>
                 </div>
-                <div className="bg-white rounded-xl border border-emerald-200 p-4 shadow-sm flex flex-col items-center justify-center">
+                <div className="bg-white rounded-xl border border-green-200 p-4 shadow-sm flex flex-col items-center justify-center">
                     <div className="flex items-center gap-1.5 mb-1">
                         <ShieldCheck className="h-4 w-4 text-slate-900" />
                         <span className="text-2xl font-semibold text-slate-900">{stats.active}</span>

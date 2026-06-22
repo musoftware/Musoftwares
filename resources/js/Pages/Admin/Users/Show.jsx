@@ -311,7 +311,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                     <DropdownMenuItem
                                         onClick={handleRecalcBalance}
                                         disabled={isRecalcLoading}
-                                        className="text-amber-700 focus:bg-amber-50 focus:text-amber-800"
+                                        className="text-yellow-700 focus:bg-yellow-50 focus:text-yellow-800"
                                     >
                                         <RefreshCcw className={`me-2 h-4 w-4 ${isRecalcLoading ? 'animate-spin' : ''}`} />
                                         <span>{isRecalcLoading ? 'Recalculating...' : 'Recalc Balance'}</span>
@@ -536,13 +536,13 @@ ${newPassword}`}
                         <span className="px-3 py-1 bg-slate-100 text-slate-800 rounded-full text-xs font-bold uppercase tracking-wide border border-slate-200">
                             ID: {client.id}
                         </span>
-                        <span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold uppercase tracking-wide border border-indigo-200">
+                        <span className="px-3 py-1 bg-slate-50 text-slate-900 rounded-full text-xs font-bold uppercase tracking-wide border border-slate-200">
                             Role: {client.role || 'client'}
                         </span>
                         {client.kyc_verified ? (
                             <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold uppercase tracking-wide border border-green-200">{__('general.kyc_verified')}</span>
                         ) : (
-                            <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold uppercase tracking-wide border border-amber-200">
+                            <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-bold uppercase tracking-wide border border-yellow-200">
                                 {__('general.unverified')}</span>
                         )}
                         <span className="px-3 py-1 bg-slate-50 text-slate-500 rounded-full text-xs uppercase tracking-wide border border-slate-200">
@@ -562,7 +562,7 @@ ${newPassword}`}
                 <div className="bg-white p-4 rounded-[12px] shadow-sm border border-slate-200 text-center">
                     <div className="text-3xl font-bold font-jetbrains text-slate-900 mb-1">{stats.tickets_total || 0}</div>
                     <div className="text-xs font-bold uppercase tracking-wider text-slate-500">{__('general.tickets')}</div>
-                    <div className="text-xs text-amber-600 font-medium mt-1">{stats.tickets_open || 0} Open</div>
+                    <div className="text-xs text-yellow-600 font-medium mt-1">{stats.tickets_open || 0} Open</div>
                 </div>
                 <div className="bg-white p-4 rounded-[12px] shadow-sm border border-slate-200 text-center">
                     <div className="text-3xl font-bold font-jetbrains text-slate-900 mb-1">{stats.orders_total || 0}</div>
@@ -693,7 +693,7 @@ ${newPassword}`}
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-slate-500 text-sm">{__('general.pending_comm')}</span>
-                                <span className="font-bold text-amber-600 font-jetbrains">{formatCurrency(client.pending_commission || 0, client.currency)}</span>
+                                <span className="font-bold text-yellow-600 font-jetbrains">{formatCurrency(client.pending_commission || 0, client.currency)}</span>
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-slate-500 text-sm">{__('general.work_time')}</span>
@@ -705,7 +705,7 @@ ${newPassword}`}
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-slate-500 text-sm">{__('general.reward_points')}</span>
-                                <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-bold text-xs">0</span>
+                                <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded font-bold text-xs">0</span>
                             </div>
                         </div>
                     </div>
@@ -814,7 +814,7 @@ ${newPassword}`}
                                                     <span className={`px-2 py-1 text-xs font-bold uppercase rounded-full ${
                                                         sub.status === 'active' ? 'bg-green-100 text-green-800' :
                                                         sub.status === 'expired' ? 'bg-red-100 text-red-800' :
-                                                        'bg-amber-100 text-amber-800'
+                                                        'bg-yellow-100 text-yellow-800'
                                                     }`}>
                                                         {sub.status}
                                                     </span>

@@ -122,7 +122,7 @@ export default function Index({ clients, filters, stats }) {
                 <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10 border border-slate-200">
                         <AvatarImage src={client.avatar_url || ''} alt={client.name} />
-                        <AvatarFallback className="bg-blue-50 text-blue-500">
+                        <AvatarFallback className="bg-slate-50 text-slate-700">
                             <User className="h-5 w-5" />
                         </AvatarFallback>
                     </Avatar>
@@ -133,14 +133,14 @@ export default function Index({ clients, filters, stats }) {
                         }}
                         className="flex flex-col text-start group"
                     >
-                        <span className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
+                        <span className="font-semibold text-slate-900 group-hover:text-slate-900 transition-colors">
                             {client.name}
                         </span>
                         <div className="flex items-center gap-2 mt-0.5">
                             <span className="text-sm text-slate-500">
                                 {client.email}
                             </span>
-                            <span className="px-1.5 py-0.5 bg-indigo-50 text-indigo-700 rounded-full text-[9px] font-black uppercase border border-indigo-100/50 tracking-wider">
+                            <span className="px-1.5 py-0.5 bg-slate-50 text-slate-900 rounded-full text-[9px] font-black uppercase border border-slate-50/50 tracking-wider">
                                 {client.role || 'client'}
                             </span>
                         </div>
@@ -236,7 +236,7 @@ export default function Index({ clients, filters, stats }) {
     const advancedFilters = (
         <div className="flex items-center gap-2">
             <select 
-                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                 value={filters.role || ''}
                 onChange={(e) => handleFilter('role', e.target.value)}
             >
@@ -246,7 +246,7 @@ export default function Index({ clients, filters, stats }) {
                 <option value="employee">{__('general.employees')}</option>
             </select>
             <select 
-                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                 value={filters.status || ''}
                 onChange={(e) => handleFilter('status', e.target.value)}
             >
@@ -255,7 +255,7 @@ export default function Index({ clients, filters, stats }) {
                 <option value="blocked">{__('general.blocked')}</option>
             </select>
             <select 
-                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                 value={filters.kyc || ''}
                 onChange={(e) => handleFilter('kyc', e.target.value)}
             >
@@ -283,15 +283,15 @@ export default function Index({ clients, filters, stats }) {
                         <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.blocked')}</span>
                     </div>
                     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
-                        <span className="text-2xl font-semibold text-indigo-600">{stats.kyc_verified}</span>
+                        <span className="text-2xl font-semibold text-slate-900">{stats.kyc_verified}</span>
                         <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.kyc_verified')}</span>
                     </div>
                     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
-                        <span className="text-2xl font-semibold text-blue-600">{stats.new_this_week}</span>
+                        <span className="text-2xl font-semibold text-slate-900">{stats.new_this_week}</span>
                         <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.new_this_week')}</span>
                     </div>
                     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
-                        <span className="text-2xl font-semibold text-purple-600">{stats.new_this_month}</span>
+                        <span className="text-2xl font-semibold text-slate-900">{stats.new_this_month}</span>
                         <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.new_this_month')}</span>
                     </div>
                 </div>
@@ -419,7 +419,7 @@ export default function Index({ clients, filters, stats }) {
 
                     {resetPasswordState.status === 'loading' && (
                         <div className="py-12 flex flex-col items-center justify-center space-y-4">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
                             <p className="text-slate-500 text-sm">{__('general.resetting_password')}</p>
                         </div>
                     )}
@@ -427,7 +427,7 @@ export default function Index({ clients, filters, stats }) {
                     {resetPasswordState.status === 'success' && (
                         <>
                             <DialogHeader>
-                                <DialogTitle className="text-emerald-600 flex items-center gap-2">
+                                <DialogTitle className="text-green-600 flex items-center gap-2">
                                     <CheckCircle2 className="h-5 w-5" />
                                     {__('general.password_reset_success_email_sent') || 'Password reset successful and email sent! You can also copy the details below:'}
                                 </DialogTitle>

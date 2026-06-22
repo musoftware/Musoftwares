@@ -82,7 +82,7 @@ function AdjustDialog({ user, onClose }: { user: UserRow; onClose: () => void })
             <DialogContent className="max-w-md">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-                        <Coins className="h-4 w-4 text-amber-500" />
+                        <Coins className="h-4 w-4 text-yellow-600" />
                         Adjust Points — {user.name}
                     </DialogTitle>
                 </DialogHeader>
@@ -276,9 +276,9 @@ export default function Index({ users, search }: Props) {
                         <h1 className="text-xl font-semibold text-slate-900">{__('general.points_control')}</h1>
                         <p className="text-sm text-slate-500 mt-0.5">{__('general.view_and_adjust_user_points_balances_across_the_platform')}</p>
                     </div>
-                    <div className="flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5">
-                        <Coins className="h-4 w-4 text-amber-500" />
-                        <span className="text-sm font-medium text-amber-700">
+                    <div className="flex items-center gap-1.5 rounded-lg border border-yellow-200 bg-yellow-50 px-3 py-1.5">
+                        <Coins className="h-4 w-4 text-yellow-600" />
+                        <span className="text-sm font-medium text-yellow-700">
                             {users?.total ?? 0} users
                         </span>
                     </div>
@@ -346,7 +346,7 @@ export default function Index({ users, search }: Props) {
                                             <span
                                                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
                                                     user.coins_balance > 0
-                                                        ? 'bg-amber-100 text-amber-800'
+                                                        ? 'bg-yellow-100 text-yellow-800'
                                                         : user.coins_balance < 0
                                                         ? 'bg-red-100 text-red-700'
                                                         : 'bg-slate-100 text-slate-500'

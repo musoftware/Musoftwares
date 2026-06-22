@@ -91,12 +91,12 @@ export default function Index({ projects, currentTab, filters }) {
                 <>
                     <button 
                         onClick={() => openProjectSheet(project)}
-                        className="hover:text-slate-900 hover:underline text-start font-semibold cursor-pointer outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                        className="hover:text-slate-900 hover:underline text-start font-semibold cursor-pointer outline-none focus:ring-2 focus:ring-slate-900 rounded"
                     >
                         {project.project_name}
                     </button>
                     {project.invoices && project.invoices.length > 0 && (
-                        <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-slate-900 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded w-fit" title="Unpaid Invoices / Milestones">
+                        <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-slate-900 bg-red-50 border border-red-200 px-2 py-0.5 rounded w-fit" title="Unpaid Invoices / Milestones">
                             <AlertCircle className="w-3 h-3" /> {__('general.unpaid_dues')}
                         </div>
                     )}
@@ -111,7 +111,7 @@ export default function Index({ projects, currentTab, filters }) {
                     <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10 border border-slate-200">
                             <AvatarImage src={project.client.avatar_url || ''} alt={project.client.name} />
-                            <AvatarFallback className="bg-blue-50 text-slate-900">
+                            <AvatarFallback className="bg-slate-50 text-slate-900">
                                 <User className="h-5 w-5" />
                             </AvatarFallback>
                         </Avatar>

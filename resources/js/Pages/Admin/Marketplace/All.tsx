@@ -58,7 +58,7 @@ function getStatusBadge(status: string) {
             );
         case 'draft':
             return (
-                <Badge className="bg-amber-50 text-amber-700 border border-amber-200 font-medium capitalize"><Clock className="h-3 w-3 me-1" />{__('admin.pending')}</Badge>
+                <Badge className="bg-yellow-50 text-yellow-700 border border-yellow-200 font-medium capitalize"><Clock className="h-3 w-3 me-1" />{__('admin.pending')}</Badge>
             );
         case 'suspended':
             return (
@@ -432,7 +432,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                         <div className="flex items-center gap-1.5 mt-0.5">
                                                             <span className="text-xs text-slate-400 font-mono">#{service.id}</span>
                                                             {service.is_featured && (
-                                                                <Badge className="text-[10px] px-1 py-0 h-4 bg-amber-50 text-amber-600 border border-amber-200 font-medium">
+                                                                <Badge className="text-[10px] px-1 py-0 h-4 bg-yellow-50 text-yellow-600 border border-yellow-200 font-medium">
                                                                     <Star className="h-2.5 w-2.5 me-0.5 fill-current" />{__('admin.featured')}</Badge>
                                                             )}
                                                         </div>
@@ -482,7 +482,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                         {service.orders_count ?? 0}
                                                     </span>
                                                     <span className="text-xs text-slate-400 flex items-center gap-1">
-                                                        <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                                                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                                                         {service.avg_rating ?? '0.0'} ({service.review_count ?? 0})
                                                     </span>
                                                 </div>
@@ -533,7 +533,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                             className="gap-2 cursor-pointer"
                                                         >
                                                             {service.is_featured ? (
-                                                                <><StarOff className="h-4 w-4 text-amber-500" /> {__('admin.unfeature')}</>
+                                                                <><StarOff className="h-4 w-4 text-yellow-600" /> {__('admin.unfeature')}</>
                                                             ) : (
                                                                 <><Star className="h-4 w-4" /> {__('admin.feature')}</>
                                                             )}
@@ -562,7 +562,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                         {service.status === 'active' && (
                                                             <DropdownMenuItem
                                                                 onClick={() => openConfirm('suspend', service)}
-                                                                className="gap-2 cursor-pointer text-amber-700 focus:text-amber-700 focus:bg-amber-50"
+                                                                className="gap-2 cursor-pointer text-yellow-700 focus:text-yellow-700 focus:bg-yellow-50"
                                                             ><Ban className="h-4 w-4" /> {__('admin.suspend')}</DropdownMenuItem>
                                                         )}
 

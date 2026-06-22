@@ -63,7 +63,7 @@ export default function Create({ client }: Props) {
                     <aside className="xl:col-span-3 space-y-4">
                         <Card>
                             <CardContent className="p-4 flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+                                <div className="h-10 w-10 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center shrink-0">
                                     <Coins className="h-5 w-5" />
                                 </div>
                                 <div className="min-w-0">

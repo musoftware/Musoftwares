@@ -49,7 +49,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                 {/* Header Section */}
                 <div className="p-6 sm:p-8 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between">
                     <div className="flex items-center gap-5">
-                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-3xl shadow-inner flex-shrink-0">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-slate-700 flex items-center justify-center text-white font-bold text-3xl shadow-inner flex-shrink-0">
                             {worker.person_name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '??'}
                         </div>
                         <div>
@@ -160,20 +160,20 @@ export default function LegacyCoWorkerShow({ worker }) {
                             <div className="space-y-4">
                                 {(worker.facebook || worker.linked_in) && (
                                     <div className="flex items-start gap-3">
-                                        <div className="p-2 bg-blue-50 text-blue-600 rounded-lg flex-shrink-0">
+                                        <div className="p-2 bg-slate-50 text-slate-900 rounded-lg flex-shrink-0">
                                             <ExternalLink className="w-5 h-5" />
                                         </div>
                                         <div className="space-y-2">
                                             <p className="text-xs font-medium text-slate-500 mb-0.5">{__('general.social_profiles')}</p>
                                             {worker.facebook && (
                                                 <div>
-                                                    <a href={worker.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-medium hover:underline inline-flex items-center gap-1">{__('general.facebook_profile')}<ExternalLink className="w-3.5 h-3.5" />
+                                                    <a href={worker.facebook} target="_blank" rel="noopener noreferrer" className="text-slate-900 font-medium hover:underline inline-flex items-center gap-1">{__('general.facebook_profile')}<ExternalLink className="w-3.5 h-3.5" />
                                                     </a>
                                                 </div>
                                             )}
                                             {worker.linked_in && (
                                                 <div>
-                                                    <a href={worker.linked_in} target="_blank" rel="noopener noreferrer" className="text-sky-700 font-medium hover:underline inline-flex items-center gap-1">{__('general.linkedin_profile')}<ExternalLink className="w-3.5 h-3.5" />
+                                                    <a href={worker.linked_in} target="_blank" rel="noopener noreferrer" className="text-slate-900 font-medium hover:underline inline-flex items-center gap-1">{__('general.linkedin_profile')}<ExternalLink className="w-3.5 h-3.5" />
                                                     </a>
                                                 </div>
                                             )}
@@ -183,7 +183,7 @@ export default function LegacyCoWorkerShow({ worker }) {
 
                                 {(worker.time_from || worker.time_to) && (
                                     <div className="flex items-start gap-3">
-                                        <div className="p-2 bg-amber-50 text-amber-600 rounded-lg flex-shrink-0">
+                                        <div className="p-2 bg-yellow-50 text-yellow-600 rounded-lg flex-shrink-0">
                                             <Clock className="w-5 h-5" />
                                         </div>
                                         <div>
@@ -204,7 +204,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                             <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4">{__('general.technical_skills_tags')}</h2>
                             <div className="flex flex-wrap gap-2">
                                 {worker.tech_tags.map(t => (
-                                    <span key={t.id} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                    <span key={t.id} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-green-50 text-green-700 border border-green-100">
                                         <Tag className="w-4 h-4" /> {t.name}
                                     </span>
                                 ))}

@@ -32,7 +32,7 @@ export default function Reports() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between space-y-0 pb-2">
                             <p className="text-sm font-medium text-slate-500">{__('general.total_users')}</p>
-                            <div className="p-2 bg-indigo-50 rounded-xl">
+                            <div className="p-2 bg-slate-50 rounded-xl">
                                 <Users className="h-4 w-4 text-slate-900" />
                             </div>
                         </div>
@@ -46,7 +46,7 @@ export default function Reports() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between space-y-0 pb-2">
                             <p className="text-sm font-medium text-slate-500">{__('general.total_projects')}</p>
-                            <div className="p-2 bg-indigo-50 rounded-xl">
+                            <div className="p-2 bg-slate-50 rounded-xl">
                                 <Briefcase className="h-4 w-4 text-slate-900" />
                             </div>
                         </div>
@@ -60,7 +60,7 @@ export default function Reports() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between space-y-0 pb-2">
                             <p className="text-sm font-medium text-slate-500">{__('general.total_invoices')}</p>
-                            <div className="p-2 bg-indigo-50 rounded-xl">
+                            <div className="p-2 bg-slate-50 rounded-xl">
                                 <FileText className="h-4 w-4 text-slate-900" />
                             </div>
                         </div>
@@ -74,7 +74,7 @@ export default function Reports() {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between space-y-0 pb-2">
                             <p className="text-sm font-medium text-slate-500">{__('general.total_transactions')}</p>
-                            <div className="p-2 bg-indigo-50 rounded-xl">
+                            <div className="p-2 bg-slate-50 rounded-xl">
                                 <Activity className="h-4 w-4 text-slate-900" />
                             </div>
                         </div>

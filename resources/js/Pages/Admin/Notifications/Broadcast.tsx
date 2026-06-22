@@ -86,7 +86,7 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                                 <Label>{__('admin.audience_type')}</Label>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div 
-                                        className={`border rounded-lg p-4 cursor-pointer transition-all ${data.audience_type === 'global' ? 'border-indigo-500 bg-indigo-50' : 'hover:border-slate-300'}`}
+                                        className={`border rounded-lg p-4 cursor-pointer transition-all ${data.audience_type === 'global' ? 'border-slate-900 bg-slate-50' : 'hover:border-slate-300'}`}
                                         onClick={() => setData('audience_type', 'global')}
                                     >
                                         <div className="font-semibold text-slate-900 mb-1 flex items-center gap-2">
@@ -98,7 +98,7 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                                         </div>
                                     </div>
                                     <div 
-                                        className={`border rounded-lg p-4 cursor-pointer transition-all ${data.audience_type === 'personal' ? 'border-indigo-500 bg-indigo-50' : 'hover:border-slate-300'}`}
+                                        className={`border rounded-lg p-4 cursor-pointer transition-all ${data.audience_type === 'personal' ? 'border-slate-900 bg-slate-50' : 'hover:border-slate-300'}`}
                                         onClick={() => setData('audience_type', 'personal')}
                                     >
                                         <div className="font-semibold text-slate-900 mb-1 flex items-center gap-2">
@@ -114,7 +114,7 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                             </div>
 
                             {data.audience_type === 'personal' && (
-                                <div className="space-y-4 border-s-2 border-indigo-200 ps-4 py-2">
+                                <div className="space-y-4 border-s-2 border-slate-200 ps-4 py-2">
                                     <Label>{__('admin.target_users')}</Label>
                                     <div className="flex gap-2">
                                         <Button 
@@ -148,7 +148,7 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                                                     <div 
                                                         key={role.id} 
                                                         onClick={() => handleRoleToggle(role.id)}
-                                                        className={`px-3 py-1.5 rounded-full border text-sm cursor-pointer transition-colors ${data.roles.includes(role.id) ? 'bg-slate-900 text-white border-indigo-600' : 'bg-white text-slate-700 hover:bg-slate-50'}`}
+                                                        className={`px-3 py-1.5 rounded-full border text-sm cursor-pointer transition-colors ${data.roles.includes(role.id) ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 hover:bg-slate-50'}`}
                                                     >
                                                         {role.name}
                                                     </div>

@@ -115,8 +115,8 @@ export default function Index({ jobs, filters }: any) {
                                     <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold leading-5 
                                         ${job.status === 'published' || job.status === 'open' ? 'bg-green-100 text-green-800' : 
                                           job.status === 'suspended' ? 'bg-red-100 text-red-800' :
-                                          job.status === 'completed' ? 'bg-blue-100 text-blue-800' :
-                                          job.status === 'in_progress' ? 'bg-indigo-100 text-indigo-800' :
+                                          job.status === 'completed' ? 'bg-slate-50 text-slate-900' :
+                                          job.status === 'in_progress' ? 'bg-slate-50 text-slate-900' :
                                           'bg-gray-100 text-gray-800'}`}>
                                         {__('freelance.' + job.status) || job.status.replace('_', ' ')}
                                     </span>
@@ -162,7 +162,7 @@ export default function Index({ jobs, filters }: any) {
                                             )}
 
                                             {(job.status === 'published' || job.status === 'open' || job.status === 'suspended') && (
-                                                <DropdownMenuItem onClick={() => setRefundConfirm({ open: true, id: job.id })} className="text-orange-600 focus:text-orange-600 focus:bg-orange-50 cursor-pointer">
+                                                <DropdownMenuItem onClick={() => setRefundConfirm({ open: true, id: job.id })} className="text-yellow-600 focus:text-yellow-600 focus:bg-yellow-50 cursor-pointer">
                                                     <RefreshCw className="me-2 h-4 w-4" />
                                                     <span>{__('freelance.force_refund')}</span>
                                                 </DropdownMenuItem>

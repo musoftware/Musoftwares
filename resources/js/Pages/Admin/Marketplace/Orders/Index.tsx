@@ -11,7 +11,7 @@ export default function Index({ orders }) {
     const getStatusBadge = (status) => {
         switch (status) {
             case 'completed': return <Badge variant="default" className="bg-green-100 text-green-800">{__('general.completed')}</Badge>;
-            case 'in_progress': return <Badge variant="secondary" className="bg-blue-100 text-blue-800">{__('general.in_progress')}</Badge>;
+            case 'in_progress': return <Badge variant="secondary" className="bg-slate-50 text-slate-900">{__('general.in_progress')}</Badge>;
             case 'disputed': return <Badge variant="destructive" className="bg-red-100 text-red-800">{__('general.disputed')}</Badge>;
             case 'cancelled': return <Badge variant="outline" className="text-gray-500 border-gray-300">{__('general.cancelled')}</Badge>;
             default: return <Badge variant="outline" className="text-gray-600">{status}</Badge>;
@@ -51,7 +51,7 @@ export default function Index({ orders }) {
                                 <td className="p-4 text-end">
                                     <Link
                                         href={`/admin/marketplace/orders/${order.id}`}
-                                        className="text-slate-900 hover:text-indigo-900 hover:underline font-medium text-sm"
+                                        className="text-slate-900 hover:text-slate-900 hover:underline font-medium text-sm"
                                     >
                                         {__('general.manage')}</Link>
                                 </td>

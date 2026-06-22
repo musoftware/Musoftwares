@@ -128,7 +128,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                         </Card>
                         <Card>
                             <CardContent className="p-4 flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-blue-100 text-slate-900 flex items-center justify-center shrink-0">
+                                <div className="h-10 w-10 rounded-full bg-slate-50 text-slate-900 flex items-center justify-center shrink-0">
                                     <TrendingUp className="h-5 w-5" />
                                 </div>
                                 <div className="min-w-0">
@@ -141,7 +141,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                         </Card>
                         <Card>
                             <CardContent className="p-4 flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+                                <div className="h-10 w-10 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center shrink-0">
                                     <Receipt className="h-5 w-5" />
                                 </div>
                                 <div className="min-w-0">
@@ -177,7 +177,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                             <span className="hidden sm:inline">{__('general.receive')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="timer-due" className="flex items-center gap-2">
-                            <Receipt className="h-4 w-4 text-orange-500" />
+                            <Receipt className="h-4 w-4 text-yellow-600" />
                             <span className="hidden sm:inline">{__('general.charge')}</span>
                         </TabsTrigger>
                         <TabsTrigger value="send" className="flex items-center gap-2">

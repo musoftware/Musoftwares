@@ -48,7 +48,7 @@ export default function Contracts({ project, contracts, currencies }) {
             {contracts.length === 0 ? (
                 <Card className="text-center p-12 bg-slate-50 border-dashed">
                     <div className="flex flex-col items-center gap-4">
-                        <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center">
                             <FileText className="h-6 w-6 text-slate-900" />
                         </div>
                         <div>
@@ -72,9 +72,9 @@ export default function Contracts({ project, contracts, currencies }) {
                                         <CardTitle className="text-base truncate">{contract.project_name}</CardTitle>
                                     </div>
                                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold
-                                        ${contract.status === 'signed' ? 'bg-emerald-100 text-slate-900' : ''}
+                                        ${contract.status === 'signed' ? 'bg-green-100 text-slate-900' : ''}
                                         ${contract.status === 'draft' ? 'bg-slate-100 text-slate-700' : ''}
-                                        ${contract.status === 'sent' ? 'bg-blue-100 text-slate-900' : ''}
+                                        ${contract.status === 'sent' ? 'bg-slate-50 text-slate-900' : ''}
                                     `}>
                                         {contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}
                                     </span>
@@ -99,7 +99,7 @@ export default function Contracts({ project, contracts, currencies }) {
                                         </span>
                                     </div>
                                     {contract.status === 'signed' && (
-                                        <div className="flex justify-between text-sm text-slate-900 bg-emerald-50 p-2 rounded">
+                                        <div className="flex justify-between text-sm text-slate-900 bg-green-50 p-2 rounded">
                                             <span>Signed by:</span>
                                             <span className="font-semibold truncate max-w-[120px]" title={contract.client_name}>
                                                 {contract.client_name}

@@ -179,23 +179,23 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                 
                 <div className="flex border-b mb-4">
                     <button 
-                        className={`px-4 py-2 font-medium text-sm ${activeTab === 'details' ? 'border-b-2 border-indigo-500 text-slate-900' : 'text-slate-500'}`}
+                        className={`px-4 py-2 font-medium text-sm ${activeTab === 'details' ? 'border-b-2 border-slate-900 text-slate-900' : 'text-slate-500'}`}
                         onClick={() => setActiveTab('details')}
                     >
                         {__('general.general_details')}</button>
                     <button 
-                        className={`px-4 py-2 font-medium text-sm ${activeTab === 'scope' ? 'border-b-2 border-indigo-500 text-slate-900' : 'text-slate-500'}`}
+                        className={`px-4 py-2 font-medium text-sm ${activeTab === 'scope' ? 'border-b-2 border-slate-900 text-slate-900' : 'text-slate-500'}`}
                         onClick={() => setActiveTab('scope')}
                     >
                         {__('general.scope_features')}</button>
                     <button 
-                        className={`px-4 py-2 font-medium text-sm ${activeTab === 'pricing' ? 'border-b-2 border-indigo-500 text-slate-900' : 'text-slate-500'}`}
+                        className={`px-4 py-2 font-medium text-sm ${activeTab === 'pricing' ? 'border-b-2 border-slate-900 text-slate-900' : 'text-slate-500'}`}
                         onClick={() => setActiveTab('pricing')}
                     >
                         {__('general.pricing_milestones')}</button>
                     {contract && (
                         <button 
-                            className={`px-4 py-2 font-medium text-sm ${activeTab === 'ai' ? 'border-b-2 border-indigo-500 text-slate-900' : 'text-slate-500'} ms-auto flex items-center gap-1`}
+                            className={`px-4 py-2 font-medium text-sm ${activeTab === 'ai' ? 'border-b-2 border-slate-900 text-slate-900' : 'text-slate-500'} ms-auto flex items-center gap-1`}
                             onClick={() => setActiveTab('ai')}
                         >
                             <Sparkles className="w-3 h-3" /> {__('general.ai_assistant')}</button>
@@ -203,15 +203,15 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                 </div>
 
                 {!contract && activeTab === 'details' && (
-                    <div className="bg-indigo-50 p-4 rounded-lg mb-6 border border-indigo-100 flex flex-col gap-3">
-                        <div className="flex items-center gap-2 text-indigo-800 font-semibold">
+                    <div className="bg-slate-50 p-4 rounded-lg mb-6 border border-slate-50 flex flex-col gap-3">
+                        <div className="flex items-center gap-2 text-slate-900 font-semibold">
                             <Sparkles className="w-5 h-5" /> Generate with AI (Recommended)
                         </div>
                         <Textarea 
                             placeholder={__('general.describe_the_project_requirements_featur')} 
                             value={aiPrompt}
                             onChange={(e) => setAiPrompt(e.target.value)}
-                            className="bg-white border-indigo-200"
+                            className="bg-white border-slate-200"
                             rows={3}
                         />
                         <Button 
@@ -399,8 +399,8 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                     )}
                     
                     {activeTab === 'ai' && contract && (
-                        <div className="bg-indigo-50 p-4 rounded-lg mb-6 border border-indigo-100 flex flex-col gap-3">
-                            <div className="flex items-center gap-2 text-indigo-800 font-semibold">
+                        <div className="bg-slate-50 p-4 rounded-lg mb-6 border border-slate-50 flex flex-col gap-3">
+                            <div className="flex items-center gap-2 text-slate-900 font-semibold">
                                 <Sparkles className="w-5 h-5" /> {__('general.refine_with_ai')}</div>
                             <p className="text-sm text-slate-900 mb-2">
                                 Describe the changes you want to make to this contract (e.g., "Add a milestone for testing", "Change the duration to 6 months and adjust pricing accordingly"). The AI will create a new version.
@@ -409,7 +409,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                 placeholder={__('general.instructions_for_ai')} 
                                 value={aiPrompt}
                                 onChange={(e) => setAiPrompt(e.target.value)}
-                                className="bg-white border-indigo-200"
+                                className="bg-white border-slate-200"
                                 rows={3}
                             />
                             <Button 
