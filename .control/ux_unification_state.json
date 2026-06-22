@@ -98,7 +98,7 @@
     {
         "id": "BP_10",
         "name": "Fix button placement in Index.tsx",
-        "status": "running",
+        "status": "done",
         "dependencies": [
             "BP_9"
         ]
@@ -106,7 +106,7 @@
     {
         "id": "BP_11",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_10"
         ]
@@ -114,7 +114,7 @@
     {
         "id": "BP_12",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_11"
         ]
@@ -122,7 +122,7 @@
     {
         "id": "BP_13",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_12"
         ]
@@ -130,7 +130,7 @@
     {
         "id": "BP_14",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_13"
         ]
@@ -138,7 +138,7 @@
     {
         "id": "BP_15",
         "name": "Fix button placement in Edit.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_14"
         ]
@@ -146,7 +146,7 @@
     {
         "id": "BP_16",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_15"
         ]
@@ -154,7 +154,7 @@
     {
         "id": "BP_17",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_16"
         ]
@@ -162,7 +162,7 @@
     {
         "id": "BP_18",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_17"
         ]
@@ -170,7 +170,7 @@
     {
         "id": "BP_19",
         "name": "Fix button placement in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_18"
         ]
@@ -178,7 +178,7 @@
     {
         "id": "BP_20",
         "name": "Fix button placement in Edit.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_19"
         ]
@@ -186,7 +186,7 @@
     {
         "id": "BP_21",
         "name": "Fix button placement in Pending.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_20"
         ]
@@ -194,7 +194,7 @@
     {
         "id": "BP_22",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_21"
         ]
@@ -202,7 +202,7 @@
     {
         "id": "BP_23",
         "name": "Fix button placement in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_22"
         ]
@@ -210,7 +210,7 @@
     {
         "id": "BP_24",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_23"
         ]
@@ -218,7 +218,7 @@
     {
         "id": "BP_25",
         "name": "Fix button placement in Create.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_24"
         ]
@@ -226,7 +226,7 @@
     {
         "id": "BP_26",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_25"
         ]
@@ -234,7 +234,7 @@
     {
         "id": "BP_27",
         "name": "Fix button placement in ContractModal.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_26"
         ]
@@ -242,7 +242,7 @@
     {
         "id": "BP_28",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_27"
         ]
@@ -250,7 +250,7 @@
     {
         "id": "BP_29",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_28"
         ]
@@ -258,7 +258,7 @@
     {
         "id": "BP_30",
         "name": "Fix button placement in Create.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_29"
         ]
@@ -266,7 +266,7 @@
     {
         "id": "BP_31",
         "name": "Fix button placement in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_30"
         ]
@@ -274,7 +274,7 @@
     {
         "id": "BP_32",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_31"
         ]
@@ -282,7 +282,7 @@
     {
         "id": "BP_33",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_32"
         ]
@@ -290,7 +290,7 @@
     {
         "id": "BP_34",
         "name": "Fix button placement in Security.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_33"
         ]
@@ -298,7 +298,7 @@
     {
         "id": "BP_35",
         "name": "Fix button placement in AsList.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_34"
         ]
@@ -306,7 +306,7 @@
     {
         "id": "BP_36",
         "name": "Fix button placement in ClientTasks.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_35"
         ]
@@ -314,7 +314,7 @@
     {
         "id": "BP_37",
         "name": "Fix button placement in TaskCalendar.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_36"
         ]
@@ -322,7 +322,7 @@
     {
         "id": "BP_38",
         "name": "Fix button placement in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_37"
         ]
@@ -330,7 +330,7 @@
     {
         "id": "BP_39",
         "name": "Fix button placement in AssignTask.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_38"
         ]
@@ -338,7 +338,7 @@
     {
         "id": "BP_40",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_39"
         ]
@@ -346,7 +346,7 @@
     {
         "id": "BP_41",
         "name": "Fix button placement in Login.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_40"
         ]
@@ -354,7 +354,7 @@
     {
         "id": "BP_42",
         "name": "Fix button placement in Appointments.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_41"
         ]
@@ -362,7 +362,7 @@
     {
         "id": "BP_43",
         "name": "Fix button placement in Checkout.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_42"
         ]
@@ -370,7 +370,7 @@
     {
         "id": "BP_44",
         "name": "Fix button placement in Exceptions.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_43"
         ]
@@ -378,7 +378,7 @@
     {
         "id": "BP_45",
         "name": "Fix button placement in Providers.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_44"
         ]
@@ -386,7 +386,7 @@
     {
         "id": "BP_46",
         "name": "Fix button placement in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_45"
         ]
@@ -394,7 +394,7 @@
     {
         "id": "BP_47",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_46"
         ]
@@ -402,7 +402,7 @@
     {
         "id": "BP_48",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_47"
         ]
@@ -410,7 +410,7 @@
     {
         "id": "BP_49",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_48"
         ]
@@ -418,7 +418,7 @@
     {
         "id": "BP_50",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_49"
         ]
@@ -426,7 +426,7 @@
     {
         "id": "BP_51",
         "name": "Fix button placement in Members.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_50"
         ]
@@ -434,7 +434,7 @@
     {
         "id": "BP_52",
         "name": "Fix button placement in Form.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_51"
         ]
@@ -442,7 +442,7 @@
     {
         "id": "BP_53",
         "name": "Fix button placement in Dashboard.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_52"
         ]
@@ -450,7 +450,7 @@
     {
         "id": "BP_54",
         "name": "Fix button placement in Create.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_53"
         ]
@@ -458,7 +458,7 @@
     {
         "id": "BP_55",
         "name": "Fix button placement in ManageCategoriesModal.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_54"
         ]
@@ -466,7 +466,7 @@
     {
         "id": "BP_56",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_55"
         ]
@@ -474,7 +474,7 @@
     {
         "id": "BP_57",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_56"
         ]
@@ -482,7 +482,7 @@
     {
         "id": "BP_58",
         "name": "Fix button placement in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_57"
         ]
@@ -490,7 +490,7 @@
     {
         "id": "BP_59",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_58"
         ]
@@ -498,7 +498,7 @@
     {
         "id": "BP_60",
         "name": "Fix button placement in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_59"
         ]
@@ -506,7 +506,7 @@
     {
         "id": "BP_61",
         "name": "Fix button placement in Login.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_60"
         ]
@@ -514,7 +514,7 @@
     {
         "id": "BP_62",
         "name": "Fix button placement in Members.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_61"
         ]
@@ -522,7 +522,7 @@
     {
         "id": "BP_63",
         "name": "Fix button placement in MyPortal.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_62"
         ]
@@ -530,7 +530,7 @@
     {
         "id": "BP_64",
         "name": "Fix button placement in Adjust.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_63"
         ]
@@ -538,7 +538,7 @@
     {
         "id": "BP_65",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_64"
         ]
@@ -546,7 +546,7 @@
     {
         "id": "BP_66",
         "name": "Fix button placement in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_65"
         ]
@@ -554,7 +554,7 @@
     {
         "id": "BP_67",
         "name": "Fix button placement in Browse.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_66"
         ]
@@ -562,7 +562,7 @@
     {
         "id": "BP_68",
         "name": "Fix button placement in Browse.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_67"
         ]
@@ -570,7 +570,7 @@
     {
         "id": "BP_69",
         "name": "Fix button placement in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_68"
         ]
@@ -578,7 +578,7 @@
     {
         "id": "BP_70",
         "name": "Fix button placement in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_69"
         ]
@@ -586,7 +586,7 @@
     {
         "id": "BP_71",
         "name": "Fix button placement in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_70"
         ]
@@ -594,7 +594,7 @@
     {
         "id": "BP_72",
         "name": "Fix button placement in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_71"
         ]
@@ -602,7 +602,7 @@
     {
         "id": "BP_73",
         "name": "Fix button placement in InvoiceShow.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_72"
         ]
@@ -610,7 +610,7 @@
     {
         "id": "BP_74",
         "name": "Fix button placement in ContractView.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_73"
         ]
@@ -618,7 +618,7 @@
     {
         "id": "BP_75",
         "name": "Fix button placement in ContractForm.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_74"
         ]
@@ -626,7 +626,7 @@
     {
         "id": "BP_76",
         "name": "Fix button placement in Create.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_75"
         ]
@@ -634,7 +634,7 @@
     {
         "id": "BP_77",
         "name": "Fix button placement in Create.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_76"
         ]
@@ -642,7 +642,7 @@
     {
         "id": "BP_78",
         "name": "Fix button placement in Edit.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_77"
         ]
@@ -650,7 +650,7 @@
     {
         "id": "BP_79",
         "name": "Fix button placement in ApiKeys.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_78"
         ]
@@ -658,7 +658,7 @@
     {
         "id": "BP_80",
         "name": "Fix button placement in Device.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_79"
         ]
@@ -666,7 +666,7 @@
     {
         "id": "BP_81",
         "name": "Fix button placement in IntegrationTester.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_80"
         ]
@@ -674,7 +674,7 @@
     {
         "id": "BP_82",
         "name": "Fix button placement in PaymentLinks.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_81"
         ]
@@ -682,7 +682,7 @@
     {
         "id": "BP_83",
         "name": "Fix button placement in Settings.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_82"
         ]
@@ -690,7 +690,7 @@
     {
         "id": "BP_84",
         "name": "Fix button placement in SmsSimulator.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_83"
         ]
@@ -698,7 +698,7 @@
     {
         "id": "BP_85",
         "name": "Fix button placement in TestMode.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_84"
         ]
@@ -706,7 +706,7 @@
     {
         "id": "BP_86",
         "name": "Fix button placement in Wallets.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_85"
         ]
@@ -714,7 +714,7 @@
     {
         "id": "BP_87",
         "name": "Fix button placement in Webhooks.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_86"
         ]
@@ -722,7 +722,7 @@
     {
         "id": "BP_88",
         "name": "Fix button placement in CampaignsWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_87"
         ]
@@ -730,7 +730,7 @@
     {
         "id": "BP_89",
         "name": "Fix button placement in InboxesWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_88"
         ]
@@ -738,7 +738,7 @@
     {
         "id": "BP_90",
         "name": "Fix button placement in LinkedInWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_89"
         ]
@@ -746,7 +746,7 @@
     {
         "id": "BP_91",
         "name": "Fix button placement in OutreachWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_90"
         ]
@@ -754,7 +754,7 @@
     {
         "id": "BP_92",
         "name": "Fix button placement in GoogleMapsRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_91"
         ]
@@ -762,7 +762,7 @@
     {
         "id": "BP_93",
         "name": "Fix button placement in ScreenshotFeedbackRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_92"
         ]
@@ -770,7 +770,7 @@
     {
         "id": "BP_94",
         "name": "Fix button placement in Subscribe.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_93"
         ]
@@ -778,7 +778,7 @@
     {
         "id": "BP_95",
         "name": "Fix button placement in AccountsWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_94"
         ]
@@ -786,7 +786,7 @@
     {
         "id": "BP_96",
         "name": "Fix button placement in AutoReplyWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_95"
         ]
@@ -794,7 +794,7 @@
     {
         "id": "BP_97",
         "name": "Fix button placement in BroadcastListsWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_96"
         ]
@@ -802,7 +802,7 @@
     {
         "id": "BP_98",
         "name": "Fix button placement in ContactsWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_97"
         ]
@@ -810,7 +810,7 @@
     {
         "id": "BP_99",
         "name": "Fix button placement in GroupsWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_98"
         ]
@@ -818,7 +818,7 @@
     {
         "id": "BP_100",
         "name": "Fix button placement in GoldSaver.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_99"
         ]
@@ -826,7 +826,7 @@
     {
         "id": "BP_101",
         "name": "Fix button placement in WithdrawInstapay.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "BP_100"
         ]
@@ -834,7 +834,7 @@
     {
         "id": "SL_102",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Cat_SL"
         ]
@@ -842,7 +842,7 @@
     {
         "id": "SL_103",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_102"
         ]
@@ -850,7 +850,7 @@
     {
         "id": "SL_104",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_103"
         ]
@@ -858,7 +858,7 @@
     {
         "id": "SL_105",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_104"
         ]
@@ -866,7 +866,7 @@
     {
         "id": "SL_106",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_105"
         ]
@@ -874,7 +874,7 @@
     {
         "id": "SL_107",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_106"
         ]
@@ -882,7 +882,7 @@
     {
         "id": "SL_108",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_107"
         ]
@@ -890,7 +890,7 @@
     {
         "id": "SL_109",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_108"
         ]
@@ -898,7 +898,7 @@
     {
         "id": "SL_110",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_109"
         ]
@@ -906,7 +906,7 @@
     {
         "id": "SL_111",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_110"
         ]
@@ -914,7 +914,7 @@
     {
         "id": "SL_112",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_111"
         ]
@@ -922,7 +922,7 @@
     {
         "id": "SL_113",
         "name": "Fix layout width in TimerDetails.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_112"
         ]
@@ -930,7 +930,7 @@
     {
         "id": "SL_114",
         "name": "Fix layout width in Pending.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_113"
         ]
@@ -938,7 +938,7 @@
     {
         "id": "SL_115",
         "name": "Fix layout width in Broadcast.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_114"
         ]
@@ -946,7 +946,7 @@
     {
         "id": "SL_116",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_115"
         ]
@@ -954,7 +954,7 @@
     {
         "id": "SL_117",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_116"
         ]
@@ -962,7 +962,7 @@
     {
         "id": "SL_118",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_117"
         ]
@@ -970,7 +970,7 @@
     {
         "id": "SL_119",
         "name": "Fix layout width in Create.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_118"
         ]
@@ -978,7 +978,7 @@
     {
         "id": "SL_120",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_119"
         ]
@@ -986,7 +986,7 @@
     {
         "id": "SL_121",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_120"
         ]
@@ -994,7 +994,7 @@
     {
         "id": "SL_122",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_121"
         ]
@@ -1002,7 +1002,7 @@
     {
         "id": "SL_123",
         "name": "Fix layout width in ContractModal.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_122"
         ]
@@ -1010,7 +1010,7 @@
     {
         "id": "SL_124",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_123"
         ]
@@ -1018,7 +1018,7 @@
     {
         "id": "SL_125",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_124"
         ]
@@ -1026,7 +1026,7 @@
     {
         "id": "SL_126",
         "name": "Fix layout width in Assign.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_125"
         ]
@@ -1034,7 +1034,7 @@
     {
         "id": "SL_127",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_126"
         ]
@@ -1042,7 +1042,7 @@
     {
         "id": "SL_128",
         "name": "Fix layout width in AsList.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_127"
         ]
@@ -1050,7 +1050,7 @@
     {
         "id": "SL_129",
         "name": "Fix layout width in ClientTasks.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_128"
         ]
@@ -1058,7 +1058,7 @@
     {
         "id": "SL_130",
         "name": "Fix layout width in TaskCalendar.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_129"
         ]
@@ -1066,7 +1066,7 @@
     {
         "id": "SL_131",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_130"
         ]
@@ -1074,7 +1074,7 @@
     {
         "id": "SL_132",
         "name": "Fix layout width in AiEstimator.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_131"
         ]
@@ -1082,7 +1082,7 @@
     {
         "id": "SL_133",
         "name": "Fix layout width in Cost.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_132"
         ]
@@ -1090,7 +1090,7 @@
     {
         "id": "SL_134",
         "name": "Fix layout width in Income.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_133"
         ]
@@ -1098,7 +1098,7 @@
     {
         "id": "SL_135",
         "name": "Fix layout width in Transfer.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_134"
         ]
@@ -1106,7 +1106,7 @@
     {
         "id": "SL_136",
         "name": "Fix layout width in AssignTask.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_135"
         ]
@@ -1114,7 +1114,7 @@
     {
         "id": "SL_137",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_136"
         ]
@@ -1122,7 +1122,7 @@
     {
         "id": "SL_138",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_137"
         ]
@@ -1130,7 +1130,7 @@
     {
         "id": "SL_139",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_138"
         ]
@@ -1138,7 +1138,7 @@
     {
         "id": "SL_140",
         "name": "Fix layout width in OnboardingWizard.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_139"
         ]
@@ -1146,7 +1146,7 @@
     {
         "id": "SL_141",
         "name": "Fix layout width in Appointments.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_140"
         ]
@@ -1154,7 +1154,7 @@
     {
         "id": "SL_142",
         "name": "Fix layout width in Checkout.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_141"
         ]
@@ -1162,7 +1162,7 @@
     {
         "id": "SL_143",
         "name": "Fix layout width in Providers.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_142"
         ]
@@ -1170,7 +1170,7 @@
     {
         "id": "SL_144",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_143"
         ]
@@ -1178,7 +1178,7 @@
     {
         "id": "SL_145",
         "name": "Fix layout width in Success.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_144"
         ]
@@ -1186,7 +1186,7 @@
     {
         "id": "SL_146",
         "name": "Fix layout width in QueueManager.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_145"
         ]
@@ -1194,7 +1194,7 @@
     {
         "id": "SL_147",
         "name": "Fix layout width in Builder.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_146"
         ]
@@ -1202,7 +1202,7 @@
     {
         "id": "SL_148",
         "name": "Fix layout width in SmartCalendar.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_147"
         ]
@@ -1210,7 +1210,7 @@
     {
         "id": "SL_149",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_148"
         ]
@@ -1218,7 +1218,7 @@
     {
         "id": "SL_150",
         "name": "Fix layout width in PaymentResult.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_149"
         ]
@@ -1226,7 +1226,7 @@
     {
         "id": "SL_151",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_150"
         ]
@@ -1234,7 +1234,7 @@
     {
         "id": "SL_152",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_151"
         ]
@@ -1242,7 +1242,7 @@
     {
         "id": "SL_153",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_152"
         ]
@@ -1250,7 +1250,7 @@
     {
         "id": "SL_154",
         "name": "Fix layout width in CrmWidgetIframe.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_153"
         ]
@@ -1258,7 +1258,7 @@
     {
         "id": "SL_155",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_154"
         ]
@@ -1266,7 +1266,7 @@
     {
         "id": "SL_156",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_155"
         ]
@@ -1274,7 +1274,7 @@
     {
         "id": "SL_157",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_156"
         ]
@@ -1282,7 +1282,7 @@
     {
         "id": "SL_158",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_157"
         ]
@@ -1290,7 +1290,7 @@
     {
         "id": "SL_159",
         "name": "Fix layout width in Login.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_158"
         ]
@@ -1298,7 +1298,7 @@
     {
         "id": "SL_160",
         "name": "Fix layout width in Members.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_159"
         ]
@@ -1306,7 +1306,7 @@
     {
         "id": "SL_161",
         "name": "Fix layout width in Form.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_160"
         ]
@@ -1314,7 +1314,7 @@
     {
         "id": "SL_162",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_161"
         ]
@@ -1322,7 +1322,7 @@
     {
         "id": "SL_163",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_162"
         ]
@@ -1330,7 +1330,7 @@
     {
         "id": "SL_164",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_163"
         ]
@@ -1338,7 +1338,7 @@
     {
         "id": "SL_165",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_164"
         ]
@@ -1346,7 +1346,7 @@
     {
         "id": "SL_166",
         "name": "Fix layout width in ClientActionModal.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_165"
         ]
@@ -1354,7 +1354,7 @@
     {
         "id": "SL_167",
         "name": "Fix layout width in Dashboard.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_166"
         ]
@@ -1362,7 +1362,7 @@
     {
         "id": "SL_168",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_167"
         ]
@@ -1370,7 +1370,7 @@
     {
         "id": "SL_169",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_168"
         ]
@@ -1378,7 +1378,7 @@
     {
         "id": "SL_170",
         "name": "Fix layout width in NotFound.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_169"
         ]
@@ -1386,7 +1386,7 @@
     {
         "id": "SL_171",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_170"
         ]
@@ -1394,7 +1394,7 @@
     {
         "id": "SL_172",
         "name": "Fix layout width in ManageCategoriesModal.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_171"
         ]
@@ -1402,7 +1402,7 @@
     {
         "id": "SL_173",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_172"
         ]
@@ -1410,7 +1410,7 @@
     {
         "id": "SL_174",
         "name": "Fix layout width in Approvals.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_173"
         ]
@@ -1418,7 +1418,7 @@
     {
         "id": "SL_175",
         "name": "Fix layout width in ReviewLeave.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_174"
         ]
@@ -1426,7 +1426,7 @@
     {
         "id": "SL_176",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_175"
         ]
@@ -1434,7 +1434,7 @@
     {
         "id": "SL_177",
         "name": "Fix layout width in CheckoutModal.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_176"
         ]
@@ -1442,7 +1442,7 @@
     {
         "id": "SL_178",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_177"
         ]
@@ -1450,7 +1450,7 @@
     {
         "id": "SL_179",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_178"
         ]
@@ -1458,7 +1458,7 @@
     {
         "id": "SL_180",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_179"
         ]
@@ -1466,7 +1466,7 @@
     {
         "id": "SL_181",
         "name": "Fix layout width in Members.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_180"
         ]
@@ -1474,7 +1474,7 @@
     {
         "id": "SL_182",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_181"
         ]
@@ -1482,7 +1482,7 @@
     {
         "id": "SL_183",
         "name": "Fix layout width in UpgradePreview.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_182"
         ]
@@ -1490,7 +1490,7 @@
     {
         "id": "SL_184",
         "name": "Fix layout width in Error.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_183"
         ]
@@ -1498,7 +1498,7 @@
     {
         "id": "SL_185",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_184"
         ]
@@ -1506,7 +1506,7 @@
     {
         "id": "SL_186",
         "name": "Fix layout width in AboutUs.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_185"
         ]
@@ -1514,7 +1514,7 @@
     {
         "id": "SL_187",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_186"
         ]
@@ -1522,7 +1522,7 @@
     {
         "id": "SL_188",
         "name": "Fix layout width in HowItWorks.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_187"
         ]
@@ -1530,7 +1530,7 @@
     {
         "id": "SL_189",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_188"
         ]
@@ -1538,7 +1538,7 @@
     {
         "id": "SL_190",
         "name": "Fix layout width in Landing.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_189"
         ]
@@ -1546,7 +1546,7 @@
     {
         "id": "SL_191",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_190"
         ]
@@ -1554,7 +1554,7 @@
     {
         "id": "SL_192",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_191"
         ]
@@ -1562,7 +1562,7 @@
     {
         "id": "SL_193",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_192"
         ]
@@ -1570,7 +1570,7 @@
     {
         "id": "SL_194",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_193"
         ]
@@ -1578,7 +1578,7 @@
     {
         "id": "SL_195",
         "name": "Fix layout width in InvoiceShow.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_194"
         ]
@@ -1586,7 +1586,7 @@
     {
         "id": "SL_196",
         "name": "Fix layout width in PaymentLinkShow.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_195"
         ]
@@ -1594,7 +1594,7 @@
     {
         "id": "SL_197",
         "name": "Fix layout width in PaymentResult.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_196"
         ]
@@ -1602,7 +1602,7 @@
     {
         "id": "SL_198",
         "name": "Fix layout width in ContractView.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_197"
         ]
@@ -1610,7 +1610,7 @@
     {
         "id": "SL_199",
         "name": "Fix layout width in Create.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_198"
         ]
@@ -1618,7 +1618,7 @@
     {
         "id": "SL_200",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_199"
         ]
@@ -1626,7 +1626,7 @@
     {
         "id": "SL_201",
         "name": "Fix layout width in Browse.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_200"
         ]
@@ -1634,7 +1634,7 @@
     {
         "id": "SL_202",
         "name": "Fix layout width in ExclusiveService.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_201"
         ]
@@ -1642,7 +1642,7 @@
     {
         "id": "SL_203",
         "name": "Fix layout width in GalleryStep.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_202"
         ]
@@ -1650,7 +1650,7 @@
     {
         "id": "SL_204",
         "name": "Fix layout width in PublishStep.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_203"
         ]
@@ -1658,7 +1658,7 @@
     {
         "id": "SL_205",
         "name": "Fix layout width in RoleAssignment.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_204"
         ]
@@ -1666,7 +1666,7 @@
     {
         "id": "SL_206",
         "name": "Fix layout width in TenantSetup.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_205"
         ]
@@ -1674,7 +1674,7 @@
     {
         "id": "SL_207",
         "name": "Fix layout width in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_206"
         ]
@@ -1682,7 +1682,7 @@
     {
         "id": "SL_208",
         "name": "Fix layout width in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_207"
         ]
@@ -1690,7 +1690,7 @@
     {
         "id": "SL_209",
         "name": "Fix layout width in InstallGuide.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_208"
         ]
@@ -1698,7 +1698,7 @@
     {
         "id": "SL_210",
         "name": "Fix layout width in Download.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_209"
         ]
@@ -1706,7 +1706,7 @@
     {
         "id": "SL_211",
         "name": "Fix layout width in ApiKeys.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_210"
         ]
@@ -1714,7 +1714,7 @@
     {
         "id": "SL_212",
         "name": "Fix layout width in Device.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_211"
         ]
@@ -1722,7 +1722,7 @@
     {
         "id": "SL_213",
         "name": "Fix layout width in Devices.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_212"
         ]
@@ -1730,7 +1730,7 @@
     {
         "id": "SL_214",
         "name": "Fix layout width in Documentation.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_213"
         ]
@@ -1738,7 +1738,7 @@
     {
         "id": "SL_215",
         "name": "Fix layout width in Install.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_214"
         ]
@@ -1746,7 +1746,7 @@
     {
         "id": "SL_216",
         "name": "Fix layout width in IntegrationTester.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_215"
         ]
@@ -1754,7 +1754,7 @@
     {
         "id": "SL_217",
         "name": "Fix layout width in PaymentLinks.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_216"
         ]
@@ -1762,7 +1762,7 @@
     {
         "id": "SL_218",
         "name": "Fix layout width in Settings.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_217"
         ]
@@ -1770,7 +1770,7 @@
     {
         "id": "SL_219",
         "name": "Fix layout width in SmsSimulator.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_218"
         ]
@@ -1778,7 +1778,7 @@
     {
         "id": "SL_220",
         "name": "Fix layout width in Verification.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_219"
         ]
@@ -1786,7 +1786,7 @@
     {
         "id": "SL_221",
         "name": "Fix layout width in VerificationSecret.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_220"
         ]
@@ -1794,7 +1794,7 @@
     {
         "id": "SL_222",
         "name": "Fix layout width in Wallets.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_221"
         ]
@@ -1802,7 +1802,7 @@
     {
         "id": "SL_223",
         "name": "Fix layout width in Webhooks.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_222"
         ]
@@ -1810,7 +1810,7 @@
     {
         "id": "SL_224",
         "name": "Fix layout width in TextPaymentGateway.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_223"
         ]
@@ -1818,7 +1818,7 @@
     {
         "id": "SL_225",
         "name": "Fix layout width in AdLibraryMonitorRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_224"
         ]
@@ -1826,7 +1826,7 @@
     {
         "id": "SL_226",
         "name": "Fix layout width in ArticleMakerRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_225"
         ]
@@ -1834,7 +1834,7 @@
     {
         "id": "SL_227",
         "name": "Fix layout width in B2BProspectorRunnerPage.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_226"
         ]
@@ -1842,7 +1842,7 @@
     {
         "id": "SL_228",
         "name": "Fix layout width in CampaignsWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_227"
         ]
@@ -1850,7 +1850,7 @@
     {
         "id": "SL_229",
         "name": "Fix layout width in InboxesWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_228"
         ]
@@ -1858,7 +1858,7 @@
     {
         "id": "SL_230",
         "name": "Fix layout width in LeadsWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_229"
         ]
@@ -1866,7 +1866,7 @@
     {
         "id": "SL_231",
         "name": "Fix layout width in OutreachWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_230"
         ]
@@ -1874,7 +1874,7 @@
     {
         "id": "SL_232",
         "name": "Fix layout width in Billing.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_231"
         ]
@@ -1882,7 +1882,7 @@
     {
         "id": "SL_233",
         "name": "Fix layout width in CompetitorTrackerRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_232"
         ]
@@ -1890,7 +1890,7 @@
     {
         "id": "SL_234",
         "name": "Fix layout width in DataFilterRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_233"
         ]
@@ -1898,7 +1898,7 @@
     {
         "id": "SL_235",
         "name": "Fix layout width in DomainIntelligenceRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_234"
         ]
@@ -1906,7 +1906,7 @@
     {
         "id": "SL_236",
         "name": "Fix layout width in Downloads.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_235"
         ]
@@ -1914,7 +1914,7 @@
     {
         "id": "SL_237",
         "name": "Fix layout width in DuplicateFinderRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_236"
         ]
@@ -1922,7 +1922,7 @@
     {
         "id": "SL_238",
         "name": "Fix layout width in EmailSenderRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_237"
         ]
@@ -1930,7 +1930,7 @@
     {
         "id": "SL_239",
         "name": "Fix layout width in ExcelMergerRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_238"
         ]
@@ -1938,7 +1938,7 @@
     {
         "id": "SL_240",
         "name": "Fix layout width in FacebookExtractorRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_239"
         ]
@@ -1946,7 +1946,7 @@
     {
         "id": "SL_241",
         "name": "Fix layout width in Runner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_240"
         ]
@@ -1954,7 +1954,7 @@
     {
         "id": "SL_242",
         "name": "Fix layout width in FbInboxSenderRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_241"
         ]
@@ -1962,7 +1962,7 @@
     {
         "id": "SL_243",
         "name": "Fix layout width in FormatExtractorRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_242"
         ]
@@ -1970,7 +1970,7 @@
     {
         "id": "SL_244",
         "name": "Fix layout width in GoogleMapsRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_243"
         ]
@@ -1978,7 +1978,7 @@
     {
         "id": "SL_245",
         "name": "Fix layout width in HarajRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_244"
         ]
@@ -1986,7 +1986,7 @@
     {
         "id": "SL_246",
         "name": "Fix layout width in HookAnalyzerRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_245"
         ]
@@ -1994,7 +1994,7 @@
     {
         "id": "SL_247",
         "name": "Fix layout width in InstagramRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_246"
         ]
@@ -2002,7 +2002,7 @@
     {
         "id": "SL_248",
         "name": "Fix layout width in MyLicenses.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_247"
         ]
@@ -2010,7 +2010,7 @@
     {
         "id": "SL_249",
         "name": "Fix layout width in ObfuscatorRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_248"
         ]
@@ -2018,7 +2018,7 @@
     {
         "id": "SL_250",
         "name": "Fix layout width in OpensooqRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_249"
         ]
@@ -2026,7 +2026,7 @@
     {
         "id": "SL_251",
         "name": "Fix layout width in PropertyFinderRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_250"
         ]
@@ -2034,7 +2034,7 @@
     {
         "id": "SL_252",
         "name": "Fix layout width in Runner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_251"
         ]
@@ -2042,7 +2042,7 @@
     {
         "id": "SL_253",
         "name": "Fix layout width in RuntimeConnect.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_252"
         ]
@@ -2050,7 +2050,7 @@
     {
         "id": "SL_254",
         "name": "Fix layout width in ScreenshotFeedbackRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_253"
         ]
@@ -2058,7 +2058,7 @@
     {
         "id": "SL_255",
         "name": "Fix layout width in LogTerminal.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_254"
         ]
@@ -2066,7 +2066,7 @@
     {
         "id": "SL_256",
         "name": "Fix layout width in ActiveProcessesWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_255"
         ]
@@ -2074,7 +2074,7 @@
     {
         "id": "SL_257",
         "name": "Fix layout width in AutomationsWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_256"
         ]
@@ -2082,7 +2082,7 @@
     {
         "id": "SL_258",
         "name": "Fix layout width in FoldersWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_257"
         ]
@@ -2090,7 +2090,7 @@
     {
         "id": "SL_259",
         "name": "Fix layout width in HistoryWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_258"
         ]
@@ -2098,7 +2098,7 @@
     {
         "id": "SL_260",
         "name": "Fix layout width in NewDownloadWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_259"
         ]
@@ -2106,7 +2106,7 @@
     {
         "id": "SL_261",
         "name": "Fix layout width in QueueWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_260"
         ]
@@ -2114,7 +2114,7 @@
     {
         "id": "SL_262",
         "name": "Fix layout width in Subscribe.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_261"
         ]
@@ -2122,7 +2122,7 @@
     {
         "id": "SL_263",
         "name": "Fix layout width in SwipeVaultRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_262"
         ]
@@ -2130,7 +2130,7 @@
     {
         "id": "SL_264",
         "name": "Fix layout width in TelegramDownloaderRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_263"
         ]
@@ -2138,7 +2138,7 @@
     {
         "id": "SL_265",
         "name": "Fix layout width in TelegramToolRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_264"
         ]
@@ -2146,7 +2146,7 @@
     {
         "id": "SL_266",
         "name": "Fix layout width in TikTokBoosterRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_265"
         ]
@@ -2154,7 +2154,7 @@
     {
         "id": "SL_267",
         "name": "Fix layout width in TikTokIntelligenceRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_266"
         ]
@@ -2162,7 +2162,7 @@
     {
         "id": "SL_268",
         "name": "Fix layout width in Tutorial.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_267"
         ]
@@ -2170,7 +2170,7 @@
     {
         "id": "SL_269",
         "name": "Fix layout width in UgcCreatorsSearchRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_268"
         ]
@@ -2178,7 +2178,7 @@
     {
         "id": "SL_270",
         "name": "Fix layout width in ViralAutopsyRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_269"
         ]
@@ -2186,7 +2186,7 @@
     {
         "id": "SL_271",
         "name": "Fix layout width in WaAiAgentRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_270"
         ]
@@ -2194,7 +2194,7 @@
     {
         "id": "SL_272",
         "name": "Fix layout width in WaFunnelEngineRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_271"
         ]
@@ -2202,7 +2202,7 @@
     {
         "id": "SL_273",
         "name": "Fix layout width in WaWarmupRunner.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_272"
         ]
@@ -2210,7 +2210,7 @@
     {
         "id": "SL_274",
         "name": "Fix layout width in AccountsWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_273"
         ]
@@ -2218,7 +2218,7 @@
     {
         "id": "SL_275",
         "name": "Fix layout width in AutoReplyWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_274"
         ]
@@ -2226,7 +2226,7 @@
     {
         "id": "SL_276",
         "name": "Fix layout width in BroadcastListsWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_275"
         ]
@@ -2234,7 +2234,7 @@
     {
         "id": "SL_277",
         "name": "Fix layout width in CampaignsListWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_276"
         ]
@@ -2242,7 +2242,7 @@
     {
         "id": "SL_278",
         "name": "Fix layout width in CampaignWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_277"
         ]
@@ -2250,7 +2250,7 @@
     {
         "id": "SL_279",
         "name": "Fix layout width in DeliverabilityWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_278"
         ]
@@ -2258,7 +2258,7 @@
     {
         "id": "SL_280",
         "name": "Fix layout width in GroupsWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_279"
         ]
@@ -2266,7 +2266,7 @@
     {
         "id": "SL_281",
         "name": "Fix layout width in MediaLibraryWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_280"
         ]
@@ -2274,7 +2274,7 @@
     {
         "id": "SL_282",
         "name": "Fix layout width in TemplatesWorkspace.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_281"
         ]
@@ -2282,7 +2282,7 @@
     {
         "id": "SL_283",
         "name": "Fix layout width in GoldSaver.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_282"
         ]
@@ -2290,7 +2290,7 @@
     {
         "id": "SL_284",
         "name": "Fix layout width in PayGuest.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_283"
         ]
@@ -2298,7 +2298,7 @@
     {
         "id": "SL_285",
         "name": "Fix layout width in PayGuestPayLink.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_284"
         ]
@@ -2306,7 +2306,7 @@
     {
         "id": "SL_286",
         "name": "Fix layout width in WithdrawInstapay.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_285"
         ]
@@ -2314,7 +2314,7 @@
     {
         "id": "SL_287",
         "name": "Fix layout width in WithdrawInstapayPayLink.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_286"
         ]
@@ -2322,7 +2322,7 @@
     {
         "id": "SL_288",
         "name": "Fix layout width in CipherIdentifier.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_287"
         ]
@@ -2330,7 +2330,7 @@
     {
         "id": "SL_289",
         "name": "Fix layout width in CoordinatesConverter.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_288"
         ]
@@ -2338,7 +2338,7 @@
     {
         "id": "SL_290",
         "name": "Fix layout width in JsObfuscator.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_289"
         ]
@@ -2346,7 +2346,7 @@
     {
         "id": "SL_291",
         "name": "Fix layout width in MultipleCountdownTimer.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_290"
         ]
@@ -2354,7 +2354,7 @@
     {
         "id": "SL_292",
         "name": "Fix layout width in Welcome.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "SL_291"
         ]
@@ -2362,7 +2362,7 @@
     {
         "id": "CT_293",
         "name": "Fix colors in AppSidebar.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Cat_CT"
         ]
@@ -2370,7 +2370,7 @@
     {
         "id": "CT_294",
         "name": "Fix colors in AdminNotesPanel.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_293"
         ]
@@ -2378,7 +2378,7 @@
     {
         "id": "CT_295",
         "name": "Fix colors in AdminSidebarLayout.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_294"
         ]
@@ -2386,7 +2386,7 @@
     {
         "id": "CT_296",
         "name": "Fix colors in BalanceReport.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_295"
         ]
@@ -2394,7 +2394,7 @@
     {
         "id": "CT_297",
         "name": "Fix colors in Costs.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_296"
         ]
@@ -2402,7 +2402,7 @@
     {
         "id": "CT_298",
         "name": "Fix colors in CostsCreate.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_297"
         ]
@@ -2410,7 +2410,7 @@
     {
         "id": "CT_299",
         "name": "Fix colors in CostsEdit.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_298"
         ]
@@ -2418,7 +2418,7 @@
     {
         "id": "CT_300",
         "name": "Fix colors in Income.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_299"
         ]
@@ -2426,7 +2426,7 @@
     {
         "id": "CT_301",
         "name": "Fix colors in View.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_300"
         ]
@@ -2434,7 +2434,7 @@
     {
         "id": "CT_302",
         "name": "Fix colors in View.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_301"
         ]
@@ -2442,7 +2442,7 @@
     {
         "id": "CT_303",
         "name": "Fix colors in View.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_302"
         ]
@@ -2450,7 +2450,7 @@
     {
         "id": "CT_304",
         "name": "Fix colors in Reports.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_303"
         ]
@@ -2458,7 +2458,7 @@
     {
         "id": "CT_305",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_304"
         ]
@@ -2466,7 +2466,7 @@
     {
         "id": "CT_306",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_305"
         ]
@@ -2474,7 +2474,7 @@
     {
         "id": "CT_307",
         "name": "Fix colors in Dashboard.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_306"
         ]
@@ -2482,7 +2482,7 @@
     {
         "id": "CT_308",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_307"
         ]
@@ -2490,7 +2490,7 @@
     {
         "id": "CT_309",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_308"
         ]
@@ -2498,7 +2498,7 @@
     {
         "id": "CT_310",
         "name": "Fix colors in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_309"
         ]
@@ -2506,7 +2506,7 @@
     {
         "id": "CT_311",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_310"
         ]
@@ -2514,7 +2514,7 @@
     {
         "id": "CT_312",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_311"
         ]
@@ -2522,7 +2522,7 @@
     {
         "id": "CT_313",
         "name": "Fix colors in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_312"
         ]
@@ -2530,7 +2530,7 @@
     {
         "id": "CT_314",
         "name": "Fix colors in Create.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_313"
         ]
@@ -2538,7 +2538,7 @@
     {
         "id": "CT_315",
         "name": "Fix colors in Edit.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_314"
         ]
@@ -2546,7 +2546,7 @@
     {
         "id": "CT_316",
         "name": "Fix colors in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_315"
         ]
@@ -2554,7 +2554,7 @@
     {
         "id": "CT_317",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_316"
         ]
@@ -2562,7 +2562,7 @@
     {
         "id": "CT_318",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_317"
         ]
@@ -2570,7 +2570,7 @@
     {
         "id": "CT_319",
         "name": "Fix colors in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_318"
         ]
@@ -2578,7 +2578,7 @@
     {
         "id": "CT_320",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_319"
         ]
@@ -2586,7 +2586,7 @@
     {
         "id": "CT_321",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_320"
         ]
@@ -2594,7 +2594,7 @@
     {
         "id": "CT_322",
         "name": "Fix colors in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_321"
         ]
@@ -2602,7 +2602,7 @@
     {
         "id": "CT_323",
         "name": "Fix colors in TimerDetails.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_322"
         ]
@@ -2610,7 +2610,7 @@
     {
         "id": "CT_324",
         "name": "Fix colors in Categories.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_323"
         ]
@@ -2618,7 +2618,7 @@
     {
         "id": "CT_325",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_324"
         ]
@@ -2626,7 +2626,7 @@
     {
         "id": "CT_326",
         "name": "Fix colors in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_325"
         ]
@@ -2634,7 +2634,7 @@
     {
         "id": "CT_327",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_326"
         ]
@@ -2642,7 +2642,7 @@
     {
         "id": "CT_328",
         "name": "Fix colors in Broadcast.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_327"
         ]
@@ -2650,7 +2650,7 @@
     {
         "id": "CT_329",
         "name": "Fix colors in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_328"
         ]
@@ -2658,7 +2658,7 @@
     {
         "id": "CT_330",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_329"
         ]
@@ -2666,7 +2666,7 @@
     {
         "id": "CT_331",
         "name": "Fix colors in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_330"
         ]
@@ -2674,7 +2674,7 @@
     {
         "id": "CT_332",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_331"
         ]
@@ -2682,7 +2682,7 @@
     {
         "id": "CT_333",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_332"
         ]
@@ -2690,7 +2690,7 @@
     {
         "id": "CT_334",
         "name": "Fix colors in ContractModal.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_333"
         ]
@@ -2698,7 +2698,7 @@
     {
         "id": "CT_335",
         "name": "Fix colors in Contracts.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_334"
         ]
@@ -2706,7 +2706,7 @@
     {
         "id": "CT_336",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_335"
         ]
@@ -2714,7 +2714,7 @@
     {
         "id": "CT_337",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_336"
         ]
@@ -2722,7 +2722,7 @@
     {
         "id": "CT_338",
         "name": "Fix colors in Create.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_337"
         ]
@@ -2730,7 +2730,7 @@
     {
         "id": "CT_339",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_338"
         ]
@@ -2738,7 +2738,7 @@
     {
         "id": "CT_340",
         "name": "Fix colors in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_339"
         ]
@@ -2746,7 +2746,7 @@
     {
         "id": "CT_341",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_340"
         ]
@@ -2754,7 +2754,7 @@
     {
         "id": "CT_342",
         "name": "Fix colors in ByUser.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_341"
         ]
@@ -2762,7 +2762,7 @@
     {
         "id": "CT_343",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_342"
         ]
@@ -2770,7 +2770,7 @@
     {
         "id": "CT_344",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_343"
         ]
@@ -2778,7 +2778,7 @@
     {
         "id": "CT_345",
         "name": "Fix colors in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_344"
         ]
@@ -2786,7 +2786,7 @@
     {
         "id": "CT_346",
         "name": "Fix colors in AsList.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_345"
         ]
@@ -2794,7 +2794,7 @@
     {
         "id": "CT_347",
         "name": "Fix colors in ClientTasks.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_346"
         ]
@@ -2802,7 +2802,7 @@
     {
         "id": "CT_348",
         "name": "Fix colors in TaskCalendar.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_347"
         ]
@@ -2810,7 +2810,7 @@
     {
         "id": "CT_349",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_348"
         ]
@@ -2818,7 +2818,7 @@
     {
         "id": "CT_350",
         "name": "Fix colors in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_349"
         ]
@@ -2826,7 +2826,7 @@
     {
         "id": "CT_351",
         "name": "Fix colors in Create.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_350"
         ]
@@ -2834,7 +2834,7 @@
     {
         "id": "CT_352",
         "name": "Fix colors in Index.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_351"
         ]
@@ -2842,7 +2842,7 @@
     {
         "id": "CT_353",
         "name": "Fix colors in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_352"
         ]
@@ -2850,7 +2850,7 @@
     {
         "id": "CT_354",
         "name": "Fix colors in Show.tsx",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "CT_353"
         ]

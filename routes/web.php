@@ -473,7 +473,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('settings', [\App\Http\Controllers\Admin\AdminSettingController::class, 'store'])->name('settings.store');
     Route::post('settings/do-update-prices', [\App\Http\Controllers\Admin\AdminSettingController::class, 'doUpdatePrices'])->name('settings.do-update-prices');
     Route::post('settings/calculate-hourly-rate', [\App\Http\Controllers\Admin\AdminSettingController::class, 'calculateHourlyRate'])->name('settings.calculate-hourly-rate');
-    Route::post('settings/recalculate-overhead-hourly-rate', [\App\Http\Controllers\Admin\AdminSettingController::class, 'recalculateOverheadHourlyRate'])->name('settings.recalculate-overhead-hourly-rate');
+
     Route::post('settings/sync-exchange-rates', [\App\Http\Controllers\Admin\AdminSettingController::class, 'syncExchangeRates'])->name('settings.sync-exchange-rates');
 
     Route::resource('language-lines', \App\Http\Controllers\Admin\AdminLanguageLineController::class)->except(['create', 'show', 'edit']);
@@ -908,6 +908,14 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::get('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
     Route::get('/invoices/{invoice}/download-pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'downloadPdf'])->name('invoices.download-pdf');
     Route::get('/invoices/{invoice}/print-pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'printPdf'])->name('invoices.print-pdf');
+
+    // ── Admin Payouts ───────────────────────
+    Route::get('/payouts', [\App\Http\Controllers\Admin\PayoutController::class, 'index'])->name('payouts.index');
+    Route::get('/payouts/create', [\App\Http\Controllers\Admin\PayoutController::class, 'create'])->name('payouts.create');
+    Route::get('/payouts/{payout}', [\App\Http\Controllers\Admin\PayoutController::class, 'show'])->name('payouts.show');
+    Route::put('/payouts/{payout}', [\App\Http\Controllers\Admin\PayoutController::class, 'update'])->name('payouts.update');
+    Route::delete('/payouts/{payout}', [\App\Http\Controllers\Admin\PayoutController::class, 'destroy'])->name('payouts.destroy');
+    Route::post('/payouts/{payout}/mark-paid', [\App\Http\Controllers\Admin\PayoutController::class, 'markPaid'])->name('payouts.mark-paid');
 
     Route::put('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'update'])->name('invoices.update');
     Route::post('/invoices/{invoice}/mark-paid', [\App\Http\Controllers\Admin\InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');

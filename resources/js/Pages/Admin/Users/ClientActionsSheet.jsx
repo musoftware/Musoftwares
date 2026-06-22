@@ -71,6 +71,12 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                                 >
                                     <FilePlus className="h-4 w-4 me-3 text-slate-500" />{__('general.new_invoice')}</Link>
                                 <Link 
+                                    href={`/admin/payouts/create?user=${client.id}`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <FilePlus className="h-4 w-4 me-3 text-slate-500" />New Payout</Link>
+                                <Link 
                                     href={`/admin/transactions/create?user=${client.id}&type=receive`} 
                                     onClick={onClose}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
