@@ -274,7 +274,7 @@ function ShowContractContent({ auth, contract, userCurrency }: any) {
                                                 <div className="space-y-4 py-4">
                                                     <div className="space-y-2">
                                                         <label className="text-sm font-medium">{__('freelance.rating')}</label>
-                                                        <select name="rating" className="flex h-10 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm" required defaultValue="5">
+                                                        <select name="rating" className="flex h-10 w-full items-center justify-end gap-4 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm" required defaultValue="5">
                                                             <option value="5">5 - {__('freelance.excellent')}</option>
                                                             <option value="4">4 - {__('freelance.good')}</option>
                                                             <option value="3">3 - {__('freelance.average')}</option>

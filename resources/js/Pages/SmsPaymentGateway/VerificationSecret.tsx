@@ -31,7 +31,7 @@ export default function VerificationSecret({ secret }: VerificationSecretProps) 
             <Head title={__('general.security_secret_text_payment_gateway')} />
 
             <div className="py-8 md:py-12">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">

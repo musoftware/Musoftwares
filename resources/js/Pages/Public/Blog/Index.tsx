@@ -58,7 +58,7 @@ export default function Index({ articles }: IndexProps) {
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
                     
                     {/* Hero Section */}
-                    <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-24">
+                    <div className="text-center max-w-7xl mx-auto mb-16 lg:mb-24">
                         <motion.div 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -163,7 +163,7 @@ export default function Index({ articles }: IndexProps) {
                             ))}
                         </div>
                     ) : (
-                        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/60 shadow-sm max-w-2xl mx-auto">
+                        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/60 shadow-sm max-w-7xl mx-auto">
                             <div className="h-20 w-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <BookOpen className="h-10 w-10 text-slate-300" />
                             </div>

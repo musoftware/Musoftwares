@@ -9,7 +9,7 @@ export default function InstallGuide() {
         <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
             <Head title={__('general.install_app')} />
 
-            <div className="max-w-md mx-auto w-full flex-1 flex flex-col p-6 mt-8 sm:mt-12 bg-white rounded-2xl shadow-sm border border-slate-100">
+            <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col p-6 mt-8 sm:mt-12 bg-white rounded-2xl shadow-sm border border-slate-100">
                 <div className="mb-8">
                     <Link href="/" className="inline-flex items-center text-slate-500 hover:text-slate-900 transition-colors">
                         <ArrowLeft className="w-5 h-5 me-2" />

@@ -51,7 +51,7 @@ export default function Create() {
                             {/* Client Selection (Async Combobox) */}
                             <div className="space-y-2">
                                 <Label className="text-slate-700 font-semibold" htmlFor="client_id">
-                                    {__('freelance.client')} <span className="text-rose-500">*</span>
+                                    {__('freelance.client')} <span className="text-slate-900">*</span>
                                 </Label>
                                 <AsyncCombobox
                                     endpoint={route('search-users')}
@@ -64,14 +64,14 @@ export default function Create() {
                                     placeholder={__('freelance.search_client_placeholder', undefined, 'Type name or email...')}
                                     className="w-full bg-white"
                                 />
-                                {errors.client_id && <p className="text-[13px] text-rose-500 font-medium">{errors.client_id}</p>}
+                                {errors.client_id && <p className="text-[13px] text-slate-900 font-medium">{errors.client_id}</p>}
                                 <p className="text-xs text-slate-500">{__('freelance.client_search_hint', undefined, 'Type to search clients by name or email.')}</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2 md:col-span-2">
                                     <Label className="text-slate-700 font-semibold" htmlFor="title">
-                                        {__('freelance.job_title')} <span className="text-rose-500">*</span>
+                                        {__('freelance.job_title')} <span className="text-slate-900">*</span>
                                     </Label>
                                     <Input
                                         id="title"
@@ -80,7 +80,7 @@ export default function Create() {
                                         placeholder={__('freelance.job_title_placeholder', undefined, 'e.g. Build an E-commerce Website')}
                                         className="h-10 transition-shadow focus-visible:ring-slate-800/20 focus-visible:border-slate-800"
                                     />
-                                    {errors.title && <p className="text-[13px] text-rose-500 font-medium">{errors.title}</p>}
+                                    {errors.title && <p className="text-[13px] text-slate-900 font-medium">{errors.title}</p>}
                                 </div>
 
                                 <div className="space-y-2">
@@ -96,7 +96,7 @@ export default function Create() {
                                         <option value="fixed">{__('freelance.fixed_price')}</option>
                                         <option value="hourly">{__('freelance.hourly_rate')}</option>
                                     </select>
-                                    {errors.type && <p className="text-[13px] text-rose-500 font-medium">{errors.type}</p>}
+                                    {errors.type && <p className="text-[13px] text-slate-900 font-medium">{errors.type}</p>}
                                 </div>
 
                                 <div className="space-y-2">
@@ -113,7 +113,7 @@ export default function Create() {
                                         placeholder="0.00"
                                         className="h-10 transition-shadow focus-visible:ring-slate-800/20 focus-visible:border-slate-800"
                                     />
-                                    {errors.budget && <p className="text-[13px] text-rose-500 font-medium">{errors.budget}</p>}
+                                    {errors.budget && <p className="text-[13px] text-slate-900 font-medium">{errors.budget}</p>}
                                 </div>
 
                                 <div className="space-y-2 md:col-span-2">
@@ -127,12 +127,12 @@ export default function Create() {
                                         placeholder={__('freelance.duration_placeholder', undefined, 'e.g. 2-4 weeks, Less than 1 month')}
                                         className="h-10 transition-shadow focus-visible:ring-slate-800/20 focus-visible:border-slate-800"
                                     />
-                                    {errors.duration && <p className="text-[13px] text-rose-500 font-medium">{errors.duration}</p>}
+                                    {errors.duration && <p className="text-[13px] text-slate-900 font-medium">{errors.duration}</p>}
                                 </div>
 
                                 <div className="space-y-2 md:col-span-2">
                                     <Label className="text-slate-700 font-semibold" htmlFor="description">
-                                        {__('freelance.job_description')} <span className="text-rose-500">*</span>
+                                        {__('freelance.job_description')} <span className="text-slate-900">*</span>
                                     </Label>
                                     <Textarea
                                         id="description"
@@ -142,7 +142,7 @@ export default function Create() {
                                         rows={6}
                                         className="resize-none transition-shadow focus-visible:ring-slate-800/20 focus-visible:border-slate-800"
                                     />
-                                    {errors.description && <p className="text-[13px] text-rose-500 font-medium">{errors.description}</p>}
+                                    {errors.description && <p className="text-[13px] text-slate-900 font-medium">{errors.description}</p>}
                                 </div>
                             </div>
 

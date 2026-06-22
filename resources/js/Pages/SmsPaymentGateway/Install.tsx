@@ -29,7 +29,7 @@ export default function Install({ androidAppUrl, macrodroidUrl, macrodroidToken 
         <AuthenticatedLayout>
             <Head title={__('admin.install_app')} />
 
-            <div className="container mx-auto p-4 md:p-6 lg:p-8 max-w-4xl space-y-6">
+            <div className="container mx-auto p-4 md:p-6 lg:p-8 max-w-7xl space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">{__('admin.install_app')}</h1>
@@ -83,7 +83,7 @@ export default function Install({ androidAppUrl, macrodroidUrl, macrodroidToken 
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-lg">{__('admin.download_apk')}</h3>
-                                        <p className="text-muted-foreground text-sm max-w-md mx-auto mt-1">
+                                        <p className="text-muted-foreground text-sm max-w-7xl mx-auto mt-1">
                                             {__('admin.download_apk_desc')}
                                         </p>
                                     </div>

@@ -48,7 +48,7 @@ export default function CrmWidgetIframe({ widget, token, flash }: { widget: any,
         <div className="min-h-screen bg-transparent p-4 sm:p-6 flex flex-col font-sans">
             <Head title={config.title || 'Contact Form'} />
             
-            <div className="w-full max-w-md mx-auto bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden">
+            <div className="w-full max-w-7xl mx-auto bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden">
                 <div 
                     className="h-2 w-full" 
                     style={{ backgroundColor: primaryColor }}

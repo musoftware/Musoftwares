@@ -29,7 +29,7 @@ interface Props {
 }
 
 const statusColor: Record<string, string> = {
-    active:   'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+    active:   'bg-slate-900/15 text-slate-900 border-emerald-500/30',
     inactive: 'bg-zinc-700/50 text-zinc-400 border-zinc-600',
     blocked:  'bg-red-500/15 text-red-400 border-red-500/30',
 };

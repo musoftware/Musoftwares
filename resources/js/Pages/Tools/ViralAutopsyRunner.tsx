@@ -189,7 +189,7 @@ export default function ViralAutopsyRunner({ tool }: any) {
                 </Badge>
             </div>
 
-            <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+            <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
 
                 {/* URL Input card */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">

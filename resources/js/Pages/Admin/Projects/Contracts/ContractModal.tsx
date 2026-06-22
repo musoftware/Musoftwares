@@ -179,23 +179,23 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                 
                 <div className="flex border-b mb-4">
                     <button 
-                        className={`px-4 py-2 font-medium text-sm ${activeTab === 'details' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'text-slate-500'}`}
+                        className={`px-4 py-2 font-medium text-sm ${activeTab === 'details' ? 'border-b-2 border-indigo-500 text-slate-900' : 'text-slate-500'}`}
                         onClick={() => setActiveTab('details')}
                     >
                         {__('general.general_details')}</button>
                     <button 
-                        className={`px-4 py-2 font-medium text-sm ${activeTab === 'scope' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'text-slate-500'}`}
+                        className={`px-4 py-2 font-medium text-sm ${activeTab === 'scope' ? 'border-b-2 border-indigo-500 text-slate-900' : 'text-slate-500'}`}
                         onClick={() => setActiveTab('scope')}
                     >
                         {__('general.scope_features')}</button>
                     <button 
-                        className={`px-4 py-2 font-medium text-sm ${activeTab === 'pricing' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'text-slate-500'}`}
+                        className={`px-4 py-2 font-medium text-sm ${activeTab === 'pricing' ? 'border-b-2 border-indigo-500 text-slate-900' : 'text-slate-500'}`}
                         onClick={() => setActiveTab('pricing')}
                     >
                         {__('general.pricing_milestones')}</button>
                     {contract && (
                         <button 
-                            className={`px-4 py-2 font-medium text-sm ${activeTab === 'ai' ? 'border-b-2 border-indigo-500 text-indigo-600' : 'text-slate-500'} ms-auto flex items-center gap-1`}
+                            className={`px-4 py-2 font-medium text-sm ${activeTab === 'ai' ? 'border-b-2 border-indigo-500 text-slate-900' : 'text-slate-500'} ms-auto flex items-center gap-1`}
                             onClick={() => setActiveTab('ai')}
                         >
                             <Sparkles className="w-3 h-3" /> {__('general.ai_assistant')}</button>
@@ -217,7 +217,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                         <Button 
                             onClick={handleGenerateAi} 
                             disabled={isGenerating} 
-                            className="self-end bg-indigo-600 hover:bg-indigo-700 text-white"
+                            className="self-end bg-slate-900 hover:bg-slate-900 text-white"
                         >
                             {isGenerating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" /> {__('general.generating')}</> : 'Generate Contract'}
                         </Button>
@@ -296,7 +296,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                     {activeTab === 'scope' && (
                         <div className="space-y-4">
                             <div>
-                                <div className="flex justify-between items-center mb-2">
+                                <div className="flex justify-end gap-4 items-center mb-2">
                                     <Label className="text-base font-semibold">Key Features / Scope of Work</Label>
                                     <Button type="button" variant="outline" size="sm" onClick={addFeature}>
                                         <Plus className="w-4 h-4 me-1" /> {__('general.add_feature')}</Button>
@@ -337,7 +337,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                     {activeTab === 'pricing' && (
                         <div className="space-y-4">
                             <div>
-                                <div className="flex justify-between items-center mb-2">
+                                <div className="flex justify-end gap-4 items-center mb-2">
                                     <Label className="text-base font-semibold">Pricing Items (Quotation)</Label>
                                     <Button type="button" variant="outline" size="sm" onClick={addPricing}>
                                         <Plus className="w-4 h-4 me-1" /> {__('general.add_item')}</Button>
@@ -388,7 +388,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                             </div>
 
                             {contract && (
-                                <div className="pt-4 border-t flex items-center justify-between">
+                                <div className="pt-4 border-t flex items-center justify-end gap-4">
                                     <div className="text-sm text-slate-600">
                                         {__('general.you_can_generate_invoices_dynamically_fr')}</div>
                                     <Button type="button" variant="outline" onClick={handleGenerateInvoice}>
@@ -402,7 +402,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                         <div className="bg-indigo-50 p-4 rounded-lg mb-6 border border-indigo-100 flex flex-col gap-3">
                             <div className="flex items-center gap-2 text-indigo-800 font-semibold">
                                 <Sparkles className="w-5 h-5" /> {__('general.refine_with_ai')}</div>
-                            <p className="text-sm text-indigo-700 mb-2">
+                            <p className="text-sm text-slate-900 mb-2">
                                 Describe the changes you want to make to this contract (e.g., "Add a milestone for testing", "Change the duration to 6 months and adjust pricing accordingly"). The AI will create a new version.
                             </p>
                             <Textarea 
@@ -415,7 +415,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                             <Button 
                                 onClick={handleGenerateAi} 
                                 disabled={isGenerating} 
-                                className="self-end bg-indigo-600 hover:bg-indigo-700 text-white"
+                                className="self-end bg-slate-900 hover:bg-slate-900 text-white"
                             >
                                 {isGenerating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" /> {__('general.processing')}</> : 'Refine Contract'}
                             </Button>

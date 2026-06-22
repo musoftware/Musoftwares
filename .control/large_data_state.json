@@ -48,19 +48,19 @@
     {
         "id": "HR2_B",
         "name": "Convert filteredProjects select to Async Search Dropdown",
-        "status": "running",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "HR2_C",
         "name": "Convert products select to Async Search Dropdown",
-        "status": "pending",
+        "status": "done",
         "dependencies": []
     },
     {
         "id": "Phase2",
         "name": "Phase 2: Client Dropdowns",
-        "status": "pending",
+        "status": "running",
         "dependencies": [
             "HR1_B",
             "HR2_A",

@@ -74,7 +74,7 @@ export default function Show({ contract }: any) {
                                 <p className="text-gray-500 text-sm mt-1">
                                     {__('freelance.linked_to_job', undefined, 'Linked to Job:')}{' '}
                                     {contract.job ? (
-                                        <Link href={route('admin.freelance.jobs.show', contract.job.id)} className="text-blue-600 hover:underline">
+                                        <Link href={route('admin.freelance.jobs.show', contract.job.id)} className="text-slate-900 hover:underline">
                                             {contract.job.title}
                                         </Link>
                                     ) : __('freelance.job_deleted', undefined, 'Deleted')}
@@ -88,7 +88,7 @@ export default function Show({ contract }: any) {
                         <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50 p-4 rounded-md mb-6">
                             <div>
                                 <span className="text-gray-500 block mb-1">{__('freelance.contract_amount', undefined, 'Contract Amount')}</span>
-                                <span className="font-semibold text-blue-600 text-lg">{formatCurrency(contract.amount, contract.currency || contract.job?.currency)}</span>
+                                <span className="font-semibold text-slate-900 text-lg">{formatCurrency(contract.amount, contract.currency || contract.job?.currency)}</span>
                                 <div className="text-xs text-gray-500 mt-1">({contract.contract_points} pts)</div>
                             </div>
                             <div>
@@ -137,7 +137,7 @@ export default function Show({ contract }: any) {
                                     variant="outline"
                                     onClick={() => resolveDispute('refund_client')}
                                 >
-                                    <ArrowLeft className="h-4 w-4 me-2 text-blue-600" />
+                                    <ArrowLeft className="h-4 w-4 me-2 text-slate-900" />
                                     {__('freelance.refund_100_client', undefined, 'Refund 100% to Client')}
                                 </Button>
                                 
@@ -146,7 +146,7 @@ export default function Show({ contract }: any) {
                                     variant="outline"
                                     onClick={() => resolveDispute('split')}
                                 >
-                                    <ArrowRightLeft className="h-4 w-4 me-2 text-purple-600" />
+                                    <ArrowRightLeft className="h-4 w-4 me-2 text-slate-900" />
                                     {__('freelance.split_50_50', undefined, 'Split 50/50 Between Both')}
                                 </Button>
                                 
@@ -171,7 +171,7 @@ export default function Show({ contract }: any) {
                             <span className="text-xs text-gray-500 uppercase font-bold tracking-wider mb-2 block">{__('freelance.client')}</span>
                             {contract.client ? (
                                 <div className="flex items-center space-x-3">
-                                    <div className="bg-blue-100 text-blue-700 h-10 w-10 flex items-center justify-center rounded-full font-bold">
+                                    <div className="bg-blue-100 text-slate-900 h-10 w-10 flex items-center justify-center rounded-full font-bold">
                                         {contract.client.name.charAt(0)}
                                     </div>
                                     <div>

@@ -25,7 +25,7 @@ export default function Error({ status }: { status: number }) {
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-12 sm:px-6 lg:px-8">
             <Head title={displayTitle} />
-            <div className="mx-auto w-full max-w-md text-center">
+            <div className="mx-auto w-full max-w-7xl text-center">
                 <h1 className="text-9xl font-extrabold text-indigo-600">
                     {status}
                 </h1>

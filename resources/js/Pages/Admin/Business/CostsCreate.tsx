@@ -55,7 +55,7 @@ export default function CostsCreate() {
                 <Card className="border-none shadow-sm shadow-slate-200/50">
                     <CardHeader className="pb-4 border-b border-slate-100 bg-slate-50/50 rounded-t-xl">
                         <div className="flex items-center gap-3">
-                            <div className="p-2.5 bg-rose-100 text-rose-600 rounded-xl shadow-sm">
+                            <div className="p-2.5 bg-rose-100 text-slate-900 rounded-xl shadow-sm">
                                 <Receipt className="w-5 h-5" />
                             </div>
                             <div>
@@ -77,7 +77,7 @@ export default function CostsCreate() {
                                 <div className="space-y-2">
                                     <Label className="text-slate-700 font-semibold flex items-center gap-2">
                                         <DollarSign className="w-4 h-4 text-slate-400" />
-                                        {__('general.amount') || "Amount"} <span className="text-rose-500">*</span>
+                                        {__('general.amount') || "Amount"} <span className="text-slate-900">*</span>
                                     </Label>
                                     <Input
                                         type="number"
@@ -89,14 +89,14 @@ export default function CostsCreate() {
                                         className="h-11 font-mono text-base bg-white"
                                         required
                                     />
-                                    {errors.amount && <p className="text-xs text-rose-500 mt-1">{errors.amount}</p>}
+                                    {errors.amount && <p className="text-xs text-slate-900 mt-1">{errors.amount}</p>}
                                 </div>
 
                                 {/* Currency */}
                                 <div className="space-y-2">
                                     <Label className="text-slate-700 font-semibold flex items-center gap-2">
                                         <DollarSign className="w-4 h-4 text-slate-400" />
-                                        {__('general.currency') || "Currency"} <span className="text-rose-500">*</span>
+                                        {__('general.currency') || "Currency"} <span className="text-slate-900">*</span>
                                     </Label>
                                     <PremiumCombobox
                                         value={data.currency_id}
@@ -107,14 +107,14 @@ export default function CostsCreate() {
                                         }))}
                                         placeholder={__('general.select_currency') || "Select Currency..."}
                                     />
-                                    {errors.currency_id && <p className="text-xs text-rose-500 mt-1">{errors.currency_id}</p>}
+                                    {errors.currency_id && <p className="text-xs text-slate-900 mt-1">{errors.currency_id}</p>}
                                 </div>
 
                                 {/* Reason */}
                                 <div className="space-y-2 md:col-span-2">
                                     <Label className="text-slate-700 font-semibold flex items-center gap-2">
                                         <FileText className="w-4 h-4 text-slate-400" />
-                                        {__('general.reason') || "Reason / Description"} <span className="text-rose-500">*</span>
+                                        {__('general.reason') || "Reason / Description"} <span className="text-slate-900">*</span>
                                     </Label>
                                     <Input
                                         value={data.reason}
@@ -123,7 +123,7 @@ export default function CostsCreate() {
                                         className="h-11 bg-white"
                                         required
                                     />
-                                    {errors.reason && <p className="text-xs text-rose-500 mt-1">{errors.reason}</p>}
+                                    {errors.reason && <p className="text-xs text-slate-900 mt-1">{errors.reason}</p>}
                                 </div>
 
                                 {/* Date */}
@@ -138,7 +138,7 @@ export default function CostsCreate() {
                                         onChange={(e) => setData('created_at', e.target.value)}
                                         className="h-11 bg-white"
                                     />
-                                    {errors.created_at && <p className="text-xs text-rose-500 mt-1">{errors.created_at}</p>}
+                                    {errors.created_at && <p className="text-xs text-slate-900 mt-1">{errors.created_at}</p>}
                                 </div>
 
                                 {/* Spacer for layout on large screens */}
@@ -162,7 +162,7 @@ export default function CostsCreate() {
                                                 options={users}
                                                 placeholder={__('admin.search_client') || "Search Client..."}
                                             />
-                                            {errors.user_id && <p className="text-xs text-rose-500 mt-1">{errors.user_id}</p>}
+                                            {errors.user_id && <p className="text-xs text-slate-900 mt-1">{errors.user_id}</p>}
                                         </div>
 
                                         {/* Project */}
@@ -177,7 +177,7 @@ export default function CostsCreate() {
                                                 options={projects}
                                                 placeholder={__('admin.search_project') || "Search Project..."}
                                             />
-                                            {errors.project_id && <p className="text-xs text-rose-500 mt-1">{errors.project_id}</p>}
+                                            {errors.project_id && <p className="text-xs text-slate-900 mt-1">{errors.project_id}</p>}
                                         </div>
                                     </div>
                                 </div>
@@ -192,7 +192,7 @@ export default function CostsCreate() {
                             >
                                 {__('general.cancel') || "Cancel"}
                             </Button>
-                            <Button type="submit" disabled={processing} className="bg-rose-600 hover:bg-rose-700 text-white min-w-[120px]">
+                            <Button type="submit" disabled={processing} className="bg-slate-900 hover:bg-slate-900 text-white min-w-[120px]">
                                 {processing ? (
                                     <>
                                         <Loader2 className="me-2 h-4 w-4 animate-spin" />

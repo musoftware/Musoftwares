@@ -55,7 +55,7 @@ export default function Webhooks({ webhook }: WebhooksProps) {
             <Head title={__('general.webhooks_payment_gateway')} />
 
             <div className="py-8 md:py-12">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
                     {/* Header Actions */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -100,7 +100,7 @@ export default function Webhooks({ webhook }: WebhooksProps) {
                                     <p className="text-xs text-slate-500">{__('general.if_left_blank_during_creation_a_secure_random_string_will_be_generated_automatically')}</p>
                                 </div>
                             </CardContent>
-                            <CardFooter className="flex justify-between border-t p-4 bg-slate-50">
+                            <CardFooter className="flex justify-end gap-4 border-t p-4 bg-slate-50">
                                 {webhook ? (
                                     <Button type="button" variant="destructive" onClick={handleDelete} className="bg-rose-600 hover:bg-rose-700 text-white">
                                         <Trash2 className="w-4 h-4 me-2" />{__('general.remove_webhook')}</Button>

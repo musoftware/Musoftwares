@@ -35,7 +35,7 @@ export default function HowItWorks() {
                 description={__('freelance.how_it_works_desc', undefined, 'Learn how ArabiJobs Freelance connects top talent with great businesses.')}
             />
 
-            <div className="mx-auto max-w-3xl text-center pb-16">
+            <div className="mx-auto max-w-7xl text-center pb-16">
                 <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
                     {__('freelance.how_it_works_heading', undefined, 'How ArabiJobs Works')}
                 </h1>
@@ -44,7 +44,7 @@ export default function HowItWorks() {
                 </p>
             </div>
 
-            <div className="mx-auto max-w-5xl mt-8">
+            <div className="mx-auto max-w-7xl mt-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
                     {steps.map((step, index) => (
                         <div key={index} className="flex gap-6">

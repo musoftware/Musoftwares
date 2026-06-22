@@ -130,7 +130,7 @@ export default function Show({ sequence }) {
                 </div>
             </div>
 
-            <div className="max-w-3xl mx-auto py-8">
+            <div className="max-w-7xl mx-auto py-8">
                 {/* Trigger Node */}
                 <div className="flex flex-col items-center mb-8">
                     <div className="bg-gray-900 text-white px-6 py-3 rounded-full font-medium shadow-lg flex items-center">

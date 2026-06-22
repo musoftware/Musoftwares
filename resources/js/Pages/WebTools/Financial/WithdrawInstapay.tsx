@@ -63,14 +63,14 @@ export default function WithdrawInstapay({
 
     return (
         <WebToolsLayout title={__('general.instapay_vodafone_cash')} activeNav="explore">
-            <div className="max-w-5xl mx-auto py-12 px-4 sm:px-6">
+            <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6">
                 <div className="mb-8 text-center">
                     <div className="inline-flex items-center justify-center p-3 bg-purple-100 rounded-2xl text-purple-600 mb-4">
                         <Send className="w-8 h-8" />
                     </div>
                     <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
                         {__('general.instapay_vodafone_cash')}</h1>
-                    <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                    <p className="text-lg text-slate-600 max-w-7xl mx-auto">
                         {isGuest 
                             ? "Enter your details to create an account and receive login credentials on WhatsApp. Then log in to complete payment."
                             : "Calculate transfer fees and process payments between InstaPay and mobile wallets."
@@ -79,7 +79,7 @@ export default function WithdrawInstapay({
                 </div>
 
                 {isGuest ? (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
                         <div className="md:col-span-2">
                             <Card className="border-slate-200 shadow-sm border-t-4 border-t-purple-500 overflow-hidden">
                                 <div className="bg-purple-50/50 p-6 border-b border-slate-100 flex items-start gap-4">
@@ -222,7 +222,7 @@ export default function WithdrawInstapay({
                         </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
                         <Card className="border-slate-200 shadow-sm">
                             <CardHeader className="bg-slate-50 border-b border-slate-100 pb-4">
                                 <CardTitle className="text-lg flex items-center gap-2">

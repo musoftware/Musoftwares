@@ -350,7 +350,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
             </div>
 
             {/* Main Content Area */}
-            <main className="flex-1 max-w-6xl w-full mx-auto p-8">
+            <main className="flex-1 max-w-7xl w-full mx-auto p-8">
                 
                 {/* Dashboard Workspace */}
                 {activeTab === 'dashboard' && (

@@ -607,7 +607,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
 
                     {/* ══ TAB: CAMPAIGNS ══ */}
                     {activeTab === 'campaigns' && (
-                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300 max-w-5xl mx-auto">
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300 max-w-7xl mx-auto">
                             {/* Header */}
                             <div className="flex items-center justify-between">
                                 <div>
@@ -628,7 +628,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                         <MapPin className="w-7 h-7 text-emerald-600" />
                                     </div>
                                     <h3 className="text-sm font-bold text-slate-900">{__('general.no_campaigns_yet')}</h3>
-                                    <p className="text-xs text-slate-500 mt-1.5 max-w-xs mx-auto">{__('general.create_your_first_campaign_to_start_extracting_businesses_from_google_maps')}</p>
+                                    <p className="text-xs text-slate-500 mt-1.5 max-w-7xl mx-auto">{__('general.create_your_first_campaign_to_start_extracting_businesses_from_google_maps')}</p>
                                     <Button
                                         onClick={() => setShowNewModal(true)}
                                         className="mt-6"
@@ -690,7 +690,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                                     </div>
 
                                                     {/* Actions */}
-                                                    <div className="flex items-center justify-between border-t border-slate-100 pt-3">
+                                                    <div className="flex items-center justify-end gap-4 border-t border-slate-100 pt-3">
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
@@ -742,7 +742,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
 
                     {/* ══ TAB: RESULTS ══ */}
                     {activeTab === 'results' && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 max-w-6xl mx-auto">
+                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 max-w-7xl mx-auto">
                             {/* Header */}
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div>
@@ -885,7 +885,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
 
                                     {/* Pagination */}
                                     {totalResults > resultsLimit && (
-                                        <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between">
+                                        <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-end gap-4">
                                             <span className="text-xs text-slate-500">
                                                 Showing {resultsOffset + 1}–{Math.min(resultsOffset + resultsLimit, totalResults)} of {totalResults.toLocaleString()}
                                             </span>

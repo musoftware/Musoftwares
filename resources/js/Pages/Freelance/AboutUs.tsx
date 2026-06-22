@@ -27,7 +27,7 @@ export default function AboutUs() {
                 description={__('freelance.about_us_desc', undefined, 'Learn more about ArabiJobs and our mission to connect professionals.')}
             />
 
-            <div className="mx-auto max-w-3xl text-center pb-16">
+            <div className="mx-auto max-w-7xl text-center pb-16">
                 <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
                     {__('freelance.about_us_heading', undefined, 'About ArabiJobs')}
                 </h1>
@@ -36,16 +36,16 @@ export default function AboutUs() {
                 </p>
             </div>
 
-            <div className="mx-auto max-w-4xl mt-8 mb-24">
+            <div className="mx-auto max-w-7xl mt-8 mb-24">
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 sm:p-12 text-center">
                     <h2 className="text-2xl font-bold text-slate-900 mb-4">{__('freelance.our_mission', undefined, 'Our Mission')}</h2>
-                    <p className="text-slate-600 leading-relaxed max-w-2xl mx-auto">
+                    <p className="text-slate-600 leading-relaxed max-w-7xl mx-auto">
                         {__('freelance.mission_statement', undefined, 'ArabiJobs was founded with a single goal: to empower individuals to build their careers on their own terms, while providing businesses with seamless access to world-class talent.')}
                     </p>
                 </div>
             </div>
 
-            <div className="mx-auto max-w-3xl mt-16">
+            <div className="mx-auto max-w-7xl mt-16">
                 <h2 className="text-3xl font-bold tracking-tight text-slate-900 text-center mb-10">
                     {__('freelance.frequently_asked_questions', undefined, 'Frequently Asked Questions')}
                 </h2>

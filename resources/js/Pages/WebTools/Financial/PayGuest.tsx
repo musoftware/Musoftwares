@@ -36,14 +36,14 @@ export default function PayGuest({ payGuestCurrencies = [] }: PayGuestProps) {
 
     return (
         <WebToolsLayout title={__('general.pay_as_guest')} activeNav="explore">
-            <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6">
+            <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6">
                 <div className="mb-8 text-center">
                     <div className="inline-flex items-center justify-center p-3 bg-indigo-100 rounded-2xl text-indigo-600 mb-4">
                         <CreditCard className="w-8 h-8" />
                     </div>
                     <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
                         {__('general.pay_as_guest')}</h1>
-                    <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                    <p className="text-lg text-slate-600 max-w-7xl mx-auto">
                         {__('general.create_an_account_instantly_and_receive')}</p>
                 </div>
 

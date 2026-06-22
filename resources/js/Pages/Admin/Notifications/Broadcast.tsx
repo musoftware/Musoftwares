@@ -68,11 +68,11 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
         <AdminSidebarLayout>
             <Head title={__('admin.broadcast_notification')} />
 
-            <div className="max-w-4xl mx-auto py-8 space-y-6">
+            <div className="max-w-7xl mx-auto py-8 space-y-6">
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <Send className="w-5 h-5 text-indigo-500" />
+                            <Send className="w-5 h-5 text-slate-900" />
                             {__('admin.broadcast_notification')}
                         </CardTitle>
                         <CardDescription>
@@ -148,7 +148,7 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                                                     <div 
                                                         key={role.id} 
                                                         onClick={() => handleRoleToggle(role.id)}
-                                                        className={`px-3 py-1.5 rounded-full border text-sm cursor-pointer transition-colors ${data.roles.includes(role.id) ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-700 hover:bg-slate-50'}`}
+                                                        className={`px-3 py-1.5 rounded-full border text-sm cursor-pointer transition-colors ${data.roles.includes(role.id) ? 'bg-slate-900 text-white border-indigo-600' : 'bg-white text-slate-700 hover:bg-slate-50'}`}
                                                     >
                                                         {role.name}
                                                     </div>

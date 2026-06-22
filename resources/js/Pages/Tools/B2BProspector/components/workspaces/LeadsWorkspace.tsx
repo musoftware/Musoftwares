@@ -113,7 +113,7 @@ export function LeadsWorkspace(props: LeadsWorkspaceProps) {
                 <div className="py-20 text-center bg-white border border-slate-200 rounded-2xl">
                     <MailQuestion className="w-8 h-8 text-slate-300 mx-auto mb-3" />
                     <h3 className="text-sm font-bold text-slate-900">{__('general.no_matching_leads_found')}</h3>
-                    <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">{__('general.verify_that_you_have_launched_an_active_lead_finder_campaign_or_try_clearing_search_queries')}</p>
+                    <p className="text-xs text-slate-500 mt-1 max-w-7xl mx-auto">{__('general.verify_that_you_have_launched_an_active_lead_finder_campaign_or_try_clearing_search_queries')}</p>
                 </div>
             ) : (
                 <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">

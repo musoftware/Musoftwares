@@ -44,6 +44,9 @@ export function AsyncAutocomplete({
     const [items, setItems] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedName, setSelectedName] = useState('');
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     useEffect(() => {
         if (initialItem && !selectedName && (!value || String(value) === String(initialItem.id))) {
@@ -54,7 +57,11 @@ export function AsyncAutocomplete({
     }, [initialItem, value]);
 
     useEffect(() => {
-        const handler = setTimeout(() => setDebouncedSearch(search), 300);
+        const handler = setTimeout(() => {
+            setDebouncedSearch(search);
+            setPage(1);
+            setHasMore(true);
+        }, 300);
         return () => clearTimeout(handler);
     }, [search]);
 
@@ -62,21 +69,52 @@ export function AsyncAutocomplete({
         if (!open) return;
 
         let active = true;
-        setIsLoading(true);
+        if (page === 1) {
+            setIsLoading(true);
+        } else {
+            setIsLoadingMore(true);
+        }
 
         axios.get(searchEndpoint, {
-            params: { q: debouncedSearch, ...extraParams }
+            params: { q: debouncedSearch, page, ...extraParams }
         })
         .then(response => {
-            if (active) setItems(response.data?.data || response.data || []);
+            if (!active) return;
+            const resData = response.data?.data;
+            const isPaginated = resData !== undefined;
+            const newItems = isPaginated ? resData : (response.data || []);
+            
+            if (page === 1) {
+                setItems(newItems);
+            } else {
+                setItems(prev => [...prev, ...newItems]);
+            }
+
+            if (isPaginated) {
+                setHasMore(response.data.current_page < response.data.last_page);
+            } else {
+                setHasMore(false);
+            }
         })
         .catch(err => console.error('Error fetching items:', err))
         .finally(() => {
-            if (active) setIsLoading(false);
+            if (active) {
+                setIsLoading(false);
+                setIsLoadingMore(false);
+            }
         });
 
         return () => { active = false; };
-    }, [debouncedSearch, open, searchEndpoint, JSON.stringify(extraParams)]);
+    }, [debouncedSearch, open, page, searchEndpoint, JSON.stringify(extraParams)]);
+
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const target = e.currentTarget;
+        if (target.scrollHeight - target.scrollTop <= target.clientHeight + 20) {
+            if (hasMore && !isLoading && !isLoadingMore) {
+                setPage(p => p + 1);
+            }
+        }
+    };
 
     const displayName = (item: any) => getDisplayName ? getDisplayName(item) : item.name;
 
@@ -106,7 +144,7 @@ export function AsyncAutocomplete({
                             onValueChange={setSearch}
                             className="text-slate-900 border-none outline-none focus:ring-0"
                         />
-                        <CommandList className="max-h-60 overflow-y-auto">
+                        <CommandList className="max-h-60 overflow-y-auto" onScroll={handleScroll}>
                             {isLoading && (
                                 <div className="flex items-center justify-center p-4 text-xs text-slate-500">
                                     <Loader2 className="h-4 w-4 animate-spin me-2" /> Searching...
@@ -142,6 +180,11 @@ export function AsyncAutocomplete({
                                             )}
                                         </CommandItem>
                                     ))}
+                                    {isLoadingMore && (
+                                        <CommandItem disabled className="justify-center text-xs text-slate-500 py-3">
+                                            <Loader2 className="h-4 w-4 animate-spin me-2" /> Loading more...
+                                        </CommandItem>
+                                    )}
                                 </CommandGroup>
                             )}
                         </CommandList>

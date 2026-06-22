@@ -171,7 +171,7 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                 </Badge>
             </div>
 
-            <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+            <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
 
                 {tab === 'discover' && (
                     <>
@@ -259,7 +259,7 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                             <div className="py-24 text-center border border-dashed border-slate-800 rounded-2xl">
                                 <Flame className="w-10 h-10 text-slate-700 mx-auto mb-4" />
                                 <h3 className="text-sm font-bold text-slate-400">{__('general.find_viral_creators_by_niche')}</h3>
-                                <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">{__('general.enter_a_keyword_and_select_a_niche_to_start_discovering_high_engagement_tiktok_creators_in_your_market')}</p>
+                                <p className="text-xs text-slate-600 mt-2 max-w-7xl mx-auto">{__('general.enter_a_keyword_and_select_a_niche_to_start_discovering_high_engagement_tiktok_creators_in_your_market')}</p>
                             </div>
                         )}
                     </>
@@ -269,7 +269,7 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                     <div className="py-24 text-center border border-dashed border-slate-800 rounded-2xl">
                         <Eye className="w-10 h-10 text-slate-700 mx-auto mb-4" />
                         <h3 className="text-sm font-bold text-slate-400">{__('general.competitor_monitoring_jobs')}</h3>
-                        <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">{__('general.add_competitors_and_hashtags_to_track_the_intelligence_engine_will_monitor_them_daily_and_alert_you_to_viral_content_and_trend_changes')}</p>
+                        <p className="text-xs text-slate-600 mt-2 max-w-7xl mx-auto">{__('general.add_competitors_and_hashtags_to_track_the_intelligence_engine_will_monitor_them_daily_and_alert_you_to_viral_content_and_trend_changes')}</p>
                         <Button variant="outline" className="mt-6 h-10 bg-pink-500/10 border-pink-500/30 text-pink-400 hover:bg-pink-500/20 hover:text-pink-400">
                             + Add Monitoring Job
                         </Button>
@@ -280,7 +280,7 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                     <div className="py-24 text-center border border-dashed border-slate-800 rounded-2xl">
                         <Bookmark className="w-10 h-10 text-slate-700 mx-auto mb-4" />
                         <h3 className="text-sm font-bold text-slate-400">{__('general.ugc_content_vault')}</h3>
-                        <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">{__('general.discovered_viral_content_is_automatically_saved_here_browse_filter_and_extract_format_blueprints_from_the_best_performing_videos_in_your_niche')}</p>
+                        <p className="text-xs text-slate-600 mt-2 max-w-7xl mx-auto">{__('general.discovered_viral_content_is_automatically_saved_here_browse_filter_and_extract_format_blueprints_from_the_best_performing_videos_in_your_niche')}</p>
                         <Button variant="outline" className="mt-6 h-10 bg-pink-500/10 border-pink-500/30 text-pink-400 hover:bg-pink-500/20 hover:text-pink-400">{__('general.sync_vault_now')}</Button>
                     </div>
                 )}

@@ -42,7 +42,7 @@ export default function Index({ webhooks }: Props) {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                            <Webhook className="w-6 h-6 text-indigo-600" /> {__('general.incoming_webhooks')}</h1>
+                            <Webhook className="w-6 h-6 text-slate-900" /> {__('general.incoming_webhooks')}</h1>
                         <p className="text-slate-500 mt-1">{__('general.monitor_webhooks_received_from_external')}</p>
                     </div>
                 </div>
@@ -77,7 +77,7 @@ export default function Index({ webhooks }: Props) {
                                                 <td className="px-6 py-4 text-end">
                                                     <Link 
                                                         href={route('admin.settings.incoming-webhooks.show', webhook.id)}
-                                                        className="inline-flex items-center text-indigo-600 hover:text-indigo-900"
+                                                        className="inline-flex items-center text-slate-900 hover:text-indigo-900"
                                                     >
                                                         <Eye className="w-4 h-4 me-1" /> {__('general.view')}</Link>
                                                 </td>

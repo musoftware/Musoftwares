@@ -33,7 +33,7 @@ export default function Reports() {
                         <div className="flex items-center justify-between space-y-0 pb-2">
                             <p className="text-sm font-medium text-slate-500">{__('general.total_users')}</p>
                             <div className="p-2 bg-indigo-50 rounded-xl">
-                                <Users className="h-4 w-4 text-indigo-600" />
+                                <Users className="h-4 w-4 text-slate-900" />
                             </div>
                         </div>
                         <div className="text-3xl font-bold text-slate-900 tracking-tight">
@@ -47,7 +47,7 @@ export default function Reports() {
                         <div className="flex items-center justify-between space-y-0 pb-2">
                             <p className="text-sm font-medium text-slate-500">{__('general.total_projects')}</p>
                             <div className="p-2 bg-indigo-50 rounded-xl">
-                                <Briefcase className="h-4 w-4 text-indigo-600" />
+                                <Briefcase className="h-4 w-4 text-slate-900" />
                             </div>
                         </div>
                         <div className="text-3xl font-bold text-slate-900 tracking-tight">
@@ -61,7 +61,7 @@ export default function Reports() {
                         <div className="flex items-center justify-between space-y-0 pb-2">
                             <p className="text-sm font-medium text-slate-500">{__('general.total_invoices')}</p>
                             <div className="p-2 bg-indigo-50 rounded-xl">
-                                <FileText className="h-4 w-4 text-indigo-600" />
+                                <FileText className="h-4 w-4 text-slate-900" />
                             </div>
                         </div>
                         <div className="text-3xl font-bold text-slate-900 tracking-tight">
@@ -75,7 +75,7 @@ export default function Reports() {
                         <div className="flex items-center justify-between space-y-0 pb-2">
                             <p className="text-sm font-medium text-slate-500">{__('general.total_transactions')}</p>
                             <div className="p-2 bg-indigo-50 rounded-xl">
-                                <Activity className="h-4 w-4 text-indigo-600" />
+                                <Activity className="h-4 w-4 text-slate-900" />
                             </div>
                         </div>
                         <div className="text-3xl font-bold text-slate-900 tracking-tight">

@@ -117,7 +117,7 @@ export function ManageCategoriesModal() {
                             </div>
                         ) : (
                             categories.map(category => (
-                                <div key={category.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <div key={category.id} className="flex items-center justify-end gap-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
                                     <span className="font-medium text-sm text-slate-700">{category.name}</span>
                                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-rose-500 hover:text-rose-700 hover:bg-rose-50" onClick={() => handleDelete(category.id)}>
                                         <Trash2 className="h-4 w-4" />

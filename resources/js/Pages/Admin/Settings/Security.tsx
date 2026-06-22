@@ -127,7 +127,7 @@ export default function Security({ blockedIps, rateLimits }: any) {
                                 <div className="p-5 text-sm text-gray-500 text-center">{__('general.no_custom_rate_limits_configured')}</div>
                             ) : (
                                 rateLimits.map((limit: any) => (
-                                    <div key={limit.id} className="p-4 flex items-center justify-between">
+                                    <div key={limit.id} className="p-4 flex items-center justify-end gap-4">
                                         <div>
                                             <p className="font-medium text-sm text-gray-900">{limit.module}</p>
                                             <p className="text-xs text-gray-500 mt-1">
@@ -165,7 +165,7 @@ export default function Security({ blockedIps, rateLimits }: any) {
                                 </div>
                             ) : (
                                 blockedIps.map((ip: any) => (
-                                    <div key={ip.id} className="p-4 flex items-center justify-between">
+                                    <div key={ip.id} className="p-4 flex items-center justify-end gap-4">
                                         <div>
                                             <p className="font-medium text-sm text-gray-900 font-mono">{ip.ip_address}</p>
                                             <p className="text-xs text-gray-500 mt-1">{ip.reason}</p>

@@ -36,7 +36,7 @@ export default function CreateEdit({ invoice, has_inventory_addon, currencies, b
         invoice_number: invoice?.invoice_number || `INV-${Date.now()}`,
         issued_at: invoice?.issued_at?.split('T')[0] || new Date().toISOString().split('T')[0],
         due_date: invoice?.due_date?.split('T')[0] || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        amount_currency: invoice?.currency || invoice?.client?.currency || null,
+        amount_currency: invoice?.currency?.currency || invoice?.currency_code || invoice?.currency || invoice?.client?.currency?.currency || invoice?.client?.currency_code || invoice?.client?.currency || null,
         items: invoice?.items || [
             { type: 'simple', title: '', description: '', unit_price: 0, quantity: 1 }
         ],

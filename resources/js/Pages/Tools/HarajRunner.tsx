@@ -184,7 +184,7 @@ export default function HarajRunner({ tool }: any) {
                 </div>
             </div>
 
-            <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+            <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
                 {/* Config card */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                     <div className="mb-5">
@@ -294,7 +294,7 @@ export default function HarajRunner({ tool }: any) {
                     <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                         <ShoppingBag className="w-10 h-10 text-slate-300 mx-auto mb-4" />
                         <h3 className="text-sm font-bold text-slate-700">{__('general.haraj_has_millions_of_active_listings')}</h3>
-                        <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">{__('general.enter_a_keyword_or_category_to_extract_real_saudi_contact_leads_from_haraj_com_sa_the_largest_arabic_classifieds_platform_in_ksa')}</p>
+                        <p className="text-xs text-slate-400 mt-2 max-w-7xl mx-auto">{__('general.enter_a_keyword_or_category_to_extract_real_saudi_contact_leads_from_haraj_com_sa_the_largest_arabic_classifieds_platform_in_ksa')}</p>
                     </div>
                 )}
             </div>

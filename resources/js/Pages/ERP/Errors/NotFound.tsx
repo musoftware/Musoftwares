@@ -19,7 +19,7 @@ export default function NotFound({ message, section = 'overview' }: Props) {
         <ERPLayout title={__('general.not_found')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
             <Head title={__('general.not_found')} />
 
-            <div className="max-w-3xl mx-auto px-4 py-16">
+            <div className="max-w-7xl mx-auto px-4 py-16">
                 <Card className="bg-white border border-slate-200 shadow-sm">
                     <CardContent className="p-8 flex flex-col items-center text-center space-y-6">
                         <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center border border-rose-100">

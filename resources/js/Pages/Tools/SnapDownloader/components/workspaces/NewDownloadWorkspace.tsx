@@ -39,7 +39,7 @@ export function NewDownloadWorkspace({
     };
 
     return (
-        <div className="max-w-2xl mx-auto space-y-5">
+        <div className="max-w-7xl mx-auto space-y-5">
             <div>
                 <h1 className="text-xl sm:text-2xl font-black text-white">{__('general.new_download')}</h1>
                 <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{__('general.queue_a_snapchat_profile_for')}</p>

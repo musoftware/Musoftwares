@@ -41,7 +41,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
     return (
         <AdminSidebarLayout title={__('general.assign_device')} header="Assign Device">
             <Head title={__('general.assign_device')} />
-            <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+            <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
                 <div className="flex items-center gap-3">
                     <Link href={route('admin.serial-user-devices.index')} className="text-zinc-400 hover:text-white transition-colors">
                         <ArrowLeft className="w-5 h-5" />

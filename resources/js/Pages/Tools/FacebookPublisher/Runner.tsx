@@ -112,7 +112,7 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
 
                 {/* Main Workspace */}
                 <div className="flex-1 overflow-auto bg-background p-8">
-                    <div className="max-w-5xl mx-auto space-y-6">
+                    <div className="max-w-7xl mx-auto space-y-6">
                         
                         {activeTab === 'queue' && (
                             <div className="space-y-6">

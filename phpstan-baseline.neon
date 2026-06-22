@@ -1999,12 +1999,6 @@ parameters:
 			path: Modules/GoldSavers/app/Features/LivePrices/Services/GoldLivePriceService.php
 
 		-
-			message: '#^Relation ''landingPage'' is not found in Modules\\Marketplace\\Models\\Service model\.$#'
-			identifier: larastan.relationExistence
-			count: 3
-			path: Modules/Marketplace/Http/Controllers/Admin/AdminServiceLandingPageController.php
-
-		-
 			message: '#^Relation ''seller'' is not found in Modules\\Marketplace\\Models\\Service model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
@@ -2026,12 +2020,6 @@ parameters:
 			message: '#^Call to static method create\(\) on an unknown class App\\Models\\ServiceLandingPageCtaVariant\.$#'
 			identifier: class.notFound
 			count: 1
-			path: Modules/Marketplace/Http/Controllers/Seller/ServiceLandingPageController.php
-
-		-
-			message: '#^Relation ''landingPage'' is not found in Modules\\Marketplace\\Models\\Service model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
 			path: Modules/Marketplace/Http/Controllers/Seller/ServiceLandingPageController.php
 
 		-
@@ -2057,12 +2045,6 @@ parameters:
 			identifier: larastan.relationExistence
 			count: 1
 			path: Modules/Marketplace/Http/Controllers/Seller/ServiceLandingPageSubmissionController.php
-
-		-
-			message: '#^Relation ''packages'' is not found in Modules\\Marketplace\\Models\\Service model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: Modules/Marketplace/Http/Controllers/ServiceController.php
 
 		-
 			message: '#^Relation ''messages'' is not found in App\\Models\\Conversation model\.$#'
@@ -2993,12 +2975,6 @@ parameters:
 			identifier: larastan.relationExistence
 			count: 3
 			path: app/Http/Controllers/Admin/InvoiceController.php
-
-		-
-			message: '#^Relation ''category'' is not found in Modules\\Marketplace\\Models\\Service model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/Admin/MarketplaceServiceController.php
 
 		-
 			message: '#^Relation ''seller'' is not found in Modules\\Marketplace\\Models\\Service model\.$#'

@@ -91,13 +91,13 @@ export default function CoordinatesConverter() {
 
     return (
         <WebToolsLayout title="Decimal to Degrees Converter (DMS)" activeNav="explore">
-            <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6">
+            <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6">
                 <div className="text-center mb-10">
                     <div className="inline-flex items-center justify-center p-3 bg-blue-100 text-blue-700 rounded-2xl mb-4">
                         <MapPin className="w-8 h-8" />
                     </div>
                     <h1 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">{__('general.decimal_to_degrees_converter')}</h1>
-                    <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+                    <p className="mt-4 text-lg text-slate-600 max-w-7xl mx-auto">
                         Convert GPS coordinates between Decimal Degrees (DD) and Degrees, Minutes, Seconds (DMS).
                     </p>
                 </div>

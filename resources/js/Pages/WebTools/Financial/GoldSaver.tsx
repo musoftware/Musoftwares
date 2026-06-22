@@ -274,7 +274,7 @@ export default function GoldSaver() {
                     </TabsContent>
 
                     <TabsContent value="new">
-                        <Card className="border-slate-200 shadow-sm max-w-3xl mx-auto">
+                        <Card className="border-slate-200 shadow-sm max-w-7xl mx-auto">
                             <CardHeader>
                                 <CardTitle>{__('general.record_investment')}</CardTitle>
                                 <CardDescription>{__('general.add_a_new_gold_purchase_to_your_portfoli')}</CardDescription>

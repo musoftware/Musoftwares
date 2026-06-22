@@ -120,7 +120,7 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
     const getCategoryIcon = (cat: string) => {
         switch (cat) {
             case 'password': return <Key size={14} className="text-amber-500" />;
-            case 'anydesk': return <Monitor size={14} className="text-blue-500" />;
+            case 'anydesk': return <Monitor size={14} className="text-slate-900" />;
             case 'archived': return <Archive size={14} className="text-gray-500" />;
             default: return <FileText size={14} className="text-slate-500" />;
         }

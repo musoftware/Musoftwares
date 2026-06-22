@@ -19,10 +19,10 @@ export default function OrderShow({ order }: any) {
 
     const TimelineStep = ({ title, active, isLast }: { title: string, active: boolean, isLast?: boolean }) => (
         <div className="flex flex-col items-center">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${active ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-400'}`}>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${active ? 'bg-slate-900 text-white shadow-md' : 'bg-gray-100 text-gray-400'}`}>
                 <CheckCircle2 className="w-5 h-5" />
             </div>
-            <div className={`text-xs mt-2 font-medium ${active ? 'text-blue-700' : 'text-gray-500'}`}>{title}</div>
+            <div className={`text-xs mt-2 font-medium ${active ? 'text-slate-900' : 'text-gray-500'}`}>{title}</div>
         </div>
     );
 
@@ -65,7 +65,7 @@ export default function OrderShow({ order }: any) {
                 <CardContent className="p-6">
                     <div className="flex justify-between items-center relative px-8">
                         <div className="absolute top-5 start-16 end-16 h-0.5 bg-gray-100 z-0"></div>
-                        <div className="absolute top-5 start-16 end-16 h-0.5 bg-blue-600 z-0 transition-all duration-500" style={{ width: order.status === 'new' ? '0%' : order.status === 'preparing' ? '33%' : order.status === 'shipping' ? '66%' : '100%' }}></div>
+                        <div className="absolute top-5 start-16 end-16 h-0.5 bg-slate-900 z-0 transition-all duration-500" style={{ width: order.status === 'new' ? '0%' : order.status === 'preparing' ? '33%' : order.status === 'shipping' ? '66%' : '100%' }}></div>
                         
                         <div className="relative z-10"><TimelineStep title={__('general.new_order')} active={true} /></div>
                         <div className="relative z-10"><TimelineStep title={__('general.preparing')} active={['preparing', 'shipping', 'delivered'].includes(order.status)} /></div>
@@ -149,7 +149,7 @@ export default function OrderShow({ order }: any) {
                                 </TableRow>
                                 <TableRow className="bg-blue-50/30">
                                     <TableCell colSpan={4} className="text-end font-semibold text-blue-900">{__('general.grand_total')}</TableCell>
-                                    <TableCell className="text-end font-bold text-blue-700 text-lg">{order.total.toLocaleString()} EGP</TableCell>
+                                    <TableCell className="text-end font-bold text-slate-900 text-lg">{order.total.toLocaleString()} EGP</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>

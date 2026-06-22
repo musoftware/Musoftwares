@@ -513,7 +513,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                 {device.userDeviceAssignment?.user && (
                                                     <Link
                                                         href={route('admin.users.show', device.userDeviceAssignment.user.id)}
-                                                        className="text-xs text-blue-600 hover:underline"
+                                                        className="text-xs text-slate-900 hover:underline"
                                                         onClick={e => e.stopPropagation()}
                                                     >
                                                         {device.userDeviceAssignment.user.email}
@@ -690,7 +690,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                     <Row label={__('general.linked_user')} value={
                                         <Link
                                             href={route('admin.users.show', detail.userDeviceAssignment.user.id)}
-                                            className="text-blue-600 hover:underline"
+                                            className="text-slate-900 hover:underline"
                                         >
                                             {detail.userDeviceAssignment.user.name} ({detail.userDeviceAssignment.user.email})
                                         </Link>

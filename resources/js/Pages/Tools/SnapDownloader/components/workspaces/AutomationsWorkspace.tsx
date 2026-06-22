@@ -111,7 +111,7 @@ export function AutomationsWorkspace({
     };
 
     return (
-        <div className="max-w-3xl mx-auto space-y-5">
+        <div className="max-w-7xl mx-auto space-y-5">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-xl sm:text-2xl font-black text-white">{__('general.automations')}</h1>
@@ -328,7 +328,7 @@ export function AutomationsWorkspace({
                                 <Clock className="w-6 h-6 text-slate-400" />
                             </div>
                             <h3 className="text-white font-bold mb-2">{__('general.no_automations_running')}</h3>
-                            <p className="text-xs text-slate-400 max-w-sm mx-auto mb-6">
+                            <p className="text-xs text-slate-400 max-w-7xl mx-auto mb-6">
                                 {__('general.create_a_campaign_to_automatically')}
                             </p>
                             <Button onClick={() => setShowAutoForm(true)} className="gap-2" style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>

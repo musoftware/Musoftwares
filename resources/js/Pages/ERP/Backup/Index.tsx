@@ -61,7 +61,7 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
         >
             <Head title={__('general.erp_backup_service')} />
             
-            <div className="max-w-4xl mx-auto space-y-6">
+            <div className="max-w-7xl mx-auto space-y-6">
                 <div>
                     <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">{__('general.data_backup_restore')}</h2>
                     <p className="text-sm text-slate-500 mt-1">{__('general.download_a_complete_snapshot_of_your_workspace_or_restore_from_a_previous_backup')}</p>

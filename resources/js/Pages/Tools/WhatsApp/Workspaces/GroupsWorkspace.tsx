@@ -211,7 +211,7 @@ export default function GroupsWorkspace({ t, locale, callRPC, selectedAccount, s
             <Card className="border-dashed rounded-2xl">
                 <CardContent className="py-16 text-center space-y-4">
                     <AlertCircle className="w-10 h-10 text-amber-400 mx-auto" />
-                    <div className="max-w-md mx-auto space-y-1">
+                    <div className="max-w-7xl mx-auto space-y-1">
                         <h3 className="text-sm font-bold">{t.groups.noAccountTitle}</h3>
                         <p className="text-xs text-muted-foreground">{t.groups.noAccountSub}</p>
                     </div>

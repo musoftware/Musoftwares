@@ -230,7 +230,7 @@ export default function WaWarmupRunner({ tool }: any) {
                     <Plus className="w-3.5 h-3.5" />{__('general.connect_number')}</Button>
             </div>
 
-            <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+            <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
                 {/* Stats */}
                 {numbers.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -269,7 +269,7 @@ export default function WaWarmupRunner({ tool }: any) {
                     <div className="py-24 text-center border border-dashed border-slate-800 rounded-2xl">
                         <Thermometer className="w-10 h-10 text-slate-700 mx-auto mb-4" />
                         <h3 className="text-sm font-bold text-slate-400">{__('general.no_whatsapp_numbers_connected_yet')}</h3>
-                        <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">{__('general.connect_a_whatsapp_number_to_start_building_a_safe_sending_reputation_warming_up_is_recommended_before_launching_campaign_messaging')}</p>
+                        <p className="text-xs text-slate-600 mt-2 max-w-7xl mx-auto">{__('general.connect_a_whatsapp_number_to_start_building_a_safe_sending_reputation_warming_up_is_recommended_before_launching_campaign_messaging')}</p>
                         <Button onClick={() => setShowAdd(true)} className="mt-6 gap-2 h-10 bg-green-500 text-white hover:bg-green-600 mx-auto shadow-lg shadow-green-500/20">
                             <Plus className="w-4 h-4" />{__('general.connect_first_number')}</Button>
                     </div>

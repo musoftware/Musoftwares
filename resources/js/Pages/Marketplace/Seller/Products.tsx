@@ -40,6 +40,18 @@ export default function SellerProducts({ products }: any) {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <StatusBadge status={product.status || 'pending'} size="sm" />
+                                    <Link
+                                        href={`/marketplace/services/${product.id}/edit`}
+                                        className="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
+                                    >
+                                        Edit
+                                    </Link>
+                                    <Link
+                                        href={`/marketplace/services/${product.id}`}
+                                        className="text-slate-600 hover:text-slate-800 text-xs font-medium"
+                                    >
+                                        Preview
+                                    </Link>
                                 </div>
                             </div>
                         ))}

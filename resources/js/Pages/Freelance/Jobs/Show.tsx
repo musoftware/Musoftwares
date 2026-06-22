@@ -335,7 +335,7 @@ function ShowJobContent({ auth, job, pointsCost, userCurrency }: any) {
                                     <AlertDescription>{__('freelance.this_job_is_no_longer')}</AlertDescription>
                                 </Alert>
                             ) : isGuest ? (
-                                <div className="bg-white rounded-lg border border-slate-200 p-8 text-center space-y-4 max-w-xl mx-auto">
+                                <div className="bg-white rounded-lg border border-slate-200 p-8 text-center space-y-4 max-w-7xl mx-auto">
                                     <User className="h-12 w-12 text-slate-300 mx-auto" />
                                     <p className="text-slate-600 font-medium text-lg">{__('freelance.log_in_to_submit_proposal', undefined, 'Log in to submit a proposal')}</p>
                                     <Link href={route('login')} className="block w-full">

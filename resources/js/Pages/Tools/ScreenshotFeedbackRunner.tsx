@@ -230,7 +230,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
             </div>
 
             {/* Main Content Area */}
-            <main className="flex-1 max-w-6xl w-full mx-auto p-8">
+            <main className="flex-1 max-w-7xl w-full mx-auto p-8">
                 {activeTab === 'projects' && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="flex items-center justify-between">
@@ -314,7 +314,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                                 <div className="absolute inset-0 flex items-center justify-center text-slate-400"><ImageIcon className="w-6 h-6 animate-pulse" /></div>
                                             )}
                                         </div>
-                                        <div className="p-4 flex items-center justify-between">
+                                        <div className="p-4 flex items-center justify-end gap-4">
                                             <div className="truncate">
                                                 <h4 className="font-medium text-sm text-slate-900 truncate">{s.filename}</h4>
                                                 <p className="text-xs text-slate-500 mt-0.5">{new Date(s.created_at * 1000).toLocaleDateString()}</p>
@@ -335,7 +335,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                 )}
 
                 {activeTab === 'activity' && selectedProjectId && (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 max-w-2xl mx-auto">
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 max-w-7xl mx-auto">
                         <div className="flex items-center justify-between mb-8">
                             <h1 className="text-2xl font-bold tracking-tight">{__('general.timeline')}</h1>
                         </div>
@@ -463,7 +463,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                                     <div className="absolute -top-1.5 start-1/2 -translate-x-1/2 w-3 h-3 bg-white border-t border-s border-slate-200 rotate-45" />
 
                                                     <form onSubmit={handleSavePin} className="space-y-3 relative z-10">
-                                                        <div className="flex items-center justify-between">
+                                                        <div className="flex items-center justify-end gap-4">
                                                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{__('general.add_comment')}</span>
                                                             <Button 
                                                                 variant="ghost"

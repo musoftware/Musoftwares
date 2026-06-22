@@ -465,7 +465,7 @@ export default function OpensooqRunner({ tool }: any) {
             </div>
 
             {/* ── Content ── */}
-            <div className="max-w-5xl mx-auto px-4 py-6">
+            <div className="max-w-7xl mx-auto px-4 py-6">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="grid w-full max-w-md grid-cols-2 mb-6 bg-slate-100 p-1 rounded-xl">
                         <TabsTrigger
@@ -628,7 +628,7 @@ export default function OpensooqRunner({ tool }: any) {
                             <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                 <Globe className="w-10 h-10 text-slate-300 mx-auto mb-4" />
                                 <h3 className="text-sm font-bold text-slate-700">{__('general.opensooq_has_millions_of_active_listings')}</h3>
-                                <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">{__('general.enter_a_keyword_and_pick_a_country_to_extract_real_contact_leads_from_the_largest_arab_classifieds_platform')}</p>
+                                <p className="text-xs text-slate-400 mt-2 max-w-7xl mx-auto">{__('general.enter_a_keyword_and_pick_a_country_to_extract_real_contact_leads_from_the_largest_arab_classifieds_platform')}</p>
                             </div>
                         )}
                     </TabsContent>

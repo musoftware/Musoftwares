@@ -107,14 +107,14 @@ export default function Costs() {
                         <div className="flex items-center justify-between space-y-0 pb-2">
                             <p className="text-sm font-medium text-slate-500">{__('general.monthly_costs')}</p>
                             <div className="p-2 bg-rose-50 rounded-xl">
-                                <ArrowDownRight className="h-4 w-4 text-rose-600" />
+                                <ArrowDownRight className="h-4 w-4 text-slate-900" />
                             </div>
                         </div>
                         <div className="text-3xl font-bold text-slate-900 tracking-tight">
                             {formatCurrency(stats.total_monthly_costs, stats.business_currency_code)}
                         </div>
                         <p className="text-xs text-slate-500 mt-2 font-medium">
-                            <span className="text-rose-600 font-semibold bg-rose-50 px-1.5 py-0.5 rounded me-1">{__('general.this_month')}</span>
+                            <span className="text-slate-900 font-semibold bg-rose-50 px-1.5 py-0.5 rounded me-1">{__('general.this_month')}</span>
                             {__('general.total_costs')}</p>
                     </CardContent>
                 </Card>
@@ -123,7 +123,7 @@ export default function Costs() {
             <Card className="border-none shadow-sm shadow-slate-200/50 mb-6">
                 <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                        <CalendarIcon className="w-5 h-5 text-rose-500" />
+                        <CalendarIcon className="w-5 h-5 text-slate-900" />
                         {__('general.cost_trends')}</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -187,7 +187,7 @@ export default function Costs() {
                             </div>
                             <Button type="submit" size="sm" variant="secondary">{__('general.search')}</Button>
                         </form>
-                        <Button size="sm" onClick={() => router.visit(route('admin.costs.create'))} className="bg-rose-600 hover:bg-rose-700 text-white w-full sm:w-auto">
+                        <Button size="sm" onClick={() => router.visit(route('admin.costs.create'))} className="bg-slate-900 hover:bg-slate-900 text-white w-full sm:w-auto">
                             {__('admin.add_cost') || "Add Cost"}
                         </Button>
                     </div>
@@ -212,13 +212,13 @@ export default function Costs() {
                                     <TableCell>
                                         <div className="font-medium text-slate-900">{entry.title}</div>
                                         {entry.is_recurring && (
-                                            <span className="inline-flex items-center mt-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700">
+                                            <span className="inline-flex items-center mt-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-slate-900">
                                                 {__('general.recurring')}</span>
                                         )}
                                     </TableCell>
                                     <TableCell>
                                         {entry.project ? (
-                                            <div className="text-sm font-medium text-indigo-600">{entry.project.name}</div>
+                                            <div className="text-sm font-medium text-slate-900">{entry.project.name}</div>
                                         ) : entry.user ? (
                                             <div className="text-sm text-slate-600">{entry.user.name}</div>
                                         ) : (
@@ -226,7 +226,7 @@ export default function Costs() {
                                         )}
                                     </TableCell>
                                     <TableCell className="text-end">
-                                        <div className="font-semibold font-mono tabular-nums text-rose-600">
+                                        <div className="font-semibold font-mono tabular-nums text-slate-900">
                                             -{formatCurrency(Math.abs(entry.amount), entry.currency)}
                                         </div>
                                         {entry.currency !== stats.business_currency_code && (

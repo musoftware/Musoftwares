@@ -232,7 +232,7 @@ export default function DomainIntelligenceRunner({ tool }: any) {
                         </div>
                     )}
 
-                    <div className="flex-1 p-6 max-w-6xl mx-auto w-full">
+                    <div className="flex-1 p-6 max-w-7xl mx-auto w-full">
                         {results.length === 0 && status !== 'running' ? (
                             <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-4">
                                 <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center">

@@ -72,7 +72,7 @@ export default function AiEstimator({ expected_monthly_income, work_days_per_mon
         <AdminSidebarLayout title={__('admin.ai_estimator')} header={__('admin.ai_estimator')}>
             <Head title={__('admin.ai_estimator')} />
 
-            <div className="max-w-4xl mx-auto space-y-6">
+            <div className="max-w-7xl mx-auto space-y-6">
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">

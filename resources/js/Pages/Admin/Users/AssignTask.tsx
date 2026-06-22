@@ -33,7 +33,7 @@ export default function AssignTask({ client }: Props) {
         <AdminSidebarLayout title={__('general.assign_task')} header={__('general.assign_task')} user={auth?.user}>
             <Head title={`Assign Task: ${client.name}`} />
 
-            <div className="w-full max-w-3xl mx-auto py-6 space-y-6">
+            <div className="w-full max-w-7xl mx-auto py-6 space-y-6">
                 <header className="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">{__('general.assign_task')}</h1>

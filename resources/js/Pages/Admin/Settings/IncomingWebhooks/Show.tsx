@@ -55,11 +55,11 @@ export default function Show({ webhook }: Props) {
                     <div className="bg-rose-50 border-s-4 border-rose-500 p-4 rounded-e-md">
                         <div className="flex">
                             <div className="flex-shrink-0">
-                                <XCircle className="h-5 w-5 text-rose-500" aria-hidden="true" />
+                                <XCircle className="h-5 w-5 text-slate-900" aria-hidden="true" />
                             </div>
                             <div className="ms-3">
                                 <h3 className="text-sm font-medium text-rose-800">{__('general.processing_failed')}</h3>
-                                <div className="mt-2 text-sm text-rose-700 font-mono bg-white/50 p-2 rounded">
+                                <div className="mt-2 text-sm text-slate-900 font-mono bg-white/50 p-2 rounded">
                                     {webhook.error_message}
                                 </div>
                             </div>
@@ -103,7 +103,7 @@ export default function Show({ webhook }: Props) {
                         </CardHeader>
                         <CardContent>
                             <div className="bg-slate-900 rounded-md p-4 overflow-x-auto">
-                                <pre className="text-emerald-400 text-xs font-mono">
+                                <pre className="text-slate-900 text-xs font-mono">
                                     {JSON.stringify(webhook.headers, null, 2)}
                                 </pre>
                             </div>
@@ -118,7 +118,7 @@ export default function Show({ webhook }: Props) {
                     </CardHeader>
                     <CardContent>
                         <div className="bg-slate-900 rounded-md p-4 overflow-x-auto">
-                            <pre className="text-emerald-400 text-xs font-mono leading-relaxed">
+                            <pre className="text-slate-900 text-xs font-mono leading-relaxed">
                                 {JSON.stringify(webhook.payload, null, 2)}
                             </pre>
                         </div>

@@ -79,7 +79,7 @@ export function InboxesWorkspace(props: InboxesWorkspaceProps) {
                             <div className="py-16 text-center">
                                 <Zap className="w-8 h-8 text-slate-300 mx-auto mb-3" />
                                 <h4 className="text-xs font-bold text-slate-900">{__('general.no_sending_mailboxes_connected_yet')}</h4>
-                                <p className="text-[11px] text-slate-400 mt-1 max-w-xs mx-auto">{__('general.connecting_a_custom_domain_email_account_will_enable_automated_outbound_message_triggers')}</p>
+                                <p className="text-[11px] text-slate-400 mt-1 max-w-7xl mx-auto">{__('general.connecting_a_custom_domain_email_account_will_enable_automated_outbound_message_triggers')}</p>
                             </div>
                         ) : (
                             <div className="divide-y divide-slate-100">

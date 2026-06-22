@@ -51,7 +51,7 @@ export default function Index({ orders }) {
                                 <td className="p-4 text-end">
                                     <Link
                                         href={`/admin/marketplace/orders/${order.id}`}
-                                        className="text-indigo-600 hover:text-indigo-900 hover:underline font-medium text-sm"
+                                        className="text-slate-900 hover:text-indigo-900 hover:underline font-medium text-sm"
                                     >
                                         {__('general.manage')}</Link>
                                 </td>

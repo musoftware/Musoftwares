@@ -259,9 +259,9 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
         <AdminSidebarLayout>
             <Head title={`${__('general.timer_details')} - Invoice #${item.invoice_number}`} />
 
-            <div className="max-w-6xl mx-auto pb-12">
+            <div className="max-w-7xl mx-auto pb-12">
                 <div className="mb-5">
-                    <span className="text-xs font-bold tracking-widest text-indigo-600 uppercase bg-indigo-50 px-2 py-1 rounded mb-2 inline-block">
+                    <span className="text-xs font-bold tracking-widest text-slate-900 uppercase bg-indigo-50 px-2 py-1 rounded mb-2 inline-block">
                         {__('billing.billing')}
                     </span>
                     <div className="flex items-baseline flex-wrap gap-3">
@@ -285,11 +285,11 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                     <div className="p-2 border rounded-xl bg-white flex items-center gap-3 shadow-sm">
                         <div className="rounded-full bg-blue-50 p-2 flex items-center justify-center w-10 h-10">
-                            <User className="w-4 h-4 text-blue-600" />
+                            <User className="w-4 h-4 text-slate-900" />
                         </div>
                         <div className="overflow-hidden">
                             <small className="text-gray-400 block uppercase font-bold text-[10px] tracking-wider">{__('general.client')}</small>
-                            <Link href={route('admin.users.show', item.client_id || 0)} target="_blank" className="font-bold text-gray-900 text-sm truncate block hover:text-blue-600 transition-colors">
+                            <Link href={route('admin.users.show', item.client_id || 0)} target="_blank" className="font-bold text-gray-900 text-sm truncate block hover:text-slate-900 transition-colors">
                                 {item.client_name}
                             </Link>
                         </div>
@@ -335,7 +335,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                                 name="rateType" 
                                                 checked={rate === system_base_rate}
                                                 onChange={() => setRate(system_base_rate)}
-                                                className="w-3.5 h-3.5 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                                className="w-3.5 h-3.5 text-slate-900 focus:ring-blue-500 border-gray-300"
                                                 disabled={item.invoice_status !== 'unpaid'}
                                             />
                                             {__('admin.base_system_rate')} ({system_base_rate})
@@ -346,7 +346,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                                 name="rateType" 
                                                 checked={rate === client_rate}
                                                 onChange={() => setRate(client_rate)}
-                                                className="w-3.5 h-3.5 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                                className="w-3.5 h-3.5 text-slate-900 focus:ring-blue-500 border-gray-300"
                                                 disabled={item.invoice_status !== 'unpaid' || client_rate <= 0}
                                             />
                                             {__('admin.client_rate')} ({client_rate > 0 ? client_rate : __('general.not_set')})
@@ -367,7 +367,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                     </Button>
                                     <Link href={rateUrl} target="_blank">
                                         <Button type="button" variant="outline" className="rounded-s-none px-3 hover:bg-gray-100 border-s-0">
-                                            <Edit className="w-4 h-4 text-blue-600" />
+                                            <Edit className="w-4 h-4 text-slate-900" />
                                         </Button>
                                     </Link>
                                 </div>
@@ -460,7 +460,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                 <Button 
                                     onClick={handleStart} 
                                     disabled={isRunning || item.invoice_status !== 'unpaid'} 
-                                    className="bg-blue-600 hover:bg-blue-700 shadow-sm"
+                                    className="bg-slate-900 hover:bg-slate-900 shadow-sm"
                                 >
                                     <Play className="w-4 h-4 me-2" /> {__('general.start')}</Button>
                                 <Button 
@@ -514,8 +514,8 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                 <div className="font-mono text-sm text-gray-800">{lastEndDate}</div>
                             </div>
                             <div className="flex-1 min-w-[120px]">
-                                <span className="block text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1">{__('general.total_time')}</span>
-                                <div className="font-mono text-lg font-bold text-blue-700">{formatDurationMS(currentTotalSeconds)}</div>
+                                <span className="block text-[10px] font-bold text-slate-900 uppercase tracking-wider mb-1">{__('general.total_time')}</span>
+                                <div className="font-mono text-lg font-bold text-slate-900">{formatDurationMS(currentTotalSeconds)}</div>
                             </div>
                             <div className="flex-1 min-w-[120px]">
                                 <span className="block text-[10px] font-bold text-green-600 uppercase tracking-wider mb-1">{invoice_currency?.currency || 'Amount'}</span>

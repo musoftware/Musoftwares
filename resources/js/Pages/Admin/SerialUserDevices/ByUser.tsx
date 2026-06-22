@@ -84,7 +84,7 @@ export default function SerialUserDevicesByUser({ users, filters }: Props) {
                                         <p className="text-zinc-500 text-xs">{__('general.total')}</p>
                                     </div>
                                     <div className="text-center">
-                                        <p className="text-emerald-400 font-semibold">{user.active_devices}</p>
+                                        <p className="text-slate-900 font-semibold">{user.active_devices}</p>
                                         <p className="text-zinc-500 text-xs">{__('general.active')}</p>
                                     </div>
                                     <div className="text-center">
@@ -94,7 +94,7 @@ export default function SerialUserDevicesByUser({ users, filters }: Props) {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Button size="sm" variant="ghost"
-                                        className="text-emerald-400 hover:bg-emerald-500/10 text-xs h-8 px-3"
+                                        className="text-slate-900 hover:bg-slate-900/10 text-xs h-8 px-3"
                                         onClick={() => updateAllStatus(user, 'active')}>{__('general.activate_all')}</Button>
                                     <Button size="sm" variant="ghost"
                                         className="text-red-400 hover:bg-red-500/10 text-xs h-8 px-3"

@@ -69,7 +69,7 @@ export default function Browse({ services, categories, filters }: any) {
             {/* Hero Banner */}
             <div className="bg-indigo-900 px-6 py-20 text-center text-white sm:px-12">
                 <h1 className="mb-6 text-4xl font-bold md:text-5xl">{__('general.find_the_perfect_service')}</h1>
-                <div className="relative mx-auto max-w-3xl">
+                <div className="relative mx-auto max-w-7xl">
                     <form
                         onSubmit={handleSearch}
                         className="relative flex w-full items-center"

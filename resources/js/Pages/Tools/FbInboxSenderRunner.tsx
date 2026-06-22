@@ -129,7 +129,7 @@ export default function FbInboxSenderRunner({ tool }: any) {
         <div className="min-h-screen bg-[#0a0a0f] text-white font-sans">
             {/* Header */}
             <div className="sticky top-0 z-30 bg-[#0a0a0f]/95 backdrop-blur-xl border-b border-white/5">
-                <div className="max-w-6xl mx-auto px-4">
+                <div className="max-w-7xl mx-auto px-4">
                     <div className="h-14 flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -180,7 +180,7 @@ export default function FbInboxSenderRunner({ tool }: any) {
             </div>
 
             {/* Content */}
-            <div className="max-w-6xl mx-auto px-4 py-6">
+            <div className="max-w-7xl mx-auto px-4 py-6">
                 {activeTab === 'inbox' && <InboxTab call={call} onEvent={onEvent} profileId={selectedProfileId} profiles={profiles} onProfilesChange={loadProfiles} />}
                 {activeTab === 'campaigns' && <CampaignsTab call={call} onEvent={onEvent} profileId={selectedProfileId} />}
                 {activeTab === 'watch' && <WatchTab call={call} onEvent={onEvent} profileId={selectedProfileId} />}

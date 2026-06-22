@@ -18,7 +18,7 @@ export default function Index({ articles, filters }) {
 
     return (
         <AdminSidebarLayout title={__('general.blog_articles')} header="Blog Articles Manager">
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex items-center justify-end gap-4">
                 <form onSubmit={handleSearch} className="flex max-w-sm w-full relative">
                     <Input
                         type="text"

@@ -178,7 +178,7 @@ export default function Index({ auth, vouchers, redemptions }: Props) {
                             <Ticket className="h-10 w-10 text-slate-400" />
                         </div>
                         <h3 className="text-2xl font-bold mb-2">{__('vouchers.empty.title')}</h3>
-                        <p className="text-muted-foreground max-w-md mx-auto">
+                        <p className="text-muted-foreground max-w-7xl mx-auto">
                             {__('vouchers.empty.description')}
                         </p>
                     </div>

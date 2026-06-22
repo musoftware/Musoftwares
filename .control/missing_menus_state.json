@@ -68,7 +68,7 @@
     {
         "id": "sel2",
         "name": "/seller/dashboard",
-        "status": "running",
+        "status": "done",
         "dependencies": [
             "sel1"
         ]
@@ -76,7 +76,7 @@
     {
         "id": "sel3",
         "name": "/seller/products",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "sel1"
         ]
@@ -84,7 +84,7 @@
     {
         "id": "sel4",
         "name": "/seller/payouts",
-        "status": "pending",
+        "status": "running",
         "dependencies": [
             "sel1"
         ]

@@ -31,7 +31,7 @@ export default function Show({ widget }: { widget: any }) {
 
     return (
         <CrmLayout title={__('general.form_embed_code')} activeMenu="widgets">
-            <div className="max-w-4xl mx-auto space-y-6 pb-12">
+            <div className="max-w-7xl mx-auto space-y-6 pb-12">
                 <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <Button variant="ghost" size="icon" asChild className="rounded-full">

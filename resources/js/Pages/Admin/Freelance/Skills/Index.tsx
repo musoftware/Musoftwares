@@ -126,7 +126,7 @@ export default function Index({ skills, filters }: any) {
 
     return (
         <AdminSidebarLayout title={__('freelance.admin_skills', undefined, 'Freelance Skills')} header={__('freelance.manage_skills', undefined, 'Manage Freelance Skills')}>
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex items-center justify-end gap-4">
                 <form onSubmit={handleSearch} className="flex space-x-2">
                     <Input 
                         value={search}
@@ -251,7 +251,7 @@ export default function Index({ skills, filters }: any) {
                                                 </>
                                             )}
                                             <DropdownMenuItem onClick={() => openEditModal(skill)} className="cursor-pointer">
-                                                <Edit className="me-2 h-4 w-4 text-blue-600" />
+                                                <Edit className="me-2 h-4 w-4 text-slate-900" />
                                                 <span>{__('freelance.edit')}</span>
                                             </DropdownMenuItem>
                                             

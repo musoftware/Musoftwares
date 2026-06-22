@@ -48,7 +48,7 @@ export function HistoryWorkspace({
     const closeLogs = () => { setLogsExpanded(false); setSelectedProcessId(null); };
 
     return (
-        <div className="space-y-5 max-w-3xl mx-auto">
+        <div className="space-y-5 max-w-7xl mx-auto">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-xl sm:text-2xl font-black text-white">{__('general.history')}</h1>

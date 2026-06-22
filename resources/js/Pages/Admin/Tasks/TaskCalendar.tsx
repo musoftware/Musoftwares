@@ -159,7 +159,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                            <CalendarIcon className="h-6 w-6 text-indigo-600" />{__('general.task_calendar')}</h1>
+                            <CalendarIcon className="h-6 w-6 text-slate-900" />{__('general.task_calendar')}</h1>
                         <p className="text-sm text-slate-500 mt-1">{__('general.detailed_overview_of_all_tasks_todos_and_busy_times_by_date_across_platform_clients')}</p>
                     </div>
 
@@ -219,7 +219,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                         <span
                                             className={`text-sm font-semibold flex items-center justify-center h-7 w-7 rounded-full ${
                                                 isCurrentDay
-                                                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
+                                                    ? 'bg-slate-900 text-white shadow-md shadow-indigo-200'
                                                     : 'text-slate-700'
                                             }`}
                                         >
@@ -230,7 +230,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                     <div className="flex-1 space-y-1.5 overflow-y-auto max-h-[160px] pe-1 styled-scrollbar">
                                         {/* Busy Times */}
                                         {dayEvents.busy_times.map((bt) => (
-                                            <div key={bt.id} className="text-[10px] px-1.5 py-1 rounded bg-rose-50 text-rose-700 border border-rose-100 flex flex-col gap-0.5 shadow-sm">
+                                            <div key={bt.id} className="text-[10px] px-1.5 py-1 rounded bg-rose-50 text-slate-900 border border-rose-100 flex flex-col gap-0.5 shadow-sm">
                                                 <div className="font-semibold flex items-center gap-1">
                                                     <AlertCircle className="h-3 w-3" />
                                                     <span className="truncate">{bt.title}</span>
@@ -246,14 +246,14 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
 
                                         {/* Tasks */}
                                         {dayEvents.tasks.map((task) => (
-                                            <div key={`task-${task.id}`} className="text-[10px] px-1.5 py-1 rounded bg-indigo-50 text-indigo-700 border border-indigo-100 flex flex-col gap-0.5 shadow-sm">
+                                            <div key={`task-${task.id}`} className="text-[10px] px-1.5 py-1 rounded bg-indigo-50 text-slate-900 border border-indigo-100 flex flex-col gap-0.5 shadow-sm">
                                                 <div className="font-semibold flex items-start gap-1">
                                                     <ListTodo className="h-3 w-3 mt-0.5 shrink-0" />
                                                     <span className={`truncate ${task.completed ? 'line-through opacity-70' : ''}`}>{task.title}</span>
                                                 </div>
                                                 {task.client && (
                                                     <div className="flex items-center gap-1 opacity-80 ps-4">
-                                                        <User className="h-2.5 w-2.5 shrink-0 text-indigo-600" />
+                                                        <User className="h-2.5 w-2.5 shrink-0 text-slate-900" />
                                                         <span className="truncate">{task.client}</span>
                                                     </div>
                                                 )}
@@ -262,7 +262,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
 
                                         {/* Todos */}
                                         {dayEvents.todos.map((todo) => (
-                                            <div key={`todo-${todo.id}`} className="text-[10px] px-1.5 py-1 rounded bg-emerald-50 text-emerald-700 border border-emerald-100 flex flex-col gap-0.5 shadow-sm">
+                                            <div key={`todo-${todo.id}`} className="text-[10px] px-1.5 py-1 rounded bg-emerald-50 text-slate-900 border border-emerald-100 flex flex-col gap-0.5 shadow-sm">
                                                 <div className="font-semibold flex items-start gap-1">
                                                     {todo.completed ? (
                                                         <CheckCircle2 className="h-3 w-3 mt-0.5 shrink-0" />
@@ -275,12 +275,12 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                                                 </div>
                                                 <div className="flex flex-col gap-0.5 ps-4 opacity-80">
                                                     <div className="flex items-center gap-1">
-                                                        <Clock className="h-2.5 w-2.5 shrink-0 text-emerald-600" />
+                                                        <Clock className="h-2.5 w-2.5 shrink-0 text-slate-900" />
                                                         <span>{todo.start_time}</span>
                                                     </div>
                                                     {todo.client && (
                                                         <div className="flex items-center gap-1">
-                                                            <User className="h-2.5 w-2.5 shrink-0 text-emerald-600" />
+                                                            <User className="h-2.5 w-2.5 shrink-0 text-slate-900" />
                                                             <span className="truncate">{todo.client}</span>
                                                         </div>
                                                     )}
@@ -363,7 +363,7 @@ export default function TaskCalendar({ events, year, month, clients, filters }: 
                         </div>
 
                         <div className="space-y-2 pt-2 border-t border-slate-100">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-end gap-4">
                                 <Label>{__('general.sub_todos')}</Label>
                                 <Button 
                                     type="button" 

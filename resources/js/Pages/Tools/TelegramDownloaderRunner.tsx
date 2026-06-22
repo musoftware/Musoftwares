@@ -172,7 +172,7 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
 
             <div className="flex-1 flex overflow-hidden">
                 {/* Main Workspace content */}
-                <main className="flex-1 overflow-y-auto p-8 max-w-5xl mx-auto w-full">
+                <main className="flex-1 overflow-y-auto p-8 max-w-7xl mx-auto w-full">
                     {activeTab === 'auth' && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <div>

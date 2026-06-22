@@ -380,7 +380,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                             </div>
 
                             <div className="pt-4 border-t">
-                                <div className="flex justify-between items-center mb-2">
+                                <div className="flex justify-end gap-4 items-center mb-2">
                                     <Label htmlFor="description">{__('general.contract_description_content')}</Label>
                                     <Button type="button" variant="secondary" size="sm" onClick={handleAiReview} disabled={isReviewing}>
                                         <Wand2 className="w-4 h-4 me-2" />
@@ -436,7 +436,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                 <Label className="mb-2 block">{__('general.assigned_client')}</Label>
                                 
                                 {data.user_id ? (
-                                    <div className="flex items-center justify-between p-3 border rounded-md bg-gray-50">
+                                    <div className="flex items-center justify-end gap-4 p-3 border rounded-md bg-gray-50">
                                         <span className="text-sm font-medium">{selectedClientName}</span>
                                         <Button type="button" variant="ghost" size="icon" onClick={() => { setData('user_id', null); setSelectedClientName(''); }}>
                                             <X className="w-4 h-4 text-red-500" />

@@ -1,0 +1,376 @@
+# UX Consistency Audit
+
+## Standard Rules Deduced
+
+1. **Button Placements**: Form action buttons (Save/Cancel) should be right-aligned (justify-end gap-2 or justify-end gap-4), not spread apart (justify-between) or left-aligned.
+2. **Spacing & Layout Widths**: Standard application pages must use the boxed layout max-w-7xl mx-auto px-4 sm:px-6 lg:px-8. Intermediate custom max-widths (like max-w-2xl, max-w-3xl, max-w-5xl) on page containers lead to inconsistent margins and should be avoided.
+3. **Colors and Typography**: Admin interfaces must strictly adhere to the Black & White Premium aesthetic. Decorative colors (	ext-blue-500, g-emerald-500, g-indigo-600) are forbidden. Colors are strictly reserved for semantic status alerts (e.g. 	ext-red-600 for danger, 	ext-green-600 for success).
+4. **Component Structural Layouts**: Full-page forms are mandatory for entity Create/Edit actions. The use of Modals (<Dialog>), Dialogs, or Sliding Sheets for standard form submissions is strictly prohibited.
+
+---
+
+## Violations Identified
+
+### 1. Button Placements (justify-between in forms)
+- resources\js\Components\Marketplace\Layout\MarketplaceHeader.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Layouts\PublicLayout.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\BlogArticles\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Business\Costs.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Business\Income.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Business\RecurringIncome\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Business\RecurringSalaries\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\CharityCounter\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Coupons\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\ERP\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Finance\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Finance\PaymentLinks\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Freelance\Contracts\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Freelance\Jobs\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Freelance\Profiles\Edit.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Freelance\Profiles\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Freelance\Proposals\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Freelance\Skills\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Invoices\Show.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Marketplace\Edit.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Marketplace\Pending.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\PaymentGateway\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\PaymentGateway\Show.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\PointPackages\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Points\Create.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Points\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Projects\Contracts\ContractModal.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Projects\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Reports\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Resellers\Create.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Resellers\Show.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\SerialSoftwares\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Settings\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Settings\Security.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Tasks\AsList.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Tasks\ClientTasks.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Tasks\TaskCalendar.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Tickets\Show.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Users\AssignTask.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Admin\Vouchers\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Auth\Login.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Booking\Appointments.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Booking\Checkout.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Booking\Exceptions.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Booking\Providers.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Booking\Public\Show.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\CRM\Campaigns\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\CRM\Leads\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\CRM\Reports\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\CRM\Sequences\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\CRM\Team\Members.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\CRM\Widgets\Form.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\ERP\Dashboard.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\ERP\Debts\Transactions\Create.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\ERP\Inventory\Components\ManageCategoriesModal.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\ERP\Inventory\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\ERP\Payroll\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\ERP\Projects\Show.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\ERP\Tasks\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\ERP\Tasks\Show.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\ERP\Team\Login.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\ERP\Team\Members.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\ERP\Team\MyPortal.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\ERP\Wallet\Adjust.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Fbmb\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Freelance\Contracts\Show.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Freelance\Freelancers\Browse.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Freelance\Jobs\Browse.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Freelance\Jobs\Show.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Frontend\Contract\Show.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\GoldSavers\Wallets\Index.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\GoldSavers\Wallets\Show.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Guest\InvoiceShow.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\iSaaS\ClientPortal\ContractView.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\iSaaS\Contracts\Components\ContractForm.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\iSaaS\Proposals\Create.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Marketplace\Services\Create.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Marketplace\Services\Edit.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\SmsPaymentGateway\ApiKeys.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\SmsPaymentGateway\Device.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\SmsPaymentGateway\IntegrationTester.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\SmsPaymentGateway\PaymentLinks.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\SmsPaymentGateway\Settings.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\SmsPaymentGateway\SmsSimulator.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\SmsPaymentGateway\TestMode.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\SmsPaymentGateway\Wallets.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\SmsPaymentGateway\Webhooks.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Tools\B2BProspector\components\workspaces\CampaignsWorkspace.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Tools\B2BProspector\components\workspaces\InboxesWorkspace.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Tools\B2BProspector\components\workspaces\LinkedInWorkspace.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Tools\B2BProspector\components\workspaces\OutreachWorkspace.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Tools\GoogleMapsRunner.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Tools\ScreenshotFeedbackRunner.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Tools\Subscribe.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Tools\WhatsApp\Workspaces\AccountsWorkspace.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Tools\WhatsApp\Workspaces\AutoReplyWorkspace.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Tools\WhatsApp\Workspaces\BroadcastListsWorkspace.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Tools\WhatsApp\Workspaces\ContactsWorkspace.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\Tools\WhatsApp\Workspaces\GroupsWorkspace.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\WebTools\Financial\GoldSaver.tsx uses justify-between for form actions instead of justify-end.
+- resources\js\Pages\WebTools\Financial\WithdrawInstapay.tsx uses justify-between for form actions instead of justify-end.
+
+### 2. Spacing & Layout Widths (Inconsistent max-w-*)
+- resources\js\Pages\Admin\BlogArticles\Index.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Admin\Coupons\Index.tsx contains intermediate widths: max-w-lg
+- resources\js\Pages\Admin\EmployeeTodos\Index.tsx contains intermediate widths: max-w-lg
+- resources\js\Pages\Admin\ERP\Index.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Admin\Freelance\Contracts\Index.tsx contains intermediate widths: max-w-2xl
+- resources\js\Pages\Admin\Freelance\Jobs\Index.tsx contains intermediate widths: max-w-2xl
+- resources\js\Pages\Admin\Freelance\Profiles\Index.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Admin\Freelance\Proposals\Index.tsx contains intermediate widths: max-w-2xl
+- resources\js\Pages\Admin\Freelance\Proposals\Show.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\Admin\GuestTickets\Show.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\Admin\Invoices\Show.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Admin\Invoices\TimerDetails.tsx contains intermediate widths: max-w-6xl, max-w-xs
+- resources\js\Pages\Admin\Marketplace\Pending.tsx contains intermediate widths: max-w-md, max-w-xl
+- resources\js\Pages\Admin\Notifications\Broadcast.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\Admin\Notifications\Show.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\Admin\PaymentGateway\Index.tsx contains intermediate widths: max-w-lg
+- resources\js\Pages\Admin\PaymentGateway\Show.tsx contains intermediate widths: max-w-md, max-w-3xl
+- resources\js\Pages\Admin\Plans\Create.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Admin\Plans\Index.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Admin\PointPackages\Index.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Admin\Points\Index.tsx contains intermediate widths: max-w-md, max-w-2xl
+- resources\js\Pages\Admin\Projects\Contracts\ContractModal.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\Admin\Resellers\Show.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Admin\SerialDevices\Index.tsx contains intermediate widths: max-w-xl
+- resources\js\Pages\Admin\SerialUserDevices\Assign.tsx contains intermediate widths: max-w-2xl
+- resources\js\Pages\Admin\SerialUserDevices\Index.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Admin\Tasks\AsList.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Admin\Tasks\ClientTasks.tsx contains intermediate widths: max-w-md, max-w-xs, max-w-xl
+- resources\js\Pages\Admin\Tasks\TaskCalendar.tsx contains intermediate widths: max-w-xl
+- resources\js\Pages\Admin\Tickets\Index.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Admin\Tools\AiEstimator.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\Admin\Transactions\Cost.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Admin\Transactions\Income.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Admin\Transactions\Transfer.tsx contains intermediate widths: max-w-6xl
+- resources\js\Pages\Admin\Users\AssignTask.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\Admin\Vouchers\Index.tsx contains intermediate widths: max-w-lg
+- resources\js\Pages\AffiliatePos\POS\Index.tsx contains intermediate widths: max-w-xl
+- resources\js\Pages\AffiliatePos\Vendor\Products\Index.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Auth\OnboardingWizard.tsx contains intermediate widths: max-w-xl
+- resources\js\Pages\Booking\Appointments.tsx contains intermediate widths: max-w-6xl
+- resources\js\Pages\Booking\Checkout.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\Booking\Providers.tsx contains intermediate widths: max-w-6xl, max-w-2xl, max-w-md
+- resources\js\Pages\Booking\Public\Show.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\Booking\Success.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\BookingPriority\QueueManager.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\BookingRules\Builder.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\BookingSmartSlots\SmartCalendar.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\Client\Activity\Index.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\Client\Billing\PaymentResult.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Client\Kyc\Index.tsx contains intermediate widths: max-w-4xl, max-w-md
+- resources\js\Pages\Client\Vouchers\Index.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\CRM\Customers\Show.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\CRM\Embeds\CrmWidgetIframe.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\CRM\Leads\Index.tsx contains intermediate widths: max-w-md, max-w-xs
+- resources\js\Pages\CRM\Reports\Index.tsx contains intermediate widths: max-w-xl
+- resources\js\Pages\CRM\Search\Index.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\CRM\Sequences\Show.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\CRM\Team\Login.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\CRM\Team\Members.tsx contains intermediate widths: max-w-xs, max-w-md
+- resources\js\Pages\CRM\Widgets\Form.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\CRM\Widgets\Show.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\CRM\Workspaces\Index.tsx contains intermediate widths: max-w-5xl, max-w-md
+- resources\js\Pages\ERP\Backup\Index.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\ERP\ClientInvoices\Index.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\ERP\Clients\Components\ClientActionModal.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\ERP\Dashboard.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\ERP\Debts\Index.tsx contains intermediate widths: max-w-6xl
+- resources\js\Pages\ERP\Debts\Show.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\ERP\Errors\NotFound.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\ERP\Files\Index.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\ERP\Inventory\Components\ManageCategoriesModal.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\ERP\Inventory\Index.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\ERP\Manager\Approvals.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\ERP\Manager\ReviewLeave.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\ERP\Payroll\Index.tsx contains intermediate widths: max-w-2xl
+- resources\js\Pages\ERP\Pos\Partials\CheckoutModal.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\ERP\Projects\Show.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\ERP\Referrals\Index.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\ERP\Tasks\Show.tsx contains intermediate widths: max-w-2xl
+- resources\js\Pages\ERP\Team\Members.tsx contains intermediate widths: max-w-xs, max-w-md
+- resources\js\Pages\ERP\Transactions\Show.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\ERP\UpgradePreview.tsx contains intermediate widths: max-w-2xl
+- resources\js\Pages\Error.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Fbmb\Index.tsx contains intermediate widths: max-w-3xl, max-w-xs, max-w-md
+- resources\js\Pages\Freelance\AboutUs.tsx contains intermediate widths: max-w-3xl, max-w-4xl, max-w-2xl
+- resources\js\Pages\Freelance\Contracts\Show.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Freelance\HowItWorks.tsx contains intermediate widths: max-w-3xl, max-w-5xl
+- resources\js\Pages\Freelance\Jobs\Show.tsx contains intermediate widths: max-w-xl
+- resources\js\Pages\Freelance\Landing.tsx contains intermediate widths: max-w-2xl
+- resources\js\Pages\Frontend\Contract\Show.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\GoldSavers\Analytics\Index.tsx contains intermediate widths: max-w-2xl
+- resources\js\Pages\GoldSavers\Wallets\Index.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\GoldSavers\Wallets\Show.tsx contains intermediate widths: max-w-xs, max-w-lg
+- resources\js\Pages\Guest\InvoiceShow.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\Guest\PaymentLinkShow.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Guest\PaymentResult.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\iSaaS\ClientPortal\ContractView.tsx contains intermediate widths: max-w-4xl, max-w-md
+- resources\js\Pages\iSaaS\Proposals\Create.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\iSaaS\Proposals\Show.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\Marketplace\Browse.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\Marketplace\Services\ExclusiveService.tsx contains intermediate widths: max-w-xl, max-w-md
+- resources\js\Pages\Marketplace\Services\Steps\GalleryStep.tsx contains intermediate widths: max-w-xl
+- resources\js\Pages\Marketplace\Services\Steps\PublishStep.tsx contains intermediate widths: max-w-2xl, max-w-md
+- resources\js\Pages\Onboarding\RoleAssignment.tsx contains intermediate widths: max-w-2xl
+- resources\js\Pages\Onboarding\TenantSetup.tsx contains intermediate widths: max-w-xl
+- resources\js\Pages\Public\Blog\Index.tsx contains intermediate widths: max-w-3xl, max-w-2xl
+- resources\js\Pages\Public\Blog\Show.tsx contains intermediate widths: max-w-4xl, max-w-3xl
+- resources\js\Pages\PWA\InstallGuide.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Runtime\Download.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\SmsPaymentGateway\ApiKeys.tsx contains intermediate widths: max-w-5xl, max-w-md, max-w-lg, max-w-xs
+- resources\js\Pages\SmsPaymentGateway\Device.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\SmsPaymentGateway\Devices.tsx contains intermediate widths: max-w-6xl, max-w-3xl
+- resources\js\Pages\SmsPaymentGateway\Documentation.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\SmsPaymentGateway\Install.tsx contains intermediate widths: max-w-4xl, max-w-md
+- resources\js\Pages\SmsPaymentGateway\IntegrationTester.tsx contains intermediate widths: max-w-6xl
+- resources\js\Pages\SmsPaymentGateway\PaymentLinks.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\SmsPaymentGateway\Settings.tsx contains intermediate widths: max-w-3xl, max-w-md
+- resources\js\Pages\SmsPaymentGateway\SmsSimulator.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\SmsPaymentGateway\Verification.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\SmsPaymentGateway\VerificationSecret.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\SmsPaymentGateway\Wallets.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\SmsPaymentGateway\Webhooks.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\TextPaymentGateway.tsx contains intermediate widths: max-w-6xl, max-w-2xl
+- resources\js\Pages\Tools\AdLibraryMonitorRunner.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Tools\ArticleMakerRunner.tsx contains intermediate widths: max-w-5xl, max-w-lg, max-w-xs
+- resources\js\Pages\Tools\B2BProspector\B2BProspectorRunnerPage.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\Tools\B2BProspector\components\workspaces\CampaignsWorkspace.tsx contains intermediate widths: max-w-xs, max-w-lg
+- resources\js\Pages\Tools\B2BProspector\components\workspaces\InboxesWorkspace.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Tools\B2BProspector\components\workspaces\LeadsWorkspace.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Tools\B2BProspector\components\workspaces\OutreachWorkspace.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Tools\Billing.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\Tools\CompetitorTrackerRunner.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Tools\DataFilterRunner.tsx contains intermediate widths: max-w-5xl, max-w-xs
+- resources\js\Pages\Tools\DomainIntelligenceRunner.tsx contains intermediate widths: max-w-6xl
+- resources\js\Pages\Tools\Downloads.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\Tools\DuplicateFinderRunner.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\Tools\EmailSenderRunner.tsx contains intermediate widths: max-w-6xl, max-w-md, max-w-3xl, max-w-2xl, max-w-4xl, max-w-lg, max-w-xl, max-w-xs
+- resources\js\Pages\Tools\ExcelMergerRunner.tsx contains intermediate widths: max-w-xs, max-w-2xl
+- resources\js\Pages\Tools\FacebookExtractorRunner.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\Tools\FacebookPublisher\Runner.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\Tools\FbInboxSenderRunner.tsx contains intermediate widths: max-w-6xl, max-w-xs, max-w-lg
+- resources\js\Pages\Tools\FormatExtractorRunner.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\Tools\GoogleMapsRunner.tsx contains intermediate widths: max-w-md, max-w-2xl, max-w-5xl, max-w-xs, max-w-6xl
+- resources\js\Pages\Tools\HarajRunner.tsx contains intermediate widths: max-w-5xl, max-w-xs
+- resources\js\Pages\Tools\HookAnalyzerRunner.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\Tools\InstagramRunner.tsx contains intermediate widths: max-w-5xl, max-w-md, max-w-xs
+- resources\js\Pages\Tools\MyLicenses.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\Tools\ObfuscatorRunner.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\Tools\OpensooqRunner.tsx contains intermediate widths: max-w-5xl, max-w-md, max-w-xs
+- resources\js\Pages\Tools\PropertyFinderRunner.tsx contains intermediate widths: max-w-5xl, max-w-md, max-w-xs
+- resources\js\Pages\Tools\Runner.tsx contains intermediate widths: max-w-lg, max-w-md
+- resources\js\Pages\Tools\RuntimeConnect.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Tools\ScreenshotFeedbackRunner.tsx contains intermediate widths: max-w-6xl, max-w-2xl
+- resources\js\Pages\Tools\SnapDownloader\components\shared\LogTerminal.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Tools\SnapDownloader\components\workspaces\ActiveProcessesWorkspace.tsx contains intermediate widths: max-w-3xl, max-w-xs
+- resources\js\Pages\Tools\SnapDownloader\components\workspaces\AutomationsWorkspace.tsx contains intermediate widths: max-w-3xl, max-w-xs
+- resources\js\Pages\Tools\SnapDownloader\components\workspaces\FoldersWorkspace.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\Tools\SnapDownloader\components\workspaces\HistoryWorkspace.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\Tools\SnapDownloader\components\workspaces\NewDownloadWorkspace.tsx contains intermediate widths: max-w-2xl
+- resources\js\Pages\Tools\SnapDownloader\components\workspaces\QueueWorkspace.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\Tools\Subscribe.tsx contains intermediate widths: max-w-md, max-w-lg
+- resources\js\Pages\Tools\SwipeVaultRunner.tsx contains intermediate widths: max-w-md, max-w-lg, max-w-xs
+- resources\js\Pages\Tools\TelegramDownloaderRunner.tsx contains intermediate widths: max-w-5xl, max-w-xl
+- resources\js\Pages\Tools\TelegramToolRunner.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Tools\TikTokBoosterRunner.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\Tools\TikTokIntelligenceRunner.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\Tools\Tutorial.tsx contains intermediate widths: max-w-3xl, max-w-xl
+- resources\js\Pages\Tools\UgcCreatorsSearchRunner.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Tools\ViralAutopsyRunner.tsx contains intermediate widths: max-w-4xl
+- resources\js\Pages\Tools\WaAiAgentRunner.tsx contains intermediate widths: max-w-lg, max-w-5xl, max-w-md
+- resources\js\Pages\Tools\WaFunnelEngineRunner.tsx contains intermediate widths: max-w-5xl, max-w-md
+- resources\js\Pages\Tools\WaWarmupRunner.tsx contains intermediate widths: max-w-5xl
+- resources\js\Pages\Tools\WhatsApp\Workspaces\AccountsWorkspace.tsx contains intermediate widths: max-w-lg
+- resources\js\Pages\Tools\WhatsApp\Workspaces\AutoReplyWorkspace.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Tools\WhatsApp\Workspaces\BroadcastListsWorkspace.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Tools\WhatsApp\Workspaces\CampaignsListWorkspace.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Tools\WhatsApp\Workspaces\CampaignWorkspace.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\Tools\WhatsApp\Workspaces\DeliverabilityWorkspace.tsx contains intermediate widths: max-w-xs
+- resources\js\Pages\Tools\WhatsApp\Workspaces\GroupsWorkspace.tsx contains intermediate widths: max-w-md
+- resources\js\Pages\Tools\WhatsApp\Workspaces\MediaLibraryWorkspace.tsx contains intermediate widths: max-w-2xl
+- resources\js\Pages\Tools\WhatsApp\Workspaces\TemplatesWorkspace.tsx contains intermediate widths: max-w-3xl, max-w-2xl
+- resources\js\Pages\WebTools\Financial\GoldSaver.tsx contains intermediate widths: max-w-3xl
+- resources\js\Pages\WebTools\Financial\PayGuest.tsx contains intermediate widths: max-w-4xl, max-w-2xl
+- resources\js\Pages\WebTools\Financial\PayGuestPayLink.tsx contains intermediate widths: max-w-3xl, max-w-xl, max-w-md
+- resources\js\Pages\WebTools\Financial\WithdrawInstapay.tsx contains intermediate widths: max-w-5xl, max-w-2xl, max-w-4xl
+- resources\js\Pages\WebTools\Financial\WithdrawInstapayPayLink.tsx contains intermediate widths: max-w-3xl, max-w-xl, max-w-md
+- resources\js\Pages\WebTools\Utilities\CipherIdentifier.tsx contains intermediate widths: max-w-4xl, max-w-2xl
+- resources\js\Pages\WebTools\Utilities\CoordinatesConverter.tsx contains intermediate widths: max-w-4xl, max-w-2xl
+- resources\js\Pages\WebTools\Utilities\JsObfuscator.tsx contains intermediate widths: max-w-2xl, max-w-md
+- resources\js\Pages\WebTools\Utilities\MultipleCountdownTimer.tsx contains intermediate widths: max-w-6xl, max-w-2xl
+- resources\js\Pages\Welcome.tsx contains intermediate widths: max-w-2xl
+
+### 3. Colors and Typography (Decorative colors in Admin UI)
+- resources\js\Components\Admin\AppSidebar.tsx contains forbidden decorative colors: text-indigo-600
+- resources\js\Components\AdminNotesPanel.tsx contains forbidden decorative colors: text-blue-500
+- resources\js\Layouts\AdminSidebarLayout.tsx contains forbidden decorative colors: text-rose-600, text-rose-700
+- resources\js\Pages\Admin\Business\BalanceReport.tsx contains forbidden decorative colors: text-rose-400, text-emerald-500, text-emerald-600, text-rose-500, text-rose-600, text-purple-500, text-purple-600
+- resources\js\Pages\Admin\Business\Costs.tsx contains forbidden decorative colors: text-rose-600, text-rose-500, bg-rose-600, bg-rose-700, text-blue-700, text-indigo-600
+- resources\js\Pages\Admin\Business\CostsCreate.tsx contains forbidden decorative colors: text-rose-600, text-rose-500, bg-rose-600, bg-rose-700
+- resources\js\Pages\Admin\Business\CostsEdit.tsx contains forbidden decorative colors: text-rose-600, text-rose-500, bg-rose-600, bg-rose-700
+- resources\js\Pages\Admin\Business\Income.tsx contains forbidden decorative colors: text-emerald-600, text-indigo-500, text-blue-700, text-indigo-600, text-rose-600
+- resources\js\Pages\Admin\Business\RecurringCosts\View.tsx contains forbidden decorative colors: text-emerald-700
+- resources\js\Pages\Admin\Business\RecurringIncome\View.tsx contains forbidden decorative colors: text-emerald-600, text-emerald-700
+- resources\js\Pages\Admin\Business\RecurringSalaries\View.tsx contains forbidden decorative colors: text-emerald-700
+- resources\js\Pages\Admin\Business\Reports.tsx contains forbidden decorative colors: text-indigo-600
+- resources\js\Pages\Admin\BusyTimes\Index.tsx contains forbidden decorative colors: text-blue-600, text-indigo-600
+- resources\js\Pages\Admin\Coupons\Index.tsx contains forbidden decorative colors: text-blue-700, text-purple-700
+- resources\js\Pages\Admin\Dashboard.tsx contains forbidden decorative colors: text-blue-700, text-blue-500, text-indigo-500, text-blue-600, text-purple-600
+- resources\js\Pages\Admin\EmployeeTodos\Index.tsx contains forbidden decorative colors: text-emerald-700, text-blue-700, text-indigo-700, text-purple-700, text-indigo-600, text-blue-600, text-purple-600
+- resources\js\Pages\Admin\ERP\Index.tsx contains forbidden decorative colors: text-indigo-600, text-emerald-600, bg-indigo-600, bg-indigo-700, text-indigo-700
+- resources\js\Pages\Admin\ERP\Show.tsx contains forbidden decorative colors: text-indigo-600, text-emerald-700, text-rose-700, bg-indigo-600, bg-indigo-700, text-indigo-700, text-blue-700, text-purple-700
+- resources\js\Pages\Admin\Finance\Index.tsx contains forbidden decorative colors: text-indigo-700, text-blue-700
+- resources\js\Pages\Admin\Finance\PaymentLinks\Index.tsx contains forbidden decorative colors: text-emerald-700, text-emerald-600
+- resources\js\Pages\Admin\Freelance\Contracts\Show.tsx contains forbidden decorative colors: text-blue-600, text-purple-600, text-blue-700
+- resources\js\Pages\Admin\Freelance\Jobs\Create.tsx contains forbidden decorative colors: text-rose-500
+- resources\js\Pages\Admin\Freelance\Jobs\Edit.tsx contains forbidden decorative colors: text-rose-500
+- resources\js\Pages\Admin\Freelance\Jobs\Show.tsx contains forbidden decorative colors: text-blue-700, text-blue-600, text-blue-500
+- resources\js\Pages\Admin\Freelance\Profiles\Index.tsx contains forbidden decorative colors: text-purple-600, text-blue-600
+- resources\js\Pages\Admin\Freelance\Proposals\Index.tsx contains forbidden decorative colors: text-blue-600
+- resources\js\Pages\Admin\Freelance\Proposals\Show.tsx contains forbidden decorative colors: text-blue-600
+- resources\js\Pages\Admin\Freelance\Skills\Index.tsx contains forbidden decorative colors: text-blue-600
+- resources\js\Pages\Admin\Invoices\Index.tsx contains forbidden decorative colors: text-emerald-700, text-blue-500, text-blue-600, text-emerald-600, text-emerald-500
+- resources\js\Pages\Admin\Invoices\Show.tsx contains forbidden decorative colors: bg-blue-600, bg-blue-700, text-blue-600, text-blue-700, text-emerald-600, text-blue-500, bg-emerald-500, bg-emerald-600
+- resources\js\Pages\Admin\Invoices\TimerDetails.tsx contains forbidden decorative colors: text-indigo-600, text-blue-600, bg-blue-600, bg-blue-700, text-blue-700
+- resources\js\Pages\Admin\Marketplace\Categories.tsx contains forbidden decorative colors: bg-indigo-600, bg-indigo-700
+- resources\js\Pages\Admin\Marketplace\Orders\Index.tsx contains forbidden decorative colors: text-indigo-600
+- resources\js\Pages\Admin\Marketplace\Orders\Show.tsx contains forbidden decorative colors: text-indigo-600
+- resources\js\Pages\Admin\Marketplace\ServiceLandingPages\Index.tsx contains forbidden decorative colors: text-blue-500
+- resources\js\Pages\Admin\Notifications\Broadcast.tsx contains forbidden decorative colors: text-indigo-500, bg-indigo-600
+- resources\js\Pages\Admin\Notifications\Show.tsx contains forbidden decorative colors: text-indigo-700, text-blue-500, text-purple-500, text-emerald-500, text-indigo-500, text-blue-600
+- resources\js\Pages\Admin\PaymentMethods\Index.tsx contains forbidden decorative colors: text-emerald-700, text-blue-600, text-indigo-600, text-purple-600, text-rose-600, bg-indigo-600, text-emerald-600, text-emerald-500
+- resources\js\Pages\Admin\PaymentMethods\Show.tsx contains forbidden decorative colors: text-emerald-700, text-indigo-600, bg-emerald-600, bg-emerald-700
+- resources\js\Pages\Admin\Plans\Index.tsx contains forbidden decorative colors: text-blue-600
+- resources\js\Pages\Admin\Points\Index.tsx contains forbidden decorative colors: bg-blue-600, text-blue-600
+- resources\js\Pages\Admin\Projects\Contracts\ContractModal.tsx contains forbidden decorative colors: text-indigo-600, bg-indigo-600, bg-indigo-700, text-indigo-700
+- resources\js\Pages\Admin\Projects\Contracts.tsx contains forbidden decorative colors: text-blue-500, text-indigo-600, text-indigo-500, text-emerald-700, text-blue-700, text-emerald-600
+- resources\js\Pages\Admin\Projects\Index.tsx contains forbidden decorative colors: text-blue-600, text-rose-600, text-blue-500, bg-blue-600
+- resources\js\Pages\Admin\Reports\Index.tsx contains forbidden decorative colors: text-blue-600, text-indigo-600, bg-blue-500
+- resources\js\Pages\Admin\Resellers\Create.tsx contains forbidden decorative colors: text-emerald-600
+- resources\js\Pages\Admin\Resellers\Index.tsx contains forbidden decorative colors: bg-emerald-500, text-emerald-500, text-emerald-600
+- resources\js\Pages\Admin\Resellers\Show.tsx contains forbidden decorative colors: text-emerald-600, text-emerald-700, text-emerald-500, text-emerald-400, text-blue-500
+- resources\js\Pages\Admin\SerialDevices\Index.tsx contains forbidden decorative colors: text-blue-600
+- resources\js\Pages\Admin\SerialUserDevices\ByUser.tsx contains forbidden decorative colors: text-emerald-400, bg-emerald-500
+- resources\js\Pages\Admin\SerialUserDevices\Index.tsx contains forbidden decorative colors: bg-emerald-500, text-emerald-400
+- resources\js\Pages\Admin\Settings\IncomingWebhooks\Index.tsx contains forbidden decorative colors: text-indigo-600
+- resources\js\Pages\Admin\Settings\IncomingWebhooks\Show.tsx contains forbidden decorative colors: text-rose-500, text-rose-700, text-emerald-400
+- resources\js\Pages\Admin\Tasks\AsList.tsx contains forbidden decorative colors: text-rose-700, text-blue-700, text-indigo-700, text-emerald-700, text-indigo-600, text-emerald-600, bg-indigo-600, bg-indigo-700, text-emerald-500
+- resources\js\Pages\Admin\Tasks\ClientTasks.tsx contains forbidden decorative colors: text-indigo-600, text-indigo-700, text-emerald-700, text-rose-700, text-rose-600, bg-indigo-600, bg-indigo-700, bg-rose-600, bg-rose-700, bg-emerald-600, bg-emerald-700, text-emerald-600
+- resources\js\Pages\Admin\Tasks\TaskCalendar.tsx contains forbidden decorative colors: text-indigo-600, bg-indigo-600, text-rose-700, text-indigo-700, text-emerald-700, text-emerald-600
+- resources\js\Pages\Admin\Tickets\Index.tsx contains forbidden decorative colors: text-indigo-600, text-indigo-700, text-emerald-700, bg-blue-500, bg-emerald-500
+- resources\js\Pages\Admin\Tickets\Show.tsx contains forbidden decorative colors: bg-blue-500, bg-emerald-500, bg-rose-500, bg-cyan-500, text-blue-500, text-emerald-700, bg-indigo-600, text-indigo-600, bg-indigo-700, text-emerald-600, bg-emerald-600, bg-emerald-700
+- resources\js\Pages\Admin\Transactions\Create.tsx contains forbidden decorative colors: text-purple-500
+- resources\js\Pages\Admin\WithdrawRequests\Index.tsx contains forbidden decorative colors: text-blue-600
+- resources\js\Pages\Admin\WithdrawRequests\Show.tsx contains forbidden decorative colors: text-indigo-600
+- resources\js\Pages\AffiliatePos\Admin\Orders\Show.tsx contains forbidden decorative colors: bg-blue-600, text-blue-700
+
+### 4. Component Structural Layouts (Modals used for Forms)
+No violations found.
+

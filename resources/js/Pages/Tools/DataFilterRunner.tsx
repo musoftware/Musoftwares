@@ -280,7 +280,7 @@ export default function DataFilterRunner({ tool }: any) {
                 </aside>
 
                 {/* Main Workspace content */}
-                <main className="flex-1 overflow-y-auto p-8 max-w-5xl mx-auto w-full">
+                <main className="flex-1 overflow-y-auto p-8 max-w-7xl mx-auto w-full">
                     {/* WORKSPACE 1: ENGINE */}
                     {activeTab === 'engine' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">

@@ -35,7 +35,7 @@ export default function Contracts({ project, contracts, currencies }) {
             header={`Contracts for ${project.project_name}`}
         >
             <div className="mb-6 flex justify-between items-center">
-                <Link href="/admin/projects?status=active" className="text-blue-500 hover:underline">
+                <Link href="/admin/projects?status=active" className="text-slate-900 hover:underline">
                     &larr; Back to Projects
                 </Link>
                 <div className="flex gap-2">
@@ -49,7 +49,7 @@ export default function Contracts({ project, contracts, currencies }) {
                 <Card className="text-center p-12 bg-slate-50 border-dashed">
                     <div className="flex flex-col items-center gap-4">
                         <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
-                            <FileText className="h-6 w-6 text-indigo-600" />
+                            <FileText className="h-6 w-6 text-slate-900" />
                         </div>
                         <div>
                             <h3 className="text-lg font-semibold text-slate-900">{__('general.no_contracts_yet')}</h3>
@@ -68,13 +68,13 @@ export default function Contracts({ project, contracts, currencies }) {
                             <CardHeader className="pb-3 border-b">
                                 <div className="flex justify-between items-start">
                                     <div className="flex items-center gap-2">
-                                        <FileText className="h-5 w-5 text-indigo-500" />
+                                        <FileText className="h-5 w-5 text-slate-900" />
                                         <CardTitle className="text-base truncate">{contract.project_name}</CardTitle>
                                     </div>
                                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold
-                                        ${contract.status === 'signed' ? 'bg-emerald-100 text-emerald-700' : ''}
+                                        ${contract.status === 'signed' ? 'bg-emerald-100 text-slate-900' : ''}
                                         ${contract.status === 'draft' ? 'bg-slate-100 text-slate-700' : ''}
-                                        ${contract.status === 'sent' ? 'bg-blue-100 text-blue-700' : ''}
+                                        ${contract.status === 'sent' ? 'bg-blue-100 text-slate-900' : ''}
                                     `}>
                                         {contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}
                                     </span>
@@ -99,7 +99,7 @@ export default function Contracts({ project, contracts, currencies }) {
                                         </span>
                                     </div>
                                     {contract.status === 'signed' && (
-                                        <div className="flex justify-between text-sm text-emerald-600 bg-emerald-50 p-2 rounded">
+                                        <div className="flex justify-between text-sm text-slate-900 bg-emerald-50 p-2 rounded">
                                             <span>Signed by:</span>
                                             <span className="font-semibold truncate max-w-[120px]" title={contract.client_name}>
                                                 {contract.client_name}
@@ -111,7 +111,7 @@ export default function Contracts({ project, contracts, currencies }) {
                                     <Button variant="outline" size="sm" className="flex-1" onClick={() => handleEdit(contract)}>
                                         Edit / View
                                     </Button>
-                                    <Button variant="outline" size="sm" className="px-3 text-slate-500 hover:text-indigo-600" onClick={() => handleCopyLink(contract.uuid)} title={__('general.copy_public_link')}>
+                                    <Button variant="outline" size="sm" className="px-3 text-slate-500 hover:text-slate-900" onClick={() => handleCopyLink(contract.uuid)} title={__('general.copy_public_link')}>
                                         <Copy className="w-4 h-4" />
                                     </Button>
                                 </div>

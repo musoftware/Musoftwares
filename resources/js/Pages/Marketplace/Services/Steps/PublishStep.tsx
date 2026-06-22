@@ -5,13 +5,13 @@ import { __ } from '@/lib/i18n';
 
 export default function PublishStep({ data, setStep, processing }: any) {
     return (
-        <div className="max-w-2xl mx-auto space-y-8 py-10">
+        <div className="max-w-7xl mx-auto space-y-8 py-10">
             <div className="text-center space-y-4">
                 <div className="w-20 h-20 bg-indigo-100 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
                     <Rocket className="w-10 h-10 text-indigo-600" />
                 </div>
                 <h2 className="text-3xl font-bold text-slate-900">{__('general.almost_there')}</h2>
-                <p className="text-slate-500 max-w-md mx-auto leading-relaxed">{__('general.you_re_just_one_click_away_from_publishing_your_service_review_your_live_preview_on_the_right_to_make_sure_everything_looks_perfect')}</p>
+                <p className="text-slate-500 max-w-7xl mx-auto leading-relaxed">{__('general.you_re_just_one_click_away_from_publishing_your_service_review_your_live_preview_on_the_right_to_make_sure_everything_looks_perfect')}</p>
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-8">

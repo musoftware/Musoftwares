@@ -207,7 +207,7 @@ export default function WaAiAgentRunner({ tool }: any) {
                     <Plus className="w-3.5 h-3.5" />{__('general.deploy_agent')}</Button>
             </div>
 
-            <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+            <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
                 {/* Stats */}
                 {agents.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -246,7 +246,7 @@ export default function WaAiAgentRunner({ tool }: any) {
                     <div className="py-24 text-center border border-dashed border-slate-800 rounded-2xl">
                         <Brain className="w-12 h-12 text-slate-700 mx-auto mb-4" />
                         <h3 className="text-sm font-bold text-slate-400">{__('general.no_ai_agents_deployed_yet')}</h3>
-                        <p className="text-xs text-slate-600 mt-2 max-w-md mx-auto">{__('general.deploy_an_autonomous_arabic_speaking_ai_agent_that_monitors_your_whatsapp_number_engages_inbound_leads_24_7_and_qualifies_them_using_your_business_context_powered_by_gpt_4o')}</p>
+                        <p className="text-xs text-slate-600 mt-2 max-w-7xl mx-auto">{__('general.deploy_an_autonomous_arabic_speaking_ai_agent_that_monitors_your_whatsapp_number_engages_inbound_leads_24_7_and_qualifies_them_using_your_business_context_powered_by_gpt_4o')}</p>
                         <Button onClick={() => setShowAdd(true)} className="mt-6 gap-2 h-10 bg-indigo-600 text-white hover:bg-indigo-500 mx-auto shadow-lg shadow-indigo-500/20">
                             <Bot className="w-4 h-4" />{__('general.deploy_first_agent')}</Button>
                     </div>

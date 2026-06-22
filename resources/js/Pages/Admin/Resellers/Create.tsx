@@ -101,7 +101,7 @@ export default function ResellersCreate() {
                                 </div>
                             )}
                             {selectedUser && (
-                                <div className="flex items-center gap-2 mt-1 text-xs text-emerald-600">
+                                <div className="flex items-center gap-2 mt-1 text-xs text-slate-900">
                                     <Users className="w-3.5 h-3.5" />
                                     Selected: <span className="font-semibold">{selectedUser.name}</span> ({selectedUser.email})
                                 </div>

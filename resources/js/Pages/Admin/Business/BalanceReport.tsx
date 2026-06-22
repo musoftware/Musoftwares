@@ -70,7 +70,7 @@ export default function BalanceReport() {
                     {payload.map((entry: any, idx: number) => (
                         <div key={idx} className="flex justify-between items-center gap-4 py-0.5">
                             <span className="text-slate-400 capitalize">{entry.name}:</span>
-                            <span className={`font-mono font-semibold ${entry.name === 'profit' && entry.value < 0 ? 'text-rose-400' : ''}`}>
+                            <span className={`font-mono font-semibold ${entry.name === 'profit' && entry.value < 0 ? 'text-slate-900' : ''}`}>
                                 {formatCurrency(entry.value, stats.business_currency_code)}
                             </span>
                         </div>
@@ -110,12 +110,12 @@ export default function BalanceReport() {
                 <Card className="border-none shadow-sm shadow-slate-200/50">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-emerald-500" />
+                            <TrendingUp className="w-4 h-4 text-slate-900" />
                             Total Income ({stats.year})
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-emerald-600 tracking-tight">
+                        <div className="text-3xl font-bold text-slate-900 tracking-tight">
                             {formatCurrency(stats.total_income, stats.business_currency_code)}
                         </div>
                     </CardContent>
@@ -124,12 +124,12 @@ export default function BalanceReport() {
                 <Card className="border-none shadow-sm shadow-slate-200/50">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                            <TrendingDown className="w-4 h-4 text-rose-500" />
+                            <TrendingDown className="w-4 h-4 text-slate-900" />
                             Total Costs ({stats.year})
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-rose-600 tracking-tight">
+                        <div className="text-3xl font-bold text-slate-900 tracking-tight">
                             {formatCurrency(stats.total_costs, stats.business_currency_code)}
                         </div>
                     </CardContent>
@@ -138,12 +138,12 @@ export default function BalanceReport() {
                 <Card className="border-none shadow-sm shadow-slate-200/50">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                            <Activity className="w-4 h-4 text-purple-500" />
+                            <Activity className="w-4 h-4 text-slate-900" />
                             Net Profit ({stats.year})
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className={`text-3xl font-bold tracking-tight ${stats.total_profit >= 0 ? 'text-purple-600' : 'text-rose-600'}`}>
+                        <div className={`text-3xl font-bold tracking-tight ${stats.total_profit >= 0 ? 'text-slate-900' : 'text-slate-900'}`}>
                             {formatCurrency(stats.total_profit, stats.business_currency_code)}
                         </div>
                     </CardContent>
@@ -239,13 +239,13 @@ export default function BalanceReport() {
                             {stats.monthly_trends.map((monthData: any, idx: number) => (
                                 <TableRow key={idx}>
                                     <TableCell className="font-medium text-slate-700">{monthData.name}</TableCell>
-                                    <TableCell className="text-end text-emerald-600 font-medium">
+                                    <TableCell className="text-end text-slate-900 font-medium">
                                         {formatCurrency(monthData.income, stats.business_currency_code)}
                                     </TableCell>
-                                    <TableCell className="text-end text-rose-600 font-medium">
+                                    <TableCell className="text-end text-slate-900 font-medium">
                                         {formatCurrency(monthData.costs, stats.business_currency_code)}
                                     </TableCell>
-                                    <TableCell className={`text-end font-semibold ${monthData.profit >= 0 ? 'text-purple-600' : 'text-rose-600'}`}>
+                                    <TableCell className={`text-end font-semibold ${monthData.profit >= 0 ? 'text-slate-900' : 'text-slate-900'}`}>
                                         {formatCurrency(monthData.profit, stats.business_currency_code)}
                                     </TableCell>
                                 </TableRow>

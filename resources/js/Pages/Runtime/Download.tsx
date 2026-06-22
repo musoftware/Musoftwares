@@ -26,7 +26,7 @@ export default function DownloadPage({ downloadUrl, password, version }: Props) 
     return (
         <AuthenticatedLayout>
             <Head title={__('general.musoftware_runtime_download')} />
-            <div className="max-w-3xl mx-auto py-8">
+            <div className="max-w-7xl mx-auto py-8">
                 <Card className="border-emerald-100 shadow-sm relative overflow-hidden">
                     <div className="absolute top-0 start-0 w-1 h-full bg-emerald-500"></div>
                     <CardHeader className="pb-4">

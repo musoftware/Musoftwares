@@ -116,7 +116,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                         <>
                             <Link
                                 href={`/admin/users/${row.user.id}`}
-                                className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                                className="font-medium text-slate-900 hover:text-blue-800 transition-colors"
                             >
                                 {row.user.name}
                             </Link>
@@ -287,7 +287,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                     <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.active')}</span>
                 </div>
                 <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
-                    <span className="text-2xl font-semibold text-indigo-600">{stats.recurring}</span>
+                    <span className="text-2xl font-semibold text-slate-900">{stats.recurring}</span>
                     <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.recurring')}</span>
                 </div>
                 <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">

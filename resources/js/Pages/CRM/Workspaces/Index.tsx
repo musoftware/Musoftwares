@@ -83,7 +83,7 @@ export default function WorkspaceIndex({ availableCenters }: { availableCenters:
                 icon={Briefcase}
                 
             />
-            <div className="flex flex-col h-full max-w-5xl mx-auto w-full px-8 pb-8">
+            <div className="flex flex-col h-full max-w-7xl mx-auto w-full px-8 pb-8">
 
 
                 {/* Hub Grid */}

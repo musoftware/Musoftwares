@@ -59,7 +59,7 @@ export default function Pending({ auth, services, filters }: any) {
             <div className="py-8 bg-slate-50 min-h-screen">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
                     
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row items-center justify-end gap-4 gap-4">
                         <div className="flex-1 max-w-md w-full">
                             <div className="relative flex items-center">
                                 <Search className="absolute start-3 h-4 w-4 text-slate-400" />

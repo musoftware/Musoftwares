@@ -23,7 +23,7 @@ export default function Index({ profiles, filters }: any) {
 
     return (
         <AdminSidebarLayout title={__('admin.freelance_profiles', undefined, 'Freelance Profiles')} header={__('admin.manage_freelance_profiles', undefined, 'Manage Freelance Profiles')}>
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex items-center justify-end gap-4">
                 <form onSubmit={handleSearch} className="flex space-x-2">
                     <Input 
                         value={search}
@@ -101,13 +101,13 @@ export default function Index({ profiles, filters }: any) {
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem asChild className="cursor-pointer">
                                                 <Link href={`/admin/users/${profile.user_id}`}>
-                                                    <User className="me-2 h-4 w-4 text-purple-600" />
+                                                    <User className="me-2 h-4 w-4 text-slate-900" />
                                                     <span>{__('admin.view_user_profile', undefined, 'View User Profile')}</span>
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild className="cursor-pointer">
                                                 <Link href={route('admin.freelance.profiles.edit', profile.id)}>
-                                                    <Edit className="me-2 h-4 w-4 text-blue-600" />
+                                                    <Edit className="me-2 h-4 w-4 text-slate-900" />
                                                     <span>{__('freelance.edit')}</span>
                                                 </Link>
                                             </DropdownMenuItem>

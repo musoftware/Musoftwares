@@ -192,7 +192,7 @@ export default function View({ salary, transactions, upcomingSchedule, total_sta
                                                 {run.recorded ? (
                                                     <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded">Recorded (Historical)</span>
                                                 ) : (
-                                                    <span className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-medium">{__('general.pending_execution')}</span>
+                                                    <span className="text-xs bg-emerald-50 text-slate-900 border border-emerald-200 px-2 py-0.5 rounded font-medium">{__('general.pending_execution')}</span>
                                                 )}
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap text-end">

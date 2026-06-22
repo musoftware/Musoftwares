@@ -66,7 +66,7 @@ interface Props {
 
 const statusStyles: Record<string, string> = {
     pending:  'bg-yellow-100 text-yellow-700',
-    active:   'bg-emerald-100 text-emerald-700',
+    active:   'bg-emerald-100 text-slate-900',
     declined: 'bg-red-100 text-red-700',
 };
 
@@ -78,11 +78,11 @@ const statusLabel: Record<string, string> = {
 
 // Map payment types to icon colors for visual variety
 const typeColors: Record<string, string> = {
-    bank:          'bg-blue-100 text-blue-600',
-    paypal:        'bg-indigo-100 text-indigo-600',
-    mobile_wallet: 'bg-purple-100 text-purple-600',
-    wallet:        'bg-purple-100 text-purple-600',
-    instapay:      'bg-rose-100 text-rose-600',
+    bank:          'bg-blue-100 text-slate-900',
+    paypal:        'bg-indigo-100 text-slate-900',
+    mobile_wallet: 'bg-purple-100 text-slate-900',
+    wallet:        'bg-purple-100 text-slate-900',
+    instapay:      'bg-rose-100 text-slate-900',
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -133,11 +133,11 @@ export default function Index({ methods, filters, stats }: Props) {
             render: (m: PaymentMethod) =>
                 m.user ? (
                     <Link href={route('admin.users.show', m.user.id)} className="flex items-center gap-2 group cursor-pointer">
-                        <div className="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-600 transition-colors">
-                            <UserIcon className="h-3.5 w-3.5 text-indigo-600 group-hover:text-white transition-colors" />
+                        <div className="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 group-hover:bg-slate-900 transition-colors">
+                            <UserIcon className="h-3.5 w-3.5 text-slate-900 group-hover:text-white transition-colors" />
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-slate-700 group-hover:text-indigo-600 transition-colors">{m.user.name}</p>
+                            <p className="text-sm font-medium text-slate-700 group-hover:text-slate-900 transition-colors">{m.user.name}</p>
                             <p className="text-xs text-slate-400">{m.user.email}</p>
                         </div>
                     </Link>
@@ -211,7 +211,7 @@ export default function Index({ methods, filters, stats }: Props) {
 
                         {m.status !== 'active' && (
                             <DropdownMenuItem
-                                className="text-emerald-600 focus:text-emerald-600"
+                                className="text-slate-900 focus:text-slate-900"
                                 onClick={() => handleUpdate(m.id, 'active')}
                             >
                                 <CheckCircle className="me-2 h-4 w-4" /> {__('general.approve')}</DropdownMenuItem>
@@ -292,8 +292,8 @@ export default function Index({ methods, filters, stats }: Props) {
                 </div>
                 <div className="bg-white rounded-xl border border-emerald-200 p-4 shadow-sm flex flex-col items-center justify-center">
                     <div className="flex items-center gap-1.5 mb-1">
-                        <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                        <span className="text-2xl font-semibold text-emerald-600">{stats.active}</span>
+                        <ShieldCheck className="h-4 w-4 text-slate-900" />
+                        <span className="text-2xl font-semibold text-slate-900">{stats.active}</span>
                     </div>
                     <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">{__('general.approved')}</span>
                 </div>

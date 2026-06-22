@@ -101,6 +101,7 @@ class ProjectController extends Controller implements HasMiddleware
     public function search(Request $request)
     {
         $search = $request->input('q');
+        $clientId = $request->input('client_id');
         $tenant = $request->user()->tenant;
         
         if (!$tenant) {
@@ -108,6 +109,9 @@ class ProjectController extends Controller implements HasMiddleware
         }
 
         $projects = Project::where('tenant_id', $tenant->id)
+            ->when($clientId, function ($query, $clientId) {
+                $query->where('client_id', $clientId);
+            })
             ->when($search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
             })

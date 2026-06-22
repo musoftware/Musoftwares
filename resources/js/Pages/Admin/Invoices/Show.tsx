@@ -383,7 +383,7 @@ export default function Show({ invoice }: { invoice: any }) {
                     )}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button className="bg-blue-600 hover:bg-blue-700 h-10 px-4">
+                            <Button className="bg-slate-900 hover:bg-slate-900 h-10 px-4">
                                 <Share2 className="w-4 h-4 me-2" /> {__('admin.share')} <ChevronDown className="w-4 h-4 ms-2" />
                             </Button>
                         </DropdownMenuTrigger>
@@ -413,7 +413,7 @@ export default function Show({ invoice }: { invoice: any }) {
                     </CardHeader>
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-slate-900">
                                 <User className="w-5 h-5" />
                             </div>
                             <div>
@@ -443,7 +443,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 </div>
                             )}
                             {invoice.project && (
-                                <div className="inline-flex items-center rounded bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700 mt-2">
+                                <div className="inline-flex items-center rounded bg-blue-50 px-2 py-1 text-xs font-semibold text-slate-900 mt-2">
                                     <Folder className="w-3 h-3 me-1" /> {invoice.project.project_name}
                                 </div>
                             )}
@@ -493,7 +493,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             {invoice.cost > 0 && (
                                 <div className="flex justify-between items-center py-1">
                                     <span className="text-gray-500">{__('general.net_revenue')}</span>
-                                    <span className="font-medium text-emerald-600">{formatCurrency(invoice.revenue, invoice.currency)}</span>
+                                    <span className="font-medium text-slate-900">{formatCurrency(invoice.revenue, invoice.currency)}</span>
                                 </div>
                             )}
                         </div>
@@ -501,7 +501,7 @@ export default function Show({ invoice }: { invoice: any }) {
                         {invoice.status !== 'paid' && (
                             <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
                                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.delivery_status')}</span>
-                                <Button onClick={() => { setJobStatusForm(invoice.job_status || 'pending'); setJobStatusModal(true); }} variant="outline" size="sm" className="h-7 text-xs border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100">{__('general.update_status')}</Button>
+                                <Button onClick={() => { setJobStatusForm(invoice.job_status || 'pending'); setJobStatusModal(true); }} variant="outline" size="sm" className="h-7 text-xs border-blue-200 text-slate-900 bg-blue-50 hover:bg-blue-100">{__('general.update_status')}</Button>
                             </div>
                         )}
                     </CardContent>
@@ -515,13 +515,13 @@ export default function Show({ invoice }: { invoice: any }) {
                     </CardHeader>
                     <CardContent className="pt-4 flex flex-col items-center justify-center h-full min-h-[140px]">
                         <div className="text-3xl font-black text-gray-900 mb-1 flex items-center">
-                            <Clock className="w-6 h-6 text-blue-500 opacity-20 me-2" />
+                            <Clock className="w-6 h-6 text-slate-900 opacity-20 me-2" />
                             {invoice.total_timer_str || '00:00:00'}
                         </div>
                         <div className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">{__('general.total_billable_hours')}</div>
                         
                         {isUnpaid && (
-                            <Button onClick={handleAddTimerItem} variant="link" className="mt-4 text-blue-600 font-bold hover:text-blue-800">
+                            <Button onClick={handleAddTimerItem} variant="link" className="mt-4 text-slate-900 font-bold hover:text-blue-800">
                                 <Plus className="w-3 h-3 me-1" />{__('general.add_manual_entry')}
                             </Button>
                         )}
@@ -551,7 +551,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             <div className="bg-gray-50 rounded p-3 mb-2 space-y-2">
                                 <div className="flex justify-between items-center">
                                     <span className="text-xs font-bold text-gray-500">{__('general.commission_rate')}</span>
-                                    <span className="font-bold text-blue-600">{invoice.affiliate_data.commission_percent}%</span>
+                                    <span className="font-bold text-slate-900">{invoice.affiliate_data.commission_percent}%</span>
                                 </div>
                                 
                                 {invoice.affiliate_data.is_paid && (
@@ -586,10 +586,10 @@ export default function Show({ invoice }: { invoice: any }) {
                     <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
                         <span className="text-xs font-bold text-gray-500 uppercase tracking-wider me-2">Quick Build:</span>
                         <div className="flex gap-2 w-full sm:w-auto">
-                            <Button onClick={handleAddQtyItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50">
-                                <Layers className="w-4 h-4 me-2 text-blue-500" />{__('general.qty_item')}</Button>
-                            <Button onClick={handleAddSimpleItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50">
-                                <Plus className="w-4 h-4 me-2 text-blue-500" />{__('general.simple_item')}</Button>
+                            <Button onClick={handleAddQtyItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-blue-300 hover:text-slate-900 hover:bg-blue-50">
+                                <Layers className="w-4 h-4 me-2 text-slate-900" />{__('general.qty_item')}</Button>
+                            <Button onClick={handleAddSimpleItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-blue-300 hover:text-slate-900 hover:bg-blue-50">
+                                <Plus className="w-4 h-4 me-2 text-slate-900" />{__('general.simple_item')}</Button>
                             <Button onClick={() => setShowPayServiceModal(true)} variant="outline" size="sm" className="hidden sm:flex border-dashed hover:border-green-300 hover:text-green-600 hover:bg-green-50">
                                 <CreditCard className="w-4 h-4 me-2 text-green-500" />{__('general.pay_service')}</Button>
                             <Button onClick={handleAddTimerItem} variant="secondary" size="sm" className="hidden sm:flex bg-gray-100 text-gray-700 hover:bg-gray-200">
@@ -634,7 +634,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                 type="checkbox" 
                                                 checked={selectedItemsForMerge.includes(index)}
                                                 onChange={() => toggleItemForMerge(index)}
-                                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                className="rounded border-gray-300 text-slate-900 focus:ring-blue-500"
                                             />
                                         </td>
                                     )}
@@ -727,7 +727,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             <tfoot className="bg-gray-50 border-t">
                                 <tr>
                                     <td colSpan={7} className="px-4 py-3">
-                                        <div className="flex justify-between items-center">
+                                        <div className="flex justify-end gap-4 items-center">
                                             <div className="text-sm text-gray-500">
                                                 Draft Total: <span className="font-bold text-gray-900">{formatCurrency(currentTotal, invoice.currency)}</span>
                                             </div>
@@ -739,7 +739,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                 )}
                                                 <Button type="button" onClick={handleCancel} variant="outline" size="sm" disabled={isSaving}>
                                                     <X className="w-4 h-4 me-1" /> {__('general.cancel')}</Button>
-                                                <Button type="button" onClick={handleSave} size="sm" disabled={isSaving} className="bg-blue-600 hover:bg-blue-700">
+                                                <Button type="button" onClick={handleSave} size="sm" disabled={isSaving} className="bg-slate-900 hover:bg-slate-900">
                                                     <Check className="w-4 h-4 me-1" />{__('general.save_changes')}</Button>
                                             </div>
                                         </div>
@@ -763,7 +763,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             variant="ghost" 
                             size="sm" 
                             onClick={() => setShowPricingInsights(!showPricingInsights)}
-                            className="text-blue-600 bg-blue-50 hover:bg-blue-100"
+                            className="text-slate-900 bg-blue-50 hover:bg-blue-100"
                         >
                             <ChartLine className="w-4 h-4 me-2" />
                             {showPricingInsights ? 'Hide Pricing Insights' : 'Show Pricing Insights'}
@@ -998,7 +998,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                                 e.preventDefault();
                                                                 router.post(route('invoices.cost-lines.record-paid', { invoice: invoice.id, line: line.id }));
                                                             }}
-                                                            className="bg-emerald-500 hover:bg-emerald-600 text-white h-8 px-3 text-xs font-semibold"
+                                                            className="bg-slate-900 hover:bg-slate-900 text-white h-8 px-3 text-xs font-semibold"
                                                         >
                                                             <Receipt className="w-3.5 h-3.5 me-1.5" />{__('general.record_as_paid')}</Button>
                                                         <span className="text-xs text-gray-500 font-medium">{__('general.creates_a_client_payment_for_this_amount')}</span>
@@ -1048,7 +1048,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             <>
                                 <Button 
                                     onClick={() => setActionModal({ isOpen: true, type: 'bill_balance', amount: '' })}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                    className="bg-slate-900 hover:bg-slate-900 text-white"
                                 >
                                     <Check className="w-4 h-4 me-2" />{__('general.bill_from_balance')}</Button>
                                 <Button 
@@ -1064,7 +1064,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                     const remaining = invoice.amount - (invoice.paid_amount || 0);
                                     setActionModal({ isOpen: true, type: 'partial_pay', amount: String(remaining) });
                                 }}
-                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                                className="bg-slate-900 hover:bg-slate-900 text-white"
                             >
                                 <Plus className="w-4 h-4 me-2" />{__('general.add_payment')}</Button>
                         )}
@@ -1235,7 +1235,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                             {formatCurrency(payServicePreview.total, payServicePreview.invoice_currency)}
                                         </span>
                                     </div>
-                                    <div className="flex justify-between text-xs text-gray-400 mt-1">
+                                    <div className="flex justify-end gap-4 text-xs text-gray-400 mt-1">
                                         <span>{__('general.business_currency_total')}</span>
                                         <span>
                                             {formatCurrency(payServicePreview.total_usd, 'USD')} {/* Assuming USD as base for display purpose here */}
@@ -1296,7 +1296,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             {__('general.cancel')}
                         </Button>
                         <Button
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            className="bg-slate-900 hover:bg-slate-900 text-white"
                             onClick={() => {
                                 if (actionModal.type === 'bill_balance') {
                                     router.post(route('admin.invoices.mark-paid', { invoice: String(invoice.id) }));
@@ -1338,7 +1338,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 <input 
                                     type="checkbox" 
                                     id="notify_client" 
-                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    className="rounded border-gray-300 text-slate-900 focus:ring-blue-500"
                                     checked={rescheduleForm.notify_client}
                                     onChange={(e) => setRescheduleForm(prev => ({ ...prev, notify_client: e.target.checked }))}
                                 />
@@ -1351,7 +1351,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             <Button type="button" variant="outline" onClick={() => setRescheduleModal(false)}>
                                 {__('general.cancel')}
                             </Button>
-                            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
+                            <Button type="submit" className="bg-slate-900 hover:bg-slate-900 text-white">
                                 {__('general.confirm')}
                             </Button>
                         </DialogFooter>
@@ -1385,7 +1385,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 onSuccess: () => setJobStatusModal(false),
                                 preserveScroll: true
                             });
-                        }} className="bg-blue-600 hover:bg-blue-700 text-white">{__('general.save_changes') || 'Save Status'}</Button>
+                        }} className="bg-slate-900 hover:bg-slate-900 text-white">{__('general.save_changes') || 'Save Status'}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -1418,7 +1418,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 onSuccess: () => setTransferModal(false),
                                 preserveScroll: true
                             });
-                        }} className="bg-blue-600 hover:bg-blue-700 text-white">{__('general.transfer')}</Button>
+                        }} className="bg-slate-900 hover:bg-slate-900 text-white">{__('general.transfer')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

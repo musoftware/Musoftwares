@@ -74,7 +74,7 @@ export default function Settings({ settings, devices }: Props) {
         <AuthenticatedLayout>
             <Head title={__('sms_gateway.payment_gateway_settings')} />
 
-            <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">{__('sms_gateway.payment_gateway_settings')}</h1>
                     <p className="mt-2 text-sm text-gray-600">{__('general.configure_transfer_number_and_available_payment_methods_for_your_customers')}</p>

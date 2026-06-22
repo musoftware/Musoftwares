@@ -15,7 +15,7 @@ interface WithdrawInstapayPayLinkProps {
 export default function WithdrawInstapayPayLink({ payLink, userId, whatsappSent }: WithdrawInstapayPayLinkProps) {
     return (
         <WebToolsLayout title={__('general.complete_payment')} activeNav="explore">
-            <div className="max-w-3xl mx-auto py-16 px-4 sm:px-6">
+            <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6">
                 <Card className="border-slate-200 shadow-lg overflow-hidden border-t-4 border-t-purple-500">
                     <CardContent className="p-8 sm:p-12 text-center">
                         <div className="inline-flex items-center justify-center p-4 bg-purple-100 rounded-full text-purple-600 mb-6">
@@ -26,7 +26,7 @@ export default function WithdrawInstapayPayLink({ payLink, userId, whatsappSent 
                             {__('general.account_created_successfully')}</h1>
 
                         {whatsappSent ? (
-                            <div className="bg-slate-50 border border-slate-100 rounded-xl p-6 mb-8 flex items-start gap-4 text-start max-w-xl mx-auto">
+                            <div className="bg-slate-50 border border-slate-100 rounded-xl p-6 mb-8 flex items-start gap-4 text-start max-w-7xl mx-auto">
                                 <Smartphone className="w-6 h-6 text-slate-500 flex-shrink-0 mt-1" />
                                 <div>
                                     <h3 className="font-bold text-slate-900">{__('general.check_your_whatsapp')}</h3>
@@ -35,7 +35,7 @@ export default function WithdrawInstapayPayLink({ payLink, userId, whatsappSent 
                                 </div>
                             </div>
                         ) : (
-                            <div className="bg-amber-50 border border-amber-100 rounded-xl p-6 mb-8 flex items-start gap-4 text-start max-w-xl mx-auto">
+                            <div className="bg-amber-50 border border-amber-100 rounded-xl p-6 mb-8 flex items-start gap-4 text-start max-w-7xl mx-auto">
                                 <AlertCircle className="w-6 h-6 text-amber-500 flex-shrink-0 mt-1" />
                                 <div>
                                     <h3 className="font-bold text-amber-900">{__('general.important_notice')}</h3>
@@ -46,7 +46,7 @@ export default function WithdrawInstapayPayLink({ payLink, userId, whatsappSent 
                             </div>
                         )}
 
-                        <div className="space-y-4 max-w-md mx-auto">
+                        <div className="space-y-4 max-w-7xl mx-auto">
                             <Button asChild size="lg" className="w-full h-14 text-lg bg-purple-600 hover:bg-purple-700">
                                 <a href={payLink}>
                                     <Lock className="w-5 h-5 me-2" /> {__('general.log_in_pay')}<ArrowRight className="w-5 h-5 ms-2" />

@@ -300,7 +300,7 @@ export default function WaFunnelEngineRunner({ tool }: any) {
                     <Plus className="w-3.5 h-3.5" />{__('general.new_funnel')}</Button>
             </div>
 
-            <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+            <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
                 {/* Stats */}
                 {funnels.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -343,7 +343,7 @@ export default function WaFunnelEngineRunner({ tool }: any) {
                     <div className="py-24 text-center border border-dashed border-slate-800 rounded-2xl">
                         <GitBranch className="w-12 h-12 text-slate-800 mx-auto mb-4" />
                         <h3 className="text-sm font-bold text-slate-400">{__('general.no_funnels_created_yet')}</h3>
-                        <p className="text-xs text-slate-600 mt-2 max-w-md mx-auto">{__('general.create_your_first_whatsapp_funnel_with_drag_and_drop_nodes_build_multi_step_sequences_with_time_delays_conditional_routing_and_ai_powered_auto_replies_that_run_24_7_on_your_local_machine')}</p>
+                        <p className="text-xs text-slate-600 mt-2 max-w-7xl mx-auto">{__('general.create_your_first_whatsapp_funnel_with_drag_and_drop_nodes_build_multi_step_sequences_with_time_delays_conditional_routing_and_ai_powered_auto_replies_that_run_24_7_on_your_local_machine')}</p>
                         <Button onClick={() => setShowNew(true)} className="mt-6 gap-2 h-10 bg-blue-500 text-white hover:bg-blue-400 mx-auto shadow-lg shadow-blue-500/20">
                             <Plus className="w-4 h-4" />{__('general.create_first_funnel')}</Button>
                     </div>

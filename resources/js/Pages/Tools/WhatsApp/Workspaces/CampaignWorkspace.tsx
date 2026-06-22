@@ -819,7 +819,7 @@ export default function CampaignWorkspace({
             {/* STEP 1.5: Drip sequences builder (Milestone 3)                    */}
             {/* ══════════════════════════════════════════════════════════════════ */}
             {currentStep === 1 && (
-                <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-400">
+                <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-400">
                     <Card className="rounded-2xl overflow-hidden border-teal-500/20">
                         <CardHeader className="pb-4 border-b bg-muted/20">
                             <CardTitle className="text-base flex items-center justify-between">
@@ -1012,7 +1012,7 @@ export default function CampaignWorkspace({
             {/* STEP 2: Pacing & Safety                                          */}
             {/* ══════════════════════════════════════════════════════════════════ */}
             {currentStep === 2 && (
-                <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-400">
+                <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-400">
                     {/* Speed Preset Card */}
                     <Card className="rounded-2xl overflow-hidden">
                         <CardHeader className="pb-4 border-b bg-muted/20">
@@ -1382,7 +1382,7 @@ export default function CampaignWorkspace({
             {/* STEP 3: Review & Launch                                          */}
             {/* ══════════════════════════════════════════════════════════════════ */}
             {currentStep === 3 && (
-                <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-400">
+                <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-400">
                     {/* Campaign Identity */}
                     <Card className="rounded-2xl overflow-hidden border-teal-500/20">
                         <div className="absolute start-0 top-0 bottom-0 w-1 bg-gradient-to-b from-teal-500 to-emerald-600" />

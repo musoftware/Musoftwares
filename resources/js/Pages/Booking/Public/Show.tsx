@@ -146,7 +146,7 @@ export default function Show({ host, eventType }: any) {
                 <div className="lg:col-span-7 space-y-4">
                     <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">{__('general.select_a_date')}</h3>
                     <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100">
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center justify-end gap-4 mb-4">
                             <span className="font-semibold text-slate-800">{format(today, 'MMMM yyyy')}</span>
                             <div className="flex gap-2">
                                 <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg" disabled><ChevronLeft className="h-4 w-4" /></Button>

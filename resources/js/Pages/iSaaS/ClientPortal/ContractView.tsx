@@ -42,7 +42,7 @@ export default function ContractView({ contract }: Props) {
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <Head title={`Contract: ${contract.project_name}`} />
 
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-10">
                     <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">{__('general.project_contract')}</h1>
                     <p className="mt-2 text-sm text-gray-500">Reference: {contract.reference || `CTR-${contract.uuid.split('-')[0]}`}</p>
