@@ -1,0 +1,65 @@
+graph TD
+    Start[Start: Large Data Optimization] --> Phase1[Phase 1: High-Risk Components]
+    
+    Phase1 --> HR1[Admin/Projects/Index.tsx]
+    HR1 --> HR1_A[Convert projects table to Paginated DataTable]
+    HR1 --> HR1_B[Convert clients select to Async Search Dropdown]
+    
+    Phase1 --> HR2[ERP/Invoices/Create.jsx]
+    HR2 --> HR2_A[Convert clients select to Async Search Dropdown]
+    HR2 --> HR2_B[Convert filteredProjects select to Async Search Dropdown]
+    HR2 --> HR2_C[Convert products select to Async Search Dropdown]
+    
+    HR1_A --> Phase2[Phase 2: Client Dropdowns]
+    HR1_B --> Phase2
+    HR2_A --> Phase2
+    HR2_B --> Phase2
+    HR2_C --> Phase2
+
+    Phase2 --> CD1[Admin/Tasks/AsList.tsx: Convert clients select to Async Search Dropdown]
+    Phase2 --> CD2[Admin/Tasks/TaskCalendar.tsx: Convert clients select to Async Search Dropdown]
+    Phase2 --> CD3[ERP/Tasks/Index.tsx: Convert clients select to Async Search Dropdown]
+    Phase2 --> CD4[ERP/Contracts/Create.tsx: Convert clients select to Async Search Dropdown]
+    
+    CD1 --> Phase3[Phase 3: User Dropdowns]
+    CD2 --> Phase3
+    CD3 --> Phase3
+    CD4 --> Phase3
+
+    Phase3 --> UD1[Admin/Business/CostsEdit.tsx: Convert users to Async Search Dropdown]
+    Phase3 --> UD2[Admin/EmployeeTodos/Index.tsx: Convert users to Async Search Dropdown]
+    Phase3 --> UD3[Admin/Business/RecurringSalaries/Index.tsx: Convert users to Async Search Dropdown]
+    Phase3 --> UD4[Admin/Business/RecurringSalaries/Edit.tsx: Convert users to Async Search Dropdown]
+    Phase3 --> UD5[Admin/Finance/Index.tsx: Convert users to Async Search Dropdown]
+    Phase3 --> UD6[Admin/SerialUserDevices/Assign.tsx: Convert users to Async Search Dropdown]
+    
+    UD1 --> Phase4[Phase 4: Project Dropdowns]
+    UD2 --> Phase4
+    UD3 --> Phase4
+    UD4 --> Phase4
+    UD5 --> Phase4
+    UD6 --> Phase4
+
+    Phase4 --> PD1[Admin/Business/CostsEdit.tsx: Convert projects to Async Search Dropdown]
+    Phase4 --> PD2[Admin/Transactions/Transfer.tsx: Convert projects to Async Search Dropdown]
+    Phase4 --> PD3[Admin/Transactions/Components/TransactionEntryForm.tsx: Convert projects to Async Search Dropdown]
+    Phase4 --> PD4[ERP/Dashboard.tsx: Convert projects to Async Search Dropdown]
+    
+    PD1 --> Phase5[Phase 5: Tool Data Dropdowns]
+    PD2 --> Phase5
+    PD3 --> Phase5
+    PD4 --> Phase5
+
+    Phase5 --> TD1[Tools/WhatsApp/Workspaces/GroupsWorkspace.tsx: Convert groups to Async Search Dropdown]
+    Phase5 --> TD2[Tools/WhatsApp/Workspaces/CampaignWorkspace.tsx: Convert presetsList/dbTags to Async Search Dropdown]
+    Phase5 --> TD3[Tools/EmailSenderRunner.tsx: Convert lists/templates to Async Search Dropdown]
+    
+    TD1 --> Phase6[Phase 6: Unpaginated Data Tables]
+    TD2 --> Phase6
+    TD3 --> Phase6
+
+    Phase6 --> DT1[Admin/Marketplace/Categories.tsx: Convert categories table to Paginated DataTable]
+    Phase6 --> DT2[ERP/Referrals/Index.tsx: Convert clients table to Paginated DataTable]
+    
+    DT1 --> Done[End: All Optimizations Complete]
+    DT2 --> Done
