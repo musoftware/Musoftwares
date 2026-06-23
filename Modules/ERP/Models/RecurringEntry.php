@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class RecurringEntry extends TenantModel
+class RecurringEntry extends TenantAwareModel
 {
     use SoftDeletes;
 

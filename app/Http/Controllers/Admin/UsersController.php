@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use App\Models\Role;
+use Spatie\Permission\Models\Role;
 use App\Models\CoWorker;
 use App\Models\CoTechTag;
 use App\Http\Requests\Admin\User\StoreUserRequest;
@@ -521,8 +521,7 @@ class UsersController extends Controller
                 'currency' => '2', // EGP currency
             ]);
 
-            $employeeRole = Role::createRule('Employee', 'employee');
-            $user->roles()->attach($employeeRole);
+            $user->assignRole('employee');
 
             if (!empty($coWorker->whatsapp) && class_exists('\App\Services\WhatsAppNotificationService')) {
                 $this->sendCredentialsViaWhatsApp($coWorker, $user, $randomPassword);
@@ -556,10 +555,7 @@ class UsersController extends Controller
                 'password' => Hash::make($randomPassword),
             ]);
 
-            $employeeRole = Role::createRule('Employee', 'employee');
-            if (!$user->roles()->where('slug', 'employee')->exists()) {
-                $user->roles()->attach($employeeRole);
-            }
+            $user->assignRole('employee');
 
             if (!empty($coWorker->whatsapp) && class_exists('\App\Services\WhatsAppNotificationService')) {
                 $this->sendCredentialsViaWhatsApp($coWorker, $user, $randomPassword, true);

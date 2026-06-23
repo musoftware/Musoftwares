@@ -10,7 +10,7 @@ use Laravel\Scout\Searchable;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Invoice extends TenantModel
+class Invoice extends TenantAwareModel
 {
     use SoftDeletes;
 

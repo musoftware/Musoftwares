@@ -15,7 +15,7 @@ use App\Models\User;
  */
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ClientNote extends TenantModel
+class ClientNote extends TenantAwareModel
 {
     use SoftDeletes;
 

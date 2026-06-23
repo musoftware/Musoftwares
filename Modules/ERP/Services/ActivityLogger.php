@@ -3,7 +3,7 @@
 namespace Modules\ERP\Services;
 
 use Modules\ERP\Models\Activity;
-use Modules\ERP\Models\TenantModel;
+use Modules\ERP\Models\TenantAwareModel;
 use Illuminate\Support\Facades\Auth;
 
 class ActivityLogger
@@ -14,7 +14,7 @@ class ActivityLogger
     public static function log(
         string $action, 
         string $description, 
-        ?TenantModel $subject = null, 
+        ?TenantAwareModel $subject = null,
         ?int $clientId = null, 
         array $properties = []
     ): ?Activity {

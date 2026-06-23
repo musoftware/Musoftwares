@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Currency;
 
-class Product extends TenantModel
+class Product extends TenantAwareModel
 {
     use SoftDeletes;
 

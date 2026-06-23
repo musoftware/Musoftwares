@@ -5,7 +5,7 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
 
-class TenantFile extends TenantModel
+class TenantFile extends TenantAwareModel
 {
     use SoftDeletes;
 

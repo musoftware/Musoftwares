@@ -19,6 +19,12 @@ trait BelongsToWorkspace
 
             if ($workspaceId) {
                 $builder->where($builder->getModel()->getTable() . '.workspace_id', $workspaceId);
+            } else {
+                if (app()->runningInConsole()) {
+                    $builder->whereRaw('0 = 1');
+                } else {
+                    throw new \App\Exceptions\TenantCouldNotBeIdentifiedException('Workspace could not be identified for the current context.');
+                }
             }
         });
 

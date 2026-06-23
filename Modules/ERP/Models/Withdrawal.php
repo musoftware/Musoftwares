@@ -7,7 +7,7 @@ use Modules\ERP\Models\TenantClient;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Withdrawal extends TenantModel
+class Withdrawal extends TenantAwareModel
 {
     use SoftDeletes;
 

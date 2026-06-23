@@ -348,20 +348,20 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin/ma
     Route::delete('/categories/{category}', [\Modules\Marketplace\Http\Controllers\ServiceCategoryController::class, 'destroy'])->name('categories.destroy');
 
     // Services Admin Actions
-    Route::get('/all-services', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'allServices'])->name('services.all');
-    Route::get('/pending-services', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'pendingServices'])->name('services.pending');
-    Route::get('/services/{service}/edit', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'edit'])->name('services.edit');
-    Route::put('/services/{service}', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'update'])->name('services.update');
-    Route::post('/services/{service}/approve', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'approve'])->name('services.approve');
-    Route::post('/services/{service}/reject', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'reject'])->name('services.reject');
-    Route::post('/services/{service}/suspend', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'suspend'])->name('services.suspend');
-    Route::post('/services/{service}/feature', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'feature'])->name('services.feature');
-    Route::delete('/services/{service}', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'destroy'])->name('services.destroy');
+    Route::get('/all-services', [\Modules\Marketplace\Http\Controllers\Admin\MarketplaceServiceController::class, 'allServices'])->name('services.all');
+    Route::get('/pending-services', [\Modules\Marketplace\Http\Controllers\Admin\MarketplaceServiceController::class, 'pendingServices'])->name('services.pending');
+    Route::get('/services/{service}/edit', [\Modules\Marketplace\Http\Controllers\Admin\MarketplaceServiceController::class, 'edit'])->name('services.edit');
+    Route::put('/services/{service}', [\Modules\Marketplace\Http\Controllers\Admin\MarketplaceServiceController::class, 'update'])->name('services.update');
+    Route::post('/services/{service}/approve', [\Modules\Marketplace\Http\Controllers\Admin\MarketplaceServiceController::class, 'approve'])->name('services.approve');
+    Route::post('/services/{service}/reject', [\Modules\Marketplace\Http\Controllers\Admin\MarketplaceServiceController::class, 'reject'])->name('services.reject');
+    Route::post('/services/{service}/suspend', [\Modules\Marketplace\Http\Controllers\Admin\MarketplaceServiceController::class, 'suspend'])->name('services.suspend');
+    Route::post('/services/{service}/feature', [\Modules\Marketplace\Http\Controllers\Admin\MarketplaceServiceController::class, 'feature'])->name('services.feature');
+    Route::delete('/services/{service}', [\Modules\Marketplace\Http\Controllers\Admin\MarketplaceServiceController::class, 'destroy'])->name('services.destroy');
 
     // Orders
-    Route::get('/orders', [\App\Http\Controllers\Admin\MarketplaceOrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{order}', [\App\Http\Controllers\Admin\MarketplaceOrderController::class, 'show'])->name('orders.show');
-    Route::post('/orders/{order}/dispute', [\App\Http\Controllers\Admin\MarketplaceOrderController::class, 'resolveDispute'])->name('orders.dispute.resolve');
+    Route::get('/orders', [\Modules\Marketplace\Http\Controllers\Admin\MarketplaceOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [\Modules\Marketplace\Http\Controllers\Admin\MarketplaceOrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/dispute', [\Modules\Marketplace\Http\Controllers\Admin\MarketplaceOrderController::class, 'resolveDispute'])->name('orders.dispute.resolve');
 
     // Admin Service Landing Pages
     Route::get('/service-landing-pages', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'index'])->name('service-landing-pages.index');
@@ -451,7 +451,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/contracts/ai/review', [\App\Http\Controllers\Admin\ContractAiController::class, 'review'])->name('contracts.ai.review');
 
     // Standalone Contracts
-    Route::resource('/contracts', \App\Http\Controllers\Admin\AdminContractController::class);
+    Route::resource('/contracts', \Modules\ERP\Http\Controllers\Admin\AdminContractController::class);
     Route::resource('/contract-price-items', \App\Http\Controllers\Admin\ContractPriceItemController::class)->except(['create', 'show', 'edit']);
 
     // ── Admin Plans ───────────────────────────────────────────────
@@ -501,18 +501,18 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // ── Freelance (Admin Control) ───────────────────────────────────
     Route::prefix('freelance')->name('freelance.')->group(function () {
-        Route::post('skills/bulk', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'bulkStore'])->name('skills.bulkStore');
-        Route::post('skills/{skill}/approve', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'approve'])->name('skills.approve');
-        Route::post('skills/{skill}/reject', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'reject'])->name('skills.reject');
-        Route::post('skills/block-user/{user}', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'blockUser'])->name('skills.block-user');
-        Route::resource('skills', \App\Http\Controllers\Admin\FreelanceSkillController::class)->except(['show']);
-        Route::resource('profiles', \App\Http\Controllers\Admin\FreelanceProfileController::class)->except(['create', 'store', 'show']);
-        Route::resource('jobs', \App\Http\Controllers\Admin\FreelanceJobController::class);
-        Route::post('jobs/{job}/status', [\App\Http\Controllers\Admin\FreelanceJobController::class, 'updateStatus'])->name('jobs.status');
-        Route::post('jobs/{job}/force-refund', [\App\Http\Controllers\Admin\FreelanceJobController::class, 'forceRefund'])->name('jobs.force-refund');
-        Route::resource('contracts', \App\Http\Controllers\Admin\FreelanceContractController::class)->only(['index', 'show', 'destroy']);
-        Route::post('contracts/{contract}/status', [\App\Http\Controllers\Admin\FreelanceContractController::class, 'updateStatus'])->name('contracts.status');
-        Route::resource('proposals', \App\Http\Controllers\Admin\FreelanceProposalController::class)->only(['index', 'show', 'destroy']);
+        Route::post('skills/bulk', [\Modules\Freelance\Http\Controllers\Admin\FreelanceSkillController::class, 'bulkStore'])->name('skills.bulkStore');
+        Route::post('skills/{skill}/approve', [\Modules\Freelance\Http\Controllers\Admin\FreelanceSkillController::class, 'approve'])->name('skills.approve');
+        Route::post('skills/{skill}/reject', [\Modules\Freelance\Http\Controllers\Admin\FreelanceSkillController::class, 'reject'])->name('skills.reject');
+        Route::post('skills/block-user/{user}', [\Modules\Freelance\Http\Controllers\Admin\FreelanceSkillController::class, 'blockUser'])->name('skills.block-user');
+        Route::resource('skills', \Modules\Freelance\Http\Controllers\Admin\FreelanceSkillController::class)->except(['show']);
+        Route::resource('profiles', \Modules\Freelance\Http\Controllers\Admin\FreelanceProfileController::class)->except(['create', 'store', 'show']);
+        Route::resource('jobs', \Modules\Freelance\Http\Controllers\Admin\FreelanceJobController::class);
+        Route::post('jobs/{job}/status', [\Modules\Freelance\Http\Controllers\Admin\FreelanceJobController::class, 'updateStatus'])->name('jobs.status');
+        Route::post('jobs/{job}/force-refund', [\Modules\Freelance\Http\Controllers\Admin\FreelanceJobController::class, 'forceRefund'])->name('jobs.force-refund');
+        Route::resource('contracts', \Modules\Freelance\Http\Controllers\Admin\FreelanceContractController::class)->only(['index', 'show', 'destroy']);
+        Route::post('contracts/{contract}/status', [\Modules\Freelance\Http\Controllers\Admin\FreelanceContractController::class, 'updateStatus'])->name('contracts.status');
+        Route::resource('proposals', \Modules\Freelance\Http\Controllers\Admin\FreelanceProposalController::class)->only(['index', 'show', 'destroy']);
     });
 
 
@@ -902,18 +902,18 @@ Route::middleware(['auth', 'verified'])->prefix('api')->name('api.')->group(func
 // ── Admin Accountant & Finance Routes ─────────────────────────────
 Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('admin')->name('admin.')->group(function () {
     // ── Admin Invoices (Platform Billing) ─────────────────────────
-    Route::get('/invoices', [\App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
-    Route::get('/invoices/unpaid', [\App\Http\Controllers\Admin\InvoiceController::class, 'unpaid'])->name('invoices.unpaid');
-    Route::get('/invoices/archive', [\App\Http\Controllers\Admin\InvoiceController::class, 'archive'])->name('invoices.archive');
-    Route::get('/invoices/create', [\App\Http\Controllers\Admin\InvoiceController::class, 'create'])->name('invoices.create');
-    Route::get('/invoices/timer-details/{item_id}', [\App\Http\Controllers\Admin\InvoiceController::class, 'timerDetails'])->name('invoices.timer-details');
-    Route::post('/invoices/timer-details/{item_id}/store', [\App\Http\Controllers\Admin\InvoiceController::class, 'storeTimerDetails'])->name('invoices.timer-details.store');
-    Route::delete('/invoices/timer-details/{item_id}/{timer_id}', [\App\Http\Controllers\Admin\InvoiceController::class, 'destroyTimerDetails'])->name('invoices.timer-details.destroy');
-    Route::post('/invoices/{invoice}/create-timer', [\App\Http\Controllers\Admin\InvoiceController::class, 'createTimerItem'])->name('invoices.create-timer');
-    Route::post('/invoices/bulk-action', [\App\Http\Controllers\Admin\InvoiceController::class, 'bulkAction'])->name('invoices.bulk-action');
-    Route::get('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
-    Route::get('/invoices/{invoice}/download-pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'downloadPdf'])->name('invoices.download-pdf');
-    Route::get('/invoices/{invoice}/print-pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'printPdf'])->name('invoices.print-pdf');
+    Route::get('/invoices', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/unpaid', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'unpaid'])->name('invoices.unpaid');
+    Route::get('/invoices/archive', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'archive'])->name('invoices.archive');
+    Route::get('/invoices/create', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'create'])->name('invoices.create');
+    Route::get('/invoices/timer-details/{item_id}', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'timerDetails'])->name('invoices.timer-details');
+    Route::post('/invoices/timer-details/{item_id}/store', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'storeTimerDetails'])->name('invoices.timer-details.store');
+    Route::delete('/invoices/timer-details/{item_id}/{timer_id}', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'destroyTimerDetails'])->name('invoices.timer-details.destroy');
+    Route::post('/invoices/{invoice}/create-timer', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'createTimerItem'])->name('invoices.create-timer');
+    Route::post('/invoices/bulk-action', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'bulkAction'])->name('invoices.bulk-action');
+    Route::get('/invoices/{invoice}', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
+    Route::get('/invoices/{invoice}/download-pdf', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'downloadPdf'])->name('invoices.download-pdf');
+    Route::get('/invoices/{invoice}/print-pdf', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'printPdf'])->name('invoices.print-pdf');
 
     // ── Admin Payouts ───────────────────────
     Route::get('/payouts', [\App\Http\Controllers\Admin\PayoutController::class, 'index'])->name('payouts.index');
@@ -923,17 +923,17 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::delete('/payouts/{payout}', [\App\Http\Controllers\Admin\PayoutController::class, 'destroy'])->name('payouts.destroy');
     Route::post('/payouts/{payout}/mark-paid', [\App\Http\Controllers\Admin\PayoutController::class, 'markPaid'])->name('payouts.mark-paid');
 
-    Route::put('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'update'])->name('invoices.update');
-    Route::post('/invoices/{invoice}/mark-paid', [\App\Http\Controllers\Admin\InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
-    Route::post('/invoices/{invoice}/cancel', [\App\Http\Controllers\Admin\InvoiceController::class, 'cancel'])->name('invoices.cancel');
-    Route::post('/invoices/{invoice}/change-status', [\App\Http\Controllers\Admin\InvoiceController::class, 'changeStatus'])->name('invoices.change-status');
-    Route::post('/invoices/{invoice}/change-job-status', [\App\Http\Controllers\Admin\InvoiceController::class, 'changeJobStatus'])->name('invoices.change-job-status');
-    Route::get('/invoices/{invoice}/notify', [\App\Http\Controllers\Admin\InvoiceController::class, 'notify'])->name('invoices.notify');
-    Route::post('/invoices/{invoice}/partial-pay', [\App\Http\Controllers\Admin\InvoiceController::class, 'partialPay'])->name('invoices.partial-pay');
-    Route::post('/invoices/{invoice}/pay-service/calculate', [\App\Http\Controllers\Admin\InvoiceController::class, 'calculatePayService'])->name('invoices.pay-service.calculate');
-    Route::post('/invoices/{invoice}/pay-service/store', [\App\Http\Controllers\Admin\InvoiceController::class, 'storePayService'])->name('invoices.pay-service.store');
-    Route::post('/invoices/{invoice}/share-link', [\App\Http\Controllers\Admin\InvoiceController::class, 'shareLink'])->name('invoices.share-link');
-    Route::post('/invoices/{invoice}/reschedule', [\App\Http\Controllers\Admin\InvoiceController::class, 'reschedule'])->name('invoices.reschedule');
+    Route::put('/invoices/{invoice}', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'update'])->name('invoices.update');
+    Route::post('/invoices/{invoice}/mark-paid', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
+    Route::post('/invoices/{invoice}/cancel', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'cancel'])->name('invoices.cancel');
+    Route::post('/invoices/{invoice}/change-status', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'changeStatus'])->name('invoices.change-status');
+    Route::post('/invoices/{invoice}/change-job-status', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'changeJobStatus'])->name('invoices.change-job-status');
+    Route::get('/invoices/{invoice}/notify', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'notify'])->name('invoices.notify');
+    Route::post('/invoices/{invoice}/partial-pay', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'partialPay'])->name('invoices.partial-pay');
+    Route::post('/invoices/{invoice}/pay-service/calculate', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'calculatePayService'])->name('invoices.pay-service.calculate');
+    Route::post('/invoices/{invoice}/pay-service/store', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'storePayService'])->name('invoices.pay-service.store');
+    Route::post('/invoices/{invoice}/share-link', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'shareLink'])->name('invoices.share-link');
+    Route::post('/invoices/{invoice}/reschedule', [\Modules\ERP\Http\Controllers\Admin\InvoiceController::class, 'reschedule'])->name('invoices.reschedule');
 
     // ── Platform Users Transactions ───────────────────────────────
     Route::get('/transactions', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'index'])->name('transactions.index');

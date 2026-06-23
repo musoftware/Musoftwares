@@ -7,7 +7,7 @@ use Laravel\Scout\Searchable;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class WithdrawalRequest extends TenantModel
+class WithdrawalRequest extends TenantAwareModel
 {
     use SoftDeletes;
 

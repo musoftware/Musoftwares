@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class TenantNote extends TenantModel
+class TenantNote extends TenantAwareModel
 {
     use SoftDeletes;
 

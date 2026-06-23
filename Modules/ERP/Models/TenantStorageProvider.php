@@ -4,7 +4,7 @@ namespace Modules\ERP\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class TenantStorageProvider extends TenantModel
+class TenantStorageProvider extends TenantAwareModel
 {
     use SoftDeletes;
 

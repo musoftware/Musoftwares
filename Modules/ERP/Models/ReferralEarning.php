@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ReferralEarning extends TenantModel
+class ReferralEarning extends TenantAwareModel
 {
     use SoftDeletes;
 

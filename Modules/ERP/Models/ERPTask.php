@@ -12,7 +12,7 @@ use App\Models\User;
  * Recovered from old project: Task model.
  * Links to TenantClient and/or Project. Created by admin, visible to client.
  */
-class ERPTask extends TenantModel
+class ERPTask extends TenantAwareModel
 {
     use SoftDeletes;
 

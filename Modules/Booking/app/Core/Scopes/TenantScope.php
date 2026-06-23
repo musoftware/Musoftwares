@@ -21,6 +21,12 @@ class TenantScope implements Scope
         
         if ($tenantId) {
             $builder->where($model->getTable() . '.tenant_id', '=', $tenantId);
+        } else {
+            if (app()->runningInConsole()) {
+                $builder->whereRaw('0 = 1');
+            } else {
+                throw new \App\Exceptions\TenantCouldNotBeIdentifiedException();
+            }
         }
     }
 }

@@ -7,7 +7,7 @@ use App\Models\User;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Expense extends TenantModel
+class Expense extends TenantAwareModel
 {
     use SoftDeletes;
 

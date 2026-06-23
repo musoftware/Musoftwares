@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class InvoiceCost extends TenantModel
+class InvoiceCost extends TenantAwareModel
 {
     use SoftDeletes;
 

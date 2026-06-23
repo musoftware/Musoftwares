@@ -7,7 +7,7 @@ use App\Models\User;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ProductStockLog extends TenantModel
+class ProductStockLog extends TenantAwareModel
 {
     use SoftDeletes;
 

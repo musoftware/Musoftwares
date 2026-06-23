@@ -2,10 +2,10 @@
 
 namespace Modules\ERP\Models;
 
-
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
+use Modules\ERP\Models\Scopes\TenantScope;
+use Modules\ERP\Infrastructure\Context\TenantContext;
 
 abstract class TenantAwareModel extends Model
 {
@@ -13,15 +13,28 @@ abstract class TenantAwareModel extends Model
 
     protected static function booted()
     {
-        static::addGlobalScope('tenant', function (Builder $builder) {
-            if (auth()->check() && session()->has('tenant_id')) {
-                $builder->where('tenant_id', session('tenant_id'));
-            }
-        });
+        static::addGlobalScope(new TenantScope);
 
         static::creating(function ($model) {
-            if (auth()->check() && session()->has('tenant_id') && empty($model->tenant_id)) {
-                $model->tenant_id = session('tenant_id');
+            if (empty($model->tenant_id)) {
+                $tenantId = app(TenantContext::class)->getTenantId();
+
+                if (!$tenantId && session()->has('tenant_id')) {
+                    $tenantId = session('tenant_id');
+                }
+
+                if (!$tenantId && auth()->check()) {
+                    $user = auth()->user();
+                    if (isset($user->tenant_id)) {
+                        $tenantId = $user->tenant_id;
+                    } else {
+                        $tenantId = $user->tenant?->id;
+                    }
+                }
+
+                if ($tenantId) {
+                    $model->tenant_id = $tenantId;
+                }
             }
         });
     }
