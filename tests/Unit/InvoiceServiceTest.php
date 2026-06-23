@@ -83,9 +83,9 @@ class InvoiceServiceTest extends TestCase
 
         // 3. Assertions
         
-        // Old items should be deleted
-        $this->assertDatabaseMissing('invoice_items', ['id' => $item1->id]);
-        $this->assertDatabaseMissing('invoice_items', ['id' => $item2->id]);
+        // Old items should be deleted (soft deleted)
+        $this->assertSoftDeleted('invoice_items', ['id' => $item1->id]);
+        $this->assertSoftDeleted('invoice_items', ['id' => $item2->id]);
 
         // New item should be created
         $this->assertDatabaseHas('invoice_items', [

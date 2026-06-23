@@ -29,11 +29,19 @@ class AdminContractController extends Controller
     {
         $priceItems = ContractPriceItem::all();
         $currencies = \App\Models\Currency::all();
+        
+        $exchangeRates = [];
+        foreach ($currencies as $c1) {
+            foreach ($currencies as $c2) {
+                $exchangeRates[$c1->id][$c2->id] = \App\Models\CurrenciesExchange::RateToday(1, $c1->id, $c2->id);
+            }
+        }
 
         return Inertia::render('Admin/Contracts/Form', [
             'contract' => null,
             'priceItems' => $priceItems,
-            'currencies' => $currencies
+            'currencies' => $currencies,
+            'exchangeRates' => $exchangeRates
         ]);
     }
 
@@ -44,6 +52,7 @@ class AdminContractController extends Controller
             'description' => 'nullable|string',
             'total_amount' => 'required|numeric|min:0',
             'currency_id' => 'required|integer',
+            'duration' => 'nullable|integer|min:1',
             'content' => 'nullable|array',
             'status' => 'nullable|string|in:draft,sent,signed,active,completed'
         ]);
@@ -56,6 +65,7 @@ class AdminContractController extends Controller
             $contract->description = $validated['description'] ?? null;
             $contract->total_amount = $validated['total_amount'];
             $contract->currency_id = $validated['currency_id'];
+            $contract->duration = $validated['duration'] ?? null;
             $contract->status = $validated['status'] ?? 'draft';
             $contract->content = $validated['content'] ?? [];
             $contract->save();
@@ -79,11 +89,19 @@ class AdminContractController extends Controller
         $contract->load('versions');
         $priceItems = ContractPriceItem::all();
         $currencies = \App\Models\Currency::all();
+        
+        $exchangeRates = [];
+        foreach ($currencies as $c1) {
+            foreach ($currencies as $c2) {
+                $exchangeRates[$c1->id][$c2->id] = \App\Models\CurrenciesExchange::RateToday(1, $c1->id, $c2->id);
+            }
+        }
 
         return Inertia::render('Admin/Contracts/Form', [
             'contract' => $contract,
             'priceItems' => $priceItems,
-            'currencies' => $currencies
+            'currencies' => $currencies,
+            'exchangeRates' => $exchangeRates
         ]);
     }
 
@@ -94,6 +112,7 @@ class AdminContractController extends Controller
             'description' => 'nullable|string',
             'total_amount' => 'required|numeric|min:0',
             'currency_id' => 'required|integer',
+            'duration' => 'nullable|integer|min:1',
             'content' => 'nullable|array',
             'status' => 'nullable|string|in:draft,sent,signed,active,completed'
         ]);
@@ -104,6 +123,7 @@ class AdminContractController extends Controller
                 'description' => $validated['description'] ?? null,
                 'total_amount' => $validated['total_amount'],
                 'currency_id' => $validated['currency_id'],
+                'duration' => $validated['duration'] ?? null,
                 'status' => $validated['status'] ?? $contract->status,
                 'content' => $validated['content'] ?? [],
             ]);

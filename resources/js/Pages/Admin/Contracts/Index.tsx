@@ -91,14 +91,16 @@ export default function Index({ contracts }) {
                     {contracts.data.map((contract: any) => (
                         <Card key={contract.id} className="flex flex-col">
                             <CardHeader className="border-b pb-3">
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <FileText className="h-5 w-5 text-slate-900" />
-                                        <CardTitle className="truncate text-base">
-                                            {contract.project_name}
-                                        </CardTitle>
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="flex min-w-0 flex-1 items-start gap-2">
+                                        <FileText className="mt-0.5 h-5 w-5 shrink-0 text-slate-900" />
+                                        <Link href={`/admin/contracts/${contract.id}/edit`} className="hover:text-indigo-600 transition-colors">
+                                            <CardTitle className="line-clamp-2 text-base">
+                                                {contract.project_name}
+                                            </CardTitle>
+                                        </Link>
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex shrink-0 items-center gap-2">
                                         <span
                                             className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${contract.status === 'signed' ? 'bg-green-100 text-slate-900' : ''} ${contract.status === 'draft' ? 'bg-slate-100 text-slate-700' : ''} ${contract.status === 'sent' ? 'bg-slate-50 text-slate-900' : ''} `}
                                         >

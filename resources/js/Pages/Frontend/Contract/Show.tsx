@@ -7,6 +7,12 @@ import { __ } from '@/lib/i18n';
 import { CheckCircle2, FileText, Download, Building2, User } from 'lucide-react';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
+
+const createMarkup = (content: string) => {
+    return { __html: DOMPurify.sanitize(marked.parse(content || '') as string) };
+};
 
 export default function Show({ contract, invoices, project }) {
     const [clientName, setClientName] = useState('');
@@ -54,9 +60,14 @@ export default function Show({ contract, invoices, project }) {
                             </CardHeader>
                             <CardContent className="pt-6 prose prose-slate max-w-none">
                                 <h3>{contract.project_name}</h3>
-                                <p className="whitespace-pre-line text-slate-600">
-                                    {contract.description || 'No general description provided.'}
-                                </p>
+                                {contract.description ? (
+                                    <div 
+                                        className="prose prose-slate max-w-none text-slate-600 prose-p:my-2 prose-headings:mb-2 prose-headings:mt-4 prose-ul:my-2 prose-pre:bg-transparent prose-pre:text-slate-600 prose-pre:p-0 prose-pre:m-0 prose-pre:font-sans prose-code:text-slate-600 prose-code:font-sans prose-code:bg-transparent prose-code:before:content-none prose-code:after:content-none prose-pre:whitespace-pre-wrap" 
+                                        dangerouslySetInnerHTML={createMarkup(contract.description)} 
+                                    />
+                                ) : (
+                                    <p className="text-slate-500 italic">No general description provided.</p>
+                                )}
 
                                 {contract.content?.key_features?.length > 0 && (
                                     <>
@@ -90,7 +101,7 @@ export default function Show({ contract, invoices, project }) {
                                     <div className="text-end">
                                         <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">{__('general.duration')}</p>
                                         <p className="text-xl font-semibold text-slate-900 mt-1">
-                                            {contract.content?.duration || 'TBD'}
+                                            {contract.duration ? `${contract.duration} ${__('general.weeks', {}, 'Weeks')}` : (contract.content?.duration || 'TBD')}
                                         </p>
                                     </div>
                                 </div>
@@ -153,8 +164,8 @@ export default function Show({ contract, invoices, project }) {
                     <div className="space-y-6">
                         {/* Status & Actions */}
                         <Card className="shadow-sm border-slate-200 sticky top-6">
-                            <CardHeader className="bg-slate-900 text-white rounded-t-lg">
-                                <CardTitle className="text-lg">{__('general.contract_status')}</CardTitle>
+                            <CardHeader className="bg-white border-b pb-4">
+                                <CardTitle className="text-xl">{__('general.contract_status')}</CardTitle>
                             </CardHeader>
                             <CardContent className="pt-6">
                                 {contract.status === 'signed' ? (

@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Textarea } from '@/Components/ui/textarea';
+import MDEditor from '@uiw/react-md-editor';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/Components/ui/card';
 import { __ } from '@/lib/i18n';
 import { Loader2, Plus, Trash2, Save, FileText } from 'lucide-react';
 import axios from 'axios';
 
-export default function Form({ contract, priceItems, currencies }) {
-    const [isLoading, setIsLoading] = useState(false);
-    const [formData, setFormData] = useState({
+export default function Form({ contract, priceItems, currencies, exchangeRates }: any) {
+    const { data: formData, setData: setFormData, post, put, processing: isLoading, errors } = useForm({
         project_name: contract?.project_name || '',
         description: contract?.description || '',
         total_amount: contract?.total_amount || '',
         currency_id: contract?.currency_id || currencies[0]?.id || '',
+        duration: contract?.duration || '',
         status: contract?.status || 'draft',
         content: {
             pricing_items: contract?.content?.pricing_items || []
@@ -26,65 +26,52 @@ export default function Form({ contract, priceItems, currencies }) {
     const [isPriceItemModalOpen, setIsPriceItemModalOpen] = useState(false);
     const [globalItems, setGlobalItems] = useState(priceItems || []);
 
-    const onSubmit = (e) => {
+    const onSubmit = (e: any) => {
         e.preventDefault();
-        setIsLoading(true);
         
-        const action = contract ? router.put : router.post;
         const url = contract ? `/admin/contracts/${contract.id}` : '/admin/contracts';
 
-        action(url, formData, {
-            onSuccess: () => {
-                setIsLoading(false);
-            },
-            onError: () => {
-                setIsLoading(false);
-            }
-        });
+        if (contract) {
+            put(url);
+        } else {
+            post(url);
+        }
     };
 
     const addPricing = () => {
-        setFormData(p => ({
-            ...p,
-            content: {
-                ...p.content,
-                pricing_items: [...p.content.pricing_items, { item: '', description: '', price: 0 }]
-            }
-        }));
-    };
-
-    const updatePricing = (i, field, val) => {
-        setFormData(p => {
-            const np = [...p.content.pricing_items];
-            np[i][field] = val;
-            return { ...p, content: { ...p.content, pricing_items: np } };
+        setFormData('content', {
+            ...formData.content,
+            pricing_items: [...formData.content.pricing_items, { item: '', description: '', price: 0, currency_id: formData.currency_id }]
         });
     };
 
-    const removePricing = (i) => {
-        setFormData(p => ({
-            ...p,
-            content: {
-                ...p.content,
-                pricing_items: p.content.pricing_items.filter((_, idx) => idx !== i)
-            }
-        }));
+    const updatePricing = (i: number, field: string, val: any) => {
+        const np = [...formData.content.pricing_items];
+        np[i] = { ...np[i], [field]: val };
+        setFormData('content', { ...formData.content, pricing_items: np });
     };
 
-    const addFromGlobalItem = (item) => {
-        setFormData(p => ({
-            ...p,
-            content: {
-                ...p.content,
-                pricing_items: [
-                    ...p.content.pricing_items,
-                    { item: item.name, description: item.description || '', price: item.default_price }
-                ]
-            }
-        }));
+    const removePricing = (i: number) => {
+        setFormData('content', {
+            ...formData.content,
+            pricing_items: formData.content.pricing_items.filter((_, idx) => idx !== i)
+        });
     };
 
-    const saveAsGlobalItem = async (index) => {
+    const addFromGlobalItem = (item: any) => {
+        const rate = exchangeRates?.[item.currency_id]?.[formData.currency_id] || 1;
+        const convertedPrice = Math.ceil((item.default_price * rate) / 5) * 5;
+
+        setFormData('content', {
+            ...formData.content,
+            pricing_items: [
+                ...formData.content.pricing_items,
+                { item: item.name, description: item.description || '', price: convertedPrice, currency_id: formData.currency_id }
+            ]
+        });
+    };
+
+    const saveAsGlobalItem = async (index: number) => {
         const itemData = formData.content.pricing_items[index];
         if (!itemData.item || !itemData.price) {
             alert('Title and Price are required to save to the global price list.');
@@ -96,7 +83,7 @@ export default function Form({ contract, priceItems, currencies }) {
                 name: itemData.item,
                 description: itemData.description,
                 default_price: itemData.price,
-                currency_id: formData.currency_id,
+                currency_id: itemData.currency_id || formData.currency_id,
             });
             setGlobalItems([...globalItems, res.data]);
             alert('Item added to Global Price List.');
@@ -128,19 +115,21 @@ export default function Form({ contract, priceItems, currencies }) {
                                 <Label>Title / Project Name</Label>
                                 <Input 
                                     value={formData.project_name} 
-                                    onChange={e => setFormData({...formData, project_name: e.target.value})}
+                                    onChange={e => setFormData('project_name', e.target.value)}
                                     placeholder="e.g. E-Commerce Website Development"
                                     required
                                 />
+                                {errors.project_name && <div className="mt-1 text-xs text-red-500">{errors.project_name}</div>}
                             </div>
-                            <div>
+                            <div data-color-mode="light">
                                 <Label>Description</Label>
-                                <Textarea 
+                                <MDEditor 
                                     value={formData.description} 
-                                    onChange={e => setFormData({...formData, description: e.target.value})}
-                                    rows={4}
-                                    placeholder="Executive summary of the contract..."
+                                    onChange={val => setFormData('description', val || '')}
+                                    height={200}
+                                    className="mt-1"
                                 />
+                                {errors.description && <div className="mt-1 text-xs text-red-500">{errors.description}</div>}
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -149,22 +138,35 @@ export default function Form({ contract, priceItems, currencies }) {
                                         type="number" 
                                         step="0.01" 
                                         value={formData.total_amount} 
-                                        onChange={e => setFormData({...formData, total_amount: e.target.value})}
+                                        onChange={e => setFormData('total_amount', e.target.value)}
                                         required
                                     />
+                                    {errors.total_amount && <div className="mt-1 text-xs text-red-500">{errors.total_amount}</div>}
                                 </div>
                                 <div>
                                     <Label>Currency</Label>
                                     <select 
                                         className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
                                         value={formData.currency_id}
-                                        onChange={e => setFormData({...formData, currency_id: e.target.value})}
+                                        onChange={e => setFormData('currency_id', e.target.value)}
                                         required
                                     >
-                                        {currencies.map(c => (
+                                        {currencies.map((c: any) => (
                                             <option key={c.id} value={c.id}>{c.currency} ({c.symbol})</option>
                                         ))}
                                     </select>
+                                    {errors.currency_id && <div className="mt-1 text-xs text-red-500">{errors.currency_id}</div>}
+                                </div>
+                                <div>
+                                    <Label>Duration (Weeks)</Label>
+                                    <Input 
+                                        type="number" 
+                                        min="1"
+                                        value={formData.duration} 
+                                        onChange={e => setFormData('duration', e.target.value)}
+                                        placeholder="e.g. 4"
+                                    />
+                                    {errors.duration && <div className="mt-1 text-xs text-red-500">{errors.duration}</div>}
                                 </div>
                             </div>
                         </CardContent>
@@ -178,7 +180,7 @@ export default function Form({ contract, priceItems, currencies }) {
                             </Button>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {formData.content.pricing_items.map((item, idx) => (
+                            {formData.content.pricing_items.map((item: any, idx: number) => (
                                 <div key={idx} className="flex items-start gap-4 p-4 border rounded-md bg-slate-50">
                                     <div className="flex-1 space-y-3">
                                         <div className="grid grid-cols-3 gap-3">
@@ -190,15 +192,29 @@ export default function Form({ contract, priceItems, currencies }) {
                                                     onChange={e => updatePricing(idx, 'item', e.target.value)} 
                                                 />
                                             </div>
-                                            <div>
+                                            <div className="flex gap-2">
+                                            <div className="flex-1">
                                                 <Label className="text-xs">Price</Label>
                                                 <Input 
                                                     type="number" 
-                                                    placeholder="0.00" 
+                                                    placeholder="0" 
                                                     value={item.price} 
                                                     onChange={e => updatePricing(idx, 'price', e.target.value)} 
                                                 />
                                             </div>
+                                            <div className="w-[100px]">
+                                                <Label className="text-xs">Currency</Label>
+                                                <select 
+                                                    className="flex h-9 w-full rounded-md border border-slate-200 bg-transparent px-2 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950"
+                                                    value={item.currency_id || formData.currency_id}
+                                                    onChange={e => updatePricing(idx, 'currency_id', e.target.value)}
+                                                >
+                                                    {currencies.map((c: any) => (
+                                                        <option key={c.id} value={c.id}>{c.currency}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
                                         </div>
                                         <div>
                                             <Label className="text-xs">Description</Label>
@@ -235,18 +251,27 @@ export default function Form({ contract, priceItems, currencies }) {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
-                                {globalItems.map(item => (
-                                    <div key={item.id} className="p-3 border rounded-md hover:bg-slate-50 flex flex-col gap-2">
-                                        <div className="flex justify-between items-start">
-                                            <div className="font-semibold text-sm">{item.name}</div>
-                                            <div className="text-sm font-medium">{item.default_price}</div>
+                                {globalItems.map((item: any) => {
+                                    const rate = exchangeRates?.[item.currency_id]?.[formData.currency_id] || 1;
+                                    const displayPrice = Math.ceil((item.default_price * rate) / 5) * 5;
+                                    const isConverted = item.currency_id != formData.currency_id;
+
+                                    return (
+                                        <div key={item.id} className="p-3 border rounded-md hover:bg-slate-50 flex flex-col gap-2">
+                                            <div className="flex justify-between items-start">
+                                                <div className="font-semibold text-sm">{item.name}</div>
+                                                <div className="text-sm font-medium text-end">
+                                                    {displayPrice}
+                                                    {isConverted && <div className="text-[10px] text-slate-400 font-normal leading-tight">(Converted)</div>}
+                                                </div>
+                                            </div>
+                                            <div className="text-xs text-slate-500 line-clamp-2">{item.description}</div>
+                                            <Button type="button" variant="secondary" size="sm" className="w-full mt-2" onClick={() => addFromGlobalItem(item)}>
+                                                Add to Contract
+                                            </Button>
                                         </div>
-                                        <div className="text-xs text-slate-500 line-clamp-2">{item.description}</div>
-                                        <Button type="button" variant="secondary" size="sm" className="w-full mt-2" onClick={() => addFromGlobalItem(item)}>
-                                            Add to Contract
-                                        </Button>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                                 {globalItems.length === 0 && (
                                     <div className="text-sm text-slate-500">No items in the global price list yet. Add a custom item and save it.</div>
                                 )}
@@ -264,7 +289,7 @@ export default function Form({ contract, priceItems, currencies }) {
                                 <select 
                                     className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
                                     value={formData.status}
-                                    onChange={e => setFormData({...formData, status: e.target.value})}
+                                    onChange={e => setFormData('status', e.target.value)}
                                 >
                                     <option value="draft">Draft</option>
                                     <option value="sent">Sent</option>
@@ -272,6 +297,7 @@ export default function Form({ contract, priceItems, currencies }) {
                                     <option value="active">Active</option>
                                     <option value="completed">Completed</option>
                                 </select>
+                                {errors.status && <div className="mt-1 text-xs text-red-500">{errors.status}</div>}
                             </div>
                         </CardContent>
                         <CardFooter>

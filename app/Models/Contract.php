@@ -60,8 +60,13 @@ class Contract extends Model
 
     public function getCurrencyAttribute()
     {
-        // Assuming currency_id 2 is EGP and 1 is USD
-        return $this->currency_id == 2 ? 'EGP' : 'USD';
+        $currencyRow = $this->currencyRow();
+        return $currencyRow ? $currencyRow->currency : '';
+    }
+
+    public function currencyRow()
+    {
+        return \App\Models\Currency::find($this->currency_id);
     }
 
     public function getTotalPriceAttribute()
