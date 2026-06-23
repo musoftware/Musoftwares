@@ -67,7 +67,7 @@ export default function Login({ status, info }: { status?: string, info?: string
                             value={data.email}
                             className="mt-1 block w-full bg-gray-50"
                             autoComplete="username"
-                            isFocused={true}
+                            autoFocus
                             onChange={(e) => setData('email', e.target.value)}
                             required
                         />

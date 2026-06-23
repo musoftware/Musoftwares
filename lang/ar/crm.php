@@ -173,5 +173,17 @@ return [
     'lead_phone' => 'رقم الهاتف',
     'lead_company' => 'اسم الشركة',
     'lead_message' => 'ملاحظات / رسالة',
-    'submitting' => 'جاري الإرسال...'
+    'submitting' => 'جاري الإرسال...',
+    'accept_invitation' => 'قبول الدعوة',
+    'account_already_active' => 'الحساب نشط بالفعل',
+    'account_pending_setup' => 'الحساب في انتظار الإعداد',
+    'account_setup_success' => 'تم إعداد الحساب بنجاح',
+    'all_rights_reserved' => 'جميع الحقوق محفوظة',
+    'hello' => 'مرحباً',
+    'invite_email_expires_warning' => 'تحذير: ستنتهي صلاحية رابط الدعوة قريباً',
+    'invite_email_instruction' => 'تعليمات البريد الإلكتروني للدعوة',
+    'invite_resent_successfully' => 'تم إعادة إرسال الدعوة بنجاح',
+    'member_already_active' => 'العضو نشط بالفعل',
+    'welcome_back_owner' => 'مرحباً بعودتك، المالك',
+    'you_are_invited' => 'أنت مدعو',
 ];

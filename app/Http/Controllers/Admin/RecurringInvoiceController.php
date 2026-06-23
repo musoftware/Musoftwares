@@ -143,7 +143,7 @@ class RecurringInvoiceController extends Controller
     public function view($id)
     {
         $invoice = RecurringInvoice::with('user')->findOrFail($id);
-        $records = $invoice->records()->with('invoice')->latest()->get()->map(function ($record) use ($invoice) {
+        $records = $invoice->records()->with('invoice')->latest()->get()->map(function ($record) {
             $actualInvoice = $record->invoice;
             return [
                 'id' => $record->id,

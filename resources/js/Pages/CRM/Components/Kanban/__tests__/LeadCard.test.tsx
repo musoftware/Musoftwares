@@ -31,7 +31,7 @@ describe('LeadCard Component', () => {
             source: 'Website',
             score: 85,
             slaBreached: false,
-            stageId: 'new',
+            stageId: 1,
             order: 0,
             value: 1000
         };

@@ -173,5 +173,17 @@ return [
     'lead_phone' => 'Phone Number',
     'lead_company' => 'Company Name',
     'lead_message' => 'Notes / Message',
-    'submitting' => 'Submitting...'
+    'submitting' => 'Submitting...',
+    'accept_invitation' => 'Accept Invitation',
+    'account_already_active' => 'Account Already Active',
+    'account_pending_setup' => 'Account Pending Setup',
+    'account_setup_success' => 'Account Setup Success',
+    'all_rights_reserved' => 'All Rights Reserved',
+    'hello' => 'Hello',
+    'invite_email_expires_warning' => 'Invite Email Expires Warning',
+    'invite_email_instruction' => 'Invite Email Instruction',
+    'invite_resent_successfully' => 'Invite Resent Successfully',
+    'member_already_active' => 'Member Already Active',
+    'welcome_back_owner' => 'Welcome Back, Owner',
+    'you_are_invited' => 'You Are Invited',
 ];

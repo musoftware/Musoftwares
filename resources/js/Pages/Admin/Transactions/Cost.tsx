@@ -139,16 +139,16 @@ export default function Cost({ transactions, filters, filteredUser }) {
                 </div>
                 <div className="flex gap-2">
                     <Button variant="default" asChild>
-                        <Link href={`/admin/transactions/create?type=receive${filteredUser ? `&user_id=${filteredUser.id}` : ''}`}>{__('general.receive')}</Link>
+                        <Link href={`/admin/transactions/create?type=receive${filteredUser ? `&user=${filteredUser.id}` : ''}`}>{__('general.receive')}</Link>
                     </Button>
                     <Button variant="outline" asChild>
-                        <Link href={`/admin/transactions/create?type=earn${filteredUser ? `&user_id=${filteredUser.id}` : ''}`}>{__('general.earn')}</Link>
+                        <Link href={`/admin/transactions/create?type=earn${filteredUser ? `&user=${filteredUser.id}` : ''}`}>{__('general.earn')}</Link>
                     </Button>
                     <Button variant="outline" asChild>
-                        <Link href={`/admin/transactions/create?type=refund${filteredUser ? `&user_id=${filteredUser.id}` : ''}`}>{__('general.refund')}</Link>
+                        <Link href={`/admin/transactions/create?type=refund${filteredUser ? `&user=${filteredUser.id}` : ''}`}>{__('general.refund')}</Link>
                     </Button>
                     <Button variant="outline" asChild>
-                        <Link href={`/admin/transactions/create?type=send${filteredUser ? `&user_id=${filteredUser.id}` : ''}`}>{__('general.send')}</Link>
+                        <Link href={`/admin/transactions/create?type=send${filteredUser ? `&user=${filteredUser.id}` : ''}`}>{__('general.send')}</Link>
                     </Button>
                 </div>
             </div>

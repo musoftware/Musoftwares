@@ -19,12 +19,12 @@ class RecurringInvoice extends Model
         'is_active' => 'boolean',
     ];
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function currency()
+    public function currency(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Currency::class);
     }
@@ -39,7 +39,7 @@ class RecurringInvoice extends Model
         return \App\Helpers\FinanceHelper::instance()->format_money($this->current_amount(), $this->currency_id);
     }
 
-    public function records()
+    public function records(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(RecurringInvoiceRecord::class);
     }

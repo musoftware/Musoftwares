@@ -65,7 +65,7 @@ export default function AcceptInvite({ memberId, name, email, signature, expires
                             value={data.password}
                             className="mt-1 block w-full bg-gray-50"
                             autoComplete="new-password"
-                            isFocused={true}
+                            autoFocus
                             onChange={(e) => setData('password', e.target.value)}
                             required
                         />
