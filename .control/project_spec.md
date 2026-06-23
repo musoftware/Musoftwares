@@ -64,3 +64,667 @@ The `app/Services/` directory centralizes core business rules, keeping controlle
 
 ### New Feature Request
 Audit full ERP module and complete full user story how to use it and then build missing gaps , missing features, etc
+
+### New Feature Request
+# MASTER ERP EVOLUTION PROMPT
+
+You are operating as a complete ERP Engineering Organization.
+
+Your roles simultaneously include:
+
+* ERP Product Manager
+* ERP Business Analyst
+* ERP Solution Architect
+* Enterprise Software Architect
+* Laravel 12 Architect
+* Filament 4 Architect
+* Senior Backend Engineer
+* Senior Database Architect
+* QA Lead
+* Technical Writer
+* SaaS Architect
+
+Your mission is to transform the existing ERP codebase into a complete enterprise-grade ERP platform comparable to:
+
+* Odoo Enterprise
+* ERPNext
+* Microsoft Dynamics 365 Business Central
+* Oracle NetSuite
+* SAP Business One
+
+You are not building a demo.
+
+You are building a production-ready ERP SaaS platform.
+
+---
+
+# PROJECT CONTEXT
+
+Current ERP already contains:
+
+## CRM
+
+* Clients
+* Client Notes
+* Client Files
+* Client Activities
+
+## Sales
+
+* Contracts
+* Invoices
+* POS
+
+## Inventory
+
+* Products
+* Categories
+* Stock Logs
+* Product Variants
+* Branch Transfers
+
+## HR
+
+* Employees
+* Attendance
+* Leave Requests
+* Payroll Contracts
+* Payslips
+
+## Operations
+
+* Projects
+* Tasks
+* Todo Lists
+* Timers
+* Support Tickets
+
+## Finance
+
+* Expenses
+* Wallets
+* Transactions
+* Debts
+* Recurring Billing
+
+## SaaS Infrastructure
+
+* Tenants
+* Subscriptions
+* Feature Flags
+* Addons
+* User Roles
+* Permissions
+
+---
+
+# AUDIT FINDINGS
+
+The current ERP is incomplete.
+
+The following critical domains are missing or partially implemented:
+
+## Procurement
+
+* Suppliers
+* Supplier Contacts
+* Purchase Requests
+* Purchase Orders
+* Purchase Order Items
+* Goods Receipt Notes
+* Vendor Bills
+* Accounts Payable
+
+## Accounting
+
+* Chart Of Accounts
+* General Ledger
+* Journal Entries
+* Journal Lines
+* Accounting Periods
+* Fiscal Years
+* Trial Balance
+* Balance Sheet
+* Profit & Loss
+* Bank Accounts
+* Bank Reconciliation
+
+## Warehouse
+
+* Warehouses
+* Warehouse Zones
+* Warehouse Bins
+* Stock Transfers
+* Stock Reservations
+* Stock Adjustments
+* Inventory Counts
+
+## Tax Engine
+
+* Tax Rates
+* Tax Groups
+* Tax Rules
+* Tax Calculators
+* Tax Reporting
+
+## Asset Management
+
+* Asset Categories
+* Fixed Assets
+* Depreciation Schedules
+* Asset Transfers
+* Asset Disposal
+
+## Approval Engine
+
+* Workflow Definitions
+* Workflow Steps
+* Approval Requests
+* Approval Actions
+* Escalations
+
+## Calendar
+
+* Events
+* Meetings
+* Reminders
+* Scheduling
+
+## OCR
+
+* OCR Documents
+* OCR Jobs
+* OCR Invoice Extraction
+* OCR Purchase Bill Recognition
+
+## Sales Enhancements
+
+* Quotations
+* Estimates
+* Sales Orders
+
+## Manufacturing (Future Ready)
+
+* Bill Of Materials
+* Production Orders
+* Work Centers
+* Routing
+
+---
+
+# CORE ERP PRINCIPLES
+
+Every ERP operation must be traceable.
+
+Every ERP operation must be auditable.
+
+Every ERP operation must be tenant isolated.
+
+Every ERP operation must be event driven.
+
+Every ERP operation must support enterprise scale.
+
+No direct business logic inside controllers.
+
+No duplicated logic.
+
+No hidden calculations.
+
+No orphan records.
+
+No manual synchronization.
+
+No hardcoded permissions.
+
+No hardcoded workflows.
+
+---
+
+# ARCHITECTURE REQUIREMENTS
+
+Use:
+
+* Laravel 12
+* PHP 8.4
+* Filament 4
+* MySQL
+* Redis
+* Queues
+* Events
+* Notifications
+* Policies
+* UUID Primary Keys
+* Soft Deletes
+* Audit Logs
+
+Architecture Patterns:
+
+* Domain Driven Design
+* Service Layer
+* Repository Pattern
+* Action Classes
+* DTOs
+* Event Driven Architecture
+* CQRS where appropriate
+
+Folder Structure:
+
+Domain/
+Application/
+Infrastructure/
+Presentation/
+
+Keep domains isolated.
+
+---
+
+# MULTI TENANT REQUIREMENTS
+
+Every business record must belong to a tenant.
+
+Examples:
+
+tenant_id required on:
+
+* suppliers
+* purchase_orders
+* warehouses
+* assets
+* journal_entries
+* tax_rules
+* approvals
+
+Prevent tenant data leakage.
+
+Implement tenant scopes.
+
+Implement tenant policies.
+
+Implement tenant-aware caching.
+
+---
+
+# ACCOUNTING RULES
+
+Accounting is the financial source of truth.
+
+Every financial operation must generate journal entries.
+
+Examples:
+
+Invoice Created
+→ Journal Entry
+
+Invoice Paid
+→ Journal Entry
+
+Expense Recorded
+→ Journal Entry
+
+Vendor Bill Approved
+→ Journal Entry
+
+Asset Purchased
+→ Journal Entry
+
+Asset Disposal
+→ Journal Entry
+
+Tax Liability
+→ Journal Entry
+
+No transaction may bypass accounting.
+
+---
+
+# INVENTORY RULES
+
+Inventory is quantity based and valuation based.
+
+Every inventory change creates:
+
+* Stock Movement
+* Audit Entry
+
+Examples:
+
+Purchase Receipt
+→ Increase Stock
+
+Sales Shipment
+→ Decrease Stock
+
+Transfer
+→ Source Decrease
+→ Destination Increase
+
+Adjustment
+→ Adjustment Record
+
+Inventory must support:
+
+* FIFO
+* Average Cost
+
+Design valuation engine accordingly.
+
+---
+
+# PROCUREMENT RULES
+
+Workflow:
+
+Purchase Request
+→ Approval
+→ Purchase Order
+→ Approval
+→ Goods Receipt
+→ Vendor Bill
+→ Payment
+→ Closed
+
+Support:
+
+* Partial Receipts
+* Partial Billing
+* Multiple Approvals
+* Supplier Performance Metrics
+
+---
+
+# SALES RULES
+
+Workflow:
+
+Quotation
+→ Approved
+→ Sales Order
+→ Invoice
+→ Payment
+
+Support:
+
+* Partial Invoicing
+* Multiple Tax Rules
+* Discounts
+* Multi Currency
+
+---
+
+# ASSET MANAGEMENT RULES
+
+Workflow:
+
+Purchase Asset
+→ Capitalize
+→ Depreciate
+→ Transfer
+→ Dispose
+
+Support:
+
+* Straight Line Depreciation
+* Declining Balance
+* Manual Adjustment
+
+Every depreciation run must generate journal entries.
+
+---
+
+# APPROVAL ENGINE RULES
+
+Approval engine must be generic.
+
+Must work with:
+
+* Purchase Orders
+* Vendor Bills
+* Expenses
+* Contracts
+* Assets
+* Leave Requests
+* Custom Modules
+
+Support:
+
+* Single Step Approval
+* Multi Step Approval
+* Parallel Approval
+* Conditional Approval
+* Escalation Rules
+
+No hardcoded approval logic.
+
+All workflows configurable from admin panel.
+
+---
+
+# OCR RULES
+
+OCR engine should support:
+
+* Purchase Invoices
+* Vendor Bills
+* Receipts
+* Expense Documents
+
+Extract:
+
+* Vendor
+* Invoice Number
+* Date
+* Tax Amount
+* Total Amount
+* Line Items
+
+Allow human review before posting.
+
+---
+
+# CALENDAR RULES
+
+Calendar integrates with:
+
+* Tasks
+* Projects
+* Meetings
+* Leave Requests
+* Approvals
+
+Support:
+
+* Daily
+* Weekly
+* Monthly
+* Agenda Views
+
+---
+
+# REQUIRED IMPLEMENTATION OUTPUT
+
+For EVERY module generate:
+
+## Business Analysis
+
+* Purpose
+* Scope
+* User Roles
+* Permissions
+* User Stories
+* Acceptance Criteria
+* Business Scenarios
+
+---
+
+## Database Design
+
+Generate:
+
+* Tables
+* Columns
+* Indexes
+* Foreign Keys
+* Constraints
+* Enums
+
+Generate complete ERD.
+
+---
+
+## Laravel Implementation
+
+Generate:
+
+* Migrations
+* Models
+* DTOs
+* Repositories
+* Services
+* Actions
+* Policies
+* Events
+* Listeners
+* Notifications
+* Jobs
+* Seeders
+* Factories
+
+Production ready.
+
+No pseudocode.
+
+---
+
+## API Layer
+
+Generate:
+
+* Controllers
+* Form Requests
+* API Resources
+* Routes
+* OpenAPI Documentation
+
+---
+
+## Filament Implementation
+
+Generate:
+
+* Resources
+* Pages
+* Widgets
+* Relation Managers
+* Tables
+* Forms
+* Filters
+* Bulk Actions
+
+---
+
+## Testing
+
+Generate:
+
+* Unit Tests
+* Feature Tests
+* Integration Tests
+* Pest Tests
+
+Minimum enterprise-grade coverage.
+
+---
+
+## Reporting
+
+Generate reports for each module.
+
+Examples:
+
+* Supplier Performance
+* Purchase Analysis
+* Aging Payables
+* Inventory Valuation
+* Asset Register
+* Depreciation Report
+* Trial Balance
+* P&L
+* Balance Sheet
+
+---
+
+## Dashboards
+
+Generate KPI widgets.
+
+---
+
+# QUALITY GATES
+
+A module is NOT complete unless all are implemented:
+
+✓ Database
+
+✓ Models
+
+✓ Services
+
+✓ Repositories
+
+✓ Policies
+
+✓ Events
+
+✓ Listeners
+
+✓ Notifications
+
+✓ APIs
+
+✓ Filament Resources
+
+✓ Tests
+
+✓ Reports
+
+✓ Dashboard Widgets
+
+✓ Audit Logs
+
+✓ Tenant Isolation
+
+✓ Documentation
+
+---
+
+# EXECUTION MODE
+
+Before generating code:
+
+1. Analyze existing codebase.
+2. Detect existing modules.
+3. Detect duplicates.
+4. Detect conflicts.
+5. Detect missing dependencies.
+6. Detect missing migrations.
+7. Detect missing permissions.
+8. Detect missing events.
+9. Detect missing policies.
+
+Then create an implementation plan.
+
+Then execute module by module.
+
+Never simplify.
+
+Never skip architecture.
+
+Never generate placeholder code.
+
+Never generate TODO comments.
+
+Never stop at CRUD.
+
+Build complete ERP business workflows.
+
+Continue until the ERP reaches enterprise-grade completeness.
