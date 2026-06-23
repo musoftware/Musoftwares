@@ -74,7 +74,7 @@ const items: MenuItem[] = [
     url: "/admin/operations", 
     icon: Briefcase,
     subItems: [
-        { title: "Broadcast Notifications", url: "/admin/notifications/broadcast" },
+        { title: "Bulk Notify", url: "/admin/notifications/broadcast" },
         { title: "Website Services", url: "/admin/website-services" },
         { title: "Guest Tickets", url: "/admin/guest-tickets" },
         { title: "Tickets", url: "/admin/tickets" },
@@ -87,6 +87,8 @@ const items: MenuItem[] = [
         { title: "Point Packages", url: "/admin/point-packages" },
         { title: "Charity", url: "/admin/charity-counter" },
         { title: "KYC Verification", url: "/admin/kyc" },
+        { title: "Contracts", url: "/admin/contracts" },
+        { title: "Contract Price List", url: "/admin/contract-price-items" },
 
     ]
   },

@@ -450,6 +450,10 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/contracts/ai/generate', [\App\Http\Controllers\Admin\ContractAiController::class, 'generate'])->name('contracts.ai.generate');
     Route::post('/contracts/ai/review', [\App\Http\Controllers\Admin\ContractAiController::class, 'review'])->name('contracts.ai.review');
 
+    // Standalone Contracts
+    Route::resource('/contracts', \App\Http\Controllers\Admin\AdminContractController::class)->except(['destroy']);
+    Route::resource('/contract-price-items', \App\Http\Controllers\Admin\ContractPriceItemController::class)->except(['create', 'show', 'edit']);
+
     // ── Admin Plans ───────────────────────────────────────────────
     Route::get('/plans/search-users', [\App\Http\Controllers\Admin\PlanController::class, 'searchUsers'])->name('plans.search-users');
     Route::resource('/plans', \App\Http\Controllers\Admin\PlanController::class)->except(['edit', 'show']);

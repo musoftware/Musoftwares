@@ -85,6 +85,50 @@ export default function Reports() {
                 </Card>
             </div>
 
+            <h3 className="text-lg font-semibold text-slate-900 mb-4 mt-8">{__('general.financial_overview') || 'Financial Overview'}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <Card className="border-none shadow-sm shadow-slate-200/50">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between space-y-0 pb-2">
+                            <p className="text-sm font-medium text-slate-500">{__('general.lifetime_income') || 'Lifetime Income'}</p>
+                            <div className="p-2 bg-slate-50 rounded-xl">
+                                <TrendingUp className="h-4 w-4 text-slate-900" />
+                            </div>
+                        </div>
+                        <div className="text-3xl font-bold text-slate-900 tracking-tight">
+                            {formatCurrency(stats.lifetime_income, stats.business_currency_code)}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-none shadow-sm shadow-slate-200/50">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between space-y-0 pb-2">
+                            <p className="text-sm font-medium text-slate-500">{__('general.lifetime_expenses') || 'Lifetime Expenses'}</p>
+                            <div className="p-2 bg-slate-50 rounded-xl">
+                                <TrendingDown className="h-4 w-4 text-slate-900" />
+                            </div>
+                        </div>
+                        <div className="text-3xl font-bold text-slate-900 tracking-tight">
+                            {formatCurrency(stats.lifetime_expenses, stats.business_currency_code)}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-none shadow-sm shadow-slate-200/50">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between space-y-0 pb-2">
+                            <p className="text-sm font-medium text-slate-500">{__('general.net_profit') || 'Net Profit'}</p>
+                            <div className="p-2 bg-slate-50 rounded-xl">
+                                <DollarSign className="h-4 w-4 text-slate-900" />
+                            </div>
+                        </div>
+                        <div className="text-3xl font-bold text-slate-900 tracking-tight">
+                            {formatCurrency(stats.net_profit, stats.business_currency_code)}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
 
         </AdminSidebarLayout>
     );

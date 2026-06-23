@@ -5250,11 +5250,6 @@ parameters:
 			count: 1
 			path: app/Models/Campaign.php
 
-		-
-			message: '#^Access to an undefined property App\\Models\\Contract\:\:\$user\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Contract.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\CostTransaction\:\:\$currency_id\.$#'
