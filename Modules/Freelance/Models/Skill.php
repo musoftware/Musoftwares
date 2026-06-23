@@ -13,7 +13,7 @@ class Skill extends Model
     protected $table = 'freelance_skills';
     protected $fillable = ['name', 'type', 'description', 'status', 'created_by'];
 
-    public function creator()
+    public function creator(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'created_by');
     }

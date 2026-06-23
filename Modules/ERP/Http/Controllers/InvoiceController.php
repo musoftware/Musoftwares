@@ -37,7 +37,7 @@ class InvoiceController extends Controller
 
     private function resolveTenant(): Tenant
     {
-        return Tenant::where('user_id', Auth::id())->firstOrFail();
+        return auth('erp_team')->user()->tenant;
     }
 
     // ── Index ─────────────────────────────────────────────────────
@@ -96,7 +96,7 @@ class InvoiceController extends Controller
         $tenant           = $this->resolveTenant();
         $baseCurrency     = Currency::find($tenant->base_currency_id);
 
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         if (Auth::guard('erp_team')->check()) {
             $user = Auth::guard('erp_team')->user()->tenant->user ?? $user;
         }
@@ -165,9 +165,10 @@ class InvoiceController extends Controller
         if ($invoice->issued_at) $timeline[] = ['event' => 'Sent', 'time' => $invoice->issued_at, 'user' => 'System'];
         if ($invoice->paid_at) $timeline[] = ['event' => 'Paid', 'time' => $invoice->paid_at, 'user' => 'Client'];
 
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         if (auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
+            $teamMember = auth('erp_team')->user();
+            $user = $teamMember?->tenant?->user;
         }
         $hasReferrals = $user && $user->hasModuleSubscription('erp-referrals');
         $hasSmtpAddon = $user && $user->hasModuleSubscription('erp-smtp');
@@ -193,7 +194,7 @@ class InvoiceController extends Controller
 
         $tenant = $this->resolveTenant();
 
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         if (Auth::guard('erp_team')->check()) {
             $user = Auth::guard('erp_team')->user()->tenant->user ?? $user;
         }
@@ -260,7 +261,7 @@ class InvoiceController extends Controller
     public function sendEmail(Invoice $invoice)
     {
         $tenant = $this->resolveTenant();
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
 
         if (!$user->hasModuleSubscription('erp-smtp')) {
             abort(403, __('errors.erp_smtp_addon_required'));
@@ -317,7 +318,7 @@ class InvoiceController extends Controller
             $cost->update([
                 'payment_status' => 'paid',
                 'paid_at' => now(),
-                'paid_by' => Auth::id(),
+                'paid_by' => auth('erp_team')->id(),
             ]);
 
             \Modules\ERP\Models\ExpenseTransaction::create([
@@ -334,7 +335,7 @@ class InvoiceController extends Controller
                 'balance_before' => 0,
                 'balance_after' => 0,
                 'note' => 'Paid internal cost for invoice: ' . $invoice->invoice_number,
-                'created_by' => Auth::id(),
+                'created_by' => auth('erp_team')->id(),
             ]);
         });
 

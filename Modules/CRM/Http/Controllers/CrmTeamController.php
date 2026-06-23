@@ -14,29 +14,19 @@ use Illuminate\Support\Facades\Log;
 
 class CrmTeamController extends Controller
 {
-    /**
-     * Only the workspace owner (not a team member) can manage team.
-     */
-    protected function ensureOwner()
-    {
-        if (session()->has('crm_team_member_id')) {
-            abort(403, __('crm.only_owner_can_manage_team'));
-        }
-    }
+
 
     /**
      * Get the current user's workspace.
      */
     protected function getWorkspace()
     {
-        $user = Auth::user();
-        $workspaceId = session('crm_workspace_id');
-
-        if ($workspaceId) {
-            return Workspace::where('id', $workspaceId)->where('user_id', $user->id)->first();
+        $member = Auth::guard('crm_team')->user();
+        if ($member) {
+            return $member->workspace;
         }
 
-        return Workspace::where('user_id', $user->id)->first();
+        return null;
     }
 
     /**
@@ -44,14 +34,18 @@ class CrmTeamController extends Controller
      */
     public function index()
     {
-        $this->ensureOwner();
 
-        $user = Auth::user();
-        $workspace = $this->getWorkspace();
+        $member = Auth::guard('crm_team')->user();
+        if (!$member) {
+            abort(403, 'Unauthorized. Please login to CRM.');
+        }
 
-        $hasFeature = $user->hasModuleSubscription('erp-team-members');
-        $capacityLimit = $user->hasModuleSubscription('crm-team-10') ? 10 : 3;
-        $hasAdvancedRolesAddon = $user->hasModuleSubscription('crm-advanced-roles');
+        $workspace = $member->workspace;
+        $owner = $workspace->owner;
+
+        $hasFeature = $owner->hasModuleSubscription('erp-team-members');
+        $capacityLimit = $owner->hasModuleSubscription('crm-team-10') ? 10 : 3;
+        $hasAdvancedRolesAddon = $owner->hasModuleSubscription('crm-advanced-roles');
 
         $members = collect();
         $activeMembersCount = 0;
@@ -126,16 +120,16 @@ class CrmTeamController extends Controller
      */
     public function store(Request $request)
     {
-        $this->ensureOwner();
 
-        $user = Auth::user();
+        $currentMember = Auth::guard('crm_team')->user();
         $workspace = $this->getWorkspace();
+        $owner = $workspace?->owner;
 
-        if (!$workspace) {
+        if (!$workspace || !$owner) {
             return back()->with('error', __('crm.tenant_not_found'));
         }
 
-        $capacityLimit = $user->hasModuleSubscription('crm-team-10') ? 10 : 3;
+        $capacityLimit = $owner->hasModuleSubscription('crm-team-10') ? 10 : 3;
         $activeMembers = CrmTeamMember::where('workspace_id', $workspace->id)->where('status', 'active')->count();
 
         if ($activeMembers >= $capacityLimit) {
@@ -153,13 +147,16 @@ class CrmTeamController extends Controller
                     return $query->where('workspace_id', $workspace->id);
                 }),
             ],
-            'password' => 'required|string|min:8',
             'role' => 'required|string|in:' . implode(',', array_keys($allRoles)),
         ]);
 
         $isAdvancedRole = array_key_exists($validated['role'], CrmTeamMember::getAdvancedRoles());
-        if ($isAdvancedRole && !$user->hasModuleSubscription('crm-advanced-roles')) {
+        if ($isAdvancedRole && !$owner->hasModuleSubscription('crm-advanced-roles')) {
             return back()->with('error', __('crm.advanced_roles_addon_required'));
+        }
+
+        if ($validated['role'] === CrmTeamMember::ROLE_MANAGER && Auth::guard('crm_team')->user()?->role !== CrmTeamMember::ROLE_MANAGER) {
+            abort(403, 'Privilege Escalation Prevented: Only managers can assign the manager role.');
         }
 
         try {
@@ -167,12 +164,14 @@ class CrmTeamController extends Controller
                 'workspace_id' => $workspace->id,
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
+                'password' => Hash::make(\Illuminate\Support\Str::random(32)),
                 'role' => $validated['role'],
-                'status' => 'active',
-                'invited_by' => $user->id,
+                'status' => 'pending',
+                'invited_by' => $currentMember->id,
                 'invited_at' => now(),
             ]);
+
+            \Illuminate\Support\Facades\Mail::to($member->email)->send(new \Modules\CRM\Mail\CrmTeamMemberInviteMail($member));
 
             return back()->with('success', __('crm.team_member_added', ['name' => $member->name]));
         } catch (\Exception $e) {
@@ -186,12 +185,12 @@ class CrmTeamController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->ensureOwner();
 
-        $user = Auth::user();
+        $currentMember = Auth::guard('crm_team')->user();
         $workspace = $this->getWorkspace();
+        $owner = $workspace?->owner;
 
-        if (!$workspace) {
+        if (!$workspace || !$owner) {
             return back()->with('error', __('crm.tenant_not_found'));
         }
 
@@ -201,17 +200,25 @@ class CrmTeamController extends Controller
 
         $validated = $request->validate([
             'role' => 'required|string|in:' . implode(',', array_keys($allRoles)),
-            'status' => 'required|in:active,suspended',
+            'status' => 'required|in:active,suspended,pending',
         ]);
 
         $isAdvancedRole = array_key_exists($validated['role'], CrmTeamMember::getAdvancedRoles());
-        if ($isAdvancedRole && !$user->hasModuleSubscription('crm-advanced-roles')) {
+        if ($isAdvancedRole && !$owner->hasModuleSubscription('crm-advanced-roles')) {
             return back()->with('error', __('crm.advanced_roles_addon_required'));
         }
 
+        if ($validated['role'] === CrmTeamMember::ROLE_MANAGER && $currentMember?->role !== CrmTeamMember::ROLE_MANAGER) {
+            abort(403, 'Privilege Escalation Prevented: Only managers can assign the manager role.');
+        }
+
+        if ($member->role === CrmTeamMember::ROLE_MANAGER && $currentMember?->role !== CrmTeamMember::ROLE_MANAGER) {
+            abort(403, 'Privilege Escalation Prevented: You cannot modify a manager account.');
+        }
+
         if ($validated['status'] === 'active' && $member->status !== 'active') {
-            $capacityLimit = $user->hasModuleSubscription('crm-team-10') ? 10 : 3;
-            $activeMembers = CrmTeamMember::where('workspace_id', $workspace->id)->where('status', 'active')->count();
+            $capacityLimit = $owner->hasModuleSubscription('crm-team-10') ? 10 : 3;
+            $activeMembers = CrmTeamMember::where('workspace_id', $workspace->id)->whereIn('status', ['active', 'pending'])->count();
 
             if ($activeMembers >= $capacityLimit) {
                 return back()->with('error', __('crm.team_capacity_reached', ['limit' => $capacityLimit]));
@@ -223,20 +230,38 @@ class CrmTeamController extends Controller
         return back()->with('success', __('crm.team_member_updated'));
     }
 
+    public function resendInvite($id)
+    {
+        $workspace = $this->getWorkspace();
+        $member = CrmTeamMember::where('workspace_id', $workspace->id)->findOrFail($id);
+
+        if ($member->status !== 'pending') {
+            return back()->with('info', __('crm.member_already_active'));
+        }
+
+        \Illuminate\Support\Facades\Mail::to($member->email)->send(new \Modules\CRM\Mail\CrmTeamMemberInviteMail($member));
+
+        return back()->with('success', __('crm.invite_resent_successfully'));
+    }
+
     /**
      * Remove a team member.
      */
     public function destroy($id)
     {
-        $this->ensureOwner();
 
         $workspace = $this->getWorkspace();
+        $currentMember = Auth::guard('crm_team')->user();
 
         if (!$workspace) {
             return back()->with('error', __('crm.tenant_not_found'));
         }
 
         $member = CrmTeamMember::where('workspace_id', $workspace->id)->findOrFail($id);
+
+        if ($member->role === CrmTeamMember::ROLE_MANAGER && $currentMember?->role !== CrmTeamMember::ROLE_MANAGER) {
+            abort(403, 'Privilege Escalation Prevented: You cannot delete a manager account.');
+        }
 
         $name = $member->name;
         $member->delete();

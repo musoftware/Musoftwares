@@ -31,11 +31,11 @@ class TimerSession extends Model
 
     public function startedBy(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'started_by');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'started_by');
     }
 
     public function stoppedBy(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'stopped_by');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'stopped_by');
     }
 }

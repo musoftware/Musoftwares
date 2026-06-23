@@ -5,7 +5,7 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "barryvdh/laravel-dompdf": "^3.1",
         "endroid/qr-code": "5.0",
         "geoip2/geoip2": "^3.3",
@@ -90,7 +90,7 @@
             "wikimedia/composer-merge-plugin": true
         },
         "platform": {
-            "php": "8.2.0"
+            "php": "8.4.0"
         },
         "platform-check": false
     },

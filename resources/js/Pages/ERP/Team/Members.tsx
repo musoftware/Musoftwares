@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ERPLayout from '@/Layouts/ERPLayout';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, Link, router } from '@inertiajs/react';
 import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 import { 
     LayoutDashboard, 
@@ -43,7 +43,7 @@ interface TeamMember {
     email: string;
     role: string;
     role_label: string;
-    status: 'active' | 'suspended';
+    status: 'active' | 'suspended' | 'pending';
     invited_at: string;
     last_login_at: string;
 }
@@ -77,13 +77,12 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
     const inviteForm = useForm({
         name: '',
         email: '',
-        password: '',
         role: 'sales_agent',
     });
 
     const editForm = useForm({
         role: '',
-        status: 'active' as 'active' | 'suspended',
+        status: 'active' as 'active' | 'suspended' | 'pending',
     });
 
     const handleInviteSubmit = (e: React.FormEvent) => {
@@ -238,10 +237,12 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                                 <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wider ${
                                                     member.status === 'active' 
                                                         ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
+                                                        : member.status === 'pending'
+                                                        ? 'bg-amber-50 text-amber-700 border border-amber-100'
                                                         : 'bg-rose-50 text-rose-700 border border-rose-100'
                                                 }`}>
-                                                    {member.status === 'active' ? <Unlock className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
-                                                    {member.status === 'active' ? 'Active' : 'Suspended'}
+                                                    {member.status === 'active' ? <Unlock className="h-3 w-3" /> : (member.status === 'pending' ? <Mail className="h-3 w-3" /> : <Lock className="h-3 w-3" />)}
+                                                    {member.status === 'active' ? 'Active' : (member.status === 'pending' ? 'Pending' : 'Suspended')}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-slate-500 font-mono text-xs">
@@ -252,6 +253,15 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                             </td>
                                             <td className="px-6 py-4 text-end">
                                                 <div className="flex items-center justify-end gap-2">
+                                                    {member.status === 'pending' && (
+                                                        <button 
+                                                            onClick={() => router.post(route('erp.team-members.resend-invite', member.id))}
+                                                            className="p-1.5 hover:bg-slate-100 rounded text-slate-500 transition-colors"
+                                                            title={__('erp.resend_invite')}
+                                                        >
+                                                            <Mail className="h-4 w-4" />
+                                                        </button>
+                                                    )}
                                                     <button 
                                                         onClick={() => handleEditClick(member)}
                                                         className="p-1.5 hover:bg-slate-100 rounded text-slate-500 transition-colors"
@@ -312,18 +322,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                 {inviteForm.errors.email && <p className="text-xs text-rose-500">{inviteForm.errors.email}</p>}
                             </div>
 
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{__('general.temporary_password')}</label>
-                                <Input 
-                                    required 
-                                    type="password" 
-                                    placeholder="••••••••" 
-                                    value={inviteForm.data.password} 
-                                    onChange={e => inviteForm.setData('password', e.target.value)} 
-                                    className="shadow-none" 
-                                />
-                                {inviteForm.errors.password && <p className="text-xs text-rose-500">{inviteForm.errors.password}</p>}
-                            </div>
+
 
                             <div className="space-y-1">
                                 <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Access Role (Job Title)</label>
@@ -334,7 +333,9 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                 >
                                     <optgroup label={__('general.basic_roles')}>
                                         {Object.entries(basicRoles).map(([key, label]) => (
-                                            <option key={key} value={key}>{label}</option>
+                                            <option key={key} value={key} disabled={key === 'admin' && auth.team_member?.role !== 'admin'}>
+                                                {label} {key === 'admin' && auth.team_member?.role !== 'admin' && "🔒"}
+                                            </option>
                                         ))}
                                     </optgroup>
                                     <optgroup label={hasAdvancedRolesAddon ? "Advanced Roles" : "Advanced Roles (Requires Addon)"}>
@@ -402,7 +403,9 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                 >
                                     <optgroup label={__('general.basic_roles')}>
                                         {Object.entries(basicRoles).map(([key, label]) => (
-                                            <option key={key} value={key}>{label}</option>
+                                            <option key={key} value={key} disabled={key === 'admin' && auth.team_member?.role !== 'admin'}>
+                                                {label} {key === 'admin' && auth.team_member?.role !== 'admin' && "🔒"}
+                                            </option>
                                         ))}
                                     </optgroup>
                                     <optgroup label={hasAdvancedRolesAddon ? "Advanced Roles" : "Advanced Roles (Requires Addon)"}>
@@ -430,6 +433,7 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                 >
                                     <option value="active">Active (Access allowed)</option>
                                     <option value="suspended">Suspended (Access blocked)</option>
+                                    <option value="pending" disabled>Pending (Waiting for invite acceptance)</option>
                                 </select>
                                 {editForm.errors.status && <p className="text-xs text-rose-500">{editForm.errors.status}</p>}
                                 

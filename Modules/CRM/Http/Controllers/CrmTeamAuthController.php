@@ -43,6 +43,13 @@ class CrmTeamAuthController extends Controller
 
         $member = Auth::guard('crm_team')->user();
 
+        if ($member->status === 'pending') {
+            Auth::guard('crm_team')->logout();
+            throw ValidationException::withMessages([
+                'email' => [__('crm.account_pending_setup')],
+            ]);
+        }
+
         if (!$member->isActive()) {
             Auth::guard('crm_team')->logout();
             throw ValidationException::withMessages([

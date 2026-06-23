@@ -30,7 +30,7 @@ class UserPaymentMethodPolicy
      */
     public function view(User $user, UserPaymentMethod $userPaymentMethod): bool
     {
-        return isset($ability->user_id) ? $user->id === $ability->user_id : false;
+        return isset($userPaymentMethod->user_id) ? $user->id === $userPaymentMethod->user_id : false;
     }
 
     /**

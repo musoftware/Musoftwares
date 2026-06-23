@@ -39,8 +39,8 @@ class WalletController extends Controller
      */
     private function resolveTenantAndClient(int|string $clientId): array
     {
-        $user   = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+        $user   = auth('erp_team')->user();
+        $tenant = auth('erp_team')->user()->tenant;
 
         $client = TenantClient::with('currency')->where('tenant_id', $tenant->id)
             ->findOrFail($clientId);

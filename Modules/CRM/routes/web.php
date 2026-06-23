@@ -24,8 +24,17 @@ Route::middleware(['web'])->prefix('crm/portal')->name('crm.team.')->group(funct
     Route::post('logout', [\Modules\CRM\Http\Controllers\CrmTeamAuthController::class, 'logout'])->name('logout');
 });
 
+// ── CRM Invite Routes ───────────────────────────────────────────────
+Route::middleware(['web'])->prefix('crm/invite')->name('crm.invite.')->group(function () {
+    Route::get('accept', [\Modules\CRM\Http\Controllers\Auth\InviteController::class, 'show'])->name('accept');
+    Route::post('accept', [\Modules\CRM\Http\Controllers\Auth\InviteController::class, 'accept'])->name('submit');
+});
+
+// ── CRM Bridge ─────────────────────────────────────────────────────
+Route::middleware(['web', 'auth'])->get('/crm/bridge', [\Modules\CRM\Http\Controllers\WorkspaceController::class, 'bridge'])->name('crm.bridge');
+
 // ── CRM Module Routes ──────────────────────────────────────────────
-Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', \Modules\CRM\Http\Middleware\ShareCrmTeamSession::class, \Modules\CRM\Http\Middleware\WorkspaceMiddleware::class])
+Route::middleware(['web', 'auth:crm_team', 'subscription:crm', \Modules\CRM\Http\Middleware\ShareCrmTeamSession::class, \Modules\CRM\Http\Middleware\WorkspaceMiddleware::class])
     ->prefix('crm')
     ->name('crm.')
     ->group(function () {
@@ -68,6 +77,7 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', 
 
         // ── CRM Team Management
         Route::resource('team-members', \Modules\CRM\Http\Controllers\CrmTeamController::class)->except(['show', 'create', 'edit']);
+        Route::post('team-members/{id}/resend-invite', [\Modules\CRM\Http\Controllers\CrmTeamController::class, 'resendInvite'])->name('team-members.resend-invite');
 
         // ── CRM Web Widgets
         Route::resource('widgets', CrmWidgetController::class);

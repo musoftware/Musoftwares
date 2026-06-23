@@ -455,17 +455,20 @@ class InvoiceController extends Controller
         }
 
         if ($action == 'send_whatsapp_reminder' && !empty($whatsapp_invoices_by_user)) {
-            $reminderService = app(\App\Services\WhatsAppNotificationService::class);
-            foreach ($whatsapp_invoices_by_user as $userId => $userInvoices) {
-                $client = \App\Models\User::find($userId);
-                if ($client) {
-                    $result = $reminderService->sendInvoiceReminder($client, collect($userInvoices));
-                    if (!$result['success']) {
-                        return redirect()->back()->with('error', __('admin.whatsapp_reminder_failed', ['name' => $result['client_name']]));
+            if (class_exists(\App\Services\WhatsAppNotificationService::class)) {
+                $reminderService = app(\App\Services\WhatsAppNotificationService::class);
+                foreach ($whatsapp_invoices_by_user as $userId => $userInvoices) {
+                    $client = \App\Models\User::find($userId);
+                    if ($client) {
+                        $result = $reminderService->sendInvoiceReminder($client, collect($userInvoices));
+                        if (!$result['success']) {
+                            return redirect()->back()->with('error', __('admin.whatsapp_reminder_failed', ['name' => $result['client_name']]));
+                        }
                     }
                 }
+                return redirect()->back()->with('success', __('admin.whatsapp_reminders_sent'));
             }
-            return redirect()->back()->with('success', __('admin.whatsapp_reminders_sent'));
+            return redirect()->back()->with('error', 'WhatsApp service not available.');
         }
 
         return redirect()->back()->with('success', __('admin.bulk_action_applied'));
@@ -555,10 +558,12 @@ class InvoiceController extends Controller
             $invoice->save();
 
             if ($request->boolean('notify_client')) {
-                $reminderService = app(\App\Services\WhatsAppNotificationService::class);
-                $client = $invoice->user;
-                if ($client) {
-                    $reminderService->sendInvoiceReminder($client, collect([$invoice]));
+                if (class_exists(\App\Services\WhatsAppNotificationService::class)) {
+                    $reminderService = app(\App\Services\WhatsAppNotificationService::class);
+                    $client = $invoice->user;
+                    if ($client) {
+                        $reminderService->sendInvoiceReminder($client, collect([$invoice]));
+                    }
                 }
             }
         } catch (\Exception $e) {
@@ -704,7 +709,7 @@ class InvoiceController extends Controller
                 'date_end' => \Carbon\Carbon::parse($session['end_date'])->toDateTimeString(),
                 'amount' => $session['amount'],
                 'project_id' => $item->invoice->project_id ?? null,
-                'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                'user_id' => auth('erp_team')->id(),
                 'currency_id' => $item->invoice->currency_id,
             ]);
         }

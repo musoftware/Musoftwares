@@ -57,7 +57,7 @@ class BranchTransferController extends Controller
             $branchId,
             $validated['to_branch_id'],
             $validated['type'],
-            Auth::id()
+            auth('erp_team')->id()
         );
 
         if ($request->wantsJson()) {

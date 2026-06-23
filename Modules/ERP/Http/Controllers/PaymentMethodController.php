@@ -16,7 +16,7 @@ class PaymentMethodController extends Controller
 
     private function resolveTenant(): Tenant
     {
-        return Tenant::where('user_id', Auth::id())->firstOrFail();
+        return auth('erp_team')->user()->tenant;
     }
 
     /**
@@ -25,7 +25,7 @@ class PaymentMethodController extends Controller
      */
     private function resolveClient(): TenantClient
     {
-        $client = TenantClient::where('user_id', Auth::id())->first();
+        $client = TenantClient::where('user_id', auth('erp_team')->id())->first();
 
         if (!$client) {
             abort(403, __('general.no_client_record_is_linked_to_your_account'));
@@ -130,7 +130,7 @@ class PaymentMethodController extends Controller
 
         $paymentMethod->update([
             'status'      => 'approved',
-            'reviewed_by' => Auth::id(),
+            'reviewed_by' => auth('erp_team')->id(),
             'reviewed_at' => now(),
         ]);
 
@@ -150,7 +150,7 @@ class PaymentMethodController extends Controller
         $paymentMethod->update([
             'status'         => 'rejected',
             'rejection_note' => $request->rejection_note,
-            'reviewed_by'    => Auth::id(),
+            'reviewed_by'    => auth('erp_team')->id(),
             'reviewed_at'    => now(),
         ]);
 

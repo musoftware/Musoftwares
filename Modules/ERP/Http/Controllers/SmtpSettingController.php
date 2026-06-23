@@ -14,13 +14,13 @@ class SmtpSettingController extends Controller
 {
     private function resolveTenant(): Tenant
     {
-        return Tenant::where('user_id', Auth::id())->firstOrFail();
+        return auth('erp_team')->user()->tenant;
     }
 
     public function edit()
     {
         $tenant = $this->resolveTenant();
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         
         if (!$user->hasModuleSubscription('erp-smtp')) {
             abort(403, __('errors.erp_smtp_addon_required'));
@@ -44,7 +44,7 @@ class SmtpSettingController extends Controller
     public function update(Request $request)
     {
         $tenant = $this->resolveTenant();
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         
         if (!$user->hasModuleSubscription('erp-smtp')) {
             abort(403, __('errors.erp_smtp_addon_required'));

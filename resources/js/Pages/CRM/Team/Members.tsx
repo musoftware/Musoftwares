@@ -12,7 +12,7 @@ import {
     Users, UserPlus, X, Loader2, Lock, Unlock,
     Shield, Key, AlertCircle, Briefcase,
     MoreHorizontal, Edit2, Trash2, Phone, Megaphone,
-    HeadphonesIcon, BarChart3, UserCog
+    HeadphonesIcon, BarChart3, UserCog, Send
 } from 'lucide-react';
 import {
     Dialog,
@@ -28,7 +28,7 @@ interface TeamMember {
     email: string;
     role: string;
     role_label: string;
-    status: 'active' | 'suspended';
+    status: 'active' | 'suspended' | 'pending';
     invited_at: string;
     last_login_at: string;
 }
@@ -105,6 +105,8 @@ const roleColors: Record<string, string> = {
 };
 
 export default function Members({ members, hasFeature, capacityLimit, activeMembersCount, hasAdvancedRolesAddon, basicRoles, advancedRoles, loginUrl, translations: t }: MembersProps) {
+    const { auth } = usePage<any>().props;
+    const isManager = auth.crm_team_member?.role === 'manager';
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
@@ -116,13 +118,12 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
     const inviteForm = useForm({
         name: '',
         email: '',
-        password: '',
         role: 'sales_agent',
     });
 
     const editForm = useForm({
         role: '',
-        status: 'active' as 'active' | 'suspended',
+        status: 'active' as 'active' | 'suspended' | 'pending',
     });
 
     const handleInviteSubmit = (e: React.FormEvent) => {
@@ -168,6 +169,10 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                 setDeleteConfirm({ open: false, member: null });
             },
         });
+    };
+
+    const handleResendInvite = (member: TeamMember) => {
+        inviteForm.post(route('crm.team-members.resend-invite', member.id));
     };
 
     return (
@@ -282,10 +287,12 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                                             <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wider ${
                                                                 member.status === 'active'
                                                                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                                                                    : 'bg-rose-50 text-rose-700 border border-rose-100'
+                                                                    : member.status === 'pending'
+                                                                        ? 'bg-amber-50 text-amber-700 border border-amber-100'
+                                                                        : 'bg-rose-50 text-rose-700 border border-rose-100'
                                                             }`}>
                                                                 {member.status === 'active' ? <Unlock className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
-                                                                {member.status === 'active' ? t.status_active : t.status_suspended}
+                                                                {member.status === 'active' ? t.status_active : (member.status === 'pending' ? 'Pending' : t.status_suspended)}
                                                             </span>
                                                         </td>
                                                         <td className="px-6 py-4 text-end">
@@ -301,6 +308,11 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                                                         <DialogTitle>{member.name}</DialogTitle>
                                                                     </DialogHeader>
                                                                     <div className="flex flex-col gap-2 py-2">
+                                                                        {member.status === 'pending' && (
+                                                                            <Button variant="outline" className="justify-start text-indigo-600 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700" onClick={() => handleResendInvite(member)}>
+                                                                                <Send className="h-4 w-4 me-2" /> Resend Invite
+                                                                            </Button>
+                                                                        )}
                                                                         <Button variant="outline" className="justify-start" onClick={() => handleEditClick(member)}>
                                                                             <Edit2 className="h-4 w-4 me-2" /> {t.update_member_details}
                                                                         </Button>
@@ -348,9 +360,11 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                                                             member.status === 'active'
                                                                 ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                                                                : 'bg-rose-50 text-rose-700 border border-rose-100'
+                                                                : member.status === 'pending'
+                                                                    ? 'bg-amber-50 text-amber-700 border border-amber-100'
+                                                                    : 'bg-rose-50 text-rose-700 border border-rose-100'
                                                         }`}>
-                                                            {member.status === 'active' ? t.status_active : t.status_suspended}
+                                                            {member.status === 'active' ? t.status_active : (member.status === 'pending' ? 'Pending' : t.status_suspended)}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -365,6 +379,11 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                                             <DialogTitle>{member.name}</DialogTitle>
                                                         </DialogHeader>
                                                         <div className="flex flex-col gap-2 py-2">
+                                                            {member.status === 'pending' && (
+                                                                <Button variant="outline" className="justify-start text-indigo-600 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700" onClick={() => handleResendInvite(member)}>
+                                                                    <Send className="h-4 w-4 me-2" /> Resend Invite
+                                                                </Button>
+                                                            )}
                                                             <Button variant="outline" className="justify-start" onClick={() => handleEditClick(member)}>
                                                                 <Edit2 className="h-4 w-4 me-2" /> {t.update_member_details}
                                                             </Button>
@@ -418,19 +437,6 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                         </div>
 
                                         <div className="space-y-1">
-                                            <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{t.temporary_password}</label>
-                                            <Input
-                                                required
-                                                type="password"
-                                                placeholder="••••••••"
-                                                value={inviteForm.data.password}
-                                                onChange={e => inviteForm.setData('password', e.target.value)}
-                                                className="shadow-none"
-                                            />
-                                            {inviteForm.errors.password && <p className="text-xs text-rose-500">{inviteForm.errors.password}</p>}
-                                        </div>
-
-                                        <div className="space-y-1">
                                             <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{t.access_role}</label>
                                             <select
                                                 className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
@@ -444,8 +450,12 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                                 </optgroup>
                                                 <optgroup label={hasAdvancedRolesAddon ? t.advanced_roles : t.advanced_roles_locked}>
                                                     {Object.entries(advancedRoles).map(([key, label]) => (
-                                                        <option key={key} value={key} disabled={!hasAdvancedRolesAddon}>
-                                                            {label} {!hasAdvancedRolesAddon && "🔒"}
+                                                        <option 
+                                                            key={key} 
+                                                            value={key} 
+                                                            disabled={!hasAdvancedRolesAddon || (key === 'manager' && !isManager)}
+                                                        >
+                                                            {label} {!hasAdvancedRolesAddon ? "🔒" : (key === 'manager' && !isManager ? "🔒" : "")}
                                                         </option>
                                                     ))}
                                                 </optgroup>
@@ -514,8 +524,12 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                                 </optgroup>
                                                 <optgroup label={hasAdvancedRolesAddon ? t.advanced_roles : t.advanced_roles_locked}>
                                                     {Object.entries(advancedRoles).map(([key, label]) => (
-                                                        <option key={key} value={key} disabled={!hasAdvancedRolesAddon}>
-                                                            {label} {!hasAdvancedRolesAddon && "🔒"}
+                                                        <option 
+                                                            key={key} 
+                                                            value={key} 
+                                                            disabled={!hasAdvancedRolesAddon || (key === 'manager' && !isManager)}
+                                                        >
+                                                            {label} {!hasAdvancedRolesAddon ? "🔒" : (key === 'manager' && !isManager ? "🔒" : "")}
                                                         </option>
                                                     ))}
                                                 </optgroup>
@@ -534,10 +548,12 @@ export default function Members({ members, hasFeature, capacityLimit, activeMemb
                                             <select
                                                 className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
                                                 value={editForm.data.status}
-                                                onChange={e => editForm.setData('status', e.target.value as 'active' | 'suspended')}
+                                                onChange={e => editForm.setData('status', e.target.value as 'active' | 'suspended' | 'pending')}
+                                                disabled={selectedMember?.status === 'pending'}
                                             >
                                                 <option value="active">{t.active_access_allowed}</option>
                                                 <option value="suspended">{t.suspended_access_blocked}</option>
+                                                {selectedMember?.status === 'pending' && <option value="pending">Pending</option>}
                                             </select>
                                             {editForm.errors.status && <p className="text-xs text-rose-500">{editForm.errors.status}</p>}
 

@@ -38,7 +38,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'support_agent',
             'client',
             'freelancer',
-            'seller'
+            'seller',
+            'employee',
+            'tenant_admin'
         ];
 
         foreach ($roles as $roleName) {

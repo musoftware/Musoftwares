@@ -99,7 +99,7 @@ class TeamMember extends Authenticatable
      */
     public function invitedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'invited_by');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'invited_by');
     }
 
     /**

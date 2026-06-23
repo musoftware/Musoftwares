@@ -40,6 +40,6 @@ class TenantFile extends TenantAwareModel
 
     public function uploader()
     {
-        return $this->belongsTo(User::class, 'uploaded_by');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'uploaded_by');
     }
 }

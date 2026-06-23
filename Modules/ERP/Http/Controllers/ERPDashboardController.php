@@ -491,6 +491,7 @@ class ERPDashboardController extends Controller
         ]);
     }
 
+
     /**
      * Complete ERP Workspace onboarding setup.
      */
@@ -526,8 +527,18 @@ class ERPDashboardController extends Controller
                     'base_currency_id' => \App\Models\Currency::where('currency', $request->baseCurrency)->value('id'),
                 ]);
 
-                // 2. We no longer set user global currency preference here.
-                // The currency is tied strictly to the tenant above.
+                // Create the Admin TeamMember for the Owner
+                $teamMember = \Modules\ERP\Models\TeamMember::create([
+                    'tenant_id' => $tenant->id,
+                    'name'      => $user->name,
+                    'email'     => $user->email,
+                    'password'  => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16)), // They don't login with password initially, they bridge
+                    'role'      => \Modules\ERP\Models\TeamMember::ROLE_ADMIN,
+                    'status'    => 'active',
+                ]);
+
+                // Log the newly created TeamMember into the erp_team guard
+                Auth::guard('erp_team')->login($teamMember);
 
                 // 3. Create first client if provided
                 if ($request->clientName) {
@@ -559,7 +570,7 @@ class ERPDashboardController extends Controller
                             'due_date' => Carbon::now()->addDays(14),
                             'issued_at' => Carbon::now(),
                             'notes' => $request->invoiceDesc,
-                            'created_by' => $user->id,
+                            'created_by' => $teamMember->id,
                         ]);
 
                         // Create invoice item
@@ -582,6 +593,52 @@ class ERPDashboardController extends Controller
             \Illuminate\Support\Facades\Log::error('ERP Onboarding wizard failed: ' . $e->getMessage());
             return back()->withErrors(['error' => __('erp.onboarding_failed')]);
         }
+    }
+
+    /**
+     * Securely bridges the global User into the ERP as an Admin TeamMember.
+     */
+    public function bridge(\Illuminate\Http\Request $request)
+    {
+        $user = Auth::guard('web')->user();
+
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $tenant = Tenant::where('user_id', $user->id)->first();
+
+        if (!$tenant) {
+            return redirect()->route('erp.onboarding');
+        }
+
+        // Find the admin TeamMember for this global user's email
+        // Or create one if it accidentally got deleted
+        $teamMember = \Modules\ERP\Models\TeamMember::firstOrCreate(
+            ['tenant_id' => $tenant->id, 'email' => $user->email],
+            [
+                'name' => $user->name,
+                'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(32)),
+                'role' => \Modules\ERP\Models\TeamMember::ROLE_ADMIN,
+                'status' => 'active',
+            ]
+        );
+
+        // Ensure the owner always has admin role and is active
+        if ($teamMember->role !== \Modules\ERP\Models\TeamMember::ROLE_ADMIN || $teamMember->status !== 'active') {
+            $teamMember->update([
+                'role' => \Modules\ERP\Models\TeamMember::ROLE_ADMIN,
+                'status' => 'active',
+            ]);
+        }
+
+        // Log into the ERP guard
+        Auth::guard('erp_team')->login($teamMember);
+
+        // Record login time
+        $teamMember->update(['last_login_at' => now()]);
+
+        return redirect()->route('erp.dashboard')->with('success', __('erp.welcome_back_owner'));
     }
 
     public function updateSettings(\Illuminate\Http\Request $request)

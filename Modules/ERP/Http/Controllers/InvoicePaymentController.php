@@ -30,7 +30,7 @@ class InvoicePaymentController extends Controller
      */
     private function resolveClient(): ?TenantClient
     {
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         if (!$user) {
             return null;
         }
@@ -149,7 +149,7 @@ class InvoicePaymentController extends Controller
                     'reference_type'       => Invoice::class,
                     'reference_id'         => $invoice->id,
                     'note'                 => ($isPaid ? 'Full payment' : 'Partial payment') . ' for Invoice #' . $invoice->invoice_number . ' via client portal.',
-                    'created_by'           => Auth::id(),
+                    'created_by'           => auth('erp_team')->id(),
                 ]);
 
                 // Update invoice status

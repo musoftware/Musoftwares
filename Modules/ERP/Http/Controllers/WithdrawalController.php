@@ -41,7 +41,7 @@ class WithdrawalController extends Controller
 
     private function resolveTenant(): Tenant
     {
-        return Tenant::where('user_id', Auth::id())->firstOrFail();
+        return auth('erp_team')->user()->tenant;
     }
 
     // ── Index — tenant sees all withdrawal requests ───────────────────
@@ -126,7 +126,7 @@ class WithdrawalController extends Controller
 
         $withdrawal->update([
             'status'      => 'approved',
-            'reviewed_by' => Auth::id(),
+            'reviewed_by' => auth('erp_team')->id(),
             'reviewed_at' => now(),
         ]);
 
@@ -181,7 +181,7 @@ class WithdrawalController extends Controller
                     'reference_type'    => Withdrawal::class,
                     'reference_id'      => $withdrawal->id,
                     'note'              => 'Withdrawal paid — ref: ' . $request->reference,
-                    'created_by'        => Auth::id(),
+                    'created_by'        => auth('erp_team')->id(),
                 ]);
 
                 // Handle proof upload
@@ -194,7 +194,7 @@ class WithdrawalController extends Controller
                     'status'      => 'paid',
                     'reference'   => $request->reference,
                     'proof_path'  => $proofPath,
-                    'paid_by'     => Auth::id(),
+                    'paid_by'     => auth('erp_team')->id(),
                     'paid_at'     => now(),
                 ]);
             });
@@ -222,7 +222,7 @@ class WithdrawalController extends Controller
         $withdrawal->update([
             'status'       => 'rejected',
             'admin_notes'  => $request->admin_notes,
-            'reviewed_by'  => Auth::id(),
+            'reviewed_by'  => auth('erp_team')->id(),
             'reviewed_at'  => now(),
         ]);
 

@@ -240,7 +240,7 @@ function AuthenticatedContent({
                                                                     </AccordionTrigger>
                                                                     <AccordionContent className="pb-1 px-2">
                                                                         <div className="flex flex-col space-y-1 mt-1 border-s-2 border-slate-100 ms-5 ps-4">
-                                                                            <Link href={activeModules.crm ? safeRoute('crm.dashboard') : safeRoute('subscriptions.plans', { module: 'crm' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-indigo-50/50 text-slate-600 font-medium">
+                                                                            <Link href={activeModules.crm ? safeRoute('crm.bridge') : safeRoute('subscriptions.plans', { module: 'crm' })} onClick={() => setIsMobileOpen(false)} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-indigo-50/50 text-slate-600 font-medium">
                                                                                 <div className="flex items-center gap-3">
                                                                                     <Megaphone className="w-4 h-4 text-indigo-500" /> {__('general.lead_gen_crm')}
                                                                                 </div>
@@ -478,7 +478,7 @@ function AuthenticatedContent({
                                                     "p-0 outline-none border transition-colors duration-150 cursor-pointer",
                                                     isCrmActive ? "bg-indigo-50/80 border-indigo-100" : "hover:bg-slate-50 border-transparent"
                                                 )}
-                                                render={<Link href={activeModules.crm ? safeRoute('crm.dashboard') : safeRoute('subscriptions.plans', { module: 'crm' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<Link href={activeModules.crm ? safeRoute('crm.bridge') : safeRoute('subscriptions.plans', { module: 'crm' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
                                             >
                                                 <div className={cn(
                                                     "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",

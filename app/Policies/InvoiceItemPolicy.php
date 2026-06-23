@@ -30,7 +30,7 @@ class InvoiceItemPolicy
      */
     public function view(User $user, InvoiceItem $invoiceItem): bool
     {
-        return isset($ability->user_id) ? $user->id === $ability->user_id : false;
+        return isset($invoiceItem->user_id) ? $user->id === $invoiceItem->user_id : false;
     }
 
     /**

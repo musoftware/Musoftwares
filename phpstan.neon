@@ -12,6 +12,8 @@ parameters:
     # Level 1 catches undefined variables, properties, and methods
     level: 1
 
+    reportUnmatchedIgnoredErrors: false
+
     ignoreErrors:
         -
             message: '#^Class App\\Services\\WhatsAppNotificationService not found\.$#'

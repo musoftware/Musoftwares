@@ -23,7 +23,7 @@ class RecurringController extends Controller
 
     public function index()
     {
-        $tenant = Tenant::where('user_id', Auth::id())->firstOrFail();
+        $tenant = auth('erp_team')->user()->tenant;
 
         // H3 fix: scope to current tenant only
         $entries = RecurringEntry::where('tenant_id', $tenant->id)->latest()->get();
@@ -81,7 +81,7 @@ class RecurringController extends Controller
 
     public function create()
     {
-        $tenant = Tenant::where('user_id', Auth::id())->firstOrFail();
+        $tenant = auth('erp_team')->user()->tenant;
         $currency = \App\Models\Currency::find($tenant->base_currency_id);
         $businessCurrency = $currency ? $currency->currency : config('app.business_currency', 'USD');
         return Inertia::render('ERP/Recurring/Create', [
@@ -105,7 +105,7 @@ class RecurringController extends Controller
         ]);
 
         // H4 fix: resolve business currency from tenant
-        $tenant = Tenant::where('user_id', Auth::id())->firstOrFail();
+        $tenant = auth('erp_team')->user()->tenant;
         $currency = \App\Models\Currency::find($tenant->base_currency_id);
         $businessCurrency = $currency ? $currency->currency : config('app.business_currency', 'USD');
         $conversion = $this->exchangeRateService->convertAmount(
@@ -126,7 +126,7 @@ class RecurringController extends Controller
         $validated['exchange_rate_date'] = $conversion[5];
         $validated['status']             = 'active';
         $validated['tenant_id']          = $tenant->id;
-        $validated['created_by']         = Auth::id();
+        $validated['created_by']         = auth('erp_team')->id();
 
         $validated['next_run_at'] = $this->calculateFirstRun(
             $validated['frequency'],
@@ -173,7 +173,7 @@ class RecurringController extends Controller
 
     private function authorizeTenantRecurringEntry(RecurringEntry $entry)
     {
-        $tenant = Tenant::where('user_id', Auth::id())->firstOrFail();
+        $tenant = auth('erp_team')->user()->tenant;
         if ($entry->tenant_id !== $tenant->id) {
             abort(403, __('general.unauthorized_access_to_recurring_entry'));
         }
@@ -183,7 +183,7 @@ class RecurringController extends Controller
     {
         $this->authorizeTenantRecurringEntry($recurring);
 
-        $tenant = Tenant::where('user_id', Auth::id())->firstOrFail();
+        $tenant = auth('erp_team')->user()->tenant;
         $currency = \App\Models\Currency::find($tenant->base_currency_id);
         $businessCurrency = $currency ? $currency->currency : config('app.business_currency', 'USD');
         return Inertia::render('ERP/Recurring/Edit', [
@@ -210,7 +210,7 @@ class RecurringController extends Controller
             'status' => 'required|in:active,paused,cancelled',
         ]);
 
-        $tenant = Tenant::where('user_id', Auth::id())->firstOrFail();
+        $tenant = auth('erp_team')->user()->tenant;
         $currency = \App\Models\Currency::find($tenant->base_currency_id);
         $businessCurrency = $currency ? $currency->currency : config('app.business_currency', 'USD');
         $conversion = $this->exchangeRateService->convertAmount(

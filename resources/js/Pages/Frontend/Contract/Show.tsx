@@ -114,9 +114,7 @@ export default function Show({ contract, invoices, project }) {
                                                 <thead>
                                                     <tr className="border-b border-slate-200 text-sm text-slate-500">
                                                         <th className="pb-3 font-medium">{__('general.item')}</th>
-                                                        <th className="pb-3 font-medium text-end">Hours/Qty</th>
-                                                        <th className="pb-3 font-medium text-end">{__('general.rate')}</th>
-                                                        <th className="pb-3 font-medium text-end">{__('general.total')}</th>
+                                                        <th className="pb-3 font-medium text-end">{__('general.price')}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="text-sm">
@@ -126,9 +124,7 @@ export default function Show({ contract, invoices, project }) {
                                                                 <p className="font-medium text-slate-900">{item.item}</p>
                                                                 {item.description && <p className="text-slate-500 text-xs mt-0.5">{item.description}</p>}
                                                             </td>
-                                                            <td className="py-3 text-end text-slate-600">{item.hours || '-'}</td>
-                                                            <td className="py-3 text-end text-slate-600">{formatMoney(item.hourly_rate || 0, contract.currency)}</td>
-                                                            <td className="py-3 text-end font-medium text-slate-900">{formatMoney(item.total || 0, contract.currency)}</td>
+                                                            <td className="py-3 text-end font-medium text-slate-900">{formatMoney(item.price || 0, contract.currency)}</td>
                                                         </tr>
                                                     ))}
                                                 </tbody>

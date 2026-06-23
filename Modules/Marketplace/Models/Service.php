@@ -42,7 +42,7 @@ class Service extends Model
         'auto_reply_translations' => 'array',
     ];
 
-    public function seller()
+    public function seller(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'seller_id');
     }

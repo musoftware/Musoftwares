@@ -29,22 +29,22 @@ class Contract extends Model
         return \Modules\Freelance\Database\Factories\ContractFactory::new();
     }
 
-    public function job()
+    public function job(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Job::class);
     }
 
-    public function proposal()
+    public function proposal(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Proposal::class);
     }
 
-    public function client()
+    public function client(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id');
     }
 
-    public function freelancer()
+    public function freelancer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'freelancer_id');
     }

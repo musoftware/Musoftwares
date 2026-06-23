@@ -49,11 +49,11 @@ class WithdrawalRequest extends TenantAwareModel
 
     public function reviewer(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'reviewed_by');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'reviewed_by');
     }
 
     public function payer(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'paid_by');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'paid_by');
     }
 }

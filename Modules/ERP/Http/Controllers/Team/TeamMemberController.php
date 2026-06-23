@@ -14,26 +14,17 @@ use Inertia\Response as InertiaResponse;
 
 class TeamMemberController extends Controller
 {
-    /**
-     * Enforce that only the tenant owner (not a team member) can manage the team.
-     */
-    protected function checkOwner()
-    {
-        if (session()->has('erp_team_member_id')) {
-            abort(403, __('general.only_the_workspace_owner_can_manage_team_members'));
-        }
-    }
+
 
     /**
      * Display a listing of the team members.
      */
     public function index(): InertiaResponse
     {
-        $this->checkOwner();
 
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         $hasFeature = $user->hasModuleSubscription('erp-team-members');
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+        $tenant = auth('erp_team')->user()->tenant;
 
         $members = collect();
         $activeMembersCount = 0;
@@ -77,13 +68,13 @@ class TeamMemberController extends Controller
      */
     public function store(Request $request)
     {
-        $this->checkOwner();
 
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+        $user = auth('erp_team')->user();
+        $tenant = auth('erp_team')->user()->tenant;
 
         $capacityLimit = $user->hasModuleSubscription('crm-team-10') ? 10 : 3;
-        $activeMembers = TeamMember::where('tenant_id', $tenant->id)->where('status', 'active')->count();
+        // Count active AND pending members against capacity limit
+        $activeMembers = TeamMember::where('tenant_id', $tenant->id)->whereIn('status', ['active', 'pending'])->count();
 
         if ($activeMembers >= $capacityLimit) {
             return back()->with('error', __('erp.team_capacity_reached', ['limit' => $capacityLimit]));
@@ -98,7 +89,6 @@ class TeamMemberController extends Controller
                     return $query->where('tenant_id', $tenant->id);
                 }),
             ],
-            'password' => 'required|string|min:8',
             'role' => 'required|string|in:' . implode(',', array_keys(TeamMember::getAllRoles())),
         ]);
 
@@ -107,18 +97,25 @@ class TeamMemberController extends Controller
             return back()->with('error', __('erp.advanced_roles_addon_required'));
         }
 
+        if ($validated['role'] === TeamMember::ROLE_ADMIN && $user->role !== TeamMember::ROLE_ADMIN) {
+            abort(403, 'Privilege Escalation Prevented: Only administrators can assign the admin role.');
+        }
+
         $member = TeamMember::create([
             'tenant_id' => $tenant->id,
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            // They will set their password later via the invite link
+            'password' => Hash::make(\Illuminate\Support\Str::random(32)),
             'role' => $validated['role'],
-            'status' => 'active',
+            'status' => 'pending',
             'invited_by' => $user->id,
             'invited_at' => now(),
         ]);
 
-        return back()->with('success', __('erp.team_member_added', ['name' => $member->name]));
+        \Illuminate\Support\Facades\Mail::to($member->email)->send(new \Modules\ERP\Mail\TeamMemberInviteMail($member));
+
+        return back()->with('success', __('erp.team_member_added_and_invited', ['name' => $member->name]));
     }
 
     /**
@@ -126,15 +123,14 @@ class TeamMemberController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->checkOwner();
 
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+        $user = auth('erp_team')->user();
+        $tenant = auth('erp_team')->user()->tenant;
         $member = TeamMember::where('tenant_id', $tenant->id)->findOrFail($id);
 
         $validated = $request->validate([
             'role' => 'required|string|in:' . implode(',', array_keys(TeamMember::getAllRoles())),
-            'status' => 'required|in:active,suspended',
+            'status' => 'required|in:active,suspended,pending',
         ]);
 
         $isAdvancedRole = array_key_exists($validated['role'], TeamMember::getAdvancedRoles());
@@ -142,9 +138,17 @@ class TeamMemberController extends Controller
             return back()->with('error', __('erp.advanced_roles_addon_required'));
         }
 
+        if ($validated['role'] === TeamMember::ROLE_ADMIN && $user->role !== TeamMember::ROLE_ADMIN) {
+            abort(403, 'Privilege Escalation Prevented: Only administrators can assign the admin role.');
+        }
+
+        if ($member->role === TeamMember::ROLE_ADMIN && $user->role !== TeamMember::ROLE_ADMIN) {
+            abort(403, 'Privilege Escalation Prevented: You cannot modify an administrator account.');
+        }
+
         if ($validated['status'] === 'active' && $member->status !== 'active') {
             $capacityLimit = $user->hasModuleSubscription('crm-team-10') ? 10 : 3;
-            $activeMembers = TeamMember::where('tenant_id', $tenant->id)->where('status', 'active')->count();
+            $activeMembers = TeamMember::where('tenant_id', $tenant->id)->whereIn('status', ['active', 'pending'])->count();
 
             if ($activeMembers >= $capacityLimit) {
                 return back()->with('error', __('erp.team_capacity_reached', ['limit' => $capacityLimit]));
@@ -157,15 +161,36 @@ class TeamMemberController extends Controller
     }
 
     /**
+     * Resend the invitation email to a pending team member.
+     */
+    public function resendInvite($id)
+    {
+
+        $tenant = auth('erp_team')->user()->tenant;
+        $member = TeamMember::where('tenant_id', $tenant->id)->findOrFail($id);
+
+        if ($member->status !== 'pending') {
+            return back()->with('info', __('erp.member_already_active'));
+        }
+
+        \Illuminate\Support\Facades\Mail::to($member->email)->send(new \Modules\ERP\Mail\TeamMemberInviteMail($member));
+
+        return back()->with('success', __('erp.invite_resent_successfully'));
+    }
+
+    /**
      * Remove the specified team member.
      */
     public function destroy($id)
     {
-        $this->checkOwner();
 
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+        $user = auth('erp_team')->user();
+        $tenant = auth('erp_team')->user()->tenant;
         $member = TeamMember::where('tenant_id', $tenant->id)->findOrFail($id);
+
+        if ($member->role === TeamMember::ROLE_ADMIN && $user->role !== TeamMember::ROLE_ADMIN) {
+            abort(403, 'Privilege Escalation Prevented: You cannot delete an administrator account.');
+        }
 
         $name = $member->name;
         $member->delete();

@@ -88,7 +88,7 @@ class ERPTodoItem extends Model
 
     public function assignee(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'assigned_to');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'assigned_to');
     }
 
     public function assigneeTeamMember(): BelongsTo

@@ -23,13 +23,8 @@ abstract class TenantAwareModel extends Model
                     $tenantId = session('tenant_id');
                 }
 
-                if (!$tenantId && auth()->check()) {
-                    $user = auth()->user();
-                    if (isset($user->tenant_id)) {
-                        $tenantId = $user->tenant_id;
-                    } else {
-                        $tenantId = $user->tenant?->id;
-                    }
+                if (!$tenantId && auth('erp_team')->check()) {
+                    $tenantId = auth('erp_team')->user()->tenant_id;
                 }
 
                 if ($tenantId) {

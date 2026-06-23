@@ -164,12 +164,12 @@ class Invoice extends Model
             ->where('created_at', '<', now()->subDays(30));
     }
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function client()
+    public function client(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
@@ -418,7 +418,7 @@ class Invoice extends Model
         return $this->unpaid_total();
     }
 
-    public function project()
+    public function project(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(\App\Models\Project::class);
     }

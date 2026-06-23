@@ -58,7 +58,7 @@ class WalletTransaction extends TenantAwareModel
 
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'created_by');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'created_by');
     }
 
     public function currency(): BelongsTo

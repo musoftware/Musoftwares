@@ -30,7 +30,7 @@ class WalletTransferPolicy
      */
     public function view(User $user, WalletTransfer $walletTransfer): bool
     {
-        return isset($ability->user_id) ? $user->id === $ability->user_id : false;
+        return isset($walletTransfer->user_id) ? $user->id === $walletTransfer->user_id : false;
     }
 
     /**

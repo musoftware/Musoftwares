@@ -24,12 +24,8 @@ class ShareCrmTeamSession
                 session(['crm_workspace_id' => $member->workspace_id]);
                 session(['crm_team_member_id' => $member->id]);
 
-                // Authenticate web guard as workspace owner for subscription checks
-                $owner = $member->workspace?->owner;
-                if ($owner) {
-                    Auth::guard('web')->setUser($owner);
-                }
-            } else {
+                // Removed dangerous impersonation logic
+                // Subscription checks should be done directly on the workspace owner, not by spoofing the web guard.
                 // Suspended member — log them out
                 Auth::guard('crm_team')->logout();
                 session()->forget(['crm_workspace_id', 'crm_team_member_id']);

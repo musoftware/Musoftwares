@@ -43,8 +43,8 @@ class ProjectController extends Controller
 
     public function store(StoreProjectRequest $request)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->first();
+        $user = auth('erp_team')->user();
+        $tenant = auth('erp_team')->user()->tenant;
         
         if (!$tenant) {
             return back()->withErrors(['error' => __('errors.no_active_workspace')]);
@@ -75,8 +75,8 @@ class ProjectController extends Controller
     {
         $this->authorize('update', $project);
 
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->first();
+        $user = auth('erp_team')->user();
+        $tenant = auth('erp_team')->user()->tenant;
 
         $this->projectService->updateProject($project, $request->validated(), $tenant);
 
@@ -99,8 +99,8 @@ class ProjectController extends Controller
     {
         $this->authorize('view', $project);
 
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+        $user = auth('erp_team')->user();
+        $tenant = auth('erp_team')->user()->tenant;
 
         $currency = \App\Models\Currency::find($tenant->base_currency_id);
         $businessCurrency = $currency;

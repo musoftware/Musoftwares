@@ -30,7 +30,7 @@ class PlatformContractPolicy
      */
     public function view(User $user, PlatformContract $platformContract): bool
     {
-        return isset($ability->user_id) ? $user->id === $ability->user_id : false;
+        return isset($platformContract->user_id) ? $user->id === $platformContract->user_id : false;
     }
 
     /**

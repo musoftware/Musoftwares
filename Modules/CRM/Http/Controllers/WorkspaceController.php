@@ -427,4 +427,52 @@ class WorkspaceController extends Controller
             'priorityMessages' => []
         ]);
     }
+
+    /**
+     * Securely bridges the global User into the CRM as a Manager.
+     */
+    public function bridge(Request $request)
+    {
+        $user = Auth::guard('web')->user();
+
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $workspace = \Modules\CRM\Models\Workspace::where('user_id', $user->id)->first();
+
+        if (!$workspace) {
+            return redirect()->route('crm.onboarding');
+        }
+
+        // Find or create the manager TeamMember for this global user
+        $teamMember = \Modules\CRM\Models\CrmTeamMember::firstOrCreate(
+            ['workspace_id' => $workspace->id, 'email' => $user->email],
+            [
+                'name' => $user->name,
+                'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(32)),
+                'role' => \Modules\CRM\Models\CrmTeamMember::ROLE_MANAGER,
+                'status' => 'active',
+            ]
+        );
+
+        // Ensure the owner always has manager role and is active
+        if ($teamMember->role !== \Modules\CRM\Models\CrmTeamMember::ROLE_MANAGER || $teamMember->status !== 'active') {
+            $teamMember->update([
+                'role' => \Modules\CRM\Models\CrmTeamMember::ROLE_MANAGER,
+                'status' => 'active',
+            ]);
+        }
+
+        // Log into the CRM guard
+        Auth::guard('crm_team')->login($teamMember);
+
+        // Set session
+        session(['crm_workspace_id' => $workspace->id]);
+        session(['crm_team_member_id' => $teamMember->id]);
+
+        $teamMember->update(['last_login_at' => now()]);
+
+        return redirect()->route('crm.dashboard')->with('success', __('crm.welcome_back_owner'));
+    }
 }

@@ -44,7 +44,7 @@ class TaskController extends Controller
         if (Auth::guard('erp_team')->check()) {
             return Auth::guard('erp_team')->user()->tenant;
         }
-        return Tenant::where('user_id', Auth::id())->firstOrFail();
+        return auth('erp_team')->user()->tenant;
     }
 
     // ── Task Board CRUD ──────────────────────────────────────────────
@@ -304,7 +304,7 @@ class TaskController extends Controller
             'comment' => 'required|string',
         ]);
 
-        $user = Auth::guard('erp_team')->user() ?? Auth::user();
+        $user = Auth::guard('erp_team')->user() ?? auth('erp_team')->user();
 
         $task->comments()->create([
             'commenter_id'   => $user->id,
@@ -320,7 +320,7 @@ class TaskController extends Controller
     {
         $this->authorize('update', $task);
 
-        $user = Auth::guard('erp_team')->user() ?? Auth::user();
+        $user = Auth::guard('erp_team')->user() ?? auth('erp_team')->user();
         
         // Ensure user can only delete their own comments or admins can delete any
         if ($comment->commenter_id !== $user->id && !($user instanceof \App\Models\User)) {

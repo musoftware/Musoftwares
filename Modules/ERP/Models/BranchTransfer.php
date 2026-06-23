@@ -24,11 +24,11 @@ class BranchTransfer extends Model
 
     public function requestedBy()
     {
-        return $this->belongsTo(\App\Models\User::class, 'requested_by');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'requested_by');
     }
 
     public function approvedBy()
     {
-        return $this->belongsTo(\App\Models\User::class, 'approved_by');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'approved_by');
     }
 }

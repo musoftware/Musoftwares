@@ -1004,6 +1004,15 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
         Route::get('salaries/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_salaries_view'])->name('recurring_salaries.view');
         Route::delete('salaries/{id}/delete', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_salaries_delete'])->name('recurring_salaries.delete');
         Route::post('salaries/{id}/toggle-status', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'toggle_recurring_salaries'])->name('recurring_salaries.toggle');
+
+        // Invoices
+        Route::get('invoices', [\App\Http\Controllers\Admin\RecurringInvoiceController::class, 'index'])->name('recurring_invoices.index');
+        Route::post('invoices', [\App\Http\Controllers\Admin\RecurringInvoiceController::class, 'store'])->name('recurring_invoices.store');
+        Route::get('invoices/edit/{id}', [\App\Http\Controllers\Admin\RecurringInvoiceController::class, 'edit'])->name('recurring_invoices.edit');
+        Route::put('invoices/{id}', [\App\Http\Controllers\Admin\RecurringInvoiceController::class, 'update'])->name('recurring_invoices.update');
+        Route::get('invoices/{id}', [\App\Http\Controllers\Admin\RecurringInvoiceController::class, 'view'])->name('recurring_invoices.view');
+        Route::delete('invoices/{id}/delete', [\App\Http\Controllers\Admin\RecurringInvoiceController::class, 'delete'])->name('recurring_invoices.delete');
+        Route::post('invoices/{id}/toggle-status', [\App\Http\Controllers\Admin\RecurringInvoiceController::class, 'toggle'])->name('recurring_invoices.toggle');
     });
 
     // ── Admin Hours Calendar ──────────────────────────────────────

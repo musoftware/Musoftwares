@@ -30,7 +30,7 @@ class KanbanTaskPolicy
      */
     public function view(User $user, KanbanTask $kanbanTask): bool
     {
-        return isset($ability->user_id) ? $user->id === $ability->user_id : false;
+        return isset($kanbanTask->user_id) ? $user->id === $kanbanTask->user_id : false;
     }
 
     /**

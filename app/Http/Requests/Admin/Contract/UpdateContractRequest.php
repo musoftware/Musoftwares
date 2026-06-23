@@ -8,7 +8,7 @@ class UpdateContractRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user() && $this->user()->can('update', $this->route('contract'));
     }
 
     public function rules(): array

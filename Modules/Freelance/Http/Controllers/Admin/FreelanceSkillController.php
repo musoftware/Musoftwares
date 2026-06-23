@@ -59,7 +59,7 @@ class FreelanceSkillController extends Controller
 
         $addedCount = 0;
         foreach ($skillsArray as $skillName) {
-            if (!empty($skillName) && mb_strlen($skillName) <= 255) {
+            if ($skillName !== '' && mb_strlen($skillName) <= 255) {
                 if (!Skill::where('name', $skillName)->exists()) {
                     Skill::create([
                         'name' => $skillName,

@@ -30,7 +30,7 @@ class VoucherPolicy
      */
     public function view(User $user, Voucher $voucher): bool
     {
-        return isset($ability->user_id) ? $user->id === $ability->user_id : false;
+        return isset($voucher->user_id) ? $user->id === $voucher->user_id : false;
     }
 
     /**

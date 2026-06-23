@@ -16,7 +16,7 @@ class UploadUserFileRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return true;
+        return $this->user() && $this->user()->hasAnyRole(['admin', 'super_admin', 'Admin', 'superadmin']);
     }
 
     public function rules(): array

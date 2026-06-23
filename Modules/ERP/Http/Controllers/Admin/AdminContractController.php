@@ -60,7 +60,7 @@ class AdminContractController extends Controller
         $contract = DB::transaction(function () use ($validated) {
             $contract = new Contract();
             $contract->uuid = (string) Str::uuid();
-            $contract->user_id = Auth::id();
+            $contract->user_id = auth('erp_team')->id();
             $contract->project_name = $validated['project_name'];
             $contract->description = $validated['description'] ?? null;
             $contract->total_amount = $validated['total_amount'];
@@ -72,7 +72,7 @@ class AdminContractController extends Controller
 
             ContractVersion::create([
                 'contract_id' => $contract->id,
-                'user_id' => Auth::id(),
+                'user_id' => auth('erp_team')->id(),
                 'description' => $contract->description,
                 'total_amount' => $contract->total_amount,
                 'content' => $contract->content,
@@ -130,7 +130,7 @@ class AdminContractController extends Controller
 
             ContractVersion::create([
                 'contract_id' => $contract->id,
-                'user_id' => Auth::id(),
+                'user_id' => auth('erp_team')->id(),
                 'description' => $contract->description,
                 'total_amount' => $contract->total_amount,
                 'content' => $contract->content,

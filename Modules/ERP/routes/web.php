@@ -3,17 +3,42 @@
 use Illuminate\Support\Facades\Route;
 use Modules\ERP\Http\Controllers\InvoiceController;
 
-Route::middleware(['web', 'auth:web,erp_team', 'tenant.active', 'erp.team.permissions'])
+// ── Dashboard & Onboarding for Primary User ──
+Route::middleware(['web', 'auth'])
     ->prefix('erp')
     ->name('erp.')
     ->group(function () {
-        // ── Dashboard & Onboarding ──
-        Route::get('dashboard', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('dashboard');
         Route::get('onboarding', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'onboarding'])->name('onboarding');
         Route::post('onboarding', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'completeOnboarding'])->name('onboarding.complete');
+        
+        Route::get('bridge', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'bridge'])->name('bridge');
+    });
+
+// ── Authentication for ERP Team Members ──
+Route::middleware(['web'])
+    ->prefix('erp')
+    ->name('erp.')
+    ->group(function () {
+        Route::get('login', [\Modules\ERP\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+        Route::post('login', [\Modules\ERP\Http\Controllers\Auth\LoginController::class, 'login'])->name('login.submit');
+        Route::post('logout', [\Modules\ERP\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout')->middleware('auth:erp_team');
+        
+        Route::get('invite/{id}/accept', [\Modules\ERP\Http\Controllers\Auth\InviteController::class, 'showAcceptForm'])->name('invite.accept');
+        Route::post('invite/{id}/accept', [\Modules\ERP\Http\Controllers\Auth\InviteController::class, 'accept'])->name('invite.submit');
+    });
+
+// ── ERP Module Routes for Team Members ──
+Route::middleware(['web', 'auth:erp_team', 'tenant.active', 'erp.team.permissions'])
+    ->prefix('erp')
+    ->name('erp.')
+    ->group(function () {
+        Route::get('dashboard', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('dashboard');
+
+        // ── Settings ──
         Route::put('settings', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'updateSettings'])->name('settings.update');
         Route::get('settings/smtp', [\Modules\ERP\Http\Controllers\SmtpSettingController::class, 'edit'])->name('settings.smtp.edit');
         Route::put('settings/smtp', [\Modules\ERP\Http\Controllers\SmtpSettingController::class, 'update'])->name('settings.smtp.update');
+
 
         // ── Clients ──
         Route::get('clients', [\Modules\ERP\Http\Controllers\ClientController::class, 'index'])->name('clients.index');
@@ -111,6 +136,7 @@ Route::middleware(['web', 'auth:web,erp_team', 'tenant.active', 'erp.team.permis
         // ── Team Members ──
         Route::get('team-members', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'index'])->name('team-members.index');
         Route::post('team-members', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'store'])->name('team-members.store');
+        Route::post('team-members/{id}/resend-invite', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'resendInvite'])->name('team-members.resend-invite');
         Route::put('team-members/{id}', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'update'])->name('team-members.update');
         Route::delete('team-members/{id}', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'destroy'])->name('team-members.destroy');
         Route::get('tickets/create', [\Modules\ERP\Http\Controllers\TicketController::class, 'create'])->name('tickets.create');

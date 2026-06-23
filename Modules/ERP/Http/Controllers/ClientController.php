@@ -32,7 +32,7 @@ class ClientController extends Controller
         if (Auth::guard('erp_team')->check()) {
             return Auth::guard('erp_team')->user()->tenant;
         }
-        return Tenant::where('user_id', Auth::id())->firstOrFail();
+        return auth('erp_team')->user()->tenant;
     }
 
     /**
@@ -108,7 +108,7 @@ class ClientController extends Controller
     {
         $this->authorize('view', $client);
 
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         $hasTickets = $user->hasModuleSubscription('erp-tickets');
 
         $baseData = $this->clientService->getClientBaseData($client, $hasTickets);
@@ -137,7 +137,7 @@ class ClientController extends Controller
     {
         $this->authorize('view', $client);
 
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         $hasTickets = $user->hasModuleSubscription('erp-tickets');
 
         $baseData = $this->clientService->getClientBaseData($client, $hasTickets);
@@ -159,7 +159,7 @@ class ClientController extends Controller
     {
         $this->authorize('view', $client);
 
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         $hasTickets = $user->hasModuleSubscription('erp-tickets');
 
         $baseData = $this->clientService->getClientBaseData($client, $hasTickets);
@@ -182,7 +182,7 @@ class ClientController extends Controller
     {
         $this->authorize('view', $client);
 
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         $hasTickets = $user->hasModuleSubscription('erp-tickets');
 
         $baseData = $this->clientService->getClientBaseData($client, $hasTickets);
@@ -214,8 +214,8 @@ class ClientController extends Controller
 
     public function create()
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->first();
+        $user = auth('erp_team')->user();
+        $tenant = auth('erp_team')->user()->tenant;
         $hasMultiCurrency = $user->hasModuleSubscription('erp-multi-currency');
         $baseCurrency = $tenant?->baseCurrency?->currency;
 

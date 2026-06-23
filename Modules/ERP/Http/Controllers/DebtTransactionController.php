@@ -14,9 +14,10 @@ class DebtTransactionController extends Controller
 {
     private function resolveTenantUser()
     {
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         if (auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
+            $teamMember = auth('erp_team')->user();
+            $user = $teamMember?->tenant?->user;
         }
         return $user;
     }
@@ -32,7 +33,7 @@ class DebtTransactionController extends Controller
     private function getTenantId()
     {
         $user = $this->resolveTenantUser();
-        return Tenant::where('user_id', $user->id)->value('id');
+        return auth('erp_team')->user()->tenant_id;
     }
 
     public function create()

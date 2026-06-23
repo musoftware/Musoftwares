@@ -61,6 +61,7 @@ const items: MenuItem[] = [
         { title: "Income", url: "/admin/business/income" },
         { title: "Recurring Income", url: "/admin/business/recurring/income" },
         { title: "Recurring Salaries", url: "/admin/business/recurring/salaries" },
+        { title: "Recurring Invoices", url: "/admin/business/recurring/invoices" },
         { title: "Reports", url: "/admin/business/reports" },
         { title: "Balance", url: "/admin/business/balance-report" },
         { title: "Payment Links", url: "/admin/payment-links" },

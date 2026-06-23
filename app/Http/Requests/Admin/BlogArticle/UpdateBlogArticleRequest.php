@@ -11,7 +11,7 @@ class UpdateBlogArticleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // Assuming admin middleware handles auth
+        return $this->user() && $this->user()->hasAnyRole(['admin', 'super_admin', 'Admin', 'superadmin']); // Assuming admin middleware handles auth
     }
 
     /**

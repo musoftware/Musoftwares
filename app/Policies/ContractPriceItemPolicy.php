@@ -30,7 +30,7 @@ class ContractPriceItemPolicy
      */
     public function view(User $user, ContractPriceItem $contractPriceItem): bool
     {
-        return isset($ability->user_id) ? $user->id === $ability->user_id : false;
+        return isset($contractPriceItem->user_id) ? $user->id === $contractPriceItem->user_id : false;
     }
 
     /**

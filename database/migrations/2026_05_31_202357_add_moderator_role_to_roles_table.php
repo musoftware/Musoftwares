@@ -12,18 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Role::where('name', 'moderator')->exists()) {
-            Role::create(['name' => 'moderator', 'guard_name' => 'web']);
-        }
+        // Deprecated: role is now seeded centrally in RolesAndPermissionsSeeder
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('roles', function (Blueprint $table) {
-            //
-        });
+        // Deprecated
     }
 };

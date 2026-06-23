@@ -30,13 +30,14 @@ class FileController extends Controller
 
     public function index()
     {
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         if (auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
+            $teamMember = auth('erp_team')->user();
+            $user = $teamMember?->tenant?->user;
         }
 
         $hasFeature = $user ? $user->hasModuleSubscription('erp-document-storage') : false;
-        $tenant = Tenant::where('user_id', $user->id)->first();
+        $tenant = auth('erp_team')->user()->tenant;
 
         $files = collect();
         $storageProviders = collect();
@@ -76,8 +77,8 @@ class FileController extends Controller
 
     public function store(Request $request)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->first();
+        $user = auth('erp_team')->user();
+        $tenant = auth('erp_team')->user()->tenant;
 
         if (!$tenant) {
             return back()->withErrors(['error' => __('errors.no_active_workspace')]);
@@ -132,8 +133,8 @@ class FileController extends Controller
 
     public function show(TenantFile $file)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->first();
+        $user = auth('erp_team')->user();
+        $tenant = auth('erp_team')->user()->tenant;
 
         if (!$tenant || $file->tenant_id !== $tenant->id) {
             abort(403, __('general.unauthorized_access_to_file'));
@@ -158,8 +159,8 @@ class FileController extends Controller
 
     public function destroy(TenantFile $file)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->first();
+        $user = auth('erp_team')->user();
+        $tenant = auth('erp_team')->user()->tenant;
 
         if (!$tenant || $file->tenant_id !== $tenant->id) {
             abort(403, __('general.unauthorized_access_to_file'));

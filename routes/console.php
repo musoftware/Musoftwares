@@ -25,6 +25,7 @@ Schedule::command(CleanupExpiredFbmbResults::class)->dailyAt('04:00');
 Schedule::command(\App\Console\Commands\AddRecurringCosts::class)->everyMinute();
 Schedule::command(\App\Console\Commands\AddRecurringSalaries::class)->everyMinute();
 Schedule::command(\App\Console\Commands\AddRecurringIncomes::class)->everyMinute();
+Schedule::command(\App\Console\Commands\AddRecurringInvoices::class)->everyMinute();
 
 // Process matured referral earnings every minute
 Schedule::command(ProcessEarningsClearing::class)->everyMinute();

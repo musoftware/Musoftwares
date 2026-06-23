@@ -114,7 +114,7 @@ export default function CommandPalette() {
                                     <span className="font-medium">{__('general.create_new_task')}</span>
                                 </Command.Item>
                                 <Command.Item
-                                    onSelect={() => { setOpen(false); router.visit(route('crm.dashboard')); }}
+                                    onSelect={() => { setOpen(false); router.visit(route('crm.bridge')); }}
                                     className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-gray-900 select-none aria-selected:bg-gray-100"
                                 >
                                     <span className="font-medium">{__('general.go_to_crm_dashboard')}</span>

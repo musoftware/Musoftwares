@@ -21,18 +21,20 @@ class PayrollController extends Controller
 {
     protected function resolveTenant()
     {
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         if (auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
+            $teamMember = auth('erp_team')->user();
+            $user = $teamMember?->tenant?->user;
         }
-        return Tenant::where('user_id', $user->id)->firstOrFail();
+        return auth('erp_team')->user()->tenant;
     }
 
     protected function checkAddon()
     {
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         if (auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
+            $teamMember = auth('erp_team')->user();
+            $user = $teamMember?->tenant?->user;
         }
         if (!$user || !$user->hasModuleSubscription('erp-payroll')) {
             abort(403, __('erp.upgrade_to_enable_payroll_system'));

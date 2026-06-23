@@ -12,9 +12,10 @@ class InventoryController extends Controller
 {
     private function resolveTenantUser()
     {
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         if (auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
+            $teamMember = auth('erp_team')->user();
+            $user = $teamMember?->tenant?->user;
         }
         return $user;
     }
@@ -24,7 +25,7 @@ class InventoryController extends Controller
     public function index(Request $request)
     {
         $user = $this->resolveTenantUser();
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+        $tenant = auth('erp_team')->user()->tenant;
         
         $query = \Modules\ERP\Models\Product::with('currency')
             ->where('tenant_id', $tenant->id);

@@ -14,9 +14,10 @@ class ReferralController extends Controller
 {
     private function resolveTenantUser()
     {
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         if (auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
+            $teamMember = auth('erp_team')->user();
+            $user = $teamMember?->tenant?->user;
         }
         return $user;
     }
@@ -33,7 +34,7 @@ class ReferralController extends Controller
     {
         $this->checkAddon();
         $user = $this->resolveTenantUser();
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+        $tenant = auth('erp_team')->user()->tenant;
         
         $clients = TenantClient::where('tenant_id', $tenant->id)
             ->with('referrer')
@@ -59,7 +60,7 @@ class ReferralController extends Controller
     {
         $this->checkAddon();
         $user = $this->resolveTenantUser();
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+        $tenant = auth('erp_team')->user()->tenant;
         
         if ($client->tenant_id !== $tenant->id) {
             abort(403);
@@ -77,7 +78,7 @@ class ReferralController extends Controller
     {
         $this->checkAddon();
         $user = $this->resolveTenantUser();
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+        $tenant = auth('erp_team')->user()->tenant;
 
         $earnings = ReferralEarning::where('tenant_id', $tenant->id)
             ->with(['referrer', 'referee', 'currencyModel'])

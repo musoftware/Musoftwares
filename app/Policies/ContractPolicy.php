@@ -30,7 +30,7 @@ class ContractPolicy
      */
     public function view(User $user, Contract $contract): bool
     {
-        return isset($ability->user_id) ? $user->id === $ability->user_id : false;
+        return isset($contract->user_id) ? $user->id === $contract->user_id : false;
     }
 
     /**

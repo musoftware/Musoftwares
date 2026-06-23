@@ -30,7 +30,7 @@ class CouponRedemptionPolicy
      */
     public function view(User $user, CouponRedemption $couponRedemption): bool
     {
-        return isset($ability->user_id) ? $user->id === $ability->user_id : false;
+        return isset($couponRedemption->user_id) ? $user->id === $couponRedemption->user_id : false;
     }
 
     /**

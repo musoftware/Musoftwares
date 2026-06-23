@@ -13,17 +13,18 @@ class TicketController extends Controller
 {
     private function getTenant()
     {
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         if (auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
+            $teamMember = auth('erp_team')->user();
+            $user = $teamMember?->tenant?->user;
         }
-        return Tenant::where('user_id', $user->id)->first();
+        return auth('erp_team')->user()->tenant;
     }
 
     public function create()
     {
         $tenant = $this->getTenant();
-        $user = $tenant ? $tenant->user : Auth::user();
+        $user = $tenant ? $tenant->user : auth('erp_team')->user();
 
         if (!$user || !$user->hasModuleSubscription('erp-tickets')) {
             abort(403, __('general.upgrade_to_enable_support_tickets'));
@@ -56,7 +57,7 @@ class TicketController extends Controller
             'priority' => 'required|in:low,medium,high,critical',
         ]);
 
-        $authUser = auth('erp_team')->check() ? auth('erp_team')->user() : Auth::user();
+        $authUser = auth('erp_team')->check() ? auth('erp_team')->user() : auth('erp_team')->user();
 
         SupportTicket::create([
             'tenant_id' => $tenant->id,

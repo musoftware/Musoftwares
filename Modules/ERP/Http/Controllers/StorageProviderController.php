@@ -19,8 +19,8 @@ class StorageProviderController extends Controller
 
     public function store(Request $request)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->first();
+        $user = auth('erp_team')->user();
+        $tenant = auth('erp_team')->user()->tenant;
 
         if (!$tenant) {
             return back()->withErrors(['error' => __('errors.no_active_workspace')]);

@@ -14,7 +14,7 @@ class InvoiceItem extends Model
 
     protected $fillable = ['item_title', 'amount', 'qty', 'item_type', 'invoice_id'];
 
-    public function invoice()
+    public function invoice(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Invoice::class, 'invoice_id');
     }

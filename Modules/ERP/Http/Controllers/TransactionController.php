@@ -16,12 +16,12 @@ class TransactionController extends Controller
      */
     public function show(Request $request, WalletTransaction $transaction)
     {
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         if (Auth::guard('erp_team')->check()) {
             $tenant = Auth::guard('erp_team')->user()->tenant;
             $ownerUser = $tenant?->user;
         } else {
-            $tenant = Tenant::where('user_id', $user?->id)->firstOrFail();
+            $tenant = auth('erp_team')->user()->tenant;
             $ownerUser = $user;
         }
 

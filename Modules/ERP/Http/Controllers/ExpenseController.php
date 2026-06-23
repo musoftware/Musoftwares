@@ -20,7 +20,7 @@ class ExpenseController extends Controller
         if (Auth::guard('erp_team')->check()) {
             return Auth::guard('erp_team')->user()->tenant;
         }
-        return Tenant::where('user_id', Auth::id())->first();
+        return auth('erp_team')->user()->tenant;
     }
 
     /**
@@ -44,7 +44,7 @@ class ExpenseController extends Controller
      */
     public function store(Request $request)
     {
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         $tenant = $this->resolveTenant();
 
         if (!$tenant) {

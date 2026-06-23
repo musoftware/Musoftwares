@@ -53,12 +53,12 @@ class ERPTask extends TenantAwareModel
 
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'created_by');
     }
 
     public function assignee(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'assigned_to');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'assigned_to');
     }
 
     public function assigneeTeamMember(): BelongsTo

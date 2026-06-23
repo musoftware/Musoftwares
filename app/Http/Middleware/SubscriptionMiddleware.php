@@ -22,7 +22,7 @@ class SubscriptionMiddleware
      */
     public function handle(Request $request, Closure $next, string $module): Response
     {
-        if (!auth()->check() && !auth('erp_team')->check()) {
+        if (!auth()->check() && !auth('erp_team')->check() && !auth('crm_team')->check()) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 abort(401, __('general.unauthorized_access'));
             }
@@ -33,6 +33,9 @@ class SubscriptionMiddleware
         if (auth('erp_team')->check()) {
             $member = auth('erp_team')->user();
             $user = $member?->tenant?->user;
+        } elseif (auth('crm_team')->check()) {
+            $crmMember = auth('crm_team')->user();
+            $user = $crmMember?->workspace?->owner;
         }
 
         if (!$user) {

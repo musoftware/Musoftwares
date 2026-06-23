@@ -35,7 +35,7 @@ class TaskController extends Controller implements HasMiddleware
     {
         return [
             new Middleware(function ($request, Closure $next) {
-                $user = Auth::user();
+                $user = auth('erp_team')->user();
                 if (Auth::guard('erp_team')->check()) {
                     $user = Auth::guard('erp_team')->user()->tenant->user;
                 }
@@ -227,7 +227,7 @@ class TaskController extends Controller implements HasMiddleware
         $task = ERPTask::create(array_merge($validated, [
             'tenant_id'  => $tenant->id,
             'task_name'  => $taskName,
-            'created_by' => Auth::id(),
+            'created_by' => auth('erp_team')->id(),
             'status'     => $request->input('status', 'open'),
         ]));
 

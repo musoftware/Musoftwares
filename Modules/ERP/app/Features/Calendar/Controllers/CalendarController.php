@@ -20,7 +20,7 @@ class CalendarController extends Controller implements HasMiddleware
     {
         return [
             new Middleware(function ($request, Closure $next) {
-                $user = Auth::user();
+                $user = auth('erp_team')->user();
                 if (Auth::guard('erp_team')->check()) {
                     $user = Auth::guard('erp_team')->user()->tenant->user;
                 }

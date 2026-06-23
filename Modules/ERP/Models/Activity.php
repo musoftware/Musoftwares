@@ -33,6 +33,6 @@ class Activity extends TenantAwareModel
 
     public function causer(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'causer_id');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'causer_id');
     }
 }

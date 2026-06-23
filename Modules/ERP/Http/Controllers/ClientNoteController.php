@@ -17,7 +17,7 @@ class ClientNoteController extends Controller
 {
     private function resolveTenant(): \Modules\ERP\Models\Tenant
     {
-        return \Modules\ERP\Models\Tenant::where('user_id', Auth::id())->firstOrFail();
+        return auth('erp_team')->user()->tenant;
     }
 
     private function validateTenantClient(TenantClient $client)
@@ -52,7 +52,7 @@ class ClientNoteController extends Controller
         $note = ClientNote::create([
             'tenant_id'  => $client->tenant_id,
             'client_id'  => $client->id,
-            'created_by' => Auth::id(),
+            'created_by' => auth('erp_team')->id(),
             'category'   => $request->input('category'),
             'title'      => $request->input('title'),
             'content'    => $request->input('content'),

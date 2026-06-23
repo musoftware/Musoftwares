@@ -26,13 +26,8 @@ class TenantScope implements Scope
         }
 
         // Fallback for API or direct use without session
-        if (!$tenantId && auth()->check()) {
-            $user = auth()->user();
-            if (isset($user->tenant_id)) {
-                $tenantId = $user->tenant_id;
-            } else {
-                $tenantId = $user->tenant?->id;
-            }
+        if (!$tenantId && auth('erp_team')->check()) {
+            $tenantId = auth('erp_team')->user()->tenant_id;
         }
 
         if ($tenantId) {

@@ -25,7 +25,7 @@ class FreelanceProfile extends Model
         'notifications_muted_until' => 'datetime'
     ];
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
     }

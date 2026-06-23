@@ -12,9 +12,10 @@ class BackupController extends Controller
     public function index()
     {
         // Resolve the correct user (handles both web and erp_team guards)
-        $user = auth()->user();
+        $user = auth('erp_team')->user();
         if (auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
+            $teamMember = auth('erp_team')->user();
+            $user = $teamMember?->tenant?->user;
         }
 
         return Inertia::render('ERP/Backup/Index', [
@@ -24,16 +25,17 @@ class BackupController extends Controller
 
     public function download(BackupService $backupService)
     {
-        $user = auth()->user();
+        $user = auth('erp_team')->user();
         if (auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
+            $teamMember = auth('erp_team')->user();
+            $user = $teamMember?->tenant?->user;
         }
         
         if (!$user || !$user->hasModuleSubscription('erp-backup')) {
             abort(403, __('errors.erp_backup_addon_required'));
         }
 
-        $tenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->firstOrFail();
+        $tenant = auth('erp_team')->user()->tenant;
         $filePath = $backupService->createBackup($tenant);
 
         return response()->download($filePath)->deleteFileAfterSend(true);
@@ -41,9 +43,10 @@ class BackupController extends Controller
 
     public function restore(Request $request, BackupService $backupService)
     {
-        $user = auth()->user();
+        $user = auth('erp_team')->user();
         if (auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
+            $teamMember = auth('erp_team')->user();
+            $user = $teamMember?->tenant?->user;
         }
 
         if (!$user || !$user->hasModuleSubscription('erp-backup')) {
@@ -54,7 +57,7 @@ class BackupController extends Controller
             'backup_file' => 'required|file|mimes:zip,json',
         ]);
 
-        $tenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->firstOrFail();
+        $tenant = auth('erp_team')->user()->tenant;
 
         try {
             $backupService->restoreBackup($tenant, $request->file('backup_file'));

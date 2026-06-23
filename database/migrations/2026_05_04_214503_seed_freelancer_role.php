@@ -13,14 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Role::createRule('Freelancer', 'freelancer');
+        // Deprecated: role is now seeded centrally in RolesAndPermissionsSeeder
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Role::where('slug', 'freelancer')->delete();
+        // Deprecated
     }
 };

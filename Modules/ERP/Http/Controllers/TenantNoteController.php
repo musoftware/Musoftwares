@@ -18,7 +18,7 @@ class TenantNoteController extends Controller
 
     private function resolveTenant(): Tenant
     {
-        return Tenant::where('user_id', Auth::id())->firstOrFail();
+        return auth('erp_team')->user()->tenant;
     }
 
     private function authorizeNote(TenantNote $note, Tenant $tenant): void
@@ -45,7 +45,7 @@ class TenantNoteController extends Controller
 
         $note = TenantNote::create([
             'tenant_id'  => $tenant->id,
-            'created_by' => Auth::id(),
+            'created_by' => auth('erp_team')->id(),
             'title'      => $validated['title'] ?? 'Untitled Note',
             'content'    => $validated['content'] ?? '',
             'category'   => $validated['category'] ?? 'Internal',

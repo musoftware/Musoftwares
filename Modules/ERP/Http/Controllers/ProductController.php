@@ -25,9 +25,10 @@ class ProductController extends Controller
     }
     private function resolveTenantUser()
     {
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         if (auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
+            $teamMember = auth('erp_team')->user();
+            $user = $teamMember?->tenant?->user;
         }
         return $user;
     }
@@ -43,7 +44,7 @@ class ProductController extends Controller
     private function getTenantId()
     {
         $user = $this->resolveTenantUser();
-        return Tenant::where('user_id', $user->id)->value('id');
+        return auth('erp_team')->user()->tenant_id;
     }
 
     public function create()
@@ -53,7 +54,7 @@ class ProductController extends Controller
 
         $currencies = \App\Models\Currency::all();
         $user = $this->resolveTenantUser();
-        $tenant = Tenant::where('user_id', $user->id)->first();
+        $tenant = auth('erp_team')->user()->tenant;
         $hasMultiCurrency = $user && $user->hasModuleSubscription('erp-multi-currency');
 
         $categories = \Modules\ERP\Models\ProductCategory::where('tenant_id', $tenantId)->get();
@@ -121,7 +122,7 @@ class ProductController extends Controller
 
         $currencies = \App\Models\Currency::all();
         $user = $this->resolveTenantUser();
-        $tenant = Tenant::where('user_id', $user->id)->first();
+        $tenant = auth('erp_team')->user()->tenant;
         $hasMultiCurrency = $user && $user->hasModuleSubscription('erp-multi-currency');
 
         $categories = \Modules\ERP\Models\ProductCategory::where('tenant_id', $tenantId)->get();

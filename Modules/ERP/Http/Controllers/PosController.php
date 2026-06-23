@@ -11,9 +11,10 @@ class PosController extends Controller
 {
     private function resolveTenantUser()
     {
-        $user = Auth::user();
+        $user = auth('erp_team')->user();
         if (auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
+            $teamMember = auth('erp_team')->user();
+            $user = $teamMember?->tenant?->user;
         }
         return $user;
     }
@@ -21,7 +22,7 @@ class PosController extends Controller
     private function resolveTenant()
     {
         $user = $this->resolveTenantUser();
-        return \Modules\ERP\Models\Tenant::where('user_id', $user->id)->firstOrFail();
+        return auth('erp_team')->user()->tenant;
     }
 
     private function checkAddon()

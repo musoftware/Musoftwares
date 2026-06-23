@@ -10,7 +10,7 @@ class EnsureOnboardingCompleted
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth('erp_team')->check()) {
+        if (auth('erp_team')->check() || auth('crm_team')->check()) {
             return $next($request);
         }
 

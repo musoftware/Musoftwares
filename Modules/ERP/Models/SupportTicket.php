@@ -35,7 +35,7 @@ class SupportTicket extends TenantAwareModel
 
     public function assignee(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'assigned_to');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'assigned_to');
     }
 
     public function assigneeTeamMember(): BelongsTo
@@ -45,6 +45,6 @@ class SupportTicket extends TenantAwareModel
 
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'created_by');
+        return $this->belongsTo(\Modules\ERP\Models\TeamMember::class, 'created_by');
     }
 }

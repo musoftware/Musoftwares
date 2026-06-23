@@ -41,6 +41,6 @@ class WalletTransactionPolicy
 
     public function delete(User $user, WalletTransaction $transaction)
     {
-        return isset($ability->user_id) ? $user->id === $ability->user_id : false;
+        return isset($transaction->user_id) ? $user->id === $transaction->user_id : false;
     }
 }
