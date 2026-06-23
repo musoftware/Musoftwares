@@ -1,4 +1,5 @@
 import React from 'react';
+import { router } from '@inertiajs/react';
 import { PipelineLead } from '../../Stores/usePipelineStore';
 
 import { Phone, MessageCircle, Clock, AlertTriangle } from 'lucide-react';
@@ -12,7 +13,7 @@ interface LeadCardProps {
 
 export default function LeadCard({ lead, index }: LeadCardProps) {
     const openDrawer = (id: number) => { 
-        (window as any).location.href = route('crm.leads.show', id);
+        router.visit((window as any).route('crm.leads.show', id));
     };
 
     // Dynamic SLA coloring
