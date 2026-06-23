@@ -1,0 +1,92 @@
+[
+    {
+        "id": "Start",
+        "name": "Start Pre-Implementation Analysis",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "A",
+        "name": "Analyze Existing Codebase Context",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "B",
+        "name": "Detect Existing Modules and Related Controllers",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "C",
+        "name": "Detect Naming Collisions and Duplicate Logic",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "D",
+        "name": "Detect Missing Core Dependencies",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "E",
+        "name": "Detect Missing Database Migrations",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "F",
+        "name": "Detect Missing Permissions and Roles",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "G",
+        "name": "Detect Missing Events and Listeners",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "H",
+        "name": "Detect Missing Policies and Authorization Rules",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "I",
+        "name": "Map All Dependencies: Models, Services, Routes",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "J",
+        "name": "Identify Integration Points with Existing ERP",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "K",
+        "name": "Evaluate Tenant Isolation and Scope Impact",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "L",
+        "name": "Evaluate Audit Logging and Accounting Hooks",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "M",
+        "name": "Formulate Detailed Implementation Plan",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "End",
+        "name": "Analysis Complete - Ready for Implementation",
+        "status": "done",
+        "dependencies": []
+    }
+]

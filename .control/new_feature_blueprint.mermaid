@@ -1,0 +1,100 @@
+graph TD
+    Phase1[Phase 1: Architectural Alignment]
+    P1T1[Update composer.json: PHP 8.4]
+    P1T2[Update package.json: react-i18next, lucide-react]
+    P1T3[Fix TypeScript Imports: Label, router]
+    P1T4[Centralize Roles in RolesAndPermissionsSeeder.php]
+
+    Phase1 --> P1T1
+    Phase1 --> P1T2
+    Phase1 --> P1T3
+    Phase1 --> P1T4
+
+    Phase2[Phase 2: Security & Tenant Isolation Overhaul]
+    P1T1 --> Phase2
+    P1T2 --> Phase2
+    P1T3 --> Phase2
+    P1T4 --> Phase2
+
+    P2T1[Refactor TenantAwareModel & TenantScope]
+    P2T2[Generate Policy Classes for Invoice, Contract, etc.]
+    P2T3[Implement authorize checks in FormRequests & Controllers]
+
+    Phase2 --> P2T1
+    Phase2 --> P2T2
+    Phase2 --> P2T3
+
+    Phase3[Phase 3: Domain Deduplication & Module Encapsulation]
+    P2T1 --> Phase3
+    P2T2 --> Phase3
+    P2T3 --> Phase3
+
+    P3T1[Consolidate Duplicate Models: Invoice, Contract, etc.]
+    P3T2[Move Admin Controllers to Modules directory]
+    P3T3[Merge Fragmented Domain Logic & Remove Exact Duplicates]
+
+    Phase3 --> P3T1
+    Phase3 --> P3T2
+    Phase3 --> P3T3
+
+    Phase4[Phase 4: Event-Driven Architecture & Accounting Activation]
+    P3T1 --> Phase4
+    P3T2 --> Phase4
+    P3T3 --> Phase4
+
+    P4T1[Create Listeners for Ghost Events]
+    P4T2[Develop AccountingService for Double-Entry Ledger]
+    P4T3[Implement Core Domain Events: InvoiceCreated, etc.]
+
+    Phase4 --> P4T1
+    Phase4 --> P4T2
+    Phase4 --> P4T3
+
+    Phase5[Phase 5: Scaffold Missing ERP Domains]
+    P4T1 --> Phase5
+    P4T2 --> Phase5
+    P4T3 --> Phase5
+
+    P5_Procurement[Procurement: Suppliers, POs, Receipts, Vendor Bills]
+    P5_Accounting[Accounting: Chart Of Accounts, Ledger, Journals]
+    P5_Warehouse[Warehouse: Zones, Bins, Transfers, Counts]
+    P5_Tax[Tax Engine: Rates, Rules, Calculators]
+    P5_Asset[Asset Management: Fixed Assets, Depreciation]
+    P5_Approval[Approval Engine: Workflows, Steps, Escalations]
+    P5_Calendar[Calendar: Events, Meetings, Scheduling]
+    P5_OCR[OCR: Documents, Invoice Extraction]
+
+    Phase5 --> P5_Procurement
+    Phase5 --> P5_Accounting
+    Phase5 --> P5_Warehouse
+    Phase5 --> P5_Tax
+    Phase5 --> P5_Asset
+    Phase5 --> P5_Approval
+    Phase5 --> P5_Calendar
+    Phase5 --> P5_OCR
+
+    ModuleImplementation[Module Implementation Workflow]
+    P5_Procurement -.-> ModuleImplementation
+    P5_Accounting -.-> ModuleImplementation
+    P5_Warehouse -.-> ModuleImplementation
+    P5_Tax -.-> ModuleImplementation
+    P5_Asset -.-> ModuleImplementation
+    P5_Approval -.-> ModuleImplementation
+    P5_Calendar -.-> ModuleImplementation
+    P5_OCR -.-> ModuleImplementation
+    
+    M_DB[DB Migrations & Seeders]
+    M_Models[Models, DTOs & Repositories]
+    M_Logic[Services, Actions & Policies]
+    M_Events[Events, Listeners & Notifications]
+    M_API[API Controllers & FormRequests]
+    M_UI[Frontend Pages & Widgets]
+    M_Tests[Tests & Reports]
+
+    ModuleImplementation --> M_DB
+    M_DB --> M_Models
+    M_Models --> M_Logic
+    M_Logic --> M_Events
+    M_Events --> M_API
+    M_API --> M_UI
+    M_UI --> M_Tests

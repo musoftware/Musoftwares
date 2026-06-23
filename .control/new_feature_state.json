@@ -1,0 +1,279 @@
+[
+    {
+        "id": "Phase1",
+        "name": "Phase 1: Architectural Alignment",
+        "status": "done",
+        "dependencies": []
+    },
+    {
+        "id": "P1T1",
+        "name": "Update composer.json: PHP 8.4",
+        "status": "done",
+        "dependencies": [
+            "Phase1"
+        ]
+    },
+    {
+        "id": "P1T2",
+        "name": "Update package.json: react-i18next, lucide-react",
+        "status": "done",
+        "dependencies": [
+            "Phase1"
+        ]
+    },
+    {
+        "id": "P1T3",
+        "name": "Fix TypeScript Imports: Label, router",
+        "status": "done",
+        "dependencies": [
+            "Phase1"
+        ]
+    },
+    {
+        "id": "P1T4",
+        "name": "Centralize Roles in RolesAndPermissionsSeeder.php",
+        "status": "done",
+        "dependencies": [
+            "Phase1"
+        ]
+    },
+    {
+        "id": "Phase2",
+        "name": "Phase 2: Security & Tenant Isolation Overhaul",
+        "status": "done",
+        "dependencies": [
+            "P1T1",
+            "P1T2",
+            "P1T3",
+            "P1T4"
+        ]
+    },
+    {
+        "id": "P2T1",
+        "name": "Refactor TenantAwareModel & TenantScope",
+        "status": "done",
+        "dependencies": [
+            "Phase2"
+        ]
+    },
+    {
+        "id": "P2T2",
+        "name": "Generate Policy Classes for Invoice, Contract, etc.",
+        "status": "done",
+        "dependencies": [
+            "Phase2"
+        ]
+    },
+    {
+        "id": "P2T3",
+        "name": "Implement authorize checks in FormRequests & Controllers",
+        "status": "done",
+        "dependencies": [
+            "Phase2"
+        ]
+    },
+    {
+        "id": "Phase3",
+        "name": "Phase 3: Domain Deduplication & Module Encapsulation",
+        "status": "done",
+        "dependencies": [
+            "P2T1",
+            "P2T2",
+            "P2T3"
+        ]
+    },
+    {
+        "id": "P3T1",
+        "name": "Consolidate Duplicate Models: Invoice, Contract, etc.",
+        "status": "done",
+        "dependencies": [
+            "Phase3"
+        ]
+    },
+    {
+        "id": "P3T2",
+        "name": "Move Admin Controllers to Modules directory",
+        "status": "done",
+        "dependencies": [
+            "Phase3"
+        ]
+    },
+    {
+        "id": "P3T3",
+        "name": "Merge Fragmented Domain Logic & Remove Exact Duplicates",
+        "status": "running",
+        "dependencies": [
+            "Phase3"
+        ]
+    },
+    {
+        "id": "Phase4",
+        "name": "Phase 4: Event-Driven Architecture & Accounting Activation",
+        "status": "pending",
+        "dependencies": [
+            "P3T1",
+            "P3T2",
+            "P3T3"
+        ]
+    },
+    {
+        "id": "P4T1",
+        "name": "Create Listeners for Ghost Events",
+        "status": "pending",
+        "dependencies": [
+            "Phase4"
+        ]
+    },
+    {
+        "id": "P4T2",
+        "name": "Develop AccountingService for Double-Entry Ledger",
+        "status": "pending",
+        "dependencies": [
+            "Phase4"
+        ]
+    },
+    {
+        "id": "P4T3",
+        "name": "Implement Core Domain Events: InvoiceCreated, etc.",
+        "status": "pending",
+        "dependencies": [
+            "Phase4"
+        ]
+    },
+    {
+        "id": "Phase5",
+        "name": "Phase 5: Scaffold Missing ERP Domains",
+        "status": "pending",
+        "dependencies": [
+            "P4T1",
+            "P4T2",
+            "P4T3"
+        ]
+    },
+    {
+        "id": "P5_Procurement",
+        "name": "Procurement: Suppliers, POs, Receipts, Vendor Bills",
+        "status": "pending",
+        "dependencies": [
+            "Phase5"
+        ]
+    },
+    {
+        "id": "P5_Accounting",
+        "name": "Accounting: Chart Of Accounts, Ledger, Journals",
+        "status": "pending",
+        "dependencies": [
+            "Phase5"
+        ]
+    },
+    {
+        "id": "P5_Warehouse",
+        "name": "Warehouse: Zones, Bins, Transfers, Counts",
+        "status": "pending",
+        "dependencies": [
+            "Phase5"
+        ]
+    },
+    {
+        "id": "P5_Tax",
+        "name": "Tax Engine: Rates, Rules, Calculators",
+        "status": "pending",
+        "dependencies": [
+            "Phase5"
+        ]
+    },
+    {
+        "id": "P5_Asset",
+        "name": "Asset Management: Fixed Assets, Depreciation",
+        "status": "pending",
+        "dependencies": [
+            "Phase5"
+        ]
+    },
+    {
+        "id": "P5_Approval",
+        "name": "Approval Engine: Workflows, Steps, Escalations",
+        "status": "pending",
+        "dependencies": [
+            "Phase5"
+        ]
+    },
+    {
+        "id": "P5_Calendar",
+        "name": "Calendar: Events, Meetings, Scheduling",
+        "status": "pending",
+        "dependencies": [
+            "Phase5"
+        ]
+    },
+    {
+        "id": "P5_OCR",
+        "name": "OCR: Documents, Invoice Extraction",
+        "status": "pending",
+        "dependencies": [
+            "Phase5"
+        ]
+    },
+    {
+        "id": "ModuleImplementation",
+        "name": "Module Implementation Workflow",
+        "status": "pending",
+        "dependencies": []
+    },
+    {
+        "id": "M_DB",
+        "name": "DB Migrations & Seeders",
+        "status": "pending",
+        "dependencies": [
+            "ModuleImplementation"
+        ]
+    },
+    {
+        "id": "M_Models",
+        "name": "Models, DTOs & Repositories",
+        "status": "pending",
+        "dependencies": [
+            "M_DB"
+        ]
+    },
+    {
+        "id": "M_Logic",
+        "name": "Services, Actions & Policies",
+        "status": "pending",
+        "dependencies": [
+            "M_Models"
+        ]
+    },
+    {
+        "id": "M_Events",
+        "name": "Events, Listeners & Notifications",
+        "status": "pending",
+        "dependencies": [
+            "M_Logic"
+        ]
+    },
+    {
+        "id": "M_API",
+        "name": "API Controllers & FormRequests",
+        "status": "pending",
+        "dependencies": [
+            "M_Events"
+        ]
+    },
+    {
+        "id": "M_UI",
+        "name": "Frontend Pages & Widgets",
+        "status": "pending",
+        "dependencies": [
+            "M_API"
+        ]
+    },
+    {
+        "id": "M_Tests",
+        "name": "Tests & Reports",
+        "status": "pending",
+        "dependencies": [
+            "M_UI"
+        ]
+    }
+]

@@ -1,0 +1,178 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+class RecurringInvoice extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $guarded = [];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class);
+    }
+
+    public function current_amount()
+    {
+        return $this->amount;
+    }
+
+    public function current_amount_str()
+    {
+        return \App\Helpers\FinanceHelper::instance()->format_money($this->current_amount(), $this->currency_id);
+    }
+
+    public function records()
+    {
+        return $this->hasMany(RecurringInvoiceRecord::class);
+    }
+
+    public function details()
+    {
+        if ($this->recurring == 'day') {
+            return '';
+        }
+        if ($this->recurring == 'month') {
+            return $this->recurring_times_month;
+        }
+        if ($this->recurring == 'week') {
+            return $this->recurring_times_week;
+        }
+        if ($this->recurring == 'year') {
+            return $this->recurring_times_year;
+        }
+    }
+
+    public function apply()
+    {
+        $now = Carbon::now();
+        if ($this->isToday($now)) {
+            if (!$this->createdBefore($now)) {
+                $user = $this->user;
+                if (!$user) return;
+
+                $userCurrencyId = $user->currency_id ?? $user->currency;
+                if (!$userCurrencyId) return;
+
+                // Convert amount to user's currency
+                $convertedAmount = CurrenciesExchange::RateToday($this->amount, $this->currency_id, $userCurrencyId);
+
+                DB::transaction(function () use ($user, $userCurrencyId, $convertedAmount, $now) {
+                    $invoice = new Invoice();
+                    $invoice->uuid = (string) Str::uuid();
+                    $invoice->user_id = $user->id;
+                    $invoice->currency_id = $userCurrencyId;
+                    $invoice->status = 'unpaid';
+                    $invoice->job_status = 'pending';
+                    $invoice->save();
+
+                    $item = new InvoiceItem();
+                    $item->invoice_id = $invoice->id;
+                    $item->item = $this->title;
+                    $item->description = 'Generated automatically by Recurring Invoice system';
+                    $item->qty = 1;
+                    $item->price = $convertedAmount;
+                    $item->save();
+
+                    $invoice->unpaid = $invoice->total();
+                    $invoice->save();
+
+                    DB::table('recurring_invoice_records')->insert([
+                        'recurring_invoice_id' => $this->id,
+                        'invoice_id' => $invoice->id,
+                        'unique_id' => $this->unique_id($now),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                });
+            }
+        }
+    }
+
+    private function unique_id($date)
+    {
+        if ($date instanceof Carbon) {
+            $d = $date->format('Y-m-d');
+        } else {
+            $d = date('Y-m-d', strtotime($date));
+        }
+        return $this->id . '-' . $d;
+    }
+
+    public function createdBefore($date)
+    {
+        $is_exist = DB::selectOne('select count(id) as is_exist_count from recurring_invoice_records where unique_id=?', [$this->unique_id($date)]);
+        return $is_exist->is_exist_count == 1;
+    }
+
+    public function isToday($date)
+    {
+        if ($this->recurring == 'day') {
+            $t = Carbon::parse($this->current_date);
+            $diff = $date->diffInDays($t);
+            if ($diff == 0) return true;
+            return $diff % max(1, $this->recurring_times) == 0;
+        }
+
+        if ($this->recurring == 'week') {
+            $t = Carbon::parse($this->current_date);
+            $diff = $date->diffInWeeks($t);
+            $days = explode(',', $this->recurring_times_week);
+
+            if ($diff % max(1, $this->recurring_times) == 0) {
+                return in_array(date('l', strtotime($date)), $days);
+            }
+        }
+
+        if ($this->recurring == 'month') {
+            $t = Carbon::parse($this->current_date);
+            $diff = $date->diffInMonths($t);
+            $days = explode(',', $this->recurring_times_month);
+
+            if ($diff % max(1, $this->recurring_times) == 0) {
+                if (date('n', strtotime($date)) == '2') {
+                    foreach ($days as $day) {
+                        if ($day > date('t', strtotime($date))) {
+                            return date('t', strtotime($date)) == date('d', strtotime($date));
+                        }
+                    }
+                }
+                return in_array(date('d', strtotime($date)), $days);
+            }
+        }
+
+        if ($this->recurring == 'year') {
+            $t = Carbon::parse($this->current_date);
+            $diff = $date->diffInYears($t);
+            $day_months = explode(',', $this->recurring_times_year);
+            if ($diff % max(1, $this->recurring_times) == 0) {
+                return in_array(date('j-n', strtotime($date)), $day_months);
+            }
+        }
+
+        return false;
+    }
+
+    public function delete_with_records()
+    {
+        $this->records()->delete();
+        $this->delete();
+    }
+}
