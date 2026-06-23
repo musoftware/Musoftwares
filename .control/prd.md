@@ -50,7 +50,7 @@ The following critical domains are currently missing or only partially implement
 - **Backend:** Laravel ^12.0, PHP ^8.4, `nwidart/laravel-modules` (Modular Monolith), Laravel Sanctum, Laravel Breeze, Laravel Socialite, Spatie Permissions/Model States, Laravel Reverb (WebSockets).
 - **Frontend:** React ^18.2.0, Inertia.js ^2.0 (SPA bridging), TypeScript ^5.0.2, Vite ^7.0.7, Tailwind CSS v4, Shadcn UI (`base-nova`), Zustand ^5.0.14, Recharts, React Flow, GSAP, Framer Motion.
 - **Data Layer:** Eloquent ORM (MySQL/PostgreSQL), Redis (Cache/Queue), Meilisearch (via Scout).
-- **Architecture Patterns:** Domain Driven Design (DDD), Service Layer, Repository Pattern, Action Classes, DTOs, Event Driven Architecture, and CQRS where appropriate. Folder Structure: `Domain/`, `Application/`, `Infrastructure/`, `Presentation/`. Domains must be kept isolated.
+- **Architecture Patterns:** Domain Driven Design (DDD), Service Layer, Repository Pattern, Action Classes, DTOs, Event Driven Architecture, and CQRS where appropriate. Folder Structure: `Domain/`, `Application/`, `Infrastructure/`, `Presentation/`. Domains must be kept isolated. Crucially, the ERP system must be fully separated from the Main System and other SaaS modules. Cross-module communication must happen exclusively via Laravel Events; direct model imports across boundaries are strictly prohibited.
 - **Data Primitives:** UUID Primary Keys, Soft Deletes, Audit Logs.
 
 ## 4. Core ERP Principles & Rules
@@ -87,6 +87,11 @@ The approval engine must be generic and work with Purchase Orders, Vendor Bills,
 
 ### 4.9. Calendar Rules
 - **Calendar:** Integrates with Tasks, Projects, Meetings, Leave Requests, and Approvals. Support Daily, Weekly, Monthly, and Agenda views.
+
+### 4.10. ERP System Separation & Independence
+- **Absolute Separation:** The ERP system must be fully separated from the Main System and other modules (e.g., Booking, CRM). It must operate as an independent SaaS product. Removing or disabling the ERP module must never break the Main System.
+- **Event-Driven Write Operations:** Write operations crossing module boundaries must occur exclusively via the Event Bus (Laravel Events). Never import or instantiate Main System models directly inside ERP Controllers, Services, or Commands.
+- **Defensive Read Pattern:** When displaying Main System data within the ERP (or vice versa), apply the Defensive Read Pattern strictly. This requires three guards: validating the module subscription (`hasModuleSubscription`), ensuring the module exists (`class_exists`), and wrapping the query in a `try/catch` block to prevent cascading crashes.
 
 ## 5. Comprehensive Route & Page Checklist
 
@@ -262,7 +267,7 @@ Then create an implementation plan and execute module by module.
 Build complete ERP business workflows and continue until the ERP reaches enterprise-grade completeness.
 
 ## 8. Missing Gaps & Edge Cases to Address
-- **ERP Integration:** Ensure ERP financial transactions perfectly sync with the Core wallet system without race conditions.
+- **ERP Integration:** Ensure ERP financial transactions perfectly sync with the Core wallet system without race conditions. This integration must adhere to the absolute separation rule, utilizing strictly event-driven communication to prevent tight coupling.
 - **Multi-Currency:** Dual-currency processing must be explicitly visible on all pricing and invoicing screens. Exchange rates must be cached but frequently updated.
 - **Tenant Data Isolation:** Global scopes must be strictly applied across all modules so tenant data never leaks.
 - **Soft Deletes Context:** Ensure related models (e.g., deleted employee) still render correctly in historical records (e.g., past payslips) without throwing 404s or null pointer exceptions.
