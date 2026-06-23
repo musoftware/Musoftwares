@@ -451,7 +451,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/contracts/ai/review', [\App\Http\Controllers\Admin\ContractAiController::class, 'review'])->name('contracts.ai.review');
 
     // Standalone Contracts
-    Route::resource('/contracts', \App\Http\Controllers\Admin\AdminContractController::class)->except(['destroy']);
+    Route::resource('/contracts', \App\Http\Controllers\Admin\AdminContractController::class);
     Route::resource('/contract-price-items', \App\Http\Controllers\Admin\ContractPriceItemController::class)->except(['create', 'show', 'edit']);
 
     // ── Admin Plans ───────────────────────────────────────────────

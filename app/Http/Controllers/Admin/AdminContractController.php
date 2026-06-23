@@ -127,4 +127,10 @@ class AdminContractController extends Controller
             'contract' => $contract
         ]);
     }
+
+    public function destroy(Contract $contract)
+    {
+        $contract->delete();
+        return redirect()->route('admin.contracts.index')->with('success', __('general.contract_deleted_successfully'));
+    }
 }
