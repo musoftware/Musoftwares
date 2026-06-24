@@ -129,12 +129,7 @@ Route::get('/fix-cities', function () {
     return 'Done';
 });
 
-// Team Auth Routes
-Route::middleware(['web'])->group(function () {
-    Route::get('erp/team/login', [\Modules\ERP\Http\Controllers\Team\TeamAuthController::class, 'showLogin'])->name('erp.team.login');
-    Route::post('erp/team/login', [\Modules\ERP\Http\Controllers\Team\TeamAuthController::class, 'login'])->name('erp.team.login.store');
-    Route::post('erp/team/logout', [\Modules\ERP\Http\Controllers\Team\TeamAuthController::class, 'logout'])->name('erp.team.logout');
-});
+
 
 /* // ERP Routes (Migrated to Modules/ERP/routes/web.php)
 Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp', 'erp.team.permissions'])->prefix('erp')->name('erp.')->group(function () {
@@ -495,21 +490,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::delete('settings/security/rate-limits/{id}', [\App\Http\Controllers\Admin\SecurityController::class, 'deleteRateLimit'])->name('settings.security.rate-limits.destroy');
 
 
-    // ── Freelance (Admin Control) ───────────────────────────────────
-    Route::prefix('freelance')->name('freelance.')->group(function () {
-        Route::post('skills/bulk', [\Modules\Freelance\Http\Controllers\Admin\FreelanceSkillController::class, 'bulkStore'])->name('skills.bulkStore');
-        Route::post('skills/{skill}/approve', [\Modules\Freelance\Http\Controllers\Admin\FreelanceSkillController::class, 'approve'])->name('skills.approve');
-        Route::post('skills/{skill}/reject', [\Modules\Freelance\Http\Controllers\Admin\FreelanceSkillController::class, 'reject'])->name('skills.reject');
-        Route::post('skills/block-user/{user}', [\Modules\Freelance\Http\Controllers\Admin\FreelanceSkillController::class, 'blockUser'])->name('skills.block-user');
-        Route::resource('skills', \Modules\Freelance\Http\Controllers\Admin\FreelanceSkillController::class)->except(['show']);
-        Route::resource('profiles', \Modules\Freelance\Http\Controllers\Admin\FreelanceProfileController::class)->except(['create', 'store', 'show']);
-        Route::resource('jobs', \Modules\Freelance\Http\Controllers\Admin\FreelanceJobController::class);
-        Route::post('jobs/{job}/status', [\Modules\Freelance\Http\Controllers\Admin\FreelanceJobController::class, 'updateStatus'])->name('jobs.status');
-        Route::post('jobs/{job}/force-refund', [\Modules\Freelance\Http\Controllers\Admin\FreelanceJobController::class, 'forceRefund'])->name('jobs.force-refund');
-        Route::resource('contracts', \Modules\Freelance\Http\Controllers\Admin\FreelanceContractController::class)->only(['index', 'show', 'destroy']);
-        Route::post('contracts/{contract}/status', [\Modules\Freelance\Http\Controllers\Admin\FreelanceContractController::class, 'updateStatus'])->name('contracts.status');
-        Route::resource('proposals', \Modules\Freelance\Http\Controllers\Admin\FreelanceProposalController::class)->only(['index', 'show', 'destroy']);
-    });
+
 
 
     // ── User Management (Full Admin Control) ────────────────────────
@@ -660,11 +641,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::post('/{resellerId}/users/{userId}/toggle-check', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'toggleSharingCheck'])->name('users.toggle-check');
     });
 
-    // ERP Oversight Admin Routes
-    Route::prefix('erp')->name('erp.')->group(function () {
-        Route::get('/', [\Modules\ERP\Http\Controllers\Admin\ERPAdminController::class, 'index'])->name('index');
-        Route::get('/{id}', [\Modules\ERP\Http\Controllers\Admin\ERPAdminController::class, 'show'])->name('show');
-    });
+
 
     // Admin Tasks List (platform checklist items)
     Route::get('/tasks/as_list', [\App\Http\Controllers\Admin\AdminTaskController::class, 'asList'])->name('tasks.as_list');
@@ -693,13 +670,7 @@ Route::get('/reseller/{token}', [\Modules\Tools\Http\Controllers\ResellerPortalC
     ->name('reseller.portal')
     ->withoutMiddleware([\Illuminate\Http\Middleware\FrameGuard::class]);
 
-// CRM Lead Capture Iframe Routes (No Auth required, allowed to be embedded)
-Route::get('/crm/embed/capture/{token}', [\Modules\CRM\Http\Controllers\LeadCaptureController::class, 'show'])
-    ->name('crm.embed.capture.show')
-    ->withoutMiddleware([\Illuminate\Http\Middleware\FrameGuard::class]);
-Route::post('/crm/embed/capture/{token}', [\Modules\CRM\Http\Controllers\LeadCaptureController::class, 'store'])
-    ->name('crm.embed.capture.store')
-    ->withoutMiddleware([\Illuminate\Http\Middleware\FrameGuard::class]);
+
 
 
 // Public SaaS Routes
@@ -857,14 +828,7 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::delete('/admin-notes/{note}', [\App\Http\Controllers\AdminNoteController::class, 'destroy']);
 });
 
-// New API routes for polling
-Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
-    // Route::get('/conversations', [\App\Http\Controllers\ConversationController::class, 'index']);
-    Route::get('/timer/{id}', [\Modules\ERP\Http\Controllers\TimerSessionController::class, 'show']);
 
-    // Activity Engine — widget API for dashboard feeds
-    // Route::get('/activity', [\App\Http\Controllers\ActivityController::class, 'feed'])->name('api.activity.feed');
-});
 
 // ── Activity Engine ───────────────────────────────────────────────────────────
 // The heartbeat of the iSAAS ecosystem. Full-page operational activity log.

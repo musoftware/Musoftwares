@@ -13,10 +13,10 @@ This document defines the core frontend architectural guidelines, strict coding 
 - **TypeScript 5.0**: Ensure strict typings across all files. Define precise interfaces for Inertia page props and component props. Avoid `any` types.
 - **Zustand**: Use Zustand for global state management. Keep stores modular and minimal. Do not use Redux or Context API for complex global state.
 
-## 2. Real-time Updates & Graceful Degradation
-- **WebSockets / SSE**: Implement real-time features (e.g., chat, tool runners, notifications) using WebSockets or Server-Sent Events.
-- **Reconnection Strategy**: Implement a robust reconnect backoff strategy for WebSockets/SSE.
-- **Graceful Degradation**: If socket connections fail, do not fail silently. Provide a clear, non-intrusive banner indicating "Reconnecting...". If real-time fails completely, degrade to graceful polling where appropriate to keep data relatively fresh without overloading the server.
+## 2. Real-time Updates & Data Fetching
+- **No WebSockets for SaaS**: The main hosting does not support WebSockets. Do not use WebSockets, SSE, or Pusher/Reverb for general SaaS features (ERP, CRM, Notifications).
+- **No Polling**: Do not implement automatic polling. If data needs to be updated, it must rely on manual user actions (e.g., page refresh, clicking a refresh button).
+- **Runtime Tools Exception**: WebSockets are strictly and exclusively used for **Runtime Tools**, where the Cloud UI connects to a local WebSocket server running on the user's machine.
 
 ## 3. Strict Git Workflow Rules (CRITICAL FOR AI AGENTS)
 Future AI agents MUST follow this strict git workflow:

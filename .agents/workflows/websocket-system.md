@@ -16,12 +16,11 @@ This skill automatically applies when you are:
 
 ## 1. System Topology & Strict Communication Flow
 The Frontend NEVER talks directly to workers.
-**Frontend -> Runtime API/WebSocket -> Runtime Agent (Orchestrator) -> Worker Process**
+**Frontend (Cloud UI) -> Local WebSocket Server -> Local Runtime Agent (Orchestrator) -> Worker Process**
 
-- **The Hub**: Laravel Reverb, Soketi, or Pusher.
-- **The Clients**:
-  - The Web Browser (React frontend receiving updates).
-  - The Local Runtime Agent (NodeJS daemon receiving commands and sending telemetry).
+- **The Hub (Local Server)**: The Local NodeJS daemon running on the user's PC acts as the WebSocket server (binding to localhost).
+- **The Client (Cloud UI)**: The Web Browser (React frontend served from the cloud) connects directly to the local WebSocket server to receive updates and send commands.
+- **No Cloud Middleware**: There is NO Laravel Reverb, Soketi, or Pusher in the middle. The cloud host does not support them.
 
 ## 2. Event Naming Conventions
 Always use a clear namespace:
