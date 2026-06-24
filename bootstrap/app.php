@@ -17,7 +17,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(\App\Http\Middleware\RemoveSecurityHeaders::class);
         $middleware->web(append: [
             'throttle:web',
-            \Modules\ERP\Http\Middleware\ShareTeamMemberSession::class,
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
             \App\Http\Middleware\EnforceFreelanceDomain::class,
@@ -48,7 +47,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'onboarding' => \App\Http\Middleware\EnsureOnboardingCompleted::class,
-            'erp.team.permissions' => \Modules\ERP\Http\Middleware\EnforceTeamMemberPermissions::class,
             'reseller.sharing' => \App\Http\Middleware\ResellerSharingGuard::class,
             'force.json' => \App\Http\Middleware\ForceJsonRequest::class,
             'embed' => \App\Http\Middleware\VerifyEmbedKey::class,

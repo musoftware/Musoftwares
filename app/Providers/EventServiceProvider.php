@@ -18,8 +18,6 @@ use App\Events\ProposalAccepted;
 use App\Events\ReferralCommissionEarned;
 use App\Events\MessageSent;
 use App\Events\TimerUpdated;
-use Modules\Booking\Events\BookingStatusChanged;
-use Modules\Booking\Listeners\SendBookingNotification;
 use App\Events\AmountReceived;
 use App\Events\CalculateReferralRegisteredEvent;
 use App\Events\SaaSLimitApproaching;
@@ -56,14 +54,7 @@ class EventServiceProvider extends ServiceProvider
         SaaSLimitApproaching::class    => [SaaSLimitListener::class],
         SaaSLimitReached::class        => [SaaSLimitReachedListener::class],
 
-        // Booking Custom Domain Events
-        \Modules\Booking\app\Features\CustomDomains\Events\BookingCustomDomainCreated::class => [ActivityEventListener::class],
-        \Modules\Booking\app\Features\CustomDomains\Events\BookingCustomDomainDeleted::class => [ActivityEventListener::class],
-        \Modules\Booking\app\Features\CustomDomains\Events\BookingCustomDomainFailed::class => [ActivityEventListener::class],
-        \Modules\Booking\app\Features\CustomDomains\Events\BookingCustomDomainPrimaryChanged::class => [ActivityEventListener::class],
-        \Modules\Booking\app\Features\CustomDomains\Events\BookingCustomDomainVerified::class => [ActivityEventListener::class],
-        \Modules\Booking\app\Features\PublicBooking\Events\BookingPagePublished::class => [ActivityEventListener::class],
-        \Modules\Booking\app\Features\PublicBooking\Events\BookingPageSettingsUpdated::class => [ActivityEventListener::class],
+
 
         // Marketplace
         MarketplaceOrderPlaced::class  => [ActivityEventListener::class],
@@ -76,11 +67,7 @@ class EventServiceProvider extends ServiceProvider
         MessageSent::class             => [ActivityEventListener::class],
         TimerUpdated::class            => [ActivityEventListener::class],
 
-        // Booking
-        BookingStatusChanged::class    => [
-            SendBookingNotification::class,
-            \Modules\Booking\app\Features\Analytics\Listeners\UpdateDailyMetricsListener::class,
-        ],
+
     ];
 
     public function boot(): void

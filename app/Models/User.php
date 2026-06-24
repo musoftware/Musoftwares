@@ -112,24 +112,6 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\Message::class, 'sender_id');
     }
 
-    public function freelanceSkills()
-    {
-        return $this->belongsToMany(\Modules\Freelance\Models\Skill::class, 'freelance_user_skills')
-            ->withTimestamps();
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function freelanceProfile()
-    {
-        return $this->hasOne(\Modules\Freelance\Models\FreelanceProfile::class, 'user_id');
-    }
-
-    public function skills()
-    {
-        return $this->hasMany(\Modules\Freelance\Models\UserSkill::class, 'user_id');
-    }
 
 
     public function deviceTokens()
@@ -157,15 +139,7 @@ class User extends Authenticatable
             $locked += $this->withdraw()->where('status', 'pending')->sum('amount');
         }
 
-        // 2. Active Freelance Contracts
-        if (class_exists(\Modules\Freelance\Models\Contract::class)) {
-            $contracts = \Modules\Freelance\Models\Contract::where('freelancer_id', $this->id)
-                ->where('status', 'active')
-                ->get();
-            foreach ($contracts as $contract) {
-                $locked += \App\Models\CurrenciesExchange::RateToday($contract->amount, $contract->currency_id, $this->currency_id);
-            }
-        }
+
 
         // 3. Pending invoices
         $unpaidInvoices = $this->invoices()
@@ -571,7 +545,7 @@ class User extends Authenticatable
      */
     public function isAdmin(): bool
     {
-        return in_array(strtolower($this->role ?? ''), ['admin', 'superadmin']);
+        return $this->hasRole(['super_admin', 'admin', 'superadmin', 'Admin']);
     }
 
     /**

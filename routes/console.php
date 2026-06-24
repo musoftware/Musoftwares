@@ -33,10 +33,3 @@ Schedule::command(\Modules\Fbmb\Console\ProcessPendingFbmbLookups::class)->every
 // Auto-complete delivered marketplace orders hourly
 Schedule::command(\App\Console\Commands\CompleteDeliveredMarketplaceOrders::class)->hourly();
 
-// Gold Savers Jobs
-Schedule::command(\Modules\GoldSavers\app\Console\Commands\FetchLocalGoldPrices::class)->hourly();
-Schedule::command(\Modules\GoldSavers\app\Console\Commands\FetchGlobalGoldPrices::class)->hourly();
-
-// Legacy Gold Commands
-Schedule::command(\App\Console\Commands\GoldPriceFetcher::class)->everySixHours();
-Schedule::command(\App\Console\Commands\GoldWorldPriceFetcher::class)->everySixHours();
