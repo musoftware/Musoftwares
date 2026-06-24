@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ERPLayout } from '@/Layouts/ERPLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { ArrowRightLeft, Plus } from 'lucide-react';
 import {
@@ -52,7 +52,7 @@ export default function StockTransferIndex({ transfers, warehouses }: { transfer
     };
 
     return (
-        <ERPLayout>
+        <ERPLayout title="Stock Transfers">
             <Head title="Stock Transfers" />
             <div className="space-y-6">
                 <div className="flex justify-between items-center">

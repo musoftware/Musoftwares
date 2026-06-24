@@ -14,7 +14,7 @@ class SupportTicketController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $isAdmin = $user->hasRole('admin');
+        $isAdmin = $user->isAdmin();
         
         $query = Ticket::with(['user', 'conversation.messages.sender']);
 
@@ -39,7 +39,7 @@ class SupportTicketController extends Controller
         ]);
 
         try {
-            $service->createTicket(Auth::user(), $validated, Auth::user()->hasRole('admin'));
+            $service->createTicket(Auth::user(), $validated, Auth::user()->isAdmin());
             return redirect()->back()->with('success', __('general.support_ticket_opened_successfully'));
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Failed to create ticket: ' . $e->getMessage()]);
@@ -52,7 +52,7 @@ class SupportTicketController extends Controller
         $user = Auth::user();
 
         // Authorize (only owner or admin)
-        $isAdmin = $user && ($user->hasRole(['admin', 'Admin']) || $user->roles->contains('name', 'Admin'));
+        $isAdmin = $user && $user->isAdmin();
         if (!$user || ($user->id !== $ticket->user_id && !$isAdmin)) {
             abort(403);
         }
@@ -67,7 +67,7 @@ class SupportTicketController extends Controller
         $ticket = Ticket::findOrFail($id);
         $user = Auth::user();
 
-        $isAdmin = $user && ($user->hasRole(['admin', 'Admin']) || $user->roles->contains('name', 'Admin'));
+        $isAdmin = $user && $user->isAdmin();
         if (!$user || ($user->id !== $ticket->user_id && !$isAdmin)) {
             abort(403);
         }
@@ -82,7 +82,7 @@ class SupportTicketController extends Controller
         $ticket = Ticket::findOrFail($id);
         $user = Auth::user();
 
-        $isAdmin = $user && ($user->hasRole(['admin', 'Admin']) || $user->roles->contains('name', 'Admin'));
+        $isAdmin = $user && $user->isAdmin();
         if (!$user || ($user->id !== $ticket->user_id && !$isAdmin)) {
             abort(403);
         }

@@ -258,8 +258,8 @@ class Invoice extends TenantAwareModel
             $this->processReferralCommissions();
 
             // Fire event
-            if (class_exists(\App\Events\InvoicePaid::class)) {
-                event(new \App\Events\InvoicePaid($this));
+            if (class_exists(\Modules\ERP\Events\InvoicePaid::class)) {
+                event(new \Modules\ERP\Events\InvoicePaid($this));
             }
 
             \Modules\ERP\Services\ActivityLogger::log(
@@ -336,8 +336,8 @@ class Invoice extends TenantAwareModel
             $this->processReferralCommissions();
 
             // Fire event
-            if (class_exists(\App\Events\InvoicePaid::class)) {
-                event(new \App\Events\InvoicePaid($this));
+            if (class_exists(\Modules\ERP\Events\InvoicePaid::class)) {
+                event(new \Modules\ERP\Events\InvoicePaid($this));
             }
 
             \Modules\ERP\Services\ActivityLogger::log(

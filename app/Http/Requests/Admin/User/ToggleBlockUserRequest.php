@@ -8,7 +8,7 @@ class ToggleBlockUserRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() && $this->user()->hasAnyRole(['admin', 'super_admin']);
+        return $this->user() && $this->user()->isAdmin();
     }
 
     public function rules(): array

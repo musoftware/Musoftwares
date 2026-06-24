@@ -157,7 +157,7 @@ class KycController extends Controller
         $document = KycDocument::findOrFail($id);
 
         // Security check (only owner or admin)
-        if ($document->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
+        if ($document->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
             abort(403);
         }
 

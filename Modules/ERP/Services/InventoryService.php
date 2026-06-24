@@ -84,6 +84,8 @@ class InventoryService
 
             $product->checkLowStock($oldQuantity);
 
+            event(new \Modules\ERP\Events\InventoryAdjusted($product, $changeAmount));
+
             return $product;
         });
     }

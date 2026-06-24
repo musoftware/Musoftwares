@@ -35,10 +35,16 @@ Route::middleware(['web', 'auth:erp_team', 'tenant.active', 'erp.team.permission
         Route::get('dashboard', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('dashboard');
 
         // ── Settings ──
+        // Route::get('settings/profile', [\Modules\ERP\Http\Controllers\Admin\TenantSettingsController::class, 'editProfile'])->name('settings.profile.edit');
         Route::put('settings', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'updateSettings'])->name('settings.update');
-        Route::get('settings/smtp', [\Modules\ERP\Http\Controllers\SmtpSettingController::class, 'edit'])->name('settings.smtp.edit');
-        Route::put('settings/smtp', [\Modules\ERP\Http\Controllers\SmtpSettingController::class, 'update'])->name('settings.smtp.update');
 
+        // ── Accounting ──
+        Route::prefix('accounting')->name('accounting.')->group(function () {
+            Route::resource('chart-of-accounts', \Modules\ERP\Http\Controllers\Accounting\ChartOfAccountController::class);
+            Route::resource('journal-entries', \Modules\ERP\Http\Controllers\Accounting\JournalEntryController::class);
+            Route::post('journal-entries/{journal_entry}/post', [\Modules\ERP\Http\Controllers\Accounting\JournalEntryController::class, 'post'])->name('journal-entries.post');
+            Route::resource('rules', \Modules\ERP\Http\Controllers\Accounting\AccountingRuleController::class);
+        });
 
         // ── Clients ──
         Route::get('clients', [\Modules\ERP\Http\Controllers\ClientController::class, 'index'])->name('clients.index');
@@ -66,16 +72,16 @@ Route::middleware(['web', 'auth:erp_team', 'tenant.active', 'erp.team.permission
         Route::get('transactions/{transaction}', [\Modules\ERP\Http\Controllers\TransactionController::class, 'show'])->name('transactions.show');
 
         // ── Tasks & Todos ──
-        Route::resource('tasks', \Modules\ERP\app\Features\Tasks\Controllers\TaskController::class);
-        Route::post('tasks/{task}/items', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'storeItem'])->name('tasks.items.store');
-        Route::put('tasks/{task}/items/{item}', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'updateItem'])->name('tasks.items.update');
-        Route::post('tasks/{task}/items/{item}/complete', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'completeItem'])->name('tasks.items.complete');
-        Route::post('tasks/{task}/items/sort', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'sortItems'])->name('tasks.items.sort');
-        Route::post('tasks/{task}/items/{item}/pause', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'pauseItem'])->name('tasks.items.pause');
-        Route::post('tasks/{task}/items/{item}/resume', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'resumeItem'])->name('tasks.items.resume');
-        Route::delete('tasks/{task}/items/{item}', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'destroyItem'])->name('tasks.items.destroy');
-        Route::post('tasks/{task}/comments', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'storeComment'])->name('tasks.comments.store');
-        Route::delete('tasks/{task}/comments/{comment}', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'destroyComment'])->name('tasks.comments.destroy');
+        Route::resource('tasks', \Modules\ERP\Http\Controllers\TaskController::class);
+        Route::post('tasks/{task}/items', [\Modules\ERP\Http\Controllers\TaskController::class, 'storeItem'])->name('tasks.items.store');
+        Route::put('tasks/{task}/items/{item}', [\Modules\ERP\Http\Controllers\TaskController::class, 'updateItem'])->name('tasks.items.update');
+        Route::post('tasks/{task}/items/{item}/complete', [\Modules\ERP\Http\Controllers\TaskController::class, 'completeItem'])->name('tasks.items.complete');
+        Route::post('tasks/{task}/items/sort', [\Modules\ERP\Http\Controllers\TaskController::class, 'sortItems'])->name('tasks.items.sort');
+        Route::post('tasks/{task}/items/{item}/pause', [\Modules\ERP\Http\Controllers\TaskController::class, 'pauseItem'])->name('tasks.items.pause');
+        Route::post('tasks/{task}/items/{item}/resume', [\Modules\ERP\Http\Controllers\TaskController::class, 'resumeItem'])->name('tasks.items.resume');
+        Route::delete('tasks/{task}/items/{item}', [\Modules\ERP\Http\Controllers\TaskController::class, 'destroyItem'])->name('tasks.items.destroy');
+        Route::post('tasks/{task}/comments', [\Modules\ERP\Http\Controllers\TaskController::class, 'storeComment'])->name('tasks.comments.store');
+        Route::delete('tasks/{task}/comments/{comment}', [\Modules\ERP\Http\Controllers\TaskController::class, 'destroyComment'])->name('tasks.comments.destroy');
 
         // ── Recurring Entries ──
         Route::resource('recurring', \Modules\ERP\Http\Controllers\RecurringController::class);
@@ -117,10 +123,6 @@ Route::middleware(['web', 'auth:erp_team', 'tenant.active', 'erp.team.permission
 
         // ── Calendar ──
         Route::get('calendar', [\Modules\ERP\app\Features\Calendar\Controllers\CalendarController::class, 'index'])->name('calendar.index');
-
-        // ── Storage Providers ──
-        Route::get('storage-providers/create', [\Modules\ERP\Http\Controllers\StorageProviderController::class, 'create'])->name('storage-providers.create');
-        Route::post('storage-providers', [\Modules\ERP\Http\Controllers\StorageProviderController::class, 'store'])->name('storage-providers.store');
         
         // ── Files ──
         Route::get('files', [\Modules\ERP\Http\Controllers\FileController::class, 'index'])->name('files.index');
@@ -167,6 +169,40 @@ Route::middleware(['web', 'auth:erp_team', 'tenant.active', 'erp.team.permission
         Route::get('inventory/categories', [\Modules\ERP\Http\Controllers\ProductCategoryController::class, 'index'])->name('inventory.categories.index');
         Route::post('inventory/categories', [\Modules\ERP\Http\Controllers\ProductCategoryController::class, 'store'])->name('inventory.categories.store');
         Route::delete('inventory/categories/{category}', [\Modules\ERP\Http\Controllers\ProductCategoryController::class, 'destroy'])->name('inventory.categories.destroy');
+
+        // ── Warehouse ──
+        Route::prefix('warehouse')->name('warehouse.')->group(function () {
+            Route::resource('warehouses', \Modules\ERP\Http\Controllers\Warehouse\WarehouseController::class);
+            Route::resource('transfers', \Modules\ERP\Http\Controllers\Warehouse\StockTransferController::class)->only(['index', 'store']);
+        });
+
+        // ── Procurement ──
+        Route::prefix('procurement')->name('procurement.')->group(function () {
+            Route::resource('suppliers', \Modules\ERP\Http\Controllers\Procurement\SupplierController::class);
+            Route::resource('purchase-orders', \Modules\ERP\Http\Controllers\Procurement\PurchaseOrderController::class);
+            Route::post('purchase-orders/{purchase_order}/approve', [\Modules\ERP\Http\Controllers\Procurement\PurchaseOrderController::class, 'approve'])->name('purchase-orders.approve');
+            Route::post('purchase-orders/{purchase_order}/receive', [\Modules\ERP\Http\Controllers\Procurement\PurchaseOrderController::class, 'receive'])->name('purchase-orders.receive');
+        });
+
+        // ── Tax Engine ──
+        Route::prefix('tax')->name('tax.')->group(function () {
+            Route::resource('rates', \Modules\ERP\Http\Controllers\Tax\TaxRateController::class);
+        });
+
+        // ── Asset Management ──
+        Route::prefix('assets')->name('assets.')->group(function () {
+            Route::resource('fixed-assets', \Modules\ERP\Http\Controllers\Asset\FixedAssetController::class);
+            Route::resource('categories', \Modules\ERP\Http\Controllers\Asset\AssetCategoryController::class)->only(['store', 'destroy']);
+        });
+
+        // ── Approval Engine ──
+        Route::prefix('approvals')->name('approvals.')->group(function () {
+            Route::resource('workflows', \Modules\ERP\Http\Controllers\Approval\WorkflowController::class);
+            Route::resource('requests', \Modules\ERP\Http\Controllers\Approval\ApprovalRequestController::class)->only(['index', 'show']);
+        });
+
+        // ── Calendar ──
+        Route::resource('calendar', \Modules\ERP\Http\Controllers\Calendar\CalendarEventController::class);
 
         // ── POS ──
         Route::get('pos', [\Modules\ERP\Http\Controllers\PosController::class, 'index'])->name('pos.index');

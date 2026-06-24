@@ -10,6 +10,7 @@ use Modules\GoldSavers\Http\Controllers\ReportsController;
 Route::middleware(['auth', 'verified'])->prefix('isaas/gold-savers')->name('isaas.gold-savers.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
     Route::get('/live-prices', [DashboardController::class, 'livePrices'])->name('live-prices');
+    Route::post('/live-prices/refresh', [DashboardController::class, 'refreshPrices'])->name('live-prices.refresh');
     
     Route::get('/market', [MarketController::class, 'index'])->name('market.index');
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');

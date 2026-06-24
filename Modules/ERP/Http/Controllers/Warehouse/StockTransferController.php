@@ -20,7 +20,7 @@ class StockTransferController extends Controller
 
     public function index(Request $request)
     {
-        $tenantId = tenant('id') ?? $request->user()->tenant_id;
+        $tenantId = $request->user()->tenant_id;
 
         $transfers = StockTransfer::where('tenant_id', $tenantId)
             ->with(['fromWarehouse', 'toWarehouse'])
@@ -45,7 +45,7 @@ class StockTransferController extends Controller
             'notes' => 'nullable|string'
         ]);
 
-        $tenantId = tenant('id') ?? $request->user()->tenant_id;
+        $tenantId = $request->user()->tenant_id;
 
         try {
             $this->warehouseService->initiateTransfer(

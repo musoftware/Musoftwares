@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ERPLayout } from '@/Layouts/ERPLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { Monitor, Plus, Edit2, Trash2 } from 'lucide-react';
 import {
@@ -75,7 +75,7 @@ export default function FixedAssetIndex({ assets, categories }: { assets: any[],
     };
 
     return (
-        <ERPLayout>
+        <ERPLayout title="Fixed Assets">
             <Head title="Fixed Assets" />
             <div className="space-y-6">
                 <div className="flex justify-between items-center">

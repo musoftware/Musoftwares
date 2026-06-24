@@ -11,7 +11,7 @@ class WorkflowController extends Controller
 {
     public function index(Request $request)
     {
-        $tenantId = tenant('id') ?? $request->user()->tenant_id;
+        $tenantId = $request->user()->tenant_id;
 
         $workflows = WorkflowDefinition::where('tenant_id', $tenantId)
             ->with('steps')
@@ -32,7 +32,7 @@ class WorkflowController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $tenantId = tenant('id') ?? $request->user()->tenant_id;
+        $tenantId = $request->user()->tenant_id;
 
         WorkflowDefinition::create([
             'tenant_id' => $tenantId,

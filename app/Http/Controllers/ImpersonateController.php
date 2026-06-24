@@ -9,7 +9,7 @@ class ImpersonateController extends Controller
 {
     public function impersonate(Request $request, $id)
     {
-        if (!$request->user()->hasRole('admin')) {
+        if (!$request->user()->isAdmin()) {
             abort(403, __('general.only_admins_can_impersonate_users'));
         }
 

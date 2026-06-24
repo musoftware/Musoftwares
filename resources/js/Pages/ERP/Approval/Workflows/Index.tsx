@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ERPLayout } from '@/Layouts/ERPLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { CheckSquare, Plus, Edit2, Trash2 } from 'lucide-react';
 import {
@@ -50,7 +50,7 @@ export default function WorkflowIndex({ workflows }: { workflows: any[] }) {
     };
 
     return (
-        <ERPLayout>
+        <ERPLayout title="Workflows">
             <Head title="Workflows" />
             <div className="space-y-6">
                 <div className="flex justify-between items-center">

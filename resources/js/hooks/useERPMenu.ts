@@ -23,6 +23,12 @@ import {
     Building2,
     MonitorSmartphone,
     MonitorPlay,
+    ArrowRightLeft,
+    Percent,
+    Monitor,
+    Workflow,
+    ShoppingCart,
+    Truck,
 } from 'lucide-react';
 
 interface MenuItem {
@@ -71,10 +77,20 @@ export function useERPMenu(
         { id: 'pos', label: 'POS System', icon: MonitorSmartphone },
         { id: 'transactions', label: 'Transactions', icon: History },
         { id: 'expenses', label: 'Expenses', icon: Receipt },
+        { id: 'accounting-chart', label: 'Chart of Accounts', icon: Banknote },
+        { id: 'accounting-journals', label: 'Journal Entries', icon: FileText },
+        { id: 'accounting-rules', label: 'Accounting Rules', icon: Settings },
+        { id: 'tax-rates', label: 'Tax Settings', icon: Percent },
         { id: 'referrals', label: 'Referrals', icon: Users },
         { id: 'branches', label: 'Branches', icon: Building2 },
         { id: 'inventory', label: 'Inventory', icon: Package },
-        { id: 'documents', label: 'Files', icon: Folder },
+        { id: 'warehouse', label: 'Warehouses', icon: Building2 },
+        { id: 'warehouse-transfers', label: 'Stock Transfers', icon: ArrowRightLeft },
+        { id: 'procurement-suppliers', label: 'Suppliers', icon: Truck },
+        { id: 'procurement-orders', label: 'Purchase Orders', icon: ShoppingCart },
+        { id: 'fixed-assets', label: 'Fixed Assets', icon: Monitor },
+        { id: 'approval-workflows', label: 'Workflows', icon: Workflow },
+        { id: 'pending-approvals', label: 'Approvals', icon: CheckSquare },
         { id: 'notes', label: 'Notes', icon: Pin },
         { id: 'calendar', label: 'Calendar', icon: Calendar },
         { id: 'team', label: 'Team', icon: UserCheck },
@@ -116,8 +132,14 @@ export function useERPMenu(
                 if (item.id === 'team' && role !== 'account_manager' && role !== 'branch_manager') {
                     return false;
                 }
+                // Approvals
+                if (['approval-workflows', 'pending-approvals'].includes(item.id)) {
+                    if (!['branch_manager', 'account_manager', 'sales_manager'].includes(role)) {
+                        return false;
+                    }
+                }
                 // Financials
-                const isFinancial = ['invoices', 'transactions', 'expenses', 'referrals'].includes(item.id);
+                const isFinancial = ['invoices', 'transactions', 'expenses', 'referrals', 'accounting-chart', 'accounting-journals', 'accounting-rules', 'tax-rates'].includes(item.id);
                 if (isFinancial) {
                     if (!['account_manager', 'sales_manager', 'branch_manager'].includes(role)) {
                         if (role === 'sales_agent' && item.id === 'invoices') {
@@ -127,8 +149,8 @@ export function useERPMenu(
                         }
                     }
                 }
-                // Inventory & POS
-                const isInventory = ['inventory', 'pos'].includes(item.id);
+                // Inventory & POS & Assets & Procurement
+                const isInventory = ['inventory', 'pos', 'warehouse', 'warehouse-transfers', 'fixed-assets', 'procurement-suppliers', 'procurement-orders'].includes(item.id);
                 if (isInventory) {
                     if (!['branch_manager', 'sales_manager', 'sales_agent', 'account_manager'].includes(role)) {
                         return false;
@@ -177,7 +199,31 @@ export function useERPMenu(
                         ? route('erp.pos.index')
                         : m.id === 'branches'
                           ? route('erp.branches.index')
-                          : route('erp.dashboard', { section: m.id }),
+                          : m.id === 'accounting-chart'
+                            ? route('erp.accounting.chart-of-accounts.index')
+                            : m.id === 'accounting-journals'
+                              ? route('erp.accounting.journal-entries.index')
+                              : m.id === 'accounting-rules'
+                                ? route('erp.accounting.rules.index')
+                                : m.id === 'tax-rates'
+                                  ? route('erp.tax.rates.index')
+                                  : m.id === 'warehouse'
+                                    ? route('erp.warehouse.warehouses.index')
+                                    : m.id === 'warehouse-transfers'
+                                      ? route('erp.warehouse.transfers.index')
+                                      : m.id === 'fixed-assets'
+                                        ? route('erp.assets.fixed-assets.index')
+                                        : m.id === 'procurement-suppliers'
+                                          ? route('erp.procurement.suppliers.index')
+                                          : m.id === 'procurement-orders'
+                                            ? route('erp.procurement.purchase-orders.index')
+                                            : m.id === 'approval-workflows'
+                                          ? route('erp.approvals.workflows.index')
+                                          : m.id === 'pending-approvals'
+                                            ? route('erp.approvals.requests.index')
+                                            : m.id === 'calendar'
+                                              ? route('erp.calendar.index')
+                                              : route('erp.dashboard', { section: m.id }),
     }));
 
     // Build locked addon items — only show addons the user DOESN'T have

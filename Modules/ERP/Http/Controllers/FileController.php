@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantFile;
-use Modules\ERP\Models\TenantStorageProvider;
 use Modules\ERP\Services\ActivityLogger;
 
 class FileController extends Controller
@@ -59,7 +58,7 @@ class FileController extends Controller
                     ];
                 });
 
-            $storageProviders = TenantStorageProvider::where('tenant_id', $tenant->id)->get();
+            $storageProviders = collect();
         }
 
         return inertia('ERP/Files/Index', [
@@ -84,7 +83,7 @@ class FileController extends Controller
             return back()->withErrors(['error' => __('errors.no_active_workspace')]);
         }
 
-        $provider = TenantStorageProvider::where('tenant_id', $tenant->id)->where('is_default', true)->first();
+        $provider = null;
         if (!$provider) {
             return back()->withErrors(['error' => __('errors.configure_storage_provider')]);
         }

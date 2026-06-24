@@ -11,7 +11,7 @@ class TaxRateController extends Controller
 {
     public function index(Request $request)
     {
-        $tenantId = tenant('id') ?? $request->user()->tenant_id;
+        $tenantId = $request->user()->tenant_id;
 
         $rates = TaxRate::where('tenant_id', $tenantId)->latest()->get();
 
@@ -30,7 +30,7 @@ class TaxRateController extends Controller
             'is_active' => 'boolean'
         ]);
 
-        $tenantId = tenant('id') ?? $request->user()->tenant_id;
+        $tenantId = $request->user()->tenant_id;
 
         TaxRate::create([
             'tenant_id' => $tenantId,

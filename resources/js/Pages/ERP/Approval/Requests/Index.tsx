@@ -1,5 +1,5 @@
 import React from 'react';
-import { ERPLayout } from '@/Layouts/ERPLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
 import { Head, Link } from '@inertiajs/react';
 import {
     Card,
@@ -20,7 +20,7 @@ import { ArrowRight } from 'lucide-react';
 
 export default function ApprovalRequestIndex({ requests }: { requests: any[] }) {
     return (
-        <ERPLayout>
+        <ERPLayout title="Approval Requests">
             <Head title="Pending Approvals" />
             <div className="space-y-6">
                 <div>

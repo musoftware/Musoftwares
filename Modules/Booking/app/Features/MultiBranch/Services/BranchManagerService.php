@@ -2,7 +2,7 @@
 
 namespace Modules\Booking\app\Features\MultiBranch\Services;
 
-use Modules\Booking\app\Features\MultiBranch\Models\BookingBranch;
+use Modules\Booking\Models\BookingBranch;
 use Modules\Booking\app\Features\MultiBranch\Events\BranchStaffAssigned;
 
 class BranchManagerService
@@ -44,3 +44,4 @@ class BranchManagerService
         return $branch->users()->where('user_id', $userId)->exists();
     }
 }
+

@@ -15,6 +15,10 @@ class CalculateReferralRegisteredEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $user;
+    public $referral;
+    public $ip;
+
     /**
      * Create a new event instance.
      *
@@ -23,6 +27,10 @@ class CalculateReferralRegisteredEvent
     /** @phpstan-ignore-next-line */
     public function __construct($user, $referral, $ip)
     {
+        $this->user = $user;
+        $this->referral = $referral;
+        $this->ip = $ip;
+
         if (isset($referral) && $referral !== '') {
             $get_ref = \App\Helper\ReferralHelper::GetRef($referral);
             if ($get_ref !== null) {

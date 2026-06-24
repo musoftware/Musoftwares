@@ -570,6 +570,15 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if the user is an admin.
+     * Consolidates various role casings used across the application to ensure DRY.
+     */
+    public function isAdmin(): bool
+    {
+        return in_array(strtolower($this->role ?? ''), ['admin', 'superadmin']);
+    }
+
+    /**
      * Send the password reset notification.
      *
      * @param  string  $token

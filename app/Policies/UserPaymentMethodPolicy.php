@@ -11,7 +11,7 @@ class UserPaymentMethodPolicy
 
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->hasRole(['super_admin', 'admin', 'superadmin', 'Admin'])) {
+        if ($user->isAdmin()) {
             return true;
         }
         return null;

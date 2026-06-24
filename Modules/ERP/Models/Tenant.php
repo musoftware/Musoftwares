@@ -49,10 +49,6 @@ class Tenant extends Model
         return $this->hasMany(TeamMember::class);
     }
 
-    public function smtpSetting()
-    {
-        return $this->hasOne(SmtpSetting::class, 'tenant_id');
-    }
 
     public function baseCurrency()
     {

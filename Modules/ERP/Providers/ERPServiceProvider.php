@@ -43,6 +43,11 @@ class ERPServiceProvider extends ServiceProvider
             );
         }
 
+        // Accounting Events
+        Event::listen(\App\Events\InvoicePaid::class, [\Modules\ERP\Listeners\AccountingListener::class, 'handle']);
+        Event::listen(\App\Events\WalletCredited::class, [\Modules\ERP\Listeners\AccountingListener::class, 'handle']);
+        Event::listen(\App\Events\WalletDebited::class, [\Modules\ERP\Listeners\AccountingListener::class, 'handle']);
+
         $this->registerExceptionRenderers();
     }
 

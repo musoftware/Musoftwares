@@ -24,16 +24,16 @@ class CouponPolicy
 
     public function create(User $user)
     {
-        return $user->hasRole('admin') || $user->hasRole('super_admin');
+        return $user->isAdmin();
     }
 
     public function update(User $user, Coupon $coupon)
     {
-        return $user->hasRole('admin') || $user->hasRole('super_admin');
+        return $user->isAdmin();
     }
 
     public function delete(User $user, Coupon $coupon)
     {
-        return $user->hasRole('admin') || $user->hasRole('super_admin');
+        return $user->isAdmin();
     }
 }

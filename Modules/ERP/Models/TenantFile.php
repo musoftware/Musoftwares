@@ -33,10 +33,6 @@ class TenantFile extends TenantAwareModel
         return $this->belongsTo(Tenant::class);
     }
 
-    public function storageProvider()
-    {
-        return $this->belongsTo(TenantStorageProvider::class);
-    }
 
     public function uploader()
     {

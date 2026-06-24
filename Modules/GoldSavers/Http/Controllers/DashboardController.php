@@ -104,4 +104,17 @@ class DashboardController extends Controller
         if (!$old || $old == 0) return 0;
         return round((($new - $old) / $old) * 100, 2);
     }
+
+    public function refreshPrices()
+    {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('gold:fetch-local');
+            \Illuminate\Support\Facades\Artisan::call('gold:fetch-global');
+            \Illuminate\Support\Facades\Artisan::call('gold_price:fetcher');
+            \Illuminate\Support\Facades\Artisan::call('gold_world_price:fetcher');
+            return redirect()->back()->with('success', __('Prices refreshed successfully'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', __('Failed to refresh prices'));
+        }
+    }
 }

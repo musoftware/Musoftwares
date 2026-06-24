@@ -173,7 +173,7 @@ class InvoiceController extends Controller
         $hasReferrals = $user && $user->hasModuleSubscription('erp-referrals');
         $hasSmtpAddon = $user && $user->hasModuleSubscription('erp-smtp');
         $tenant = $invoice->tenant;
-        $hasSmtpSettings = $tenant && $tenant->smtpSetting && $tenant->smtpSetting->host && $tenant->smtpSetting->username;
+        $hasSmtpSettings = false;
 
         return Inertia::render('ERP/Invoices/Show', [
             'invoice' => $invoice,
@@ -267,10 +267,10 @@ class InvoiceController extends Controller
             abort(403, __('errors.erp_smtp_addon_required'));
         }
 
-        $smtpSetting = $tenant->smtpSetting;
-        if (!$smtpSetting || !$smtpSetting->host || !$smtpSetting->username) {
-            return back()->withErrors(['email' => __('errors.smtp_settings_not_configured')]);
-        }
+        // SMTP settings have been removed.
+        // if (!$smtpSetting || !$smtpSetting->host || !$smtpSetting->username) {
+        //     return back()->withErrors(['email' => __('errors.smtp_settings_not_configured')]);
+        // }
 
         // Normally, you would dynamically configure the mailer here and dispatch a Job/Mailable.
         // For example: Config::set('mail.mailers.smtp.host', $smtpSetting->host);

@@ -7,7 +7,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Modules\Booking\app\Features\MultiBranch\Models\BookingBranch;
+use Modules\Booking\Models\BookingBranch;
 
 class BookingBranchUpdated implements ShouldBroadcast
 {
@@ -30,3 +30,4 @@ class BookingBranchUpdated implements ShouldBroadcast
         return 'branch.updated';
     }
 }
+

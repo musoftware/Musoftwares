@@ -12,7 +12,7 @@ class WarehouseController extends Controller
 {
     public function index(Request $request)
     {
-        $tenantId = tenant('id') ?? $request->user()->tenant_id;
+        $tenantId = $request->user()->tenant_id;
 
         $warehouses = Warehouse::where('tenant_id', $tenantId)
             ->withCount(['zones', 'stockTransfersFrom', 'stockTransfersTo'])
@@ -34,7 +34,7 @@ class WarehouseController extends Controller
             'is_active' => 'boolean'
         ]);
 
-        $tenantId = tenant('id') ?? $request->user()->tenant_id;
+        $tenantId = $request->user()->tenant_id;
 
         Warehouse::create([
             'tenant_id' => $tenantId,

@@ -101,7 +101,7 @@
     {
         "id": "P3T3",
         "name": "Merge Fragmented Domain Logic & Remove Exact Duplicates",
-        "status": "running",
+        "status": "done",
         "dependencies": [
             "Phase3"
         ]
@@ -109,7 +109,7 @@
     {
         "id": "Phase4",
         "name": "Phase 4: Event-Driven Architecture & Accounting Activation",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "P3T1",
             "P3T2",
@@ -119,7 +119,7 @@
     {
         "id": "P4T1",
         "name": "Create Listeners for Ghost Events",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Phase4"
         ]
@@ -127,7 +127,7 @@
     {
         "id": "P4T2",
         "name": "Develop AccountingService for Double-Entry Ledger",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Phase4"
         ]
@@ -135,7 +135,7 @@
     {
         "id": "P4T3",
         "name": "Implement Core Domain Events: InvoiceCreated, etc.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Phase4"
         ]
@@ -143,7 +143,7 @@
     {
         "id": "Phase5",
         "name": "Phase 5: Scaffold Missing ERP Domains",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "P4T1",
             "P4T2",
@@ -153,7 +153,7 @@
     {
         "id": "P5_Procurement",
         "name": "Procurement: Suppliers, POs, Receipts, Vendor Bills",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Phase5"
         ]
@@ -161,7 +161,7 @@
     {
         "id": "P5_Accounting",
         "name": "Accounting: Chart Of Accounts, Ledger, Journals",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Phase5"
         ]
@@ -169,7 +169,7 @@
     {
         "id": "P5_Warehouse",
         "name": "Warehouse: Zones, Bins, Transfers, Counts",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Phase5"
         ]
@@ -177,7 +177,7 @@
     {
         "id": "P5_Tax",
         "name": "Tax Engine: Rates, Rules, Calculators",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Phase5"
         ]
@@ -185,7 +185,7 @@
     {
         "id": "P5_Asset",
         "name": "Asset Management: Fixed Assets, Depreciation",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Phase5"
         ]
@@ -193,23 +193,15 @@
     {
         "id": "P5_Approval",
         "name": "Approval Engine: Workflows, Steps, Escalations",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
             "Phase5"
         ]
     },
     {
         "id": "P5_Calendar",
-        "name": "Calendar: Events, Meetings, Scheduling",
-        "status": "pending",
-        "dependencies": [
-            "Phase5"
-        ]
-    },
-    {
-        "id": "P5_OCR",
-        "name": "OCR: Documents, Invoice Extraction",
-        "status": "pending",
+        "name": "Calendar & Scheduling: Events, Resources",
+        "status": "done",
         "dependencies": [
             "Phase5"
         ]

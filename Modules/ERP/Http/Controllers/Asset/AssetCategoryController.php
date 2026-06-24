@@ -17,7 +17,7 @@ class AssetCategoryController extends Controller
             'useful_life_years' => 'nullable|integer|min:1',
         ]);
 
-        $tenantId = tenant('id') ?? $request->user()->tenant_id;
+        $tenantId = $request->user()->tenant_id;
 
         AssetCategory::create([
             'tenant_id' => $tenantId,

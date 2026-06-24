@@ -28,9 +28,28 @@ use Modules\ERP\Services\TaskService;
  * 4. Both admin and client can mark todos complete
  * 5. Paid todos (is_paid=true) cannot be deleted
  */
-class TaskController extends Controller
+class TaskController extends Controller implements \Illuminate\Routing\Controllers\HasMiddleware
 {
     protected $taskService;
+
+    public static function middleware(): array
+    {
+        return [
+            new \Illuminate\Routing\Controllers\Middleware(function ($request, \Closure $next) {
+                $user = auth('erp_team')->user();
+                if (Auth::guard('erp_team')->check()) {
+                    $user = Auth::guard('erp_team')->user()->tenant->user;
+                }
+                if (!$user || !$user->hasModuleSubscription('erp-tasks')) {
+                    if ($request->expectsJson() || $request->is('api/*')) {
+                        return response()->json(['message' => 'Tasks addon required.'], 403);
+                    }
+                    return Inertia::render('ERP/UpgradePreview', ['module' => 'erp-tasks']);
+                }
+                return $next($request);
+            }),
+        ];
+    }
 
     public function __construct(TaskService $taskService)
     {

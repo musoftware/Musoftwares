@@ -2056,3 +2056,6 @@ Never stop at CRUD.
 Build complete ERP business workflows.
 
 Continue until the ERP reaches enterprise-grade completeness.
+
+### New Feature Request
+Ensure ERP System fully seperated from Main System

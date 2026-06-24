@@ -10,7 +10,7 @@ class UpdateSerialUserDeviceStatusRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() && $this->user()->hasAnyRole(['admin', 'super_admin', 'Admin', 'superadmin']);
+        return $this->user() && $this->user()->isAdmin();
     }
 
     public function rules(): array

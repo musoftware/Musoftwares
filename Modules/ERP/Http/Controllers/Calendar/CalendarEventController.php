@@ -11,7 +11,7 @@ class CalendarEventController extends Controller
 {
     public function index(Request $request)
     {
-        $tenantId = tenant('id') ?? $request->user()->tenant_id;
+        $tenantId = $request->user()->tenant_id;
 
         $events = CalendarEvent::where('tenant_id', $tenantId)
             ->with(['creator', 'meeting'])
@@ -45,7 +45,7 @@ class CalendarEventController extends Controller
             'type' => 'required|string',
         ]);
 
-        $tenantId = tenant('id') ?? $request->user()->tenant_id;
+        $tenantId = $request->user()->tenant_id;
 
         CalendarEvent::create([
             'tenant_id' => $tenantId,

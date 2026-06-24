@@ -1,5 +1,5 @@
 import React from 'react';
-import { ERPLayout } from '@/Layouts/ERPLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
 import { Head, Link } from '@inertiajs/react';
 import {
     Card,
@@ -13,7 +13,7 @@ import { CheckCircle, XCircle } from 'lucide-react';
 
 export default function ApprovalRequestShow({ approvalRequest }: { approvalRequest: any }) {
     return (
-        <ERPLayout>
+        <ERPLayout title="Request Details">
             <Head title={`Approval Request: ${approvalRequest.id}`} />
             <div className="space-y-6">
                 <div className="flex justify-between items-center">

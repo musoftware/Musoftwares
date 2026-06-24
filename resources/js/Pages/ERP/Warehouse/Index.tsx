@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ERPLayout } from '@/Layouts/ERPLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { Warehouse, Plus, Edit2, Trash2 } from 'lucide-react';
 import {
@@ -63,7 +63,7 @@ export default function WarehouseIndex({ warehouses }: { warehouses: WarehouseDa
     };
 
     return (
-        <ERPLayout>
+        <ERPLayout title="Warehouses">
             <Head title="Warehouses" />
             <div className="space-y-6">
                 <div className="flex justify-between items-center">

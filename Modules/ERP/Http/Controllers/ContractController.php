@@ -44,6 +44,10 @@ class ContractController extends Controller
         
         $contract->save();
 
+        if ($contract->status === 'Active') {
+            event(new \Modules\ERP\Events\ContractSigned($contract));
+        }
+
         return back()->with('success', __('erp.contract_created_success'));
     }
 }

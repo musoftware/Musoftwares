@@ -7,7 +7,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Messages\BroadcastMessage;
-use Modules\Booking\app\Features\MultiBranch\Models\BookingBranch;
+use Modules\Booking\Models\BookingBranch;
 
 class YouWereAssignedToBranch extends Notification implements ShouldQueue
 {
@@ -44,3 +44,4 @@ class YouWereAssignedToBranch extends Notification implements ShouldQueue
         ]);
     }
 }
+

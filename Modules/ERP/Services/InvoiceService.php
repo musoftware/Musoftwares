@@ -121,6 +121,8 @@ class InvoiceService
                 workspace: 'erp'
             );
 
+            event(new \Modules\ERP\Events\InvoiceCreated($invoice));
+
             return $invoice;
         });
     }

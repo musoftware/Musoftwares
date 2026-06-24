@@ -6,6 +6,7 @@ namespace Modules\GoldSavers\Models;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class GoldTransaction extends Model
 {
@@ -33,5 +34,17 @@ class GoldTransaction extends Model
     public function wallet()
     {
         return $this->belongsTo(GoldWallet::class, 'wallet_id');
+    }
+
+    protected function type(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                $val = strtolower(trim((string) $value));
+                if ($val === '1') return 'buy';
+                if ($val === '2') return 'sell';
+                return $val;
+            }
+        );
     }
 }

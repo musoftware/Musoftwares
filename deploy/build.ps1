@@ -77,7 +77,10 @@ if ($LASTEXITCODE -ne 0) {
 
 # 2. Local Build
 Write-Host "[2/5] Running local npm build..." -ForegroundColor Yellow
+$originalPath = $env:PATH
+$env:PATH = "C:\tools\php83;" + $env:PATH
 cmd.exe /c "npm run build"
+$env:PATH = $originalPath
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Error in local build! Upload aborted." -ForegroundColor Red
     exit 1

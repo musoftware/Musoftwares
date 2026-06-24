@@ -53,7 +53,7 @@ class FileHelper
         if (Str::startsWith($id, 'file')) {
             return User::query()->find($user_id)->files()->find(str_replace('file', '', $id));
         } else {
-            if (\Illuminate\Support\Facades\Auth::user()->hasRole('admin')) {
+            if (\Illuminate\Support\Facades\Auth::user()->isAdmin()) {
                 if (Str::startsWith(str_replace('folder', '', $id), 'usr-')){
                     $n_user_id = str_replace('folderusr-', '', $id);
                     return User::query()->find($n_user_id)->fileFolders()->whereNull('folder_id')->get();

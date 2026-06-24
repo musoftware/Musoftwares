@@ -42,7 +42,7 @@ class ConversationController extends Controller
 
         // Security check: user must be a participant or admin
         $isParticipant = $conversation->participants()->where('user_id', $user->id)->exists();
-        if (!$isParticipant && !$user->hasRole('admin')) {
+        if (!$isParticipant && !$user->isAdmin()) {
             abort(403, 'Unauthorized');
         }
 
@@ -67,7 +67,7 @@ class ConversationController extends Controller
 
         // Security check: user must be a participant or admin
         $isParticipant = $conversation->participants()->where('user_id', $user->id)->exists();
-        if (!$isParticipant && !$user->hasRole('admin')) {
+        if (!$isParticipant && !$user->isAdmin()) {
             abort(403, 'Unauthorized');
         }
 

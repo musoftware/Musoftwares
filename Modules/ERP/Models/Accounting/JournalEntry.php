@@ -13,7 +13,7 @@ class JournalEntry extends TenantAwareModel
     protected $table = 'erp_journal_entries';
     protected $guarded = [];
 
-    public function lines()
+    public function lines(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(JournalEntryLine::class);
     }

@@ -2,7 +2,7 @@
 
 namespace Modules\Booking\app\Features\MultiBranch\Repositories;
 
-use Modules\Booking\app\Features\MultiBranch\Models\BookingBranch;
+use Modules\Booking\Models\BookingBranch;
 
 class BookingBranchRepository
 {
@@ -32,3 +32,4 @@ class BookingBranchRepository
         return $branch->delete();
     }
 }
+

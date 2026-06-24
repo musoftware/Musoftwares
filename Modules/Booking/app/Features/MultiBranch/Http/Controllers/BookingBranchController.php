@@ -11,7 +11,7 @@ use Modules\Booking\app\Features\MultiBranch\Events\BookingBranchCreated;
 use Modules\Booking\app\Features\MultiBranch\Events\BookingBranchUpdated;
 use Modules\Booking\app\Features\MultiBranch\Events\BookingBranchDeleted;
 use Modules\Booking\app\Features\MultiBranch\Http\Resources\BookingBranchResource;
-use Modules\Booking\app\Features\MultiBranch\Models\BookingBranch;
+use Modules\Booking\Models\BookingBranch;
 
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -88,3 +88,4 @@ class BookingBranchController extends Controller implements HasMiddleware
         return response()->json(null, 204);
     }
 }
+

@@ -11,7 +11,7 @@ class ApprovalRequestController extends Controller
 {
     public function index(Request $request)
     {
-        $tenantId = tenant('id') ?? $request->user()->tenant_id;
+        $tenantId = $request->user()->tenant_id;
 
         $requests = ApprovalRequest::where('tenant_id', $tenantId)
             ->with(['workflowDefinition', 'requester'])

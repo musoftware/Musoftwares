@@ -12,7 +12,7 @@ class FixedAssetController extends Controller
 {
     public function index(Request $request)
     {
-        $tenantId = tenant('id') ?? $request->user()->tenant_id;
+        $tenantId = $request->user()->tenant_id;
 
         $assets = FixedAsset::where('tenant_id', $tenantId)
             ->with(['category', 'assignee'])
@@ -41,7 +41,7 @@ class FixedAssetController extends Controller
             'status' => 'required|string'
         ]);
 
-        $tenantId = tenant('id') ?? $request->user()->tenant_id;
+        $tenantId = $request->user()->tenant_id;
 
         FixedAsset::create([
             'tenant_id' => $tenantId,

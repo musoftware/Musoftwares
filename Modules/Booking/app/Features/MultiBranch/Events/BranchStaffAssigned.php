@@ -7,7 +7,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Modules\Booking\app\Features\MultiBranch\Models\BookingBranch;
+use Modules\Booking\Models\BookingBranch;
 
 class BranchStaffAssigned implements ShouldBroadcast
 {
@@ -37,3 +37,4 @@ class BranchStaffAssigned implements ShouldBroadcast
         return 'branch.staff.assigned';
     }
 }
+

@@ -3,7 +3,7 @@
 namespace Modules\Booking\app\Features\MultiBranch\Policies;
 
 use App\Models\User;
-use Modules\Booking\app\Features\MultiBranch\Models\BookingBranch;
+use Modules\Booking\Models\BookingBranch;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class BookingBranchPolicy
@@ -47,3 +47,4 @@ class BookingBranchPolicy
         return $user->tenant_id === $branch->tenant_id;
     }
 }
+

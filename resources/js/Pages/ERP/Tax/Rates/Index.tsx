@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ERPLayout } from '@/Layouts/ERPLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { Percent, Plus, Edit2, Trash2 } from 'lucide-react';
 import {
@@ -53,7 +53,7 @@ export default function TaxRateIndex({ rates }: { rates: any[] }) {
     };
 
     return (
-        <ERPLayout>
+        <ERPLayout title="Tax Rates">
             <Head title="Tax Rates" />
             <div className="space-y-6">
                 <div className="flex justify-between items-center">

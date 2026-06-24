@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -13,7 +13,7 @@ import {
 } from "@/Components/ui/select";
 import { formatNumber } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
-import { ArrowLeft, Wallet, TrendingUp, TrendingDown, Settings, MoreHorizontal, Trash, Edit, Coins } from 'lucide-react';
+import { ArrowLeft, Wallet, TrendingUp, TrendingDown, Settings, MoreHorizontal, Trash, Edit, Coins, RefreshCw } from 'lucide-react';
 import { Label } from '@/Components/ui/label';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
 
@@ -68,6 +68,19 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
         '22': latestPrice?.price_gram_24k ? parseFloat(latestPrice.price_gram_24k) * (22/24) : 0,
         '24': latestPrice?.price_gram_24k ? parseFloat(latestPrice.price_gram_24k) : 0,
     });
+
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    useEffect(() => {
+        if (latestPrice) {
+            setPrices({
+                '18': latestPrice.price_gram_18k ? parseFloat(latestPrice.price_gram_18k) : 0,
+                '21': latestPrice.price_gram_21k ? parseFloat(latestPrice.price_gram_21k) : 0,
+                '22': latestPrice.price_gram_24k ? parseFloat(latestPrice.price_gram_24k) * (22/24) : 0,
+                '24': latestPrice.price_gram_24k ? parseFloat(latestPrice.price_gram_24k) : 0,
+            });
+        }
+    }, [latestPrice]);
     
     const [newTx, setNewTx] = useState({
         type: 'buy',
@@ -245,11 +258,29 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                     {/* Today's Prices */}
                     <Card className="mb-6 border-slate-200 shadow-sm">
                         <CardContent className="p-6">
-                            <div className="flex items-center gap-2 mb-4">
-                                <div className="bg-amber-100 p-2 rounded-lg text-amber-700">
-                                    <Coins className="w-5 h-5" />
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-2">
+                                    <div className="bg-amber-100 p-2 rounded-lg text-amber-700">
+                                        <Coins className="w-5 h-5" />
+                                    </div>
+                                    <h3 className="font-semibold text-slate-900">{__('gold_saver.todays_prices_egp')} ({wallet.currency})</h3>
                                 </div>
-                                <h3 className="font-semibold text-slate-900">{__('gold_saver.todays_prices_egp')} ({wallet.currency})</h3>
+                                <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="gap-2"
+                                    disabled={isRefreshing}
+                                    onClick={() => {
+                                        setIsRefreshing(true);
+                                        router.post(route('isaas.gold-savers.live-prices.refresh'), {}, {
+                                            onFinish: () => setIsRefreshing(false),
+                                            preserveScroll: true
+                                        });
+                                    }}
+                                >
+                                    <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                                    {__('general.refresh')}
+                                </Button>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 {Object.entries(prices).map(([carat, price]) => (

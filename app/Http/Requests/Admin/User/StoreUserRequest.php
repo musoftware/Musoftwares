@@ -11,7 +11,7 @@ class StoreUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user() && $this->user()->hasAnyRole(['admin', 'super_admin', 'Admin', 'superadmin']); // Add specific role authorization if needed later
+        return $this->user() && $this->user()->isAdmin(); // Add specific role authorization if needed later
     }
 
     /**

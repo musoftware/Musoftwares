@@ -13,12 +13,12 @@ class AccountingRule extends TenantAwareModel
     protected $table = 'erp_accounting_rules';
     protected $guarded = [];
 
-    public function debitAccount()
+    public function debitAccount(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(ChartOfAccount::class, 'debit_account_id');
     }
 
-    public function creditAccount()
+    public function creditAccount(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(ChartOfAccount::class, 'credit_account_id');
     }

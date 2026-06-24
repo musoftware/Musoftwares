@@ -8,7 +8,7 @@ import { Button } from '@/Components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
 import { ChevronDown, MoreHorizontal, Trash } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
- // Example for translations if applicable
+// Example for translations if applicable
 import { __ } from '@/lib/i18n';
 import TransactionUserCard from './Components/TransactionUserCard';
 
@@ -93,10 +93,10 @@ export default function Income({ transactions, filters, filteredUser }) {
             label: __('general.type'),
             render: (tx) => {
                 const creditTypes = ['earned', 'received', 'sent'];
-                const debitTypes  = ['used', 'refunded', 'send'];
+                const debitTypes = ['used', 'refunded', 'send'];
                 const variant = creditTypes.includes(tx.type) ? 'default'
-                              : debitTypes.includes(tx.type)  ? 'destructive'
-                              : 'secondary';
+                    : debitTypes.includes(tx.type) ? 'destructive'
+                        : 'secondary';
                 return (
                     <Badge variant={variant} className="uppercase">
                         {tx.type}
@@ -150,7 +150,7 @@ export default function Income({ transactions, filters, filteredUser }) {
     return (
         <AdminSidebarLayout title={__('erp.income_transactions')} header={__('erp.transactions')}>
             {filteredUser && <TransactionUserCard user={filteredUser} />}
-            
+
             <div className="flex justify-end items-center mb-6 gap-4">
                 <div className="flex-1">
                     <h2 className="text-lg font-semibold text-slate-900">{__('erp.income_transactions')}</h2>
@@ -173,17 +173,17 @@ export default function Income({ transactions, filters, filteredUser }) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
-                                <Link href={`/admin/transactions/create?type=used${filteredUser ? `&user_id=${filteredUser.id}` : ''}`} className="w-full cursor-pointer">
+                                <Link href={`/admin/transactions/create?type=used${filteredUser ? `&user=${filteredUser.id}` : ''}`} className="w-full cursor-pointer">
                                     {__('general.used') || 'Used'}
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href={`/admin/transactions/create?type=refund${filteredUser ? `&user_id=${filteredUser.id}` : ''}`} className="w-full cursor-pointer">
+                                <Link href={`/admin/transactions/create?type=refund${filteredUser ? `&user=${filteredUser.id}` : ''}`} className="w-full cursor-pointer">
                                     {__('general.refund')}
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href={`/admin/transactions/create?type=send${filteredUser ? `&user_id=${filteredUser.id}` : ''}`} className="w-full cursor-pointer">
+                                <Link href={`/admin/transactions/create?type=send${filteredUser ? `&user=${filteredUser.id}` : ''}`} className="w-full cursor-pointer">
                                     {__('general.send')}
                                 </Link>
                             </DropdownMenuItem>

@@ -13,7 +13,6 @@ use Modules\ERP\Models\Project;
 use Modules\ERP\Models\Activity;
 use Modules\ERP\Models\TenantFile;
 use Modules\ERP\Models\TenantNote;
-use Modules\ERP\Models\TenantStorageProvider;
 use Modules\ERP\Models\SupportTicket;
 use Modules\ERP\Models\WalletTransaction;
 use App\Services\ExchangeRateService;
@@ -290,8 +289,8 @@ class ERPDashboardController extends Controller
         $storageProviders = collect();
         $documents = collect();
         if ($tenantId) {
-            $storageProviders = TenantStorageProvider::where('tenant_id', $tenantId)->get();
-            $documents = TenantFile::with(['uploader', 'storageProvider'])
+            $storageProviders = collect();
+            $documents = TenantFile::with(['uploader'])
                 ->where('tenant_id', $tenantId)
                 ->latest()
                 ->get()
@@ -299,7 +298,7 @@ class ERPDashboardController extends Controller
                     return [
                         'id' => $doc->id,
                         'name' => $doc->name,
-                        'provider' => $doc->storageProvider?->name ?? 'Local',
+                        'provider' => 'Local',
                         'size' => round($doc->size / 1024, 2) . ' KB',
                         'tags' => [$doc->folder],
                         'uploadedBy' => $doc->uploader?->name ?? 'Unknown',
@@ -582,7 +581,10 @@ class ERPDashboardController extends Controller
                             'unit_price' => $amount,
                             'quantity' => 1.0,
                             'total' => $amount,
+                            'sort_order' => 0,
                         ]);
+
+                        event(new \Modules\ERP\Events\InvoiceCreated($invoice));
                     }
                 }
             });
