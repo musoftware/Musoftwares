@@ -12,10 +12,6 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->isAdmin()) {
-            return $this->adminDashboard($user);
-        }
-
         return $this->clientDashboard($user);
     }
 
@@ -27,12 +23,5 @@ class DashboardController extends Controller
         return Inertia::render('Client/Dashboard', $data);
     }
 
-    /**
-     * Admin dashboard redirects to Admin/DashboardController
-     */
-    private function adminDashboard($user)
-    {
-        return app(\App\Http\Controllers\Admin\DashboardController::class)->index();
-    }
 }
 
