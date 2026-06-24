@@ -128,3 +128,4 @@ Route::post('webhooks/incoming/{source}', [\App\Http\Controllers\WebhookControll
 
 
 Route::post('/sso/verify', [\App\Http\Controllers\SsoController::class, 'verify'])->name('sso.verify');
+Route::post('/sso/subscriptions/sync', [\App\Http\Controllers\Api\SubscriptionSyncController::class, 'sync'])->name('sso.subscriptions.sync');

@@ -1,10 +1,8 @@
 {
-    "Core": true,
     "ERP": true,
     "Freelance": true,
     "Marketplace": true,
     "Shared": false,
-    "Booking": true,
     "Intelligence": true,
     "Tools": true,
     "fbmb": true,
@@ -12,10 +10,8 @@
     "GoldSavers": true,
     "WrittenCoursesEngine": true,
     "ISaas": true,
-    "AffiliatePos": true,
     "PaymentGateway": true,
     "CRM": true,
     "PasswordSync": true,
-    "WebTools": true,
-    "Billing": true
+    "WebTools": true
 }
