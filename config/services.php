@@ -66,4 +66,12 @@ return [
         'key' => env('OPENAI_API_KEY'),
     ],
 
+    'erp' => [
+        'url' => env('ERP_URL', 'http://localhost:8001'),
+    ],
+
+    'crm' => [
+        'url' => env('CRM_URL', 'http://localhost:8002'),
+    ],
+
 ];

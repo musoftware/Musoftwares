@@ -101,11 +101,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/onboarding/cities/{countryName}', [\App\Http\Controllers\OnboardingController::class, 'getCities'])->middleware('throttle:60,1')->name('onboarding.cities');
 
     // Tenant Onboarding
-    Route::get('/onboarding/tenant-setup', [\App\Http\Controllers\TenantOnboardingController::class, 'showSetup'])->name('onboarding.tenant.setup');
-    Route::post('/onboarding/tenant-setup', [\App\Http\Controllers\TenantOnboardingController::class, 'storeSetup'])->name('onboarding.tenant.store');
-    Route::get('/onboarding/role-assignment', [\App\Http\Controllers\TenantOnboardingController::class, 'showRoles'])->name('onboarding.tenant.roles');
-    Route::post('/onboarding/role-assignment/invite', [\App\Http\Controllers\TenantOnboardingController::class, 'inviteRole'])->name('onboarding.tenant.invite');
-    Route::post('/onboarding/role-assignment/finish', [\App\Http\Controllers\TenantOnboardingController::class, 'finish'])->name('onboarding.tenant.finish');
+
 
     // Vouchers (Client Facing)
     Route::get('/vouchers', [\App\Http\Controllers\VoucherController::class, 'index'])->name('vouchers.index');
@@ -1028,3 +1024,5 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::resource('withdraw-requests', \App\Http\Controllers\Admin\AdminWithdrawRequestController::class)->only(['index', 'show', 'update']);
 
 });
+
+Route::get('/sso/{system}', [\App\Http\Controllers\SsoController::class, 'redirect'])->name('sso.redirect');

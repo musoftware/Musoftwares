@@ -147,10 +147,6 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\Project::class, 'user_id');
     }
 
-    public function tenant()
-    {
-        return $this->hasOne(\Modules\ERP\Models\Tenant::class, 'user_id');
-    }
 
     public function locked_balance()
     {

@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('newsletter_subscriptions', function (Blueprint $table) {
+        Schema::create('sso_tokens', function (Blueprint $table) {
             $table->id();
-            $table->string('email')->unique();
-            $table->boolean('upsell')->default(false);
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('token')->unique();
+            $table->string('target_system'); // e.g. erp, crm
+            $table->timestamp('expires_at');
+            $table->timestamp('used_at')->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('newsletter_subscriptions');
+        Schema::dropIfExists('sso_tokens');
     }
 };

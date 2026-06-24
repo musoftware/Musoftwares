@@ -112,9 +112,9 @@ class DashboardController extends Controller
             \Illuminate\Support\Facades\Artisan::call('gold:fetch-global');
             \Illuminate\Support\Facades\Artisan::call('gold_price:fetcher');
             \Illuminate\Support\Facades\Artisan::call('gold_world_price:fetcher');
-            return redirect()->back()->with('success', __('Prices refreshed successfully'));
+            return redirect()->back()->with('success', __('general.prices_refreshed_successfully'));
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', __('Failed to refresh prices'));
+            return redirect()->back()->with('error', __('general.failed_to_refresh_prices'));
         }
     }
 }

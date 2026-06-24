@@ -179,17 +179,7 @@ class ProcessWebhookJob implements ShouldQueue
                 $days = $metaData['days'] ?? 365;
                 $isNewSystem = $metaData['is_new_system'] ?? true;
                 
-                $userTenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
-                if ($isNewSystem && !$userTenant) {
-                    $tenantName = explode(' ', $user->name)[0] . ' Workspace ' . substr(uniqid(), -4);
-                    $tenant = \Modules\ERP\Models\Tenant::create([
-                        'user_id' => $user->id,
-                        'name' => $tenantName,
-                        'status' => 'active',
-                        'base_currency_id' => $user->currency_id ?: 1,
-                    ]);
-                    $userTenant = $tenant;
-                }
+
 
                 $user->add_balance($amountPaid, $reason, 'received');
                 if (class_exists('\App\Helpers\TimerHelper') && method_exists('\App\Helpers\TimerHelper', 'instance')) {
@@ -213,12 +203,7 @@ class ProcessWebhookJob implements ShouldQueue
                             ['status' => 'active', 'started_at' => now(), 'expires_at' => $expiry, 'auto_renew' => true]
                         );
 
-                        if ($userTenant) {
-                            \App\Models\TenantFeature::updateOrCreate(
-                                ['tenant_id' => $userTenant->id, 'feature_key' => $item],
-                                ['module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : (str_starts_with($item, 'tool') ? 'tools' : 'booking')), 'expires_at' => $expiry]
-                            );
-                        }
+
                     }
                 }
             });

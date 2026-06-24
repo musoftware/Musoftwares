@@ -47,23 +47,7 @@ class ExecuteAutomationActionJob implements ShouldQueue
                     }
                 }
                 break;
-            case 'update_tag':
-                $tagName = $this->action['target'] ?? 'Automation';
-                $leadId = $this->eventData['lead_id'] ?? null;
-                if ($leadId) {
-                    $lead = \Modules\CRM\Models\Lead::find($leadId);
-                    if ($lead) {
-                        $tag = \Modules\CRM\Models\LeadTag::firstOrCreate([
-                            'name' => $tagName,
-                            'workspace_id' => $lead->workspace_id,
-                        ], [
-                            'color' => '#3b82f6'
-                        ]);
-                        $lead->tags()->syncWithoutDetaching([$tag->id]);
-                        \Illuminate\Support\Facades\Log::info("Tag {$tagName} added to Lead ID {$lead->id}");
-                    }
-                }
-                break;
+
             case 'webhook':
                 $url = $this->action['target'] ?? null;
                 if ($url) {

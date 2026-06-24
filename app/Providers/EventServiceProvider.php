@@ -27,7 +27,6 @@ use App\Events\SaaSLimitReached;
 use App\Events\InvoiceCreated;
 use App\Events\ContractSigned;
 use App\Events\InventoryAdjusted;
-use Modules\ERP\Listeners\AccountingListener;
 use App\Listeners\AmountReceivedListener;
 use App\Listeners\CalculateReferralListener;
 use App\Listeners\SaaSLimitListener;
@@ -46,9 +45,9 @@ class EventServiceProvider extends ServiceProvider
         InvoiceCreated::class          => [ActivityEventListener::class],
         ContractSigned::class          => [ActivityEventListener::class],
         InventoryAdjusted::class       => [ActivityEventListener::class],
-        InvoicePaid::class             => [ActivityEventListener::class, NotificationEventListener::class, AccountingListener::class],
-        WalletCredited::class          => [ActivityEventListener::class, AccountingListener::class],
-        WalletDebited::class           => [ActivityEventListener::class, AccountingListener::class],
+        InvoicePaid::class             => [ActivityEventListener::class, NotificationEventListener::class],
+        WalletCredited::class          => [ActivityEventListener::class],
+        WalletDebited::class           => [ActivityEventListener::class],
         WithdrawalRequested::class     => [ActivityEventListener::class],
         WithdrawalApproved::class      => [ActivityEventListener::class, NotificationEventListener::class],
         ReferralCommissionEarned::class => [ActivityEventListener::class],

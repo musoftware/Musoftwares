@@ -6838,4 +6838,9 @@ return [
     'recurring_invoice_updated_successfully' => 'تم تحديث الفاتورة المتكررة بنجاح',
     'recurring_invoices' => 'الفواتير المتكررة',
     'user_user' => 'المستخدم',
+    'failed_to_refresh_prices' => 'فشل في تحديث الأسعار',
+    'prices_refreshed_successfully' => 'تم تحديث الأسعار بنجاح',
+    'service_unavailable' => 'الخدمة غير متاحة',
+    'sorry_we_are_doing_some_maintenance_please_check_back_soon' => 'عذراً، نقوم ببعض أعمال الصيانة. يرجى التحقق لاحقاً.',
+    'the_page_has_expired_please_try_again' => 'انتهت صلاحية الصفحة، يرجى المحاولة مرة أخرى.',
 ];

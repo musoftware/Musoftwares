@@ -126,3 +126,5 @@ Route::post('webhooks/incoming/{source}', [\App\Http\Controllers\WebhookControll
     ->name('api.webhooks.incoming');
 
 
+
+Route::post('/sso/verify', [\App\Http\Controllers\SsoController::class, 'verify'])->name('sso.verify');

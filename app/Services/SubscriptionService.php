@@ -328,19 +328,8 @@ class SubscriptionService extends BaseService
 
     public function processSubscription(User $user, float $amount, int $days, array $items, bool $isNewSystem, string $reason, string $action = 'wallet_subscribe')
     {
-        return $this->executeInTransaction(function () use ($user, $amount, $days, $items, $isNewSystem, $reason, $action) {
-            $userTenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
-            if ($isNewSystem && !$userTenant) {
-                $tenantName = explode(' ', $user->name)[0] . ' Workspace ' . substr(uniqid(), -4);
-                $usdCurrencyId = \App\Models\Currency::where('currency', 'USD')->value('id') ?: 1;
-                $tenant = \Modules\ERP\Models\Tenant::create([
-                    'user_id' => $user->id,
-                    'name' => $tenantName,
-                    'status' => 'active',
-                    'base_currency_id' => $user->currency_id ?: $usdCurrencyId,
-                ]);
-                $userTenant = $tenant;
-            }
+        return $this->executeInTransaction(function () use ($user, $amount, $days, $items, $reason, $action) {
+
 
             if ($action === 'webhook_received') {
                 $user->add_balance($amount, $reason, 'received');
@@ -369,16 +358,7 @@ class SubscriptionService extends BaseService
                         ]
                     );
 
-                    // Also update tenant_features
-                    if ($userTenant) {
-                        \App\Models\TenantFeature::updateOrCreate(
-                            ['tenant_id' => $userTenant->id, 'feature_key' => $item],
-                            [
-                                'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : (str_starts_with($item, 'tool') ? 'tools' : 'booking')),
-                                'expires_at' => $expiry
-                            ]
-                        );
-                    }
+
                 }
             }
         });
@@ -409,16 +389,7 @@ class SubscriptionService extends BaseService
                 'auto_renew' => true
             ]);
 
-            $tenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
-            if ($tenant) {
-                \App\Models\TenantFeature::updateOrCreate(
-                    ['tenant_id' => $tenant->id, 'feature_key' => $sub->object],
-                    [
-                        'module' => str_starts_with($sub->object, 'crm') ? 'crm' : (str_starts_with($sub->object, 'erp') ? 'erp' : (str_starts_with($sub->object, 'tool') ? 'tools' : 'booking')),
-                        'expires_at' => $newExpiresAt
-                    ]
-                );
-            }
+
         });
     }
 

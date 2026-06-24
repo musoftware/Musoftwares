@@ -55,28 +55,6 @@ class ActivityService extends BaseService
         // ERP module logs its own activities internally via Modules\ERP\Services\ActivityLogger.
         // The main ActivityService does NOT write to the ERP module.
 
-        // CRM logging
-        if ($workspace === 'crm') {
-            if (class_exists(\Modules\CRM\Models\Activity::class)) {
-                $workspaceId = session('crm_workspace_id');
-                if (!$workspaceId && Auth::check()) {
-                    $crmWorkspace = \Modules\CRM\Models\Workspace::where('user_id', Auth::id())->first();
-                    if ($crmWorkspace) {
-                        $workspaceId = $crmWorkspace->id;
-                    }
-                }
-                if ($workspaceId) {
-                    \Modules\CRM\Models\Activity::create([
-                        'workspace_id' => $workspaceId,
-                        'user_id' => $userId,
-                        'event' => $event ?? 'unknown',
-                        'entity_type' => $subject ? get_class($subject) : null,
-                        'entity_id' => $subject ? $subject->id : null,
-                        'metadata' => $properties,
-                    ]);
-                }
-            }
-        }
 
         // Always log to core UserActivity table for general usage tracking
         if (class_exists(UserActivity::class) && $userId) {

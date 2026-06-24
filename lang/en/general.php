@@ -6837,4 +6837,9 @@ return [
     'recurring_invoice_updated_successfully' => 'Recurring invoice updated successfully.',
     'recurring_invoices' => 'Recurring Invoices',
     'user_user' => 'User (User)',
+    'failed_to_refresh_prices' => 'Failed to refresh prices',
+    'prices_refreshed_successfully' => 'Prices refreshed successfully',
+    'service_unavailable' => 'Service Unavailable',
+    'sorry_we_are_doing_some_maintenance_please_check_back_soon' => 'Sorry, we are doing some maintenance. Please check back soon.',
+    'the_page_has_expired_please_try_again' => 'The page has expired, please try again.',
 ];

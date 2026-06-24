@@ -8437,7 +8437,12 @@
             "recurring_invoice_deleted": "تم حذف الفاتورة المتكررة",
             "recurring_invoice_updated_successfully": "تم تحديث الفاتورة المتكررة بنجاح",
             "recurring_invoices": "الفواتير المتكررة",
-            "user_user": "المستخدم"
+            "user_user": "المستخدم",
+            "failed_to_refresh_prices": "فشل في تحديث الأسعار",
+            "prices_refreshed_successfully": "تم تحديث الأسعار بنجاح",
+            "service_unavailable": "الخدمة غير متاحة",
+            "sorry_we_are_doing_some_maintenance_please_check_back_soon": "عذراً، نقوم ببعض أعمال الصيانة. يرجى التحقق لاحقاً.",
+            "the_page_has_expired_please_try_again": "انتهت صلاحية الصفحة، يرجى المحاولة مرة أخرى."
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -17553,7 +17558,12 @@
             "recurring_invoice_deleted": "Recurring invoice deleted.",
             "recurring_invoice_updated_successfully": "Recurring invoice updated successfully.",
             "recurring_invoices": "Recurring Invoices",
-            "user_user": "User (User)"
+            "user_user": "User (User)",
+            "failed_to_refresh_prices": "Failed to refresh prices",
+            "prices_refreshed_successfully": "Prices refreshed successfully",
+            "service_unavailable": "Service Unavailable",
+            "sorry_we_are_doing_some_maintenance_please_check_back_soon": "Sorry, we are doing some maintenance. Please check back soon.",
+            "the_page_has_expired_please_try_again": "The page has expired, please try again."
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
