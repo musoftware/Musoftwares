@@ -60,4 +60,4 @@ axios.interceptors.response.use(
     }
 );
 
-import './echo';
+// Echo disabled
