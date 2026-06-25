@@ -26,23 +26,29 @@ class SubscriptionSyncController extends Controller
         $userIds = $request->input('user_ids');
 
         $subscriptions = UserSubscription::whereIn('user_id', $userIds)
-            ->where('object', $module)
-            ->get(['user_id', 'status', 'expires_at'])
-            ->keyBy('user_id');
+            ->where('object', 'like', $module . '%')
+            ->get(['user_id', 'object', 'status', 'expires_at'])
+            ->groupBy('user_id');
 
         $results = [];
         foreach ($userIds as $userId) {
             if ($subscriptions->has($userId)) {
-                $sub = $subscriptions->get($userId);
-                $results[$userId] = [
-                    'status' => $sub->status,
-                    'expires_at' => $sub->expires_at,
-                ];
+                $userSubs = $subscriptions->get($userId);
+                $subsArray = [];
+                foreach ($userSubs as $sub) {
+                    $subsArray[$sub->object] = [
+                        'status' => $sub->status,
+                        'expires_at' => $sub->expires_at,
+                    ];
+                }
+                $results[$userId] = $subsArray;
             } else {
                 // If they don't have a record, they are effectively expired or cancelled
                 $results[$userId] = [
-                    'status' => 'cancelled',
-                    'expires_at' => null,
+                    $module => [
+                        'status' => 'cancelled',
+                        'expires_at' => null,
+                    ]
                 ];
             }
         }
