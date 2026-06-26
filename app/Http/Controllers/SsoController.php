@@ -6,6 +6,7 @@ use App\Models\SsoToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class SsoController extends Controller
 {
@@ -52,11 +53,14 @@ class SsoController extends Controller
             abort(404, 'System not found');
         }
 
-        return redirect()->away($targetUrl . '?token=' . $token);
+        return Inertia::location($targetUrl . '?token=' . $token);
     }
 
     /**
      * Verify the token via server-to-server API call.
+     *
+     * Returns the user, the target system, and the user's active subscription
+     * for that system so the satellite app can route correctly without a second API call.
      */
     public function verify(Request $request)
     {
@@ -78,15 +82,32 @@ class SsoController extends Controller
         // Mark as used
         $ssoToken->update(['used_at' => now()]);
 
-        $user = $ssoToken->user;
+        $user     = $ssoToken->user;
+        $system   = $ssoToken->target_system;
+
+        // Fetch the user's subscription for the target system (e.g. 'erp', 'goldsaversys')
+        $subscription = \App\Models\UserSubscription::where('user_id', $user->id)
+            ->where('object', 'like', $system . '%')
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('expires_at')
+                  ->orWhere('expires_at', '>', now());
+            })
+            ->orderBy('expires_at', 'desc')
+            ->first(['object', 'status', 'expires_at']);
 
         return response()->json([
             'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
+                'id'    => $user->id,
+                'name'  => $user->name,
                 'email' => $user->email,
             ],
-            'system' => $ssoToken->target_system
+            'system'       => $system,
+            'subscription' => $subscription ? [
+                'object'     => $subscription->object,
+                'status'     => $subscription->status,
+                'expires_at' => $subscription->expires_at?->toIso8601String(),
+            ] : null,
         ]);
     }
 }
