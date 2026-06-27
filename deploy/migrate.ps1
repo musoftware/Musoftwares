@@ -48,6 +48,7 @@ $schemaBase64 = Get-Content "deploy\schema.b64" -Raw
 
 $syncCmd = "cd $REMOTE_PATH && php artisan schema:sync --stdin"
 $migrateCmd = "cd $REMOTE_PATH && php artisan migrate --force"
+$optimizeCmd = "cd $REMOTE_PATH && php artisan optimize:clear"
 
 $hasPutty = $null -ne (Get-Command plink -ErrorAction SilentlyContinue)
 
@@ -66,9 +67,13 @@ if ($hasPutty -and $SSH_PASSWORD -and -not $NoPassword) {
     cmd.exe /c $syncPlink
     Remove-Item -Path $tempFile -ErrorAction SilentlyContinue
 
-    Write-Host "[4/4] Running migrations on remote server..." -ForegroundColor Yellow
+    Write-Host "[4/5] Running migrations on remote server..." -ForegroundColor Yellow
     $migratePlink = "echo. | plink.exe -batch -T -P $SSH_PORT -pw ""$SSH_PASSWORD"" $SSH_USER@$SSH_HOST ""$migrateCmd"""
     cmd.exe /c $migratePlink
+
+    Write-Host "[5/5] Running optimize:clear on remote server..." -ForegroundColor Yellow
+    $optimizePlink = "echo. | plink.exe -batch -T -P $SSH_PORT -pw ""$SSH_PASSWORD"" $SSH_USER@$SSH_HOST ""$optimizeCmd"""
+    cmd.exe /c $optimizePlink
 } else {
     Write-Host "[3/4] Running remote schema sync via SSH..." -ForegroundColor Yellow
     $tempFile = [System.IO.Path]::GetTempFileName()
@@ -76,10 +81,13 @@ if ($hasPutty -and $SSH_PASSWORD -and -not $NoPassword) {
     cmd.exe /c "type ""$tempFile"" | ssh -p $SSH_PORT -o StrictHostKeyChecking=no ""$SSH_USER@$SSH_HOST"" ""$syncCmd"""
     Remove-Item -Path $tempFile -ErrorAction SilentlyContinue
 
-    Write-Host "[4/4] Running migrations on remote server..." -ForegroundColor Yellow
+    Write-Host "[4/5] Running migrations on remote server..." -ForegroundColor Yellow
     & ssh -p $SSH_PORT -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" $migrateCmd
+
+    Write-Host "[5/5] Running optimize:clear on remote server..." -ForegroundColor Yellow
+    & ssh -p $SSH_PORT -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" $optimizeCmd
 }
 
 Write-Host ""
 Write-Host "=== SUCCESS ===" -ForegroundColor Green
-Write-Host "Schema Sync and Migrations completed successfully!" -ForegroundColor Green
+Write-Host "Schema Sync, Migrations, and Optimize:Clear completed successfully!" -ForegroundColor Green

@@ -30,9 +30,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
-        if (auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
-        }
+
         if (auth('crm_team')->check()) {
             $crmMember = auth('crm_team')->user();
             $user = $crmMember?->workspace?->owner ?? $user;
@@ -46,7 +44,7 @@ class HandleInertiaRequests extends Middleware
                     'roles' => $user->roles->pluck('name')->map(fn($r) => strtolower($r))->toArray(),
                     'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
                 ]) : null,
-                'team_member' => \Illuminate\Support\Facades\Auth::guard('erp_team')->user(),
+                'team_member' => null,
                 'crm_team_member' => \Illuminate\Support\Facades\Auth::guard('crm_team')->user(),
                 'is_impersonating' => session()->has('impersonator_id'),
                 'has_ios_shortcut_active' => $user ? $user->last_shortcut_sync_at !== null : false,
@@ -121,31 +119,10 @@ class HandleInertiaRequests extends Middleware
                 return null;
             },
             'tenant' => function () use ($user) {
-                if (!$user) return null;
-                if (auth('erp_team')->check()) {
-                    return auth('erp_team')->user()?->tenant;
-                }
-                if (class_exists(\Modules\ERP\Models\Tenant::class)) {
-                    return \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
-                }
                 return null;
             },
             'settings' => [
                 'base_currency' => function () use ($user) {
-                    if ($user && class_exists(\Modules\ERP\Models\Tenant::class)) {
-                        $tenant = null;
-                        if (auth('erp_team')->check()) {
-                            $tenant = auth('erp_team')->user()?->tenant;
-                        } else {
-                            $tenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
-                        }
-                        if ($tenant && $tenant->base_currency_id) {
-                            $baseCurrency = \App\Models\Currency::find($tenant->base_currency_id);
-                            if ($baseCurrency) {
-                                return $baseCurrency->currency;
-                            }
-                        }
-                    }
                     if (class_exists(\App\Models\AdminSettings::class)) {
                         return \App\Models\AdminSettings::business_currency_name();
                     }

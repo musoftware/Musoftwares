@@ -10,12 +10,13 @@ import { Label } from '@/Components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { formatMoney } from '@/lib/utils';
 
-export default function AddBalance({ wallet }) {
-    const [selectedPreset, setSelectedPreset] = useState(50);
+export default function AddBalance({ wallet, presets = [] }) {
+    const defaultAmount = presets.length > 0 ? presets[0] : 50;
+    const [selectedPreset, setSelectedPreset] = useState(defaultAmount);
     const [customAmount, setCustomAmount] = useState('');
 
     const { data, setData, post, processing, errors } = useForm({
-        amount: 50,
+        amount: defaultAmount,
     });
 
     const safeRoute = (name, params, fallbackUrl) => {
@@ -50,7 +51,6 @@ export default function AddBalance({ wallet }) {
         post(safeRoute('financial.add-balance.kashier', undefined, '/financial/add-balance/kashier'));
     };
 
-    const presets = [10, 25, 50, 100, 250, 500];
     const walletBalance = Number(wallet?.balance || 0);
     const walletCurrency = wallet?.currency;
 

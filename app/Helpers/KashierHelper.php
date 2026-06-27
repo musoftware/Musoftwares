@@ -15,6 +15,26 @@ class KashierHelper
         return hash_hmac('sha256', $path, $secretKey, false);
     }
 
+    private static function prepareEgpConversion(float &$amount, string &$currency, array &$metaData): void
+    {
+        $originalCurrency = strtoupper($currency);
+        
+        if ($originalCurrency !== 'EGP') {
+            $currencyModel = \App\Models\Currency::where('currency', $originalCurrency)->first();
+            $egpModel = \App\Models\Currency::where('currency', 'EGP')->first();
+            
+            if ($currencyModel && $egpModel) {
+                // Keep track of original values
+                $metaData['original_amount'] = $amount;
+                $metaData['original_currency'] = $originalCurrency;
+
+                // Convert amount to EGP using today's rate
+                $amount = \App\Models\CurrenciesExchange::RateToday($amount, $currencyModel->id, $egpModel->id);
+            }
+            $currency = 'EGP';
+        }
+    }
+
     public static function buildBalancePaymentUrl(
         float $amount,
         int $userId,
@@ -29,6 +49,12 @@ class KashierHelper
         $successUrl = urlencode(route('financial.add-balance.success'));
         $failureUrl = urlencode(route('financial.add-balance.failure'));
         $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
+
+        $metaDataArray = [
+            'user_id' => $userId,
+            'source' => 'balance-recharge',
+        ];
+        self::prepareEgpConversion($amount, $currency, $metaDataArray);
 
         $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
 
@@ -59,10 +85,7 @@ class KashierHelper
             'enable3DS' => 'true',
             'allowedMethods' => 'card,wallet',
             'CustomerReference' => 'user_' . $userId,
-            'metaData' => json_encode([
-                'user_id' => $userId,
-                'source' => 'balance-recharge',
-            ]),
+            'metaData' => json_encode($metaDataArray),
         ];
 
         return 'https://payments.kashier.io/?' . http_build_query($params);
@@ -84,6 +107,14 @@ class KashierHelper
         $failureUrl = urlencode(route('freelance.point-purchases.failure'));
         $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
 
+        $metaDataArray = [
+            'user_id' => $userId,
+            'source' => 'points-purchase',
+            'package_id' => $packageId,
+            'points' => $points,
+        ];
+        self::prepareEgpConversion($amount, $currency, $metaDataArray);
+
         $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
 
         $customer = [
@@ -113,12 +144,7 @@ class KashierHelper
             'enable3DS' => 'true',
             'allowedMethods' => 'card,wallet',
             'CustomerReference' => 'user_' . $userId,
-            'metaData' => json_encode([
-                'user_id' => $userId,
-                'source' => 'points-purchase',
-                'package_id' => $packageId,
-                'points' => $points,
-            ]),
+            'metaData' => json_encode($metaDataArray),
         ];
 
         return 'https://payments.kashier.io/?' . http_build_query($params);
@@ -143,6 +169,17 @@ class KashierHelper
         $failureUrl = urlencode(route('subscriptions.kashier.failure'));
         $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
 
+        $metaDataArray = [
+            'user_id' => $userId,
+            'source' => 'subscription-purchase',
+            'plan_id' => $planId,
+            'billing_cycle' => $billingCycle,
+            'days' => $days,
+            'items' => $items,
+            'is_new_system' => $isNewSystem,
+        ];
+        self::prepareEgpConversion($amount, $currency, $metaDataArray);
+
         $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
 
         $customer = [
@@ -172,15 +209,7 @@ class KashierHelper
             'enable3DS' => 'true',
             'allowedMethods' => 'card,wallet',
             'CustomerReference' => 'user_' . $userId,
-            'metaData' => json_encode([
-                'user_id' => $userId,
-                'source' => 'subscription-purchase',
-                'plan_id' => $planId,
-                'billing_cycle' => $billingCycle,
-                'days' => $days,
-                'items' => $items,
-                'is_new_system' => $isNewSystem,
-            ]),
+            'metaData' => json_encode($metaDataArray),
         ];
 
         return 'https://payments.kashier.io/?' . http_build_query($params);
@@ -202,6 +231,13 @@ class KashierHelper
         $failureUrl = urlencode(route('booking.checkout', $bookingId));
         $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
 
+        $metaDataArray = [
+            'user_id' => $userId,
+            'source' => 'booking-purchase',
+            'booking_id' => $bookingId,
+        ];
+        self::prepareEgpConversion($amount, $currency, $metaDataArray);
+
         $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
 
         $customer = [
@@ -231,11 +267,7 @@ class KashierHelper
             'enable3DS' => 'true',
             'allowedMethods' => 'card,wallet',
             'CustomerReference' => 'user_' . $userId,
-            'metaData' => json_encode([
-                'user_id' => $userId,
-                'source' => 'booking-purchase',
-                'booking_id' => $bookingId,
-            ]),
+            'metaData' => json_encode($metaDataArray),
         ];
 
         return 'https://payments.kashier.io/?' . http_build_query($params);
@@ -256,6 +288,13 @@ class KashierHelper
         $failureUrl = urlencode(route('guest.invoices.payment.failure'));
         $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
 
+        $metaDataArray = [
+            'user_id' => $userId,
+            'source' => 'guest-invoice-payment',
+            'invoice_id' => $invoiceId,
+        ];
+        self::prepareEgpConversion($amount, $currency, $metaDataArray);
+
         $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
 
         $customer = [
@@ -285,11 +324,7 @@ class KashierHelper
             'enable3DS' => 'true',
             'allowedMethods' => 'card,wallet',
             'CustomerReference' => 'user_' . $userId,
-            'metaData' => json_encode([
-                'user_id' => $userId,
-                'source' => 'guest-invoice-payment',
-                'invoice_id' => $invoiceId,
-            ]),
+            'metaData' => json_encode($metaDataArray),
         ];
 
         return 'https://payments.kashier.io/?' . http_build_query($params);
@@ -309,6 +344,13 @@ class KashierHelper
         $successUrl = urlencode(route('billing.invoices.payment.success'));
         $failureUrl = urlencode(route('billing.invoices.payment.failure'));
         $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
+
+        $metaDataArray = [
+            'user_id' => $userId,
+            'source' => 'user-invoice-payment',
+            'invoice_id' => $invoiceId,
+        ];
+        self::prepareEgpConversion($amount, $currency, $metaDataArray);
 
         $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
 
@@ -339,11 +381,7 @@ class KashierHelper
             'enable3DS' => 'true',
             'allowedMethods' => 'card,wallet',
             'CustomerReference' => 'user_' . $userId,
-            'metaData' => json_encode([
-                'user_id' => $userId,
-                'source' => 'user-invoice-payment',
-                'invoice_id' => $invoiceId,
-            ]),
+            'metaData' => json_encode($metaDataArray),
         ];
 
         return 'https://payments.kashier.io/?' . http_build_query($params);
@@ -363,6 +401,13 @@ class KashierHelper
         $successUrl = urlencode(route('guest.payment-links.success'));
         $failureUrl = urlencode(route('guest.payment-links.failure'));
         $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
+
+        $metaDataArray = [
+            'user_id' => $userId,
+            'source' => 'payment-link',
+            'payment_link_id' => $paymentLinkId,
+        ];
+        self::prepareEgpConversion($amount, $currency, $metaDataArray);
 
         $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
 
@@ -393,11 +438,7 @@ class KashierHelper
             'enable3DS' => 'true',
             'allowedMethods' => 'card,wallet',
             'CustomerReference' => 'user_' . $userId,
-            'metaData' => json_encode([
-                'user_id' => $userId,
-                'source' => 'payment-link',
-                'payment_link_id' => $paymentLinkId,
-            ]),
+            'metaData' => json_encode($metaDataArray),
         ];
 
         return 'https://payments.kashier.io/?' . http_build_query($params);

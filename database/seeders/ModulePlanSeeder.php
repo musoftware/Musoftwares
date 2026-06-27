@@ -14,18 +14,18 @@ class ModulePlanSeeder extends Seeder
         ModulePlan::truncate();
         \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
 
-        // 1. ERP Plans
+        // 1. Core ERP Plans (Based on Core Packages)
         ModulePlan::create([
             'module' => 'erp',
             'name' => 'ERP Starter',
             'price' => 19.00,
             'billing' => 'monthly',
             'features' => [
-                'Projects' => 'Up to 5 active projects',
-                'Invoices' => 'Up to 10 invoices per month',
-                'Tasks' => 'Up to 50 active tasks',
-                'Wallet Integration' => 'Fully supported',
+                'Core Foundation' => 'Authentication, Settings, Roles, Dashboards',
+                'Core Business' => 'Customers, Suppliers, Products & Basic Taxes',
+                'Core Sales' => 'Quotations, Sales Orders, Invoices & Payments',
                 'Team Members' => 'Up to 2 team members',
+                'Support' => 'Standard Email Support',
             ],
             'is_active' => true,
         ]);
@@ -36,13 +36,12 @@ class ModulePlanSeeder extends Seeder
             'price' => 49.00,
             'billing' => 'monthly',
             'features' => [
-                'Projects' => 'Unlimited projects',
-                'Invoices' => 'Unlimited invoices',
-                'Tasks' => 'Unlimited tasks',
-                'Wallet Integration' => 'Fully supported',
+                'Everything in Starter' => 'Foundation, Business, Sales',
+                'Core Inventory' => 'Warehouses, Stock Tracking, Movement & Adjustments',
+                'Core Purchasing' => 'Purchase Orders, Supplier Invoices & Receiving',
+                'Core Reports' => 'Sales, Inventory, Purchase & Expense Reports',
                 'Team Members' => 'Up to 10 team members',
-                'Advanced Reporting' => 'PnL reports and detailed analytics',
-                'Time Tracking' => 'Included with automated invoicing',
+                'Support' => 'Priority Support',
             ],
             'is_active' => true,
         ]);
@@ -53,10 +52,9 @@ class ModulePlanSeeder extends Seeder
             'price' => 190.00,
             'billing' => 'yearly',
             'features' => [
-                'Projects' => 'Up to 5 active projects',
-                'Invoices' => 'Up to 10 invoices per month',
-                'Tasks' => 'Up to 50 active tasks',
-                'Wallet Integration' => 'Fully supported',
+                'Core Foundation' => 'Authentication, Settings, Roles, Dashboards',
+                'Core Business' => 'Customers, Suppliers, Products & Basic Taxes',
+                'Core Sales' => 'Quotations, Sales Orders, Invoices & Payments',
                 'Team Members' => 'Up to 2 team members',
                 'Saving' => 'Get 2 months free',
             ],
@@ -69,17 +67,57 @@ class ModulePlanSeeder extends Seeder
             'price' => 490.00,
             'billing' => 'yearly',
             'features' => [
-                'Projects' => 'Unlimited projects',
-                'Invoices' => 'Unlimited invoices',
-                'Tasks' => 'Unlimited tasks',
-                'Wallet Integration' => 'Fully supported',
+                'Everything in Starter' => 'Foundation, Business, Sales',
+                'Core Inventory' => 'Warehouses, Stock Tracking, Movement & Adjustments',
+                'Core Purchasing' => 'Purchase Orders, Supplier Invoices & Receiving',
+                'Core Reports' => 'Sales, Inventory, Purchase & Expense Reports',
                 'Team Members' => 'Up to 10 team members',
-                'Advanced Reporting' => 'PnL reports and detailed analytics',
-                'Time Tracking' => 'Included with automated invoicing',
                 'Saving' => 'Get 2 months free',
             ],
             'is_active' => true,
         ]);
+
+        // 1.1 ERP Addons (Purchased on top of Core Plans)
+        ModulePlan::create([
+            'module' => 'erp_projects',
+            'name' => 'Projects Management Addon',
+            'price' => 10.00,
+            'billing' => 'monthly',
+            'features' => [
+                'Projects' => 'Unlimited Projects',
+                'Tasks' => 'Task management & tracking',
+                'Time Tracking' => 'Timesheets and billable hours',
+            ],
+            'is_active' => true,
+        ]);
+
+        ModulePlan::create([
+            'module' => 'erp_pos',
+            'name' => 'Point of Sale (POS) Addon',
+            'price' => 15.00,
+            'billing' => 'monthly',
+            'features' => [
+                'Registers' => 'Unlimited Cash Registers',
+                'Hardware' => 'Barcode scanners, receipt printers support',
+                'Offline Mode' => 'Supported with auto-sync',
+            ],
+            'is_active' => true,
+        ]);
+
+        ModulePlan::create([
+            'module' => 'erp_hr',
+            'name' => 'HR & Payroll Addon',
+            'price' => 20.00,
+            'billing' => 'monthly',
+            'features' => [
+                'Employees' => 'Employee Profiles & Contracts',
+                'Attendance' => 'Time clock and attendance tracking',
+                'Payroll' => 'Automated salary slips and deductions',
+                'Leaves' => 'Leave request management',
+            ],
+            'is_active' => true,
+        ]);
+
 
         // 2. Freelancer Premium Plans (for extra perks, basic tier is free)
         ModulePlan::create([

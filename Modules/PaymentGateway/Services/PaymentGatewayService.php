@@ -137,11 +137,33 @@ class PaymentGatewayService
         $failureUrl = route('api.payment-gateway.webhook.failure', $payment->internal_order_id);
         $webhookUrl = route('api.payment-gateway.webhook.kashier');
 
+        $amount = $payment->amount;
+        $currency = $payment->currency ?: 'USD';
+        $originalCurrency = strtoupper($currency);
+
+        $metaDataArray = [
+            'source'              => 'musoftware-payment-gateway',
+            'internal_order_id'   => $payment->internal_order_id,
+            'client_id'           => $client->client_id,
+        ];
+
+        if ($originalCurrency !== 'EGP') {
+            $currencyModel = \App\Models\Currency::where('currency', $originalCurrency)->first();
+            $egpModel = \App\Models\Currency::where('currency', 'EGP')->first();
+            
+            if ($currencyModel && $egpModel) {
+                $metaDataArray['original_amount'] = $amount;
+                $metaDataArray['original_currency'] = $originalCurrency;
+                $amount = \App\Models\CurrenciesExchange::RateToday($amount, $currencyModel->id, $egpModel->id);
+            }
+            $currency = 'EGP';
+        }
+
         $hash = KashierHelper::generateHash(
             $merchantId,
             $payment->internal_order_id,
-            $payment->amount,
-            $payment->currency,
+            $amount,
+            $currency,
             'pgw_client_' . $client->id
         );
 
@@ -155,8 +177,8 @@ class PaymentGatewayService
         $params = [
             'merchantId'         => $merchantId,
             'orderId'            => $payment->internal_order_id,
-            'amount'             => $payment->amount,
-            'currency'           => $payment->currency,
+            'amount'             => $amount,
+            'currency'           => $currency,
             'hash'               => $hash,
             'mode'               => $mode,
             'merchantRedirect'   => urlencode($successUrl),
@@ -172,11 +194,7 @@ class PaymentGatewayService
             'enable3DS'          => 'true',
             'allowedMethods'     => 'card,wallet',
             'CustomerReference'  => 'pgw_client_' . $client->id,
-            'metaData'           => json_encode([
-                'source'              => 'musoftware-payment-gateway',
-                'internal_order_id'   => $payment->internal_order_id,
-                'client_id'           => $client->client_id,
-            ]),
+            'metaData'           => json_encode($metaDataArray),
         ];
 
         return 'https://payments.kashier.io/?' . http_build_query($params);

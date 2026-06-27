@@ -106,9 +106,19 @@ class FinancialController extends Controller
 
     public function addBalance(Request $request)
     {
-        $wallet = ['id' => null, 'balance' => (float)$request->user()->user_balance, 'currency' => $request->user()->currency_name()];
+        $user = $request->user();
+        $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
+
+        $baseUSD = [50, 100, 150, 200, 400, 700, 1000];
+        $presets = [];
+        foreach ($baseUSD as $usd) {
+            $exchanged = \App\Models\CurrenciesExchange::RateToday($usd, 1, $user->currency);
+            $presets[] = \App\Helpers\FinanceHelper::instance()->price_fixer($exchanged, $user->currency);
+        }
+
         return Inertia::render('Client/Financial/AddBalance', [
             'wallet' => $wallet,
+            'presets' => $presets,
         ]);
     }
 

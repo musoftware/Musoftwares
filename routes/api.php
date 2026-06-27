@@ -120,12 +120,49 @@ if (file_exists(base_path('Modules/Freelance/routes/api.php'))) {
     require base_path('Modules/Freelance/routes/api.php');
 }
 
-// â”€â”€ Incoming Webhooks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Incoming Webhooks ────────────────────────────────────────────────────────
 // Handles all incoming webhooks from external providers
 Route::post('webhooks/incoming/{source}', [\App\Http\Controllers\WebhookController::class, 'handle'])
     ->name('api.webhooks.incoming');
 
+// ── Geolocation ──────────────────────────────────────────────────────────────
+Route::get('ip-country', function (\Illuminate\Http\Request $request) {
+    $ip = $request->ip();
+    $service = new \App\Services\IpGeolocationService();
+    $country = $service->getCountryFromIp($ip);
+    $currency = $service->getCurrencyCodeForCountry($country);
+    
+    return response()->json([
+        'ip' => $ip,
+        'country' => $country,
+        'currency' => $currency,
+    ]);
+})->name('api.ip-country');
+
+// ── Currencies ───────────────────────────────────────────────────────────────
+// Provides all currencies, their USD exchange rates, and global gold prices. Used by ERP and modules.
+Route::get('currencies', function () {
+    $currencies = \App\Models\Currency::all();
+    $rates = \App\Helpers\CurrencyHelper::prepare(date('Y-m-d'));
+    
+    $usdRates = [];
+    foreach ($currencies as $currency) {
+        $code = strtoupper($currency->currency);
+        if (isset($rates[$code])) {
+            $usdRates[$currency->id] = $rates[$code];
+        }
+    }
+
+    $latestGoldWorldPrice = \App\Models\GoldWorldPrice::orderBy('price_date', 'desc')->first();
+    
+    return response()->json([
+        'currencies' => $currencies,
+        'usd_rates' => $usdRates,
+        'gold_world_price' => $latestGoldWorldPrice,
+    ]);
+})->name('api.currencies');
 
 
 Route::post('/sso/verify', [\App\Http\Controllers\SsoController::class, 'verify'])->name('sso.verify');
 Route::post('/sso/subscriptions/sync', [\App\Http\Controllers\Api\SubscriptionSyncController::class, 'sync'])->name('sso.subscriptions.sync');
+
