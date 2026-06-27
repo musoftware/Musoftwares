@@ -171,6 +171,8 @@ class FinancialController extends Controller
                 if ($userId && $trxId && $amountPaid > 0) {
                     $user = \App\Models\User::find($userId);
                     if ($user) {
+                        $amountPaid = \App\Helpers\KashierHelper::getWebhookAmountInUserCurrency($amountPaid, $metadata, $user);
+
                         $balanceService = app(\App\Services\BalanceService::class);
                         $result = $balanceService->processKashierDepositWebhook($user, $amountPaid, $trxId);
 

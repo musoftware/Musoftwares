@@ -147,6 +147,8 @@ class PointPurchaseController extends Controller
                     $user = \App\Models\User::find($userId);
                     
                     if ($user) {
+                        $amountPaid = \App\Helpers\KashierHelper::getWebhookAmountInUserCurrency($amountPaid, $metadata, $user);
+
                         // Idempotency check
                         $reason = "Points purchase via Kashier online payment (Trx: $trxId)";
                         $alreadyProcessed = \App\Models\Transaction::where('user_id', $user->id)

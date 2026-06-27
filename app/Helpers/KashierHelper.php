@@ -35,6 +35,24 @@ class KashierHelper
         }
     }
 
+    /**
+     * Parses the webhook amount safely into the user's currency.
+     * Uses the original_amount if available, otherwise converts from EGP.
+     */
+    public static function getWebhookAmountInUserCurrency(float $webhookAmount, array $metadata, \App\Models\User $user): float
+    {
+        if (isset($metadata['original_amount'])) {
+            return floatval($metadata['original_amount']);
+        }
+
+        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
+        if ($egpCurrency && $user->currency != $egpCurrency->id) {
+            return \App\Models\CurrenciesExchange::RateToday($webhookAmount, $egpCurrency->id, $user->currency);
+        }
+
+        return $webhookAmount;
+    }
+
     public static function buildBalancePaymentUrl(
         float $amount,
         int $userId,
@@ -48,7 +66,7 @@ class KashierHelper
         $mode = config('services.kashier.mode', 'live');
         $successUrl = urlencode(route('financial.add-balance.success'));
         $failureUrl = urlencode(route('financial.add-balance.failure'));
-        $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
+        $webhookUrl = urlencode(route('financial.add-balance.webhook'));
 
         $metaDataArray = [
             'user_id' => $userId,
@@ -105,7 +123,7 @@ class KashierHelper
         $mode = config('services.kashier.mode', 'live');
         $successUrl = urlencode(route('freelance.point-purchases.success'));
         $failureUrl = urlencode(route('freelance.point-purchases.failure'));
-        $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
+        $webhookUrl = urlencode(route('freelance.point-purchases.webhook'));
 
         $metaDataArray = [
             'user_id' => $userId,
@@ -167,7 +185,7 @@ class KashierHelper
         $mode = config('services.kashier.mode', 'live');
         $successUrl = urlencode(route('subscriptions.kashier.success'));
         $failureUrl = urlencode(route('subscriptions.kashier.failure'));
-        $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
+        $webhookUrl = urlencode(route('subscriptions.kashier.webhook'));
 
         $metaDataArray = [
             'user_id' => $userId,
@@ -229,7 +247,7 @@ class KashierHelper
         $successUrl = urlencode(route('booking.success', $bookingId));
         // Using the same checkout page for failure so user can retry
         $failureUrl = urlencode(route('booking.checkout', $bookingId));
-        $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
+        $webhookUrl = urlencode(route('booking.webhook'));
 
         $metaDataArray = [
             'user_id' => $userId,
@@ -286,7 +304,7 @@ class KashierHelper
         $mode = config('services.kashier.mode', 'live');
         $successUrl = urlencode(route('guest.invoices.payment.success'));
         $failureUrl = urlencode(route('guest.invoices.payment.failure'));
-        $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
+        $webhookUrl = urlencode(route('guest.invoices.payment.webhook'));
 
         $metaDataArray = [
             'user_id' => $userId,
@@ -343,7 +361,7 @@ class KashierHelper
         $mode = config('services.kashier.mode', 'live');
         $successUrl = urlencode(route('billing.invoices.payment.success'));
         $failureUrl = urlencode(route('billing.invoices.payment.failure'));
-        $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
+        $webhookUrl = urlencode(route('billing.invoices.payment.webhook'));
 
         $metaDataArray = [
             'user_id' => $userId,
@@ -400,7 +418,7 @@ class KashierHelper
         $mode = config('services.kashier.mode', 'live');
         $successUrl = urlencode(route('guest.payment-links.success'));
         $failureUrl = urlencode(route('guest.payment-links.failure'));
-        $webhookUrl = urlencode(route('api.webhooks.incoming', ['source' => 'kashier']));
+        $webhookUrl = urlencode(route('webhook'));
 
         $metaDataArray = [
             'user_id' => $userId,

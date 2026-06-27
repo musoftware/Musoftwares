@@ -184,6 +184,8 @@ class SubscriptionController extends Controller
                     $user = \App\Models\User::find($userId);
                     
                     if ($user) {
+                        $amountPaid = \App\Helpers\KashierHelper::getWebhookAmountInUserCurrency($amountPaid, $metadata, $user);
+
                         // Idempotency check
                         $reason = "Subscription modules via Kashier online payment (Trx: $trxId)";
                         $alreadyProcessed = Transaction::where('user_id', $user->id)
