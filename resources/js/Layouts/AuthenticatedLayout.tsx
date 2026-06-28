@@ -55,6 +55,15 @@ function AuthenticatedContent({
     const displayName = activeUser?.name || 'SaaS User';
     const displayEmail = activeUser?.email || 'user@example.com';
     const [isMobileOpen, setIsMobileOpen] = useState(false);
+    const [isIOS, setIsIOS] = useState(false);
+
+    useEffect(() => {
+        setIsIOS(
+            typeof window !== 'undefined' &&
+            /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+            !(window as any).MSStream
+        );
+    }, []);
 
     // Safety checks for route existence
     const safeRoute = (name: string, params?: any, fallbackUrl?: string) => {
@@ -855,18 +864,21 @@ function AuthenticatedContent({
                             {__('general.notifications_disabled_message')}
                         </p>
                         <div className="flex items-center gap-2">
-                            <button
-                                onClick={requestPermission}
-                                className="flex-none rounded-full bg-indigo-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-900 transition-colors"
-                            >
-                                {__('general.enable_notifications')} <span aria-hidden="true">&rarr;</span>
-                            </button>
-                            <Link
-                                href={safeRoute('freelance.settings.notifications') || '#'}
-                                className="flex-none rounded-full border border-indigo-400 px-3.5 py-1 text-sm font-semibold text-indigo-100 hover:bg-indigo-500 transition-colors"
-                            >
-                                iPhone User? Use iOS Shortcut
-                            </Link>
+                            {isIOS ? (
+                                <Link
+                                    href={safeRoute('freelance.settings.notifications') || '#'}
+                                    className="flex-none rounded-full bg-indigo-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-900 transition-colors"
+                                >
+                                    {__('general.enable_notifications')} <span aria-hidden="true">&rarr;</span>
+                                </Link>
+                            ) : (
+                                <button
+                                    onClick={requestPermission}
+                                    className="flex-none rounded-full bg-indigo-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-900 transition-colors"
+                                >
+                                    {__('general.enable_notifications')} <span aria-hidden="true">&rarr;</span>
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
