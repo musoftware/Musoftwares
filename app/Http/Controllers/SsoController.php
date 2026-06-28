@@ -86,8 +86,10 @@ class SsoController extends Controller
         $system   = $ssoToken->target_system;
 
         // Fetch the user's subscription for the target system (e.g. 'erp', 'goldsaversys')
+        $subscriptionPrefix = config("saas.system_to_module.{$system}", $system);
+
         $subscription = \App\Models\UserSubscription::where('user_id', $user->id)
-            ->where('object', 'like', $system . '%')
+            ->where('object', 'like', $subscriptionPrefix . '%')
             ->where('status', 'active')
             ->where(function ($q) {
                 $q->whereNull('expires_at')

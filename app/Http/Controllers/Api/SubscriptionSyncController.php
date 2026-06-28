@@ -25,8 +25,10 @@ class SubscriptionSyncController extends Controller
         $module = $request->input('module');
         $userIds = $request->input('user_ids');
 
+        $subscriptionPrefix = config("saas.system_to_module.{$module}", $module);
+
         $subscriptions = UserSubscription::whereIn('user_id', $userIds)
-            ->where('object', 'like', $module . '%')
+            ->where('object', 'like', $subscriptionPrefix . '%')
             ->get(['user_id', 'object', 'status', 'expires_at'])
             ->groupBy('user_id');
 
