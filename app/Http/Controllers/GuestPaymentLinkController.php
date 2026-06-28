@@ -54,14 +54,20 @@ class GuestPaymentLinkController extends Controller
         }
         $currency = $paymentLink->currency->currency;
 
-        $paymentUrl = KashierHelper::buildPaymentLinkUrl(
-            $amount,
-            $paymentLink->id,
-            $paymentLink->user_id,
-            $request->input('guest_name'),
-            $request->input('guest_email'),
-            $currency
-        );
+        $paymentUrl = \App\Builders\KashierCheckoutBuilder::make()
+            ->forAmount($amount, $currency)
+            ->forGuest($request->input('guest_name'), $request->input('guest_email'), 'user_' . $paymentLink->user_id)
+            ->withSource('payment-link', 'plnk_')
+            ->withMetadata([
+                'payment_link_id' => $paymentLink->id,
+                'user_id' => $paymentLink->user_id,
+            ])
+            ->withRoutes(
+                success: route('guest.payment-links.success'),
+                failure: route('guest.payment-links.failure'),
+                webhook: route('webhook')
+            )
+            ->build();
 
         return Inertia::location($paymentUrl);
     }

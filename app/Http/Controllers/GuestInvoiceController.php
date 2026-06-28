@@ -58,14 +58,20 @@ class GuestInvoiceController extends Controller
         }
         $currency = $invoice->currency->currency;
 
-        $paymentUrl = KashierHelper::buildInvoiceGuestPaymentUrl(
-            $amount,
-            $invoice->id,
-            $invoice->user_id,
-            $request->input('guest_name'),
-            $request->input('guest_email'),
-            $currency
-        );
+        $paymentUrl = \App\Builders\KashierCheckoutBuilder::make()
+            ->forAmount($amount, $currency)
+            ->forGuest($request->input('guest_name'), $request->input('guest_email'), 'user_' . $invoice->user_id)
+            ->withSource('guest-invoice-payment', 'inv_')
+            ->withMetadata([
+                'invoice_id' => $invoice->id,
+                'user_id' => $invoice->user_id,
+            ])
+            ->withRoutes(
+                success: route('guest.invoices.payment.success'),
+                failure: route('guest.invoices.payment.failure'),
+                webhook: route('guest.invoices.payment.webhook')
+            )
+            ->build();
 
         return Inertia::location($paymentUrl);
     }

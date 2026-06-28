@@ -131,13 +131,16 @@ class FinancialController extends Controller
         $user = $request->user();
         $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
 
-        $paymentUrl = \App\Helpers\KashierHelper::buildBalancePaymentUrl(
-            (float) $request->amount,
-            $user->id,
-            $user->name,
-            $user->email,
-            $wallet['currency']
-        );
+        $paymentUrl = \App\Builders\KashierCheckoutBuilder::make()
+            ->forAmount((float) $request->amount, $wallet['currency'])
+            ->forUser($user->id, $user->name, $user->email)
+            ->withSource('balance-recharge', 'deposit_')
+            ->withRoutes(
+                success: route('financial.add-balance.success'),
+                failure: route('financial.add-balance.failure'),
+                webhook: route('financial.add-balance.webhook')
+            )
+            ->build();
 
         return Inertia::location($paymentUrl);
     }

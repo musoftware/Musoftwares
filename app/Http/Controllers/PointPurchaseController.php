@@ -72,15 +72,20 @@ class PointPurchaseController extends Controller
         } catch (\Exception $e) {
             if ($e->getMessage() === 'INSUFFICIENT_FUNDS') {
                 $paymentDetails = $this->pointsService->getUserAmountAndCurrency($user, $costInEgp);
-                $paymentUrl = KashierHelper::buildPointPurchasePaymentUrl(
-                    $paymentDetails['amount'],
-                    $user->id,
-                    $user->name,
-                    $user->email,
-                    null,
-                    $points,
-                    $paymentDetails['currency']
-                );
+                $paymentUrl = \App\Builders\KashierCheckoutBuilder::make()
+                    ->forAmount($paymentDetails['amount'], $paymentDetails['currency'])
+                    ->forUser($user->id, $user->name, $user->email)
+                    ->withSource('points-purchase', 'pts_')
+                    ->withMetadata([
+                        'package_id' => null,
+                        'points' => $points,
+                    ])
+                    ->withRoutes(
+                        success: route('points.kashier.success'),
+                        failure: route('points.kashier.failure'),
+                        webhook: route('points.kashier.webhook')
+                    )
+                    ->build();
                 return Inertia::location($paymentUrl);
             }
             
@@ -99,15 +104,20 @@ class PointPurchaseController extends Controller
         } catch (\Exception $e) {
             if ($e->getMessage() === 'INSUFFICIENT_FUNDS') {
                 $paymentDetails = $this->pointsService->getUserAmountAndCurrency($user, $package->price);
-                $paymentUrl = KashierHelper::buildPointPurchasePaymentUrl(
-                    $paymentDetails['amount'],
-                    $user->id,
-                    $user->name,
-                    $user->email,
-                    $package->id,
-                    $package->points,
-                    $paymentDetails['currency']
-                );
+                $paymentUrl = \App\Builders\KashierCheckoutBuilder::make()
+                    ->forAmount($paymentDetails['amount'], $paymentDetails['currency'])
+                    ->forUser($user->id, $user->name, $user->email)
+                    ->withSource('points-purchase', 'pts_')
+                    ->withMetadata([
+                        'package_id' => $package->id,
+                        'points' => $package->points,
+                    ])
+                    ->withRoutes(
+                        success: route('points.kashier.success'),
+                        failure: route('points.kashier.failure'),
+                        webhook: route('points.kashier.webhook')
+                    )
+                    ->build();
                 return Inertia::location($paymentUrl);
             }
             

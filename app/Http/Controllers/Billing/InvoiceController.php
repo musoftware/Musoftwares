@@ -159,14 +159,17 @@ class InvoiceController extends Controller
         
         $currencyCode = $invoice->currency->currency;
 
-        $paymentUrl = KashierHelper::buildUserInvoicePaymentUrl(
-            $remaining,
-            $invoice->id,
-            $user->id,
-            $user->name,
-            $user->email,
-            $currencyCode
-        );
+        $paymentUrl = \App\Builders\KashierCheckoutBuilder::make()
+            ->forAmount($remaining, $currencyCode)
+            ->forUser($user->id, $user->name, $user->email)
+            ->withSource('user-invoice-payment', 'u_inv_')
+            ->withMetadata(['invoice_id' => $invoice->id])
+            ->withRoutes(
+                success: route('billing.invoices.payment.success'),
+                failure: route('billing.invoices.payment.failure'),
+                webhook: route('billing.invoices.payment.webhook')
+            )
+            ->build();
 
         return response()->json([
             'success' => true,

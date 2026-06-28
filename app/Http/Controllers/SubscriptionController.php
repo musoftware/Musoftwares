@@ -146,18 +146,23 @@ class SubscriptionController extends Controller
 
         $plan_amount = $currencyDetails['currencyCode'] === 'EGP' ? round($base_plan_amount) : psychological_price($base_plan_amount);
 
-        $paymentUrl = \App\Helpers\KashierHelper::buildSubscriptionPaymentUrl(
-            $plan_amount,
-            $user->id,
-            $user->name,
-            $user->email,
-            null,
-            $currencyDetails['currencyCode'],
-            $billingCycle,
-            $billing['days'],
-            $request->items ?? [],
-            $isNewSystem
-        );
+        $paymentUrl = \App\Builders\KashierCheckoutBuilder::make()
+            ->forAmount($plan_amount, $currencyDetails['currencyCode'])
+            ->forUser($user->id, $user->name, $user->email)
+            ->withSource('subscription-purchase', 'sub_')
+            ->withMetadata([
+                'plan_id' => null,
+                'billing_cycle' => $billingCycle,
+                'days' => $billing['days'],
+                'items' => $request->items ?? [],
+                'is_new_system' => $isNewSystem,
+            ])
+            ->withRoutes(
+                success: route('subscriptions.kashier.success'),
+                failure: route('subscriptions.kashier.failure'),
+                webhook: route('subscriptions.kashier.webhook')
+            )
+            ->build();
 
         return Inertia::location($paymentUrl);
     }
