@@ -38,6 +38,24 @@ class SubscriptionSyncController extends Controller
                 $userSubs = $subscriptions->get($userId);
                 $subsArray = [];
                 foreach ($userSubs as $sub) {
+                    if (isset($subsArray[$sub->object])) {
+                        $existing = $subsArray[$sub->object];
+                        // If new one is active and existing is not, overwrite
+                        if ($sub->status === 'active' && $existing['status'] !== 'active') {
+                            // Proceed to overwrite
+                        } elseif ($sub->status === $existing['status']) {
+                            // If same status, keep the one that expires later
+                            if ($sub->expires_at > $existing['expires_at']) {
+                                // Proceed to overwrite
+                            } else {
+                                continue;
+                            }
+                        } else {
+                            // Existing is active, new is not, keep existing
+                            continue;
+                        }
+                    }
+
                     $subsArray[$sub->object] = [
                         'status' => $sub->status,
                         'expires_at' => $sub->expires_at,

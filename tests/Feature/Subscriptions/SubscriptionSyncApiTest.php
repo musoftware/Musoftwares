@@ -15,7 +15,15 @@ class SubscriptionSyncApiTest extends TestCase
     {
         $user = User::factory()->create();
 
-        // Give the user a "gold-saver" subscription (which is the actual DB object)
+        // Create an old "cancelled" subscription to simulate multiple subscriptions
+        UserSubscription::factory()->create([
+            'user_id' => $user->id,
+            'object' => 'gold-saver',
+            'status' => 'cancelled',
+            'expires_at' => now()->subYear(),
+        ]);
+
+        // Give the user an "active" gold-saver subscription
         UserSubscription::factory()->create([
             'user_id' => $user->id,
             'object' => 'gold-saver',
@@ -35,7 +43,7 @@ class SubscriptionSyncApiTest extends TestCase
         
         $this->assertArrayHasKey($user->id, $data);
         
-        // Assert that the active gold-saver subscription is returned
-        $this->assertEquals('active', $data[$user->id]['gold-saver']['status'] ?? 'cancelled', 'Failed: returns cancelled because it looks for goldsaversys% instead of gold-saver%');
+        // Assert that the active gold-saver subscription is prioritized and returned
+        $this->assertEquals('active', $data[$user->id]['gold-saver']['status'] ?? 'cancelled', 'Failed: expected the active subscription to be prioritized over the cancelled one.');
     }
 }

@@ -7,8 +7,8 @@ return [
     |--------------------------------------------------------------------------
     */
     'system_to_module' => [
-        'goldsaversys' => 'gold-saver',
-        'affsys'       => 'affiliate-pos',
+        'goldsaversys' => 'gold',
+        'affsys'       => 'affiliate',
         'bookingsys'   => 'booking',
     ],
 

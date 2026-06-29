@@ -11,7 +11,7 @@
     "WrittenCoursesEngine": true,
     "ISaas": true,
     "PaymentGateway": true,
-    "CRM": true,
+    "CRM": false,
     "PasswordSync": true,
     "WebTools": true
 }

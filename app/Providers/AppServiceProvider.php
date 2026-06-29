@@ -79,19 +79,19 @@ class AppServiceProvider extends ServiceProvider
         };
 
         RateLimiter::for('api', function (Request $request) use ($getLimit) {
-            return $getLimit('api', 60, 1, $request)->by($request->user()?->id ?: $request->ip());
+            return $getLimit('api', 300, 1, $request)->by($request->user()?->id ?: $request->ip());
         });
 
         RateLimiter::for('web', function (Request $request) use ($getLimit) {
-            return $getLimit('web', 120, 1, $request)->by($request->user()?->id ?: $request->ip());
+            return $getLimit('web', 600, 1, $request)->by($request->user()?->id ?: $request->ip());
         });
 
         RateLimiter::for('tenant', function (Request $request) use ($getLimit) {
-            return $getLimit('tenant', 1000, 1, $request)->by(session('tenant_id', $request->user()?->id ?: $request->ip()));
+            return $getLimit('tenant', 5000, 1, $request)->by(session('tenant_id', $request->user()?->id ?: $request->ip()));
         });
 
         RateLimiter::for('webhooks', function (Request $request) use ($getLimit) {
-            return $getLimit('webhooks', 300, 1, $request)->by($request->ip());
+            return $getLimit('webhooks', 1500, 1, $request)->by($request->ip());
         });
     }
 }
