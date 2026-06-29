@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Events\SerialUserDeviceStatusChanged;
 use App\Models\SerialDevice;
 use App\Models\SerialUserDevice;
 
@@ -36,6 +37,12 @@ class SerialUserDeviceObserver
     {
         if ($serialUserDevice->wasChanged('status')) {
             $this->syncStatusToSerialDevices($serialUserDevice);
+
+            event(new SerialUserDeviceStatusChanged(
+                $serialUserDevice,
+                $serialUserDevice->getOriginal('status'),
+                $serialUserDevice->status,
+            ));
         }
     }
 

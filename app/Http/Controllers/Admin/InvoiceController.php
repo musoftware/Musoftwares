@@ -2,14 +2,31 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\FinanceHelper;
+use App\Helpers\TextHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\InvoiceResource;
-use App\Models\Invoice;
-use App\Models\User;
-use App\Models\Project;
-use App\Services\InvoiceService;
 use App\Http\Requests\Admin\Invoice\UpdateInvoiceRequest;
+use App\Http\Resources\InvoiceResource;
+use App\Models\AdminAuditLog;
+use App\Models\AdminSettings;
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
+use App\Models\GoldPrice;
+use App\Models\GoldWorldPrice;
+use App\Models\Invoice;
+use App\Models\InvoiceCostLine;
+use App\Models\InvoiceItem;
+use App\Models\InvoiceItemTimer;
+use App\Models\Project;
+use App\Models\User;
+use App\Services\AdminAuditService;
+use App\Services\InvoiceService;
+use App\Services\WhatsAppNotificationService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 
 class InvoiceController extends Controller
@@ -17,6 +34,7 @@ class InvoiceController extends Controller
     public function __construct(
         protected InvoiceService $invoiceService
     ) {}
+
     private function applyFilters($query, Request $request)
     {
         if ($request->filled('client_id')) {
@@ -35,12 +53,12 @@ class InvoiceController extends Controller
             $filterBy = 'all';
         }
 
-        if (!empty($search)) {
+        if (! empty($search)) {
             $query->where(function ($q) use ($filterBy, $search) {
                 $decodedSearch = $search;
-                if (in_array($filterBy, ['all', 'id']) && class_exists(\App\Helpers\TextHelper::class)) {
+                if (in_array($filterBy, ['all', 'id']) && class_exists(TextHelper::class)) {
                     try {
-                        $decodedSearch = \App\Helpers\TextHelper::instance()->crockford_decode2($search);
+                        $decodedSearch = TextHelper::instance()->crockford_decode2($search);
                     } catch (\Exception $e) {
                         // Ignore
                     }
@@ -48,15 +66,15 @@ class InvoiceController extends Controller
 
                 if ($filterBy === 'all') {
                     $q->orWhere('id', $decodedSearch)
-                      ->orWhere('status', $search)
-                      ->orWhereHas('user', function ($uq) use ($search) {
-                          $uq->where('name', 'like', '%' . $search . '%');
-                      });
+                        ->orWhere('status', $search)
+                        ->orWhereHas('user', function ($uq) use ($search) {
+                            $uq->where('name', 'like', '%'.$search.'%');
+                        });
                 } elseif ($filterBy === 'id') {
                     $q->where('id', $decodedSearch);
                 } elseif ($filterBy === 'client_name') {
                     $q->whereHas('user', function ($uq) use ($search) {
-                        $uq->where('name', 'like', '%' . $search . '%');
+                        $uq->where('name', 'like', '%'.$search.'%');
                     });
                 } elseif ($filterBy === 'status') {
                     if ($search === 'unpaid_partial') {
@@ -77,7 +95,7 @@ class InvoiceController extends Controller
 
     private function getStats(Request $request)
     {
-        if (!$request->filled('client_id') && !$request->filled('project_id')) {
+        if (! $request->filled('client_id') && ! $request->filled('project_id')) {
             return null;
         }
 
@@ -109,9 +127,9 @@ class InvoiceController extends Controller
             ->withQueryString()
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
 
-        $projects = $request->filled('client_id') 
-            ? \App\Models\Project::where('user_id', $request->client_id)->get()
-            : \App\Models\Project::all();
+        $projects = $request->filled('client_id')
+            ? Project::where('user_id', $request->client_id)->get()
+            : Project::all();
 
         return Inertia::render('Admin/Invoices/Index', [
             'invoices' => $invoices,
@@ -134,9 +152,9 @@ class InvoiceController extends Controller
             ->withQueryString()
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
 
-        $projects = $request->filled('client_id') 
-            ? \App\Models\Project::where('user_id', $request->client_id)->get()
-            : \App\Models\Project::all();
+        $projects = $request->filled('client_id')
+            ? Project::where('user_id', $request->client_id)->get()
+            : Project::all();
 
         return Inertia::render('Admin/Invoices/Index', [
             'invoices' => $invoices,
@@ -159,9 +177,9 @@ class InvoiceController extends Controller
             ->withQueryString()
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
 
-        $projects = $request->filled('client_id') 
-            ? \App\Models\Project::where('user_id', $request->client_id)->get()
-            : \App\Models\Project::all();
+        $projects = $request->filled('client_id')
+            ? Project::where('user_id', $request->client_id)->get()
+            : Project::all();
 
         return Inertia::render('Admin/Invoices/Index', [
             'invoices' => $invoices,
@@ -180,7 +198,7 @@ class InvoiceController extends Controller
     {
         $clientId = $request->input('client_id') ?? $request->input('user') ?? $request->input('user_id');
         $client = User::find($clientId);
-        if (!$client) {
+        if (! $client) {
             return redirect()->route('admin.invoices.index')
                 ->with('error', __('admin.client_not_found'));
         }
@@ -191,10 +209,12 @@ class InvoiceController extends Controller
 
         try {
             $invoice = Invoice::createInvoice($client, $project, null);
+
             return redirect()->route('admin.invoices.show', $invoice->id)
                 ->with('success', __('admin.invoice_created'));
         } catch (\Exception $e) {
-            \Log::error('Invoice creation failed: ' . $e->getMessage());
+            \Log::error('Invoice creation failed: '.$e->getMessage());
+
             return redirect()->back()
                 ->with('error', __('admin.invoice_creation_failed'));
         }
@@ -206,9 +226,9 @@ class InvoiceController extends Controller
     public function show(Invoice $invoice)
     {
         $invoice->load(['user.projects', 'project', 'items.timers', 'costLines.creditUser']);
-        
+
         return Inertia::render('Admin/Invoices/Show', [
-            'invoice' => (new InvoiceResource($invoice))->resolve()
+            'invoice' => (new InvoiceResource($invoice))->resolve(),
         ]);
     }
 
@@ -220,7 +240,8 @@ class InvoiceController extends Controller
         try {
             $this->invoiceService->updateInvoice($invoice, $request->validated());
         } catch (\Exception $e) {
-            \Log::error('Invoice update failed: ' . $e->getMessage());
+            \Log::error('Invoice update failed: '.$e->getMessage());
+
             return redirect()->back()->with('error', __('admin.invoice_update_failed'));
         }
 
@@ -234,7 +255,7 @@ class InvoiceController extends Controller
     {
         try {
             $client_balance = $invoice->user->balance($invoice->currency_id);
-            if (((float)$client_balance >= (float)$invoice->unpaid_total()) && ((float)$invoice->unpaid_total() > 0)) {
+            if (((float) $client_balance >= (float) $invoice->unpaid_total()) && ((float) $invoice->unpaid_total() > 0)) {
                 $invoice->bill_invoice();
             } else {
                 return redirect()->back()->with('error', __('admin.insufficient_balance'));
@@ -280,7 +301,7 @@ class InvoiceController extends Controller
     public function changeStatus(Request $request, Invoice $invoice)
     {
         $request->validate(['status' => 'required|in:unpaid,partially_paid,paid,cancelled']);
-        
+
         try {
             if ($request->status === 'paid' && $invoice->status !== 'paid') {
                 $this->invoiceService->markPaid($invoice);
@@ -302,7 +323,7 @@ class InvoiceController extends Controller
     public function changeJobStatus(Request $request, Invoice $invoice)
     {
         $request->validate(['job_status' => 'required|in:pending,processing,done']);
-        
+
         try {
             $invoice->update(['job_status' => $request->job_status]);
         } catch (\Exception $e) {
@@ -320,7 +341,7 @@ class InvoiceController extends Controller
         $request->validate([
             'action' => 'required|string',
             'invoices' => 'required|array',
-            'project_id' => 'nullable|integer'
+            'project_id' => 'nullable|integer',
         ]);
 
         $action = $request->input('action');
@@ -362,10 +383,10 @@ class InvoiceController extends Controller
                 $client_balance = $inv->user->balance($inv->currency_id);
                 $invoice_total = $inv->unpaid_total();
 
-                if (((float)$client_balance >= (float)$inv->unpaid_total()) && ((float)$inv->unpaid_total() > 0)) {
+                if (((float) $client_balance >= (float) $inv->unpaid_total()) && ((float) $inv->unpaid_total() > 0)) {
                     $inv->bill_invoice();
                 } else {
-                    if (((float)$inv->total() == 0)) {
+                    if (((float) $inv->total() == 0)) {
                         return redirect()->back()->with('error', __('admin.invoice_total_zero'));
                     } else {
                         return redirect()->back()->with('error', __('admin.insufficient_balance'));
@@ -392,22 +413,54 @@ class InvoiceController extends Controller
                     return redirect()->back()->with('error', __('admin.no_unpaid_amount'));
                 }
                 $project = $inv->project;
-                $inv->user->add_balance(
-                    -1 * $invoice_total,
-                    'Invoice #' . $inv->id . ' converted to transaction',
-                    'used',
-                    $inv->currency_id,
-                    $project
-                );
-                $inv->paid = $inv->total();
-                $inv->status = 'paid';
-                $inv->save();
+
+                // Atomic balance deduction + invoice close. Lock the user row
+                // so a concurrent admin action (e.g. another convert, partial
+                // pay, or transfer) cannot interleave between the balance
+                // write and the invoice status write.
+                DB::transaction(function () use ($inv, $invoice_total, $project) {
+                    $user = User::where('id', $inv->user_id)->lockForUpdate()->first();
+                    if (! $user) {
+                        throw new \RuntimeException('User vanished mid-conversion');
+                    }
+
+                    // Re-read the invoice under serializable behaviour to ensure
+                    // its unpaid total is still > 0 (someone may have paid it
+                    // while we waited for the user lock).
+                    $freshInv = Invoice::where('id', $inv->id)->lockForUpdate()->first();
+                    if (! $freshInv || $freshInv->status === 'paid' || $freshInv->unpaid_total() <= 0) {
+                        throw new \RuntimeException('Invoice no longer eligible for conversion');
+                    }
+
+                    $user->add_balance(
+                        -1 * $invoice_total,
+                        'Invoice #'.$freshInv->id.' converted to transaction',
+                        'used',
+                        $freshInv->currency_id,
+                        $project
+                    );
+
+                    $freshInv->paid = $freshInv->total();
+                    $freshInv->status = 'paid';
+                    $freshInv->save();
+
+                    app(AdminAuditService::class)->record(
+                        'invoice.convert_to_transaction',
+                        $freshInv,
+                        [
+                            'actor_user_id' => Auth::id(),
+                            'amount' => $invoice_total,
+                            'currency_id' => $freshInv->currency_id,
+                        ],
+                        AdminAuditLog::SEVERITY_WARNING
+                    );
+                });
             } elseif ($action == 'send_whatsapp_reminder') {
                 if ($inv->status != 'unpaid' && $inv->status != 'partially_paid') {
                     return redirect()->back()->with('error', __('admin.only_unpaid_for_whatsapp'));
                 }
                 $userId = $inv->user_id;
-                if (!isset($whatsapp_invoices_by_user[$userId])) {
+                if (! isset($whatsapp_invoices_by_user[$userId])) {
                     $whatsapp_invoices_by_user[$userId] = [];
                 }
                 $whatsapp_invoices_by_user[$userId][] = $inv;
@@ -454,20 +507,22 @@ class InvoiceController extends Controller
             }
         }
 
-        if ($action == 'send_whatsapp_reminder' && !empty($whatsapp_invoices_by_user)) {
-            if (class_exists(\App\Services\WhatsAppNotificationService::class)) {
-                $reminderService = app(\App\Services\WhatsAppNotificationService::class);
+        if ($action == 'send_whatsapp_reminder' && ! empty($whatsapp_invoices_by_user)) {
+            if (class_exists(WhatsAppNotificationService::class)) {
+                $reminderService = app(WhatsAppNotificationService::class);
                 foreach ($whatsapp_invoices_by_user as $userId => $userInvoices) {
-                    $client = \App\Models\User::find($userId);
+                    $client = User::find($userId);
                     if ($client) {
                         $result = $reminderService->sendInvoiceReminder($client, collect($userInvoices));
-                        if (!$result['success']) {
+                        if (! $result['success']) {
                             return redirect()->back()->with('error', __('admin.whatsapp_reminder_failed', ['name' => $result['client_name']]));
                         }
                     }
                 }
+
                 return redirect()->back()->with('success', __('admin.whatsapp_reminders_sent'));
             }
+
             return redirect()->back()->with('error', 'WhatsApp service not available.');
         }
 
@@ -480,9 +535,10 @@ class InvoiceController extends Controller
     public function downloadPdf(Invoice $invoice)
     {
         $invoice->loadMissing(['user.projects', 'project', 'items.timers', 'costLines.creditUser']);
-        $pdf = \App\Helpers\TextHelper::pdfInvoice($invoice);
+        $pdf = TextHelper::pdfInvoice($invoice);
         $clientName = $invoice->user ? $invoice->user->name : 'Client';
-        return $pdf->download(str_replace(' ', '-', $clientName) . '-' . $invoice->invoice_number . '.pdf');
+
+        return $pdf->download(str_replace(' ', '-', $clientName).'-'.$invoice->invoice_number.'.pdf');
     }
 
     /**
@@ -491,7 +547,8 @@ class InvoiceController extends Controller
     public function printPdf(Invoice $invoice)
     {
         $invoice->loadMissing(['user.projects', 'project', 'items.timers', 'costLines.creditUser']);
-        $pdf = \App\Helpers\TextHelper::pdfInvoice($invoice);
+        $pdf = TextHelper::pdfInvoice($invoice);
+
         return $pdf->stream();
     }
 
@@ -501,6 +558,7 @@ class InvoiceController extends Controller
     public function notify(Invoice $invoice)
     {
         $invoice->update(['is_published' => 1]);
+
         return redirect()->back()->with('success', __('admin.notification_sent'));
     }
 
@@ -510,7 +568,7 @@ class InvoiceController extends Controller
     public function shareLink(Request $request, Invoice $invoice)
     {
         $duration = $request->input('duration', '24_hours');
-        
+
         $expiresAt = now();
         if ($duration === '3_days') {
             $expiresAt->addDays(3);
@@ -521,7 +579,7 @@ class InvoiceController extends Controller
             $expiresAt->addHours(24);
         }
 
-        $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+        $url = URL::temporarySignedRoute(
             'guest.invoices.show',
             $expiresAt,
             ['invoice' => $invoice->id]
@@ -529,7 +587,7 @@ class InvoiceController extends Controller
 
         return response()->json([
             'url' => $url,
-            'expires_at' => $expiresAt->toDateTimeString()
+            'expires_at' => $expiresAt->toDateTimeString(),
         ]);
     }
 
@@ -538,19 +596,19 @@ class InvoiceController extends Controller
      */
     public function reschedule(Request $request, Invoice $invoice)
     {
-        if (!in_array($invoice->status, ['unpaid', 'partially_paid'])) {
+        if (! in_array($invoice->status, ['unpaid', 'partially_paid'])) {
             return redirect()->back()->with('error', __('admin.only_unpaid_can_be_rescheduled'));
         }
 
         $request->validate([
             'new_date' => 'required|date',
-            'notify_client' => 'nullable|boolean'
+            'notify_client' => 'nullable|boolean',
         ]);
 
         try {
-            $newDate = \Carbon\Carbon::parse($request->new_date);
+            $newDate = Carbon::parse($request->new_date);
             // Keep the current time, just change the date
-            $currentDate = \Carbon\Carbon::parse($invoice->created_at);
+            $currentDate = Carbon::parse($invoice->created_at);
             $newDate->setTime($currentDate->hour, $currentDate->minute, $currentDate->second);
 
             $invoice->created_at = $newDate;
@@ -558,8 +616,8 @@ class InvoiceController extends Controller
             $invoice->save();
 
             if ($request->boolean('notify_client')) {
-                if (class_exists(\App\Services\WhatsAppNotificationService::class)) {
-                    $reminderService = app(\App\Services\WhatsAppNotificationService::class);
+                if (class_exists(WhatsAppNotificationService::class)) {
+                    $reminderService = app(WhatsAppNotificationService::class);
                     $client = $invoice->user;
                     if ($client) {
                         $reminderService->sendInvoiceReminder($client, collect([$invoice]));
@@ -567,7 +625,8 @@ class InvoiceController extends Controller
                 }
             }
         } catch (\Exception $e) {
-            \Log::error('Invoice reschedule failed: ' . $e->getMessage());
+            \Log::error('Invoice reschedule failed: '.$e->getMessage());
+
             return redirect()->back()->with('error', __('general.error_occurred'));
         }
 
@@ -600,7 +659,8 @@ class InvoiceController extends Controller
                 $invoice->save();
             }
         } catch (\Exception $e) {
-            \Log::error('Partial payment failed: ' . $e->getMessage());
+            \Log::error('Partial payment failed: '.$e->getMessage());
+
             return redirect()->back()->with('error', __('admin.partial_payment_failed'));
         }
 
@@ -612,8 +672,8 @@ class InvoiceController extends Controller
      */
     public function timerDetails($item_id)
     {
-        $item = \App\Models\InvoiceItem::with(['timers', 'invoice.user', 'invoice.currency'])->findOrFail($item_id);
-        
+        $item = InvoiceItem::with(['timers', 'invoice.user', 'invoice.currency'])->findOrFail($item_id);
+
         $timers = $item->timers->map(function ($timer) {
             return [
                 'id' => $timer->id,
@@ -621,7 +681,7 @@ class InvoiceController extends Controller
                 'end_date' => $timer->date_end,
                 'amount' => (float) $timer->amount,
                 'duration_seconds' => $timer->date_start && $timer->date_end
-                    ? abs(\Carbon\Carbon::parse($timer->date_end)->diffInSeconds(\Carbon\Carbon::parse($timer->date_start)))
+                    ? abs(Carbon::parse($timer->date_end)->diffInSeconds(Carbon::parse($timer->date_start)))
                     : 0,
             ];
         });
@@ -633,27 +693,27 @@ class InvoiceController extends Controller
         $last_end = $item->timers->max('date_end');
         $spanSeconds = 0;
         if ($first_start && $last_end) {
-            $spanSeconds = abs(\Carbon\Carbon::parse($last_end)->diffInSeconds(\Carbon\Carbon::parse($first_start)));
+            $spanSeconds = abs(Carbon::parse($last_end)->diffInSeconds(Carbon::parse($first_start)));
         }
 
-        $baseRate = \App\Helpers\FinanceHelper::calculateOverheadHourlyRate();
-        $system_base_rate = \App\Models\CurrenciesExchange::RateToday(
+        $baseRate = FinanceHelper::calculateOverheadHourlyRate();
+        $system_base_rate = CurrenciesExchange::RateToday(
             $baseRate,
-            \App\Models\AdminSettings::GetValue('business_currency', 2),
+            AdminSettings::GetValue('business_currency', 2),
             $item->invoice->currency_id
         );
 
         $client_rate = 0;
         $user = $item->invoice->user;
         if ($user && (float) ($user->hour_rate ?? 0) > 0) {
-            $client_rate = \App\Models\CurrenciesExchange::RateToday(
+            $client_rate = CurrenciesExchange::RateToday(
                 $user->hour_rate,
                 $user->hour_rate_currency_id ?? $user->hour_rate_currency ?? $user->currency_id ?? 1,
                 $item->invoice->currency_id
             );
         }
 
-        return \Inertia\Inertia::render('Admin/Invoices/TimerDetails', [
+        return Inertia::render('Admin/Invoices/TimerDetails', [
             'item' => [
                 'id' => $item->id,
                 'item_title' => $item->item_title,
@@ -666,7 +726,7 @@ class InvoiceController extends Controller
                 'project_name' => $item->invoice->project ? $item->invoice->project->name : null,
                 'date' => $item->invoice->date() ?? null,
             ],
-            'invoice_currency' => ($curr = \App\Models\Currency::find($item->invoice->currency_id)) ? [
+            'invoice_currency' => ($curr = Currency::find($item->invoice->currency_id)) ? [
                 'id' => $curr->id,
                 'currency' => $curr->currency,
                 'symbol' => $curr->symbol,
@@ -681,10 +741,10 @@ class InvoiceController extends Controller
         ]);
     }
 
-    public function storeTimerDetails(\Illuminate\Http\Request $request, $item_id)
+    public function storeTimerDetails(Request $request, $item_id)
     {
-        $item = \App\Models\InvoiceItem::findOrFail($item_id);
-        
+        $item = InvoiceItem::findOrFail($item_id);
+
         if ($item->invoice && $item->invoice->status !== 'unpaid') {
             return redirect()->back()->with('error', __('admin.only_unpaid_invoices_can_be_edited'));
         }
@@ -703,10 +763,10 @@ class InvoiceController extends Controller
         }
 
         foreach ($request->sessions as $session) {
-            \App\Models\InvoiceItemTimer::create([
+            InvoiceItemTimer::create([
                 'invoice_item_id' => $item->id,
-                'date_start' => \Carbon\Carbon::parse($session['start_date'])->toDateTimeString(),
-                'date_end' => \Carbon\Carbon::parse($session['end_date'])->toDateTimeString(),
+                'date_start' => Carbon::parse($session['start_date'])->toDateTimeString(),
+                'date_end' => Carbon::parse($session['end_date'])->toDateTimeString(),
                 'amount' => $session['amount'],
                 'project_id' => $item->invoice->project_id ?? null,
                 'user_id' => auth()->id(),
@@ -719,25 +779,25 @@ class InvoiceController extends Controller
 
     public function destroyTimerDetails($item_id, $timer_id)
     {
-        $item = \App\Models\InvoiceItem::findOrFail($item_id);
-        
+        $item = InvoiceItem::findOrFail($item_id);
+
         if ($item->invoice && $item->invoice->status !== 'unpaid') {
             return redirect()->back()->with('error', __('admin.only_unpaid_invoices_can_be_edited'));
         }
 
-        $timer = \App\Models\InvoiceItemTimer::where('invoice_item_id', $item->id)->findOrFail($timer_id);
+        $timer = InvoiceItemTimer::where('invoice_item_id', $item->id)->findOrFail($timer_id);
         $timer->delete();
 
         return redirect()->back()->with('success', __('admin.timer_session_deleted'));
     }
 
-    public function createTimerItem(\App\Models\Invoice $invoice)
+    public function createTimerItem(Invoice $invoice)
     {
         if ($invoice->status !== 'unpaid') {
             return redirect()->back()->with('error', __('admin.only_unpaid_invoices_can_be_edited'));
         }
 
-        $item = new \App\Models\InvoiceItem();
+        $item = new InvoiceItem;
         $item->invoice_id = $invoice->id;
         $item->item_title = 'Time Tracking';
         $item->item_type = 'timer';
@@ -748,16 +808,17 @@ class InvoiceController extends Controller
         return redirect()->route('admin.invoices.timer-details', $item->id);
     }
 
-    public function recordCostLinePaid(\App\Models\Invoice $invoice, $line)
+    public function recordCostLinePaid(Invoice $invoice, $line)
     {
         $result = $invoice->postDirectCostLineNow((int) $line);
         if ($result['ok']) {
             return redirect()->back()->with('success', __('admin.cost_line_recorded_success'));
         }
+
         return redirect()->back()->with('error', $result['message']);
     }
 
-    public function calculatePayService(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
+    public function calculatePayService(Request $request, Invoice $invoice)
     {
         $request->validate([
             'service_amount' => 'required|numeric',
@@ -781,13 +842,13 @@ class InvoiceController extends Controller
             'total' => round($calc['total'], 2),
             'total_usd' => round($calc['total_usd'], 2),
             'invoice_currency_id' => $invoice->currency_id,
-            'invoice_currency' => ($curr = \App\Models\Currency::find($invoice->currency_id)) ? $curr->currency : null,
+            'invoice_currency' => ($curr = Currency::find($invoice->currency_id)) ? $curr->currency : null,
         ]);
     }
 
-    private function runPayServiceCalculation(\App\Models\Invoice $invoice, $service_amount, $currency, $source, $dest, $revenue)
+    private function runPayServiceCalculation(Invoice $invoice, $service_amount, $currency, $source, $dest, $revenue)
     {
-        $ex_cost = \App\Models\CurrenciesExchange::RateToday((int) $service_amount, $currency, $invoice->currency_id);
+        $ex_cost = CurrenciesExchange::RateToday((int) $service_amount, $currency, $invoice->currency_id);
         $total_cost = $ex_cost;
 
         if ($source == 'wallet') {
@@ -828,15 +889,15 @@ class InvoiceController extends Controller
             $total_cost = round($total_cost / (1 - 0.06), 2);
         }
         if ($dest == 'redot') {
-            $item = \App\Models\GoldWorldPrice::query()
-                ->select(\Illuminate\Support\Facades\DB::raw('DATE(price_date) as price_date, avg(price_24k) as price_24k, avg(price_22k) as price_22k, avg(price_21k) as price_21k, avg(price_18k) as price_18k, avg(price_14k) as price_14k'))
-                ->groupBy(\Illuminate\Support\Facades\DB::raw('DATE(price_date)'))
-                ->orderBy(\Illuminate\Support\Facades\DB::raw('DATE(price_date)'), 'desc')
+            $item = GoldWorldPrice::query()
+                ->select(DB::raw('DATE(price_date) as price_date, avg(price_24k) as price_24k, avg(price_22k) as price_22k, avg(price_21k) as price_21k, avg(price_18k) as price_18k, avg(price_14k) as price_14k'))
+                ->groupBy(DB::raw('DATE(price_date)'))
+                ->orderBy(DB::raw('DATE(price_date)'), 'desc')
                 ->first();
-            
+
             if ($item) {
-                $usdPrice1 = \App\Models\CurrenciesExchange::RateByDate($item->price_date, $item->price_21k, 2, 1);
-                $price_21 = \App\Models\GoldPrice::query()->where(\Illuminate\Support\Facades\DB::raw('DATE(price_date)'), $item->price_date)->select(\Illuminate\Support\Facades\DB::raw('avg(price_21k) as price_21k'))->groupBy(\Illuminate\Support\Facades\DB::raw('DATE(price_date)'))->first();
+                $usdPrice1 = CurrenciesExchange::RateByDate($item->price_date, $item->price_21k, 2, 1);
+                $price_21 = GoldPrice::query()->where(DB::raw('DATE(price_date)'), $item->price_date)->select(DB::raw('avg(price_21k) as price_21k'))->groupBy(DB::raw('DATE(price_date)'))->first();
 
                 if ($usdPrice1 > 0 && $price_21) {
                     $total_cost = (int) $service_amount * ($price_21->price_21k / $usdPrice1);
@@ -852,12 +913,18 @@ class InvoiceController extends Controller
         $cost = $total_cost;
         $total = $cost;
         switch ((int) $revenue) {
-            case 3: $total = round($cost / (1 - 0.25), 2); break;
-            case 2: $total = round($cost / (1 - 0.175), 2); break;
-            case 1: $total = round($cost / (1 - 0.1125), 2); break;
-            case 0: $total = round($cost / (1 - 0.0475), 2); break;
-            case -1: $total = round($cost / (1 - 0.01125), 2); break;
-            default: $total = round($cost / (1 - 0.0175), 2); break;
+            case 3: $total = round($cost / (1 - 0.25), 2);
+                break;
+            case 2: $total = round($cost / (1 - 0.175), 2);
+                break;
+            case 1: $total = round($cost / (1 - 0.1125), 2);
+                break;
+            case 0: $total = round($cost / (1 - 0.0475), 2);
+                break;
+            case -1: $total = round($cost / (1 - 0.01125), 2);
+                break;
+            default: $total = round($cost / (1 - 0.0175), 2);
+                break;
         }
 
         $total_usd = $total;
@@ -869,7 +936,7 @@ class InvoiceController extends Controller
         ];
     }
 
-    public function storePayService(\Illuminate\Http\Request $request, \App\Models\Invoice $invoice)
+    public function storePayService(Request $request, Invoice $invoice)
     {
         $request->validate([
             'service_amount' => 'required|numeric',
@@ -893,28 +960,28 @@ class InvoiceController extends Controller
         );
 
         $cost = round((float) $calc['cost'], 3);
-        $total = round((float) $calc['total'], 2); 
+        $total = round((float) $calc['total'], 2);
 
-        $item = new \App\Models\InvoiceItem();
+        $item = new InvoiceItem;
         $item->invoice_id = $invoice->id;
-        $item->item_title = 'Service Payment - ' . $request->service_pay_source;
+        $item->item_title = 'Service Payment - '.$request->service_pay_source;
         $item->qty = 1;
         $item->amount = $total;
         $item->item_type = 'simple';
         $item->save();
 
-        $nextSort = (int) \App\Models\InvoiceCostLine::where('invoice_id', $invoice->id)->max('sort_order') + 1;
-        
-        $costLine = new \App\Models\InvoiceCostLine();
+        $nextSort = (int) InvoiceCostLine::where('invoice_id', $invoice->id)->max('sort_order') + 1;
+
+        $costLine = new InvoiceCostLine;
         $costLine->invoice_id = $invoice->id;
         $costLine->line_type = 'direct';
         $costLine->amount = $cost;
-        $costLine->description = 'Service Payment - ' . $request->service_pay_source;
+        $costLine->description = 'Service Payment - '.$request->service_pay_source;
         $costLine->sort_order = $nextSort;
         $costLine->save();
 
         $invoice->update([
-            'cost' => (float) \App\Models\InvoiceCostLine::where('invoice_id', $invoice->id)->sum('amount'),
+            'cost' => (float) InvoiceCostLine::where('invoice_id', $invoice->id)->sum('amount'),
         ]);
 
         return redirect()->back()->with('success', __('admin.service_payment_added_successfully'));

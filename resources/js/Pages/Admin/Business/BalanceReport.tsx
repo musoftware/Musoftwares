@@ -46,7 +46,9 @@ export default function BalanceReport() {
     const { stats } = usePage<any>().props;
 
     const currentYear = new Date().getFullYear();
-    const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
+    const years = Array.isArray(stats.available_years) && stats.available_years.length > 0
+        ? stats.available_years
+        : Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
     const handlePrevYear = () => {
         router.get(route('admin.reports.balance'), { year: stats.year - 1 }, { preserveState: true });

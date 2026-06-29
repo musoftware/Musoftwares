@@ -1,5 +1,18 @@
 <?php
 
+use App\Helpers\CurrencyHelper;
+use App\Http\Controllers\Api\MobileAuthController;
+use App\Http\Controllers\Api\SerialDeviceController;
+use App\Http\Controllers\Api\SubscriptionSyncController;
+use App\Http\Controllers\SsoController;
+use App\Http\Controllers\TrackerController;
+use App\Http\Controllers\WebhookController;
+use App\Models\Currency;
+use App\Models\GoldWorldPrice;
+use App\Services\IpGeolocationService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,42 +26,48 @@ use Illuminate\Support\Facades\Route;
 
 // ── Serial License Check-In ──────────────────────────────────────────────────
 // Called by client software on startup to verify license status.
-// No authentication — device_id is the identity.
+//
+// Auth: shared-secret HMAC over the raw request body. The client must send
+//       `X-Musoftwares-Signature: sha256=<hex>` and `services.serial_device.api_secret`
+//       must be configured in the environment.
+// Throttle: 60 req/min/IP (the middleware also records any 401 into the
+//       blocked-IP pipeline via SecurityEnforcement).
 // Returns: { "status": "active" } or { "status": "inactive" }
 
 Route::post('serial/device',
-    [\App\Http\Controllers\Api\SerialDeviceController::class, 'register']
-)->middleware('force.json');
+    [SerialDeviceController::class, 'register']
+)->middleware(['force.json', 'throttle:60,1', 'serial.device.hmac']);
 
 // ── Runtime Version Manifest (public) ─────────────────────────────────────────
 // Polled by local runtime agents to check for updates.
 // Served from public/downloads/runtime/latest.json
 Route::get('runtime/version', function () {
     $manifest = public_path('downloads/runtime/latest.json');
-    if (!file_exists($manifest)) {
+    if (! file_exists($manifest)) {
         return response()->json([
-            'version'           => '1.0.0',
+            'version' => '1.0.0',
             'minimum_supported' => '1.0.0',
-            'channel'           => 'stable',
-            'downloads'         => [],
-            'changelog'         => [],
+            'channel' => 'stable',
+            'downloads' => [],
+            'changelog' => [],
         ]);
     }
+
     return response()->file($manifest, ['Content-Type' => 'application/json']);
 })->name('api.runtime.version');
 
 // ── Runtime Plugin Manifest (public) ─────────────────────────────────────────
 // Lists all available plugins (no auth — only returns public metadata).
-Route::get('runtime/plugins', function (\Illuminate\Http\Request $request) {
+Route::get('runtime/plugins', function (Request $request) {
     $tools = collect(config('tools'))
-        ->filter(fn($t) => $t['is_active'] ?? false)
-        ->map(fn($t) => [
-            'id'          => $t['slug'],
-            'name'        => $t['title'],
-            'slug'        => $t['slug'],
-            'runtime'     => 'nodejs',
+        ->filter(fn ($t) => $t['is_active'] ?? false)
+        ->map(fn ($t) => [
+            'id' => $t['slug'],
+            'name' => $t['title'],
+            'slug' => $t['slug'],
+            'runtime' => 'nodejs',
             'description' => $t['short_description'] ?? '',
-            'version'     => $t['version'] ?? '1.0.0',
+            'version' => $t['version'] ?? '1.0.0',
         ])
         ->values();
 
@@ -57,42 +76,45 @@ Route::get('runtime/plugins', function (\Illuminate\Http\Request $request) {
 
 // ── Email Tracker System ─────────────────────────────────────────────────────
 // Handles 1x1 image tracking for Email Sender Pro local plugin
-Route::get('t/open/{payload}.gif', [\App\Http\Controllers\TrackerController::class, 'pixel'])
+Route::get('t/open/{payload}.gif', [TrackerController::class, 'pixel'])
     ->name('api.tracker.pixel');
 
-Route::get('t/click/{payload}', [\App\Http\Controllers\TrackerController::class, 'click'])
+Route::get('t/click/{payload}', [TrackerController::class, 'click'])
     ->name('api.tracker.click');
 
-Route::get('t/unsubscribe/{payload}', [\App\Http\Controllers\TrackerController::class, 'unsubscribe'])
+Route::get('t/unsubscribe/{payload}', [TrackerController::class, 'unsubscribe'])
     ->name('api.tracker.unsubscribe');
 
-Route::post('tracker/sync', [\App\Http\Controllers\TrackerController::class, 'sync'])
+Route::post('tracker/sync', [TrackerController::class, 'sync'])
     ->name('api.tracker.sync');
 
 // ── Public: Bing daily images ────────────────────────────────────────────────
 // Fetches daily images from Bing for backgrounds (e.g. desktop wallpapers)
 Route::get('bing-daily-images', function () {
-    $images = \Illuminate\Support\Facades\Cache::remember('auth_bing_images', 3600, function () {
+    $images = Cache::remember('auth_bing_images', 3600, function () {
         try {
-            $response = \Illuminate\Support\Facades\Http::timeout(5)->get('https://www.bing.com/HPImageArchive.aspx', [
+            $response = Http::timeout(5)->get('https://www.bing.com/HPImageArchive.aspx', [
                 'format' => 'js',
                 'idx' => 0,
                 'n' => 8,
                 'mkt' => 'en-US',
             ]);
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return [];
             }
             $data = $response->json();
             $list = $data['images'] ?? [];
+
             return array_values(array_filter(array_map(function ($img) {
                 $url = $img['url'] ?? '';
-                return $url ? 'https://www.bing.com' . $url : null;
+
+                return $url ? 'https://www.bing.com'.$url : null;
             }, $list)));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return [];
         }
     });
+
     return response()->json($images ?: []);
 })->name('api.bing-daily-images');
 
@@ -104,13 +126,13 @@ if (file_exists(base_path('Modules/CRM/routes/api.php'))) {
 // Phone number + OTP flow for the React Native Freelancer mobile app.
 
 Route::prefix('auth')->group(function () {
-    Route::post('send-otp',    [\App\Http\Controllers\Api\MobileAuthController::class, 'sendOtp']);
-    Route::post('verify-otp',  [\App\Http\Controllers\Api\MobileAuthController::class, 'verifyOtp']);
+    Route::post('send-otp', [MobileAuthController::class, 'sendOtp']);
+    Route::post('verify-otp', [MobileAuthController::class, 'verifyOtp']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('user',          [\App\Http\Controllers\Api\MobileAuthController::class, 'me']);
-    Route::put('user/profile',  [\App\Http\Controllers\Api\MobileAuthController::class, 'updateProfile']);
+    Route::get('user', [MobileAuthController::class, 'me']);
+    Route::put('user/profile', [MobileAuthController::class, 'updateProfile']);
 });
 
 // ── Mobile Freelance API ────────────────────────────────────────────────────
@@ -122,16 +144,16 @@ if (file_exists(base_path('Modules/Freelance/routes/api.php'))) {
 
 // ── Incoming Webhooks ────────────────────────────────────────────────────────
 // Handles all incoming webhooks from external providers
-Route::post('webhooks/incoming/{source}', [\App\Http\Controllers\WebhookController::class, 'handle'])
+Route::post('webhooks/incoming/{source}', [WebhookController::class, 'handle'])
     ->name('api.webhooks.incoming');
 
 // ── Geolocation ──────────────────────────────────────────────────────────────
-Route::get('ip-country', function (\Illuminate\Http\Request $request) {
+Route::get('ip-country', function (Request $request) {
     $ip = $request->ip();
-    $service = new \App\Services\IpGeolocationService();
+    $service = new IpGeolocationService;
     $country = $service->getCountryFromIp($ip);
     $currency = $service->getCurrencyCodeForCountry($country);
-    
+
     return response()->json([
         'ip' => $ip,
         'country' => $country,
@@ -142,9 +164,9 @@ Route::get('ip-country', function (\Illuminate\Http\Request $request) {
 // ── Currencies ───────────────────────────────────────────────────────────────
 // Provides all currencies, their USD exchange rates, and global gold prices. Used by ERP and modules.
 Route::get('currencies', function () {
-    $currencies = \App\Models\Currency::all();
-    $rates = \App\Helpers\CurrencyHelper::prepare(date('Y-m-d'));
-    
+    $currencies = Currency::all();
+    $rates = CurrencyHelper::prepare(date('Y-m-d'));
+
     $usdRates = [];
     foreach ($currencies as $currency) {
         $code = strtoupper($currency->currency);
@@ -153,8 +175,8 @@ Route::get('currencies', function () {
         }
     }
 
-    $latestGoldWorldPrice = \App\Models\GoldWorldPrice::orderBy('price_date', 'desc')->first();
-    
+    $latestGoldWorldPrice = GoldWorldPrice::orderBy('price_date', 'desc')->first();
+
     return response()->json([
         'currencies' => $currencies,
         'usd_rates' => $usdRates,
@@ -162,7 +184,5 @@ Route::get('currencies', function () {
     ]);
 })->name('api.currencies');
 
-
-Route::post('/sso/verify', [\App\Http\Controllers\SsoController::class, 'verify'])->name('sso.verify');
-Route::post('/sso/subscriptions/sync', [\App\Http\Controllers\Api\SubscriptionSyncController::class, 'sync'])->name('sso.subscriptions.sync');
-
+Route::post('/sso/verify', [SsoController::class, 'verify'])->name('sso.verify');
+Route::post('/sso/subscriptions/sync', [SubscriptionSyncController::class, 'sync'])->name('sso.subscriptions.sync');

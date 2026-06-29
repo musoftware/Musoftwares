@@ -79,6 +79,11 @@
         <!-- End Meta Pixel Code -->
 
         <!-- Custom Head Scripts -->
+        {{-- SECURITY: $custom_head is intentionally emitted raw ({!! !!}). It is --}}
+        {{-- an admin-only XSS sink. Writes are restricted to <script>/<style> --}}
+        {{-- blocks by AdminSettingController::assertSafeScriptBlock() and every --}}
+        {{-- write is recorded in the admin_audit_logs table. Do NOT loosen this --}}
+        {{-- output escaping without first closing the trust boundary. --}}
         @if($custom_head)
         {!! $custom_head !!}
         @endif
@@ -139,6 +144,8 @@
         <!-- End Google Tag Manager (noscript) -->
 
         <!-- Custom Body Scripts -->
+        {{-- SECURITY: $custom_body is intentionally emitted raw ({!! !!}). It --}}
+        {{-- is an admin-only XSS sink. See the custom_head_scripts note above. --}}
         @if($custom_body)
         {!! $custom_body !!}
         @endif

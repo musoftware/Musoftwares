@@ -2,18 +2,35 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\BalancesHelper;
+use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
+use App\Models\AdminSettings;
 use App\Models\CostTransaction;
+use App\Models\Currency;
+use App\Models\Invoice;
+use App\Models\Project;
 use App\Models\Transaction;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class BusinessController extends Controller
 {
     public function income(Request $request)
     {
-        $year = (int) $request->query('year', now()->year);
+        $currentYear = (int) now()->year;
+        $year = (int) $request->query('year', $currentYear);
         $month = (int) $request->query('month', now()->month);
+
+        $txMin = Transaction::min('created_at');
+        $txMax = Transaction::max('created_at');
+        $earliestYear = $txMin ? (int) Carbon::parse($txMin)->year : $currentYear;
+        $latestYear = $txMax ? (int) Carbon::parse($txMax)->year : $currentYear;
+        $availableYears = range($latestYear, $earliestYear);
+        $availableMonths = range(1, 12);
 
         $incomeQuery = Transaction::with(['user', 'project'])
             ->whereIn('type', ['received', 'refunded', 'sent'])
@@ -23,13 +40,13 @@ class BusinessController extends Controller
 
         $entries = $incomeQuery->paginate(50)->withQueryString();
 
-        $currencies = \App\Models\Currency::as_array();
-        
+        $currencies = Currency::as_array();
+
         $entries->getCollection()->transform(function ($entry) use ($currencies) {
             $currId = $entry->currency_id ?? $entry->currency;
             $currRow = isset($currencies[$currId]) ? $currencies[$currId] : null;
             $currencyCode = $currRow ? $currRow->currency : 'EGP';
-            $currencySymbol = $currRow ? $currRow->symbol : 'e£';
+            $currencySymbol = $currRow ? $currRow->symbol : '£';
 
             return [
                 'id' => $entry->id,
@@ -50,36 +67,42 @@ class BusinessController extends Controller
             ];
         });
 
-        // Calc stats
         $iq = Transaction::whereYear('created_at', $year)->whereMonth('created_at', $month);
         $received = (clone $iq)->where('type', 'received')->sum('business_amount') ?? 0;
         $refunded = (clone $iq)->where('type', 'refunded')->sum('business_amount') ?? 0;
         $sent = (clone $iq)->where('type', 'sent')->sum('business_amount') ?? 0;
         $netIncome = max(0, abs($received) - abs($refunded) - abs($sent));
 
-        // Lifetime stats removed per user request
-        // For Chart
+        $prevMonth = Carbon::createFromDate($year, $month)->subMonth();
+        $prevIq = Transaction::whereYear('created_at', $prevMonth->year)->whereMonth('created_at', $prevMonth->month);
+        $prevReceived = (clone $prevIq)->where('type', 'received')->sum('business_amount') ?? 0;
+        $prevRefunded = (clone $prevIq)->where('type', 'refunded')->sum('business_amount') ?? 0;
+        $prevSent = (clone $prevIq)->where('type', 'sent')->sum('business_amount') ?? 0;
+        $prevNetIncome = max(0, abs($prevReceived) - abs($prevRefunded) - abs($prevSent));
+
+        $incomeChange = 0;
+        if ($prevNetIncome > 0) {
+            $incomeChange = (($netIncome - $prevNetIncome) / $prevNetIncome) * 100;
+        } elseif ($netIncome > 0) {
+            $incomeChange = 100;
+        }
+
         $monthlyTrends = [];
         for ($i = 5; $i >= 0; $i--) {
             $m = now()->subMonths($i);
             $mReceived = Transaction::whereYear('created_at', $m->year)->whereMonth('created_at', $m->month)->where('type', 'received')->sum('business_amount') ?? 0;
             $mRefunded = Transaction::whereYear('created_at', $m->year)->whereMonth('created_at', $m->month)->where('type', 'refunded')->sum('business_amount') ?? 0;
             $mSent = Transaction::whereYear('created_at', $m->year)->whereMonth('created_at', $m->month)->where('type', 'sent')->sum('business_amount') ?? 0;
-            
+            $mCosts = CostTransaction::whereYear('created_at', $m->year)->whereMonth('created_at', $m->month)->where('reason', '!=', 'salary')->sum('business_amount') ?? 0;
+
             $monthlyTrends[] = [
                 'name' => $m->format('M'),
                 'income' => max(0, abs($mReceived) - abs($mRefunded) - abs($mSent)),
+                'expenses' => abs($mCosts),
             ];
         }
 
-        // Client Breakdown (Monthly & Annually)
-        $monthlyClientData = Transaction::with('user')
-            ->whereIn('type', ['received', 'refunded', 'sent'])
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
-            ->get()
-            ->groupBy('user_id');
-
+        $monthlyClientData = Transaction::with('user')->whereIn('type', ['received', 'refunded', 'sent'])->whereYear('created_at', $year)->whereMonth('created_at', $month)->get()->groupBy('user_id');
         $monthlyClientBreakdown = [];
         foreach ($monthlyClientData as $userId => $txs) {
             $user = $txs->first()->user;
@@ -89,19 +112,11 @@ class BusinessController extends Controller
             $cSent = $txs->where('type', 'sent')->sum('business_amount');
             $cNet = max(0, abs($cReceived) - abs($cRefunded) - abs($cSent));
             if ($cNet > 0) {
-                $monthlyClientBreakdown[] = [
-                    'name' => $userName,
-                    'value' => $cNet,
-                ];
+                $monthlyClientBreakdown[] = ['name' => $userName, 'value' => $cNet];
             }
         }
 
-        $annualClientData = Transaction::with('user')
-            ->whereIn('type', ['received', 'refunded', 'sent'])
-            ->whereYear('created_at', $year)
-            ->get()
-            ->groupBy('user_id');
-
+        $annualClientData = Transaction::with('user')->whereIn('type', ['received', 'refunded', 'sent'])->whereYear('created_at', $year)->get()->groupBy('user_id');
         $annualClientBreakdown = [];
         foreach ($annualClientData as $userId => $txs) {
             $user = $txs->first()->user;
@@ -111,29 +126,61 @@ class BusinessController extends Controller
             $cSent = $txs->where('type', 'sent')->sum('business_amount');
             $cNet = max(0, abs($cReceived) - abs($cRefunded) - abs($cSent));
             if ($cNet > 0) {
-                $annualClientBreakdown[] = [
-                    'name' => $userName,
-                    'value' => $cNet,
-                ];
+                $annualClientBreakdown[] = ['name' => $userName, 'value' => $cNet];
             }
         }
 
-        usort($monthlyClientBreakdown, fn($a, $b) => $b['value'] <=> $a['value']);
-        usort($annualClientBreakdown, fn($a, $b) => $b['value'] <=> $a['value']);
+        usort($monthlyClientBreakdown, fn ($a, $b) => $b['value'] <=> $a['value']);
+        usort($annualClientBreakdown, fn ($a, $b) => $b['value'] <=> $a['value']);
 
-        $bCurrencyId = \App\Models\AdminSettings::business_currency();
-        $bCurrency = \App\Models\Currency::find($bCurrencyId);
+        $monthlyCategoryData = Transaction::whereIn('type', ['received', 'refunded', 'sent'])->whereYear('created_at', $year)->whereMonth('created_at', $month)->get()->groupBy('reason');
+        $monthlyCategoryBreakdown = [];
+        foreach ($monthlyCategoryData as $reason => $txs) {
+            $cReceived = $txs->where('type', 'received')->sum('business_amount');
+            $cRefunded = $txs->where('type', 'refunded')->sum('business_amount');
+            $cSent = $txs->where('type', 'sent')->sum('business_amount');
+            $cNet = max(0, abs($cReceived) - abs($cRefunded) - abs($cSent));
+            if ($cNet > 0) {
+                $monthlyCategoryBreakdown[] = ['name' => ucfirst($reason ?: 'Other'), 'value' => $cNet];
+            }
+        }
+
+        $annualCategoryData = Transaction::whereIn('type', ['received', 'refunded', 'sent'])->whereYear('created_at', $year)->get()->groupBy('reason');
+        $annualCategoryBreakdown = [];
+        foreach ($annualCategoryData as $reason => $txs) {
+            $cReceived = $txs->where('type', 'received')->sum('business_amount');
+            $cRefunded = $txs->where('type', 'refunded')->sum('business_amount');
+            $cSent = $txs->where('type', 'sent')->sum('business_amount');
+            $cNet = max(0, abs($cReceived) - abs($cRefunded) - abs($cSent));
+            if ($cNet > 0) {
+                $annualCategoryBreakdown[] = ['name' => ucfirst($reason ?: 'Other'), 'value' => $cNet];
+            }
+        }
+
+        usort($monthlyCategoryBreakdown, fn ($a, $b) => $b['value'] <=> $a['value']);
+        usort($annualCategoryBreakdown, fn ($a, $b) => $b['value'] <=> $a['value']);
+
+        $bCurrencyId = AdminSettings::business_currency();
+        $bCurrency = Currency::find($bCurrencyId);
 
         return Inertia::render('Admin/Business/Income', [
             'entries' => $entries,
+            'filters' => ['year' => $year, 'month' => $month, 'available_years' => $availableYears, 'available_months' => $availableMonths],
             'stats' => [
+                'total_received' => abs($received),
+                'total_refunded' => abs($refunded),
+                'total_sent' => abs($sent),
                 'total_monthly_income' => $netIncome,
+                'previous_month_income' => $prevNetIncome,
+                'income_change_percent' => round($incomeChange, 1),
                 'monthly_trends' => $monthlyTrends,
                 'monthly_client_breakdown' => $monthlyClientBreakdown,
                 'annual_client_breakdown' => $annualClientBreakdown,
+                'monthly_category_breakdown' => $monthlyCategoryBreakdown,
+                'annual_category_breakdown' => $annualCategoryBreakdown,
                 'business_currency_code' => $bCurrency ? $bCurrency->currency : 'EGP',
-                'business_currency_symbol' => $bCurrency ? $bCurrency->symbol : 'e£',
-            ]
+                'business_currency_symbol' => $bCurrency ? $bCurrency->symbol : '£',
+            ],
         ]);
     }
 
@@ -150,8 +197,8 @@ class BusinessController extends Controller
 
         $entries = $costsQuery->paginate(50)->withQueryString();
 
-        $currencies = \App\Models\Currency::as_array();
-        
+        $currencies = Currency::as_array();
+
         $entries->getCollection()->transform(function ($entry) use ($currencies) {
             $currId = $entry->currency_id ?? $entry->currency;
             $currRow = isset($currencies[$currId]) ? $currencies[$currId] : null;
@@ -163,18 +210,19 @@ class BusinessController extends Controller
             $title = $entry->reason;
 
             try {
-                $recTx = \Illuminate\Support\Facades\DB::table('recurring_cost_transactions')
+                $recTx = DB::table('recurring_cost_transactions')
                     ->join('recurring_costs', 'recurring_cost_transactions.recurring_cost_id', '=', 'recurring_costs.id')
                     ->where('recurring_cost_transactions.cost_transaction_id', $entry->id)
                     ->select('recurring_costs.title as source_title', 'recurring_costs.reason as source_reason')
                     ->first();
-                
+
                 if ($recTx) {
                     $isRecurring = true;
                     $categoryName = $recTx->source_reason;
                     $title = $entry->reason ?: $recTx->source_title;
                 }
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) {
+            }
 
             return [
                 'id' => $entry->id,
@@ -200,8 +248,6 @@ class BusinessController extends Controller
             ->where('reason', '!=', 'salary')
             ->sum('business_amount');
 
-
-
         $monthlyTrends = [];
         for ($i = 5; $i >= 0; $i--) {
             $m = now()->subMonths($i);
@@ -209,15 +255,15 @@ class BusinessController extends Controller
                 ->whereMonth('created_at', $m->month)
                 ->where('reason', '!=', 'salary')
                 ->sum('business_amount') ?? 0;
-            
+
             $monthlyTrends[] = [
                 'name' => $m->format('M'),
                 'costs' => abs($mCosts),
             ];
         }
 
-        $bCurrencyId = \App\Models\AdminSettings::business_currency();
-        $bCurrency = \App\Models\Currency::find($bCurrencyId);
+        $bCurrencyId = AdminSettings::business_currency();
+        $bCurrency = Currency::find($bCurrencyId);
 
         return Inertia::render('Admin/Business/Costs', [
             'entries' => $entries,
@@ -226,17 +272,17 @@ class BusinessController extends Controller
                 'monthly_trends' => $monthlyTrends,
                 'business_currency_code' => $bCurrency ? $bCurrency->currency : 'EGP',
                 'business_currency_symbol' => $bCurrency ? $bCurrency->symbol : 'e£',
-            ]
+            ],
         ]);
     }
 
     public function create_cost()
     {
-        $users = \App\Models\User::select('id', 'name')->get();
-        $projects = \App\Models\Project::whereNotIn('status', ['Completed', 'Cancelled'])->select('id', 'project_name as name', 'user_id')->get();
-        $currencies = array_values(\App\Models\Currency::as_array());
-        
-        $businessCurrency = \App\Helpers\CurrencyHelper::getBusinessCurrency();
+        $users = User::select('id', 'name')->get();
+        $projects = Project::whereNotIn('status', ['Completed', 'Cancelled'])->select('id', 'project_name as name', 'user_id')->get();
+        $currencies = array_values(Currency::as_array());
+
+        $businessCurrency = CurrencyHelper::getBusinessCurrency();
 
         return Inertia::render('Admin/Business/CostsCreate', [
             'users' => $users,
@@ -257,27 +303,27 @@ class BusinessController extends Controller
             'project_id' => 'nullable|exists:projects,id',
         ]);
 
-        $cost = new CostTransaction();
+        $cost = new CostTransaction;
         $cost->amount = $request->amount;
         $cost->currency_id = $request->currency_id;
         $cost->reason = $request->reason;
-        
+
         if ($request->filled('created_at')) {
             $cost->created_at = $request->created_at;
         }
-        
+
         if ($request->filled('user_id')) {
             $cost->user_id = $request->user_id;
         }
-        
+
         if ($request->filled('project_id')) {
             $cost->project_id = $request->project_id;
         }
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($cost) {
+        DB::transaction(function () use ($cost) {
             $cost->save();
             if ($cost->user_id) {
-                \App\Models\User::find($cost->user_id)->increment('total_cost', $cost->amount);
+                User::find($cost->user_id)->increment('total_cost', $cost->amount);
             }
         });
 
@@ -287,12 +333,12 @@ class BusinessController extends Controller
     public function edit_cost($id)
     {
         $cost = CostTransaction::findOrFail($id);
-        
-        $users = \App\Models\User::select('id', 'name')->get();
-        $projects = \App\Models\Project::whereNotIn('status', ['Completed', 'Cancelled'])->select('id', 'project_name as name', 'user_id')->get();
-        $currencies = array_values(\App\Models\Currency::as_array());
-        
-        $businessCurrency = \App\Helpers\CurrencyHelper::getBusinessCurrency();
+
+        $users = User::select('id', 'name')->get();
+        $projects = Project::whereNotIn('status', ['Completed', 'Cancelled'])->select('id', 'project_name as name', 'user_id')->get();
+        $currencies = array_values(Currency::as_array());
+
+        $businessCurrency = CurrencyHelper::getBusinessCurrency();
 
         return Inertia::render('Admin/Business/CostsEdit', [
             'cost' => $cost,
@@ -306,7 +352,7 @@ class BusinessController extends Controller
     public function update_cost(Request $request, $id)
     {
         $cost = CostTransaction::findOrFail($id);
-        
+
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'currency_id' => 'required|exists:currencies,id',
@@ -316,24 +362,24 @@ class BusinessController extends Controller
             'project_id' => 'nullable|exists:projects,id',
         ]);
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($cost, $request) {
+        DB::transaction(function () use ($cost, $request) {
             $cost->amount = $request->amount;
             $cost->currency_id = $request->currency_id;
             $cost->reason = $request->reason;
-            
+
             if ($request->filled('created_at')) {
                 $cost->created_at = $request->created_at;
             }
-            
+
             $cost->user_id = $request->filled('user_id') ? $request->user_id : null;
             $cost->project_id = $request->filled('project_id') ? $request->project_id : null;
-            
+
             $cost->save();
 
             if ($cost->user_id) {
-                $user = \App\Models\User::find($cost->user_id);
+                $user = User::find($cost->user_id);
                 if ($user) {
-                    \App\Helpers\BalancesHelper::instance()->CalcCostBalance($user);
+                    BalancesHelper::instance()->CalcCostBalance($user);
                 }
             }
         });
@@ -344,15 +390,15 @@ class BusinessController extends Controller
     public function delete_cost($id)
     {
         $cost = CostTransaction::findOrFail($id);
-        
-        \Illuminate\Support\Facades\DB::transaction(function () use ($cost) {
+
+        DB::transaction(function () use ($cost) {
             $userId = $cost->user_id;
             $cost->delete();
-            
+
             if ($userId) {
-                $user = \App\Models\User::find($userId);
+                $user = User::find($userId);
                 if ($user) {
-                    \App\Helpers\BalancesHelper::instance()->CalcCostBalance($user);
+                    BalancesHelper::instance()->CalcCostBalance($user);
                 }
             }
         });
@@ -363,7 +409,7 @@ class BusinessController extends Controller
     public function delete_income($id)
     {
         $transaction = Transaction::findOrFail($id);
-        
+
         if ($transaction->isReversed() || $transaction->isReverseTransaction()) {
             return redirect()->back()->with('error', 'Cannot delete a reversed or reversal transaction. It must be kept for ledger integrity.');
         }
@@ -380,9 +426,10 @@ class BusinessController extends Controller
         ]);
 
         $transaction = Transaction::findOrFail($id);
-        
+
         try {
             $transaction->createReverse($request->reason);
+
             return redirect()->route('admin.income.index')->with('success', 'Transaction reversed successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
@@ -391,8 +438,8 @@ class BusinessController extends Controller
 
     public function reports(Request $request)
     {
-        $bCurrencyId = \App\Models\AdminSettings::business_currency();
-        $bCurrency = \App\Models\Currency::find($bCurrencyId);
+        $bCurrencyId = AdminSettings::business_currency();
+        $bCurrency = Currency::find($bCurrencyId);
 
         $lifetimeReceived = Transaction::where('type', 'received')->sum('business_amount') ?? 0;
         $lifetimeRefunded = Transaction::where('type', 'refunded')->sum('business_amount') ?? 0;
@@ -404,43 +451,62 @@ class BusinessController extends Controller
 
         return Inertia::render('Admin/Business/Reports', [
             'stats' => [
-                'total_users' => \App\Models\User::count(),
-                'total_projects' => \App\Models\Project::count(),
-                'total_invoices' => \App\Models\Invoice::count(),
+                'total_users' => User::count(),
+                'total_projects' => Project::count(),
+                'total_invoices' => Invoice::count(),
                 'total_transactions' => Transaction::count(),
                 'lifetime_income' => $lifetimeIncome,
                 'lifetime_expenses' => abs($lifetimeExpenses),
                 'net_profit' => $netProfit,
                 'business_currency_code' => $bCurrency ? $bCurrency->currency : 'EGP',
                 'business_currency_symbol' => $bCurrency ? $bCurrency->symbol : 'e£',
-            ]
+            ],
         ]);
     }
 
     public function balance(Request $request)
     {
-        $year = (int) $request->query('year', now()->year);
-        
+        $currentYear = (int) now()->year;
+        $year = (int) $request->query('year', $currentYear);
+
+        $txnMin = Transaction::min('created_at');
+        $txnMax = Transaction::max('created_at');
+        $costMin = CostTransaction::min('created_at');
+        $costMax = CostTransaction::max('created_at');
+
+        $mins = array_filter([$txnMin, $costMin]);
+        $maxes = array_filter([$txnMax, $costMax]);
+
+        if (! empty($mins) && ! empty($maxes)) {
+            $earliestYear = (int) Carbon::parse(min($mins))->year;
+            $latestYear = (int) Carbon::parse(max($maxes))->year;
+        } else {
+            $earliestYear = $currentYear;
+            $latestYear = $currentYear;
+        }
+
+        $availableYears = range($latestYear, $earliestYear);
+
         $monthlyTrends = [];
         for ($i = 1; $i <= 12; $i++) {
             $mReceived = Transaction::whereYear('created_at', $year)->whereMonth('created_at', $i)->where('type', 'received')->sum('business_amount') ?? 0;
             $mRefunded = Transaction::whereYear('created_at', $year)->whereMonth('created_at', $i)->where('type', 'refunded')->sum('business_amount') ?? 0;
             $mSent = Transaction::whereYear('created_at', $year)->whereMonth('created_at', $i)->where('type', 'sent')->sum('business_amount') ?? 0;
-            
+
             $income = max(0, abs($mReceived) - abs($mRefunded) - abs($mSent));
             $costs = CostTransaction::whereYear('created_at', $year)->whereMonth('created_at', $i)->sum('business_amount') ?? 0;
             $profit = $income - abs($costs);
 
             $monthlyTrends[] = [
-                'name' => \Carbon\Carbon::create()->month($i)->format('M'),
+                'name' => Carbon::create()->month($i)->format('M'),
                 'income' => $income,
                 'costs' => abs($costs),
-                'profit' => $profit
+                'profit' => $profit,
             ];
         }
 
-        $bCurrencyId = \App\Models\AdminSettings::business_currency();
-        $bCurrency = \App\Models\Currency::find($bCurrencyId);
+        $bCurrencyId = AdminSettings::business_currency();
+        $bCurrency = Currency::find($bCurrencyId);
 
         $totalYearIncome = array_sum(array_column($monthlyTrends, 'income'));
         $totalYearCosts = array_sum(array_column($monthlyTrends, 'costs'));
@@ -449,13 +515,14 @@ class BusinessController extends Controller
         return Inertia::render('Admin/Business/BalanceReport', [
             'stats' => [
                 'year' => $year,
+                'available_years' => $availableYears,
                 'monthly_trends' => $monthlyTrends,
                 'total_income' => $totalYearIncome,
                 'total_costs' => $totalYearCosts,
                 'total_profit' => $totalYearProfit,
                 'business_currency_code' => $bCurrency ? $bCurrency->currency : 'EGP',
                 'business_currency_symbol' => $bCurrency ? $bCurrency->symbol : 'e£',
-            ]
+            ],
         ]);
     }
 }

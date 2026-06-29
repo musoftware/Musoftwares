@@ -2,26 +2,42 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\User\AddTaskRequest;
+use App\Http\Requests\Admin\User\StoreUserRequest;
+use App\Http\Requests\Admin\User\ToggleBlockUserRequest;
+use App\Http\Requests\Admin\User\UpdateUserRequest;
+use App\Http\Resources\UserResource;
+use App\Models\AdminAuditLog;
+use App\Models\CoTechTag;
+use App\Models\CoWorker;
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
+use App\Models\Earning;
+use App\Models\ModulePlan;
 use App\Models\User;
+use App\Models\UserSubscription;
+use App\Services\AdminAuditService;
 use App\Services\AdminUserService;
+use App\Services\EarningAnalyzeService;
+use App\Services\PricingService;
+use App\Services\WhatsAppNotificationService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Spatie\Permission\Models\Role;
-use App\Models\CoWorker;
-use App\Models\CoTechTag;
-use App\Http\Requests\Admin\User\StoreUserRequest;
-use App\Http\Requests\Admin\User\UpdateUserRequest;
-use App\Http\Requests\Admin\User\ToggleBlockUserRequest;
-use App\Http\Requests\Admin\User\AddTaskRequest;
-use App\Http\Resources\UserResource;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
+use Modules\Marketplace\Models\Order;
+use Modules\Marketplace\Models\Service;
+use Spatie\Permission\Models\Role;
 
 class UsersController extends Controller
 {
@@ -41,9 +57,9 @@ class UsersController extends Controller
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
 
-                if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'whatsapp_number')) {
+                if (Schema::hasColumn('users', 'whatsapp_number')) {
                     $q->orWhere('whatsapp_number', 'like', "%{$search}%");
                 }
             });
@@ -67,8 +83,8 @@ class UsersController extends Controller
         }
 
         // Sorting
-        $sortable  = ['name', 'email', 'created_at', 'id', 'last_activity_at'];
-        $sort      = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'id';
+        $sortable = ['name', 'email', 'created_at', 'id', 'last_activity_at'];
+        $sort = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'id';
         // The old system defaulted to ASC sorting for users
         $direction = $request->get('direction', 'asc') === 'desc' ? 'desc' : 'asc';
         $query->orderBy($sort, $direction);
@@ -76,18 +92,18 @@ class UsersController extends Controller
         $users = $query->paginate(25)->withQueryString()->through(fn ($user) => (new UserResource($user))->resolve());
 
         $stats = [
-            'total'           => User::count(),
-            'active'          => User::where('account_status', 'active')->orWhereNull('account_status')->count(),
-            'blocked'         => User::where('account_status', 'blocked')->count(),
-            'kyc_verified'    => User::where('kyc_verified', true)->count(),
-            'new_this_week'   => User::where('created_at', '>=', now()->subDays(7))->count(),
-            'new_this_month'  => User::where('created_at', '>=', now()->startOfMonth())->count(),
+            'total' => User::count(),
+            'active' => User::where('account_status', 'active')->orWhereNull('account_status')->count(),
+            'blocked' => User::where('account_status', 'blocked')->count(),
+            'kyc_verified' => User::where('kyc_verified', true)->count(),
+            'new_this_week' => User::where('created_at', '>=', now()->subDays(7))->count(),
+            'new_this_month' => User::where('created_at', '>=', now()->startOfMonth())->count(),
         ];
 
         return Inertia::render('Admin/Users/Index', [
             'clients' => $users,
             'filters' => $request->only(['search', 'role', 'status', 'kyc', 'sort', 'direction']),
-            'stats'   => $stats,
+            'stats' => $stats,
         ]);
     }
 
@@ -101,47 +117,48 @@ class UsersController extends Controller
             ->findOrFail($id);
 
         $initials = collect(explode(' ', $user->name))
-            ->map(fn($w) => mb_strtoupper(mb_substr($w, 0, 1, 'UTF-8'), 'UTF-8'))
+            ->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1, 'UTF-8'), 'UTF-8'))
             ->take(2)
             ->implode('');
 
         $stats = [
-            'tickets_total'  => $user->tickets()->count(),
-            'tickets_open'   => $user->tickets()->where('ticket_status', 'open')->count(),
+            'tickets_total' => $user->tickets()->count(),
+            'tickets_open' => $user->tickets()->where('ticket_status', 'open')->count(),
             'kyc_docs_count' => $user->kycDocuments()->count(),
         ];
 
         // Fetch stats using User model relations
         try {
             $stats['invoices_total'] = $user->invoices()->count();
-            $stats['invoices_paid']  = $user->invoices()->where('status', 'paid')->count();
+            $stats['invoices_paid'] = $user->invoices()->where('status', 'paid')->count();
             $stats['invoices_unpaid_sum'] = $user->unpaid_invoices_amount(true);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Error fetching user stats: ' . $e->getMessage());
+            Log::error('Error fetching user stats: '.$e->getMessage());
         }
 
         // Try Marketplace stats
         try {
             if (class_exists('\Modules\Marketplace\Models\Order')) {
-                $stats['orders_total'] = \Modules\Marketplace\Models\Order::where('buyer_id', $user->id)->count();
+                $stats['orders_total'] = Order::where('buyer_id', $user->id)->count();
             }
             if (class_exists('\Modules\Marketplace\Models\Service')) {
-                $stats['services_total'] = \Modules\Marketplace\Models\Service::where('seller_id', $user->id)->count();
-                $stats['services_approved'] = \Modules\Marketplace\Models\Service::where('seller_id', $user->id)->where('status', 'approved')->count();
+                $stats['services_total'] = Service::where('seller_id', $user->id)->count();
+                $stats['services_approved'] = Service::where('seller_id', $user->id)->where('status', 'approved')->count();
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
 
         $userDetail = (new UserResource($user))->resolve();
 
-        $modulePlans = \App\Models\ModulePlan::where('is_active', true)->get();
+        $modulePlans = ModulePlan::where('is_active', true)->get();
         $subscriptions = $user->subscriptions()->orderBy('expires_at', 'desc')->get();
-        $currencies = \App\Models\Currency::all();
+        $currencies = Currency::all();
 
         return Inertia::render('Admin/Users/Show', [
             'client' => $userDetail,
-            'loans'  => $user->loans,
+            'loans' => $user->loans,
             'currencies' => $currencies,
-            'stats'  => $stats,
+            'stats' => $stats,
             'modulePlans' => $modulePlans,
             'subscriptions' => $subscriptions,
 
@@ -154,8 +171,8 @@ class UsersController extends Controller
     public function create()
     {
         return Inertia::render('Admin/Users/Create', [
-            'roles'      => ['admin', 'client'],
-            'currencies' => \App\Models\Currency::all(),
+            'roles' => ['admin', 'client'],
+            'currencies' => Currency::all(),
         ]);
     }
 
@@ -181,66 +198,66 @@ class UsersController extends Controller
 
         return Inertia::render('Admin/Users/Edit', [
             'user' => [
-                'id'                   => $user->id,
-                'name'                 => $user->name,
-                'full_name'            => $user->full_name ?? '',
-                'email'                => $user->email,
-                'role'                 => $user->roles->first()?->name ?? 'client',
-                'facebook'             => $user->facebook ?? '',
-                'skype'                => $user->skype ?? '',
-                'job'                  => $user->job ?? '',
-                'address'              => $user->address ?? '',
-                'phone_number'         => $user->phone_number ?? '',
-                'phone_number2'        => $user->phone_number2 ?? '',
-                'mobile_1'             => $user->mobile_1 ?? '',
-                'mobile_2'             => $user->mobile_2 ?? '',
-                'whatsapp_number'      => $user->whatsapp_number ?? '',
+                'id' => $user->id,
+                'name' => $user->name,
+                'full_name' => $user->full_name ?? '',
+                'email' => $user->email,
+                'role' => $user->roles->first()?->name ?? 'client',
+                'facebook' => $user->facebook ?? '',
+                'skype' => $user->skype ?? '',
+                'job' => $user->job ?? '',
+                'address' => $user->address ?? '',
+                'phone_number' => $user->phone_number ?? '',
+                'phone_number2' => $user->phone_number2 ?? '',
+                'mobile_1' => $user->mobile_1 ?? '',
+                'mobile_2' => $user->mobile_2 ?? '',
+                'whatsapp_number' => $user->whatsapp_number ?? '',
                 'disable_unpaid_balance_whatsapp' => (bool) ($user->disable_unpaid_balance_whatsapp ?? false),
-                'telegram_username'    => $user->telegram_username ?? '',
-                'country'              => $user->country ?? '',
-                'city'                 => $user->city ?? '',
-                'currency'             => $user->currency_id ?? $user->currency ?? '',
+                'telegram_username' => $user->telegram_username ?? '',
+                'country' => $user->country ?? '',
+                'city' => $user->city ?? '',
+                'currency' => $user->currency_id ?? $user->currency ?? '',
 
-                'hour_rate_currency'   => $user->hour_rate_currency_id ?? $user->hour_rate_currency ?? '',
-                'hour_rate'            => $user->hour_rate ?? '',
-                'booking_rate_currency'=> $user->booking_rate_currency_id ?? $user->booking_rate_currency ?? '',
-                'booking_rate'         => $user->booking_rate ?? '',
+                'hour_rate_currency' => $user->hour_rate_currency_id ?? $user->hour_rate_currency ?? '',
+                'hour_rate' => $user->hour_rate ?? '',
+                'booking_rate_currency' => $user->booking_rate_currency_id ?? $user->booking_rate_currency ?? '',
+                'booking_rate' => $user->booking_rate ?? '',
                 'booking_rate_expires_at' => $user->booking_rate_expires_at ? $user->booking_rate_expires_at->format('Y-m-d') : '',
-                'salary'               => $user->salary ?? '',
-                'usd_type'             => $user->usd_type ?? 'bank_usd',
+                'salary' => $user->salary ?? '',
+                'usd_type' => $user->usd_type ?? 'bank_usd',
 
-                'subscription_date'    => $user->subscription_date ? (is_string($user->subscription_date) ? date('Y-m-d', strtotime($user->subscription_date)) : $user->subscription_date->format('Y-m-d')) : '',
-                'subscription_plan'    => $user->plan_id ?? '',
-                'postpaid_limit'       => $user->postpaid_limit ?? '',
-                'subscription_force'   => (bool) ($user->subscription_force ?? false),
+                'subscription_date' => $user->subscription_date ? (is_string($user->subscription_date) ? date('Y-m-d', strtotime($user->subscription_date)) : $user->subscription_date->format('Y-m-d')) : '',
+                'subscription_plan' => $user->plan_id ?? '',
+                'postpaid_limit' => $user->postpaid_limit ?? '',
+                'subscription_force' => (bool) ($user->subscription_force ?? false),
 
-                'client_taxable'       => (bool) ($user->client_taxable ?? false),
-                'invoice_taxable'      => (bool) ($user->invoice_taxable ?? false),
-                'timer_taxable'        => (bool) ($user->timer_taxable ?? false),
+                'client_taxable' => (bool) ($user->client_taxable ?? false),
+                'invoice_taxable' => (bool) ($user->invoice_taxable ?? false),
+                'timer_taxable' => (bool) ($user->timer_taxable ?? false),
 
-                'allow_referral_system'=> (bool) ($user->allow_referral_system ?? false),
-                'allow_view_times'     => (bool) ($user->allow_view_times ?? false),
-                'allow_postpaid'       => (bool) ($user->allow_postpaid ?? false),
+                'allow_referral_system' => (bool) ($user->allow_referral_system ?? false),
+                'allow_view_times' => (bool) ($user->allow_view_times ?? false),
+                'allow_postpaid' => (bool) ($user->allow_postpaid ?? false),
 
-                'account_status'       => $user->account_status ?? 'active',
-                'block_reason'         => $user->block_reason ?? '',
+                'account_status' => $user->account_status ?? 'active',
+                'block_reason' => $user->block_reason ?? '',
 
-                'kyc_verified'         => (bool) ($user->kyc_verified ?? false),
-                'kyc_notes'            => $user->kyc_notes ?? '',
-                'kyc_verified_at'      => $user->kyc_verified_at ? $user->kyc_verified_at->format('M d, Y \a\t H:i') : null,
-                'kyc_verifier'         => $user->kycVerifier ? ['name' => $user->kycVerifier->name] : null,
-                'kyc_documents_count'  => $user->kycDocuments ? $user->kycDocuments->count() : 0,
+                'kyc_verified' => (bool) ($user->kyc_verified ?? false),
+                'kyc_notes' => $user->kyc_notes ?? '',
+                'kyc_verified_at' => $user->kyc_verified_at ? $user->kyc_verified_at->format('M d, Y \a\t H:i') : null,
+                'kyc_verifier' => $user->kycVerifier ? ['name' => $user->kycVerifier->name] : null,
+                'kyc_documents_count' => $user->kycDocuments ? $user->kycDocuments->count() : 0,
 
                 'affiliate_commission_percentage' => $user->affiliate_commission_percentage ?? 1.00,
                 'add_commission_to_total' => (bool) ($user->add_commission_to_total ?? false),
-                'ref_user_id'          => $user->ref_user_id ?? '',
-                'slug'                 => $user->slug ?? '',
-                'max_devices'          => $user->max_devices ?? '',
+                'ref_user_id' => $user->ref_user_id ?? '',
+                'slug' => $user->slug ?? '',
+                'max_devices' => $user->max_devices ?? '',
             ],
-            'roles'      => ['client', 'user', 'admin', 'manager', 'employee', 'moderator'],
-            'currencies' => \App\Models\Currency::all(),
-            'plans'      => \App\Models\ModulePlan::where('is_active', true)->get(),
-            'statuses'   => ['active', 'blocked', 'suspended'],
+            'roles' => ['client', 'user', 'admin', 'manager', 'employee', 'moderator'],
+            'currencies' => Currency::all(),
+            'plans' => ModulePlan::where('is_active', true)->get(),
+            'statuses' => ['active', 'blocked', 'suspended'],
         ]);
     }
 
@@ -296,22 +313,51 @@ class UsersController extends Controller
      */
     public function loginAs(Request $request, $id)
     {
-        $user  = User::findOrFail($id);
-        $token = $user->createToken('admin-impersonation-' . Auth::id())->plainTextToken;
+        $actorId = Auth::id();
+        $user = User::findOrFail($id);
 
-        // Store the impersonation token in session so the impersonated session can be detected
+        // Block impersonating another admin (prevents privilege escalation chain).
+        if ($user->isAdmin() && $user->id !== $actorId) {
+            return back()->withErrors(['error' => __('errors.cannot_impersonate_admin')]);
+        }
+
+        // Refuse to impersonate a user whose account is blocked or unverified email
+        // (the impersonator would inherit any blocked-by-auth restrictions).
+        if (($user->account_status ?? null) === 'blocked') {
+            return back()->withErrors(['error' => __('errors.cannot_impersonate_blocked_user')]);
+        }
+
+        // Issue the Sanctum token but DO NOT return it in the JSON response.
+        // The browser already has the cookie/session — there's no legitimate
+        // reason to surface a plaintext bearer token back to the client.
+        $user->createToken('admin-impersonation-'.$actorId);
+
+        // Track impersonation in the database-backed audit log + a session
+        // marker so stopImpersonate() can validate and restore the actor.
+        $startedAt = now();
         session([
-            'impersonator_id' => Auth::id(),
+            'impersonator_id' => $actorId,
             'impersonate' => $user->id,
             'impersonating_user_id' => $user->id,
-            'impersonated_by' => Auth::id()
+            'impersonated_by' => $actorId,
+            'impersonation_started_at' => $startedAt->toIso8601String(),
         ]);
+
+        app(AdminAuditService::class)->record(
+            'user.login_as',
+            $user,
+            [
+                'actor_user_id' => $actorId,
+                'started_at' => $startedAt->toIso8601String(),
+                'via' => $request->isMethod('post') ? 'post' : 'get',
+            ],
+            AdminAuditLog::SEVERITY_CRITICAL
+        );
 
         Auth::loginUsingId($user->id);
 
         if ($request->wantsJson() || $request->isMethod('post')) {
             return response()->json([
-                'token' => $token,
                 'redirect_url' => route('dashboard'),
             ]);
         }
@@ -328,35 +374,36 @@ class UsersController extends Controller
         $blocked = User::where('account_status', 'blocked')
             ->latest()
             ->get()
-            ->map(fn($u) => [
-                'id'             => $u->id,
-                'name'           => $u->name,
-                'email'          => $u->email,
+            ->map(fn ($u) => [
+                'id' => $u->id,
+                'name' => $u->name,
+                'email' => $u->email,
                 'account_status' => $u->account_status,
-                'block_reason'   => $u->block_reason,
-                'created_at'     => $u->created_at,
+                'block_reason' => $u->block_reason,
+                'created_at' => $u->created_at,
             ]);
 
         $noWhatsApp = collect();
-        if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'whatsapp_number')) {
+        if (Schema::hasColumn('users', 'whatsapp_number')) {
             $noWhatsApp = User::role('client')
-                ->where(fn($q) => $q->whereNull('whatsapp_number')->orWhere('whatsapp_number', ''))
+                ->where(fn ($q) => $q->whereNull('whatsapp_number')->orWhere('whatsapp_number', ''))
                 ->latest()
                 ->get()
-                ->map(fn($u) => [
-                    'id'             => $u->id,
-                    'name'           => $u->name,
-                    'email'          => $u->email,
-                    'whatsapp_number'=> $u->whatsapp_number,
-                    'created_at'     => $u->created_at,
+                ->map(fn ($u) => [
+                    'id' => $u->id,
+                    'name' => $u->name,
+                    'email' => $u->email,
+                    'whatsapp_number' => $u->whatsapp_number,
+                    'created_at' => $u->created_at,
                 ]);
         }
 
         return Inertia::render('Admin/Users/Problematic', [
-            'blocked_users'       => $blocked,
-            'no_whatsapp_users'   => $noWhatsApp,
+            'blocked_users' => $blocked,
+            'no_whatsapp_users' => $noWhatsApp,
         ]);
     }
+
     /**
      * Co-Work page — two tabs:
      *  1. Freelancer System: users with skills from the Freelance module
@@ -366,70 +413,70 @@ class UsersController extends Controller
     {
         // Tab 1: Users registered in the Freelance system (have at least one skill)
         // freelanceSkills() is a belongsToMany → Skill, so items are Skill models directly.
-        $freelancers = \App\Models\User::query()
+        $freelancers = User::query()
             ->whereHas('freelanceSkills')
             ->with(['roles', 'freelanceSkills'])
             ->latest()
             ->get()
-            ->map(fn($user) => [
-                'id'         => $user->id,
-                'name'       => $user->name,
-                'email'      => $user->email,
+            ->map(fn ($user) => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
                 'created_at' => $user->created_at,
-                'skills'     => $user->freelanceSkills->map(fn($skill) => [
-                    'id'   => $skill->id,
+                'skills' => $user->freelanceSkills->map(fn ($skill) => [
+                    'id' => $skill->id,
                     'name' => $skill->name ?? '—',
                 ])->values(),
             ]);
 
         // Tab 2: Legacy CoWorkers
-        $legacyCoWorkers = \App\Models\CoWorker::with('techTags')
+        $legacyCoWorkers = CoWorker::with('techTags')
             ->latest()
             ->get()
-            ->map(fn($cw) => [
-                'id'          => $cw->id,
+            ->map(fn ($cw) => [
+                'id' => $cw->id,
                 'person_name' => $cw->person_name,
-                'email'       => $cw->email,
-                'mobile'      => $cw->mobile,
-                'facebook'    => $cw->facebook,
-                'linked_in'   => $cw->linked_in,
-                'whatsapp'    => $cw->whatsapp,
-                'time_from'   => $cw->time_from,
-                'time_to'     => $cw->time_to,
-                'flag_path'   => $cw->getFlagPath(),
-                'tech_tags'   => $cw->techTags->map(fn($t) => [
-                    'id'   => $t->id,
+                'email' => $cw->email,
+                'mobile' => $cw->mobile,
+                'facebook' => $cw->facebook,
+                'linked_in' => $cw->linked_in,
+                'whatsapp' => $cw->whatsapp,
+                'time_from' => $cw->time_from,
+                'time_to' => $cw->time_to,
+                'flag_path' => $cw->getFlagPath(),
+                'tech_tags' => $cw->techTags->map(fn ($t) => [
+                    'id' => $t->id,
                     'name' => $t->tag_name ?? '?',
                 ])->values(),
             ]);
 
         return Inertia::render('Admin/Users/CoWork', [
-            'freelancers'     => $freelancers,
+            'freelancers' => $freelancers,
             'legacyCoWorkers' => $legacyCoWorkers,
         ]);
     }
 
     public function showLegacyCoWorker($id)
     {
-        $worker = \App\Models\CoWorker::with('techTags')->findOrFail($id);
+        $worker = CoWorker::with('techTags')->findOrFail($id);
 
         $workerData = [
-            'id'          => $worker->id,
+            'id' => $worker->id,
             'person_name' => $worker->person_name,
-            'email'       => $worker->email,
-            'mobile'      => $worker->mobile,
-            'facebook'    => $worker->facebook,
-            'linked_in'   => $worker->linked_in,
-            'whatsapp'    => $worker->whatsapp,
-            'time_from'   => $worker->time_from,
-            'time_to'     => $worker->time_to,
-            'flag_path'   => $worker->getFlagPath(),
-            'created_at'  => $worker->created_at,
-            'tech_tags'   => $worker->techTags->map(fn($t) => ['id' => $t->id, 'name' => $t->tag_name]),
+            'email' => $worker->email,
+            'mobile' => $worker->mobile,
+            'facebook' => $worker->facebook,
+            'linked_in' => $worker->linked_in,
+            'whatsapp' => $worker->whatsapp,
+            'time_from' => $worker->time_from,
+            'time_to' => $worker->time_to,
+            'flag_path' => $worker->getFlagPath(),
+            'created_at' => $worker->created_at,
+            'tech_tags' => $worker->techTags->map(fn ($t) => ['id' => $t->id, 'name' => $t->tag_name]),
         ];
 
         return Inertia::render('Admin/Users/LegacyCoWorkerShow', [
-            'worker' => $workerData
+            'worker' => $workerData,
         ]);
     }
 
@@ -438,19 +485,19 @@ class UsersController extends Controller
         $worker = CoWorker::with('techTags')->findOrFail($id);
 
         $workerData = [
-            'id'          => $worker->id,
+            'id' => $worker->id,
             'person_name' => $worker->person_name,
-            'email'       => $worker->email,
-            'mobile'      => $worker->mobile,
-            'facebook'    => $worker->facebook,
-            'linked_in'   => $worker->linked_in,
-            'whatsapp'    => $worker->whatsapp,
-            'time_from'   => $worker->time_from,
-            'time_to'     => $worker->time_to,
-            'tech_tags'   => $worker->techTags->map(fn($t) => ['id' => $t->id, 'name' => $t->tag_name])->toArray(),
+            'email' => $worker->email,
+            'mobile' => $worker->mobile,
+            'facebook' => $worker->facebook,
+            'linked_in' => $worker->linked_in,
+            'whatsapp' => $worker->whatsapp,
+            'time_from' => $worker->time_from,
+            'time_to' => $worker->time_to,
+            'tech_tags' => $worker->techTags->map(fn ($t) => ['id' => $t->id, 'name' => $t->tag_name])->toArray(),
         ];
 
-        $techTags = CoTechTag::orderBy('tag_name')->get(['id', 'tag_name'])->map(function($tag) {
+        $techTags = CoTechTag::orderBy('tag_name')->get(['id', 'tag_name'])->map(function ($tag) {
             return ['id' => $tag->id, 'name' => $tag->tag_name];
         });
 
@@ -477,7 +524,7 @@ class UsersController extends Controller
         $worker = CoWorker::findOrFail($id);
 
         $worker->update($request->only([
-            'person_name', 'email', 'mobile', 'facebook', 'linked_in', 'whatsapp', 'time_from', 'time_to'
+            'person_name', 'email', 'mobile', 'facebook', 'linked_in', 'whatsapp', 'time_from', 'time_to',
         ]));
 
         if ($request->has('selectedTechTags')) {
@@ -485,7 +532,7 @@ class UsersController extends Controller
         }
 
         return redirect()->route('admin.users.legacy-coworker.show', $worker->id)
-                         ->with('success', __('erp.coworker_updated_success', [], 'en') ?: 'Co-Worker updated successfully.');
+            ->with('success', __('erp.coworker_updated_success', [], 'en') ?: 'Co-Worker updated successfully.');
     }
 
     public function deleteLegacyCoWorker($id)
@@ -495,7 +542,7 @@ class UsersController extends Controller
         $worker->delete();
 
         return redirect()->route('admin.users.co-work')
-                         ->with('success', __('erp.coworker_deleted_success', [], 'en') ?: 'Co-Worker deleted successfully.');
+            ->with('success', __('erp.coworker_deleted_success', [], 'en') ?: 'Co-Worker deleted successfully.');
     }
 
     public function createUserFromCoWorker($id)
@@ -512,26 +559,42 @@ class UsersController extends Controller
                 return redirect()->back()->with('error', __('general.user_with_this_email_already_exists'));
             }
 
-            $randomPassword = Str::random(12);
+            // Use a non-guessable random password (never sent to anyone) and
+            // require the new employee to set their own password via a
+            // one-time signed link delivered over WhatsApp.
+            $placeholderPassword = Hash::make(Str::random(48));
 
             $user = User::create([
                 'name' => $coWorker->person_name,
                 'email' => $coWorker->email,
-                'password' => Hash::make($randomPassword),
+                'password' => $placeholderPassword,
                 'currency' => '2', // EGP currency
             ]);
 
             $user->assignRole('employee');
 
-            if (!empty($coWorker->whatsapp) && class_exists('\App\Services\WhatsAppNotificationService')) {
-                $this->sendCredentialsViaWhatsApp($coWorker, $user, $randomPassword);
+            $setLink = SetPasswordController::issueLink($user, Auth::id());
+
+            if (! empty($coWorker->whatsapp) && class_exists('\App\Services\WhatsAppNotificationService')) {
+                $this->sendSetPasswordLinkViaWhatsApp($coWorker, $user, $setLink, false);
             }
 
-            return redirect()->back()->with('success', __('general.user_created_successfully_as_employee_temporary_password_randompassword'));
+            app(AdminAuditService::class)->record(
+                'user.create_from_coworker',
+                $user,
+                [
+                    'coworker_id' => $coWorker->id,
+                    'delivery' => 'one_time_link',
+                ],
+                AdminAuditLog::SEVERITY_WARNING
+            );
+
+            return redirect()->back()->with('success', __('general.user_created_successfully_send_set_password_link'));
 
         } catch (\Exception $e) {
-            Log::error('Error creating user from co-worker: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return redirect()->back()->with('error', 'Failed to create user: ' . $e->getMessage());
+            Log::error('Error creating user from co-worker: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            return redirect()->back()->with('error', 'Failed to create user: '.$e->getMessage());
         }
     }
 
@@ -545,68 +608,115 @@ class UsersController extends Controller
             }
 
             $user = User::where('email', $coWorker->email)->first();
-            if (!$user) {
+            if (! $user) {
                 return redirect()->back()->with('error', __('general.user_with_this_email_does_not_exist'));
             }
 
-            $randomPassword = Str::random(12);
-
+            // Invalidate any existing passwords/sessions for this user, then
+            // deliver a one-time link — never plaintext.
             $user->update([
-                'password' => Hash::make($randomPassword),
+                'password' => Hash::make(Str::random(48)),
             ]);
+            if (method_exists($user, 'tokens')) {
+                $user->tokens()->delete();
+            }
 
             $user->assignRole('employee');
 
-            if (!empty($coWorker->whatsapp) && class_exists('\App\Services\WhatsAppNotificationService')) {
-                $this->sendCredentialsViaWhatsApp($coWorker, $user, $randomPassword, true);
+            $setLink = SetPasswordController::issueLink($user, Auth::id());
+
+            if (! empty($coWorker->whatsapp) && class_exists('\App\Services\WhatsAppNotificationService')) {
+                $this->sendSetPasswordLinkViaWhatsApp($coWorker, $user, $setLink, true);
             }
 
-            return redirect()->back()->with('success', __('general.password_reset_successfully_new_password_randompassword'));
+            app(AdminAuditService::class)->record(
+                'user.reset_password_for_coworker',
+                $user,
+                [
+                    'coworker_id' => $coWorker->id,
+                    'delivery' => 'one_time_link',
+                ],
+                AdminAuditLog::SEVERITY_WARNING
+            );
+
+            return redirect()->back()->with('success', __('general.password_reset_link_sent'));
 
         } catch (\Exception $e) {
-            Log::error('Error resetting password: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return redirect()->back()->with('error', 'Failed to reset password: ' . $e->getMessage());
+            Log::error('Error resetting password: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            return redirect()->back()->with('error', 'Failed to reset password: '.$e->getMessage());
         }
     }
 
-    private function sendCredentialsViaWhatsApp($coWorker, $user, $password, $isPasswordReset = false)
+    private function sendSetPasswordLinkViaWhatsApp($coWorker, $user, string $setLink, bool $isPasswordReset = false): void
     {
         try {
             $loginUrl = route('login');
 
             $message = "Hello {$coWorker->person_name},\n\n";
-            $message .= $isPasswordReset ? "Your password has been reset.\n\n" : "Your account has been created as an employee.\n\n";
-            $message .= "Login Credentials:\n";
-            $message .= "Email: {$user->email}\n";
-            $message .= "Password: {$password}\n\n";
-            $message .= "Login Link: {$loginUrl}\n\n";
-            $message .= "Please change your password after first login.\n\nThank you!";
+            $message .= $isPasswordReset
+                ? "Your password has been reset. Please set a new one using the secure link below.\n\n"
+                : "An account has been created for you. Please set your password to activate it.\n\n";
+            $message .= "Set your password: {$setLink}\n\n";
+            $message .= "Login page: {$loginUrl}\n\n";
+            $message .= 'This link is valid for 24 hours and can be used only once. '
+                ."If you did not request this, please ignore this message and contact support.\n\nThank you.";
 
-            $notificationService = app(\App\Services\WhatsAppNotificationService::class);
+            $notificationService = app(WhatsAppNotificationService::class);
             $notificationService->sendMessage($user, $message);
         } catch (\Exception $e) {
-            Log::error('Error sending WhatsApp credentials: ' . $e->getMessage());
+            Log::error('Error sending WhatsApp set-password link: '.$e->getMessage());
         }
+    }
+
+    private function sendCredentialsViaWhatsApp($coWorker, $user, $password, $isPasswordReset = false)
+    {
+        // DEPRECATED: do not transmit plaintext passwords over WhatsApp.
+        // Kept temporarily for legacy callers that may still pass through.
+        // New flows should call sendSetPasswordLinkViaWhatsApp().
+        // When invoked, it routes through the safe link path so plaintext is
+        // never emitted to the messaging channel.
+        $setLink = SetPasswordController::issueLink($user, Auth::id());
+        $this->sendSetPasswordLinkViaWhatsApp($coWorker, $user, $setLink, $isPasswordReset);
     }
 
     public function reset_password($id)
     {
         $user = User::findOrFail($id);
-        $newPassword = $this->adminUserService->resetPassword($user);
+
+        // Issue a single-use signed link instead of generating and emailing a
+        // plaintext password. The link lets the user set their own password;
+        // no plaintext ever leaves the server.
+        $setLink = SetPasswordController::issueLink($user, Auth::id());
 
         try {
-            $messageText = "Hello, {$user->name}\nHere is your login details:\nEmail:\n{$user->email}\nPassword:\n{$newPassword}";
-            \Illuminate\Support\Facades\Mail::raw($messageText, function ($message) use ($user) {
+            $messageText = "Hello {$user->name},\n\n"
+                ."An administrator has issued a one-time link to set or reset the password on your account.\n\n"
+                ."Set your password here: {$setLink}\n\n"
+                .'This link is valid for 24 hours and can be used only once. '
+                ."If you did not request this, please ignore this email and contact support.\n\nThank you.";
+
+            Mail::raw($messageText, function ($message) use ($user) {
                 $message->to($user->email)
-                        ->subject(__('general.your_new_login_details') ?: 'Your New Login Details');
+                    ->subject(__('general.set_your_password') ?: 'Set your password');
             });
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to send password reset email: ' . $e->getMessage());
+            Log::error('Failed to send password reset email: '.$e->getMessage());
         }
 
+        app(AdminAuditService::class)->record(
+            'user.reset_password',
+            $user,
+            [
+                'delivery' => 'one_time_link',
+                'email_sent' => true,
+            ],
+            AdminAuditLog::SEVERITY_WARNING
+        );
+
         return response()->json([
-            'new_password' => $newPassword,
-            'message' => 'Password reset successfully.'
+            'message' => 'A one-time password setup link has been emailed to the user.',
+            'expires_in_hours' => 24,
         ]);
     }
 
@@ -617,15 +727,15 @@ class UsersController extends Controller
 
         // Calculate commissions
         $referrals->getCollection()->transform(function ($referral) use ($client) {
-            $earnings = \App\Models\Earning::where('user_id', $client->id)
+            $earnings = Earning::where('user_id', $client->id)
                 ->where('referred_user_id', $referral->id)
                 ->get();
 
             $total_commission = 0;
             foreach ($earnings as $earning) {
                 // If the app has CurrenciesExchange::RateToday, we use it, otherwise fallback
-                if (class_exists(\App\Models\CurrenciesExchange::class)) {
-                    $total_commission += \App\Models\CurrenciesExchange::RateToday($earning->amount, $earning->currency, $client->currency);
+                if (class_exists(CurrenciesExchange::class)) {
+                    $total_commission += CurrenciesExchange::RateToday($earning->amount, $earning->currency, $client->currency);
                 } else {
                     $total_commission += $earning->amount; // Fallback
                 }
@@ -643,7 +753,7 @@ class UsersController extends Controller
         });
 
         return Inertia::render('Admin/Users/Referrals', [
-            'client' => (new \App\Http\Resources\UserResource($client))->resolve(),
+            'client' => (new UserResource($client))->resolve(),
             'referrals' => $referrals,
         ]);
     }
@@ -666,6 +776,7 @@ class UsersController extends Controller
     public function files($id)
     {
         $client = User::findOrFail($id);
+
         return Inertia::render('Admin/Users/Files', [
             'client' => $client,
         ]);
@@ -684,7 +795,7 @@ class UsersController extends Controller
         $unpaid = $client->unpaid_invoices_amount();
 
         return Inertia::render('Admin/Users/Reports', [
-            'client' => (new \App\Http\Resources\UserResource($client))->resolve(),
+            'client' => (new UserResource($client))->resolve(),
             'dates' => $dates,
             'unpaid' => $unpaid,
         ]);
@@ -693,11 +804,12 @@ class UsersController extends Controller
     public function create_task($id)
     {
         $user = User::findOrFail($id);
+
         return Inertia::render('Admin/Users/AssignTask', [
             'client' => [
                 'id' => $user->id,
                 'name' => $user->name,
-            ]
+            ],
         ]);
     }
 
@@ -712,7 +824,7 @@ class UsersController extends Controller
     public function createSubscription($id)
     {
         $user = User::findOrFail($id);
-        $serviceItems = app(\App\Services\PricingService::class)->getServiceItems();
+        $serviceItems = app(PricingService::class)->getServiceItems();
 
         return Inertia::render('Admin/Users/AddSubscription', [
             'user' => [
@@ -737,14 +849,14 @@ class UsersController extends Controller
             'duration_days' => 'required|integer|min:1',
         ]);
 
-        $serviceItems = app(\App\Services\PricingService::class)->getServiceItems();
+        $serviceItems = app(PricingService::class)->getServiceItems();
         $plan = collect($serviceItems)->firstWhere('id', $request->object);
 
-        if (!$plan) {
+        if (! $plan) {
             return back()->withErrors(['object' => 'Invalid subscription module']);
         }
 
-        \App\Models\UserSubscription::create([
+        UserSubscription::create([
             'user_id' => $user->id,
             'object' => $plan['id'],
             'status' => 'active',
@@ -759,7 +871,7 @@ class UsersController extends Controller
     public function updateMembership(Request $request, $id, $sub_id)
     {
         $user = User::findOrFail($id);
-        $subscription = \App\Models\UserSubscription::where('user_id', $user->id)->findOrFail($sub_id);
+        $subscription = UserSubscription::where('user_id', $user->id)->findOrFail($sub_id);
 
         $request->validate([
             'status' => 'required|in:active,expired,cancelled,pending',
@@ -777,7 +889,7 @@ class UsersController extends Controller
     public function deleteMembership($id, $sub_id)
     {
         $user = User::findOrFail($id);
-        $subscription = \App\Models\UserSubscription::where('user_id', $user->id)->findOrFail($sub_id);
+        $subscription = UserSubscription::where('user_id', $user->id)->findOrFail($sub_id);
         $subscription->delete();
 
         return back()->with('success', __('general.membership_deleted_successfully'));
@@ -791,7 +903,7 @@ class UsersController extends Controller
     {
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('admin.users.index')
                 ->with('error', __('errors.no_client_with_id'));
         }
@@ -800,8 +912,9 @@ class UsersController extends Controller
 
         $unpaid = $user->unpaid_invoices_amount(true);
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.users.balance_sheet_print', compact('user', 'unpaid', 'invoices'));
-        return $pdf->stream(__('general.balance_sheet') . ' - ' . $user->name . '.pdf');
+        $pdf = Pdf::loadView('admin.users.balance_sheet_print', compact('user', 'unpaid', 'invoices'));
+
+        return $pdf->stream(__('general.balance_sheet').' - '.$user->name.'.pdf');
     }
 
     /**
@@ -810,7 +923,7 @@ class UsersController extends Controller
      */
     public function earningAnalyze(Request $request): InertiaResponse
     {
-        $data = app(\App\Services\EarningAnalyzeService::class)->pageData();
+        $data = app(EarningAnalyzeService::class)->pageData();
 
         return Inertia::render('Admin/Users/EarningAnalyze', $data);
     }
@@ -820,7 +933,7 @@ class UsersController extends Controller
         $user = User::findOrFail($id);
 
         if ($user->id === Auth::id()) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'role' => __('errors.cannot_change_own_role'),
             ]);
         }
@@ -831,11 +944,10 @@ class UsersController extends Controller
 
         $roleName = $request->input('role');
         // Ensure Spatie role exists
-        \Spatie\Permission\Models\Role::findOrCreate($roleName, 'web');
+        Role::findOrCreate($roleName, 'web');
 
         $user->syncRoles([$roleName]);
 
         return back()->with('success', __('erp.role_updated_success'));
     }
 }
-

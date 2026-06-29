@@ -2,29 +2,31 @@
 
 namespace App\Models;
 
+use App\Events\InvoiceCancelled;
+use App\Events\InvoiceCreated;
 use App\Events\InvoicePaid;
 use App\Helpers\ActionHelper;
 use App\Helpers\BalancesHelper;
 use App\Helpers\FinanceHelper;
 use App\Helpers\TextHelper;
 use App\Helpers\TimezoneHelper;
-use App\Models\CharityCounter;
-use App\Models\Transaction;
 use App\Services\VoucherService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use JamesMills\LaravelTimezone\Facades\Timezone;
 
 class Invoice extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
     protected $guarded = [];
 
     protected $casts = [
@@ -59,7 +61,6 @@ class Invoice extends Model
         return $this->belongsToMany(Transaction::class);
     }
 
-
     public function cost_transactions()
     {
         return $this->belongsToMany(CostTransaction::class);
@@ -68,7 +69,7 @@ class Invoice extends Model
     protected function invoiceStatus(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => ucfirst($this->status),
+            get: fn ($value) => ucfirst($this->status),
         );
     }
 
@@ -80,6 +81,7 @@ class Invoice extends Model
                 if ($schedule && isset($schedule['start_date'])) {
                     return Carbon::parse($schedule['start_date'])->format('Y-m-d');
                 }
+
                 return null;
             },
             set: fn ($value) => null,
@@ -102,6 +104,7 @@ class Invoice extends Model
                 }
             }
             $this->cache_qty = false;
+
             return false;
         } else {
             return $this->cache_qty;
@@ -123,16 +126,16 @@ class Invoice extends Model
         $unpaid = 0;
 
         foreach ($invoices as $invoice) {
-            $unpaid += CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency_id, \App\Models\CurrenciesExchange::BusinessCurrency());
+            $unpaid += CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency_id, CurrenciesExchange::BusinessCurrency());
         }
+
         return $unpaid;
     }
 
-    public function currency(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function currency(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+        return $this->belongsTo(Currency::class, 'currency_id');
     }
-
 
     public static function UnpaidInvoices()
     {
@@ -164,12 +167,12 @@ class Invoice extends Model
             ->where('created_at', '<', now()->subDays(30));
     }
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function client(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
@@ -206,14 +209,14 @@ class Invoice extends Model
 
         $this->calculate_cost();
 
-        if (!empty($this->project_id)) {
+        if (! empty($this->project_id)) {
             $project = Project::find($this->project_id);
-            $project->add_balance($this->total(), 'Invoice #' . $this->id, 'received', $this->id, $this->currency_id);
-            $project->add_balance(-1 * $this->total(), 'Invoice #' . $this->id, 'used', $this->id, $this->currency_id);
+            $project->add_balance($this->total(), 'Invoice #'.$this->id, 'received', $this->id, $this->currency_id);
+            $project->add_balance(-1 * $this->total(), 'Invoice #'.$this->id, 'used', $this->id, $this->currency_id);
         } else {
             $client = User::find($this->user_id);
-            $client->add_balance($this->total(), 'Invoice #' . $this->id, 'received', $this->id, $this->currency_id);
-            $client->add_balance(-1 * $this->total(), 'Invoice #' . $this->id, 'used', $this->id, $this->currency_id);
+            $client->add_balance($this->total(), 'Invoice #'.$this->id, 'received', $this->id, $this->currency_id);
+            $client->add_balance(-1 * $this->total(), 'Invoice #'.$this->id, 'used', $this->id, $this->currency_id);
         }
         $this->user->calc_ref($this->total_min_cost(), $this->id, $this->currency_id);
         $this->paid = $this->total();
@@ -229,16 +232,16 @@ class Invoice extends Model
         $this->addCharityAmount();
 
         // Fire InvoicePaid event for notifications
-        event(new \App\Events\InvoicePaid($this));
+        event(new InvoicePaid($this));
     }
 
     public static function createInvoice($client, $project, $request)
     {
-        $invoice = new Invoice();
+        $invoice = new Invoice;
         $invoice->user_id = Auth::id();
-        
+
         $currencyId = $client->currency_id ?? $client->currency;
-        if (!$currencyId) {
+        if (! $currencyId) {
             throw new \Exception("Client {$client->id} is missing a currency configuration. Cannot create invoice.");
         }
         $invoice->currency_id = $currencyId;
@@ -250,24 +253,27 @@ class Invoice extends Model
             $invoice->request_id = $request->id;
         }
         $client->invoices()->save($invoice);
+
+        event(new InvoiceCreated($invoice));
+
         return $invoice;
     }
 
     public function cloneInvoice()
     {
-        $new_inc = new Invoice();
+        $new_inc = new Invoice;
         $new_inc->user_id = $this->user_id;
         $new_inc->project_id = $this->project_id;
         $new_inc->currency_id = $this->currency_id;
+
         return $new_inc;
     }
-
 
     public function transfer_to_project($project_id)
     {
         DB::transaction(function () use ($project_id) {
 
-            if (empty($project_id) || !is_numeric($project_id)) {
+            if (empty($project_id) || ! is_numeric($project_id)) {
                 $this->project_id = null;
             } else {
                 $this->project_id = intval($project_id);
@@ -301,17 +307,18 @@ class Invoice extends Model
                 $tax_calc = $business_tax * $this->sub_total() / 100;
                 $this->tax_value = $tax_calc;
                 $this->save();
+
                 return $tax_calc;
             } else {
                 $this->tax_value = 0;
                 $this->save();
+
                 return 0;
             }
         } else {
             return $this->tax_value;
         }
     }
-
 
     public function tax_str()
     {
@@ -329,7 +336,7 @@ class Invoice extends Model
         return (float) $total;
     }
 
-    public function items(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function items(): HasMany
     {
         return $this->hasMany(InvoiceItem::class);
     }
@@ -360,6 +367,7 @@ class Invoice extends Model
         foreach ($items as $item) {
             $totalCommission += $item->commission_amount();
         }
+
         return $totalCommission;
     }
 
@@ -373,6 +381,7 @@ class Invoice extends Model
         foreach ($items as $item) {
             $totalBaseAmount += $item->base_total();
         }
+
         return round($totalBaseAmount, 2);
     }
 
@@ -418,14 +427,14 @@ class Invoice extends Model
         return $this->unpaid_total();
     }
 
-    public function project(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function project(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Project::class);
+        return $this->belongsTo(Project::class);
     }
 
     public function contract()
     {
-        return $this->belongsTo(\App\Models\Contract::class);
+        return $this->belongsTo(Contract::class);
     }
 
     public function date()
@@ -448,6 +457,7 @@ class Invoice extends Model
                 $total_timer += (float) $timer->diff();
             }
         }
+
         return $total_timer;
     }
 
@@ -529,7 +539,6 @@ class Invoice extends Model
         }
     }
 
-
     public function cancel_invoice()
     {
         DB::transaction(function () {
@@ -545,8 +554,10 @@ class Invoice extends Model
             $this->status = 'cancelled';
             $this->save();
 
-            if (!empty($this->project_id)) {
-                $project = \App\Models\Project::find($this->project_id);
+            event(new InvoiceCancelled($this));
+
+            if (! empty($this->project_id)) {
+                $project = Project::find($this->project_id);
                 $client = User::find($this->user_id);
                 BalancesHelper::UpdateBalance($client, $project);
             } else {
@@ -591,7 +602,6 @@ class Invoice extends Model
         return FinanceHelper::instance()->format_money(($this->discount + $this->second_discount), $this->currency_id);
     }
 
-
     public function sub_total_str()
     {
         return FinanceHelper::instance()->format_money($this->sub_total(), $this->currency_id);
@@ -615,6 +625,7 @@ class Invoice extends Model
     public function business_paid_str()
     {
         $total = CurrenciesExchange::RateToday(round($this->paid, 2), $this->currency_id, AdminSettings::GetValue('business_currency', 2));
+
         return FinanceHelper::instance()->format_money($total, AdminSettings::GetValue('business_currency', 2));
     }
 
@@ -628,15 +639,15 @@ class Invoice extends Model
 
             $this->calculate_cost();
 
-            if (!empty($this->project_id)) {
+            if (! empty($this->project_id)) {
                 $client = User::find($this->user_id);
-                $project = \App\Models\Project::find($this->project_id);
-                $transaction_id = $project->add_balance(-1 * $this->unpaid_total(), 'Invoice #' . $this->id, 'used', $this->currency_id);
+                $project = Project::find($this->project_id);
+                $transaction_id = $project->add_balance(-1 * $this->unpaid_total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
                 $this->transactions()->attach($transaction_id);
                 $this->user->calc_ref($this->unpaid_total(), $this->id, $this->currency_id);
             } else {
                 $client = User::find($this->user_id);
-                $transaction_id = $client->add_balance(-1 * $this->unpaid_total(), 'Invoice #' . $this->id, 'used', $this->currency_id);
+                $transaction_id = $client->add_balance(-1 * $this->unpaid_total(), 'Invoice #'.$this->id, 'used', $this->currency_id);
 
                 $this->transactions()->attach($transaction_id);
                 $this->user->calc_ref($this->unpaid_total(), $this->id, $this->currency_id);
@@ -666,7 +677,7 @@ class Invoice extends Model
             $paymentTransaction = Transaction::find($transaction_id);
             if ($paymentTransaction && $client) {
                 try {
-                    $voucherService = new VoucherService();
+                    $voucherService = new VoucherService;
                     $voucherService->checkAndApplyVouchers($client, $paymentTransaction);
                 } catch (\Exception $e) {
                     // Log error but don't fail the transaction
@@ -717,10 +728,10 @@ class Invoice extends Model
         return DB::transaction(function () use ($line) {
             $reason = trim((string) $line->description) !== ''
                 ? $line->description
-                : ('Invoice #' . $this->id . ' — direct cost');
-            $c_id = \App\Models\CostTransaction::add_cost_balance(
+                : ('Invoice #'.$this->id.' — direct cost');
+            $c_id = CostTransaction::add_cost_balance(
                 $this->user,
-                        CurrenciesExchange::RateTodayNoRound((float) $line->amount, $this->currency_id, $this->client->currency_id ?? $this->client->currency),
+                CurrenciesExchange::RateTodayNoRound((float) $line->amount, $this->currency_id, $this->client->currency_id ?? $this->client->currency),
                 $reason,
                 $this->client->currency_id ?? $this->client->currency,
                 $this->project_id
@@ -756,8 +767,8 @@ class Invoice extends Model
                 if ($line->line_type === 'direct' && (float) $line->amount > 0 && ! $line->cost_transaction_id) {
                     $reason = trim((string) $line->description) !== ''
                         ? $line->description
-                        : ('Invoice #' . $this->id . ' — direct cost');
-                    $c_id = \App\Models\CostTransaction::add_cost_balance(
+                        : ('Invoice #'.$this->id.' — direct cost');
+                    $c_id = CostTransaction::add_cost_balance(
                         $this->user,
                         CurrenciesExchange::RateTodayNoRound((float) $line->amount, $this->currency_id, $this->client->currency_id ?? $this->client->currency),
                         $reason,
@@ -771,8 +782,8 @@ class Invoice extends Model
                     $payee = User::find($line->credit_user_id);
                     if ($payee) {
                         $reason = trim((string) $line->description) !== ''
-                            ? ('Invoice #' . $this->id . ': ' . $line->description)
-                            : ('Invoice #' . $this->id . ' — cost credit');
+                            ? ('Invoice #'.$this->id.': '.$line->description)
+                            : ('Invoice #'.$this->id.' — cost credit');
                         $tid = $payee->add_balance(
                             (float) $line->amount,
                             $reason,
@@ -801,7 +812,7 @@ class Invoice extends Model
             if ($payee) {
                 $payee->add_balance(
                     (float) $this->cost,
-                    'Invoice #' . $this->id . ' cost',
+                    'Invoice #'.$this->id.' cost',
                     'earned',
                     (int) $this->currency_id
                 );
@@ -812,10 +823,10 @@ class Invoice extends Model
         }
 
         if ($this->cost > 0) {
-            $c_id = \App\Models\CostTransaction::add_cost_balance(
+            $c_id = CostTransaction::add_cost_balance(
                 $this->user,
                 CurrenciesExchange::RateTodayNoRound($this->cost, $this->currency_id, $this->client->currency_id ?? $this->client->currency),
-                'Costs for Invoice #' . $this->id,
+                'Costs for Invoice #'.$this->id,
                 $this->client->currency_id ?? $this->client->currency,
                 $this->project_id
             );
@@ -824,7 +835,6 @@ class Invoice extends Model
         }
         $this->update(['cost_calculated' => '1']);
     }
-
 
     public function partially_bill_invoice($paid)
     {
@@ -838,13 +848,13 @@ class Invoice extends Model
 
             $this->calculate_cost();
 
-            if (!empty($this->project_id)) {
-                $project = \App\Models\Project::find($this->project_id);
-                $transaction_id = $project->add_balance(-1 * $paid, 'Invoice #' . $this->id, 'used', $this->currency);
+            if (! empty($this->project_id)) {
+                $project = Project::find($this->project_id);
+                $transaction_id = $project->add_balance(-1 * $paid, 'Invoice #'.$this->id, 'used', $this->currency);
             } else {
 
                 $client = User::find($this->user_id);
-                $transaction_id = $client->add_balance(-1 * $paid, 'Invoice #' . $this->id, 'used', $this->currency);
+                $transaction_id = $client->add_balance(-1 * $paid, 'Invoice #'.$this->id, 'used', $this->currency);
             }
             $this->transactions()->attach($transaction_id);
             $this->user->calc_ref($paid, $this->id, $this->currency);
@@ -871,7 +881,6 @@ class Invoice extends Model
             }
         });
     }
-
 
     public function delete_with_balance()
     {
@@ -920,7 +929,7 @@ class Invoice extends Model
         if ($comment) {
             return json_decode($comment->comment, true);
         }
-        
+
         // Default: No schedule (Due immediately / created_at)
         return null;
     }
@@ -932,14 +941,15 @@ class Invoice extends Model
     public function isScheduledJob(): bool
     {
         $schedule = $this->schedule;
-        return is_array($schedule) && !empty($schedule['end_date']);
+
+        return is_array($schedule) && ! empty($schedule['end_date']);
     }
 
     private function addCharityAmount()
     {
         try {
             $charityCounter = CharityCounter::getOrCreateForUser($this->user_id);
-            $description = "إضافة تلقائية من دفع الفاتورة رقم: " . $this->enc_id();
+            $description = 'إضافة تلقائية من دفع الفاتورة رقم: '.$this->enc_id();
 
             $charityCounter->addAmount(
                 1.0, // جنيه واحد
@@ -949,9 +959,9 @@ class Invoice extends Model
             );
         } catch (\Exception $e) {
             // تسجيل الخطأ إذا حدث ولكن لا نوقف العملية
-            \Log::error('خطأ في إضافة المبلغ لعداد الخير: ' . $e->getMessage(), [
+            \Log::error('خطأ في إضافة المبلغ لعداد الخير: '.$e->getMessage(), [
                 'invoice_id' => $this->id,
-                'user_id' => $this->user_id
+                'user_id' => $this->user_id,
             ]);
         }
     }

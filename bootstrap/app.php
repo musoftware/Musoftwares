@@ -1,8 +1,35 @@
 <?php
 
+use App\Http\Middleware\AccountantMiddleware;
+use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\ClientMiddleware;
+use App\Http\Middleware\EnforceFreelanceDomain;
+use App\Http\Middleware\EnsureOnboardingCompleted;
+use App\Http\Middleware\ForceJsonRequest;
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\ModeratorMiddleware;
+use App\Http\Middleware\RemoveSecurityHeaders;
+use App\Http\Middleware\ResellerSharingGuard;
+use App\Http\Middleware\SecurityEnforcement;
+use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\SubscriptionMiddleware;
+use App\Http\Middleware\TenantMiddleware;
+use App\Http\Middleware\VerifyEmbedKey;
+use App\Http\Middleware\VerifySerialDeviceHmac;
+use App\Models\BlockedIp;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use Spatie\Permission\Middleware\PermissionMiddleware;
+use Spatie\Permission\Middleware\RoleMiddleware;
+use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,14 +40,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->append(\App\Http\Middleware\SecurityEnforcement::class);
-        $middleware->append(\App\Http\Middleware\RemoveSecurityHeaders::class);
+        $middleware->append(SecurityEnforcement::class);
+        $middleware->append(RemoveSecurityHeaders::class);
         $middleware->web(append: [
             'throttle:web',
-            \App\Http\Middleware\SetLocale::class,
-            \App\Http\Middleware\HandleInertiaRequests::class,
-            \App\Http\Middleware\EnforceFreelanceDomain::class,
-            \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+            SetLocale::class,
+            HandleInertiaRequests::class,
+            EnforceFreelanceDomain::class,
+            AddLinkHeadersForPreloadedAssets::class,
         ]);
         $middleware->api(prepend: [
             'throttle:api',
@@ -35,30 +62,30 @@ return Application::configure(basePath: dirname(__DIR__))
             'sms-pay/*/verify', // Hosted checkout embedded via iframe across domains
         ]);
 
-
         $middleware->alias([
-            'admin' => \App\Http\Middleware\AdminMiddleware::class,
-            'moderator' => \App\Http\Middleware\ModeratorMiddleware::class,
-            'accountant' => \App\Http\Middleware\AccountantMiddleware::class,
-            'client' => \App\Http\Middleware\ClientMiddleware::class,
-            'tenant' => \App\Http\Middleware\TenantMiddleware::class,
-            'tenant.active' => \App\Http\Middleware\TenantMiddleware::class,
-            'subscription' => \App\Http\Middleware\SubscriptionMiddleware::class,
-            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
-            'onboarding' => \App\Http\Middleware\EnsureOnboardingCompleted::class,
-            'reseller.sharing' => \App\Http\Middleware\ResellerSharingGuard::class,
-            'force.json' => \App\Http\Middleware\ForceJsonRequest::class,
-            'embed' => \App\Http\Middleware\VerifyEmbedKey::class,
+            'admin' => AdminMiddleware::class,
+            'moderator' => ModeratorMiddleware::class,
+            'accountant' => AccountantMiddleware::class,
+            'client' => ClientMiddleware::class,
+            'tenant' => TenantMiddleware::class,
+            'tenant.active' => TenantMiddleware::class,
+            'subscription' => SubscriptionMiddleware::class,
+            'role' => RoleMiddleware::class,
+            'permission' => PermissionMiddleware::class,
+            'onboarding' => EnsureOnboardingCompleted::class,
+            'reseller.sharing' => ResellerSharingGuard::class,
+            'force.json' => ForceJsonRequest::class,
+            'embed' => VerifyEmbedKey::class,
+            'serial.device.hmac' => VerifySerialDeviceHmac::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response, \Throwable $exception, \Illuminate\Http\Request $request) {
+        $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
             $statusCode = $response->getStatusCode();
 
             // API or JSON requests: return generic error responses without exposing framework classes or path traces
             if ($request->expectsJson() || $request->is('api/*')) {
-                if ($exception instanceof \Illuminate\Validation\ValidationException) {
+                if ($exception instanceof ValidationException) {
                     return $response;
                 }
 
@@ -66,24 +93,24 @@ return Application::configure(basePath: dirname(__DIR__))
                     ? json_decode($response->getContent(), true)['message'] ?? $exception->getMessage()
                     : $exception->getMessage();
 
-                if ($exception instanceof \Illuminate\Database\QueryException) {
+                if ($exception instanceof QueryException) {
                     $message = __('errors.database_error') === 'errors.database_error'
                         ? 'A database error occurred.'
                         : __('errors.database_error');
                 }
 
-                if ($exception instanceof \Illuminate\Http\Exceptions\ThrottleRequestsException) {
+                if ($exception instanceof ThrottleRequestsException) {
                     $ip = $request->ip();
-                    $strikes = \Illuminate\Support\Facades\Cache::increment("throttle_strikes:{$ip}");
+                    $strikes = Cache::increment("throttle_strikes:{$ip}");
                     if ($strikes === 1) {
-                        \Illuminate\Support\Facades\Cache::put("throttle_strikes:{$ip}", 1, 3600); // 1 hour
+                        Cache::put("throttle_strikes:{$ip}", 1, 3600); // 1 hour
                     }
                     if ($strikes > 5) { // 5 rate limit hits in an hour -> block permanently
-                        \App\Models\BlockedIp::firstOrCreate(
+                        BlockedIp::firstOrCreate(
                             ['ip_address' => $ip],
                             ['reason' => 'Persistent rate limiting (Spam)', 'blocked_until' => null]
                         );
-                        \Illuminate\Support\Facades\Cache::forget("blocked_ip:{$ip}"); // clear cache
+                        Cache::forget("blocked_ip:{$ip}"); // clear cache
                     }
                 }
 
@@ -101,23 +128,23 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // Web requests - render custom Inertia error page for 404/403/503
             if (in_array($statusCode, [404, 403, 503, 429]) || ($statusCode === 500 && ! app()->environment(['local', 'testing']))) {
-                if ($statusCode === 429 || $exception instanceof \Illuminate\Http\Exceptions\ThrottleRequestsException) {
+                if ($statusCode === 429 || $exception instanceof ThrottleRequestsException) {
                     $ip = $request->ip();
-                    $strikes = \Illuminate\Support\Facades\Cache::increment("throttle_strikes:{$ip}");
+                    $strikes = Cache::increment("throttle_strikes:{$ip}");
                     if ($strikes === 1) {
-                        \Illuminate\Support\Facades\Cache::put("throttle_strikes:{$ip}", 1, 3600); // 1 hour
+                        Cache::put("throttle_strikes:{$ip}", 1, 3600); // 1 hour
                     }
                     if ($strikes > 5) {
-                        \App\Models\BlockedIp::firstOrCreate(
+                        BlockedIp::firstOrCreate(
                             ['ip_address' => $ip],
                             ['reason' => 'Persistent rate limiting (Spam)', 'blocked_until' => null]
                         );
-                        \Illuminate\Support\Facades\Cache::forget("blocked_ip:{$ip}");
+                        Cache::forget("blocked_ip:{$ip}");
                     }
                 }
 
-                if (class_exists(\Inertia\Inertia::class)) {
-                    return \Inertia\Inertia::render('Error', ['status' => $statusCode])
+                if (class_exists(Inertia::class)) {
+                    return Inertia::render('Error', ['status' => $statusCode])
                         ->toResponse($request)
                         ->setStatusCode($statusCode);
                 }

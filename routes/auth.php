@@ -8,13 +8,15 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\SetPasswordController;
+use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    Route::get('auth/google/redirect', [\App\Http\Controllers\Auth\SocialLoginController::class, 'redirect'])
+    Route::get('auth/google/redirect', [SocialLoginController::class, 'redirect'])
         ->name('social.google.redirect');
-    Route::get('auth/google/callback', [\App\Http\Controllers\Auth\SocialLoginController::class, 'callback'])
+    Route::get('auth/google/callback', [SocialLoginController::class, 'callback'])
         ->name('social.google.callback');
 
     Route::get('register', [RegisteredUserController::class, 'create'])
@@ -40,6 +42,14 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->middleware('throttle:6,1')
         ->name('password.store');
+
+    // Admin-issued single-use password set/reset link. Signed URL + cache token.
+    Route::get('set-password', [SetPasswordController::class, 'create'])
+        ->middleware('throttle:30,1')
+        ->name('password.set.show');
+    Route::post('set-password', [SetPasswordController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('password.set.store');
 });
 
 Route::middleware('auth')->group(function () {

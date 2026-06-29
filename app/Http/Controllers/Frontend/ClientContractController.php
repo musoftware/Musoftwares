@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Events\ContractSigned;
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
-use App\Models\Invoice;
+use App\Models\Currency;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -15,7 +16,7 @@ class ClientContractController extends Controller
      */
     public function show($uuid)
     {
-        $contract = Contract::with(['project', 'versions', 'invoices' => function($q) {
+        $contract = Contract::with(['project', 'versions', 'invoices' => function ($q) {
             $q->orderBy('created_at', 'asc');
         }])->where('uuid', $uuid)->firstOrFail();
 
@@ -28,7 +29,7 @@ class ClientContractController extends Controller
                 'description' => $contract->description,
                 'payment_terms' => $contract->payment_terms,
                 'total_amount' => $contract->total_amount,
-                'currency' => $contract->currencyRow() ?? \App\Models\Currency::first(),
+                'currency' => $contract->currencyRow() ?? Currency::first(),
                 'duration' => $contract->duration,
                 'status' => $contract->status,
                 'signed_at' => $contract->signed_at,
@@ -42,12 +43,12 @@ class ClientContractController extends Controller
                     'total_str' => $invoice->total_str(),
                     'unpaid_str' => $invoice->unpaid_str(),
                     'enc_id' => $invoice->enc_id(),
-                    'items' => $invoice->items->map(function($item) {
+                    'items' => $invoice->items->map(function ($item) {
                         return [
                             'item' => $item->item,
-                            'price' => $item->price
+                            'price' => $item->price,
                         ];
-                    })
+                    }),
                 ];
             }),
             'project' => $contract->project ? [
@@ -67,11 +68,11 @@ class ClientContractController extends Controller
     {
         $request->validate([
             'signature' => 'required|string',
-            'client_name' => 'required|string'
+            'client_name' => 'required|string',
         ]);
 
         $contract = Contract::where('uuid', $uuid)->firstOrFail();
-        
+
         if ($contract->status === 'signed') {
             return redirect()->back()->with('error', __('general.already_signed'));
         }
@@ -81,6 +82,8 @@ class ClientContractController extends Controller
         $contract->signed_at = now();
         $contract->status = 'signed';
         $contract->save();
+
+        event(new ContractSigned($contract));
 
         return redirect()->back()->with('success', __('general.contract_signed_successfully'));
     }

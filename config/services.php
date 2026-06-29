@@ -62,6 +62,23 @@ return [
         'redirect' => env('GOOGLE_CALENDAR_REDIRECT_URI', '/admin/google-calendar/callback'),
     ],
 
+    /*
+     * Shared HMAC secret for the public serial-device license check-in API.
+     * Each client software instance ships with this secret baked in (per-
+     * software, ideally), and signs every POST to /api/serial/device with
+     * `X-Musoftwares-Signature: sha256=<hex>` over the raw request body.
+     *
+     * Set SERIAL_DEVICE_API_SECRET in your environment. When the secret is
+     * unset, signature verification fails closed (401). This means existing
+     * deployments MUST set the env var before upgrading.
+     */
+    'serial_device' => [
+        'api_secret' => env('SERIAL_DEVICE_API_SECRET'),
+        // Optional comma-separated CIDR allowlist (e.g. "10.0.0.0/8,192.168.1.0/24").
+        // Empty = no IP restriction (relies on signature only).
+        'ip_allowlist' => env('SERIAL_DEVICE_IP_ALLOWLIST', ''),
+    ],
+
     'openai' => [
         'key' => env('OPENAI_API_KEY'),
     ],

@@ -2,13 +2,18 @@
 
 namespace App\Providers;
 
+use App\Models\BlockedIp;
+use App\Models\RateLimit;
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\LaravelModulesServiceProvider;
-use App\Providers\EventServiceProvider;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -18,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->register(LaravelModulesServiceProvider::class);
         $this->app->register(EventServiceProvider::class);
+        $this->app->register(NotificationServiceProvider::class);
     }
 
     /**
@@ -29,15 +35,15 @@ class AppServiceProvider extends ServiceProvider
 
         $this->configureRateLimiting();
 
-        \Illuminate\Support\Facades\Event::listen(
-            \Illuminate\Auth\Events\Lockout::class,
-            function (\Illuminate\Auth\Events\Lockout $event) {
+        Event::listen(
+            Lockout::class,
+            function (Lockout $event) {
                 $ip = $event->request->ip();
-                \App\Models\BlockedIp::firstOrCreate(
+                BlockedIp::firstOrCreate(
                     ['ip_address' => $ip],
                     ['reason' => 'Brute-force login attempt', 'blocked_until' => now()->addHours(24)]
                 );
-                \Illuminate\Support\Facades\Cache::forget("blocked_ip:{$ip}");
+                Cache::forget("blocked_ip:{$ip}");
             }
         );
     }
@@ -49,23 +55,27 @@ class AppServiceProvider extends ServiceProvider
             $ip = $request->ip();
 
             $cacheKey = "rate_limit:{$module}:{$tenantId}:{$ip}";
-            
-            $config = \Illuminate\Support\Facades\Cache::remember($cacheKey, 60, function () use ($module, $tenantId, $ip) {
+
+            $config = Cache::remember($cacheKey, 60, function () use ($module, $tenantId, $ip) {
                 if ($tenantId) {
-                    $limit = \App\Models\RateLimit::where('module', $module)
+                    $limit = RateLimit::where('module', $module)
                         ->where('tenant_id', $tenantId)
                         ->where('is_active', true)
                         ->first();
-                    if ($limit) return $limit;
+                    if ($limit) {
+                        return $limit;
+                    }
                 }
-                
-                $limit = \App\Models\RateLimit::where('module', $module)
+
+                $limit = RateLimit::where('module', $module)
                     ->where('ip_address', $ip)
                     ->where('is_active', true)
                     ->first();
-                if ($limit) return $limit;
+                if ($limit) {
+                    return $limit;
+                }
 
-                return \App\Models\RateLimit::where('module', $module)
+                return RateLimit::where('module', $module)
                     ->whereNull('tenant_id')
                     ->whereNull('ip_address')
                     ->where('is_active', true)
