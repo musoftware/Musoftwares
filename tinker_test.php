@@ -1,0 +1,1 @@
+<?php $test = new \Tests\Feature\Subscriptions\SubscriptionSyncApiTest("test"); $test->setUp(); $test->test_it_returns_subscription_for_goldsaversys_when_user_has_gold_saver_subscription(); echo "TEST PASSED\n"; 
