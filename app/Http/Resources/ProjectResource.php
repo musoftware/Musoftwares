@@ -9,6 +9,8 @@ class ProjectResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $currency = $this->currencyRow();
+
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
@@ -26,6 +28,12 @@ class ProjectResource extends JsonResource
             'hide_future_tasks' => (bool) $this->hide_future_tasks,
             'date_start' => optional($this->date_start)->toDateString(),
             'date_end' => optional($this->date_end)->toDateString(),
+            'currency' => $currency ? [
+                'id' => $currency->id,
+                'currency' => $currency->currency,
+                'symbol' => $currency->symbol,
+                'string_format' => $currency->string_format,
+            ] : null,
             'created_at' => optional($this->created_at)->toIso8601String(),
             'updated_at' => optional($this->updated_at)->toIso8601String(),
             'client' => $this->whenLoaded('client', fn () => [

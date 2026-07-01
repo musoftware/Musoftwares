@@ -213,13 +213,13 @@ export default function Index(props: ProjectsIndexProps) {
             key: 'budget',
             label: __('general.budget'),
             sortable: true,
-            render: (project: Project) => (project.budget && Number(project.budget) > 0 ? formatMoney(project.budget, 'USD') : '—'),
+            render: (project: Project) => (project.budget && Number(project.budget) > 0 ? formatMoney(project.budget, project.currency) : '—'),
         },
         {
             key: 'project_balance',
             label: __('general.project_balance'),
             sortable: true,
-            render: (project: Project) => (project.project_balance ? formatMoney(project.project_balance, 'USD') : '—'),
+            render: (project: Project) => (project.project_balance ? formatMoney(project.project_balance, project.currency) : '—'),
         },
         {
             key: 'status',

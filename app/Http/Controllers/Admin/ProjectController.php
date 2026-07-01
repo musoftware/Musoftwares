@@ -276,6 +276,8 @@ class ProjectController extends Controller
 
         $project->loadCount(['tasks', 'reports', 'files']);
 
+        $currency = $project->currencyRow();
+
         return Inertia::render('Admin/Projects/Board', [
             'project' => [
                 'id' => $project->id,
@@ -292,6 +294,12 @@ class ProjectController extends Controller
                 'date_end' => optional($project->date_end)->toDateString(),
                 'client_name' => $project->client?->name,
                 'owner_name' => $project->owner?->name,
+                'currency' => $currency ? [
+                    'id' => $currency->id,
+                    'currency' => $currency->currency,
+                    'symbol' => $currency->symbol,
+                    'string_format' => $currency->string_format,
+                ] : null,
                 'counts' => [
                     'tasks' => $project->tasks_count,
                     'reports' => $project->reports_count,

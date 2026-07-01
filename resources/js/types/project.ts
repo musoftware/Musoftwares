@@ -45,6 +45,12 @@ export interface Project {
     updated_at: string | null;
     client?: ProjectClient | null;
     owner?: ProjectOwner | null;
+    currency?: {
+        id: number;
+        currency: string;
+        symbol?: string;
+        string_format?: string;
+    } | null;
     counts?: ProjectCounts;
 }
 
@@ -92,6 +98,12 @@ export interface BoardProject {
     date_end: string | null;
     client_name: string | null;
     owner_name: string | null;
+    currency: {
+        id: number;
+        currency: string;
+        symbol?: string;
+        string_format?: string;
+    } | null;
     counts: BoardCounts;
 }
 

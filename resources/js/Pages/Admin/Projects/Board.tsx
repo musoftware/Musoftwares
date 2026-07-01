@@ -10,7 +10,7 @@ import { Breadcrumbs } from '@/Components/ui/Breadcrumbs';
 import { MetricCard } from '@/Components/ui/MetricCard';
 import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { formatMoney, formatNumber, formatDate } from '@/lib/utils';
+import { formatMoney, formatDate } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import type { BoardProject } from '@/types/project';
 
@@ -175,18 +175,21 @@ export default function AdminProjectBoard({ project, date, lanes, cards }: Props
                         <BudgetItem
                             label={__('general.budget')}
                             value={project.budget}
+                            currency={project.currency}
                             icon={PiggyBank}
                             color="text-emerald-600 bg-emerald-50"
                         />
                         <BudgetItem
                             label={__('general.total_paid')}
                             value={project.total_paid}
+                            currency={project.currency}
                             icon={Wallet}
                             color="text-sky-600 bg-sky-50"
                         />
                         <BudgetItem
                             label={__('general.remaining_balance')}
                             value={project.project_balance}
+                            currency={project.currency}
                             icon={Wallet}
                             color="text-violet-600 bg-violet-50"
                         />
@@ -264,9 +267,9 @@ export default function AdminProjectBoard({ project, date, lanes, cards }: Props
 }
 
 function BudgetItem({
-    label, value, icon: Icon, color,
+    label, value, currency, icon: Icon, color,
 }: {
-    label: string; value: string; icon: React.ElementType; color: string;
+    label: string; value: string; currency: BoardProject['currency']; icon: React.ElementType; color: string;
 }) {
     return (
         <div className="flex items-center gap-3 p-4">
@@ -275,7 +278,7 @@ function BudgetItem({
             </div>
             <div className="min-w-0">
                 <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">{label}</p>
-                <p className="truncate font-mono text-base font-semibold text-slate-900" title={value}>{formatNumber(value)}</p>
+                <p className="truncate font-mono text-base font-semibold text-slate-900" title={formatMoney(value, currency)}>{formatMoney(value, currency)}</p>
             </div>
         </div>
     );
