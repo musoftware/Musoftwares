@@ -107,4 +107,12 @@ return [
         'url' => env('GOLDSAVERSYS_URL', 'http://localhost:8006'),
     ],
 
+    'toolsys' => [
+        'url' => env('TOOLSYS_URL', 'http://localhost:8007'),
+        'shared_secret' => env('TOOLSYS_SHARED_SECRET', 'local-shared-secret-change-me'),
+        'timeout' => env('TOOLSYS_TIMEOUT', 10),
+        'retry_times' => env('TOOLSYS_RETRY_TIMES', 2),
+        'retry_sleep' => env('TOOLSYS_RETRY_SLEEP', 300),
+    ],
+
 ];

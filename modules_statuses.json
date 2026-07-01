@@ -1,11 +1,9 @@
 {
     "Marketplace": true,
     "Shared": false,
-    "Tools": true,
     "fbmb": true,
     "SmsPaymentGateway": true,
     "WrittenCoursesEngine": true,
     "PaymentGateway": true,
-    "PasswordSync": true,
-    "WebTools": true
+    "PasswordSync": true
 }

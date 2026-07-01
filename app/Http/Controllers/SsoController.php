@@ -49,6 +49,8 @@ class SsoController extends Controller
             $targetUrl = config('services.freelancesys.url') . '/sso/callback';
         } elseif ($system === 'goldsaversys') {
             $targetUrl = config('services.goldsaversys.url') . '/sso/callback';
+        } elseif ($system === 'toolsys') {
+            $targetUrl = config('services.toolsys.url') . '/sso/callback';
         } else {
             abort(404, 'System not found');
         }

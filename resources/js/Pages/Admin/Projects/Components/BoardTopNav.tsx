@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Link, router } from '@inertiajs/react';
 import {
     ChevronLeft, ChevronRight, CalendarDays, LayoutDashboard, KanbanSquare,
@@ -9,7 +9,17 @@ import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
-export type BoardSection = 'board' | 'tasks' | 'todos' | 'notes' | 'reports' | 'files' | 'contracts';
+export type BoardFilter = 'all' | 'card' | 'task' | 'todo' | 'note' | 'report' | 'file';
+
+export interface BoardTopNavCounts {
+    all?: number;
+    card?: number;
+    task?: number;
+    todo?: number;
+    note?: number;
+    report?: number;
+    file?: number;
+}
 
 interface BoardTopNavProps {
     project: {
@@ -17,68 +27,67 @@ interface BoardTopNavProps {
         name: string;
         status?: string;
         archived?: boolean;
-        counts?: {
-            tasks?: number;
-            todos?: number;
-            notes?: number;
-            cards?: number;
-            reports?: number;
-            files?: number;
-        };
     };
-    active: BoardSection;
+    activeFilter: BoardFilter;
+    onFilterChange: (next: BoardFilter) => void;
+    counts?: BoardTopNavCounts;
     date: string;
-    onAddNote?: () => void;
-    onAddTask?: () => void;
-    onAddTodo?: () => void;
+    onAdd: (kind: 'note' | 'task' | 'todo' | 'file' | 'report' | 'card') => void;
 }
 
-const SECTION_META: Record<BoardSection, { labelKey: string; icon: React.ElementType; href: (projectId: number) => string }> = {
-    board: { labelKey: 'general.board_nav_board', icon: LayoutDashboard, href: (id) => route('admin.projects.board.index', id) },
-    cards: { labelKey: 'general.board_nav_cards', icon: KanbanSquare, href: (id) => route('admin.projects.board.index', id) },
-    tasks: { labelKey: 'general.board_nav_tasks', icon: ListTodo, href: (id) => route('admin.projects.tasks.index', id) },
-    todos: { labelKey: 'general.board_nav_todos', icon: ClipboardList, href: (id) => route('admin.projects.board.index', id) },
-    notes: { labelKey: 'general.board_nav_notes', icon: StickyNote, href: (id) => route('admin.projects.board.index', id) },
-    reports: { labelKey: 'general.board_nav_reports', icon: FileText, href: (id) => route('admin.projects.reports.index', id) },
-    files: { labelKey: 'general.board_nav_files', icon: Paperclip, href: (id) => route('admin.projects.files.index', id) },
-    contracts: { labelKey: 'general.board_nav_contracts', icon: Wallet, href: (id) => route('admin.projects.contracts.index', id) },
+const FILTER_META: Record<BoardFilter, { labelKey: string; icon: React.ElementType }> = {
+    all: { labelKey: 'general.board_nav_board', icon: LayoutDashboard },
+    card: { labelKey: 'general.board_nav_cards', icon: KanbanSquare },
+    task: { labelKey: 'general.board_nav_tasks', icon: ListTodo },
+    todo: { labelKey: 'general.board_nav_todos', icon: ClipboardList },
+    note: { labelKey: 'general.board_nav_notes', icon: StickyNote },
+    report: { labelKey: 'general.board_nav_reports', icon: FileText },
+    file: { labelKey: 'general.board_nav_files', icon: Paperclip },
 };
 
-export default function BoardTopNav({ project, active, date, onAddNote, onAddTask, onAddTodo }: BoardTopNavProps) {
+const ADD_MENU: { kind: 'note' | 'task' | 'todo' | 'file' | 'report' | 'card'; labelKey: string; icon: React.ElementType; color: string }[] = [
+    { kind: 'note', labelKey: 'general.board_add_note', icon: StickyNote, color: 'text-amber-600' },
+    { kind: 'task', labelKey: 'general.board_add_task', icon: ListTodo, color: 'text-sky-600' },
+    { kind: 'todo', labelKey: 'general.board_add_todo', icon: ClipboardList, color: 'text-violet-600' },
+    { kind: 'file', labelKey: 'general.board_add_file', icon: Paperclip, color: 'text-orange-600' },
+    { kind: 'report', labelKey: 'general.board_add_report', icon: FileText, color: 'text-emerald-600' },
+    { kind: 'card', labelKey: 'general.board_add_card', icon: KanbanSquare, color: 'text-indigo-600' },
+];
+
+const FILTERS: BoardFilter[] = ['all', 'card', 'task', 'todo', 'note', 'report', 'file'];
+
+export default function BoardTopNav({ project, activeFilter, onFilterChange, counts, date, onAdd }: BoardTopNavProps) {
     const day = parseISO(date);
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const prev = format(new Date(day.getTime() - 86400000), 'yyyy-MM-dd');
     const next = format(new Date(day.getTime() + 86400000), 'yyyy-MM-dd');
     const isToday = date === todayStr;
     const dateInputRef = useRef<HTMLInputElement | null>(null);
-    const [menuOpen, setMenuOpen] = useState(false);
+    const [addOpen, setAddOpen] = React.useState(false);
 
-    const goToDate = useCallback(
-        (target: string) => {
-            if (!target || target === date) return;
-            router.visit(route('admin.projects.board', { project: project.id, date: target }), { preserveScroll: true });
-        },
-        [project.id, date],
-    );
+    const goToDate = (target: string) => {
+        if (!target || target === date) return;
+        router.visit(route('admin.projects.board', { project: project.id, date: target }), { preserveScroll: true });
+    };
 
-    const counts = project.counts ?? {};
-    const sections: BoardSection[] = ['board', 'cards', 'tasks', 'todos', 'notes', 'reports', 'files'];
+    const safeCounts: BoardTopNavCounts = counts ?? {};
 
     return (
         <div
-            className="sticky top-0 z-30 -mx-4 sm:-mx-6 lg:-mx-8 border-b border-slate-200 bg-white/95 backdrop-blur shadow-sm"
+            className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur shadow-sm"
             aria-label={__('general.board_layout_aria')}
         >
-            <div className="px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
                 {/* Row 1: Project context + Date navigator + Quick Add */}
                 <div className="flex flex-wrap items-center gap-3 py-3">
                     <Link
                         href={route('admin.projects.index')}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+                        className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
                         title={__('general.board_back_to_admin')}
                         aria-label={__('general.board_back_to_admin')}
                     >
                         <ArrowLeft className="h-4 w-4" />
+                        <span className="hidden md:inline">{__('general.admin_dashboard')}</span>
                     </Link>
 
                     <div className="min-w-0 flex-1">
@@ -157,70 +166,52 @@ export default function BoardTopNav({ project, active, date, onAddNote, onAddTas
                     </div>
 
                     {/* Quick Add */}
-                    {(onAddNote || onAddTask || onAddTodo) && (
-                        <div className="relative">
-                            <button
-                                type="button"
-                                onClick={() => setMenuOpen((v) => !v)}
-                                onBlur={() => setTimeout(() => setMenuOpen(false), 150)}
-                                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-slate-900 px-3 text-xs font-semibold text-white shadow-sm hover:bg-slate-800"
-                            >
-                                <Plus className="h-3.5 w-3.5" />
-                                <span className="hidden sm:inline">{__('general.board_quick_add')}</span>
-                                <ChevronDown className="h-3 w-3 opacity-70" />
-                            </button>
-                            {menuOpen && (
-                                <div className="absolute right-0 z-40 mt-1.5 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
-                                    {onAddNote && (
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() => setAddOpen((v) => !v)}
+                            onBlur={() => window.setTimeout(() => setAddOpen(false), 150)}
+                            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-slate-900 px-3 text-xs font-semibold text-white shadow-sm hover:bg-slate-800"
+                        >
+                            <Plus className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline">{__('general.board_quick_add')}</span>
+                            <ChevronDown className="h-3 w-3 opacity-70" />
+                        </button>
+                        {addOpen && (
+                            <div className="absolute right-0 z-40 mt-1.5 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl">
+                                {ADD_MENU.map((item) => {
+                                    const Icon = item.icon;
+                                    return (
                                         <button
+                                            key={item.kind}
                                             type="button"
-                                            onMouseDown={(e) => { e.preventDefault(); onAddNote(); setMenuOpen(false); }}
-                                            className="flex w-full items-center gap-2 px-3 py-2 text-start text-xs text-slate-700 transition-colors hover:bg-amber-50 hover:text-amber-800"
+                                            onMouseDown={(e) => { e.preventDefault(); onAdd(item.kind); setAddOpen(false); }}
+                                            className="flex w-full items-center gap-2 px-3 py-2 text-start text-xs text-slate-700 transition-colors hover:bg-slate-50"
                                         >
-                                            <StickyNote className="h-3.5 w-3.5 text-amber-500" /> {__('general.board_add_note')}
+                                            <Icon className={cn('h-3.5 w-3.5', item.color)} />
+                                            <span className="flex-1">{__(item.labelKey)}</span>
                                         </button>
-                                    )}
-                                    {onAddTask && (
-                                        <button
-                                            type="button"
-                                            onMouseDown={(e) => { e.preventDefault(); onAddTask(); setMenuOpen(false); }}
-                                            className="flex w-full items-center gap-2 px-3 py-2 text-start text-xs text-slate-700 transition-colors hover:bg-sky-50 hover:text-sky-800"
-                                        >
-                                            <ListTodo className="h-3.5 w-3.5 text-sky-500" /> {__('general.board_add_task')}
-                                        </button>
-                                    )}
-                                    {onAddTodo && (
-                                        <button
-                                            type="button"
-                                            onMouseDown={(e) => { e.preventDefault(); onAddTodo(); setMenuOpen(false); }}
-                                            className="flex w-full items-center gap-2 px-3 py-2 text-start text-xs text-slate-700 transition-colors hover:bg-violet-50 hover:text-violet-800"
-                                        >
-                                            <ClipboardList className="h-3.5 w-3.5 text-violet-500" /> {__('general.board_add_todo')}
-                                        </button>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    )}
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                {/* Row 2: Section tabs */}
-                <div className="-mx-4 sm:-mx-6 lg:-mx-8 overflow-x-auto border-t border-slate-100">
+                {/* Row 2: Section filter chips — all visible on the board */}
+                <div className="-mx-4 overflow-x-auto border-t border-slate-100 sm:-mx-6 lg:-mx-8">
                     <div className="flex min-w-max items-center gap-1 px-4 sm:px-6 lg:px-8">
-                        {sections.map((key) => {
-                            const meta = SECTION_META[key];
+                        {FILTERS.map((key) => {
+                            const meta = FILTER_META[key];
                             const Icon = meta.icon;
                             const label = __(meta.labelKey);
-                            const count = (counts as Record<string, number | undefined>)[
-                                key === 'cards' ? 'cards' : key
-                            ];
-                            const isActive = key === active || (active === 'board' && key === 'cards');
-                            const href = meta.href(project.id);
+                            const count = safeCounts[key];
+                            const isActive = key === activeFilter;
                             return (
-                                <Link
+                                <button
                                     key={key}
-                                    href={href}
-                                    preserveScroll
+                                    type="button"
+                                    onClick={() => onFilterChange(key)}
                                     className={cn(
                                         'relative inline-flex items-center gap-1.5 border-b-2 px-3 py-2.5 text-xs font-semibold transition-colors',
                                         isActive
@@ -238,7 +229,7 @@ export default function BoardTopNav({ project, active, date, onAddNote, onAddTas
                                             {count}
                                         </span>
                                     )}
-                                </Link>
+                                </button>
                             );
                         })}
                     </div>

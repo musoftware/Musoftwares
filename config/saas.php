@@ -10,6 +10,7 @@ return [
         'goldsaversys' => 'gold',
         'affsys'       => 'affiliate',
         'bookingsys'   => 'booking',
+        'toolsys'      => 'tool',
     ],
 
     /*

@@ -45,6 +45,8 @@ interface ProjectBoardProps {
     initialCards: BoardCard[];
     hideFuture?: boolean;
     readOnly?: boolean;
+    externalFilter?: FilterKey;
+    onExternalAddTrigger?: () => void;
 }
 
 const COL_W = 300;
@@ -94,6 +96,7 @@ type FilterKey = 'all' | CardType;
 
 export default function ProjectBoard({
     projectId, date, lanes, initialCards, hideFuture, readOnly = false,
+    externalFilter, onExternalAddTrigger,
 }: ProjectBoardProps) {
     const canvasW = lanes.length * COL_W;
     const canvasRef = useRef<HTMLDivElement | null>(null);
@@ -104,7 +107,11 @@ export default function ProjectBoard({
     const [newText, setNewText] = useState('');
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editText, setEditText] = useState('');
-    const [filter, setFilter] = useState<FilterKey>('all');
+    const [internalFilter, setInternalFilter] = useState<FilterKey>('all');
+    const filter: FilterKey = externalFilter ?? internalFilter;
+    const setFilter = (next: FilterKey) => {
+        setInternalFilter(next);
+    };
     const [query, setQuery] = useState('');
 
     const cardKey = useCallback((c: { type: CardType; id: number }) => `${c.type}:${c.id}`, []);
@@ -289,6 +296,7 @@ export default function ProjectBoard({
                         <button
                             type="button"
                             onClick={() => setAdding(true)}
+                            data-board-add-note
                             className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-slate-800"
                         >
                             <Plus className="h-3.5 w-3.5" /> {__('general.add_sticky_note')}

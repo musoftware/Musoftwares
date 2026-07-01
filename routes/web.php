@@ -43,8 +43,6 @@ use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\SerialDeviceController;
 use App\Http\Controllers\Admin\SerialSoftwareController;
 use App\Http\Controllers\Admin\SerialUserDeviceController;
-use App\Http\Controllers\Admin\Tools\AdminResellerController;
-use App\Http\Controllers\Admin\Tools\AdminToolController;
 use App\Http\Controllers\Admin\UserFileController;
 use App\Http\Controllers\Admin\UserNoteController;
 use App\Http\Controllers\Admin\UsersController;
@@ -95,7 +93,6 @@ use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\WalletTransferController;
 use App\Services\AmcAcademyApiService;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Http\Middleware\FrameGuard;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -113,7 +110,6 @@ use Modules\Marketplace\Http\Controllers\ServiceController;
 use Modules\Marketplace\Http\Controllers\ServiceOrderController;
 use Modules\Marketplace\Http\Controllers\ServicePackageController;
 use Modules\Marketplace\Http\Controllers\ServiceReviewController;
-use Modules\Tools\Http\Controllers\ResellerPortalController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/portfolio', [HomeController::class, 'portfolio'])->name('portfolio');
@@ -558,6 +554,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // ── Admin Projects ──────────────────────────────────────────────
     Route::get('/projects/search-clients', [ProjectController::class, 'searchClients'])->name('projects.search-clients');
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
+    Route::get('/projects/{project}/edit', [ProjectController::class, 'boardIndex'])->name('projects.edit');
     Route::resource('/projects', ProjectController::class)->except(['create', 'edit', 'show']);
     Route::post('/projects/{project}/archive', [ProjectController::class, 'archive'])->name('projects.archive');
     Route::post('/projects/{project}/restore', [ProjectController::class, 'restore'])->name('projects.restore');
@@ -757,34 +754,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::patch('/serial-user-devices/users/{user}/temp-valid', [SerialUserDeviceController::class, 'updateUserTempValid'])->name('serial-user-devices.update-user-temp-valid');
     Route::delete('/serial-user-devices/{serialUserDevice}', [SerialUserDeviceController::class, 'destroy'])->name('serial-user-devices.destroy');
 
-    // ── Tools Marketplace Admin ───────────────────────────────────────
-    // Admin manages the tool catalog, releases, and pricing plans.
-    Route::prefix('tools')->name('tools.')->group(function () {
-        Route::get('/', [AdminToolController::class, 'index'])->name('index');
-        Route::get('/create', [AdminToolController::class, 'create'])->name('create');
-        Route::post('/', [AdminToolController::class, 'store'])->name('store');
-        Route::get('/{tool}/edit', [AdminToolController::class, 'edit'])->name('edit');
-        Route::put('/{tool}', [AdminToolController::class, 'update'])->name('update');
-        Route::delete('/{tool}', [AdminToolController::class, 'destroy'])->name('destroy');
-        Route::post('/{tool}/upload-version', [AdminToolController::class, 'uploadVersion'])->name('upload-version');
-    });
-
-    // ── Reseller Management ────────────────────────────────────────────────────
-    Route::prefix('resellers')->name('resellers.')->group(function () {
-        Route::get('/', [AdminResellerController::class, 'index'])->name('index');
-        Route::get('/create', [AdminResellerController::class, 'create'])->name('create');
-        Route::post('/', [AdminResellerController::class, 'store'])->name('store');
-        Route::get('/search-users', [AdminResellerController::class, 'searchUsers'])->name('search-users');
-        Route::get('/{id}', [AdminResellerController::class, 'show'])->name('show');
-        Route::put('/{id}', [AdminResellerController::class, 'update'])->name('update');
-        Route::delete('/{id}', [AdminResellerController::class, 'destroy'])->name('destroy');
-        Route::post('/{id}/balance', [AdminResellerController::class, 'adjustBalance'])->name('balance');
-        Route::post('/{resellerId}/users/{userId}/suspend', [AdminResellerController::class, 'suspendUser'])->name('users.suspend');
-        Route::post('/{resellerId}/users/{userId}/activate', [AdminResellerController::class, 'activateUser'])->name('users.activate');
-        Route::post('/{resellerId}/users/{userId}/clear-flag', [AdminResellerController::class, 'clearSharingFlag'])->name('users.clear-flag');
-        Route::post('/{resellerId}/users/{userId}/toggle-check', [AdminResellerController::class, 'toggleSharingCheck'])->name('users.toggle-check');
-    });
-
     // Admin Tasks List (platform checklist items)
     Route::get('/tasks/as_list', [AdminTaskController::class, 'asList'])->name('tasks.as_list');
     Route::post('/tasks/todos/{todo}/complete', [AdminTaskController::class, 'completeTodo'])->name('tasks.todos.complete');
@@ -804,13 +773,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/admin/stop-impersonate', [ImpersonateController::class, 'stopImpersonating'])->name('admin.stop-impersonate');
 });
-
-// ── Reseller Portal (public, iframe-embeddable) ───────────────────────────────
-// No auth middleware here — the portal itself decides whether to show login or tools.
-// X-Frame-Options is set to ALLOWALL for this route via a response header.
-Route::get('/reseller/{token}', [ResellerPortalController::class, 'show'])
-    ->name('reseller.portal')
-    ->withoutMiddleware([FrameGuard::class]);
 
 // Public SaaS Routes
 Route::post('/subscriptions/calculate-custom', [SubscriptionController::class, 'calculateCustomPrice'])->name('subscriptions.calculate-custom');

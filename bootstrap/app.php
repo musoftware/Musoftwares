@@ -9,7 +9,6 @@ use App\Http\Middleware\ForceJsonRequest;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\ModeratorMiddleware;
 use App\Http\Middleware\RemoveSecurityHeaders;
-use App\Http\Middleware\ResellerSharingGuard;
 use App\Http\Middleware\SecurityEnforcement;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\SubscriptionMiddleware;
@@ -73,7 +72,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
             'onboarding' => EnsureOnboardingCompleted::class,
-            'reseller.sharing' => ResellerSharingGuard::class,
             'force.json' => ForceJsonRequest::class,
             'embed' => VerifyEmbedKey::class,
             'serial.device.hmac' => VerifySerialDeviceHmac::class,

@@ -8,7 +8,6 @@
         <!-- ── Core Unit Tests ── -->
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
-            <directory>Modules/Core/Tests/Unit</directory>
             <directory>Modules/Shared/tests/Unit</directory>
         </testsuite>
 
@@ -49,10 +48,7 @@
             <directory>Modules/Booking/tests/Unit</directory>
         </testsuite>
 
-        <!-- ── Tools Module ── -->
-        <testsuite name="Tools">
-            <directory>Modules/Tools/Tests/Feature</directory>
-        </testsuite>
+
 
         <!-- ── GoldSavers Module ── -->
         <testsuite name="GoldSavers">

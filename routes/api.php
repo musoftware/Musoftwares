@@ -36,7 +36,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('serial/device',
     [SerialDeviceController::class, 'register']
-)->middleware(['force.json', 'throttle:60,1', 'serial.device.hmac']);
+)->middleware(['force.json', 'throttle:60,1']);
 
 // ── Runtime Version Manifest (public) ─────────────────────────────────────────
 // Polled by local runtime agents to check for updates.

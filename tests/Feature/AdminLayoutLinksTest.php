@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,7 +16,7 @@ class AdminLayoutLinksTest extends TestCase
      */
     public function test_admin_layout_links_are_accessible_without_errors(): void
     {
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         // Create an admin user to act as
         $user = User::factory()->create();
@@ -38,7 +39,6 @@ class AdminLayoutLinksTest extends TestCase
             route('admin.serial-devices.index'),
             route('admin.serial-softwares.index'),
             route('admin.serial-user-devices.index'),
-            route('admin.resellers.index'),        // was: admin.tools.reseller.index
             route('admin.marketplace.orders.index'),
             route('admin.tasks.client-tasks'),
         ];
@@ -47,14 +47,14 @@ class AdminLayoutLinksTest extends TestCase
 
         foreach ($urls as $url) {
             $response = $this->actingAs($user, 'web')->get($url);
-            
-            // Accept 200 OK, 3xx Redirects, or 403/404 if the route requires specific state. 
+
+            // Accept 200 OK, 3xx Redirects, or 403/404 if the route requires specific state.
             // The main goal is to catch 500 internal server errors (crashes).
-            if (!in_array($response->status(), [200, 301, 302, 303, 307, 308, 403, 404])) {
-                $failedUrls[] = "URL {$url} failed with status {$response->status()} - " . $response->exception?->getMessage();
+            if (! in_array($response->status(), [200, 301, 302, 303, 307, 308, 403, 404])) {
+                $failedUrls[] = "URL {$url} failed with status {$response->status()} - ".$response->exception?->getMessage();
             }
         }
 
-        $this->assertEmpty($failedUrls, "The following Admin URLs crashed or failed:\n" . implode("\n", $failedUrls));
+        $this->assertEmpty($failedUrls, "The following Admin URLs crashed or failed:\n".implode("\n", $failedUrls));
     }
 }
