@@ -12,6 +12,8 @@ use Inertia\Inertia;
 
 class ClientProjectCalendarController extends Controller
 {
+    use ResolvesClientProject;
+
     public function __construct(protected ProjectBoardService $boardService)
     {
     }
@@ -31,6 +33,16 @@ class ClientProjectCalendarController extends Controller
         $this->authorizeProject($project);
 
         $dateCarbon = $this->parseDate($date) ?? Carbon::today();
+        $isAdmin = $request->user()?->isAdmin() === true;
+
+        // Clients are locked to today. If they manipulate the URL to a past or future
+        // date, silently redirect them back to today. Admins may browse any date.
+        if (! $isAdmin && ! $dateCarbon->isSameDay(Carbon::today())) {
+            return redirect()->route('client.projects.calendar.date', [
+                'project' => $project->id,
+                'date' => Carbon::today()->toDateString(),
+            ]);
+        }
 
         $cards = $this->boardService->cardsForDate($project, $dateCarbon, applyFutureGating: true);
 
@@ -40,6 +52,7 @@ class ClientProjectCalendarController extends Controller
             'lanes' => $this->boardService->lanes(),
             'cards' => fn () => $cards,
             'hideFuture' => $this->shouldHideFuture($project, $dateCarbon),
+            'isAdmin' => $isAdmin,
         ]);
     }
 

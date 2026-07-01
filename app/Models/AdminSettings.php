@@ -74,6 +74,33 @@ class AdminSettings extends Model
     }
 
     /**
+     * Supported notification delivery channel keys for invoice-related events.
+     * - mail  : SMTP / Laravel mail
+     * - fcm   : Firebase Cloud Messaging (mobile push)
+     * - sms   : SMS gateway (requires a configured gateway implementation)
+     * - whatsapp : WhatsApp gateway (requires WhatsAppNotificationService)
+     */
+    public const INVOICE_NOTIFICATION_CHANNELS = ['mail', 'fcm', 'sms', 'whatsapp'];
+
+    /**
+     * Comma-separated list of enabled channels for the given notification event.
+     * Falls back to the safe default 'mail,fcm' when no preference is stored.
+     *
+     * Example AdminSettings rows:
+     *   setting_key = 'notif_channels_invoice_created'
+     *   setting_value = 'mail,fcm,sms,whatsapp'
+     */
+    public static function invoiceNotificationChannels(string $eventKey): array
+    {
+        $key = 'notif_channels_'.$eventKey;
+        $raw = static::GetValue($key, 'mail,fcm');
+        $channels = array_values(array_filter(array_map('trim', explode(',', (string) $raw))));
+        $allowed = array_intersect($channels, self::INVOICE_NOTIFICATION_CHANNELS);
+
+        return $allowed ?: ['mail', 'fcm'];
+    }
+
+    /**
      * Whether Friday is allowed as a working day (1 = yes, 0 = no).
      * Used for timers, scheduling, and any logic that treats Friday as off.
      */

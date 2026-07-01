@@ -540,6 +540,28 @@ class User extends Authenticatable
     }
 
     /**
+     * Route notifications for the SMS channel.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return string|null
+     */
+    public function routeNotificationForSms($notification)
+    {
+        return $this->mobile_1 ?: $this->mobile_2 ?: $this->phone ?: null;
+    }
+
+    /**
+     * Route notifications for the WhatsApp channel.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return string|null
+     */
+    public function routeNotificationForWhatsapp($notification)
+    {
+        return $this->whatsapp_number ?: null;
+    }
+
+    /**
      * Check if the user is an admin.
      * Consolidates various role casings used across the application to ensure DRY.
      */

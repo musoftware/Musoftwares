@@ -17,6 +17,7 @@ import {
     Lightbulb,
     Calendar,
     Globe,
+    Bell,
 } from 'lucide-react';
 import { CurrencySelect } from '@/Components/CurrencySelect';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
@@ -62,6 +63,8 @@ interface SettingsData {
     meta_pixel_id: string | null;
     custom_head_scripts: string | null;
     custom_body_scripts: string | null;
+    notif_channels_invoice_created: string | null;
+    invoice_notification_channels?: string[];
 }
 
 interface Props {
@@ -167,6 +170,21 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
     const flash = props.flash as { success?: string } | undefined;
 
     const [form, setForm] = useState<SettingsData>({ ...settings });
+
+    // Invoice-created notification channels (globally configured; defaults to mail+fcm).
+    const availableChannels: string[] =
+        (settings.invoice_notification_channels as string[] | undefined) ?? ['mail', 'fcm', 'sms', 'whatsapp'];
+    const enabledChannels = (form.notif_channels_invoice_created ?? 'mail,fcm')
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+    const toggleChannel = (channel: string, on: boolean) => {
+        const next = new Set(enabledChannels);
+        if (on) next.add(channel);
+        else next.delete(channel);
+        set('notif_channels_invoice_created', Array.from(next).join(','));
+    };
     const [bulkCurrency, setBulkCurrency] = useState(currencies[0]?.id?.toString() ?? '');
     const [updateProjects, setUpdateProjects] = useState(true);
 
@@ -342,6 +360,36 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                 ))}
                             </SelectField>
                             <p className="text-xs text-gray-500 mt-2">{__('general.used_for_invoice_reminders_payment_confirmations_and_automated_notifications')}</p>
+                        </SectionCard>
+
+                        {/* Recurring Invoice Notifications */}
+                        <SectionCard title={__('general.recurring_invoice_notifications')} icon={Bell}>
+                            <div className="space-y-3">
+                                <p className="text-sm text-gray-600">
+                                    {__('general.recurring_invoice_notifications_help')}
+                                </p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    {availableChannels.map((ch) => (
+                                        <label
+                                            key={ch}
+                                            className="flex items-center gap-2 border border-gray-200 rounded-md px-3 py-2 text-sm bg-white hover:bg-gray-50 cursor-pointer"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                className="rounded border-gray-300 text-black focus:ring-black"
+                                                checked={enabledChannels.includes(ch)}
+                                                onChange={(e) => toggleChannel(ch, e.target.checked)}
+                                            />
+                                            <span className="capitalize">{ch}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                                <input
+                                    type="hidden"
+                                    name="notif_channels_invoice_created"
+                                    value={enabledChannels.join(',')}
+                                />
+                            </div>
                         </SectionCard>
 
                         {/* AI Integrations */}

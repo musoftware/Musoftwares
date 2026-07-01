@@ -16,6 +16,25 @@ class ProjectReport extends Model
 
     protected $casts = [
         'published_at' => 'datetime',
+        'period_start' => 'date',
+        'period_end' => 'date',
+        'notify_client' => 'boolean',
+    ];
+
+    public const TYPES = [
+        'progress' => 'Progress Update',
+        'milestone' => 'Milestone',
+        'issue' => 'Issue / Risk',
+        'summary' => 'Weekly Summary',
+        'financial' => 'Financial',
+        'final' => 'Final Report',
+    ];
+
+    public const PRIORITIES = [
+        'low' => 'Low',
+        'normal' => 'Normal',
+        'high' => 'High',
+        'urgent' => 'Urgent',
     ];
 
     protected static function booted(): void

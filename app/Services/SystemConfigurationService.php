@@ -26,7 +26,8 @@ class SystemConfigurationService extends BaseService
             'max_devices_per_tenant', 'gemini_api_keys',
             'expected_monthly_income', 'work_days_per_month', 'hours_per_day',
             'google_analytics_id', 'google_tag_manager_id', 'meta_pixel_id',
-            'custom_head_scripts', 'custom_body_scripts'
+            'custom_head_scripts', 'custom_body_scripts',
+            'notif_channels_invoice_created',
         ];
 
         foreach ($supportedKeys as $key) {

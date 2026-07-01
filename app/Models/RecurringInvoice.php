@@ -5,8 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Events\InvoiceCreated;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class RecurringInvoice extends Model
@@ -85,10 +87,10 @@ class RecurringInvoice extends Model
 
                     $item = new InvoiceItem();
                     $item->invoice_id = $invoice->id;
-                    $item->item = $this->title;
-                    $item->description = 'Generated automatically by Recurring Invoice system';
+                    $item->item_title = $this->title;
+                    $item->item_type = 'simple';
                     $item->qty = 1;
-                    $item->price = $convertedAmount;
+                    $item->amount = $convertedAmount;
                     $item->save();
 
                     $invoice->unpaid = $invoice->total();
@@ -101,6 +103,21 @@ class RecurringInvoice extends Model
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+
+                    // Fire after the transaction commits so any notification
+                    // listener that reads the freshly-persisted invoice sees
+                    // it (avoids race conditions in ShouldQueue handlers).
+                    DB::afterCommit(function () use ($invoice) {
+                        try {
+                            event(new InvoiceCreated($invoice->fresh()));
+                        } catch (\Throwable $e) {
+                            Log::warning('RecurringInvoice: failed to dispatch InvoiceCreated event', [
+                                'recurring_invoice_id' => $this->id,
+                                'invoice_id' => $invoice->id,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                    });
                 });
             }
         }
