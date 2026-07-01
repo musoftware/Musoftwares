@@ -44,7 +44,6 @@ interface ProjectBoardProps {
 
 const COL_W = 280; // px width of each lane column
 const CARD_W = 232; // px width of a card
-const CARD_H = 92;  // nominal card height (used only for clamping/minimap)
 const CANVAS_H = 640; // px height of the canvas
 
 const NOTE_COLORS: Record<string, string> = {

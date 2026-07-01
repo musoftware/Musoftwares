@@ -1,17 +1,11 @@
 {
-    "ERP": true,
-    "Freelance": true,
     "Marketplace": true,
     "Shared": false,
-    "Intelligence": true,
     "Tools": true,
     "fbmb": true,
     "SmsPaymentGateway": true,
-    "GoldSavers": true,
     "WrittenCoursesEngine": true,
-    "ISaas": true,
     "PaymentGateway": true,
-    "CRM": false,
     "PasswordSync": true,
     "WebTools": true
 }

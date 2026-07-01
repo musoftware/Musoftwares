@@ -16,14 +16,8 @@ class ClientProjectFileController extends Controller
     {
         $this->authorize('view', $project);
 
-        $files = $project->files()->latest()->get()->map(fn (ProjectFile $file) => [
-            'id' => $file->id,
-            'original_name' => $file->original_name,
-            'mime' => $file->mime,
-            'size' => (int) $file->size,
-            'human_size' => $file->humanSize(),
-            'created_at' => $file->created_at?->toIso8601String(),
-        ]);
+        $files = $project->files()->latest()->get()
+            ->map(fn (ProjectFile $file) => $file->toClientArray());
 
         return Inertia::render('Client/Projects/Files', [
             'project' => ['id' => $project->id, 'name' => $project->project_name],

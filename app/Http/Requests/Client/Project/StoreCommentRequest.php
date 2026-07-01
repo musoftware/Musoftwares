@@ -15,7 +15,7 @@ class StoreCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', 'in:' . implode(',', ProjectBoardItem::validTypeKeys())],
+            'type' => ['required', 'string', 'in:'.implode(',', ProjectBoardItem::validTypeKeys())],
             'commentable_id' => ['required', 'integer'],
             'body' => ['required', 'string', 'max:5000'],
         ];

@@ -292,4 +292,53 @@ class ClientProjectsPortalTest extends TestCase
             'title' => 'Weekly update',
         ]);
     }
+
+    public function test_client_can_comment_on_a_published_report()
+    {
+        $client = $this->makeClient();
+        $project = $this->makeProject($client);
+        $report = ProjectReport::create([
+            'project_id' => $project->id,
+            'author_id' => $this->makeAdmin()->id,
+            'title' => 'Open report',
+            'body' => 'hi',
+            'published_at' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($client)->postJson(route('client.projects.comments.store', $project), [
+            'type' => 'report',
+            'commentable_id' => $report->id,
+            'body' => 'Looks great, thanks!',
+        ]);
+
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('project_comments', [
+            'project_id' => $project->id,
+            'author_id' => $client->id,
+            'commentable_type' => ProjectReport::class,
+            'commentable_id' => $report->id,
+            'body' => 'Looks great, thanks!',
+        ]);
+    }
+
+    public function test_client_cannot_comment_on_an_unpublished_report()
+    {
+        $client = $this->makeClient();
+        $project = $this->makeProject($client);
+        $draft = ProjectReport::create([
+            'project_id' => $project->id,
+            'author_id' => $this->makeAdmin()->id,
+            'title' => 'Draft',
+            'body' => 'secret',
+            'published_at' => null,
+        ]);
+
+        $this->actingAs($client)->postJson(route('client.projects.comments.store', $project), [
+            'type' => 'report',
+            'commentable_id' => $draft->id,
+            'body' => 'sneaky',
+        ])->assertStatus(422);
+
+        $this->assertDatabaseMissing('project_comments', ['commentable_id' => $draft->id]);
+    }
 }

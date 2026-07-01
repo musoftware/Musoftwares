@@ -31,6 +31,12 @@ class ClientProjectReportController extends Controller
                 'body' => $report->body,
                 'published_at' => optional($report->published_at)->toIso8601String(),
             ],
+            'comments' => fn () => $report->comments()->with('author')->latest()->get()->map(fn ($comment) => [
+                'id' => $comment->id,
+                'body' => $comment->body,
+                'author_name' => $comment->author?->name,
+                'created_at' => $comment->created_at?->toIso8601String(),
+            ]),
         ]);
     }
 }

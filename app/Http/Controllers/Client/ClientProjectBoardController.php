@@ -126,7 +126,8 @@ class ClientProjectBoardController extends Controller
         $exists = match ($type) {
             'note' => $project->boardNotes()->whereKey($id)->exists(),
             'task' => $project->tasks()->whereKey($id)->exists(),
-            'report' => $project->reports()->whereKey($id)->exists(),
+            // Clients may only place reports they can actually see (published + scheduled time reached).
+            'report' => $project->publishedReports()->whereKey($id)->exists(),
             default => false,
         };
 

@@ -6,8 +6,6 @@ use App\Http\Controllers\Client\Concerns\ResolvesClientProject;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectBoardItem;
-use App\Models\ProjectBoardNote;
-use App\Models\ProjectReport;
 use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -127,10 +125,6 @@ class ClientProjectCalendarController extends Controller
 
     private function morphClassFor(string $type): string
     {
-        return match ($type) {
-            'task' => Task::class,
-            'report' => ProjectReport::class,
-            default => ProjectBoardNote::class,
-        };
+        return ProjectBoardItem::morphClassFor($type);
     }
 }

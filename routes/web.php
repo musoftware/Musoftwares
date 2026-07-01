@@ -177,6 +177,30 @@ Route::get('/{locale}/blog/{slug}', function ($locale, $slug) {
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'onboarding'])->name('dashboard');
 
+// ── Client Projects Portal ────────────────────────────────────────
+// Platform users (clients) view the admin-managed projects assigned to them, including a
+// per-day visual workflow board. Ownership is enforced per-route via ProjectPolicy.
+Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')->group(function () {
+    Route::get('/projects', [\App\Http\Controllers\Client\ClientProjectController::class, 'index'])->name('index');
+    Route::get('/projects/{project}', [\App\Http\Controllers\Client\ClientProjectController::class, 'show'])->name('show');
+    Route::get('/projects/{project}/tasks', [\App\Http\Controllers\Client\ClientProjectTaskController::class, 'tasksIndex'])->name('tasks.index');
+    Route::get('/projects/{project}/reports/{report}', [\App\Http\Controllers\Client\ClientProjectReportController::class, 'show'])->name('reports.show');
+
+    // Comments / feedback (polymorphic: notes, tasks, reports)
+    Route::get('/projects/{project}/comments/{type}/{id}', [\App\Http\Controllers\Client\ClientProjectCommentController::class, 'commentsIndex'])->name('comments.index');
+    Route::post('/projects/{project}/comments', [\App\Http\Controllers\Client\ClientProjectCommentController::class, 'store'])->name('comments.store');
+    Route::get('/projects/{project}/files', [\App\Http\Controllers\Client\ClientProjectFileController::class, 'index'])->name('files.index');
+    Route::get('/projects/{project}/files/{file}/download', [\App\Http\Controllers\Client\ClientProjectFileController::class, 'download'])->name('files.download');
+    Route::get('/projects/{project}/calendar', [\App\Http\Controllers\Client\ClientProjectCalendarController::class, 'calendarIndex'])->name('calendar.index');
+    Route::get('/projects/{project}/calendar/{date}', [\App\Http\Controllers\Client\ClientProjectCalendarController::class, 'calendarDate'])->name('calendar.date');
+
+    // Board mutations (JSON) — both client and admin use these endpoints.
+    Route::post('/projects/{project}/board/notes', [\App\Http\Controllers\Client\ClientProjectBoardController::class, 'storeNote'])->name('board.store-note');
+    Route::put('/projects/{project}/board/notes/{note}', [\App\Http\Controllers\Client\ClientProjectBoardController::class, 'updateNote'])->name('board.update-note');
+    Route::delete('/projects/{project}/board/notes/{note}', [\App\Http\Controllers\Client\ClientProjectBoardController::class, 'destroyNote'])->name('board.destroy-note');
+    Route::post('/projects/{project}/board/move', [\App\Http\Controllers\Client\ClientProjectBoardController::class, 'moveCard'])->name('board.move-card');
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -533,6 +557,17 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/projects/{project}/contracts', [ProjectContractController::class, 'store'])->name('projects.contracts.store');
     Route::put('/projects/{project}/contracts/{contract}', [ProjectContractController::class, 'update'])->name('projects.contracts.update');
     Route::post('/projects/{project}/contracts/{contract}/invoice', [ProjectContractController::class, 'generateInvoice'])->name('projects.contracts.invoice');
+
+    // ── Project Reports (scheduled/published progress reports for clients) ──
+    Route::get('/projects/{project}/reports', [\App\Http\Controllers\Admin\ProjectReportController::class, 'index'])->name('projects.reports.index');
+    Route::post('/projects/{project}/reports', [\App\Http\Controllers\Admin\ProjectReportController::class, 'store'])->name('projects.reports.store');
+    Route::put('/projects/{project}/reports/{report}', [\App\Http\Controllers\Admin\ProjectReportController::class, 'update'])->name('projects.reports.update');
+    Route::delete('/projects/{project}/reports/{report}', [\App\Http\Controllers\Admin\ProjectReportController::class, 'destroy'])->name('projects.reports.destroy');
+
+    // ── Project Files (attachments shared with the client) ──
+    Route::get('/projects/{project}/files', [\App\Http\Controllers\Admin\ProjectFileController::class, 'index'])->name('projects.files.index');
+    Route::post('/projects/{project}/files', [\App\Http\Controllers\Admin\ProjectFileController::class, 'store'])->name('projects.files.store');
+    Route::delete('/projects/{project}/files/{file}', [\App\Http\Controllers\Admin\ProjectFileController::class, 'destroy'])->name('projects.files.destroy');
 
     // Contract AI generator
     Route::post('/contracts/ai/generate', [ContractAiController::class, 'generate'])->name('contracts.ai.generate');

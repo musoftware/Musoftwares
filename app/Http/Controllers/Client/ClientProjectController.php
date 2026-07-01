@@ -20,9 +20,7 @@ class ClientProjectController extends Controller
             ->withQueryString();
 
         return Inertia::render('Client/Projects/Index', [
-            'projects' => fn () => ClientProjectResource::collection($projects)->additional([
-                'meta' => ['current_page' => $projects->currentPage(), 'last_page' => $projects->lastPage()],
-            ]),
+            'projects' => fn () => ClientProjectResource::collection($projects),
         ]);
     }
 

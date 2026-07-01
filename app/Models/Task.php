@@ -2,28 +2,37 @@
 
 namespace App\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Task extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [];
+
     protected $fillable = ['task_name', 'task_description', 'project_id', 'user_id', 'swimlane_id', 'assigned_to_admin', 'due_date', 'priority'];
+
+    protected static function booted(): void
+    {
+        static::deleting(function (Task $task) {
+            // Remove any board placements that reference this task (polymorphic cleanup).
+            ProjectBoardItem::where('itemable_type', static::class)
+                ->where('itemable_id', $task->id)
+                ->delete();
+        });
+    }
 
     public function completed_percentage()
     {
         return round(
             $this->task_todo_items()->count() > 0
                 ? ($this->task_todo_items()
-                        ->where('completed', true)
-                        ->count() *
+                    ->where('completed', true)
+                    ->count() *
                     100) /
                 $this->task_todo_items()->count()
                 : 0,
@@ -205,10 +214,11 @@ class Task extends Model
     public function completed()
     {
         foreach ($this->task_todo_items as $todo) {
-            if (!$todo->completed) {
+            if (! $todo->completed) {
                 return false;
             }
         }
+
         return true;
     }
 

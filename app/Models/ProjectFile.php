@@ -38,4 +38,19 @@ class ProjectFile extends Model
 
         return round($bytes, 1).' '.$units[$i];
     }
+
+    /**
+     * Shared client-facing serialization used by both the admin and client file controllers.
+     */
+    public function toClientArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'original_name' => $this->original_name,
+            'mime' => $this->mime,
+            'size' => (int) $this->size,
+            'human_size' => $this->humanSize(),
+            'created_at' => $this->created_at?->toIso8601String(),
+        ];
+    }
 }

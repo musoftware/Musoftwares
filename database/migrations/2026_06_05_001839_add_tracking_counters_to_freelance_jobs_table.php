@@ -11,11 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // The freelance_jobs table is created by the Freelance module's migration, which may not
+        // be registered in every environment (e.g. the in-memory test database). Skip gracefully.
+        if (! Schema::hasTable('freelance_jobs')) {
+            return;
+        }
+
         Schema::table('freelance_jobs', function (Blueprint $table) {
-            if (!Schema::hasColumn('freelance_jobs', 'notifications_sent_count')) {
+            if (! Schema::hasColumn('freelance_jobs', 'notifications_sent_count')) {
                 $table->unsignedInteger('notifications_sent_count')->default(0)->after('status');
             }
-            if (!Schema::hasColumn('freelance_jobs', 'views_count')) {
+            if (! Schema::hasColumn('freelance_jobs', 'views_count')) {
                 $table->unsignedInteger('views_count')->default(0)->after('notifications_sent_count');
             }
         });
@@ -26,6 +32,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('freelance_jobs')) {
+            return;
+        }
+
         Schema::table('freelance_jobs', function (Blueprint $table) {
             $table->dropColumn(['notifications_sent_count', 'views_count']);
         });

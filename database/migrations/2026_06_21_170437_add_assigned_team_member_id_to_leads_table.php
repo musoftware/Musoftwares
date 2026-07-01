@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // The leads table belongs to the separated CRM project and may not exist in this monolith.
+        if (! Schema::hasTable('leads')) {
+            return;
+        }
+
         Schema::table('leads', function (Blueprint $table) {
-            if (!Schema::hasColumn('leads', 'assigned_team_member_id')) {
+            if (! Schema::hasColumn('leads', 'assigned_team_member_id')) {
                 $table->foreignId('assigned_team_member_id')->nullable()->constrained('crm_team_members')->nullOnDelete();
             }
         });
@@ -23,6 +28,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('leads')) {
+            return;
+        }
+
         Schema::table('leads', function (Blueprint $table) {
             if (Schema::hasColumn('leads', 'assigned_team_member_id')) {
                 $table->dropForeign(['assigned_team_member_id']);

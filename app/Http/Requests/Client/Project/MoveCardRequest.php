@@ -2,19 +2,11 @@
 
 namespace App\Http\Requests\Client\Project;
 
-use App\Models\ProjectBoardNote;
-use App\Models\ProjectReport;
-use App\Models\Task;
+use App\Models\ProjectBoardItem;
 use Illuminate\Foundation\Http\FormRequest;
 
 class MoveCardRequest extends FormRequest
 {
-    public const ALLOWED_TYPES = [
-        'note' => ProjectBoardNote::class,
-        'task' => Task::class,
-        'report' => ProjectReport::class,
-    ];
-
     public function authorize(): bool
     {
         return true;
@@ -24,7 +16,7 @@ class MoveCardRequest extends FormRequest
     {
         return [
             'for_date' => ['required', 'string', 'date_format:Y-m-d'],
-            'type' => ['required', 'string', 'in:note,task,report'],
+            'type' => ['required', 'string', 'in:'.implode(',', ProjectBoardItem::validTypeKeys())],
             'id' => ['required', 'integer'],
             'lane' => ['nullable', 'string', 'max:50'],
             'pos_x' => ['nullable', 'integer', 'min:0'],
@@ -37,6 +29,6 @@ class MoveCardRequest extends FormRequest
      */
     public function morphClass(): string
     {
-        return self::ALLOWED_TYPES[$this->input('type')];
+        return ProjectBoardItem::morphClassFor($this->input('type'));
     }
 }

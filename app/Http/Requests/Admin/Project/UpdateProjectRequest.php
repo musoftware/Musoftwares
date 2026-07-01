@@ -14,8 +14,11 @@ class UpdateProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'project_name' => 'required|string|max:255',
-            'project_balance' => 'nullable|numeric',
+            'project_name' => ['sometimes', 'required', 'string', 'max:255'],
+            'project_balance' => ['nullable', 'numeric'],
+            'budget' => ['nullable', 'numeric', 'min:0'],
+            'status' => ['nullable', 'string', 'in:open,hold_on,closed'],
+            'hide_future_tasks' => ['nullable', 'boolean'],
         ];
     }
 }
