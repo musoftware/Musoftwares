@@ -572,7 +572,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // ── Project Reports (scheduled/published progress reports for clients) ──
     Route::get('/projects/{project}/reports', [ProjectReportController::class, 'index'])->name('projects.reports.index');
+    Route::get('/projects/{project}/reports/create', [ProjectReportController::class, 'create'])->name('projects.reports.create');
     Route::post('/projects/{project}/reports', [ProjectReportController::class, 'store'])->name('projects.reports.store');
+    Route::get('/projects/{project}/reports/{report}/edit', [ProjectReportController::class, 'edit'])->name('projects.reports.edit');
     Route::put('/projects/{project}/reports/{report}', [ProjectReportController::class, 'update'])->name('projects.reports.update');
     Route::delete('/projects/{project}/reports/{report}', [ProjectReportController::class, 'destroy'])->name('projects.reports.destroy');
 

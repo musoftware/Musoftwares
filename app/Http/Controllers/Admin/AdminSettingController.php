@@ -76,6 +76,9 @@ class AdminSettingController extends Controller
             'meta_pixel_id' => AdminSettings::GetValue('meta_pixel_id'),
             'custom_head_scripts' => AdminSettings::GetValue('custom_head_scripts'),
             'custom_body_scripts' => AdminSettings::GetValue('custom_body_scripts'),
+            // Recurring invoice notification channel toggles (one place; default mail+fcm).
+            'notif_channels_invoice_created' => AdminSettings::GetValue('notif_channels_invoice_created', 'mail,fcm'),
+            'invoice_notification_channels' => AdminSettings::INVOICE_NOTIFICATION_CHANNELS,
         ];
 
         return Inertia::render('Admin/Settings/Index', [
@@ -140,6 +143,13 @@ class AdminSettingController extends Controller
             'meta_pixel_id' => 'nullable|string',
             'custom_head_scripts' => 'nullable|string|max:16384',
             'custom_body_scripts' => 'nullable|string|max:16384',
+            'notif_channels_invoice_created' => ['nullable', 'string', function ($attr, $value, $fail) {
+                $allowed = AdminSettings::INVOICE_NOTIFICATION_CHANNELS;
+                $bad = array_diff(array_map('trim', explode(',', (string) $value)), $allowed);
+                if (! empty($bad)) {
+                    $fail('Invalid channel(s): '.implode(', ', $bad).'. Allowed: '.implode(', ', $allowed));
+                }
+            }],
         ]);
 
         $this->configService->updateSettings($validated);
@@ -153,6 +163,7 @@ class AdminSettingController extends Controller
             'paymob_active', 'gumroad', 'whatsapp_default_channel_id',
             'custom_head_scripts', 'custom_body_scripts',
             'google_analytics_id', 'google_tag_manager_id', 'meta_pixel_id',
+            'notif_channels_invoice_created',
         ];
         foreach ($sensitiveKeys as $key) {
             if (! array_key_exists($key, $validated)) {

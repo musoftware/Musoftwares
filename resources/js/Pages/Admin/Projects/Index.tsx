@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
-import { User, AlertCircle, Download, Archive, ArchiveRestore, Trash2, Edit, Plus } from 'lucide-react';
+import { User, AlertCircle, Download, Archive, ArchiveRestore, Trash2, Edit, Plus, LayoutDashboard } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import {
     Dialog,
@@ -170,12 +170,12 @@ export default function Index(props: ProjectsIndexProps) {
             sortable: true,
             render: (project: Project) => (
                 <div className={cn('flex flex-col gap-1', project.archived && 'opacity-60')}>
-                    <button
-                        onClick={() => openProjectSheet(project)}
+                    <Link
+                        href={route('admin.projects.board.index', project.id)}
                         className="hover:text-slate-900 hover:underline text-start font-semibold cursor-pointer outline-none focus:ring-2 focus:ring-slate-900 rounded"
                     >
                         {project.project_name}
-                    </button>
+                    </Link>
                     {project.description && (
                         <p className="text-xs text-slate-500 line-clamp-1">{project.description}</p>
                     )}
@@ -250,6 +250,9 @@ export default function Index(props: ProjectsIndexProps) {
             className: 'text-end',
             render: (project: Project) => (
                 <div className="flex justify-end space-x-2">
+                    <Button variant="outline" size="sm" onClick={() => openProjectSheet(project)} aria-label={__('general.actions')} title={__('general.actions')}>
+                        <LayoutDashboard className="h-3.5 w-3.5" />
+                    </Button>
                     <Button variant="outline" size="sm" onClick={() => openEditModal(project)} aria-label={__('general.edit')}>
                         <Edit className="h-3.5 w-3.5" />
                     </Button>
@@ -325,7 +328,13 @@ export default function Index(props: ProjectsIndexProps) {
                         <Download className="h-4 w-4" /> {__('general.export_csv')}
                     </a>
                     <Button asChild className="gap-2">
-                        <Link href={route('admin.projects.create')}>
+                        <Link
+                            href={route('admin.projects.create', {
+                                user_id: typeof window !== 'undefined'
+                                    ? new URLSearchParams(window.location.search).get('user_id')
+                                    : null,
+                            })}
+                        >
                             <Plus className="h-4 w-4" /> {__('general.create_project')}
                         </Link>
                     </Button>

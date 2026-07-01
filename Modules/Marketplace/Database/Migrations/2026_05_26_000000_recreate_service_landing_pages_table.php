@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('service_landing_pages')) {
+            return;
+        }
+
         Schema::dropIfExists('service_landing_pages');
 
         Schema::create('service_landing_pages', function (Blueprint $table) {

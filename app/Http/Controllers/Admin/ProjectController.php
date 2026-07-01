@@ -121,8 +121,9 @@ class ProjectController extends Controller
         $this->authorize('create', Project::class);
 
         $initialClient = null;
-        if ($request->filled('client_id')) {
-            $client = User::find($request->integer('client_id'));
+        $clientParam = $request->filled('client_id') ? 'client_id' : ($request->filled('user_id') ? 'user_id' : null);
+        if ($clientParam) {
+            $client = User::find($request->integer($clientParam));
             if ($client) {
                 $initialClient = [
                     'id' => $client->id,

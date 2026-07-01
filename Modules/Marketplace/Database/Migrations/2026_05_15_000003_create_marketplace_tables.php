@@ -11,74 +11,84 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         // Service Categories
-        Schema::create('marketplace_service_categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('slug')->unique();
-            $table->text('description')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('marketplace_service_categories')) {
+            Schema::create('marketplace_service_categories', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('slug')->unique();
+                $table->text('description')->nullable();
+                $table->timestamps();
+            });
+        }
 
         // Services
-        Schema::create('marketplace_services', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('category_id')->nullable()->constrained('marketplace_service_categories')->nullOnDelete();
-            $table->string('title');
-            $table->text('description');
-            $table->string('status'); // draft, active, paused, banned
-            $table->timestamp('approved_at')->nullable();
-            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('rejected_at')->nullable();
-            $table->text('rejection_reason')->nullable();
-            $table->timestamp('suspended_at')->nullable();
-            $table->foreignId('suspended_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->softDeletes();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('marketplace_services')) {
+            Schema::create('marketplace_services', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
+                $table->foreignId('category_id')->nullable()->constrained('marketplace_service_categories')->nullOnDelete();
+                $table->string('title');
+                $table->text('description');
+                $table->string('status'); // draft, active, paused, banned
+                $table->timestamp('approved_at')->nullable();
+                $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+                $table->timestamp('rejected_at')->nullable();
+                $table->text('rejection_reason')->nullable();
+                $table->timestamp('suspended_at')->nullable();
+                $table->foreignId('suspended_by')->nullable()->constrained('users')->nullOnDelete();
+                $table->softDeletes();
+                $table->timestamps();
+            });
+        }
 
         // Packages
-        Schema::create('marketplace_packages', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('service_id')->constrained('marketplace_services')->cascadeOnDelete();
-            $table->string('name');
-            $table->text('description');
-            $table->decimal('price', 20, 8);
-            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
-            $table->integer('delivery_days');
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('marketplace_packages')) {
+            Schema::create('marketplace_packages', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('service_id')->constrained('marketplace_services')->cascadeOnDelete();
+                $table->string('name');
+                $table->text('description');
+                $table->decimal('price', 20, 8);
+                $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
+                $table->integer('delivery_days');
+                $table->timestamps();
+            });
+        }
 
         // Orders
-        Schema::create('marketplace_orders', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('buyer_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('package_id')->constrained('marketplace_packages')->cascadeOnDelete();
+        if (! Schema::hasTable('marketplace_orders')) {
+            Schema::create('marketplace_orders', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('buyer_id')->constrained('users')->cascadeOnDelete();
+                $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
+                $table->foreignId('package_id')->constrained('marketplace_packages')->cascadeOnDelete();
 
-            $table->decimal('amount', 20, 8);
-            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
-            $table->decimal('business_amount', 20, 8)->nullable();
-            $table->foreignId('business_currency_id')->nullable()->constrained('currencies')->nullOnDelete();
-            $table->decimal('commission_amount', 20, 8);
+                $table->decimal('amount', 20, 8);
+                $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
+                $table->decimal('business_amount', 20, 8)->nullable();
+                $table->foreignId('business_currency_id')->nullable()->constrained('currencies')->nullOnDelete();
+                $table->decimal('commission_amount', 20, 8);
 
-            $table->string('status'); // pending, processing, delivered, completed, cancelled, disputed
-            $table->timestamp('delivered_at')->nullable();
-            $table->timestamp('completed_at')->nullable();
+                $table->string('status'); // pending, processing, delivered, completed, cancelled, disputed
+                $table->timestamp('delivered_at')->nullable();
+                $table->timestamp('completed_at')->nullable();
 
-            $table->timestamps();
-        });
+                $table->timestamps();
+            });
+        }
 
         // Reviews
-        Schema::create('marketplace_reviews', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('order_id')->constrained('marketplace_orders')->cascadeOnDelete();
-            $table->foreignId('reviewer_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('reviewee_id')->constrained('users')->cascadeOnDelete();
-            $table->integer('rating'); // 1-5
-            $table->text('comment')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('marketplace_reviews')) {
+            Schema::create('marketplace_reviews', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('order_id')->constrained('marketplace_orders')->cascadeOnDelete();
+                $table->foreignId('reviewer_id')->constrained('users')->cascadeOnDelete();
+                $table->foreignId('reviewee_id')->constrained('users')->cascadeOnDelete();
+                $table->integer('rating'); // 1-5
+                $table->text('comment')->nullable();
+                $table->timestamps();
+            });
+        }
 
         Schema::enableForeignKeyConstraints();
     }

@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('marketplace_escrows')) {
+            return;
+        }
+
         Schema::create('marketplace_escrows', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('marketplace_orders')->cascadeOnDelete();

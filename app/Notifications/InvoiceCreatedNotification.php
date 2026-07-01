@@ -21,7 +21,7 @@ class InvoiceCreatedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'fcm'];
+        return \App\Models\AdminSettings::invoiceNotificationChannels('invoice_created');
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -43,6 +43,36 @@ class InvoiceCreatedNotification extends Notification implements ShouldQueue
                 'type' => 'invoice_created',
                 'id' => (string) ($this->invoice->id ?? ''),
             ]
+        );
+    }
+
+    /**
+     * SMS payload — kept short to fit per-gateway segment limits.
+     */
+    public function toSms(object $notifiable): ?string
+    {
+        $amount = $this->invoice->total() ?? $this->invoice->unpaid ?? '';
+        $currency = $this->invoice->currency_id ?? '';
+
+        return sprintf(
+            'New invoice %s for %s %s. View: %s',
+            $this->invoice->invoice_number ?? '#'.($this->invoice->id ?? ''),
+            $amount,
+            $currency,
+            url('/app/invoices/'.($this->invoice->id ?? ''))
+        );
+    }
+
+    /**
+     * WhatsApp payload — mirrors the mail body but in plain text.
+     */
+    public function toWhatsapp(object $notifiable): ?string
+    {
+        return sprintf(
+            "%s\nInvoice %s has been created.\n%s\nView: %s",
+            __('general.hello_name', ['name' => $notifiable->name ?? '']),
+            $this->invoice->invoice_number ?? '#'.($this->invoice->id ?? ''),
+            url('/app/invoices/'.($this->invoice->id ?? ''))
         );
     }
 }
