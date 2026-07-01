@@ -61,6 +61,8 @@ return [
   'invoice_creation_failed' => 'فشل في إنشاء الفاتورة. يرجى المحاولة مرة أخرى.',
   'invoice_update_failed' => 'فشل في تحديث الفاتورة. يرجى المحاولة مرة أخرى.',
   'notification_sent' => 'تم إخطار العميل بالفاتورة.',
+  'notification_sent_resend' => 'تم إعادة إرسال الإشعار للعميل للفاتورة رقم #:id.',
+  'send_fcm_notification' => 'إرسال إشعار FCM',
   'amount_exceeds_unpaid' => 'المبلغ يتجاوز الرصيد غير المدفوع المتبقي.',
   'partial_payment_failed' => 'فشل في تسجيل الدفعة الجزئية. يرجى المحاولة مرة أخرى.',
   'partial_payment_recorded' => 'تم تسجيل الدفعة الجزئية بنجاح.',

@@ -11,10 +11,11 @@ import { Label } from "@/Components/ui/label";
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
-import { 
-    Printer, Download, Share2, User, MapPin, Phone, Folder, Receipt, 
+import {
+    Printer, Download, Share2, User, MapPin, Phone, Folder, Receipt,
     Clock, Layers, Plus, CreditCard, List, Edit2, Check, X, Trash2,
-    ChartLine, AlertCircle, Network, Calculator, Merge, ChevronDown
+    ChartLine, AlertCircle, Network, Calculator, Merge, ChevronDown,
+    Bell
 } from 'lucide-react';
 
 export default function Show({ invoice }: { invoice: any }) {
@@ -1084,17 +1085,15 @@ export default function Show({ invoice }: { invoice: any }) {
                                 {__('general.transfer')}</Button>
                         )}
 
-                        {invoice.status !== 'cancelled' && !invoice.is_published && (
-                            <Link href={route('admin.invoices.notify', { invoice: String(invoice.id) })}>
-                                <Button variant="outline" title={__('general.notify_client')}>
-                                    <Share2 className="w-4 h-4" />
-                                </Button>
-                            </Link>
-                        )}
-                        {invoice.is_published === 1 && (
-                            <span className="inline-flex items-center text-green-600" title={__('general.notification_sent')}>
-                                <Check className="w-4 h-4" />
-                            </span>
+                        {invoice.status !== 'cancelled' && invoice.user?.id && (
+                            <Button
+                                variant="outline"
+                                title={__('admin.send_fcm_notification')}
+                                onClick={() => router.post(route('admin.invoices.notify', { invoice: String(invoice.id) }))}
+                            >
+                                <Bell className="w-4 h-4 me-2" />
+                                {__('admin.send_fcm_notification')}
+                            </Button>
                         )}
                     </div>
                 </div>

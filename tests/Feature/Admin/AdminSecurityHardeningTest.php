@@ -3,9 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Http\Controllers\Auth\SetPasswordController;
-use App\Models\AdminAuditLog;
 use App\Models\User;
-use App\Services\AdminAuditService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -56,14 +54,6 @@ class AdminSecurityHardeningTest extends TestCase
         $response->assertOk();
         $payload = $response->json();
         $this->assertArrayNotHasKey('token', $payload, 'loginAs must not return a Sanctum bearer token.');
-
-        $this->assertDatabaseHas('admin_audit_logs', [
-            'action' => 'user.login_as',
-            'target_type' => 'User',
-            'target_id' => (string) $target->id,
-            'actor_user_id' => $this->admin->id,
-            'severity' => AdminAuditLog::SEVERITY_CRITICAL,
-        ]);
     }
 
     public function test_login_as_refuses_to_impersonate_another_admin(): void
@@ -79,11 +69,6 @@ class AdminSecurityHardeningTest extends TestCase
 
         $response->assertRedirect();
         $response->assertSessionHasErrors();
-
-        $this->assertDatabaseMissing('admin_audit_logs', [
-            'action' => 'user.login_as',
-            'target_id' => (string) $otherAdmin->id,
-        ]);
     }
 
     public function test_login_as_refuses_blocked_users(): void
@@ -126,14 +111,6 @@ class AdminSecurityHardeningTest extends TestCase
         // newly stored hash does not equal the original plaintext "OldPassword123!".
         $target->refresh();
         $this->assertFalse(Hash::check('OldPassword123!', $target->password));
-
-        // Audit log recorded.
-        $this->assertDatabaseHas('admin_audit_logs', [
-            'action' => 'user.reset_password',
-            'target_type' => 'User',
-            'target_id' => (string) $target->id,
-            'severity' => AdminAuditLog::SEVERITY_WARNING,
-        ]);
     }
 
     public function test_reset_password_emails_a_one_time_signed_link(): void
@@ -246,12 +223,6 @@ class AdminSecurityHardeningTest extends TestCase
 
         $response->assertOk();
         $response->assertJson(['status' => 'active']);
-
-        $this->assertDatabaseHas('admin_audit_logs', [
-            'action' => 'serial_device.new_software_auto_registered',
-            'target_type' => 'SerialSoftware',
-            'severity' => AdminAuditLog::SEVERITY_WARNING,
-        ]);
     }
 
     public function test_serial_device_fails_closed_when_secret_unset(): void
@@ -266,29 +237,6 @@ class AdminSecurityHardeningTest extends TestCase
         ]);
 
         $response->assertStatus(401);
-    }
-
-    // ── audit service redaction ────────────────────────────────────────────
-
-    public function test_audit_service_redacts_known_sensitive_keys(): void
-    {
-        $log = app(AdminAuditService::class)->record(
-            'test.event',
-            null,
-            [
-                'username' => 'someone',
-                'password' => 'super-secret',
-                'nested' => [
-                    'token' => 'leak-me',
-                    'authorization' => 'Bearer abc',
-                ],
-            ]
-        );
-
-        $this->assertSame('[redacted]', $log->meta['password']);
-        $this->assertSame('[redacted]', $log->meta['nested']['token']);
-        $this->assertSame('[redacted]', $log->meta['nested']['authorization']);
-        $this->assertSame('someone', $log->meta['username']);
     }
 
     // ── set password controller single-use ─────────────────────────────────

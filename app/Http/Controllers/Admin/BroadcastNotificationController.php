@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdminAuditLog;
 use App\Models\NotificationCampaign;
 use App\Models\User;
-use App\Services\AdminAuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -88,7 +86,6 @@ class BroadcastNotificationController extends Controller
         ]);
 
         $actorId = Auth::id();
-        $audit = app(AdminAuditService::class);
 
         // ── Confirmation gate ─────────────────────────────────────────────
         // Global sends require a confirm token stored in cache by `prepareSend`.
@@ -112,18 +109,6 @@ class BroadcastNotificationController extends Controller
                     now()->addMinutes(5)
                 );
 
-                $audit->recordRaw(
-                    'broadcast.confirm_required',
-                    'broadcast',
-                    $validated['audience_type'],
-                    [
-                        'title' => mb_substr($validated['title'], 0, 120),
-                        'audience_type' => $validated['audience_type'],
-                        'personal_target' => $validated['personal_target'] ?? null,
-                    ],
-                    AdminAuditLog::SEVERITY_WARNING
-                );
-
                 return response()->json([
                     'requires_confirmation' => true,
                     'confirm_token' => $newToken,
@@ -131,25 +116,6 @@ class BroadcastNotificationController extends Controller
                     'message' => __('admin.broadcast_confirmation_required'),
                 ], 409);
             }
-        }
-
-        // ── Per-admin daily cap ───────────────────────────────────────────
-        $since = now()->subDay();
-        $auditService = app(AdminAuditService::class);
-        $cap = $validated['audience_type'] === 'global'
-            ? self::DAILY_GLOBAL_CAP
-            : self::DAILY_PERSONAL_CAP;
-        $action = $validated['audience_type'] === 'global'
-            ? 'broadcast.send_global'
-            : 'broadcast.send_personal';
-        $sentLast24h = $auditService->countForActorSince($action, $actorId, $since);
-
-        if ($sentLast24h >= $cap) {
-            return response()->json([
-                'error' => __('admin.broadcast_daily_cap_exceeded'),
-                'sent_last_24h' => $sentLast24h,
-                'cap' => $cap,
-            ], 429);
         }
 
         try {
@@ -217,20 +183,6 @@ class BroadcastNotificationController extends Controller
             }
 
             $campaign->update(['status' => 'completed']);
-
-            $audit->recordRaw(
-                $action,
-                'NotificationCampaign',
-                (string) $campaign->id,
-                [
-                    'title' => $validated['title'],
-                    'audience_type' => $validated['audience_type'],
-                    'personal_target' => $validated['personal_target'] ?? null,
-                    'roles' => $validated['roles'] ?? null,
-                    'user_id_count' => isset($validated['user_ids']) ? count($validated['user_ids']) : null,
-                ],
-                AdminAuditLog::SEVERITY_CRITICAL
-            );
 
             return back()->with('success', __('admin.notification_sent_successfully'));
 

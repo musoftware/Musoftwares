@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdminAuditLog;
 use App\Models\User;
-use App\Services\AdminAuditService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -88,15 +86,6 @@ class SetPasswordController extends Controller
             }
             $user->save();
         });
-
-        app(AdminAuditService::class)->record(
-            'user.password_set_via_admin_link',
-            $user,
-            [
-                'issued_by' => $payload['issued_by'] ?? null,
-            ],
-            AdminAuditLog::SEVERITY_WARNING
-        );
 
         return redirect()->route('login')->with('status', __('Your password has been set. You can now log in.'));
     }

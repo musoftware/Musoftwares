@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\FinanceHelper;
 use App\Http\Controllers\Controller;
-use App\Models\AdminAuditLog;
 use App\Models\AdminSettings;
 use App\Models\CurrenciesExchange;
 use App\Models\Currency;
@@ -12,7 +11,6 @@ use App\Models\Project;
 use App\Models\User;
 use App\Models\UserIntegration;
 use App\Models\WhatsAppChannel;
-use App\Services\AdminAuditService;
 use App\Services\SystemConfigurationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -153,48 +151,6 @@ class AdminSettingController extends Controller
         ]);
 
         $this->configService->updateSettings($validated);
-
-        $audit = app(AdminAuditService::class);
-
-        // Audit sensitive keys.
-        $sensitiveKeys = [
-            'gemini_api_keys', 'paymob_token', 'paymob_card_integration',
-            'paymob_wallet_integration', 'paymob_card_iframe', 'payoneer_active',
-            'paymob_active', 'gumroad', 'whatsapp_default_channel_id',
-            'custom_head_scripts', 'custom_body_scripts',
-            'google_analytics_id', 'google_tag_manager_id', 'meta_pixel_id',
-            'notif_channels_invoice_created',
-        ];
-        foreach ($sensitiveKeys as $key) {
-            if (! array_key_exists($key, $validated)) {
-                continue;
-            }
-
-            $newValue = (string) ($validated[$key] ?? '');
-            $oldValue = (string) AdminSettings::GetValue($key, '');
-
-            // Always audit custom_*_scripts writes (even when value is empty)
-            // because clearing the field is also a security-relevant change.
-            if ($newValue === $oldValue && ! in_array($key, ['custom_head_scripts', 'custom_body_scripts'], true)) {
-                continue;
-            }
-
-            $audit->recordRaw(
-                'settings.update',
-                'AdminSettings',
-                $key,
-                [
-                    'key' => $key,
-                    'length' => strlen($newValue),
-                    'sha256_new' => $newValue === '' ? null : hash('sha256', $newValue),
-                    'sha256_old' => $oldValue === '' ? null : hash('sha256', $oldValue),
-                    'changed' => $newValue !== $oldValue,
-                ],
-                in_array($key, ['custom_head_scripts', 'custom_body_scripts'], true)
-                    ? AdminAuditLog::SEVERITY_CRITICAL
-                    : AdminAuditLog::SEVERITY_WARNING
-            );
-        }
 
         return redirect()->back()->with('success', __('general.settings_updated_successfully'));
     }

@@ -9,7 +9,6 @@ use App\Http\Requests\Admin\User\StoreUserRequest;
 use App\Http\Requests\Admin\User\ToggleBlockUserRequest;
 use App\Http\Requests\Admin\User\UpdateUserRequest;
 use App\Http\Resources\UserResource;
-use App\Models\AdminAuditLog;
 use App\Models\CoTechTag;
 use App\Models\CoWorker;
 use App\Models\CurrenciesExchange;
@@ -18,7 +17,6 @@ use App\Models\Earning;
 use App\Models\ModulePlan;
 use App\Models\User;
 use App\Models\UserSubscription;
-use App\Services\AdminAuditService;
 use App\Services\AdminUserService;
 use App\Services\EarningAnalyzeService;
 use App\Services\PricingService;
@@ -343,17 +341,6 @@ class UsersController extends Controller
             'impersonation_started_at' => $startedAt->toIso8601String(),
         ]);
 
-        app(AdminAuditService::class)->record(
-            'user.login_as',
-            $user,
-            [
-                'actor_user_id' => $actorId,
-                'started_at' => $startedAt->toIso8601String(),
-                'via' => $request->isMethod('post') ? 'post' : 'get',
-            ],
-            AdminAuditLog::SEVERITY_CRITICAL
-        );
-
         Auth::loginUsingId($user->id);
 
         if ($request->wantsJson() || $request->isMethod('post')) {
@@ -579,16 +566,6 @@ class UsersController extends Controller
                 $this->sendSetPasswordLinkViaWhatsApp($coWorker, $user, $setLink, false);
             }
 
-            app(AdminAuditService::class)->record(
-                'user.create_from_coworker',
-                $user,
-                [
-                    'coworker_id' => $coWorker->id,
-                    'delivery' => 'one_time_link',
-                ],
-                AdminAuditLog::SEVERITY_WARNING
-            );
-
             return redirect()->back()->with('success', __('general.user_created_successfully_send_set_password_link'));
 
         } catch (\Exception $e) {
@@ -628,16 +605,6 @@ class UsersController extends Controller
             if (! empty($coWorker->whatsapp) && class_exists('\App\Services\WhatsAppNotificationService')) {
                 $this->sendSetPasswordLinkViaWhatsApp($coWorker, $user, $setLink, true);
             }
-
-            app(AdminAuditService::class)->record(
-                'user.reset_password_for_coworker',
-                $user,
-                [
-                    'coworker_id' => $coWorker->id,
-                    'delivery' => 'one_time_link',
-                ],
-                AdminAuditLog::SEVERITY_WARNING
-            );
 
             return redirect()->back()->with('success', __('general.password_reset_link_sent'));
 
@@ -703,16 +670,6 @@ class UsersController extends Controller
         } catch (\Exception $e) {
             Log::error('Failed to send password reset email: '.$e->getMessage());
         }
-
-        app(AdminAuditService::class)->record(
-            'user.reset_password',
-            $user,
-            [
-                'delivery' => 'one_time_link',
-                'email_sent' => true,
-            ],
-            AdminAuditLog::SEVERITY_WARNING
-        );
 
         return response()->json([
             'message' => 'A one-time password setup link has been emailed to the user.',

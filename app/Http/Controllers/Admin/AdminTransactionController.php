@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TransactionResource;
-use App\Models\AdminAuditLog;
 use App\Models\AdminSettings;
 use App\Models\CostTransaction;
 use App\Models\CurrenciesExchange;
@@ -13,7 +12,6 @@ use App\Models\Currency;
 use App\Models\Project;
 use App\Models\Transaction;
 use App\Models\User;
-use App\Services\AdminAuditService;
 use App\Services\TransactionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -253,17 +251,6 @@ class AdminTransactionController extends Controller
             // Re-fetch to read latest mutated state under the lock, then
             // recompute the balance inside the same transaction.
             $this->transactionService->recalculateUserBalance($user, null);
-
-            app(AdminAuditService::class)->recordRaw(
-                'transaction.transfer',
-                'User',
-                (string) $user->id,
-                [
-                    'actor_user_id' => $actorId,
-                    'rows' => count($data),
-                ],
-                AdminAuditLog::SEVERITY_WARNING
-            );
         });
 
         return redirect()->back()->with('success', __('erp.transfer_completed_successfully'));

@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdminAuditLog;
 use App\Models\SerialDevice;
 use App\Models\SerialSoftware;
-use App\Services\AdminAuditService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -56,21 +54,6 @@ class SerialDeviceController extends Controller
             ['default_status' => SerialSoftware::DEFAULT_STATUS_ACTIVE]
         );
 
-        if (! $softwareExisted) {
-            app(AdminAuditService::class)->recordRaw(
-                'serial_device.new_software_auto_registered',
-                'SerialSoftware',
-                (string) $software->id,
-                [
-                    'name' => $software->name,
-                    'source_ip' => $request->ip(),
-                    'machine' => $validated['machine_name'] ?? null,
-                    'user_domain' => $validated['user_domain'] ?? null,
-                ],
-                AdminAuditLog::SEVERITY_WARNING
-            );
-        }
-
         // Auto-create device if first check-in from this machine for this software.
         $deviceExisted = SerialDevice::where('serial_software_id', $software->id)
             ->where('device_id', $validated['device_id'])
@@ -85,22 +68,6 @@ class SerialDeviceController extends Controller
                 'status' => $software->default_status,
             ]
         );
-
-        if (! $deviceExisted) {
-            app(AdminAuditService::class)->recordRaw(
-                'serial_device.new_device_auto_registered',
-                'SerialDevice',
-                (string) $device->id,
-                [
-                    'software_id' => $software->id,
-                    'source_ip' => $request->ip(),
-                    'machine' => $validated['machine_name'] ?? null,
-                    'user_name' => $validated['user_name'] ?? null,
-                    'user_domain' => $validated['user_domain'] ?? null,
-                ],
-                AdminAuditLog::SEVERITY_INFO
-            );
-        }
 
         // Build update payload — always refresh last_check_date.
         $updates = ['last_check_date' => now()];

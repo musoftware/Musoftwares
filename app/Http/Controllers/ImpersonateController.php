@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AdminAuditLog;
 use App\Models\User;
-use App\Services\AdminAuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -43,16 +41,6 @@ class ImpersonateController extends Controller
         session()->put('impersonate', $id);
         session()->put('impersonation_started_at', $startedAt->toIso8601String());
 
-        app(AdminAuditService::class)->record(
-            'user.impersonate',
-            $target,
-            [
-                'actor_user_id' => $actorId,
-                'started_at' => $startedAt->toIso8601String(),
-            ],
-            AdminAuditLog::SEVERITY_CRITICAL
-        );
-
         Auth::loginUsingId($id);
 
         return redirect()->route('dashboard');
@@ -63,7 +51,6 @@ class ImpersonateController extends Controller
         if (session()->has('impersonator_id')) {
             $impersonatorId = session()->get('impersonator_id');
             $impersonatedId = Auth::id();
-            $startedAt = session()->get('impersonation_started_at');
 
             session()->forget([
                 'impersonator_id',
@@ -74,21 +61,8 @@ class ImpersonateController extends Controller
             ]);
 
             if ($impersonatedId && $impersonatorId) {
-                app(AdminAuditService::class)->recordRaw(
-                    'user.stop_impersonation',
-                    'User',
-                    (string) $impersonatedId,
-                    [
-                        'actor_user_id' => $impersonatorId,
-                        'started_at' => $startedAt,
-                        'ended_at' => now()->toIso8601String(),
-                    ],
-                    AdminAuditLog::SEVERITY_CRITICAL,
-                    $impersonatorId
-                );
+                Auth::loginUsingId($impersonatorId);
             }
-
-            Auth::loginUsingId($impersonatorId);
         }
 
         return redirect()->route('dashboard');

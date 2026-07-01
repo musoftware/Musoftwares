@@ -61,6 +61,8 @@ return [
   'invoice_creation_failed' => 'Failed to create invoice. Please try again.',
   'invoice_update_failed' => 'Failed to update invoice. Please try again.',
   'notification_sent' => 'Client notified about the invoice.',
+  'notification_sent_resend' => 'Notification resent to the client for invoice #:id.',
+  'send_fcm_notification' => 'Send FCM Notification',
   'amount_exceeds_unpaid' => 'The amount exceeds the remaining unpaid balance.',
   'partial_payment_failed' => 'Failed to record partial payment. Please try again.',
   'partial_payment_recorded' => 'Partial payment recorded successfully.',

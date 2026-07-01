@@ -985,7 +985,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::post('/invoices/{invoice}/cancel', [App\Http\Controllers\Admin\InvoiceController::class, 'cancel'])->name('invoices.cancel');
     Route::post('/invoices/{invoice}/change-status', [App\Http\Controllers\Admin\InvoiceController::class, 'changeStatus'])->name('invoices.change-status');
     Route::post('/invoices/{invoice}/change-job-status', [App\Http\Controllers\Admin\InvoiceController::class, 'changeJobStatus'])->name('invoices.change-job-status');
-    Route::get('/invoices/{invoice}/notify', [App\Http\Controllers\Admin\InvoiceController::class, 'notify'])->name('invoices.notify');
+    Route::post('/invoices/{invoice}/notify', [App\Http\Controllers\Admin\InvoiceController::class, 'notify'])->name('invoices.notify');
     Route::post('/invoices/{invoice}/partial-pay', [App\Http\Controllers\Admin\InvoiceController::class, 'partialPay'])->name('invoices.partial-pay');
     Route::post('/invoices/{invoice}/pay-service/calculate', [App\Http\Controllers\Admin\InvoiceController::class, 'calculatePayService'])->name('invoices.pay-service.calculate');
     Route::post('/invoices/{invoice}/pay-service/store', [App\Http\Controllers\Admin\InvoiceController::class, 'storePayService'])->name('invoices.pay-service.store');

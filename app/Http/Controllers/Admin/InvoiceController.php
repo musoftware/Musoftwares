@@ -7,7 +7,6 @@ use App\Helpers\TextHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Invoice\UpdateInvoiceRequest;
 use App\Http\Resources\InvoiceResource;
-use App\Models\AdminAuditLog;
 use App\Models\AdminSettings;
 use App\Models\CurrenciesExchange;
 use App\Models\Currency;
@@ -19,7 +18,7 @@ use App\Models\InvoiceItem;
 use App\Models\InvoiceItemTimer;
 use App\Models\Project;
 use App\Models\User;
-use App\Services\AdminAuditService;
+use App\Notifications\InvoiceCreatedNotification;
 use App\Services\InvoiceService;
 use App\Services\WhatsAppNotificationService;
 use Carbon\Carbon;
@@ -448,17 +447,6 @@ class InvoiceController extends Controller
                     $freshInv->paid = $freshInv->total();
                     $freshInv->status = 'paid';
                     $freshInv->save();
-
-                    app(AdminAuditService::class)->record(
-                        'invoice.convert_to_transaction',
-                        $freshInv,
-                        [
-                            'actor_user_id' => Auth::id(),
-                            'amount' => $invoice_total,
-                            'currency_id' => $freshInv->currency_id,
-                        ],
-                        AdminAuditLog::SEVERITY_WARNING
-                    );
                 });
             } elseif ($action == 'send_whatsapp_reminder') {
                 if ($inv->status != 'unpaid' && $inv->status != 'partially_paid') {
@@ -558,11 +546,23 @@ class InvoiceController extends Controller
     }
 
     /**
-     * Notify client about their invoice (mark as published).
+     * Notify the client about their invoice by dispatching the FCM + mail
+     * `InvoiceCreatedNotification` to the invoice owner.
      */
     public function notify(Invoice $invoice)
     {
-        $invoice->update(['is_published' => 1]);
+        $invoice->loadMissing('user');
+
+        $client = $invoice->user;
+        if ($client) {
+            try {
+                $client->notify(new InvoiceCreatedNotification($invoice));
+            } catch (\Throwable $e) {
+                \Log::error('Invoice FCM notify failed for invoice #'.$invoice->id.': '.$e->getMessage());
+
+                return redirect()->back()->with('error', __('admin.notification_failed').': '.$e->getMessage());
+            }
+        }
 
         return redirect()->back()->with('success', __('admin.notification_sent'));
     }
