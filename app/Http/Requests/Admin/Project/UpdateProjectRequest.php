@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\Project;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateProjectRequest extends FormRequest
 {
@@ -14,10 +15,17 @@ class UpdateProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'user_id' => ['sometimes', 'required', 'integer', 'exists:users,id'],
             'project_name' => ['sometimes', 'required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:5000'],
             'project_balance' => ['nullable', 'numeric'],
             'budget' => ['nullable', 'numeric', 'min:0'],
-            'status' => ['nullable', 'string', 'in:open,hold_on,closed'],
+            'hour_rate' => ['nullable', 'numeric', 'min:0'],
+            'percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'status' => ['nullable', 'string', Rule::in(['open', 'hold_on', 'closed'])],
+            'date_start' => ['nullable', 'date'],
+            'date_end' => ['nullable', 'date', 'after_or_equal:date_start'],
+            'owner_id' => ['nullable', 'integer', 'exists:users,id'],
             'hide_future_tasks' => ['nullable', 'boolean'],
         ];
     }

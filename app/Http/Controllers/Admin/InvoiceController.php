@@ -203,9 +203,14 @@ class InvoiceController extends Controller
                 ->with('error', __('admin.client_not_found'));
         }
 
-        $project = $request->filled('project_id')
-            ? Project::where('id', $request->input('project_id'))->first()
-            : null;
+        $project = null;
+        if ($request->filled('project')) {
+            $project = $client->projects()->find($request->input('project'));
+            if (! $project) {
+                return redirect()->route('admin.invoices.index')
+                    ->with('error', __('admin.project_not_associated'));
+            }
+        }
 
         try {
             $invoice = Invoice::createInvoice($client, $project, null);

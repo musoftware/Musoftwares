@@ -3,64 +3,242 @@
 namespace App\Services;
 
 use App\Models\Project;
+use App\Models\ProjectAuditLog;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class ProjectService extends BaseService
 {
+    public const PROJECT_WRITEABLE = [
+        'user_id',
+        'owner_id',
+        'project_name',
+        'description',
+        'project_balance',
+        'budget',
+        'hour_rate',
+        'percentage',
+        'status',
+        'date_start',
+        'date_end',
+        'hide_future_tasks',
+    ];
+
+    public function __construct(
+        protected ProjectAuditService $audit,
+    ) {}
+
     public function createProject(array $data): Project
     {
-        $project = new Project;
-        $project->user_id = $data['user_id'];
-        $project->project_name = $data['project_name'];
-        if (isset($data['project_balance'])) {
-            $project->project_balance = $data['project_balance'];
-        }
-        $project->status = 'open';
-        $project->archived = 0;
-        $project->save();
+        return DB::transaction(function () use ($data) {
+            $project = new Project;
+            $this->fillFromArray($project, $data);
+            $project->status ??= 'open';
+            $project->archived = 0;
+            $project->archived_at = null;
+            $project->save();
 
-        return $project;
+            $this->audit->logFromRequest(
+                project: $project,
+                action: ProjectAuditLog::ACTION_CREATED,
+                changes: ['after' => $project->only(self::PROJECT_WRITEABLE)],
+            );
+
+            return $project->fresh(['client', 'owner']);
+        });
     }
 
     public function updateProject(int $id, array $data): Project
     {
-        $project = Project::findOrFail($id);
-        if (isset($data['project_name'])) {
-            $project->project_name = $data['project_name'];
-        }
-        if (isset($data['project_balance'])) {
-            $project->project_balance = $data['project_balance'];
-        }
-        if (array_key_exists('budget', $data) && $data['budget'] !== null) {
-            $project->budget = $data['budget'];
-        }
-        if (array_key_exists('status', $data) && $data['status'] !== null) {
-            $project->status = $data['status'];
-        }
-        if (array_key_exists('hide_future_tasks', $data) && $data['hide_future_tasks'] !== null) {
-            $project->hide_future_tasks = (bool) $data['hide_future_tasks'];
-        }
-        $project->save();
+        return DB::transaction(function () use ($id, $data) {
+            $project = Project::findOrFail($id);
+            $before = $project->only(self::PROJECT_WRITEABLE);
 
-        return $project;
+            $this->fillFromArray($project, $data);
+            $project->save();
+
+            $after = $project->fresh()->only(self::PROJECT_WRITEABLE);
+            $diff = $this->diffArrays($before, $after);
+
+            if ($diff !== []) {
+                $this->audit->logFromRequest(
+                    project: $project,
+                    action: ProjectAuditLog::ACTION_UPDATED,
+                    changes: ['before' => $before, 'after' => $after, 'changed' => array_keys($diff)],
+                );
+            }
+
+            return $project->fresh(['client', 'owner']);
+        });
     }
 
-    public function archiveProject(int $id): void
+    public function archiveProject(int $id): Project
     {
-        $project = Project::findOrFail($id);
-        $project->archived = 1;
-        $project->save();
+        return DB::transaction(function () use ($id) {
+            $project = Project::findOrFail($id);
+            $project->archived = 1;
+            $project->archived_at = Carbon::now();
+            $project->save();
+
+            $this->audit->logFromRequest(
+                project: $project,
+                action: ProjectAuditLog::ACTION_ARCHIVED,
+            );
+
+            return $project;
+        });
     }
 
-    public function restoreProject(int $id): void
+    public function restoreProject(int $id): Project
     {
-        $project = Project::findOrFail($id);
-        $project->archived = 0;
-        $project->save();
+        return DB::transaction(function () use ($id) {
+            $project = Project::findOrFail($id);
+            $project->archived = 0;
+            $project->archived_at = null;
+            $project->save();
+
+            $this->audit->logFromRequest(
+                project: $project,
+                action: ProjectAuditLog::ACTION_RESTORED,
+            );
+
+            return $project;
+        });
     }
 
     public function deleteProject(int $id): void
     {
-        $project = Project::findOrFail($id);
-        $project->delete();
+        DB::transaction(function () use ($id) {
+            $project = Project::findOrFail($id);
+            $project->delete();
+        });
+    }
+
+    /**
+     * Bulk-archive many projects in a single transaction. Returns the count actually
+     * affected (skips projects that were already archived).
+     */
+    public function bulkArchive(Collection $ids): int
+    {
+        return DB::transaction(function () use ($ids) {
+            $projects = Project::whereIn('id', $ids)->where('archived', 0)->get();
+            $now = Carbon::now();
+            foreach ($projects as $project) {
+                $project->archived = 1;
+                $project->archived_at = $now;
+                $project->save();
+                $this->audit->logFromRequest(
+                    project: $project,
+                    action: ProjectAuditLog::ACTION_BULK_ARCHIVED,
+                );
+            }
+
+            return $projects->count();
+        });
+    }
+
+    public function bulkRestore(Collection $ids): int
+    {
+        return DB::transaction(function () use ($ids) {
+            $projects = Project::whereIn('id', $ids)->where('archived', 1)->get();
+            foreach ($projects as $project) {
+                $project->archived = 0;
+                $project->archived_at = null;
+                $project->save();
+                $this->audit->logFromRequest(
+                    project: $project,
+                    action: ProjectAuditLog::ACTION_BULK_RESTORED,
+                );
+            }
+
+            return $projects->count();
+        });
+    }
+
+    public function bulkDelete(Collection $ids): int
+    {
+        return DB::transaction(function () use ($ids) {
+            $count = 0;
+            $projects = Project::whereIn('id', $ids)->get();
+            foreach ($projects as $project) {
+                $this->audit->logFromRequest(
+                    project: $project,
+                    action: ProjectAuditLog::ACTION_BULK_DELETED,
+                );
+                $project->delete();
+                $count++;
+            }
+
+            return $count;
+        });
+    }
+
+    /**
+     * @param  array<int, string>  $columns
+     */
+    public function exportRows(iterable $projects, array $columns): array
+    {
+        $rows = [];
+        foreach ($projects as $project) {
+            $row = [];
+            foreach ($columns as $column) {
+                $row[] = $this->resolveExportValue($project, $column);
+            }
+            $rows[] = $row;
+        }
+
+        return $rows;
+    }
+
+    protected function fillFromArray(Project $project, array $data): void
+    {
+        foreach (self::PROJECT_WRITEABLE as $field) {
+            if (! array_key_exists($field, $data)) {
+                continue;
+            }
+            $value = $data[$field];
+
+            if (in_array($field, ['date_start', 'date_end'], true)) {
+                $value = $value ? Carbon::parse($value) : null;
+            }
+
+            if ($field === 'hide_future_tasks' && $value !== null) {
+                $value = (bool) $value;
+            }
+
+            $project->{$field} = $value;
+        }
+    }
+
+    protected function diffArrays(array $before, array $after): array
+    {
+        $diff = [];
+        foreach ($after as $key => $newValue) {
+            $oldValue = $before[$key] ?? null;
+            if ($oldValue != $newValue) {
+                $diff[$key] = ['from' => $oldValue, 'to' => $newValue];
+            }
+        }
+
+        return $diff;
+    }
+
+    protected function resolveExportValue(Project $project, string $column): string
+    {
+        return match ($column) {
+            'id' => (string) $project->id,
+            'client' => (string) ($project->client?->name ?? ''),
+            'owner' => (string) ($project->owner?->name ?? ''),
+            'status' => (string) ($project->status ?? ''),
+            'archived' => $project->archived ? 'yes' : 'no',
+            'date_start' => $project->date_start?->toDateString() ?? '',
+            'date_end' => $project->date_end?->toDateString() ?? '',
+            'archived_at' => $project->archived_at?->toIso8601String() ?? '',
+            'created_at' => $project->created_at?->toIso8601String() ?? '',
+            'description' => (string) ($project->description ?? ''),
+            'project_balance', 'budget', 'total_paid', 'hour_rate' => (string) ($project->{$column} ?? '0'),
+            default => (string) ($project->{$column} ?? ''),
+        };
     }
 }

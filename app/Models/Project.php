@@ -6,6 +6,7 @@ use App\Helpers\TextHelper;
 use App\Helpers\TimerHelper;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,7 +26,11 @@ class Project extends Model
         'portfolio_tech' => 'array',
         'portfolio_gallery' => 'array',
         'hide_future_tasks' => 'boolean',
+        'archived' => 'boolean',
+        'archived_at' => 'datetime',
         'budget' => 'decimal:3',
+        'project_balance' => 'decimal:3',
+        'total_paid' => 'decimal:3',
         'date_start' => 'datetime',
         'date_end' => 'datetime',
     ];
@@ -303,5 +308,34 @@ class Project extends Model
     public function contracts(): HasMany
     {
         return $this->hasMany(Contract::class);
+    }
+
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function auditLogs(): HasMany
+    {
+        return $this->hasMany(ProjectAuditLog::class)->latest('created_at');
+    }
+
+    public function scopeOfStatus(Builder $query, ?string $status): Builder
+    {
+        if ($status === null || $status === 'all' || $status === '') {
+            return $query;
+        }
+
+        return $query->where('status', $status);
+    }
+
+    public function scopeOpen(Builder $query): Builder
+    {
+        return $query->where('archived', 0);
+    }
+
+    public function scopeArchived(Builder $query): Builder
+    {
+        return $query->where('archived', 1);
     }
 }

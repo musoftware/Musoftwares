@@ -311,7 +311,7 @@ class ProjectControllerExtendedTest extends TestCase
             \DB::table('tasks')->insert([
                 'project_id' => $project->id,
                 'user_id' => $this->client->id,
-                'title' => "Task {$i}",
+                'task_name' => "Task {$i}",
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -370,5 +370,70 @@ class ProjectControllerExtendedTest extends TestCase
         $this->actingAs($this->client)
             ->get(route('admin.projects.export'))
             ->assertStatus(403);
+    }
+
+    public function test_admin_can_view_create_page(): void
+    {
+        $this->actingAs($this->admin)
+            ->get(route('admin.projects.create'))
+            ->assertStatus(200)
+            ->assertInertia(fn ($page) => $page
+                ->component('Admin/Projects/Create'));
+    }
+
+    public function test_non_admin_cannot_view_create_page(): void
+    {
+        $this->actingAs($this->client)
+            ->get(route('admin.projects.create'))
+            ->assertStatus(403);
+    }
+
+    public function test_guest_redirected_from_create_page(): void
+    {
+        $this->get(route('admin.projects.create'))
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_store_redirects_to_index_with_flash_success(): void
+    {
+        $response = $this->actingAs($this->admin)
+            ->post(route('admin.projects.store'), [
+                'user_id' => $this->client->id,
+                'project_name' => 'Redirect Test',
+            ]);
+
+        $response->assertRedirect(route('admin.projects.index'));
+        $response->assertSessionHas('success');
+    }
+
+    public function test_create_page_passes_initial_client_when_query_param_present(): void
+    {
+        $this->actingAs($this->admin)
+            ->get(route('admin.projects.create', ['client_id' => $this->client->id]))
+            ->assertInertia(fn ($page) => $page
+                ->component('Admin/Projects/Create')
+                ->where('initialClient.id', $this->client->id)
+                ->where('initialClient.name', $this->client->name)
+                ->where('prefillClientId', $this->client->id));
+    }
+
+    public function test_create_page_omits_initial_client_when_query_param_invalid(): void
+    {
+        $this->actingAs($this->admin)
+            ->get(route('admin.projects.create', ['client_id' => 999999]))
+            ->assertInertia(fn ($page) => $page
+                ->component('Admin/Projects/Create')
+                ->where('initialClient', null)
+                ->where('prefillClientId', null));
+    }
+
+    public function test_create_page_omits_initial_client_when_no_query_param(): void
+    {
+        $this->actingAs($this->admin)
+            ->get(route('admin.projects.create'))
+            ->assertInertia(fn ($page) => $page
+                ->component('Admin/Projects/Create')
+                ->where('initialClient', null)
+                ->where('prefillClientId', null));
     }
 }

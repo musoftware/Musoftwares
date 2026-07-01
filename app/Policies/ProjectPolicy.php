@@ -36,10 +36,52 @@ class ProjectPolicy
             : Response::denyWithStatus(403);
     }
 
+    public function create(User $user): bool
+    {
+        // Admin bypass already handled in `before()`. Non-admins cannot create admin projects.
+        return false;
+    }
+
     public function update(User $user, Project $project): Response
     {
         return $project->user_id === $user->id
             ? Response::allow()
             : Response::denyWithStatus(403);
+    }
+
+    public function delete(User $user, Project $project): bool
+    {
+        // Admin bypass already handled in `before()`. Non-admins cannot delete.
+        return false;
+    }
+
+    public function deleteAny(User $user): bool
+    {
+        return false;
+    }
+
+    public function forceDelete(User $user, Project $project): bool
+    {
+        return false;
+    }
+
+    public function restore(User $user, Project $project): bool
+    {
+        return false;
+    }
+
+    public function archive(User $user, Project $project): bool
+    {
+        return false;
+    }
+
+    public function export(User $user): bool
+    {
+        return false;
+    }
+
+    public function searchClients(User $user): bool
+    {
+        return false;
     }
 }

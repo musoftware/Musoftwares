@@ -191,8 +191,8 @@ export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                <Link href={`/admin/projects/${project.id}`}>
-                                    <LayoutDashboard className="h-4 w-4 text-slate-700" /> 
+                                <Link href={`/admin/projects/${project.id}/board`}>
+                                    <LayoutDashboard className="h-4 w-4 text-slate-700" />
                                     <span className="font-normal text-slate-700">{__('general.view_project')}</span>
                                 </Link>
                             </Button>
