@@ -69,7 +69,7 @@ class InvoiceCreatedNotification extends Notification implements ShouldQueue
     public function toWhatsapp(object $notifiable): ?string
     {
         return sprintf(
-            "%s\nInvoice %s has been created.\n%s\nView: %s",
+            "%s\nInvoice %s has been created.\nView: %s",
             __('general.hello_name', ['name' => $notifiable->name ?? '']),
             $this->invoice->invoice_number ?? '#'.($this->invoice->id ?? ''),
             url('/app/invoices/'.($this->invoice->id ?? ''))

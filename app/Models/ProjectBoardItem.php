@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class ProjectBoardItem extends Model
 {
@@ -20,6 +21,8 @@ class ProjectBoardItem extends Model
         'note' => ProjectBoardNote::class,
         'task' => Task::class,
         'report' => ProjectReport::class,
+        'todo' => Todo::class,
+        'file' => ProjectFile::class,
     ];
 
     public static function morphClassFor(string $type): string
@@ -45,7 +48,7 @@ class ProjectBoardItem extends Model
         return $this->belongsTo(Project::class, 'project_id');
     }
 
-    public function itemable()
+    public function itemable(): MorphTo
     {
         return $this->morphTo();
     }

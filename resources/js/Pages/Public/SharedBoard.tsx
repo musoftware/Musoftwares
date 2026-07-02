@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Head } from '@inertiajs/react';
-import { LayoutDashboard, CalendarDays } from 'lucide-react';
+import { Head, usePage, router, Link } from '@inertiajs/react';
+import { LayoutDashboard, CalendarDays, LogIn, Calendar as LucideCalendar } from 'lucide-react';
 import ProjectBoard, { type BoardCard } from '@/Pages/Client/Projects/Components/ProjectBoard';
+import CalendarSelector from '@/Components/CalendarSelector';
 import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
@@ -12,19 +13,24 @@ interface Props {
         name: string;
         description?: string;
         status?: string;
+        share_token: string;
         client_name?: string;
         currency?: any;
     };
     date: string;
     lanes: string[];
     cards: BoardCard[];
+    activeDates: string[];
 }
 
 type FilterKey = 'all' | 'note' | 'task' | 'report';
 
-export default function SharedBoard({ project, date, lanes, cards }: Props) {
+export default function SharedBoard({ project, date, lanes, cards, activeDates = [] }: Props) {
     const day = parseISO(date);
     const [filter, setFilter] = useState<FilterKey>('all');
+    const [calendarOpen, setCalendarOpen] = useState(false);
+    const { auth } = usePage().props as any;
+    const user = auth?.user;
 
     const counts = useMemo(
         () => ({
@@ -61,40 +67,75 @@ export default function SharedBoard({ project, date, lanes, cards }: Props) {
                             </div>
                         </div>
 
-                        {/* Top Filters (Restricted to specified date, no date nav) */}
-                        <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-0.5">
-                            {(['all', 'note', 'task', 'report'] as const).map((key) => {
-                                const count = counts[key];
-                                const isActive = filter === key;
-                                const label =
-                                    key === 'all' ? __('general.all') :
-                                    key === 'note' ? __('general.notes') :
-                                    key === 'task' ? __('general.tasks') :
-                                    __('general.reports');
-                                return (
-                                    <button
-                                        key={key}
-                                        type="button"
-                                        onClick={() => setFilter(key)}
-                                        className={cn(
-                                            'relative inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors',
-                                            isActive
-                                                ? 'bg-white text-slate-900 shadow-sm'
-                                                : 'text-slate-500 hover:text-slate-700'
-                                        )}
-                                    >
-                                        <span>{label}</span>
-                                        {count > 0 && (
-                                            <span className={cn(
-                                                'rounded-full px-1.5 py-0 text-[10px] font-bold',
-                                                isActive ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-600'
-                                            )}>
-                                                {count}
-                                            </span>
-                                        )}
-                                    </button>
-                                );
-                            })}
+                        {/* Action buttons (Calendar, Login CTA, or Control Panel) */}
+                        <div className="flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setCalendarOpen(true)}
+                                className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                            >
+                                <LucideCalendar className="h-3.5 w-3.5 text-indigo-500" />
+                                <span>{__('general.calendar') || 'Calendar'}</span>
+                            </button>
+
+                            {user ? (
+                                <Link
+                                    href={user.isAdmin
+                                        ? route('admin.projects.board', { project: project.id, date })
+                                        : route('client.projects.calendar.date', { project: project.id, date })
+                                    }
+                                    className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-slate-950 px-3 text-xs font-semibold text-white shadow hover:bg-slate-800 transition-colors"
+                                >
+                                    <LayoutDashboard className="h-3.5 w-3.5" />
+                                    <span>{__('general.board_go_to_panel') || 'Go to Control Panel'}</span>
+                                </Link>
+                            ) : (
+                                <Link
+                                    href="/login"
+                                    className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 text-xs font-semibold text-white shadow hover:bg-indigo-500 transition-colors"
+                                >
+                                    <LogIn className="h-3.5 w-3.5" />
+                                    <span>{__('general.board_login_cta') || 'Login to Control Fully'}</span>
+                                </Link>
+                            )}
+
+                            <div className="h-6 w-[1px] bg-slate-200 mx-1" />
+
+                            {/* Top Filters (Restricted to specified date, no date nav) */}
+                            <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-0.5">
+                                {(['all', 'note', 'task', 'report'] as const).map((key) => {
+                                    const count = counts[key];
+                                    const isActive = filter === key;
+                                    const label =
+                                        key === 'all' ? __('general.all') :
+                                        key === 'note' ? __('general.notes') :
+                                        key === 'task' ? __('general.tasks') :
+                                        __('general.reports');
+                                    return (
+                                        <button
+                                            key={key}
+                                            type="button"
+                                            onClick={() => setFilter(key)}
+                                            className={cn(
+                                                'relative inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors',
+                                                isActive
+                                                    ? 'bg-white text-slate-900 shadow-sm'
+                                                    : 'text-slate-500 hover:text-slate-700'
+                                            )}
+                                        >
+                                            <span>{label}</span>
+                                            {count > 0 && (
+                                                <span className={cn(
+                                                    'rounded-full px-1.5 py-0 text-[10px] font-bold',
+                                                    isActive ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-600'
+                                                )}>
+                                                    {count}
+                                                </span>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -112,6 +153,17 @@ export default function SharedBoard({ project, date, lanes, cards }: Props) {
                     externalFilter={filter}
                 />
             </main>
+
+            {/* Public Shared Board Calendar Selector */}
+            <CalendarSelector
+                open={calendarOpen}
+                onOpenChange={setCalendarOpen}
+                activeDates={activeDates}
+                selectedDate={date}
+                onSelectDate={(targetDate) => {
+                    router.visit(route('shared-board.show', { token: project.share_token, date: targetDate }));
+                }}
+            />
         </div>
     );
 }

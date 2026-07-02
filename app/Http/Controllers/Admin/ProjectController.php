@@ -278,12 +278,25 @@ class ProjectController extends Controller
 
         $currency = $project->currencyRow();
 
+        $shareUrl = \Illuminate\Support\Facades\URL::signedRoute('shared-board.show', [
+            'token' => $project->share_token,
+            'date' => $date->toDateString(),
+        ]);
+
+        $activeDates = \App\Models\ProjectBoardItem::where('project_id', $project->id)
+            ->distinct()
+            ->pluck('for_date')
+            ->map(fn($d) => is_string($d) ? $d : $d->toDateString())
+            ->toArray();
+
         return Inertia::render('Admin/Projects/Board', [
             'project' => [
                 'id' => $project->id,
                 'name' => $project->project_name,
                 'description' => $project->description,
                 'status' => $project->status,
+                'share_token' => $project->share_token,
+                'share_url' => $shareUrl,
                 'archived' => (bool) $project->archived,
                 'budget' => (string) ($project->budget ?? 0),
                 'project_balance' => (string) ($project->project_balance ?? 0),
@@ -309,6 +322,7 @@ class ProjectController extends Controller
             'date' => $date->toDateString(),
             'lanes' => $this->boardService->lanes(),
             'cards' => fn () => $cards,
+            'activeDates' => $activeDates,
         ]);
     }
 

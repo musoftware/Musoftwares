@@ -181,7 +181,7 @@ export default function Income() {
                         </div>
                         <Select
                             value={String(filters?.year || new Date().getFullYear())}
-                            onValueChange={(val) => handleFilterChange('year', val)}
+                            onValueChange={(val) => { if (val) handleFilterChange('year', val); }}
                         >
                             <SelectTrigger className="w-[120px] bg-white h-9 rounded-lg">
                                 <SelectValue placeholder="Year" />
@@ -194,7 +194,7 @@ export default function Income() {
                         </Select>
                         <Select
                             value={String(filters?.month || new Date().getMonth() + 1)}
-                            onValueChange={(val) => handleFilterChange('month', val)}
+                            onValueChange={(val) => { if (val) handleFilterChange('month', val); }}
                         >
                             <SelectTrigger className="w-[140px] bg-white h-9 rounded-lg">
                                 <SelectValue placeholder="Month" />

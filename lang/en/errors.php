@@ -29,4 +29,6 @@ return [
     'escrow_currency_not_found' => 'Escrow currency not found.',
     'invalid_currency' => 'Invalid currency.',
     'multi_currency_addon_required' => 'Multi-currency addon is required.',
+    'cannot_impersonate_admin' => 'You cannot impersonate an administrator.',
+    'cannot_impersonate_blocked_user' => 'You cannot impersonate a blocked user.',
 ];

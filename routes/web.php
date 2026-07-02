@@ -174,10 +174,10 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
-// Redirect legacy localized blog URLs (e.g. /es/blog/slug) to new structure
-Route::get('/{locale}/blog/{slug}', function ($locale, $slug) {
-    return redirect()->to("/blog/{$slug}?lang={$locale}", 301);
-})->where('locale', '[a-zA-Z]{2}');
+// Shared project board (public guest view)
+Route::get('/shared-board/{token}/{date}', [\App\Http\Controllers\PublicProjectBoardController::class, 'show'])
+    ->name('shared-board.show')
+    ->middleware('signed');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'onboarding'])->name('dashboard');
@@ -203,7 +203,24 @@ Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')-
     Route::post('/projects/{project}/board/notes', [ClientProjectBoardController::class, 'storeNote'])->name('board.store-note');
     Route::put('/projects/{project}/board/notes/{note}', [ClientProjectBoardController::class, 'updateNote'])->name('board.update-note');
     Route::delete('/projects/{project}/board/notes/{note}', [ClientProjectBoardController::class, 'destroyNote'])->name('board.destroy-note');
+
+    Route::post('/projects/{project}/board/tasks', [ClientProjectBoardController::class, 'storeTask'])->name('board.store-task');
+    Route::put('/projects/{project}/board/tasks/{task}', [ClientProjectBoardController::class, 'updateTask'])->name('board.update-task');
+    Route::delete('/projects/{project}/board/tasks/{task}', [ClientProjectBoardController::class, 'destroyTask'])->name('board.destroy-task');
+
+    Route::post('/projects/{project}/board/todos', [ClientProjectBoardController::class, 'storeTodo'])->name('board.store-todo');
+    Route::put('/projects/{project}/board/todos/{todo}', [ClientProjectBoardController::class, 'updateTodo'])->name('board.update-todo');
+    Route::delete('/projects/{project}/board/todos/{todo}', [ClientProjectBoardController::class, 'destroyTodo'])->name('board.destroy-todo');
+
+    Route::post('/projects/{project}/board/files', [ClientProjectBoardController::class, 'storeFile'])->name('board.store-file');
+    Route::delete('/projects/{project}/board/files/{file}', [ClientProjectBoardController::class, 'destroyFile'])->name('board.destroy-file');
+
+    Route::post('/projects/{project}/board/reports', [ClientProjectBoardController::class, 'storeReport'])->name('board.store-report');
+    Route::put('/projects/{project}/board/reports/{report}', [ClientProjectBoardController::class, 'updateReport'])->name('board.update-report');
+    Route::delete('/projects/{project}/board/reports/{report}', [ClientProjectBoardController::class, 'destroyReport'])->name('board.destroy-report');
+
     Route::post('/projects/{project}/board/move', [ClientProjectBoardController::class, 'moveCard'])->name('board.move-card');
+    Route::post('/projects/{project}/board/bring-undone', [ClientProjectBoardController::class, 'bringUndone'])->name('board.bring-undone');
 });
 
 Route::middleware('auth')->group(function () {

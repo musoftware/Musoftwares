@@ -18,7 +18,7 @@ return new class extends Migration
 
         Schema::table('leads', function (Blueprint $table) {
             if (! Schema::hasColumn('leads', 'assigned_team_member_id')) {
-                $table->foreignId('assigned_team_member_id')->nullable()->constrained('crm_team_members')->nullOnDelete();
+                $table->foreignId('assigned_team_member_id')->nullable()->constrained('team_members')->nullOnDelete();
             }
         });
     }

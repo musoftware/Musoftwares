@@ -107,6 +107,10 @@ class AdminUserService extends BaseService
             $user->account_status = $request->input('account_status') ?: 'active';
         }
 
+        if ($request->has('block_reason')) {
+            $user->block_reason = $request->input('block_reason') ?: null;
+        }
+
         // KYC management from admin
         $kycVerified = $request->boolean('kyc_verified');
         if ($kycVerified && !$user->kyc_verified) {

@@ -571,6 +571,7 @@ class InvoiceController extends Controller
             return redirect()->back()->with('error', __('admin.notification_failed').': '.$e->getMessage());
         }
 
+        $fcmError = null;
         try {
             $tokens = $client->deviceTokens()->pluck('token')->filter()->values()->all();
             if (! empty($tokens)) {
@@ -591,6 +592,11 @@ class InvoiceController extends Controller
             }
         } catch (\Throwable $e) {
             \Log::warning('FcmHelper push failed for invoice #'.$invoice->id.': '.$e->getMessage());
+            $fcmError = $e->getMessage();
+        }
+
+        if ($fcmError !== null) {
+            return redirect()->back()->with('error', __('admin.notification_failed').': '.$fcmError);
         }
 
         return redirect()->back()->with('success', __('admin.notification_sent'));

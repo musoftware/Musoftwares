@@ -19,6 +19,15 @@ class Project extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected static function booted()
+    {
+        static::creating(function ($project) {
+            if (empty($project->share_token)) {
+                $project->share_token = \Illuminate\Support\Str::random(32);
+            }
+        });
+    }
+
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -56,6 +65,11 @@ class Project extends Model
     public function tasks()
     {
         return $this->hasMany(Task::class, 'project_id');
+    }
+
+    public function todos()
+    {
+        return $this->hasMany(Todo::class, 'project_id');
     }
 
     public function reports()

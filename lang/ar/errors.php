@@ -29,4 +29,6 @@ return [
     'escrow_currency_not_found' => 'عملة الضمان غير موجودة.',
     'invalid_currency' => 'عملة غير صالحة.',
     'multi_currency_addon_required' => 'إضافة تعدد العملات مطلوبة.',
+    'cannot_impersonate_admin' => 'لا يمكنك انتحال شخصية مسؤول.',
+    'cannot_impersonate_blocked_user' => 'لا يمكنك انتحال شخصية مستخدم محظور.',
 ];

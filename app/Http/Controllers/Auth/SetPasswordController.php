@@ -60,20 +60,20 @@ class SetPasswordController extends Controller
 
         if (! is_array($payload) || empty($payload['user_id']) || empty($payload['expires_at'])) {
             throw ValidationException::withMessages([
-                'password' => __('This link has expired or already been used. Please ask an administrator for a new one.'),
+                'password' => __('auth.set_password.link_expired_or_used'),
             ]);
         }
 
         if (now()->greaterThan($payload['expires_at'])) {
             throw ValidationException::withMessages([
-                'password' => __('This link has expired. Please ask an administrator for a new one.'),
+                'password' => __('auth.set_password.link_expired'),
             ]);
         }
 
         $user = User::find($payload['user_id']);
         if (! $user || (string) $user->id !== (string) $request->query('uid')) {
             throw ValidationException::withMessages([
-                'password' => __('This link is no longer valid.'),
+                'password' => __('auth.set_password.link_no_longer_valid'),
             ]);
         }
 
@@ -87,7 +87,7 @@ class SetPasswordController extends Controller
             $user->save();
         });
 
-        return redirect()->route('login')->with('status', __('Your password has been set. You can now log in.'));
+        return redirect()->route('login')->with('status', __('auth.set_password.password_set'));
     }
 
     /**
@@ -116,11 +116,11 @@ class SetPasswordController extends Controller
     private function assertValidRequest(Request $request): void
     {
         if (! $request->hasValidSignature()) {
-            abort(403, __('This link is invalid or has expired.'));
+            abort(403, __('auth.set_password.link_invalid'));
         }
 
         if (! $request->filled('token') || ! $request->filled('uid')) {
-            abort(403, __('This link is invalid or has expired.'));
+            abort(403, __('auth.set_password.link_invalid'));
         }
     }
 
@@ -128,7 +128,7 @@ class SetPasswordController extends Controller
     {
         $user = User::find($request->query('uid'));
         if (! $user) {
-            abort(404, __('User not found.'));
+            abort(404, __('auth.set_password.user_not_found'));
         }
 
         return $user;

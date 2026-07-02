@@ -14,7 +14,7 @@ return new class extends Migration
         if (!Schema::hasTable('freelance_reviews')) {
             Schema::create('freelance_reviews', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('contract_id')->constrained('freelance_contracts')->cascadeOnDelete();
+                $table->foreignId('contract_id')->constrained('contracts')->cascadeOnDelete();
                 $table->foreignId('reviewer_id')->constrained('users')->cascadeOnDelete();
                 $table->foreignId('reviewee_id')->constrained('users')->cascadeOnDelete();
                 $table->tinyInteger('rating')->unsigned(); // 1 to 5

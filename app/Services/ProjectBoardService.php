@@ -4,10 +4,12 @@ namespace App\Services;
 
 use App\Models\Project;
 use App\Models\ProjectBoardItem;
+use App\Models\Todo;
+use App\Models\ProjectFile;
 use Carbon\Carbon;
 
 /**
- * Builds per-day board cards (notes + tasks + reports merged with their saved placements).
+ * Builds per-day board cards (notes + tasks + reports + todos + files merged with their saved placements).
  * Shared by the client calendar (applies future-task gating) and the admin project board
  * (sees everything, no gating).
  */
@@ -41,16 +43,29 @@ class ProjectBoardService
         $reportsQuery = $applyFutureGating ? $project->publishedReports() : $project->reports();
         $reports = $reportsQuery->whereDate('published_at', $date->toDateString())->get();
 
-        return $this->buildCards($project, $date, $notes, $tasks, $reports);
+        $todos = $project->todos()
+            ->where(function($q) use ($date) {
+                $q->whereDate('inDate', $date->toDateString())
+                  ->orWhereDate('created_at', $date->toDateString());
+            })
+            ->get();
+
+        $files = $project->files()
+            ->whereDate('created_at', $date->toDateString())
+            ->get();
+
+        return $this->buildCards($project, $date, $notes, $tasks, $reports, $todos, $files);
     }
 
     /**
      * @param  iterable  $notes
      * @param  iterable  $tasks
      * @param  iterable  $reports
+     * @param  iterable  $todos
+     * @param  iterable  $files
      * @return array<int, array<string, mixed>>
      */
-    private function buildCards(Project $project, Carbon $date, $notes, $tasks, $reports): array
+    private function buildCards(Project $project, Carbon $date, $notes, $tasks, $reports, $todos, $files): array
     {
         $placements = $project->boardItems()
             ->whereDate('for_date', $date->toDateString())
@@ -85,6 +100,7 @@ class ProjectBoardService
 
         foreach ($tasks as $task) {
             $addCard('task', $task->id, $task->task_name, [
+                'description' => $task->task_description,
                 'priority' => $task->priority,
                 'done' => method_exists($task, 'completed') ? $task->completed() : false,
             ]);
@@ -92,7 +108,32 @@ class ProjectBoardService
 
         foreach ($reports as $report) {
             $addCard('report', $report->id, $report->title, [
+                'description' => $report->body,
+                'body' => $report->body,
                 'published_at' => optional($report->published_at)->toIso8601String(),
+            ]);
+        }
+
+        foreach ($todos as $todo) {
+            $checklist = $todo->checklistItems()->get()->map(fn($item) => [
+                'id' => $item->id,
+                'title' => $item->title,
+                'is_completed' => (bool)$item->is_completed,
+            ])->toArray();
+
+            $addCard('todo', $todo->id, $todo->title ?: __('general.todo'), [
+                'description' => $todo->description,
+                'completed' => (bool)$todo->completed,
+                'checklist' => $checklist,
+            ]);
+        }
+
+        foreach ($files as $file) {
+            $addCard('file', $file->id, $file->original_name ?: __('general.file'), [
+                'size' => $file->size,
+                'human_size' => $file->humanSize(),
+                'mime' => $file->mime,
+                'download_url' => route('client.projects.files.download', [$project->id, $file->id]),
             ]);
         }
 

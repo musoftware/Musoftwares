@@ -311,4 +311,5 @@ return [
     'payout_deleted' => 'تم حذف عملية الدفع بنجاح.',
     'payout_marked_paid' => 'تم تحديد عملية الدفع كمدفوعة.',
     'payout_updated' => 'تم تحديث عملية الدفع بنجاح.',
+    'broadcast_confirmation_required' => 'يرجى التأكيد قبل إرسال هذا الإشعار.',
 ];

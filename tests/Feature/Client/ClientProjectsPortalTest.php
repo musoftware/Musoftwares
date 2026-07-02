@@ -282,6 +282,8 @@ class ClientProjectsPortalTest extends TestCase
         $response = $this->actingAs($admin)
             ->post(route('admin.projects.reports.store', $project), [
                 'title' => 'Weekly update',
+                'type' => 'progress',
+                'priority' => 'normal',
                 'body' => '## Done',
                 'published_at' => now()->addDay()->toDateTimeString(),
             ]);

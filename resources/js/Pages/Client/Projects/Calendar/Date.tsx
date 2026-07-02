@@ -1,8 +1,8 @@
-import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     ArrowLeft, ChevronLeft, ChevronRight, CalendarDays, ListTodo, FileText,
-    Paperclip, Wallet, PiggyBank, Clock, LayoutDashboard, Sparkles,
+    Paperclip, Clock, LayoutDashboard, Sparkles, Calendar as LucideCalendar
 } from 'lucide-react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import ProjectBoard, { type BoardCard } from '../Components/ProjectBoard';
@@ -11,6 +11,9 @@ import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import axios from 'axios';
+import { toast } from 'sonner';
+import CalendarSelector from '@/Components/CalendarSelector';
 
 interface Props {
     project: { id: number; name: string; hide_future_tasks?: boolean; status?: string; archived?: boolean; percentage?: number };
@@ -19,6 +22,7 @@ interface Props {
     cards: BoardCard[];
     hideFuture: boolean;
     isAdmin?: boolean;
+    activeDates: string[];
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -27,13 +31,42 @@ const STATUS_STYLES: Record<string, string> = {
     closed: 'bg-slate-200 text-slate-700 ring-slate-300',
 };
 
-export default function ProjectCalendarDate({ project, date, lanes, cards, hideFuture, isAdmin = false }: Props) {
+export default function ProjectCalendarDate({ project, date, lanes, cards, hideFuture, isAdmin = false, activeDates = [] }: Props) {
     const day = parseISO(date);
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const prev = format(new Date(day.getTime() - 86400000), 'yyyy-MM-dd');
     const next = format(new Date(day.getTime() + 86400000), 'yyyy-MM-dd');
     const isToday = date === todayStr;
     const dateInputKey = `board-date-${project.id}`;
+
+    const [calendarOpen, setCalendarOpen] = useState(false);
+    const [bringingUndone, setBringingUndone] = useState(false);
+
+    const handleBringUndone = () => {
+        setBringingUndone(true);
+        axios.post(route('client.projects.board.bring-undone', { project: project.id }), {
+            for_date: date,
+        }).then(({ data }) => {
+            if (data.ok) {
+                if (data.new_cards.length === 0) {
+                    toast.info(__('general.no_undone_work_found') || 'No incomplete work was found in past days.');
+                } else {
+                    toast.success(__('general.undone_cards_brought') || `Brought ${data.new_cards.length} incomplete tasks forward!`);
+                    const customEvent = new CustomEvent('board-undone-brought', { detail: { cards: data.new_cards } });
+                    window.dispatchEvent(customEvent);
+                }
+            }
+        }).catch(() => {
+            toast.error(__('general.error') || 'Failed to bring undone work.');
+        }).finally(() => {
+            setBringingUndone(false);
+        });
+    };
+
+    const goToDate = (target: string) => {
+        if (!target || target === date) return;
+        router.visit(route('client.projects.calendar.date', { project: project.id, date: target }), { preserveScroll: true });
+    };
 
     const breadcrumbs = [
         { label: __('general.dashboard'), href: route('dashboard') },
@@ -92,44 +125,54 @@ export default function ProjectCalendarDate({ project, date, lanes, cards, hideF
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2 self-start lg:self-center">
-                            {isAdmin && (
-                                <Link
-                                    href={route('client.projects.calendar.date', { project: project.id, date: prev })}
-                                    preserveScroll
-                                    aria-label={__('general.previous_day')}
-                                    className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
-                                >
-                                    <ChevronLeft className="h-4 w-4" />
-                                </Link>
-                            )}
+                            {/* Past chevrons navigation is allowed for clients too */}
+                            <Link
+                                href={route('client.projects.calendar.date', { project: project.id, date: prev })}
+                                preserveScroll
+                                aria-label={__('general.previous_day')}
+                                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </Link>
 
-                            <div
+                            <button
+                                type="button"
+                                onClick={() => setCalendarOpen(true)}
                                 className={cn(
-                                    'inline-flex h-10 items-center gap-2 rounded-xl border px-3 text-sm font-medium',
+                                    'inline-flex h-10 items-center gap-2 rounded-xl border px-3 text-xs font-semibold shadow-sm transition-colors',
                                     isToday
-                                        ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
-                                        : 'border-slate-200 bg-white text-slate-700',
+                                        ? 'border-slate-900 bg-slate-900 text-white hover:bg-slate-800'
+                                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
                                 )}
                             >
-                                <CalendarDays className="h-4 w-4" />
+                                <LucideCalendar className="h-4 w-4 text-indigo-500" />
                                 <span>{format(day, 'EEE, MMM d')}</span>
                                 {isToday && (
                                     <span className="rounded-full bg-white/20 px-1.5 py-0 text-[10px] font-bold uppercase tracking-wider">{__('general.today')}</span>
                                 )}
-                            </div>
+                            </button>
 
-                            {isAdmin && (
-                                <Link
-                                    href={route('client.projects.calendar.date', { project: project.id, date: next })}
-                                    preserveScroll
-                                    aria-label={__('general.next_day')}
-                                    className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
-                                >
-                                    <ChevronRight className="h-4 w-4" />
-                                </Link>
-                            )}
+                            <Link
+                                href={route('client.projects.calendar.date', { project: project.id, date: next })}
+                                preserveScroll
+                                aria-label={__('general.next_day')}
+                                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </Link>
 
-                            {!isAdmin && !isToday && (
+                            {/* Bring Undone Yet action */}
+                            <button
+                                type="button"
+                                onClick={handleBringUndone}
+                                disabled={bringingUndone}
+                                className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-colors disabled:opacity-50"
+                            >
+                                <Sparkles className={cn("h-4 w-4 text-amber-500", bringingUndone && "animate-spin")} />
+                                <span>{bringingUndone ? 'Bringing...' : __('general.bring_undone') || 'Bring Undone Yet'}</span>
+                            </button>
+
+                            {!isToday && (
                                 <Link
                                     href={route('client.projects.calendar.date', { project: project.id, date: todayStr })}
                                     preserveScroll
@@ -213,6 +256,14 @@ export default function ProjectCalendarDate({ project, date, lanes, cards, hideF
 
                 <p className="text-center text-xs text-slate-400">{__('general.board_persistence_hint')}</p>
             </div>
+
+            <CalendarSelector
+                open={calendarOpen}
+                onOpenChange={setCalendarOpen}
+                activeDates={activeDates}
+                selectedDate={date}
+                onSelectDate={goToDate}
+            />
         </AuthenticatedLayout>
     );
 }

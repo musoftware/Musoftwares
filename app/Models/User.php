@@ -547,7 +547,7 @@ class User extends Authenticatable
      */
     public function routeNotificationForSms($notification)
     {
-        return $this->mobile_1 ?: $this->mobile_2 ?: $this->phone ?: null;
+        return $this->mobile_1 ?: $this->mobile_2 ?: null;
     }
 
     /**

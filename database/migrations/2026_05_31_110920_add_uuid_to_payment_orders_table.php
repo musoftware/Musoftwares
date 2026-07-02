@@ -11,18 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('payment_orders', function (Blueprint $table) {
-            $table->uuid('uuid')->nullable()->after('id');
-        });
+        if (!Schema::hasColumn('payment_orders', 'uuid')) {
+            Schema::table('payment_orders', function (Blueprint $table) {
+                $table->uuid('uuid')->nullable()->after('id');
+            });
 
-        foreach (\App\Models\PaymentOrder::all() as $order) {
-            $order->uuid = (string) \Illuminate\Support\Str::uuid();
-            $order->save();
+            foreach (\App\Models\PaymentOrder::all() as $order) {
+                $order->uuid = (string) \Illuminate\Support\Str::uuid();
+                $order->save();
+            }
+
+            Schema::table('payment_orders', function (Blueprint $table) {
+                $table->unique('uuid');
+            });
         }
-
-        Schema::table('payment_orders', function (Blueprint $table) {
-            $table->unique('uuid');
-        });
     }
 
     /**

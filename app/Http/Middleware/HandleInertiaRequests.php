@@ -118,11 +118,11 @@ class HandleInertiaRequests extends Middleware
                 }
                 return null;
             },
-            'tenant' => function () use ($user) {
+            'tenant' => function () {
                 return null;
             },
             'settings' => [
-                'base_currency' => function () use ($user) {
+                'base_currency' => function () {
                     if (class_exists(\App\Models\AdminSettings::class)) {
                         return \App\Models\AdminSettings::business_currency_name();
                     }

@@ -24,6 +24,7 @@ class Todo extends Model
         'title',
         'description',
         'user_id',
+        'project_id',
         'task_id',
         'parent_id',
         'completed',
@@ -81,6 +82,11 @@ class Todo extends Model
     public function task()
     {
         return $this->belongsTo(Task::class);
+    }
+
+    public function checklistItems()
+    {
+        return $this->hasMany(TodoChecklistItem::class, 'todo_id');
     }
 
     public function pause()

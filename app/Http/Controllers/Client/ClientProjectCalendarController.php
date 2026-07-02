@@ -35,16 +35,13 @@ class ClientProjectCalendarController extends Controller
         $dateCarbon = $this->parseDate($date) ?? Carbon::today();
         $isAdmin = $request->user()?->isAdmin() === true;
 
-        // Clients are locked to today. If they manipulate the URL to a past or future
-        // date, silently redirect them back to today. Admins may browse any date.
-        if (! $isAdmin && ! $dateCarbon->isSameDay(Carbon::today())) {
-            return redirect()->route('client.projects.calendar.date', [
-                'project' => $project->id,
-                'date' => Carbon::today()->toDateString(),
-            ]);
-        }
-
         $cards = $this->boardService->cardsForDate($project, $dateCarbon, applyFutureGating: true);
+
+        $activeDates = \App\Models\ProjectBoardItem::where('project_id', $project->id)
+            ->distinct()
+            ->pluck('for_date')
+            ->map(fn($d) => is_string($d) ? $d : $d->toDateString())
+            ->toArray();
 
         return Inertia::render('Client/Projects/Calendar/Date', [
             'project' => ['id' => $project->id, 'name' => $project->project_name, 'hide_future_tasks' => (bool) $project->hide_future_tasks],
@@ -53,6 +50,7 @@ class ClientProjectCalendarController extends Controller
             'cards' => fn () => $cards,
             'hideFuture' => $this->shouldHideFuture($project, $dateCarbon),
             'isAdmin' => $isAdmin,
+            'activeDates' => $activeDates,
         ]);
     }
 

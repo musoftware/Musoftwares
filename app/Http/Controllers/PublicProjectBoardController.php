@@ -29,6 +29,12 @@ class PublicProjectBoardController extends Controller
         $project->loadCount(['tasks', 'reports', 'files']);
         $currency = $project->currencyRow();
 
+        $activeDates = \App\Models\ProjectBoardItem::where('project_id', $project->id)
+            ->distinct()
+            ->pluck('for_date')
+            ->map(fn($d) => is_string($d) ? $d : $d->toDateString())
+            ->toArray();
+
         return Inertia::render('Public/SharedBoard', [
             'project' => [
                 'id' => $project->id,
@@ -48,6 +54,7 @@ class PublicProjectBoardController extends Controller
             'date' => $dateCarbon->toDateString(),
             'lanes' => $this->boardService->lanes(),
             'cards' => $cards,
+            'activeDates' => $activeDates,
         ]);
     }
 }

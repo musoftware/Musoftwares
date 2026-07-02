@@ -311,4 +311,5 @@ return [
     'payout_deleted' => 'Payout deleted successfully.',
     'payout_marked_paid' => 'Payout marked as paid.',
     'payout_updated' => 'Payout updated successfully.',
+    'broadcast_confirmation_required' => 'Please confirm before sending this broadcast.',
 ];
