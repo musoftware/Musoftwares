@@ -8,6 +8,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property string $short_code
+ * @property string $destination_url
+ * @property string|null $label
+ * @property int|null $created_by_user_id
+ * @property bool $is_active
+ * @property int $clicks
+ * @property \Illuminate\Support\Carbon|null $expires_at
+ * @property string|null $source_type
+ * @property int|null $source_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read User|null $creator
+ */
 class ShortlinkLink extends Model
 {
     use SoftDeletes;

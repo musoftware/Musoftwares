@@ -81,6 +81,7 @@ export default function AdminProjectBoard({ project, date, lanes, cards, activeD
                     status: project.status ?? undefined,
                     archived: project.archived,
                     share_url: project.share_url ?? undefined,
+                    short_url: project.short_url ?? undefined,
                     client_name: project.client_name ?? undefined,
                 }}
                 activeFilter={filter as any}

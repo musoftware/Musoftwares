@@ -283,6 +283,8 @@ class ProjectController extends Controller
             'date' => $date->toDateString(),
         ]);
 
+        $shortUrl = $this->shortUrlForBoardShare($project, $shareUrl, $request->user()?->id);
+
         $activeDates = \App\Models\ProjectBoardItem::where('project_id', $project->id)
             ->distinct()
             ->pluck('for_date')
@@ -297,6 +299,7 @@ class ProjectController extends Controller
                 'status' => $project->status,
                 'share_token' => $project->share_token,
                 'share_url' => $shareUrl,
+                'short_url' => $shortUrl,
                 'archived' => (bool) $project->archived,
                 'budget' => (string) ($project->budget ?? 0),
                 'project_balance' => (string) ($project->project_balance ?? 0),
@@ -337,6 +340,37 @@ class ProjectController extends Controller
         }
 
         return Carbon::today();
+    }
+
+    /**
+     * Build (and cache) a short link for the shared-board signed URL.
+     *
+     * Dedupes on the destination URL so re-rendering the same date reuses the
+     * existing short link rather than creating duplicates on every board view.
+     * Returns null (gracefully) if the Shortlink module is disabled or fails,
+     * so the board keeps working without the short URL.
+     */
+    protected function shortUrlForBoardShare(Project $project, string $shareUrl, ?int $userId): ?string
+    {
+        $serviceClass = \Modules\Shortlink\Services\ShortlinkService::class;
+
+        if (!class_exists($serviceClass)) {
+            return null;
+        }
+
+        try {
+            $service = app($serviceClass);
+            $link = $service->findOrCreateForDestination($shareUrl, [
+                'label' => 'Project board: ' . ($project->project_name ?? 'Project'),
+                'created_by_user_id' => $userId,
+            ], $project);
+
+            return $service->shortUrl($link);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return null;
+        }
     }
 
     public function searchClients(Request $request): JsonResponse

@@ -46,6 +46,7 @@ interface BoardTopNavProps {
         status?: string;
         archived?: boolean;
         share_url?: string;
+        short_url?: string;
         client_name?: string;
     };
     activeFilter: BoardFilter;
@@ -92,10 +93,11 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
     const [calendarOpen, setCalendarOpen] = useState(false);
     const [bringingUndone, setBringingUndone] = useState(false);
     const shareUrl = project.share_url || '';
+    const shortUrl = project.short_url || '';
 
-    const handleCopyLink = () => {
-        if (!shareUrl) return;
-        navigator.clipboard.writeText(shareUrl);
+    const handleCopyLink = (url: string) => {
+        if (!url) return;
+        navigator.clipboard.writeText(url);
         toast.success(__('general.share_link_copied') || 'Link copied to clipboard!');
     };
 
@@ -346,20 +348,52 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                                 <span className="font-semibold text-slate-800">{project.client_name}</span>
                             </div>
                         )}
-                        <div className="relative">
-                            <input
-                                type="text"
-                                readOnly
-                                value={shareUrl}
-                                className="w-full h-10 rounded-lg border border-slate-200 bg-slate-50 px-3 pr-24 text-xs font-mono text-slate-600 focus:outline-none"
-                            />
-                            <button
-                                type="button"
-                                onClick={handleCopyLink}
-                                className="absolute right-1.5 top-1.5 inline-flex h-7 items-center justify-center rounded-md bg-slate-900 px-3 text-[11px] font-semibold text-white hover:bg-slate-800"
-                            >
-                                {__('general.copy') || 'Copy'}
-                            </button>
+                        {shortUrl ? (
+                            <div className="space-y-1.5">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                                        {__('shortlink.short_link') || 'Short link'}
+                                    </span>
+                                    <span className="text-[10px] font-medium text-emerald-600">
+                                        {__('shortlink.recommended_for_sharing') || 'Recommended for sharing'}
+                                    </span>
+                                </div>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={shortUrl}
+                                        className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 pr-24 text-xs font-mono text-slate-900 focus:outline-none"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => handleCopyLink(shortUrl)}
+                                        className="absolute right-1.5 top-1.5 inline-flex h-7 items-center justify-center rounded-md bg-slate-900 px-3 text-[11px] font-semibold text-white hover:bg-slate-800"
+                                    >
+                                        {__('general.copy') || 'Copy'}
+                                    </button>
+                                </div>
+                            </div>
+                        ) : null}
+                        <div className="space-y-1.5">
+                            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                                {__('shortlink.destination_url') || 'Full link'}
+                            </span>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    readOnly
+                                    value={shareUrl}
+                                    className="w-full h-10 rounded-lg border border-slate-200 bg-slate-50 px-3 pr-24 text-xs font-mono text-slate-500 focus:outline-none"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => handleCopyLink(shareUrl)}
+                                    className="absolute right-1.5 top-1.5 inline-flex h-7 items-center justify-center rounded-md bg-slate-200 px-3 text-[11px] font-semibold text-slate-700 hover:bg-slate-300"
+                                >
+                                    {__('general.copy') || 'Copy'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </DialogContent>

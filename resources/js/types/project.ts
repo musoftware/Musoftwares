@@ -99,6 +99,7 @@ export interface BoardProject {
     client_name: string | null;
     owner_name: string | null;
     share_url?: string;
+    short_url?: string;
     share_token?: string;
     currency: {
         id: number;

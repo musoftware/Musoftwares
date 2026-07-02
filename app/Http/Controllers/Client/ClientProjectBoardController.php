@@ -15,6 +15,7 @@ use App\Models\Todo;
 use App\Models\ProjectFile;
 use App\Models\ProjectReport;
 use App\Models\TodoChecklistItem;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -355,10 +356,31 @@ class ClientProjectBoardController extends Controller
     {
         $this->authorizeProject($project);
         abort_unless($report->project_id === $project->id, 404);
-        
+
         $report->delete();
 
         return response()->json(['ok' => true]);
+    }
+
+    public function exportReportPdf(Request $request, Project $project, ProjectReport $report)
+    {
+        $this->authorizeProject($project);
+        abort_unless($report->project_id === $project->id, 404);
+
+        $report->loadMissing('author', 'project');
+
+        $pdf = Pdf::loadView('client.projects.reports.pdf', [
+            'project' => $project,
+            'report' => $report,
+        ])->setPaper('a4', 'portrait');
+
+        $filename = sprintf(
+            '%s-report-%d.pdf',
+            \Illuminate\Support\Str::slug($project->project_name ?: 'project') ?: 'project',
+            $report->id,
+        );
+
+        return $pdf->download($filename);
     }
 
     // ───────────────── Move Action ─────────────────

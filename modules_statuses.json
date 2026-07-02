@@ -5,5 +5,6 @@
     "SmsPaymentGateway": true,
     "WrittenCoursesEngine": true,
     "PaymentGateway": true,
-    "PasswordSync": true
+    "PasswordSync": true,
+    "Shortlink": true
 }

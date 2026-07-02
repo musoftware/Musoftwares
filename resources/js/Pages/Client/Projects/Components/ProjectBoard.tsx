@@ -984,6 +984,19 @@ export default function ProjectBoard({
                         )}
                     </div>
                     <DialogFooter className="gap-2 sm:gap-0 px-6 py-3 border-t border-slate-100 bg-slate-50/60 shrink-0">
+                        <a
+                            href={viewingReport ? route('client.projects.board.export-report-pdf', {
+                                project: projectId,
+                                report: viewingReport.id,
+                            }) : '#'}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-disabled={!viewingReport}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                        >
+                            <Download className="h-3.5 w-3.5" />
+                            {__('general.export_as_pdf') || 'Export as PDF'}
+                        </a>
                         <button
                             type="button"
                             onClick={() => setViewingReport(null)}

@@ -42,6 +42,11 @@
             <directory>Modules/Marketplace/Tests/Feature</directory>
         </testsuite>
 
+        <!-- ── Shortlink Module ── -->
+        <testsuite name="Shortlink">
+            <directory>Modules/Shortlink/Tests/Feature</directory>
+        </testsuite>
+
         <!-- ── Booking Module ── -->
         <testsuite name="Booking">
             <directory>Modules/Booking/tests/Feature</directory>
