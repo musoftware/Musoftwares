@@ -1074,15 +1074,17 @@ export default function Show({ invoice }: { invoice: any }) {
                             <div className="hidden md:block w-px h-8 bg-gray-200 mx-1"></div>
                         )}
 
-                        {invoice.user?.id && invoice.user.projects && invoice.user.projects.length > 0 && (
-                            <Button 
+                        {invoice.status !== 'cancelled' && invoice.user?.id && (
+                            <Button
                                 variant="outline"
                                 onClick={() => {
                                     setTransferProjectId(invoice.project?.id || null);
                                     setTransferModal(true);
                                 }}
                             >
-                                {__('general.transfer')}</Button>
+                                <Folder className="w-4 h-4 me-2" />
+                                {invoice.project ? __('general.transfer') : __('admin.assign_to_project')}
+                            </Button>
                         )}
 
                         {invoice.status !== 'cancelled' && invoice.user?.id && (
@@ -1392,32 +1394,49 @@ export default function Show({ invoice }: { invoice: any }) {
             <Dialog open={transferModal} onOpenChange={setTransferModal}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{__('general.transfer_to_project')}</DialogTitle>
+                        <DialogTitle>{invoice.project ? __('general.transfer_to_project') : __('admin.assign_to_project')}</DialogTitle>
                         <DialogDescription>{__('general.select_the_project_to_transfer_this_invo')}</DialogDescription>
                     </DialogHeader>
-                    <div className="py-4">
-                        <PremiumCombobox
-                            value={transferProjectId || ''}
-                            onChange={(val) => setTransferProjectId(val)}
-                            options={invoice.user?.projects?.map((p: any) => ({
-                                value: p.id,
-                                label: p.project_name
-                            })) || []}
-                            placeholder={__('general.select_project')}
-                        />
+                    <div className="py-4 space-y-3">
+                        {invoice.user?.projects?.length ? (
+                            <PremiumCombobox
+                                value={transferProjectId || ''}
+                                onChange={(val) => setTransferProjectId(val)}
+                                options={invoice.user.projects.map((p: any) => ({
+                                    value: p.id,
+                                    label: p.project_name
+                                }))}
+                                placeholder={__('general.select_project')}
+                            />
+                        ) : (
+                            <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-center">
+                                <p className="text-sm font-medium text-slate-700">{__('general.no_projects_yet')}</p>
+                                <p className="mt-1 text-xs text-slate-500">{__('general.no_projects_have_been_linked_to_this_client')}</p>
+                                <Button asChild variant="outline" className="mt-3">
+                                    <Link href={route('admin.projects.create', { user_id: invoice.user.id })}>
+                                        <Plus className="w-4 h-4 me-2" />
+                                        {__('general.create_new_project')}
+                                    </Link>
+                                </Button>
+                            </div>
+                        )}
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setTransferModal(false)}>{__('general.cancel') || 'Cancel'}</Button>
-                        <Button onClick={() => {
-                            router.post(route('admin.invoices.bulk-action'), { 
-                                action: 'change_project', 
-                                invoices: [invoice.id], 
-                                project_id: transferProjectId 
-                            }, {
-                                onSuccess: () => setTransferModal(false),
-                                preserveScroll: true
-                            });
-                        }} className="bg-slate-900 hover:bg-slate-900 text-white">{__('general.transfer')}</Button>
+                        <Button
+                            disabled={!invoice.user?.projects?.length}
+                            onClick={() => {
+                                router.post(route('admin.invoices.assign-project', { invoice: String(invoice.id) }), {
+                                    project_id: transferProjectId || null,
+                                }, {
+                                    onSuccess: () => setTransferModal(false),
+                                    preserveScroll: true,
+                                });
+                            }}
+                            className="bg-slate-900 hover:bg-slate-900 text-white"
+                        >
+                            {__('general.transfer')}
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

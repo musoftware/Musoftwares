@@ -1,76 +1,16 @@
-import React, { useState } from 'react';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import React from 'react';
+import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Switch } from '@/Components/ui/switch';
-import { Trash2, Edit, Plus, User, Clock, Calendar, ArrowLeft, Eye, Power } from 'lucide-react';
+import { Trash2, Edit, Plus, User, Clock, Calendar, ArrowLeft, Eye } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger } from
-"@/Components/ui/dialog";
-import { Input } from "@/Components/ui/input";
-import { Label } from "@/Components/ui/label";
 import { __ } from '@/lib/i18n';
 
-export default function Index({ invoices, currencies, users }) {
-  const { errors } = usePage().props;
-  const currenciesList = Array.isArray(currencies) ? currencies : currencies ? Object.values(currencies) : [];
-  const usersList = Array.isArray(users) ? users : users ? Object.values(users) : [];
-
-  // Dialog State
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-
-  const defaultCurrencyId = currenciesList[0]?.id || '';
-
-  const [newInvoice, setNewInvoice] = useState({
-    user_id: usersList[0]?.id || '',
-    title: 'Monthly invoice',
-    amount: '',
-    currency: defaultCurrencyId,
-    reason: '',
-    start_date: new Date().toISOString().slice(0, 10),
-    recurring: 'month',
-    recurring_times: 1,
-    recurring_times_week: [] as string[],
-    recurring_times_month: [] as string[],
-    recurring_times_year: [] as string[]
-  });
-
-  const handleCreate = (e) => {
-    e.preventDefault();
-    router.post(route('admin.recurring_invoices.store'), {
-      ...newInvoice,
-      user_id: parseInt(newInvoice.user_id as string) || newInvoice.user_id,
-      currency: parseInt(newInvoice.currency as string) || newInvoice.currency
-    }, {
-      onSuccess: () => {
-        setIsCreateOpen(false);
-        setNewInvoice({
-          user_id: usersList[0]?.id || '',
-          title: 'Monthly invoice',
-          amount: '',
-          currency: defaultCurrencyId,
-          reason: '',
-          start_date: new Date().toISOString().slice(0, 10),
-          recurring: 'month',
-          recurring_times: 1,
-          recurring_times_week: [],
-          recurring_times_month: [],
-          recurring_times_year: []
-        });
-      }
-    });
-  };
+export default function Index({ invoices }) {
 
   const handleDelete = (id) => {
     if (confirm('Are you sure you want to delete this Recurring Invoice?')) {
-      // In the routes we registered 'recurring_invoices.delete'
       router.delete(route('admin.recurring_invoices.delete', id));
     }
   };
@@ -93,35 +33,6 @@ export default function Index({ invoices, currencies, users }) {
     return scheduleStr;
   };
 
-  // Week days helper list
-  const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-  // Month days helper list (1-31)
-  const monthDays = Array.from({ length: 31 }, (_, i) => i + 1);
-
-  // Month name helper
-  const monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'];
-
-
-  // Days in month helper for year selection
-  const getYearDaysList = () => {
-    const list: {val: string;label: string;}[] = [];
-    monthNames.forEach((month, mIdx) => {
-      const daysInMonth = new Date(2024, mIdx + 1, 0).getDate(); // Leap year 2024 to support Feb 29
-      for (let d = 1; d <= daysInMonth; d++) {
-        list.push({
-          val: `${d}-${mIdx + 1}`,
-          label: `${d.toString().padStart(2, '0')} - ${month}`
-        });
-      }
-    });
-    return list;
-  };
-
-  const yearDaysList = getYearDaysList();
-
   return (
     <AdminSidebarLayout title={__('general.recurring_invoices')} header="Business Operations">
             <Head title={__('general.admin_recurring_invoices')} />
@@ -138,143 +49,10 @@ export default function Index({ invoices, currencies, users }) {
                     <p className="text-sm text-gray-500 mt-1">{__('general.manage_repeated_automated_salary_schedules_for_users')}</p>
                 </div>
 
-                <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                    <DialogTrigger asChild>
-                        <Button className="bg-black hover:bg-slate-800 text-white h-9">
-                            <Plus className="w-4 h-4 me-2" />{__('general.add_recurring_invoice')}</Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[450px] max-h-[85vh] overflow-y-auto">
-                        <form onSubmit={handleCreate}>
-                            <DialogHeader>
-                                <DialogTitle>{__('general.add_recurring_invoice')}</DialogTitle>
-                                <DialogDescription>{__('general.create_a_repeated_salary_payment_schedule_for_a_team_member')}</DialogDescription>
-                            </DialogHeader>
-                            <div className="space-y-4 py-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="user_id">{__('general.user_user')}</Label>
-                                    <select id="user_id" required className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newInvoice.user_id} onChange={(e) => setNewInvoice({ ...newInvoice, user_id: e.target.value })}>
-                                        <option value="">{__('general.select_user')}</option>
-                                        {usersList.map((u) => <option key={u.id} value={u.id}>{u.name} ({u.email})</option>)}
-                                    </select>
-                                    {errors.user_id && <span className="text-red-600 text-xs block">{errors.user_id}</span>}
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="title">{__('general.title_description')}</Label>
-                                    <Input id="title" required value={newInvoice.title} onChange={(e) => setNewInvoice({ ...newInvoice, title: e.target.value })} placeholder={__('general.e_g_monthly_salary')} />
-                                    {errors.title && <span className="text-red-600 text-xs block">{errors.title}</span>}
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="amount">{__('general.amount')}</Label>
-                                        <Input id="amount" type="number" step="any" required value={newInvoice.amount} onChange={(e) => setNewInvoice({ ...newInvoice, amount: e.target.value })} placeholder="0.00" />
-                                        {errors.amount && <span className="text-red-600 text-xs block">{errors.amount}</span>}
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="currency">{__('general.currency')}</Label>
-                                        <select id="currency" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newInvoice.currency} onChange={(e) => setNewInvoice({ ...newInvoice, currency: e.target.value })}>
-                                            {currenciesList.map((c) => <option key={c.id} value={c.id}>{c.currency} ({c.symbol})</option>)}
-                                        </select>
-                                        {errors.currency && <span className="text-red-600 text-xs block">{errors.currency}</span>}
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="reason">Note / Custom Reason (Optional)</Label>
-                                    <Input id="reason" value={newInvoice.reason} onChange={(e) => setNewInvoice({ ...newInvoice, reason: e.target.value })} placeholder={__('general.e_g_senior_backend_dev_rate')} />
-                                    {errors.reason && <span className="text-red-600 text-xs block">{errors.reason}</span>}
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="start_date">{__('general.start_date')}</Label>
-                                    <Input id="start_date" type="date" required value={newInvoice.start_date} onChange={(e) => setNewInvoice({ ...newInvoice, start_date: e.target.value })} />
-                                    {errors.start_date && <span className="text-red-600 text-xs block">{errors.start_date}</span>}
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="frequency">{__('general.frequency')}</Label>
-                                        <select id="frequency" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newInvoice.recurring} onChange={(e) => setNewInvoice({ ...newInvoice, recurring: e.target.value })}>
-                                            <option value="day">{__('general.daily')}</option>
-                                            <option value="week">{__('general.weekly')}</option>
-                                            <option value="month">{__('general.monthly')}</option>
-                                            <option value="year">{__('general.annually')}</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="interval">Interval (Every N)</Label>
-                                        <select id="interval" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newInvoice.recurring_times} onChange={(e) => setNewInvoice({ ...newInvoice, recurring_times: parseInt(e.target.value) || 1 })}>
-                                            {Array.from({ length: 30 }, (_, i) => i + 1).map((num) =>
-                      <option key={num} value={num}>{num}</option>
-                      )}
-                                        </select>
-                                    </div>
-                                </div>
-
-                                {newInvoice.recurring === 'week' &&
-                <div className="space-y-2">
-                                        <Label htmlFor="week-days">{__('general.specific_week_days')}</Label>
-                                        <select
-                    id="week-days"
-                    multiple
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-24"
-                    value={newInvoice.recurring_times_week}
-                    onChange={(e) => {
-                      const vals = Array.from(e.target.selectedOptions, (option) => option.value);
-                      setNewInvoice({ ...newInvoice, recurring_times_week: vals });
-                    }}>
-                    
-                                            {weekDays.map((wd) => <option key={wd} value={wd}>{wd}</option>)}
-                                        </select>
-                                        <span className="text-xs text-gray-400">{__('general.hold_ctrl_cmd_to_select_multiple_days')}</span>
-                                    </div>
-                }
-
-                                {newInvoice.recurring === 'month' &&
-                <div className="space-y-2">
-                                        <Label htmlFor="month-days">{__('general.specific_month_days')}</Label>
-                                        <select
-                    id="month-days"
-                    multiple
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-32"
-                    value={newInvoice.recurring_times_month}
-                    onChange={(e) => {
-                      const vals = Array.from(e.target.selectedOptions, (option) => option.value);
-                      setNewInvoice({ ...newInvoice, recurring_times_month: vals });
-                    }}>
-                    
-                                            {monthDays.map((d) => <option key={d} value={d.toString()}>{d.toString().padStart(2, '0')}</option>)}
-                                        </select>
-                                        <span className="text-xs text-gray-400">{__('general.hold_ctrl_cmd_to_select_multiple_days')}</span>
-                                    </div>
-                }
-
-                                {newInvoice.recurring === 'year' &&
-                <div className="space-y-2">
-                                        <Label htmlFor="year-days">{__('general.specific_year_dates')}</Label>
-                                        <select
-                    id="year-days"
-                    multiple
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-40"
-                    value={newInvoice.recurring_times_year}
-                    onChange={(e) => {
-                      const vals = Array.from(e.target.selectedOptions, (option) => option.value);
-                      setNewInvoice({ ...newInvoice, recurring_times_year: vals });
-                    }}>
-                    
-                                            {yearDaysList.map((yd) => <option key={yd.val} value={yd.val}>{yd.label}</option>)}
-                                        </select>
-                                        <span className="text-xs text-gray-400">{__('general.hold_ctrl_cmd_to_select_multiple_dates')}</span>
-                                    </div>
-                }
-                            </div>
-                            <DialogFooter>
-                                <Button type="submit" className="bg-black hover:bg-slate-800 text-white w-full">{__('general.create_recurring_invoice')}</Button>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
+                <Link href={route('admin.recurring_invoices.create')}>
+                    <Button className="bg-black hover:bg-slate-800 text-white h-9">
+                        <Plus className="w-4 h-4 me-2" />{__('general.add_recurring_invoice')}</Button>
+                </Link>
             </div>
 
             {/* Data Table */}

@@ -254,6 +254,50 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Assign the invoice to one of the client's projects.
+     * Pass project_id = null to unassign.
+     */
+    public function assignProject(Request $request, Invoice $invoice)
+    {
+        if ($invoice->status === 'cancelled') {
+            return redirect()->back()->with('error', __('admin.cannot_assign_cancelled_invoice'));
+        }
+
+        $validated = $request->validate([
+            'project_id' => 'nullable',
+        ]);
+
+        $projectId = $validated['project_id'] ?? null;
+
+        if ($projectId !== null && $projectId !== '') {
+            if (! is_numeric($projectId)) {
+                return redirect()->back()->with('error', __('admin.invalid_project_id'));
+            }
+            $projectId = (int) $projectId;
+            $exists = $invoice->user
+                ? $invoice->user->projects()->whereKey($projectId)->exists()
+                : false;
+            if (! $exists) {
+                return redirect()->back()->with('error', __('admin.project_not_associated'));
+            }
+        } else {
+            $projectId = null;
+        }
+
+        try {
+            $invoice->transfer_to_project($projectId);
+        } catch (\Exception $e) {
+            \Log::error('Invoice assign project failed: '.$e->getMessage());
+
+            return redirect()->back()->with('error', __('admin.invoice_update_failed'));
+        }
+
+        return redirect()->back()->with('success', $projectId
+            ? __('admin.invoice_assigned_to_project')
+            : __('admin.invoice_unassigned_from_project'));
+    }
+
+    /**
      * Bill invoice from client's balance
      */
     public function markPaid(Request $request, Invoice $invoice)

@@ -152,6 +152,12 @@ class UsersController extends Controller
         $subscriptions = $user->subscriptions()->orderBy('expires_at', 'desc')->get();
         $currencies = Currency::all();
 
+        $recentProjects = $user->projects()
+            ->orderByDesc('updated_at')
+            ->limit(5)
+            ->get(['id', 'project_name', 'date_start', 'date_end', 'archived', 'status', 'updated_at']);
+        $projectsCount = $user->projects()->count();
+
         return Inertia::render('Admin/Users/Show', [
             'client' => $userDetail,
             'loans' => $user->loans,
@@ -159,6 +165,8 @@ class UsersController extends Controller
             'stats' => $stats,
             'modulePlans' => $modulePlans,
             'subscriptions' => $subscriptions,
+            'recentProjects' => $recentProjects,
+            'projectsCount' => $projectsCount,
 
         ]);
     }

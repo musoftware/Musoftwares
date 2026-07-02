@@ -1009,6 +1009,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::post('/invoices/{invoice}/pay-service/store', [App\Http\Controllers\Admin\InvoiceController::class, 'storePayService'])->name('invoices.pay-service.store');
     Route::post('/invoices/{invoice}/share-link', [App\Http\Controllers\Admin\InvoiceController::class, 'shareLink'])->name('invoices.share-link');
     Route::post('/invoices/{invoice}/reschedule', [App\Http\Controllers\Admin\InvoiceController::class, 'reschedule'])->name('invoices.reschedule');
+    Route::post('/invoices/{invoice}/assign-project', [App\Http\Controllers\Admin\InvoiceController::class, 'assignProject'])->name('invoices.assign-project');
 
     // ── Platform Users Transactions ───────────────────────────────
     Route::get('/transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
@@ -1083,6 +1084,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
         // Invoices
         Route::get('invoices', [RecurringInvoiceController::class, 'index'])->name('recurring_invoices.index');
         Route::post('invoices', [RecurringInvoiceController::class, 'store'])->name('recurring_invoices.store');
+        Route::get('invoices/create', [RecurringInvoiceController::class, 'create'])->name('recurring_invoices.create');
         Route::get('invoices/edit/{id}', [RecurringInvoiceController::class, 'edit'])->name('recurring_invoices.edit');
         Route::put('invoices/{id}', [RecurringInvoiceController::class, 'update'])->name('recurring_invoices.update');
         Route::get('invoices/{id}', [RecurringInvoiceController::class, 'view'])->name('recurring_invoices.view');

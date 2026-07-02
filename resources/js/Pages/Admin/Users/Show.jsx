@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { Copy, Mail, MessageCircle, ChevronDown, Key, Wallet, FileText, Briefcase, Trash2, Edit, ShieldCheck, Plus, TrendingUp, TrendingDown, RefreshCcw } from 'lucide-react';
+import { Copy, Mail, MessageCircle, ChevronDown, Key, Wallet, FileText, Briefcase, Trash2, Edit, ShieldCheck, Plus, TrendingUp, TrendingDown, RefreshCcw, FolderKanban, ExternalLink, Archive } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import HiddenAmount from '@/Components/HiddenAmount';
 import {
@@ -27,7 +27,7 @@ import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import UserLoansTab from './UserLoansTab';
 
-export default function Show({ auth, client, loans = [], stats = {}, modulePlans = [], subscriptions = [] }) {
+export default function Show({ auth, client, loans = [], stats = {}, modulePlans = [], subscriptions = [], recentProjects = [], projectsCount = 0 }) {
     const [isLoginAsLoading, setIsLoginAsLoading] = useState(false);
     const [isResetPassOpen, setIsResetPassOpen] = useState(false);
     const [newPassword, setNewPassword] = useState('');
@@ -209,6 +209,15 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                         <Link href={`/admin/users/${client.id}/tasks/add`} className="w-full cursor-pointer flex items-center">
                                             <Briefcase className="me-2 h-4 w-4" />
                                             <span>{__('general.assign_task')}</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/admin/users/${client.id}/projects`} className="w-full cursor-pointer flex items-center">
+                                            <FolderKanban className="me-2 h-4 w-4" />
+                                            <span>{__('general.projects')}</span>
+                                            {projectsCount > 0 && (
+                                                <span className="ms-auto text-[10px] font-bold bg-slate-100 text-slate-700 rounded-full px-2 py-0.5">{projectsCount}</span>
+                                            )}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
@@ -838,6 +847,71 @@ ${newPassword}`}
                         )}
                     </div>
 
+                    {/* Client Projects Quick Access */}
+                    <div id="projects" className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200 scroll-mt-24">
+                        <div className="flex justify-between items-center mb-4 border-b pb-2">
+                            <h2 className="text-lg font-bold font-sora text-slate-900 flex items-center gap-2">
+                                <FolderKanban size={18} className="text-slate-400" />{__('general.projects')}
+                                {projectsCount > 0 && (
+                                    <span className="text-xs font-bold text-slate-500 bg-slate-100 rounded-full px-2 py-0.5">{projectsCount}</span>
+                                )}
+                            </h2>
+                            <div className="flex items-center gap-2">
+                                <Link href={`/admin/projects/create?client_id=${client.id}`} className="bg-slate-900 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-slate-800 transition flex items-center gap-1 font-semibold">
+                                    <Plus size={14} /> {__('general.new_project') || __('general.add') || 'New'}
+                                </Link>
+                                <Link href={`/admin/users/${client.id}/projects`} className="text-xs px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition flex items-center gap-1 font-semibold">
+                                    {__('general.view_all_projects')} <ExternalLink size={12} />
+                                </Link>
+                            </div>
+                        </div>
+                        {recentProjects && recentProjects.length > 0 ? (
+                            <ul className="divide-y divide-slate-100">
+                                {recentProjects.map((project) => {
+                                    const isArchived = !!project.archived;
+                                    const start = project.date_start ? new Date(project.date_start).toLocaleDateString() : null;
+                                    const end = project.date_end ? new Date(project.date_end).toLocaleDateString() : null;
+                                    const dateRange = start && end ? `${start} → ${end}` : start || end || null;
+                                    return (
+                                        <li key={project.id} className="py-3 flex items-center justify-between gap-3 hover:bg-slate-50 rounded-md px-2 -mx-2 transition">
+                                            <Link href={`/admin/projects/${project.id}/board`} className="flex items-center gap-3 min-w-0 flex-1">
+                                                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${isArchived ? 'bg-slate-100 text-slate-500' : 'bg-indigo-50 text-indigo-600'}`}>
+                                                    {isArchived ? <Archive size={16} /> : <FolderKanban size={16} />}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <div className="font-semibold text-slate-900 truncate flex items-center gap-2">
+                                                        <span className="truncate">{project.project_name || `Project #${project.id}`}</span>
+                                                        {isArchived && (
+                                                            <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-200 text-slate-700 rounded-full px-2 py-0.5 shrink-0">{__('general.archived') || 'Archived'}</span>
+                                                        )}
+                                                        {project.status && !isArchived && (
+                                                            <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 rounded-full px-2 py-0.5 shrink-0">{project.status}</span>
+                                                        )}
+                                                    </div>
+                                                    {dateRange && (
+                                                        <div className="text-xs text-slate-500 truncate">{dateRange}</div>
+                                                    )}
+                                                </div>
+                                            </Link>
+                                            <Link href={`/admin/projects/${project.id}/board`} className="text-slate-400 hover:text-slate-900 transition shrink-0" title={__('general.view_project')}>
+                                                <ExternalLink size={16} />
+                                            </Link>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        ) : (
+                            <div className="text-center py-6">
+                                <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-400">
+                                    <FolderKanban size={20} />
+                                </div>
+                                <p className="text-sm text-slate-500 mb-3">{__('general.no_projects_yet') || 'No projects yet for this client.'}</p>
+                                <Link href={`/admin/projects/create?client_id=${client.id}`} className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition font-semibold">
+                                    <Plus size={14} /> {__('general.create_first_project') || 'Create First Project'}
+                                </Link>
+                            </div>
+                        )}
+                    </div>
 
                 </div>
             </div>

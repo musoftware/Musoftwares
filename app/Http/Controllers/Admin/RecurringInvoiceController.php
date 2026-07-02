@@ -71,6 +71,17 @@ class RecurringInvoiceController extends Controller
         return redirect()->route('admin.recurring_invoices.index')->with('success', __('general.recurring_invoice_added_successfully'));
     }
 
+    public function create()
+    {
+        $currencies = Currency::all();
+        $users = User::select('id', 'name', 'email')->orderBy('name')->limit(50)->get();
+
+        return Inertia::render('Admin/Business/RecurringInvoices/Create', [
+            'currencies' => $currencies,
+            'users' => $users,
+        ]);
+    }
+
     public function edit($id)
     {
         $invoice = RecurringInvoice::findOrFail($id);
