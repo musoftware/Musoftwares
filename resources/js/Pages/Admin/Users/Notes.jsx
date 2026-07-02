@@ -162,11 +162,17 @@ export default function Notes({ user, notes, stats }) {
     
     if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        filteredNotes = filteredNotes.filter(n => 
-            (n.decryptedTitle && n.decryptedTitle.toLowerCase().includes(q)) || 
+        filteredNotes = filteredNotes.filter(n =>
+            (n.decryptedTitle && n.decryptedTitle.toLowerCase().includes(q)) ||
             (n.decryptedContent && n.decryptedContent.toLowerCase().includes(q))
         );
     }
+
+    filteredNotes = [...filteredNotes].sort((a, b) => {
+        const pinDiff = Number(!!b.is_pinned) - Number(!!a.is_pinned);
+        if (pinDiff !== 0) return pinDiff;
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
 
     return (
         <AdminSidebarLayout title={`Secure Notes: ${user.name}`} header="Secure Notes">
@@ -243,9 +249,9 @@ export default function Notes({ user, notes, stats }) {
                         </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {filteredNotes.map(note => (
-                            <div key={note.id} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm transition hover:shadow-md">
+                            <div key={note.id} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm transition hover:shadow-md flex flex-col">
                                 <div className="flex justify-between items-start mb-3 gap-4">
                                     <div className="flex flex-col flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1 flex-wrap">

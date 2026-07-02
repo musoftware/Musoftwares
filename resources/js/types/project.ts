@@ -112,7 +112,35 @@ export interface BoardProject {
 
 export type ProjectTab = 'active' | 'archived' | 'all';
 
-export type ProjectSort = 'id' | 'project_name' | 'status' | 'created_at' | 'date_start' | 'date_end' | 'budget' | 'project_balance';
+export type ProjectSort = 'id' | 'project_name' | 'status' | 'created_at' | 'date_start' | 'date_end' | 'budget' | 'project_balance' | 'percentage';
+
+export type ProjectViewMode = 'grid' | 'table';
+
+export interface ProjectOwnerOption {
+    id: number;
+    name: string;
+}
+
+/** Mirrors the `filters` array passed by ProjectController::index(). */
+export interface ProjectFiltersState {
+    search: string | null;
+    client_id: string | null;
+    owner_id: string | null;
+    statuses: ProjectStatus[];
+    status_filter: ProjectStatus | null;
+    budget_min: string | null;
+    budget_max: string | null;
+    balance_min: string | null;
+    balance_max: string | null;
+    percent_min: string | null;
+    percent_max: string | null;
+    start_from: string | null;
+    start_to: string | null;
+    created_from: string | null;
+    created_to: string | null;
+    has_unpaid: string | null;
+    view: ProjectViewMode;
+}
 
 export interface ProjectsIndexProps {
     projects: ProjectCollection;
@@ -122,7 +150,6 @@ export interface ProjectsIndexProps {
     dir: 'asc' | 'desc';
     perPage: number;
     perPageOptions: number[];
-    filters: {
-        search: string | null;
-    };
+    owners: ProjectOwnerOption[];
+    filters: ProjectFiltersState;
 }

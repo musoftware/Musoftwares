@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
-import { Button } from '@/Components/ui/button';
-import { User, AlertCircle, Download, Archive, ArchiveRestore, Trash2, Edit, Plus, LayoutDashboard } from 'lucide-react';
+import { Button, buttonVariants } from '@/Components/ui/button';
+import { User, AlertCircle, Download, Archive, ArchiveRestore, Trash2, Edit, Plus, LayoutDashboard, SlidersHorizontal, LayoutGrid, Table as TableIcon, ChevronLeft, ChevronRight, FolderKanban } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import {
     Dialog,
@@ -13,19 +13,20 @@ import {
 } from '@/Components/ui/dialog';
 import { DataTable } from '@/Components/ui/DataTable';
 import { Checkbox } from '@/Components/ui/checkbox';
-import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
-import { buttonVariants } from '@/Components/ui/button';
-import { Filter, ChevronDown } from 'lucide-react';
+import { EmptyState } from '@/Components/ui/EmptyState';
 import ProjectActionsSheet from './ProjectActionsSheet';
-import { ProjectFormFields, EMPTY_PROJECT_FORM, formToPayload, projectToForm, PROJECT_STATUS_OPTIONS } from './Components/ProjectFormFields';
+import { ProjectFormFields, EMPTY_PROJECT_FORM, formToPayload, projectToForm } from './Components/ProjectFormFields';
+import { ProjectCard } from './Components/ProjectCard';
+import { ProjectFiltersPanel, type FilterPartial } from './Components/ProjectFiltersPanel';
 import { cn, formatMoney } from '@/lib/utils';
-import { __ } from '@/lib/i18n';
-import type { ProjectsIndexProps, Project } from '@/types/project';
+import type { ProjectsIndexProps, Project, ProjectViewMode } from '@/types/project';
 
 type FormState = ReturnType<typeof projectToForm>;
 
 export default function Index(props: ProjectsIndexProps) {
-    const { projects, currentTab, statusFilter, sort, dir, perPage, perPageOptions, filters } = props;
+    const { projects, currentTab, sort, dir, perPage, perPageOptions, owners, filters } = props;
+    const statusFilter = filters?.status_filter ?? null;
+    const view: ProjectViewMode = filters?.view ?? 'grid';
 
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -35,6 +36,7 @@ export default function Index(props: ProjectsIndexProps) {
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const [filtersOpen, setFiltersOpen] = useState(false);
 
     const openProjectSheet = (project: Project) => {
         setSelectedProject(project);
@@ -103,19 +105,36 @@ export default function Index(props: ProjectsIndexProps) {
         );
     };
 
-    const navigate = (overrides: Record<string, string | number | null | undefined>) => {
-        const base: Record<string, string | number | null | undefined> = {
+    const navigate = (overrides: Record<string, string | number | string[] | null | undefined>) => {
+        const base: Record<string, string | number | string[] | null | undefined> = {
             status: currentTab,
-            status_filter: statusFilter,
+            status_filter: filters?.status_filter ?? statusFilter,
             sort,
             dir,
             per_page: perPage,
+            view,
             search: filters?.search ?? null,
+            client_id: filters?.client_id ?? null,
+            owner_id: filters?.owner_id ?? null,
+            statuses: filters?.statuses ?? null,
+            budget_min: filters?.budget_min ?? null,
+            budget_max: filters?.budget_max ?? null,
+            balance_min: filters?.balance_min ?? null,
+            balance_max: filters?.balance_max ?? null,
+            percent_min: filters?.percent_min ?? null,
+            percent_max: filters?.percent_max ?? null,
+            start_from: filters?.start_from ?? null,
+            start_to: filters?.start_to ?? null,
+            created_from: filters?.created_from ?? null,
+            created_to: filters?.created_to ?? null,
+            has_unpaid: filters?.has_unpaid ?? null,
             page: null,
         };
         const merged = { ...base, ...overrides };
         Object.keys(merged).forEach((k) => {
-            if (merged[k] === null || merged[k] === '' || merged[k] === undefined) delete merged[k];
+            const v = merged[k];
+            if (v === null || v === undefined || v === '') delete merged[k];
+            else if (Array.isArray(v) && v.length === 0) delete merged[k];
         });
         router.get(route('admin.projects.index'), merged, { preserveState: true, replace: true });
     };
@@ -137,16 +156,86 @@ export default function Index(props: ProjectsIndexProps) {
         navigate({ search, page: 1 });
     };
 
+    const onFilterChange = (partial: FilterPartial) => {
+        navigate(partial);
+    };
+
+    const clearFilters = () => {
+        navigate({
+            search: null,
+            client_id: null,
+            owner_id: null,
+            statuses: null,
+            status_filter: null,
+            budget_min: null,
+            budget_max: null,
+            balance_min: null,
+            balance_max: null,
+            percent_min: null,
+            percent_max: null,
+            start_from: null,
+            start_to: null,
+            created_from: null,
+            created_to: null,
+            has_unpaid: null,
+            page: 1,
+        });
+    };
+
+    const activeFilterCount = useMemo(() => {
+        const f = filters;
+        if (!f) return 0;
+        let n = 0;
+        if (f.search) n++;
+        if (f.client_id) n++;
+        if (f.owner_id) n++;
+        if ((f.statuses?.length ?? 0) > 0) n++;
+        if (f.status_filter) n++;
+        if (f.budget_min || f.budget_max) n++;
+        if (f.balance_min || f.balance_max) n++;
+        if (f.percent_min || f.percent_max) n++;
+        if (f.start_from || f.start_to) n++;
+        if (f.created_from || f.created_to) n++;
+        if (f.has_unpaid) n++;
+        return n;
+    }, [filters]);
+
+    const meta = projects.meta;
+    const currentPage = meta?.current_page ?? 1;
+    const lastPage = meta?.last_page ?? 1;
+    const onGridPage = (page: number) => {
+        if (page < 1 || page > lastPage) return;
+        navigate({ page });
+    };
+
     const exportHref = useMemo(() => {
         const params = new URLSearchParams({
             status: currentTab,
             sort: String(sort),
-            dir: dir,
+            dir,
         });
-        if (statusFilter) params.set('status_filter', statusFilter);
-        if (filters?.search) params.set('search', filters.search);
+        const f = filters;
+        const set = (key: string, val: string | null | undefined) => {
+            if (val !== null && val !== undefined && val !== '') params.set(key, val);
+        };
+        set('search', f?.search);
+        set('client_id', f?.client_id);
+        set('owner_id', f?.owner_id);
+        set('status_filter', f?.status_filter);
+        (f?.statuses ?? []).forEach((s) => params.append('statuses[]', s));
+        set('budget_min', f?.budget_min);
+        set('budget_max', f?.budget_max);
+        set('balance_min', f?.balance_min);
+        set('balance_max', f?.balance_max);
+        set('percent_min', f?.percent_min);
+        set('percent_max', f?.percent_max);
+        set('start_from', f?.start_from);
+        set('start_to', f?.start_to);
+        set('created_from', f?.created_from);
+        set('created_to', f?.created_to);
+        if (f?.has_unpaid) params.set('has_unpaid', '1');
         return `${route('admin.projects.export')}?${params.toString()}`;
-    }, [currentTab, sort, dir, statusFilter, filters?.search]);
+    }, [currentTab, sort, dir, filters]);
 
     const allOnPageSelected = projects.data.length > 0 && projects.data.every((p) => selectedIds.includes(p.id));
 
@@ -276,7 +365,7 @@ export default function Index(props: ProjectsIndexProps) {
     return (
         <AdminSidebarLayout title={__('general.projects')} header="Projects Manager">
             <Head title={__('general.projects')} />
-            <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex flex-wrap items-center gap-2">
                     <div className="flex space-x-2">
                         {(['active', 'archived', 'all'] as const).map((tab) => (
@@ -295,32 +384,48 @@ export default function Index(props: ProjectsIndexProps) {
                         ))}
                     </div>
 
-                    <Popover>
-                        <PopoverTrigger className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1')}>
-                            <Filter className="h-3.5 w-3.5" />
-                            {__('general.status')}: {statusFilter ? statusFilter.replace('_', ' ') : __('general.all')}
-                            <ChevronDown className="h-3.5 w-3.5 opacity-60" />
-                        </PopoverTrigger>
-                        <PopoverContent align="start" className="w-48 p-2">
-                            <div className="flex flex-col">
-                                <button
-                                    onClick={() => navigate({ status_filter: null, page: 1 })}
-                                    className={cn('rounded px-2 py-1.5 text-start text-sm hover:bg-slate-100', !statusFilter && 'bg-slate-100 font-medium')}
-                                >
-                                    {__('general.all')}
-                                </button>
-                                {PROJECT_STATUS_OPTIONS.map((s) => (
-                                    <button
-                                        key={s}
-                                        onClick={() => navigate({ status_filter: s, page: 1 })}
-                                        className={cn('rounded px-2 py-1.5 text-start text-sm capitalize hover:bg-slate-100', statusFilter === s && 'bg-slate-100 font-medium')}
-                                    >
-                                        {s.replace('_', ' ')}
-                                    </button>
-                                ))}
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+                    <Button
+                        variant={filtersOpen ? 'default' : 'outline'}
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={() => setFiltersOpen((v) => !v)}
+                    >
+                        <SlidersHorizontal className="h-3.5 w-3.5" />
+                        {__('general.filters')}
+                        {activeFilterCount > 0 && (
+                            <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-600 px-1 text-[10px] font-bold text-white">
+                                {activeFilterCount}
+                            </span>
+                        )}
+                    </Button>
+
+                    {/* View toggle */}
+                    <div className="flex items-center rounded-md border border-slate-200 bg-white p-0.5">
+                        <button
+                            type="button"
+                            onClick={() => navigate({ view: 'grid' })}
+                            className={cn(
+                                'inline-flex h-7 items-center gap-1 rounded px-2 text-xs font-medium transition-colors',
+                                view === 'grid' ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-slate-900',
+                            )}
+                            aria-label={__('general.grid_view')}
+                            title={__('general.grid_view')}
+                        >
+                            <LayoutGrid className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => navigate({ view: 'table' })}
+                            className={cn(
+                                'inline-flex h-7 items-center gap-1 rounded px-2 text-xs font-medium transition-colors',
+                                view === 'table' ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-slate-900',
+                            )}
+                            aria-label={__('general.table_view')}
+                            title={__('general.table_view')}
+                        >
+                            <TableIcon className="h-3.5 w-3.5" />
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -340,6 +445,21 @@ export default function Index(props: ProjectsIndexProps) {
                     </Button>
                 </div>
             </div>
+
+            {filtersOpen && (
+                <div className="mb-4">
+                    <ProjectFiltersPanel
+                        filters={filters ?? ({} as typeof filters)}
+                        owners={owners ?? []}
+                        perPageOptions={perPageOptions ?? [15]}
+                        sort={sort}
+                        dir={dir}
+                        perPage={perPage}
+                        onChange={onFilterChange}
+                        onClear={clearFilters}
+                    />
+                </div>
+            )}
 
             {selectedIds.length > 0 && (
                 <div className="mb-3 flex items-center justify-between rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm text-indigo-900">
@@ -365,32 +485,102 @@ export default function Index(props: ProjectsIndexProps) {
                 </div>
             )}
 
-            <div className="mb-4">
-                <DataTable
-                    columns={columns}
-                    data={projects.data}
-                    pagination={projects}
-                    filters={{
-                        ...(filters ?? {}),
-                        extra: (
+            {view === 'grid' ? (
+                projects.data.length > 0 ? (
+                    <div className="mb-4">
+                        <div className="mb-4 flex items-center justify-between gap-3">
                             <button
                                 onClick={toggleAllOnPage}
                                 className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1')}
                             >
                                 {allOnPageSelected ? __('general.deselect_all') : __('general.select_all_on_page')}
                             </button>
-                        ),
-                        sort,
-                        dir,
-                    }}
-                    onSearch={onSearch}
-                    onSort={onSort}
-                    onPageChange={onPageChange}
-                    onPerPageChange={onPerPageChange}
-                    emptyTitle={__('general.no_projects_found')}
-                    emptyDescription={__('general.create_first_project_cta')}
-                />
-            </div>
+                            {meta && (
+                                <span className="text-xs text-slate-400">
+                                    {meta.from ?? 0}–{meta.to ?? 0} / <span className="font-medium text-slate-600">{meta.total}</span>
+                                </span>
+                            )}
+                        </div>
+                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                            {projects.data.map((project) => (
+                                <ProjectCard
+                                    key={project.id}
+                                    project={project}
+                                    isSelected={selectedIds.includes(project.id)}
+                                    onSelect={toggleSelected}
+                                    onEdit={openEditModal}
+                                    onOpenBoard={openProjectSheet}
+                                    onArchive={handleArchive}
+                                    onRestore={handleRestore}
+                                    onDelete={handleDelete}
+                                />
+                            ))}
+                        </div>
+
+                        {lastPage > 1 && (
+                            <div className="mt-6 flex items-center justify-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={currentPage <= 1}
+                                    onClick={() => onGridPage(currentPage - 1)}
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Button>
+                                <span className="text-sm text-slate-600">
+                                    {__('general.page')} <span className="font-semibold text-slate-900">{currentPage}</span> / {lastPage}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={currentPage >= lastPage}
+                                    onClick={() => onGridPage(currentPage + 1)}
+                                >
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="mb-4">
+                        <EmptyState
+                            icon={FolderKanban}
+                            title={__('general.no_projects_found')}
+                            description={__('general.create_first_project_cta')}
+                            action={route('admin.projects.create')}
+                            actionLabel={__('general.create_project')}
+                            actionIcon={Plus}
+                        />
+                    </div>
+                )
+            ) : (
+                <div className="mb-4">
+                    <DataTable
+                        columns={columns}
+                        data={projects.data}
+                        pagination={projects}
+                        filters={{
+                            ...(filters ?? {}),
+                            extra: (
+                                <button
+                                    onClick={toggleAllOnPage}
+                                    className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'gap-1')}
+                                >
+                                    {allOnPageSelected ? __('general.deselect_all') : __('general.select_all_on_page')}
+                                </button>
+                            ),
+                            sort,
+                            dir,
+                        }}
+                        onSearch={onSearch}
+                        onSort={onSort}
+                        onPageChange={onPageChange}
+                        onPerPageChange={onPerPageChange}
+                        emptyTitle={__('general.no_projects_found')}
+                        emptyDescription={__('general.create_first_project_cta')}
+                    />
+                </div>
+            )}
 
             {/* Edit Modal */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>

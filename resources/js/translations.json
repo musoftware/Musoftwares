@@ -8637,7 +8637,18 @@
             "try_changing_filter": "حاول تغيير التصفية أو عبارة البحث.",
             "undone_cards_brought": "تم إحضار :count مهام غير مكتملة إلى الأمام!",
             "user_created_successfully_send_set_password_link": "تم إنشاء المستخدم بنجاح. تم إرسال رابط تعيين كلمة المرور.",
-            "view_report": "عرض التقرير"
+            "view_report": "عرض التقرير",
+            "grid_view": "عرض الشبكة",
+            "table_view": "عرض الجدول",
+            "search_projects": "البحث في المشاريع",
+            "budget_range": "نطاق الميزانية",
+            "balance_range": "نطاق الرصيد",
+            "percentage_range": "نطاق النسبة المئوية",
+            "date_range": "نطاق التاريخ",
+            "has_unpaid_invoices": "يحتوي على فواتير غير مدفوعة",
+            "ascending": "تصاعدي",
+            "descending": "تنازلي",
+            "no_owners": "لا يوجد ملاك"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",
@@ -18016,7 +18027,18 @@
             "todo_added": "Todo added.",
             "todo_updated": "Todo updated.",
             "undone_cards_brought": "Brought :count incomplete tasks forward!",
-            "user_created_successfully_send_set_password_link": "User created successfully. A set-password link has been sent."
+            "user_created_successfully_send_set_password_link": "User created successfully. A set-password link has been sent.",
+            "grid_view": "Grid View",
+            "table_view": "Table View",
+            "search_projects": "Search projects",
+            "budget_range": "Budget range",
+            "balance_range": "Balance range",
+            "percentage_range": "Percentage range",
+            "date_range": "Date range",
+            "has_unpaid_invoices": "Has unpaid invoices",
+            "ascending": "Ascending",
+            "descending": "Descending",
+            "no_owners": "No owners"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",

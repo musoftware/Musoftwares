@@ -7053,4 +7053,17 @@ return [
     'todo_updated' => 'Todo updated.',
     'undone_cards_brought' => 'Brought :count incomplete tasks forward!',
     'user_created_successfully_send_set_password_link' => 'User created successfully. A set-password link has been sent.',
+
+    // Admin Projects — advanced filters & card grid
+    'grid_view' => 'Grid View',
+    'table_view' => 'Table View',
+    'search_projects' => 'Search projects',
+    'budget_range' => 'Budget range',
+    'balance_range' => 'Balance range',
+    'percentage_range' => 'Percentage range',
+    'date_range' => 'Date range',
+    'has_unpaid_invoices' => 'Has unpaid invoices',
+    'ascending' => 'Ascending',
+    'descending' => 'Descending',
+    'no_owners' => 'No owners',
 ];

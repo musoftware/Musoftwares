@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\ProjectBoardService;
 use App\Services\ProjectService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response as ResponseFacade;
@@ -29,9 +30,132 @@ class ProjectController extends Controller
         'date_end' => 'date_end',
         'budget' => 'budget',
         'project_balance' => 'project_balance',
+        'percentage' => 'percentage',
     ];
 
     private const PER_PAGE_OPTIONS = [10, 15, 25, 50, 100];
+
+    private const VALID_STATUSES = ['open', 'hold_on', 'closed'];
+
+    /**
+     * Apply the shared faceted filters to a Project query.
+     *
+     * Used by both index() and export() so the exported CSV always matches the
+     * visible filtered set.
+     */
+    private function applyFilters(Builder $query, Request $request): void
+    {
+        // Client
+        if ($request->filled('client_id')) {
+            $query->where('user_id', $request->integer('client_id'));
+        } elseif ($request->filled('user_id')) {
+            $query->where('user_id', $request->integer('user_id'));
+        }
+
+        // Owner
+        if ($request->filled('owner_id')) {
+            $query->where('owner_id', $request->integer('owner_id'));
+        }
+
+        // Status: prefer multi-statuses[], fall back to single status_filter for backward-compat.
+        // NOTE: we deliberately use "statuses" (not "status") because the tab param
+        // already occupies "status" (active|archived|all) and reusing it would collide
+        // in PHP's $_GET when both a scalar and array are present.
+        $statusList = $request->input('statuses', []);
+        if (is_string($statusList)) {
+            $statusList = array_filter([$statusList]);
+        }
+        $statusList = is_array($statusList)
+            ? array_values(array_intersect($statusList, self::VALID_STATUSES))
+            : [];
+        if (!empty($statusList)) {
+            $query->whereIn('status', $statusList);
+        } else {
+            $statusFilter = $request->get('status_filter');
+            if ($statusFilter && in_array($statusFilter, self::VALID_STATUSES, true)) {
+                $query->where('status', $statusFilter);
+            }
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('project_name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('client', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $this->applyNumericRange($query, $request, 'budget_min', 'budget_max', 'budget');
+        $this->applyNumericRange($query, $request, 'balance_min', 'balance_max', 'project_balance');
+        $this->applyNumericRange($query, $request, 'percent_min', 'percent_max', 'percentage');
+        $this->applyDateRange($query, $request, 'start_from', 'start_to', 'date_start');
+        $this->applyDateRange($query, $request, 'created_from', 'created_to', 'created_at');
+
+        if (filter_var($request->get('has_unpaid'), FILTER_VALIDATE_BOOLEAN)) {
+            $query->whereHas('invoices', fn ($q) => $q->where('status', 'unpaid'));
+        }
+    }
+
+    private function applyNumericRange(Builder $query, Request $request, string $minKey, string $maxKey, string $column): void
+    {
+        $bounds = [];
+        if ($request->filled($minKey) && is_numeric($request->get($minKey))) {
+            $bounds[] = $request->float($minKey);
+        } else {
+            $bounds[] = null;
+        }
+        if ($request->filled($maxKey) && is_numeric($request->get($maxKey))) {
+            $bounds[] = $request->float($maxKey);
+        } else {
+            $bounds[] = null;
+        }
+
+        if ($bounds[0] === null && $bounds[1] === null) {
+            return;
+        }
+
+        if ($bounds[0] !== null && $bounds[1] !== null) {
+            $query->whereBetween($column, $bounds);
+        } elseif ($bounds[0] !== null) {
+            $query->where($column, '>=', $bounds[0]);
+        } else {
+            $query->where($column, '<=', $bounds[1]);
+        }
+    }
+
+    private function applyDateRange(Builder $query, Request $request, string $fromKey, string $toKey, string $column): void
+    {
+        $from = $request->filled($fromKey) ? $this->normalizeDate($request->get($fromKey)) : null;
+        $to = $request->filled($toKey) ? $this->normalizeDate($request->get($toKey)) : null;
+
+        if ($from === null && $to === null) {
+            return;
+        }
+
+        if ($from !== null && $to !== null) {
+            $query->whereBetween($column, [$from, $to]);
+        } elseif ($from !== null) {
+            $query->where($column, '>=', $from);
+        } else {
+            $query->where($column, '<=', $to);
+        }
+    }
+
+    private function normalizeDate(?string $date): ?string
+    {
+        if (!$date) {
+            return null;
+        }
+        try {
+            return Carbon::createFromFormat('!Y-m-d', $date)->toDateString();
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
 
     public function __construct(
         protected ProjectService $projectService,
@@ -63,29 +187,7 @@ class ProjectController extends Controller
             $query->where('archived', 0);
         }
 
-        if ($request->filled('client_id')) {
-            $query->where('user_id', $request->client_id);
-        }
-
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
-        }
-
-        if ($statusFilter && in_array($statusFilter, ['open', 'hold_on', 'closed'], true)) {
-            $query->where('status', $statusFilter);
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('project_name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhereHas('client', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%");
-                    });
-            });
-        }
+        $this->applyFilters($query, $request);
 
         // Sorting
         $sort = $request->get('sort', 'created_at');
@@ -102,6 +204,18 @@ class ProjectController extends Controller
         }
         $projects = $query->paginate($perPage)->withQueryString();
 
+        // Owners list: only staff who actually own at least one (non-archived-aware) project.
+        $owners = User::whereIn('id', Project::whereNotNull('owner_id')->distinct()->pluck('owner_id'))
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->map(fn ($u) => ['id' => $u->id, 'name' => $u->name])
+            ->values();
+
+        $statusInput = $request->input('statuses', []);
+        $statusArray = is_array($statusInput)
+            ? array_values(array_filter(array_map('strval', $statusInput)))
+            : [];
+
         return Inertia::render('Admin/Projects/Index', [
             'projects' => new ProjectCollection($projects),
             'currentTab' => $tab,
@@ -110,10 +224,36 @@ class ProjectController extends Controller
             'dir' => $dir,
             'perPage' => $perPage,
             'perPageOptions' => self::PER_PAGE_OPTIONS,
+            'owners' => $owners,
             'filters' => [
                 'search' => $request->search,
+                'client_id' => $request->filled('client_id') ? (string) $request->integer('client_id') : ($request->filled('user_id') ? (string) $request->integer('user_id') : null),
+                'owner_id' => $request->filled('owner_id') ? (string) $request->integer('owner_id') : null,
+                'statuses' => $statusArray,
+                'status_filter' => $statusFilter,
+                'budget_min' => self::presentInput($request, 'budget_min'),
+                'budget_max' => self::presentInput($request, 'budget_max'),
+                'balance_min' => self::presentInput($request, 'balance_min'),
+                'balance_max' => self::presentInput($request, 'balance_max'),
+                'percent_min' => self::presentInput($request, 'percent_min'),
+                'percent_max' => self::presentInput($request, 'percent_max'),
+                'start_from' => self::presentInput($request, 'start_from'),
+                'start_to' => self::presentInput($request, 'start_to'),
+                'created_from' => self::presentInput($request, 'created_from'),
+                'created_to' => self::presentInput($request, 'created_to'),
+                'has_unpaid' => filter_var($request->get('has_unpaid'), FILTER_VALIDATE_BOOLEAN) ? '1' : null,
+                'view' => in_array($request->get('view'), ['grid', 'table'], true) ? $request->get('view') : 'grid',
             ],
         ]);
+    }
+
+    private static function presentInput(Request $request, string $key): ?string
+    {
+        if (!$request->filled($key)) {
+            return null;
+        }
+
+        return (string) $request->get($key);
     }
 
     public function create(Request $request)
@@ -217,16 +357,8 @@ class ProjectController extends Controller
         } elseif ($tab !== 'all') {
             $query->where('archived', 0);
         }
-        if ($request->filled('status_filter') && in_array($request->status_filter, ['open', 'hold_on', 'closed'], true)) {
-            $query->where('status', $request->status_filter);
-        }
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('project_name', 'like', "%{$search}%")
-                    ->orWhereHas('client', fn ($q) => $q->where('name', 'like', "%{$search}%"));
-            });
-        }
+
+        $this->applyFilters($query, $request);
 
         $sort = $request->get('sort', 'created_at');
         $dir = strtolower($request->get('dir', 'desc')) === 'asc' ? 'asc' : 'desc';

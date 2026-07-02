@@ -7019,4 +7019,17 @@ return [
     'undone_cards_brought' => 'تم إحضار :count مهام غير مكتملة إلى الأمام!',
     'user_created_successfully_send_set_password_link' => 'تم إنشاء المستخدم بنجاح. تم إرسال رابط تعيين كلمة المرور.',
     'view_report' => 'عرض التقرير',
+
+    // Admin Projects — advanced filters & card grid
+    'grid_view' => 'عرض الشبكة',
+    'table_view' => 'عرض الجدول',
+    'search_projects' => 'البحث في المشاريع',
+    'budget_range' => 'نطاق الميزانية',
+    'balance_range' => 'نطاق الرصيد',
+    'percentage_range' => 'نطاق النسبة المئوية',
+    'date_range' => 'نطاق التاريخ',
+    'has_unpaid_invoices' => 'يحتوي على فواتير غير مدفوعة',
+    'ascending' => 'تصاعدي',
+    'descending' => 'تنازلي',
+    'no_owners' => 'لا يوجد ملاك',
 ];
