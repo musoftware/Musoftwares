@@ -13,7 +13,7 @@ class AddRecurringSalaries extends Command
 
     public function handle(): int
     {
-        foreach (RecurringSalary::all() as $salary) {
+        foreach (RecurringSalary::where('is_active', true)->get() as $salary) {
             $salary->apply();
         }
 

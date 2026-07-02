@@ -28,7 +28,7 @@ class AddRecurringCosts extends Command
      */
     public function handle()
     {
-        foreach (RecurringCost::all() as $item) {
+        foreach (RecurringCost::where('is_active', true)->get() as $item) {
             $item->apply();
         }
 

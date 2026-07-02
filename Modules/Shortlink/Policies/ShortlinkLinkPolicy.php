@@ -9,8 +9,8 @@ class ShortlinkLinkPolicy
 {
     /**
      * Administrators may manage every short link. Everyone else is denied
-     * (the route middleware already gates on role:admin; this is the
-     * application-layer defense-in-depth).
+     * (the route middleware already gates on the admin middleware; this is
+     * the application-layer defense-in-depth).
      */
     public function before(User $user, string $ability): ?bool
     {

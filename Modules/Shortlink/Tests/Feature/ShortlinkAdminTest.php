@@ -28,6 +28,16 @@ class ShortlinkAdminTest extends TestCase
         return $admin;
     }
 
+    private function superAdmin(): User
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+        $user->assignRole('super_admin');
+
+        return $user;
+    }
+
     private function client(): User
     {
         $client = User::factory()->create([
@@ -53,6 +63,13 @@ class ShortlinkAdminTest extends TestCase
     public function test_admin_can_view_index(): void
     {
         $this->actingAs($this->admin())
+            ->get(route('admin.shortlinks.index'))
+            ->assertOk();
+    }
+
+    public function test_super_admin_can_view_index(): void
+    {
+        $this->actingAs($this->superAdmin())
             ->get(route('admin.shortlinks.index'))
             ->assertOk();
     }

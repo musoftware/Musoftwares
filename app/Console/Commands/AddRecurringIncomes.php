@@ -28,7 +28,7 @@ class AddRecurringIncomes extends Command
      */
     public function handle()
     {
-        foreach (RecurringIncome::all() as $item) {
+        foreach (RecurringIncome::where('is_active', true)->get() as $item) {
             $item->apply();
         }
 
