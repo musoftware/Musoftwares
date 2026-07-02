@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Project;
+use App\Services\ProjectBoardService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+
+class PublicProjectBoardController extends Controller
+{
+    public function __construct(
+        protected ProjectBoardService $boardService
+    ) {}
+
+    public function show(Request $request, string $token, string $date)
+    {
+        $project = Project::where('share_token', $token)->firstOrFail();
+
+        try {
+            $dateCarbon = Carbon::createFromFormat('!Y-m-d', $date);
+        } catch (\Throwable $e) {
+            $dateCarbon = Carbon::today();
+        }
+
+        $cards = $this->boardService->cardsForDate($project, $dateCarbon, applyFutureGating: false);
+
+        $project->loadCount(['tasks', 'reports', 'files']);
+        $currency = $project->currencyRow();
+
+        return Inertia::render('Public/SharedBoard', [
+            'project' => [
+                'id' => $project->id,
+                'name' => $project->project_name,
+                'description' => $project->description,
+                'status' => $project->status,
+                'share_token' => $project->share_token,
+                'client_name' => $project->client?->name,
+                'owner_name' => $project->owner?->name,
+                'currency' => $currency ? [
+                    'id' => $currency->id,
+                    'currency' => $currency->currency,
+                    'symbol' => $currency->symbol,
+                    'string_format' => $currency->string_format,
+                ] : null,
+            ],
+            'date' => $dateCarbon->toDateString(),
+            'lanes' => $this->boardService->lanes(),
+            'cards' => $cards,
+        ]);
+    }
+}
