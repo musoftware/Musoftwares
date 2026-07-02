@@ -1,18 +1,29 @@
 import { useEffect, useRef } from 'react';
 import { usePage } from '@inertiajs/react';
 import { useToast } from '@/Components/ui/use-toast';
+import { __ } from '@/lib/i18n';
+
+type FlashBag = {
+    message?: string;
+    success?: string;
+    error?: string;
+    danger?: string;
+    warning?: string;
+    info?: string;
+    [key: string]: unknown;
+};
 
 export function useInertiaNotifications() {
-    const { flash, errors } = usePage().props as any;
+    const { flash, errors } = usePage().props as { flash?: FlashBag; errors?: Record<string, string> };
     const { toast } = useToast();
-    
-    // Use refs to track what we have already toasted to avoid duplicate toasts
+
     const lastToastRef = useRef<{
         message?: string;
         success?: string;
         error?: string;
         danger?: string;
         warning?: string;
+        info?: string;
         errorsSerialized?: string;
     }>({});
 
@@ -34,16 +45,20 @@ export function useInertiaNotifications() {
             lastToastRef.current.danger = flash.danger;
         }
         if (flash?.warning && lastToastRef.current.warning !== flash.warning) {
-            toast({ description: flash.warning, variant: 'default' }); // could be yellow if warning variant exists, default is safe
+            toast({ description: flash.warning });
             lastToastRef.current.warning = flash.warning;
         }
+        if (flash?.info && lastToastRef.current.info !== flash.info) {
+            toast({ description: flash.info });
+            lastToastRef.current.info = flash.info;
+        }
 
-        // Reset tracking for fields that have been cleared
         if (!flash?.message) lastToastRef.current.message = undefined;
         if (!flash?.success) lastToastRef.current.success = undefined;
         if (!flash?.error) lastToastRef.current.error = undefined;
         if (!flash?.danger) lastToastRef.current.danger = undefined;
         if (!flash?.warning) lastToastRef.current.warning = undefined;
+        if (!flash?.info) lastToastRef.current.info = undefined;
     }, [flash, toast]);
 
     useEffect(() => {
@@ -52,14 +67,14 @@ export function useInertiaNotifications() {
             if (lastToastRef.current.errorsSerialized !== errorsSerialized) {
                 if (errors.error) {
                     toast({
-                        title: 'System Error',
+                        title: __('general.system_error'),
                         description: errors.error,
                         variant: 'destructive',
                     });
                 } else {
                     const firstVal = Object.values(errors)[0];
                     toast({
-                        title: 'Validation Error',
+                        title: __('general.please_fix_the_following'),
                         description: firstVal as string,
                         variant: 'destructive',
                     });

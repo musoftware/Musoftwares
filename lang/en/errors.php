@@ -31,4 +31,10 @@ return [
     'multi_currency_addon_required' => 'Multi-currency addon is required.',
     'cannot_impersonate_admin' => 'You cannot impersonate an administrator.',
     'cannot_impersonate_blocked_user' => 'You cannot impersonate a blocked user.',
+    'page_not_found' => 'The page you are looking for could not be found.',
+    'forbidden' => 'You are not authorized to perform this action.',
+    'too_many_requests' => 'Too many requests. Please slow down and try again shortly.',
+    'service_unavailable' => 'The service is temporarily unavailable. Please try again later.',
+    'page_expired' => 'The page expired, please try again.',
+    'something_went_wrong' => 'Something went wrong. Our team has been notified. Please try again.',
 ];

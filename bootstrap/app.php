@@ -24,6 +24,7 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Spatie\Permission\Middleware\PermissionMiddleware;
@@ -142,13 +143,43 @@ return Application::configure(basePath: dirname(__DIR__))
                 }
 
                 if (class_exists(Inertia::class)) {
-                    return Inertia::render('Error', ['status' => $statusCode])
+                    $translationKey = match (true) {
+                        $statusCode === 404 => 'errors.page_not_found',
+                        $statusCode === 403 => 'errors.forbidden',
+                        $statusCode === 429 => 'errors.too_many_requests',
+                        $statusCode === 503 => 'errors.service_unavailable',
+                        default => 'errors.something_went_wrong',
+                    };
+
+                    $userMessage = Lang::has($translationKey)
+                        ? __($translationKey)
+                        : ($statusCode === 404
+                            ? 'The page you are looking for could not be found.'
+                            : 'Something went wrong. Please try again.');
+
+                    return Inertia::render('Error', [
+                        'status' => $statusCode,
+                        'message' => $userMessage,
+                    ])
                         ->toResponse($request)
-                        ->setStatusCode($statusCode);
+                        ->setStatusCode($statusCode)
+                        ->withHeaders([
+                            'X-Inertia-Flash-Error' => $userMessage,
+                        ]);
                 }
             } elseif ($statusCode === 419) {
                 return back()->with([
-                    'message' => 'The page expired, please try again.',
+                    'message' => __('errors.page_expired'),
+                ]);
+            } elseif ($statusCode >= 500 && ! app()->environment(['local', 'testing'])) {
+                // Unhandled server error on a web request — surface it as a flash
+                // so the admin sees the message in a toast instead of a silent redirect.
+                $message = Lang::has('errors.something_went_wrong')
+                    ? __('errors.something_went_wrong')
+                    : 'Something went wrong. Please try again.';
+
+                return back()->with([
+                    'error' => $message,
                 ]);
             }
 

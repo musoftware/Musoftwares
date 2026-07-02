@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
 
 import { TooltipProvider } from '@/Components/ui/tooltip';
+import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import { __ } from '@/lib/i18n';
 
 interface AdminSidebarLayoutProps extends PropsWithChildren {
@@ -16,6 +17,8 @@ interface AdminSidebarLayoutProps extends PropsWithChildren {
 }
 
 export default function AdminSidebarLayout({ title, header, user, children, actions }: AdminSidebarLayoutProps) {
+    useInertiaNotifications();
+
     const { auth } = usePage<any>().props;
     const currentUser = user || auth?.user;
     const displayName = currentUser?.name || '';

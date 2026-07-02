@@ -3,7 +3,7 @@ import { __ } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
-export default function Error({ status }: { status: number }) {
+export default function Error({ status, message }: { status: number; message?: string }) {
     const title: Record<number, string> = {
         503: '503: Service Unavailable',
         500: '500: Server Error',
@@ -20,7 +20,7 @@ export default function Error({ status }: { status: number }) {
         404: 'Sorry, the page you are looking for could not be found.',
         403: 'Sorry, you are forbidden from accessing this page.',
     };
-    const displayDescription = description[status] || 'An unexpected error occurred.';
+    const displayDescription = message || description[status] || 'An unexpected error occurred.';
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-4 py-12 sm:px-6 lg:px-8 selection:bg-zinc-900 selection:text-white dark:selection:bg-zinc-100 dark:selection:text-zinc-900">

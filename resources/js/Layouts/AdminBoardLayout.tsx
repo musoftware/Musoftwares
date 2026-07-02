@@ -1,5 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import { Head } from '@inertiajs/react';
+import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 
 interface AdminBoardLayoutProps extends PropsWithChildren {
     title?: string;
@@ -11,6 +12,8 @@ interface AdminBoardLayoutProps extends PropsWithChildren {
  * Provides a clean canvas focused 100% on the board.
  */
 export default function AdminBoardLayout({ title, children }: AdminBoardLayoutProps) {
+    useInertiaNotifications();
+
     return (
         <div className="min-h-screen bg-slate-50">
             {title && <Head title={title} />}

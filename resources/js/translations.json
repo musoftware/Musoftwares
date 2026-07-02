@@ -1050,7 +1050,13 @@
             "invalid_currency": "عملة غير صالحة.",
             "multi_currency_addon_required": "إضافة تعدد العملات مطلوبة.",
             "cannot_impersonate_admin": "لا يمكنك انتحال شخصية مسؤول.",
-            "cannot_impersonate_blocked_user": "لا يمكنك انتحال شخصية مستخدم محظور."
+            "cannot_impersonate_blocked_user": "لا يمكنك انتحال شخصية مستخدم محظور.",
+            "page_not_found": "الصفحة التي تبحث عنها غير موجودة.",
+            "forbidden": "ليس لديك صلاحية لتنفيذ هذا الإجراء.",
+            "too_many_requests": "عدد كبير جداً من الطلبات. يرجى المحاولة مرة أخرى بعد قليل.",
+            "service_unavailable": "الخدمة غير متاحة مؤقتاً. يرجى المحاولة لاحقاً.",
+            "page_expired": "انتهت صلاحية الصفحة، يرجى المحاولة مرة أخرى.",
+            "something_went_wrong": "حدث خطأ ما. تم إخطار فريقنا. يرجى المحاولة مرة أخرى."
         },
         "freelance": {
             "new_job_matched_skills": "هناك مشروع جديد يطابق مهاراتك!",
@@ -10349,7 +10355,13 @@
             "invalid_currency": "Invalid currency.",
             "multi_currency_addon_required": "Multi-currency addon is required.",
             "cannot_impersonate_admin": "You cannot impersonate an administrator.",
-            "cannot_impersonate_blocked_user": "You cannot impersonate a blocked user."
+            "cannot_impersonate_blocked_user": "You cannot impersonate a blocked user.",
+            "page_not_found": "The page you are looking for could not be found.",
+            "forbidden": "You are not authorized to perform this action.",
+            "too_many_requests": "Too many requests. Please slow down and try again shortly.",
+            "service_unavailable": "The service is temporarily unavailable. Please try again later.",
+            "page_expired": "The page expired, please try again.",
+            "something_went_wrong": "Something went wrong. Our team has been notified. Please try again."
         },
         "freelance": {
             "new_job_matched_skills": "New Job Matched Your Skills!",
