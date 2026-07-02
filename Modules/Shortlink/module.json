@@ -1,0 +1,11 @@
+{
+    "name": "Shortlink",
+    "alias": "shortlink",
+    "description": "Internal URL shortener for shareable links (signed URLs, marketing, external).",
+    "keywords": ["shortlink", "url", "shortener"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Shortlink\\Providers\\ShortlinkServiceProvider"
+    ],
+    "files": []
+}
